@@ -34,7 +34,7 @@ const Description = styled.div`
   text-overflow: ellipsis;
 `;
 
-const { getRepoUrl, useReposDeleteMutation } = openpitrixStore;
+const { getRepoUrl, useReposDeleteMutation, useRepoSyncMutation } = openpitrixStore;
 export function RepoManage(): JSX.Element {
   const params = useParams();
   const { workspace = '' } = params;
@@ -43,6 +43,7 @@ export function RepoManage(): JSX.Element {
   const [modalType, setModalType] = useState<string>('');
   const [selectedRows, setSelectedRows] = useState<RepoData[]>();
   const { mutateAsync, isLoading } = useReposDeleteMutation(workspace);
+  const { mutateAsync: syncRepo, isLoading: isSyncing } = useRepoSyncMutation(workspace);
   const tableParameters = {
     order: 'creationTimestamp',
     status: 'active',
@@ -60,6 +61,19 @@ export function RepoManage(): JSX.Element {
     authKey,
     params,
     actions: [
+      {
+        key: 'sync',
+        icon: <Icon name="refresh" />,
+        text: t('SYNC_REPOSITORY'),
+        action: 'edit',
+        show: isWorkspaceRepo,
+        disabled: record => isSyncing || record.status?.state === 'syncing',
+        onClick: async (_, record) => {
+          await syncRepo(record.metadata.name);
+          notify.success(t('SYNC_REPOSITORY_TRIGGERED'));
+          tableRef.current?.refetch();
+        },
+      },
       {
         key: 'edit',
         icon: <Icon name="pen" />,

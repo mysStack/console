@@ -1,0 +1,72 @@
+name: Build Personal Console Image
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: Optional branch, tag, or commit SHA; defaults to the branch selected in Actions
+        required: false
+        type: string
+      tag:
+        description: Base image tag (defaults to oci-repo for test builds)
+        required: false
+        default: oci-repo
+        type: string
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    name: Build and publish ks-console
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_ref || github.ref }}
+
+      - name: Generate image tag
+        id: image_tag
+        env:
+          BASE_TAG: ${{ inputs.tag || github.ref_name }}
+        run: echo "value=${BASE_TAG}-$(TZ=Asia/Shanghai date +%Y%m%d)-$(git rev-parse --short=7 HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Prepare console output
+        run: make container-cross
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: mingys
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and publish ks-console
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: build/Dockerfile.dapper
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            docker.io/mingys/ks-console:${{ steps.image_tag.outputs.value }}
+            ghcr.io/mysstack/ks-console:${{ steps.image_tag.outputs.value }}
