@@ -73,6 +73,14 @@ export function useReposDeleteMutation(workspace: string, options?: { onSuccess?
   );
 }
 
+export function useRepoSyncMutation(workspace: string, options?: { onSuccess?: () => void }) {
+  const onSuccess = options?.onSuccess;
+  return useMutation(
+    (repo_name: string) => request.post(getRepoUrl({ workspace, repo_name, name: 'action' })),
+    { onSuccess },
+  );
+}
+
 export function fetchRepoDetail(workspace: string, app_name: string): Record<string, any> {
   const url = getRepoUrl({ workspace, app_name });
 

@@ -16,7 +16,10 @@ module.exports = {
   APP_REPO_STATUS_SUCCESSFUL: '成功',
   APP_REPO_STATUS_FAILED: '失败',
   APP_REPO_STATUS_SYNCING: '同步中',
+  APP_REPO_STATUS_MANUALTRIGGER: '同步中',
   APP_REPO_STATUS_NOSYNC: '不同步',
+  SYNC_REPOSITORY: '立即同步',
+  SYNC_REPOSITORY_TRIGGERED: '同步任务已触发。',
   // List > Add
   ADD_APP_REPO: '添加应用仓库',
   VALIDATE: '验证',

@@ -17,7 +17,10 @@ module.exports = {
   APP_REPO_STATUS_SUCCESSFUL: 'Successful',
   APP_REPO_STATUS_FAILED: 'Failed',
   APP_REPO_STATUS_SYNCING: 'Syncing',
+  APP_REPO_STATUS_MANUALTRIGGER: 'Syncing',
   APP_REPO_STATUS_NOSYNC: 'Out-sync',
+  SYNC_REPOSITORY: 'Sincronizar ahora',
+  SYNC_REPOSITORY_TRIGGERED: 'La sincronización se ha activado.',
   // List > Add
   ADD_APP_REPO: 'Add App Repository',
   VALIDATE: 'Validar',
