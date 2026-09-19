@@ -13,6 +13,7 @@ import StatusIndicator from '../../StatusIndicator';
 import { DataTable } from '../../DataTable';
 import RepoManagementModal from '../../Modals/RepoManagementModal';
 import { DeleteConfirmModal } from '../../Modals/DeleteConfirm';
+import { InfoConfirmModal } from '../../Modals/InfoConfirm';
 import {
   useItemActions,
   useTableActions,
@@ -35,6 +36,11 @@ const Description = styled.div`
 `;
 
 const { getRepoUrl, useReposDeleteMutation, useRepoSyncMutation } = openpitrixStore;
+
+export function isOCIRepo(record: RepoData): boolean {
+  return record.spec.url?.startsWith('oci://') ?? false;
+}
+
 export function RepoManage(): JSX.Element {
   const params = useParams();
   const { workspace = '' } = params;
@@ -69,9 +75,21 @@ export function RepoManage(): JSX.Element {
         show: isWorkspaceRepo,
         disabled: record => isSyncing || record.status?.state === 'syncing',
         onClick: async (_, record) => {
-          await syncRepo(record.metadata.name);
+          await syncRepo({ repo_name: record.metadata.name });
           notify.success(t('SYNC_REPOSITORY_TRIGGERED'));
           tableRef.current?.refetch();
+        },
+      },
+      {
+        key: 'fullSync',
+        icon: <Icon name="refresh" />,
+        text: t('FULL_REFRESH_REPOSITORY'),
+        action: 'edit',
+        show: record => isWorkspaceRepo(record) && isOCIRepo(record),
+        disabled: record => isSyncing || record.status?.state === 'syncing',
+        onClick: (_, record) => {
+          setSelectedRows([record]);
+          setModalType('fullSync');
         },
       },
       {
@@ -231,6 +249,19 @@ export function RepoManage(): JSX.Element {
     tableRef.current?.refetch();
   }
 
+  async function handleFullRepoSync(): Promise<void> {
+    const repo_name = selectedRows?.[0]?.metadata.name;
+
+    if (!repo_name) {
+      return;
+    }
+
+    await syncRepo({ repo_name, mode: 'full' });
+    notify.success(t('SYNC_REPOSITORY_TRIGGERED'));
+    closeModal();
+    tableRef.current?.refetch();
+  }
+
   return (
     <>
       <Banner
@@ -288,6 +319,16 @@ export function RepoManage(): JSX.Element {
           onOk={handleRepoDelete}
           onCancel={closeModal}
           confirmLoading={isLoading}
+        />
+      )}
+      {modalType === 'fullSync' && (
+        <InfoConfirmModal
+          visible={true}
+          title={t('FULL_REFRESH_REPOSITORY_TITLE')}
+          content={t('FULL_REFRESH_REPOSITORY_DESC')}
+          onOk={handleFullRepoSync}
+          onCancel={closeModal}
+          confirmLoading={isSyncing}
         />
       )}
     </>

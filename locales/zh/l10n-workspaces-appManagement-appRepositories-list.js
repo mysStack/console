@@ -20,6 +20,10 @@ module.exports = {
   APP_REPO_STATUS_NOSYNC: '不同步',
   SYNC_REPOSITORY: '立即同步',
   SYNC_REPOSITORY_TRIGGERED: '同步任务已触发。',
+  FULL_REFRESH_REPOSITORY: '全量校验',
+  FULL_REFRESH_REPOSITORY_TITLE: '确认全量校验应用仓库？',
+  FULL_REFRESH_REPOSITORY_DESC:
+    '将重新校验所有 OCI 版本。该操作可能耗时较长，并可能消耗镜像仓库配额。',
   // List > Add
   ADD_APP_REPO: '添加应用仓库',
   VALIDATE: '验证',

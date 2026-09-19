@@ -21,6 +21,10 @@ module.exports = {
   APP_REPO_STATUS_NOSYNC: 'Out-sync',
   SYNC_REPOSITORY: 'Sync now',
   SYNC_REPOSITORY_TRIGGERED: 'Synchronization has been triggered.',
+  FULL_REFRESH_REPOSITORY: 'Full refresh',
+  FULL_REFRESH_REPOSITORY_TITLE: 'Fully refresh this app repository?',
+  FULL_REFRESH_REPOSITORY_DESC:
+    'All OCI versions will be rechecked. This operation may take a long time and consume Registry quota.',
   // List > Add
   ADD_APP_REPO: 'Add App Repository',
   VALIDATE: 'Validate',
