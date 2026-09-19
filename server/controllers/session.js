@@ -363,11 +363,15 @@ const handleLogout = async ctx => {
     const { origin = '', referer = '' } = ctx.headers;
     const refererPath = referer.replace(origin, '');
 
-    await sendGatewayRequest({
-      method: 'GET',
-      url: '/oauth/logout',
-      token,
-    });
+    try {
+      await sendGatewayRequest({
+        method: 'GET',
+        url: '/oauth/logout',
+        token,
+      });
+    } catch {
+      // Cookies have already been cleared. A stale backend token must not block local logout.
+    }
 
     if (isAppsRoute(refererPath)) {
       ctx.redirect(refererPath);
