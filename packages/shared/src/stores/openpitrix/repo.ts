@@ -73,10 +73,25 @@ export function useReposDeleteMutation(workspace: string, options?: { onSuccess?
   );
 }
 
+export function getRepoSyncUrl(
+  workspace: string,
+  repo_name: string,
+  mode?: 'incremental' | 'full',
+): string {
+  const url = getRepoUrl({ workspace, repo_name, name: 'action' });
+
+  return mode === 'full' ? `${url}?mode=full` : url;
+}
+
+type RepoSyncProps = {
+  repo_name: string;
+  mode?: 'incremental' | 'full';
+};
+
 export function useRepoSyncMutation(workspace: string, options?: { onSuccess?: () => void }) {
   const onSuccess = options?.onSuccess;
   return useMutation(
-    (repo_name: string) => request.post(getRepoUrl({ workspace, repo_name, name: 'action' })),
+    ({ repo_name, mode }: RepoSyncProps) => request.post(getRepoSyncUrl(workspace, repo_name, mode)),
     { onSuccess },
   );
 }
