@@ -30,7 +30,7 @@ export const Horizon = styled.div`
 
 export const InputWrapper = styled(Horizon)`
   flex: 1;
-  max-width: none;
+  max-width: 455px;
 
   .input-wrapper {
     flex: 1;

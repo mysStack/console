@@ -36,9 +36,12 @@ export function getRepoCredentialUrl(workspace: string, name?: string): string {
 }
 
 export function useRepoCredentials(workspace: string) {
-  return useQuery(
+  return useQuery<{ items: { metadata: { name: string } }[] }>(
     ['repo-credentials', workspace],
-    () => request.get(getRepoCredentialUrl(workspace)).then(({ data }) => data),
+    () =>
+      request.get(getRepoCredentialUrl(workspace)) as unknown as Promise<{
+        items: { metadata: { name: string } }[];
+      }>,
     {
       enabled: true,
     },
@@ -50,8 +53,7 @@ export function useRepoCredentialMutation(
   options?: { onSuccess?: (data: any) => void },
 ) {
   return useMutation(
-    (params: Record<string, any>) =>
-      request.post(getRepoCredentialUrl(workspace), params).then(({ data }) => data),
+    (params: Record<string, any>) => request.post(getRepoCredentialUrl(workspace), params),
     {
       onSuccess: options?.onSuccess,
     },

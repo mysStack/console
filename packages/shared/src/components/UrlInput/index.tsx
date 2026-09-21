@@ -227,7 +227,7 @@ function UrlInput({
   return (
     <>
       <UrlItem className={getInputWrapperCls()}>
-        <Label>{t('REPOSITORY_URL')}</Label>
+        <Label>{t('URL')}</Label>
         <Horizon>
           <InputWrapper className="input-wrapper">
             <Select value={urlType} options={protocols} onChange={handleTypeChange} />
@@ -241,7 +241,7 @@ function UrlInput({
           </InputWrapper>
           {!isS3Type && (
             <Button onClick={handleVerify} disabled={disableVerify()}>
-              {t('TEST_CONNECTION')}
+              {t('VALIDATE')}
             </Button>
           )}
         </Horizon>
@@ -274,7 +274,7 @@ function UrlInput({
             </div>
           </InputWrapper>
           <Button onClick={handleVerify} disabled={disableVerify()}>
-            {t('TEST_CONNECTION')}
+            {t('VALIDATE')}
           </Button>
         </AccessItem>
       )}
