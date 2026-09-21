@@ -29,7 +29,11 @@ function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.El
   const [form] = useForm();
   const { workspace = '' } = useParams();
 
-  const { data: credentialsData, refetch: refetchCredentials } = useRepoCredentials(workspace);
+  const {
+    data: credentialsData,
+    isLoading: isCredentialsLoading,
+    refetch: refetchCredentials,
+  } = useRepoCredentials(workspace);
 
   const getType = useMemo(() => {
     let type = 'https';
@@ -40,7 +44,7 @@ function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.El
       }
     }
     return type;
-  }, []);
+  }, [detail]);
 
   function getFormData(data: any) {
     const labels = { 'kubesphere.io/workspace': workspace || 'system-workspace' };
@@ -65,14 +69,15 @@ function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.El
   }
 
   const initFormData = getFormData(detail);
-
+  const [currentFormData, setCurrentFormData] = useState<RepoData>(initFormData);
+  const [credentialModalVisible, setCredentialModalVisible] = useState(false);
+  const [createdCredential, setCreatedCredential] = useState<{ metadata: { name: string } }>();
+  const [isUrlValidated, setIsUrlValidated] = useState(false);
   const urlFormData = {
-    url: detail?.spec.url,
+    url: currentFormData.spec.url,
     credential: '{}',
     type: getType,
   };
-  const [currentFormData, setCurrentFormData] = useState<RepoData>(initFormData);
-  const [credentialModalVisible, setCredentialModalVisible] = useState(false);
   const { mutate, isLoading } = useRepoMutation(workspace, {
     onSuccess: () => onOk?.(),
   });
@@ -100,6 +105,7 @@ function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.El
     const forms = { ...currentFormData };
     forms.spec.url = url;
     setCurrentFormData(forms);
+    setIsUrlValidated(false);
   }
 
   function handleValuesChange(values: any): void {
@@ -125,11 +131,20 @@ function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.El
         credentialSecretRef: name ? { name } : undefined,
       },
     }));
+    setIsUrlValidated(false);
   }
+
+  const credentials = [
+    ...(createdCredential ? [createdCredential] : []),
+    ...(credentialsData?.items || []),
+  ].filter(
+    (credential, index, all) =>
+      all.findIndex(item => item.metadata.name === credential.metadata.name) === index,
+  );
 
   const credentialOptions = [
     { label: t('NO_REPO_CREDENTIAL'), value: '' },
-    ...(credentialsData?.items || []).map((credential: { metadata: { name: string } }) => ({
+    ...credentials.map((credential: { metadata: { name: string } }) => ({
       label: credential.metadata.name,
       value: credential.metadata.name,
     })),
@@ -140,6 +155,9 @@ function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.El
       const params = { ...currentFormData };
       if (params.spec.name && !params.metadata.name) {
         params.metadata.name = params.spec.name;
+      }
+      if (!isUrlValidated) {
+        return;
       }
       if (detail?.metadata.name) {
         // params.metadata.annotations = {
@@ -161,6 +179,7 @@ function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.El
       titleIcon={<Firewall size={20} />}
       title={t(detail ? 'EDIT_APP_REPO' : 'ADD_APP_REPO')}
       confirmLoading={isLoading}
+      okButtonProps={{ disabled: !isUrlValidated }}
     >
       <StyledForm form={form} initialValues={initFormData} onValuesChange={handleValuesChange}>
         <FormItem
@@ -183,6 +202,10 @@ function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.El
           formData={currentFormData}
           urlFormData={urlFormData}
           onChange={handleUrlChange}
+          onValidate={setIsUrlValidated}
+          validationKey={`${currentFormData.spec.url || ''}:${
+            currentFormData.spec.credentialSecretRef?.name || ''
+          }`}
           isSubmitting={isLoading}
         />
         <FormItem label={t('ACCESS_CREDENTIAL')}>
@@ -192,6 +215,7 @@ function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.El
               className="credential-select"
               value={currentFormData.spec.credentialSecretRef?.name || ''}
               options={credentialOptions}
+              disabled={isCredentialsLoading}
               onChange={(value: string) => handleCredentialChange(value || undefined)}
             />
             <Button variant="text" onClick={() => setCredentialModalVisible(true)}>
@@ -223,9 +247,10 @@ function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.El
         workspace={workspace}
         onCancel={() => setCredentialModalVisible(false)}
         onCreated={credential => {
+          setCreatedCredential(credential);
           handleCredentialChange(credential.metadata.name);
           setCredentialModalVisible(false);
-          refetchCredentials();
+          void refetchCredentials();
         }}
       />
     </Modal>
