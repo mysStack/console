@@ -8,13 +8,22 @@ import { get } from 'lodash';
 import { Firewall } from '@kubed/icons';
 import { useParams } from 'react-router-dom';
 import { RuleObject } from 'rc-field-form/lib/interface';
-import { FormItem, Input, Modal, useForm, Textarea } from '@kubed/components';
+import {
+  Button,
+  FormItem,
+  Input,
+  Modal,
+  Select,
+  Switch,
+  useForm,
+  Textarea,
+} from '@kubed/components';
 import UrlInput from '../../../components/UrlInput';
 import TimeInput from '../../../components/TimeInput';
 import { Pattern } from '../../../constants';
 import { openpitrixStore } from '../../../stores';
 import type { RepoData } from '../../../types';
-import { StyledForm } from './styles';
+import { BasicInfoGrid, CredentialCard, SectionTitle, StyledForm, SyncRow } from './styles';
 import RepoCredentialModal from './RepoCredentialModal';
 
 type Props = {
@@ -127,6 +136,21 @@ function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.El
     }));
   }
 
+  function handleAutoSyncChange(enabled: boolean) {
+    const syncPeriod = enabled ? Number(currentFormData.spec.syncPeriod) || 600 : 0;
+    form.setFieldsValue({ spec: { syncPeriod } });
+    handleValuesChange({ spec: { syncPeriod } });
+  }
+
+  const autoSync = Number(currentFormData.spec.syncPeriod) > 0;
+  const credentialOptions = [
+    { label: t('NO_REPO_CREDENTIAL'), value: '' },
+    ...(credentialsData?.items || []).map((credential: { metadata: { name: string } }) => ({
+      label: credential.metadata.name,
+      value: credential.metadata.name,
+    })),
+  ];
+
   function handleOk(): void {
     form.validateFields().then(() => {
       const params = { ...currentFormData };
@@ -146,7 +170,7 @@ function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.El
 
   return (
     <Modal
-      width={691}
+      width={840}
       visible={visible}
       onOk={handleOk}
       onCancel={onCancel}
@@ -155,43 +179,65 @@ function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.El
       confirmLoading={isLoading}
     >
       <StyledForm form={form} initialValues={initFormData} onValuesChange={handleValuesChange}>
-        <FormItem
-          name={['spec', 'name']}
-          label={t('NAME')}
-          rules={[
-            { required: true, message: t('NAME_EMPTY_DESC') },
-            {
-              pattern: Pattern.PATTERN_SERVICE_NAME,
-              message: t('PROJECT_NAME_INVALID_DESC'),
-            },
-          ]}
-        >
-          <Input autoFocus={true} disabled={!!detail?.metadata.name} />
-        </FormItem>
-        <FormItem name={['metadata', 'annotations', 'kubesphere.io/alias-name']} label={t('ALIAS')}>
-          <Input />
-        </FormItem>
+        <SectionTitle>{t('BASIC_INFORMATION')}</SectionTitle>
+        <BasicInfoGrid>
+          <FormItem
+            name={['spec', 'name']}
+            label={t('NAME')}
+            rules={[
+              { required: true, message: t('NAME_EMPTY_DESC') },
+              {
+                pattern: Pattern.PATTERN_SERVICE_NAME,
+                message: t('PROJECT_NAME_INVALID_DESC'),
+              },
+            ]}
+          >
+            <Input autoFocus={true} disabled={!!detail?.metadata.name} />
+          </FormItem>
+          <FormItem
+            name={['metadata', 'annotations', 'kubesphere.io/alias-name']}
+            label={t('ALIAS')}
+          >
+            <Input />
+          </FormItem>
+        </BasicInfoGrid>
+        <SectionTitle>{t('REPOSITORY_CONFIGURATION')}</SectionTitle>
         <UrlInput
           formData={currentFormData}
           urlFormData={urlFormData}
           onChange={handleUrlChange}
           isSubmitting={isLoading}
-          credentialName={currentFormData.spec.credentialSecretRef?.name}
-          credentialOptions={credentialsData?.items || []}
-          onCredentialChange={handleCredentialChange}
-          onCreateCredential={() => setCredentialModalVisible(true)}
         />
-        <FormItem
-          name={['spec', 'syncPeriod']}
-          label={t('SYNC_INTERVAL')}
-          help={t('SYNC_INTERVAL_DESC')}
-          rules={[
-            { required: true, message: t('SYNC_PERIOD_EMPTY_DESC') },
-            { validator: timeValidator },
-          ]}
-        >
-          <TimeInput hideSeconds />
-        </FormItem>
+        <SectionTitle>{t('ACCESS_CREDENTIAL')}</SectionTitle>
+        <CredentialCard>
+          <span>🔒</span>
+          <Select
+            className="credential-select"
+            value={currentFormData.spec.credentialSecretRef?.name || ''}
+            options={credentialOptions}
+            onChange={(value: string) => handleCredentialChange(value || undefined)}
+          />
+          <Button variant="text" onClick={() => setCredentialModalVisible(true)}>
+            {t('NEW_REPO_CREDENTIAL')}
+          </Button>
+        </CredentialCard>
+        <SectionTitle>{t('SYNC_SETTINGS')}</SectionTitle>
+        <SyncRow>
+          <Switch checked={autoSync} onChange={handleAutoSyncChange} />
+          <span>{t('AUTO_SYNC')}</span>
+          {autoSync && (
+            <FormItem
+              name={['spec', 'syncPeriod']}
+              rules={[
+                { required: true, message: t('SYNC_PERIOD_EMPTY_DESC') },
+                { validator: timeValidator },
+              ]}
+            >
+              <TimeInput hideSeconds />
+            </FormItem>
+          )}
+        </SyncRow>
+        <SectionTitle>{t('OTHER')}</SectionTitle>
         <FormItem
           name={['spec', 'description']}
           label={t('DESCRIPTION')}
