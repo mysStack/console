@@ -150,6 +150,7 @@ function UrlInput({
     const requestId = validationRequestId.current + 1;
     validationRequestId.current = requestId;
     setValidateStatus('validating');
+    onValidate?.(false);
     validateRepoUrl(workspace, formData)
       .then(({ ok, errorCode }: any) => {
         if (requestId === validationRequestId.current) {
@@ -229,12 +230,16 @@ function UrlInput({
           </InputWrapper>
           {!isS3Type && (
             <Button onClick={handleVerify} disabled={disableVerify()}>
-              {t('VALIDATE')}
+              {validateStatus === 'validating' ? t('VALIDATING') : t('VALIDATE')}
             </Button>
           )}
         </Horizon>
         {hasHttpStr ? (
           <ErrorLi>{t('REPO_URL_ERR_TIP')}</ErrorLi>
+        ) : validateStatus === 'error' ? (
+          <ErrorLi role="alert" aria-live="assertive">
+            {checkRepoInvalidReason(validateStatusCode || -1)}
+          </ErrorLi>
         ) : (
           <Help>{t('APP_REPO_URL_DESC')}</Help>
         )}
@@ -262,7 +267,7 @@ function UrlInput({
             </div>
           </InputWrapper>
           <Button onClick={handleVerify} disabled={disableVerify()}>
-            {t('VALIDATE')}
+            {validateStatus === 'validating' ? t('VALIDATING') : t('VALIDATE')}
           </Button>
         </AccessItem>
       )}

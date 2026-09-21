@@ -59,3 +59,9 @@ export const CredentialCard = styled.div`
     }
   }
 `;
+
+export const CredentialStatus = styled.span`
+  flex: 1;
+  min-width: 0;
+  color: #657d95;
+`;

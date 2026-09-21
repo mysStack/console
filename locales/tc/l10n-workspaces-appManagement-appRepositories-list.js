@@ -24,6 +24,11 @@ module.exports = {
   // List > Add
   ADD_APP_REPO: '添加應用程序存儲庫',
   VALIDATE: '驗證',
+  VALIDATING: '驗證中…',
+  LOADING_REPO_CREDENTIALS: '正在載入訪問憑據…',
+  NO_REPO_CREDENTIALS: '暫無可用憑據。',
+  LOAD_REPO_CREDENTIALS_FAILED: '訪問憑據載入失敗。',
+  RETRY: '重試',
   SYNC_INTERVAL: '同步間隔',
   SYNC_INTERVAL_DESC: '設定同步間隔。 該值的範圍為3分鐘到24小時。 預設值0表示沒有同步。',
   SYNC_PERIOD_EMPTY_DESC: '請設定同步間隔。',
