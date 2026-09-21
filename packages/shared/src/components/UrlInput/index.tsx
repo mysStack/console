@@ -3,10 +3,9 @@
  * https://github.com/kubesphere/console/blob/master/LICENSE
  */
 
-import React, { ChangeEvent, useMemo, useState } from 'react';
+import React, { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { isEmpty } from 'lodash';
 import { useParams } from 'react-router-dom';
-import Schema, { Rules } from 'async-validator';
 import { Button, Input, Loading, Select, Tooltip } from '@kubed/components';
 import { openpitrixStore } from '../../stores';
 import Icon from '../Icon';
@@ -42,6 +41,7 @@ type Props = {
   urlFormData: any;
   onChange?: (urlInput: string) => void;
   onValidate?: (isValid: boolean) => void;
+  validationKey?: string;
   isSubmitting?: boolean;
 };
 
@@ -50,6 +50,7 @@ function UrlInput({
   urlFormData,
   onChange,
   onValidate,
+  validationKey,
   isSubmitting,
 }: Props): JSX.Element {
   const { workspace = '' } = useParams();
@@ -88,25 +89,22 @@ function UrlInput({
   const [urlType, setUrlType] = useState<string>(urlFormData.type || 'http');
   const [validateStatus, setValidateStatus] = useState<string>('');
   const [validateStatusCode, setValidateStatusCode] = useState<number>(0);
+  const validationRequestId = useRef(0);
   const isS3Type = useMemo(() => urlType === 's3', [urlType]);
-  const [urlIsValid, setUrlIsValid] = useState<boolean>(false);
-  const descriptor: Rules = {
-    url: {
-      validator: (rule, value, callback) => {
-        if (urlIsValid && validateStatus === 'success') {
-          callback();
-        } else {
-          callback(new Error(t('INVALID_URL_DESC')));
-        }
-      },
-    },
-  };
-  const validator = new Schema(descriptor);
 
   function resetValidateStatus(): void {
+    validationRequestId.current += 1;
     setValidateStatus('');
     setValidateStatusCode(0);
+    onValidate?.(false);
   }
+
+  useEffect(() => {
+    validationRequestId.current += 1;
+    setValidateStatus('');
+    setValidateStatusCode(0);
+    onValidate?.(false);
+  }, [onValidate, validationKey]);
 
   function handleTypeChange(type: string): void {
     setUrlType(type);
@@ -131,47 +129,37 @@ function UrlInput({
     resetValidateStatus();
   }
 
-  function handleAccessInputChange({ target }: ChangeEvent<HTMLInputElement>): void {
-    const patchCredential = JSON.stringify({
-      ...credentialValue,
-      [`${target.name}`]: target.value,
-    });
-
+  function handleAccessInputChange(): void {
     // TODO s4地址暂时隐藏
     // onChange?.({
-    //   credential: patchCredential,
+    //   credential: JSON.stringify(credentialValue),
     // });
     resetValidateStatus();
-  }
-
-  function validate(): any {
-    const opts = {
-      first: true,
-    };
-
-    validator.validate(urlFormData, opts, (_, errors) => {
-      onValidate?.(isEmpty(errors));
-    });
   }
 
   function handleVerifyResult(isOk: any, errorCode?: number) {
     setValidateStatus(isOk ? 'success' : 'error');
     setValidateStatusCode(isOk ? 0 : errorCode || 0);
-    setUrlIsValid(!!isOk);
-    validate();
+    onValidate?.(!!isOk);
   }
 
   function handleVerify(e: any) {
     e.stopPropagation();
     e.preventDefault();
 
+    const requestId = validationRequestId.current + 1;
+    validationRequestId.current = requestId;
     setValidateStatus('validating');
     validateRepoUrl(workspace, formData)
       .then(({ ok, errorCode }: any) => {
-        handleVerifyResult(ok, errorCode);
+        if (requestId === validationRequestId.current) {
+          handleVerifyResult(ok, errorCode);
+        }
       })
       .catch(() => {
-        handleVerifyResult(false);
+        if (requestId === validationRequestId.current) {
+          handleVerifyResult(false);
+        }
       });
   }
   const hasHttpStr = /^(http|https):\/\/([\w.]+\/?)\S*/.test(urlInput);

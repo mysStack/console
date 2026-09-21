@@ -50,7 +50,12 @@ export const CredentialCard = styled.div`
   border-radius: 4px;
   background: #f8fbff;
 
-  .credential-select {
+  .credential-select.kubed-select {
     flex: 1;
+    width: auto;
+
+    .kubed-select-selector {
+      width: 100%;
+    }
   }
 `;
