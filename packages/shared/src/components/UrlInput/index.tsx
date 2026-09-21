@@ -7,10 +7,28 @@ import React, { ChangeEvent, useMemo, useState } from 'react';
 import { isEmpty } from 'lodash';
 import { useParams } from 'react-router-dom';
 import Schema, { Rules } from 'async-validator';
-import { Button, Input, Loading, Select, Tooltip } from '@kubed/components';
+import {
+  Button,
+  Dropdown,
+  Input,
+  Loading,
+  Menu,
+  MenuItem,
+  Select,
+  Tooltip,
+} from '@kubed/components';
 import { openpitrixStore } from '../../stores';
 import Icon from '../Icon';
-import { InputWrapper, UrlItem, Help, Label, Horizon, AccessItem, ErrorLi } from './styles';
+import {
+  InputWrapper,
+  UrlItem,
+  Help,
+  Label,
+  LabelRow,
+  Horizon,
+  AccessItem,
+  ErrorLi,
+} from './styles';
 
 export function checkRepoInvalidReason(errCode: number): string {
   const errReason: Record<number, string> = {
@@ -43,6 +61,10 @@ type Props = {
   onChange?: (urlInput: string) => void;
   onValidate?: (isValid: boolean) => void;
   isSubmitting?: boolean;
+  credentialName?: string;
+  credentialOptions?: { metadata: { name: string } }[];
+  onCredentialChange?: (name?: string) => void;
+  onCreateCredential?: () => void;
 };
 
 function UrlInput({
@@ -51,6 +73,10 @@ function UrlInput({
   onChange,
   onValidate,
   isSubmitting,
+  credentialName,
+  credentialOptions = [],
+  onCredentialChange,
+  onCreateCredential,
 }: Props): JSX.Element {
   const { workspace = '' } = useParams();
   const protocolReg = /^(http|https|s3|oci):\/\//;
@@ -121,6 +147,11 @@ function UrlInput({
     }
 
     onChange?.(`${type}://${urlInput}`);
+    resetValidateStatus();
+  }
+
+  function handleCredentialChange(name?: string) {
+    onCredentialChange?.(name);
     resetValidateStatus();
   }
 
@@ -224,10 +255,34 @@ function UrlInput({
     return 'form-item';
   }
 
+  const credentialMenu = (
+    <Menu>
+      <MenuItem onClick={() => handleCredentialChange()}>{t('NO_REPO_CREDENTIAL')}</MenuItem>
+      {credentialOptions.map(item => (
+        <MenuItem
+          key={item.metadata.name}
+          onClick={() => handleCredentialChange(item.metadata.name)}
+        >
+          {item.metadata.name}
+        </MenuItem>
+      ))}
+      <MenuItem onClick={onCreateCredential}>+ {t('NEW_REPO_CREDENTIAL')}</MenuItem>
+    </Menu>
+  );
+
   return (
     <>
       <UrlItem className={getInputWrapperCls()}>
-        <Label>{t('URL')}</Label>
+        <LabelRow>
+          <Label>{t('URL')}</Label>
+          <Dropdown content={credentialMenu} placement="bottom-end" maxWidth={260}>
+            <Button variant="text" className="credential-button">
+              {credentialName
+                ? `${t('REPO_CREDENTIAL')}: ${credentialName}`
+                : t('CONFIGURE_REPO_CREDENTIAL')}
+            </Button>
+          </Dropdown>
+        </LabelRow>
         <Horizon>
           <InputWrapper className="input-wrapper">
             <Select value={urlType} options={protocols} onChange={handleTypeChange} />

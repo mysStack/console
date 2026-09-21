@@ -27,6 +27,37 @@ export function getRepoUrl({ workspace, repo_name, name }: RepoPathParams): stri
   return `${prefix}/repos`;
 }
 
+export function getRepoCredentialUrl(workspace: string, name?: string): string {
+  let prefix = defaultUrl;
+  if (workspace) {
+    prefix += `/workspaces/${workspace}`;
+  }
+  return `${prefix}/repo-credentials${name ? `/${name}` : ''}`;
+}
+
+export function useRepoCredentials(workspace: string) {
+  return useQuery(
+    ['repo-credentials', workspace],
+    () => request.get(getRepoCredentialUrl(workspace)).then(({ data }) => data),
+    {
+      enabled: true,
+    },
+  );
+}
+
+export function useRepoCredentialMutation(
+  workspace: string,
+  options?: { onSuccess?: (data: any) => void },
+) {
+  return useMutation(
+    (params: Record<string, any>) =>
+      request.post(getRepoCredentialUrl(workspace), params).then(({ data }) => data),
+    {
+      onSuccess: options?.onSuccess,
+    },
+  );
+}
+
 export function useRepoList(
   { workspace, app_name, versionID }: RepoPathParams,
   options?: Partial<UseListOptions<any>>,
@@ -91,7 +122,8 @@ type RepoSyncProps = {
 export function useRepoSyncMutation(workspace: string, options?: { onSuccess?: () => void }) {
   const onSuccess = options?.onSuccess;
   return useMutation(
-    ({ repo_name, mode }: RepoSyncProps) => request.post(getRepoSyncUrl(workspace, repo_name, mode)),
+    ({ repo_name, mode }: RepoSyncProps) =>
+      request.post(getRepoSyncUrl(workspace, repo_name, mode)),
     { onSuccess },
   );
 }

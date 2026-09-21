@@ -209,6 +209,10 @@ export interface RepoData {
     name: string;
     description?: Record<'zh' | 'en', string>;
     credential?: Record<string, unknown>;
+    credentialSecretRef?: {
+      name: string;
+      namespace?: string;
+    };
     syncPeriod?: number | string;
     url?: string;
   };

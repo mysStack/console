@@ -15,6 +15,7 @@ import { Pattern } from '../../../constants';
 import { openpitrixStore } from '../../../stores';
 import type { RepoData } from '../../../types';
 import { StyledForm } from './styles';
+import RepoCredentialModal from './RepoCredentialModal';
 
 type Props = {
   visible: boolean;
@@ -23,10 +24,12 @@ type Props = {
   onCancel?: () => void;
 };
 
-const { useRepoMutation } = openpitrixStore;
+const { useRepoMutation, useRepoCredentials } = openpitrixStore;
 function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.Element {
   const [form] = useForm();
   const { workspace = '' } = useParams();
+
+  const { data: credentialsData, refetch: refetchCredentials } = useRepoCredentials(workspace);
 
   const getType = useMemo(() => {
     let type = 'https';
@@ -69,6 +72,7 @@ function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.El
     type: getType,
   };
   const [currentFormData, setCurrentFormData] = useState<RepoData>(initFormData);
+  const [credentialModalVisible, setCredentialModalVisible] = useState(false);
   const { mutate, isLoading } = useRepoMutation(workspace, {
     onSuccess: () => onOk?.(),
   });
@@ -109,6 +113,16 @@ function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.El
       spec: {
         ...prevFormData.spec,
         ...values.spec,
+      },
+    }));
+  }
+
+  function handleCredentialChange(name?: string) {
+    setCurrentFormData(prev => ({
+      ...prev,
+      spec: {
+        ...prev.spec,
+        credentialSecretRef: name ? { name } : undefined,
       },
     }));
   }
@@ -162,6 +176,10 @@ function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.El
           urlFormData={urlFormData}
           onChange={handleUrlChange}
           isSubmitting={isLoading}
+          credentialName={currentFormData.spec.credentialSecretRef?.name}
+          credentialOptions={credentialsData?.items || []}
+          onCredentialChange={handleCredentialChange}
+          onCreateCredential={() => setCredentialModalVisible(true)}
         />
         <FormItem
           name={['spec', 'syncPeriod']}
@@ -182,6 +200,16 @@ function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.El
           <Textarea maxLength={256} />
         </FormItem>
       </StyledForm>
+      <RepoCredentialModal
+        visible={credentialModalVisible}
+        workspace={workspace}
+        onCancel={() => setCredentialModalVisible(false)}
+        onCreated={credential => {
+          handleCredentialChange(credential.metadata.name);
+          setCredentialModalVisible(false);
+          refetchCredentials();
+        }}
+      />
     </Modal>
   );
 }
