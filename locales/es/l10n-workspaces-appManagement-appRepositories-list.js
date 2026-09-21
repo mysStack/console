@@ -24,6 +24,11 @@ module.exports = {
   // List > Add
   ADD_APP_REPO: 'Add App Repository',
   VALIDATE: 'Validar',
+  VALIDATING: 'Validando…',
+  LOADING_REPO_CREDENTIALS: 'Cargando credenciales…',
+  NO_REPO_CREDENTIALS: 'No hay credenciales disponibles.',
+  LOAD_REPO_CREDENTIALS_FAILED: 'No se pudieron cargar las credenciales.',
+  RETRY: 'Reintentar',
   SYNC_INTERVAL: 'Sync Interval',
   SYNC_INTERVAL_DESC:
     'Set a synchronization interval. The value range is 3 minutes to 24 hours. The default value 0 indicates no synchronization.',

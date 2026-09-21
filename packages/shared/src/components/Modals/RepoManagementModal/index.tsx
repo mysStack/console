@@ -14,8 +14,9 @@ import TimeInput from '../../../components/TimeInput';
 import { Pattern } from '../../../constants';
 import { openpitrixStore } from '../../../stores';
 import type { RepoData } from '../../../types';
-import { CredentialCard, StyledForm } from './styles';
+import { CredentialCard, CredentialStatus, StyledForm } from './styles';
 import RepoCredentialModal from './RepoCredentialModal';
+import { getCredentialListState } from './credentialState';
 
 type Props = {
   visible: boolean;
@@ -31,6 +32,7 @@ function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.El
 
   const {
     data: credentialsData,
+    isError: isCredentialsError,
     isLoading: isCredentialsLoading,
     refetch: refetchCredentials,
   } = useRepoCredentials(workspace);
@@ -149,6 +151,11 @@ function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.El
       value: credential.metadata.name,
     })),
   ];
+  const credentialListState = getCredentialListState(
+    isCredentialsLoading,
+    isCredentialsError,
+    credentials.length,
+  );
 
   function handleOk(): void {
     form.validateFields().then(() => {
@@ -172,7 +179,7 @@ function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.El
 
   return (
     <Modal
-      width={691}
+      width="min(691px, calc(100vw - 32px))"
       visible={visible}
       onOk={handleOk}
       onCancel={onCancel}
@@ -211,13 +218,28 @@ function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.El
         <FormItem label={t('ACCESS_CREDENTIAL')}>
           <CredentialCard>
             <span>🔒</span>
-            <Select
-              className="credential-select"
-              value={currentFormData.spec.credentialSecretRef?.name || ''}
-              options={credentialOptions}
-              disabled={isCredentialsLoading}
-              onChange={(value: string) => handleCredentialChange(value || undefined)}
-            />
+            {credentialListState === 'ready' ? (
+              <Select
+                className="credential-select"
+                value={currentFormData.spec.credentialSecretRef?.name || ''}
+                options={credentialOptions}
+                onChange={(value: string) => handleCredentialChange(value || undefined)}
+              />
+            ) : (
+              <CredentialStatus
+                role={credentialListState === 'error' ? 'alert' : 'status'}
+                aria-live="polite"
+              >
+                {credentialListState === 'loading' && t('LOADING_REPO_CREDENTIALS')}
+                {credentialListState === 'empty' && t('NO_REPO_CREDENTIALS')}
+                {credentialListState === 'error' && t('LOAD_REPO_CREDENTIALS_FAILED')}
+              </CredentialStatus>
+            )}
+            {credentialListState === 'error' && (
+              <Button variant="text" onClick={() => void refetchCredentials()}>
+                {t('RETRY')}
+              </Button>
+            )}
             <Button variant="text" onClick={() => setCredentialModalVisible(true)}>
               {t('NEW_REPO_CREDENTIAL')}
             </Button>
