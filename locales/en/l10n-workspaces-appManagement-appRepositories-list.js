@@ -27,6 +27,13 @@ module.exports = {
     'All OCI versions will be rechecked. This operation may take a long time and consume Registry quota.',
   // List > Add
   ADD_APP_REPO: 'Add App Repository',
+  REPOSITORY_CONFIGURATION: 'Repository Configuration',
+  REPOSITORY_URL: 'Repository URL',
+  ACCESS_CREDENTIAL: 'Access Credential',
+  SYNC_SETTINGS: 'Synchronization Settings',
+  AUTO_SYNC: 'Automatic Synchronization',
+  OTHER: 'Other',
+  TEST_CONNECTION: 'Test Connection',
   VALIDATE: 'Validate',
   CONFIGURE_REPO_CREDENTIAL: 'Private repository? Configure credentials',
   REPO_CREDENTIAL: 'Credential',

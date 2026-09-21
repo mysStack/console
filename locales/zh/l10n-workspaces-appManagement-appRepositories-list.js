@@ -26,6 +26,13 @@ module.exports = {
     '将重新校验所有 OCI 版本。该操作可能耗时较长，并可能消耗镜像仓库配额。',
   // List > Add
   ADD_APP_REPO: '添加应用仓库',
+  REPOSITORY_CONFIGURATION: '仓库配置',
+  REPOSITORY_URL: '仓库地址',
+  ACCESS_CREDENTIAL: '访问凭据',
+  SYNC_SETTINGS: '同步设置',
+  AUTO_SYNC: '自动同步',
+  OTHER: '其他',
+  TEST_CONNECTION: '测试连接',
   VALIDATE: '验证',
   CONFIGURE_REPO_CREDENTIAL: '私有仓库？配置访问凭据',
   REPO_CREDENTIAL: '凭据',
