@@ -28,10 +28,16 @@ module.exports = {
   // List > Add
   ADD_APP_REPO: 'Add App Repository',
   VALIDATE: 'Validate',
+  CONFIGURE_REPO_CREDENTIAL: 'Private repository? Configure credentials',
+  REPO_CREDENTIAL: 'Credential',
+  NO_REPO_CREDENTIAL: 'Do not use a credential',
+  NEW_REPO_CREDENTIAL: 'New credential',
+  PASSWORD_OR_ACCESS_TOKEN: 'Password / Access Token',
   SYNC_INTERVAL: 'Sync Interval',
   SYNC_INTERVAL_DESC:
     'Set a synchronization interval. The value range is 3 minutes to 24 hours. The default value 0 indicates no synchronization.',
   SYNC_PERIOD_EMPTY_DESC: 'Please set a synchronization interval.',
+  PASSWORD_EMPTY_DESC: 'Please enter a password or access token.',
   SYNC_INTERVAL_INVALID: 'Invalid value. Please enter 0 or a positive integer. ',
   APP_REPO_URL_DESC: 'The URL needs to be validated before you add or edit an app repository.',
   SYNC_INTERVAL_TIP: 'The value range is 3 minutes to 24 hours. Please enter a valid value.',

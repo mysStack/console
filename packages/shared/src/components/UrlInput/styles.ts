@@ -15,6 +15,19 @@ export const Label = styled.label`
   line-height: 32px;
 `;
 
+export const LabelRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 553px;
+
+  .credential-button {
+    min-height: 24px;
+    padding: 0 4px;
+    font-weight: 400;
+  }
+`;
+
 export const Help = styled.div`
   margin-top: 4px;
   font-weight: 300;
