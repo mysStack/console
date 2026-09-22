@@ -14,6 +14,16 @@ test('uses the sync start time while a repository is syncing', () => {
   });
 });
 
+test('does not show a completed summary while a repository is queued for manual sync', () => {
+  assert.equal(
+    getRepoSyncSummary(
+      { startedAt: '2026-09-22T08:30:00Z', durationSeconds: 12, validChartVersionCount: 7 },
+      'manualTrigger',
+    ),
+    undefined,
+  );
+});
+
 test('summarizes completed HTTPS sync duration and valid versions', () => {
   assert.deepEqual(
     getRepoSyncSummary({ durationSeconds: 12, validChartVersionCount: 7 }, 'successful'),

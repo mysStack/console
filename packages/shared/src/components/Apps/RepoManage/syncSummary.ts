@@ -14,6 +14,10 @@ export function getRepoSyncSummary(
     return undefined;
   }
 
+  if (state === 'manualTrigger') {
+    return undefined;
+  }
+
   if (state === 'syncing' && sync.startedAt) {
     return { key: 'REPO_SYNC_STARTED_AT', values: { time: sync.startedAt } };
   }
