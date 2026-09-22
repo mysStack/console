@@ -220,5 +220,17 @@ export interface RepoData {
     state: string;
     specHash: string;
     lastUpdateTime: string;
+    sync?: {
+      startedAt?: string;
+      completedAt?: string;
+      durationSeconds?: number;
+      remoteTagCount?: number;
+      validChartVersionCount?: number;
+      skippedArtifactCount?: number;
+      failedTagCount?: number;
+      requestCount?: number;
+      cacheHitCount?: number;
+      lastError?: string;
+    };
   };
 }

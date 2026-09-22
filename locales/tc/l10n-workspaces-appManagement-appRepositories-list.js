@@ -19,6 +19,8 @@ module.exports = {
   APP_REPO_STATUS_SYNCING: '同步中',
   APP_REPO_STATUS_MANUALTRIGGER: '同步中',
   APP_REPO_STATUS_NOSYNC: '不同步',
+  REPO_SYNC_STARTED_AT: '開始時間：{time}',
+  REPO_SYNC_SUMMARY: '耗時：{duration} 秒 · 有效版本：{count}',
   SYNC_REPOSITORY: '立即同步',
   SYNC_REPOSITORY_TRIGGERED: '同步任務已觸發。',
   // List > Add

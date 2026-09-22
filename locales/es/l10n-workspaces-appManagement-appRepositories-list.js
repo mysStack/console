@@ -19,6 +19,8 @@ module.exports = {
   APP_REPO_STATUS_SYNCING: 'Syncing',
   APP_REPO_STATUS_MANUALTRIGGER: 'Syncing',
   APP_REPO_STATUS_NOSYNC: 'Out-sync',
+  REPO_SYNC_STARTED_AT: 'Inicio: {time}',
+  REPO_SYNC_SUMMARY: 'Duración: {duration}s · {count} versiones válidas',
   SYNC_REPOSITORY: 'Sincronizar ahora',
   SYNC_REPOSITORY_TRIGGERED: 'La sincronización se ha activado.',
   // List > Add

@@ -19,6 +19,8 @@ module.exports = {
   APP_REPO_STATUS_SYNCING: 'Syncing',
   APP_REPO_STATUS_MANUALTRIGGER: 'Syncing',
   APP_REPO_STATUS_NOSYNC: 'Out-sync',
+  REPO_SYNC_STARTED_AT: 'Started: {time}',
+  REPO_SYNC_SUMMARY: 'Duration: {duration}s · {count} valid versions',
   SYNC_REPOSITORY: 'Sync now',
   SYNC_REPOSITORY_TRIGGERED: 'Synchronization has been triggered.',
   FULL_REFRESH_REPOSITORY: 'Full refresh',
