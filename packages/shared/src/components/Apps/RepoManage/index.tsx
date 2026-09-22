@@ -24,6 +24,7 @@ import { openpitrixStore } from '../../../stores';
 import { getAuthKey } from '../../../utils';
 import type { Column, TableRef } from '../../DataTable';
 import type { RepoData } from '../../../types';
+import { getRepoSyncSummary } from './syncSummary';
 
 const AddButton = styled(Button)`
   min-width: 96px;
@@ -33,6 +34,11 @@ const Description = styled.div`
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+`;
+const SyncSummary = styled.div`
+  color: ${({ theme }) => theme.palette.accents_5};
+  font-size: 12px;
+  margin-top: 4px;
 `;
 
 const { getRepoUrl, useReposDeleteMutation, useRepoSyncMutation } = openpitrixStore;
@@ -177,12 +183,19 @@ export function RepoManage(): JSX.Element {
       field: 'status.state',
       canHide: true,
       width: '15%',
-      render: (status = 'syncing') => (
-        // @ts-ignore TODO
-        <StatusIndicator type={status}>
-          {t(`APP_REPO_STATUS_${(status as string).toUpperCase()}`)}
-        </StatusIndicator>
-      ),
+      render: (status = 'syncing', record) => {
+        const state = status as string;
+        const summary = getRepoSyncSummary(record?.status?.sync, state);
+        return (
+          <>
+            {/* @ts-ignore TODO */}
+            <StatusIndicator type={state}>
+              {t(`APP_REPO_STATUS_${state.toUpperCase()}`)}
+            </StatusIndicator>
+            {summary && <SyncSummary>{t(summary.key, summary.values)}</SyncSummary>}
+          </>
+        );
+      },
     },
     {
       title: t('URL'),

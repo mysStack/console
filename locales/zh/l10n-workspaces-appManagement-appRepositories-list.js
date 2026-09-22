@@ -18,6 +18,8 @@ module.exports = {
   APP_REPO_STATUS_SYNCING: '同步中',
   APP_REPO_STATUS_MANUALTRIGGER: '同步中',
   APP_REPO_STATUS_NOSYNC: '不同步',
+  REPO_SYNC_STARTED_AT: '开始时间：{time}',
+  REPO_SYNC_SUMMARY: '耗时：{duration} 秒 · 有效版本：{count}',
   SYNC_REPOSITORY: '立即同步',
   SYNC_REPOSITORY_TRIGGERED: '同步任务已触发。',
   FULL_REFRESH_REPOSITORY: '全量校验',
