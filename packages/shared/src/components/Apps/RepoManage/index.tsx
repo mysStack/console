@@ -3,7 +3,7 @@
  * https://github.com/kubesphere/console/blob/master/LICENSE
  */
 
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
 import { Banner, BannerTip, Button, Field, notify } from '@kubed/components';
@@ -24,7 +24,12 @@ import { openpitrixStore } from '../../../stores';
 import { getAuthKey } from '../../../utils';
 import type { Column, TableRef } from '../../DataTable';
 import type { RepoData } from '../../../types';
-import { getRepoSyncSummary } from './syncSummary';
+import {
+  getPendingRepoSyncNames,
+  getRepoStatusDisplayState,
+  getRepoSyncSummary,
+  isRepoSyncInProgress,
+} from './syncSummary';
 
 const AddButton = styled(Button)`
   min-width: 96px;
@@ -52,8 +57,10 @@ export function RepoManage(): JSX.Element {
   const { workspace = '' } = params;
   const repoListUrl = getRepoUrl({ workspace });
   const tableRef = useRef<TableRef>();
+  const syncPollingTimer = useRef<number>();
   const [modalType, setModalType] = useState<string>('');
   const [selectedRows, setSelectedRows] = useState<RepoData[]>();
+  const [pendingRepoSyncNames, setPendingRepoSyncNames] = useState<string[]>([]);
   const { mutateAsync, isLoading } = useReposDeleteMutation(workspace);
   const { mutateAsync: syncRepo, isLoading: isSyncing } = useRepoSyncMutation(workspace);
   const tableParameters = {
@@ -61,6 +68,32 @@ export function RepoManage(): JSX.Element {
     status: 'active',
   };
   const authKey = getAuthKey('app-repos');
+
+  useEffect(() => {
+    if (pendingRepoSyncNames.length === 0) {
+      return undefined;
+    }
+
+    syncPollingTimer.current = window.setInterval(() => tableRef.current?.refetch(), 3000);
+    return () => {
+      if (syncPollingTimer.current) {
+        window.clearInterval(syncPollingTimer.current);
+        syncPollingTimer.current = undefined;
+      }
+    };
+  }, [pendingRepoSyncNames.length]);
+
+  const handleRepoDataChange = useCallback((records: RepoData[]) => {
+    setPendingRepoSyncNames(names => getPendingRepoSyncNames(names, records));
+  }, []);
+
+  function triggerRepoSync(repoName: string, mode?: 'full'): Promise<void> {
+    return syncRepo({ repo_name: repoName, mode }).then(() => {
+      setPendingRepoSyncNames(names => (names.includes(repoName) ? names : [...names, repoName]));
+      notify.success(t('SYNC_REPOSITORY_TRIGGERED'));
+      tableRef.current?.refetch();
+    });
+  }
 
   function isWorkspaceRepo(val: any) {
     return (
@@ -79,11 +112,9 @@ export function RepoManage(): JSX.Element {
         text: t('SYNC_REPOSITORY'),
         action: 'edit',
         show: isWorkspaceRepo,
-        disabled: record => isSyncing || record.status?.state === 'syncing',
+        disabled: record => isSyncing || isRepoSyncInProgress(record.status?.state),
         onClick: async (_, record) => {
-          await syncRepo({ repo_name: record.metadata.name });
-          notify.success(t('SYNC_REPOSITORY_TRIGGERED'));
-          tableRef.current?.refetch();
+          await triggerRepoSync(record.metadata.name);
         },
       },
       {
@@ -92,7 +123,7 @@ export function RepoManage(): JSX.Element {
         text: t('FULL_REFRESH_REPOSITORY'),
         action: 'edit',
         show: record => isWorkspaceRepo(record) && isOCIRepo(record),
-        disabled: record => isSyncing || record.status?.state === 'syncing',
+        disabled: record => isSyncing || isRepoSyncInProgress(record.status?.state),
         onClick: (_, record) => {
           setSelectedRows([record]);
           setModalType('fullSync');
@@ -185,12 +216,13 @@ export function RepoManage(): JSX.Element {
       width: '15%',
       render: (status = 'syncing', record) => {
         const state = status as string;
+        const displayState = getRepoStatusDisplayState(state);
         const summary = getRepoSyncSummary(record?.status?.sync, state);
         return (
           <>
             {/* @ts-ignore TODO */}
-            <StatusIndicator type={state}>
-              {t(`APP_REPO_STATUS_${state.toUpperCase()}`)}
+            <StatusIndicator type={displayState}>
+              {t(`APP_REPO_STATUS_${displayState.toUpperCase()}`)}
             </StatusIndicator>
             {summary && <SyncSummary>{t(summary.key, summary.values)}</SyncSummary>}
           </>
@@ -263,16 +295,14 @@ export function RepoManage(): JSX.Element {
   }
 
   async function handleFullRepoSync(): Promise<void> {
-    const repo_name = selectedRows?.[0]?.metadata.name;
+    const repoName = selectedRows?.[0]?.metadata.name;
 
-    if (!repo_name) {
+    if (!repoName) {
       return;
     }
 
-    await syncRepo({ repo_name, mode: 'full' });
-    notify.success(t('SYNC_REPOSITORY_TRIGGERED'));
+    await triggerRepoSync(repoName, 'full');
     closeModal();
-    tableRef.current?.refetch();
   }
 
   return (
@@ -304,6 +334,7 @@ export function RepoManage(): JSX.Element {
         // @ts-ignore TODO
         format={item => ({ ...item, workspace })}
         serverDataFormat={serverDataFormatter}
+        onChangeData={handleRepoDataChange}
         emptyOptions={{
           withoutTable: true,
           createButton: !!renderTableActions() && (

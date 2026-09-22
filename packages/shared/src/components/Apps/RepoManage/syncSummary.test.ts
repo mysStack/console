@@ -1,7 +1,35 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { getRepoSyncSummary } from './syncSummary';
+import {
+  getRepoSyncSummary,
+  getRepoStatusDisplayState,
+  getPendingRepoSyncNames,
+  isRepoSyncInProgress,
+} from './syncSummary';
+
+test('maps the queued manual trigger to the visible syncing state', () => {
+  assert.equal(getRepoStatusDisplayState('manualTrigger'), 'syncing');
+});
+
+test('polls while a repository is queued or syncing', () => {
+  assert.equal(isRepoSyncInProgress('manualTrigger'), true);
+  assert.equal(isRepoSyncInProgress('syncing'), true);
+  assert.equal(isRepoSyncInProgress('successful'), false);
+});
+
+test('stops polling a triggered repository once the server reports a terminal state', () => {
+  assert.deepEqual(
+    getPendingRepoSyncNames(
+      ['redis', 'traefik'],
+      [
+        { metadata: { name: 'redis' }, status: { state: 'syncing' } },
+        { metadata: { name: 'traefik' }, status: { state: 'successful' } },
+      ],
+    ),
+    ['redis'],
+  );
+});
 
 test('returns no summary for repositories without sync status', () => {
   assert.equal(getRepoSyncSummary(undefined, 'successful'), undefined);
