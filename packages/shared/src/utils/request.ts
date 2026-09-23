@@ -7,8 +7,13 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 // import qs from 'qs';
 import { set, merge, get, toString } from 'lodash';
 import { getClusterUrl } from './urlHelper';
+import { createUnauthorizedRedirect, shouldRedirectAfterUnauthorized } from './authRedirect';
 import { GlobalMessage } from '../types';
 import { useEventEmitter } from '../hooks/useEventEmitter';
+
+const redirectAfterUnauthorized = createUnauthorizedRedirect(url => {
+  window.location.assign(url);
+});
 
 export function getRequestUrl(url: string = '') {
   const formatUrl = url.startsWith('http') ? url : `/${url.trimLeft()}`;
@@ -76,6 +81,11 @@ axios.interceptors.response.use(
     return response.data;
   },
   error => {
+    if (shouldRedirectAfterUnauthorized(error.response?.status, error.response?.config?.url)) {
+      redirectAfterUnauthorized();
+      return Promise.reject(error);
+    }
+
     if (!error.response.config.headers['x-ignore-error-notify']) {
       const msg = formatError(error.response);
       const { $emit } = useEventEmitter();
