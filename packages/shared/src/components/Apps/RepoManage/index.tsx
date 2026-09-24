@@ -18,7 +18,7 @@ import {
   useItemActions,
   useTableActions,
   useBatchActions,
-  useListQueryParams,
+  useListQueryParams as getListQueryParams,
 } from '../../../hooks';
 import { openpitrixStore } from '../../../stores';
 import { getAuthKey } from '../../../utils';
@@ -260,7 +260,7 @@ export function RepoManage(): JSX.Element {
   function transformRequestParams(paramData: Record<string, any>): Record<string, any> {
     const { parameters, pageIndex, filters } = paramData;
     const keyword = filters?.[0]?.value;
-    const formattedParams = useListQueryParams({
+    const formattedParams = getListQueryParams({
       ...parameters,
       page: pageIndex + 1,
     });
