@@ -14,6 +14,7 @@ import {
 } from '@ks-console/shared';
 
 import BaseLayout from '../containers/Base/BaseLayout';
+import ManageListLayout from '../containers/Base/ListLayout';
 
 import AppDeploy from '../containers/AppDeploy';
 import AppDetails from '../containers/AppDetails';
@@ -38,6 +39,11 @@ export default [
         children: [{ path: 'workspaces/:workspace/app-repos', element: <RepoManage /> }],
       },
     ],
+  },
+  {
+    path: '/apps-manage',
+    element: <ManageListLayout />,
+    children: [{ path: 'repo', element: <RepoManage /> }],
   },
   {
     path: '/',
