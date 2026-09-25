@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { Navigate } from 'react-router-dom';
 import {
   WorkspaceLayout,
   RepoManage,
@@ -14,13 +15,18 @@ import {
 } from '@ks-console/shared';
 
 import BaseLayout from '../containers/Base/BaseLayout';
-import ManageListLayout from '../containers/Base/ListLayout';
 
 import AppDeploy from '../containers/AppDeploy';
 import AppDetails from '../containers/AppDetails';
 import AppsDashBoard from '../containers/AppsDashBoard';
 import AppDeployManage from '../containers/AppDeployManage';
 export default [
+  // v4.1.3 reserves /apps-manage for cluster management. Keep the old
+  // application-repository bookmark as an alias to its supported route.
+  {
+    path: '/apps-manage/repo',
+    element: <Navigate to="/workspaces/system-workspace/app-repos" replace />,
+  },
   {
     path: '/apps',
     element: <BaseLayout />,
@@ -39,11 +45,6 @@ export default [
         children: [{ path: 'workspaces/:workspace/app-repos', element: <RepoManage /> }],
       },
     ],
-  },
-  {
-    path: '/apps-manage',
-    element: <ManageListLayout />,
-    children: [{ path: 'repo', element: <RepoManage /> }],
   },
   {
     path: '/',
