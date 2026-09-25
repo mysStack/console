@@ -14,10 +14,22 @@ export function getPendingRepoSyncNames(
   names: string[],
   records: Array<{ metadata: { name: string }; status?: { state?: string } }>,
 ): string[] {
-  return names.filter(name => {
+  const nextNames = names.filter(name => {
     const record = records.find(item => item.metadata.name === name);
     return record && isRepoSyncInProgress(record.status?.state);
   });
+
+  // DataTable notifies consumers whenever its formatted data changes. Keep the
+  // previous reference when polling has not changed the pending set so React
+  // does not schedule an update on every render.
+  if (
+    nextNames.length === names.length &&
+    nextNames.every((name, index) => name === names[index])
+  ) {
+    return names;
+  }
+
+  return nextNames;
 }
 
 export type RepoSyncSummaryValue =

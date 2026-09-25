@@ -31,6 +31,15 @@ test('stops polling a triggered repository once the server reports a terminal st
   );
 });
 
+test('keeps the pending sync list reference when polling state is unchanged', () => {
+  const pendingNames = ['redis'];
+  const nextNames = getPendingRepoSyncNames(pendingNames, [
+    { metadata: { name: 'redis' }, status: { state: 'syncing' } },
+  ]);
+
+  assert.strictEqual(nextNames, pendingNames);
+});
+
 test('returns no summary for repositories without sync status', () => {
   assert.equal(getRepoSyncSummary(undefined, 'successful'), undefined);
 });
