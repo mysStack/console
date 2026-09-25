@@ -16,10 +16,9 @@ import GlobalStyles from './components/GlobalStyles';
 import { PrefersContext, themes } from './contexts/PrefersContext';
 import Pages from './Pages';
 
-const { getWorkspaces } = aliasNameStore;
+const { getWorkspaces, useAliasNameActions } = aliasNameStore;
 const App = () => {
-  // 获取别名数据
-  getWorkspaces();
+  const aliasNameActions = useAliasNameActions();
   useGlobalStore(); // init global store.
   const [themeLocalValue, setThemeLocalValue] = useLocalStorage({
     key: 'themeType',
@@ -27,6 +26,11 @@ const App = () => {
   });
   const [themeType, setThemeType] = useState('light');
   const userLang = get(globals.user, 'lang') || getBrowserLang();
+
+  // 获取别名数据。加载动作必须放在 effect 中，不能在渲染阶段触发异步请求和状态更新。
+  useEffect(() => {
+    getWorkspaces(aliasNameActions);
+  }, []);
 
   // useWatchExtensions({
   //   enabled: true,

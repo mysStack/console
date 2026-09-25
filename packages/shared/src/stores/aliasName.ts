@@ -44,13 +44,39 @@ export async function getProjects(params: {
 }
 
 let status = false;
-async function getWorkspaces() {
+export interface AliasNameActions {
+  setProjectAliasName: (value: Record<string, Record<string, string>>) => void;
+  setWorkspacesAliasName: (value: Record<string, string>) => void;
+  setUserAliasName: (value: Record<string, string>) => void;
+  setClustersAliasName: (value: Record<string, string>) => void;
+  setPlatformRolesAliasName: (value: Record<string, string>) => void;
+}
+
+export function useAliasNameActions(): AliasNameActions {
   const [, setProjectAliasName] = useStore('projectAliasName');
   const [, setWorkspacesAliasName] = useStore('workspaceAliasName');
   const [, setUserAliasName] = useStore('userAliasName');
   const [, setClustersAliasName] = useStore('clustersAliasName');
   const [, setPlatformRolesAliasName] = useStore('platformRolesAliasName');
+
+  return {
+    setProjectAliasName,
+    setWorkspacesAliasName,
+    setUserAliasName,
+    setClustersAliasName,
+    setPlatformRolesAliasName,
+  };
+}
+
+async function getWorkspaces(actions: AliasNameActions) {
   if (status || location.href.includes('/login') || !globals?.user) return;
+  const {
+    setProjectAliasName,
+    setWorkspacesAliasName,
+    setUserAliasName,
+    setClustersAliasName,
+    setPlatformRolesAliasName,
+  } = actions;
   status = true;
   const url = workspaceStore.getListUrl({});
   const res: any = await request.get(url);
@@ -103,4 +129,5 @@ async function getWorkspaces() {
 export default {
   getWorkspaces,
   getProjects,
+  useAliasNameActions,
 };
