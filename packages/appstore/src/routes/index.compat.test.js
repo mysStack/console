@@ -21,7 +21,7 @@ function getStringValue(property) {
     : undefined;
 }
 
-test('redirects the legacy repository URL without mounting the removed apps-manage layout', () => {
+test('does not register the legacy repository URL in the client router', () => {
   const source = ts.createSourceFile(
     sourcePath,
     fs.readFileSync(sourcePath, 'utf8'),
@@ -42,24 +42,8 @@ test('redirects the legacy repository URL without mounting the removed apps-mana
   }
   visit(source);
 
-  assert.ok(legacyRoute, 'the legacy repository route must be present');
-
-  const elementProperty = getProperty(legacyRoute, 'element');
-  assert.ok(elementProperty && ts.isJsxSelfClosingElement(elementProperty.initializer));
-  assert.equal(elementProperty.initializer.tagName.getText(source), 'Navigate');
-
-  const toAttribute = elementProperty.initializer.attributes.properties.find(
-    attribute => ts.isJsxAttribute(attribute) && attribute.name.text === 'to',
-  );
-  assert.equal(
-    toAttribute?.initializer?.getText(source),
-    '"/workspaces/system-workspace/app-repos"',
-  );
-
-  const replaceAttribute = elementProperty.initializer.attributes.properties.find(
-    attribute => ts.isJsxAttribute(attribute) && attribute.name.text === 'replace',
-  );
-  assert.ok(replaceAttribute, 'the compatibility redirect must replace browser history');
+  assert.equal(legacyRoute, undefined, 'the client router must not claim the legacy URL');
+  assert.doesNotMatch(source.getFullText(), /import \{ Navigate \} from 'react-router-dom';/);
 
   assert.doesNotMatch(
     source.getFullText(),

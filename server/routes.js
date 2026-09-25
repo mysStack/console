@@ -89,6 +89,13 @@ router
   // console v3
   .get('/consolev3/(.*)', renderV3View)
 
+  // The OpenPitrix remote extension still claims this legacy client route.
+  // Redirect it before rendering the Console shell so it cannot shadow the
+  // v4 application repository page.
+  .get('/apps-manage/repo', ctx => {
+    ctx.redirect('/workspaces/system-workspace/app-repos');
+  })
+
   // theme static image
   .use(proxy('/theme/(.*)', staticFileProxy))
 

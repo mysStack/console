@@ -4,7 +4,6 @@
  */
 
 import React from 'react';
-import { Navigate } from 'react-router-dom';
 import {
   WorkspaceLayout,
   RepoManage,
@@ -21,12 +20,6 @@ import AppDetails from '../containers/AppDetails';
 import AppsDashBoard from '../containers/AppsDashBoard';
 import AppDeployManage from '../containers/AppDeployManage';
 export default [
-  // v4.1.3 reserves /apps-manage for cluster management. Keep the old
-  // application-repository bookmark as an alias to its supported route.
-  {
-    path: '/apps-manage/repo',
-    element: <Navigate to="/workspaces/system-workspace/app-repos" replace />,
-  },
   {
     path: '/apps',
     element: <BaseLayout />,
