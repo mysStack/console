@@ -254,7 +254,10 @@ export function RepoManage(): JSX.Element {
       title: t('URL'),
       field: 'spec.url',
       width: '35%',
-      render: (url = '') => <RepoUrl title={url}>{url}</RepoUrl>,
+      render: url => {
+        const repoUrl = typeof url === 'string' ? url : '';
+        return <RepoUrl title={repoUrl}>{repoUrl}</RepoUrl>;
+      },
     },
     {
       title: t('TYPE'),
