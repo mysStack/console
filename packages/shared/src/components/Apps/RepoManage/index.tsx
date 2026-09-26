@@ -49,6 +49,13 @@ const SyncSummary = styled.div`
   color: ${({ theme }) => theme.palette.accents_5};
   font-size: 12px;
   margin-top: 4px;
+  white-space: nowrap;
+`;
+const RepoUrl = styled.div`
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 const { getRepoUrl, useReposDeleteMutation, useRepoSyncMutation } = openpitrixStore;
@@ -227,7 +234,7 @@ export function RepoManage(): JSX.Element {
       title: t('STATUS'),
       field: 'status.state',
       canHide: true,
-      width: '15%',
+      width: '20%',
       render: (status = 'syncing', record) => {
         const state = getRepoStatusState(status as string | { state?: string });
         const displayState = getRepoStatusDisplayState(state);
@@ -246,12 +253,13 @@ export function RepoManage(): JSX.Element {
     {
       title: t('URL'),
       field: 'spec.url',
-      width: '45%',
+      width: '35%',
+      render: (url = '') => <RepoUrl title={url}>{url}</RepoUrl>,
     },
     {
       title: t('TYPE'),
       field: 'workspace',
-      width: '45%',
+      width: '14%',
       render: (_, record) => {
         const isSystem =
           record.metadata?.labels?.['kubesphere.io/workspace'] === 'system-workspace';
@@ -261,7 +269,7 @@ export function RepoManage(): JSX.Element {
     {
       id: 'more',
       title: '',
-      width: '15%',
+      width: '6%',
       // @ts-ignore TODO
       render: renderItemActions,
     },
