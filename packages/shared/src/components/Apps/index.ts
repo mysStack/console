@@ -19,7 +19,7 @@ export { DeployYamlModal } from './DeployYamlModal';
 export { Applications } from './Applications';
 export { PlacementForm } from './AppForms/AppBaseInfoForm/PlacementForm';
 export { RepoManage } from './RepoManage';
-export { getRepoManageAuthKey } from './RepoManage/repoManageAuth';
+export { getRepoManageActionParams, getRepoManageAuthKey } from './RepoManage/repoManageAuth';
 export {
   getRepoStatusDisplayState,
   getRepoStatusState,

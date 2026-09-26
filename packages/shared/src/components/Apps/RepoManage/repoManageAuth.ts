@@ -1,5 +1,20 @@
-export function getRepoManageAuthKey(search: string, hash = ''): 'app-repos' | 'manage-app' {
-  return hash === '#global' ? 'manage-app' : 'app-repos';
+export function getRepoManageAuthKey(
+  search: string,
+  hash = '',
+  pathname = '',
+  workspace = '',
+): 'app-repos' | 'manage-app' {
+  if (hash === '#global' || pathname.startsWith('/apps-manage')) {
+    return 'manage-app';
+  }
+
+  // The legacy global repository route redirects to this workspace URL and
+  // drops the hash. Keep using the platform-level permission in that case.
+  if (workspace === 'system-workspace' && pathname.endsWith('/app-repos')) {
+    return 'manage-app';
+  }
+
+  return 'app-repos';
 }
 
 export function getRepoManageActionParams(

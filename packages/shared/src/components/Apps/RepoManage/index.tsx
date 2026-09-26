@@ -73,7 +73,12 @@ export function RepoManage(): JSX.Element {
     order: 'creationTimestamp',
     status: 'active',
   };
-  const authKey = getRepoManageAuthKey(location.search, location.hash);
+  const authKey = getRepoManageAuthKey(
+    location.search,
+    location.hash,
+    location.pathname,
+    workspace,
+  );
   const actionParams = getRepoManageActionParams(authKey, params);
 
   useEffect(() => {

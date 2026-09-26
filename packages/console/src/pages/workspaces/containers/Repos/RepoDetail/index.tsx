@@ -7,8 +7,15 @@ import React, { useState } from 'react';
 import { isEmpty } from 'lodash';
 import { Appcenter } from '@kubed/icons';
 import { Loading, notify } from '@kubed/components';
-import { useParams, useNavigate } from 'react-router-dom';
-import { DeleteConfirmModal, DetailPagee, formatTime, openpitrixStore } from '@ks-console/shared';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import {
+  DeleteConfirmModal,
+  DetailPagee,
+  getRepoManageActionParams,
+  formatTime,
+  getRepoManageAuthKey,
+  openpitrixStore,
+} from '@ks-console/shared';
 
 import { RepoManagementModal } from '../../../components/Modals';
 
@@ -19,6 +26,7 @@ const REPO_DETAIL_PATH_PREFIX = `/workspaces/:workspace/repos/:repoId`;
 function RepoDetail(): JSX.Element {
   const { workspace = '', repoId = '' } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [modalType, setModalType] = useState<string>('');
   const { data: detail, isLoading, refetch } = useRepoDetail(workspace, repoId);
   const { mutateAsync, isLoading: isDeleting } = useReposDeleteMutation(workspace);
@@ -54,6 +62,8 @@ function RepoDetail(): JSX.Element {
       },
     },
   ];
+  const authKey = getRepoManageAuthKey('', '', location.pathname, workspace);
+  const actionParams = getRepoManageActionParams(authKey, { workspace });
 
   function getAttrs() {
     if (isEmpty(detail)) {
@@ -99,11 +109,11 @@ function RepoDetail(): JSX.Element {
         cardProps={{
           name: detail?.name,
           desc: detail?.description,
-          authKey: 'app-repos',
+          authKey,
           icon: <Appcenter size={28} />,
           attrs: getAttrs(),
           actions,
-          params: { workspace },
+          params: actionParams,
           breadcrumbs: {
             label: t('APP_REPOSITORY_PL'),
             url: `/workspaces/${workspace}/repos`,

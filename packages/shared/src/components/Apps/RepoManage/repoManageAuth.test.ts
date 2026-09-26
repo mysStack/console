@@ -23,3 +23,14 @@ test('uses the system workspace for global repository rows', () => {
   assert.equal(getRepoManageWorkspace(''), 'system-workspace');
   assert.equal(getRepoManageWorkspace('test-workspace'), 'test-workspace');
 });
+
+test('uses global app-repository permissions after the legacy route redirects', () => {
+  assert.equal(
+    getRepoManageAuthKey('', '', '/workspaces/system-workspace/app-repos', 'system-workspace'),
+    'manage-app',
+  );
+  assert.equal(
+    getRepoManageAuthKey('', '', '/workspaces/test-workspace/app-repos', 'test-workspace'),
+    'app-repos',
+  );
+});
