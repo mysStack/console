@@ -5,7 +5,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { Banner, BannerTip, Button, Field, notify } from '@kubed/components';
 
 import Icon from '../../Icon';
@@ -21,15 +21,16 @@ import {
   useListQueryParams,
 } from '../../../hooks';
 import { openpitrixStore } from '../../../stores';
-import { getAuthKey } from '../../../utils';
 import type { Column, TableRef } from '../../DataTable';
 import type { RepoData } from '../../../types';
 import {
+  getRepoStatusState,
   getPendingRepoSyncNames,
   getRepoStatusDisplayState,
   getRepoSyncSummary,
   isRepoSyncInProgress,
 } from './syncSummary';
+import { getRepoManageAuthKey } from './repoManageAuth';
 
 const AddButton = styled(Button)`
   min-width: 96px;
@@ -54,6 +55,7 @@ export function isOCIRepo(record: RepoData): boolean {
 
 export function RepoManage(): JSX.Element {
   const params = useParams();
+  const location = useLocation();
   const { workspace = '' } = params;
   const repoListUrl = getRepoUrl({ workspace });
   const tableRef = useRef<TableRef>();
@@ -67,7 +69,7 @@ export function RepoManage(): JSX.Element {
     order: 'creationTimestamp',
     status: 'active',
   };
-  const authKey = getAuthKey('app-repos');
+  const authKey = getRepoManageAuthKey(location.search);
 
   useEffect(() => {
     if (pendingRepoSyncNames.length === 0) {
@@ -215,7 +217,7 @@ export function RepoManage(): JSX.Element {
       canHide: true,
       width: '15%',
       render: (status = 'syncing', record) => {
-        const state = status as string;
+        const state = getRepoStatusState(status as string | { state?: string });
         const displayState = getRepoStatusDisplayState(state);
         const summary = getRepoSyncSummary(record?.status?.sync, state);
         return (

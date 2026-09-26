@@ -2,11 +2,18 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  getRepoStatusState,
   getRepoSyncSummary,
   getRepoStatusDisplayState,
   getPendingRepoSyncNames,
   isRepoSyncInProgress,
 } from './syncSummary';
+
+test('normalizes repository status objects from the v2 API', () => {
+  assert.equal(getRepoStatusState({ state: 'successful' }), 'successful');
+  assert.equal(getRepoStatusState('failed'), 'failed');
+  assert.equal(getRepoStatusState(undefined), 'syncing');
+});
 
 test('maps the queued manual trigger to the visible syncing state', () => {
   assert.equal(getRepoStatusDisplayState('manualTrigger'), 'syncing');

@@ -90,10 +90,10 @@ router
   .get('/consolev3/(.*)', renderV3View)
 
   // Keep the legacy application repository bookmark compatible with v4.
-  // It must run before the page catch-all, otherwise the shell renders the
-  // removed route and the browser ends up on a blank page.
+  // Keep its platform permission scope when it is rendered through the
+  // workspace implementation.
   .get('/apps-manage/repo', ctx => {
-    ctx.redirect('/workspaces/system-workspace/app-repos');
+    ctx.redirect('/workspaces/system-workspace/app-repos?global=true');
   })
 
   // theme static image

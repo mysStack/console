@@ -2,6 +2,10 @@ import type { RepoData } from '../../../types';
 
 type RepoSyncStatus = NonNullable<NonNullable<RepoData['status']>['sync']>;
 
+export function getRepoStatusState(status: string | { state?: string } | undefined): string {
+  return typeof status === 'string' ? status : status?.state || 'syncing';
+}
+
 export function isRepoSyncInProgress(state: string | undefined): boolean {
   return state === 'manualTrigger' || state === 'syncing';
 }

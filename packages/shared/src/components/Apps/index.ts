@@ -19,6 +19,14 @@ export { DeployYamlModal } from './DeployYamlModal';
 export { Applications } from './Applications';
 export { PlacementForm } from './AppForms/AppBaseInfoForm/PlacementForm';
 export { RepoManage } from './RepoManage';
+export { getRepoManageAuthKey } from './RepoManage/repoManageAuth';
+export {
+  getRepoStatusDisplayState,
+  getRepoStatusState,
+  getRepoSyncSummary,
+  getPendingRepoSyncNames,
+  isRepoSyncInProgress,
+} from './RepoManage/syncSummary';
 export { CreateApp } from './AppCreate';
 export { AppDataTable } from './AppDataTable';
 export { AppsDashBoard } from './AppsDashBoard';
