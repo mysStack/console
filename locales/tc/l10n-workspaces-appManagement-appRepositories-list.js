@@ -36,6 +36,7 @@ module.exports = {
   REPO_SYNC_LASTERROR: '最近錯誤',
   SYNC_REPOSITORY: '立即同步',
   SYNC_REPOSITORY_TRIGGERED: '同步任務已觸發。',
+  SYNC_REPOSITORY_ALREADY_RUNNING: '該倉庫正在同步，無需重複觸發。',
   // List > Add
   ADD_APP_REPO: '添加應用程序存儲庫',
   VALIDATE: '驗證',

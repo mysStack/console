@@ -36,6 +36,7 @@ module.exports = {
   REPO_SYNC_LASTERROR: 'Último error',
   SYNC_REPOSITORY: 'Sincronizar ahora',
   SYNC_REPOSITORY_TRIGGERED: 'La sincronización se ha activado.',
+  SYNC_REPOSITORY_ALREADY_RUNNING: 'Este repositorio ya se está sincronizando.',
   // List > Add
   ADD_APP_REPO: 'Add App Repository',
   VALIDATE: 'Validar',

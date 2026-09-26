@@ -36,6 +36,7 @@ module.exports = {
   REPO_SYNC_LASTERROR: 'Last error',
   SYNC_REPOSITORY: 'Sync now',
   SYNC_REPOSITORY_TRIGGERED: 'Synchronization has been triggered.',
+  SYNC_REPOSITORY_ALREADY_RUNNING: 'This repository is already synchronizing.',
   FULL_REFRESH_REPOSITORY: 'Full refresh',
   FULL_REFRESH_REPOSITORY_TITLE: 'Fully refresh this app repository?',
   FULL_REFRESH_REPOSITORY_DESC:

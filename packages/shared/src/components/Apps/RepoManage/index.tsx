@@ -120,9 +120,15 @@ export function RepoManage(): JSX.Element {
   }, []);
 
   function triggerRepoSync(repoName: string, mode?: 'full'): Promise<void> {
-    return syncRepo({ repo_name: repoName, mode }).then(() => {
+    return syncRepo({ repo_name: repoName, mode }).then(response => {
       setPendingRepoSyncNames(names => (names.includes(repoName) ? names : [...names, repoName]));
-      notify.success(t('SYNC_REPOSITORY_TRIGGERED'));
+      notify.success(
+        t(
+          response?.alreadyRunning
+            ? 'SYNC_REPOSITORY_ALREADY_RUNNING'
+            : 'SYNC_REPOSITORY_TRIGGERED',
+        ),
+      );
       tableRef.current?.refetch();
     });
   }
