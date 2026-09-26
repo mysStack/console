@@ -350,6 +350,7 @@ export function RepoManage(): JSX.Element {
       {['create', 'edit'].includes(modalType) && (
         <RepoManagementModal
           visible={true}
+          workspace={workspace}
           onCancel={closeModal}
           onOk={handleManageOk}
           detail={selectedRows?.[0]}

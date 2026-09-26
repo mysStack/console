@@ -10,6 +10,14 @@ import { UseListOptions } from '../../hooks';
 import type { PathParams } from '../../types';
 
 import { defaultUrl, useBaseList } from './base';
+import {
+  getRepoCredentialItems,
+  getRepoCredentialMetadata,
+  normalizeRepoCredentialWorkspace,
+  RepoCredentialItem,
+} from './repoCredential';
+
+export { getRepoCredentialItems, normalizeRepoCredentialWorkspace } from './repoCredential';
 
 type RepoPathParams = PathParams & { repo_name?: string; app_name?: string; versionID?: string };
 
@@ -29,19 +37,16 @@ export function getRepoUrl({ workspace, repo_name, name }: RepoPathParams): stri
 
 export function getRepoCredentialUrl(workspace: string, name?: string): string {
   let prefix = defaultUrl;
-  if (workspace) {
-    prefix += `/workspaces/${workspace}`;
-  }
+  prefix += `/workspaces/${normalizeRepoCredentialWorkspace(workspace)}`;
   return `${prefix}/repo-credentials${name ? `/${name}` : ''}`;
 }
 
 export function useRepoCredentials(workspace: string) {
-  return useQuery<{ items: { metadata: { name: string } }[] }>(
+  return useQuery<{ items: RepoCredentialItem[] }>(
     ['repo-credentials', workspace],
-    () =>
-      request.get(getRepoCredentialUrl(workspace)) as unknown as Promise<{
-        items: { metadata: { name: string } }[];
-      }>,
+    async () => ({
+      items: getRepoCredentialItems(await request.get(getRepoCredentialUrl(workspace))),
+    }),
     {
       enabled: true,
     },
@@ -53,7 +58,10 @@ export function useRepoCredentialMutation(
   options?: { onSuccess?: (data: any) => void },
 ) {
   return useMutation(
-    (params: Record<string, any>) => request.post(getRepoCredentialUrl(workspace), params),
+    async (params: Record<string, any>) => {
+      const response = await request.post(getRepoCredentialUrl(workspace), params);
+      return getRepoCredentialMetadata(response) || response;
+    },
     {
       onSuccess: options?.onSuccess,
     },

@@ -21,14 +21,22 @@ import { getCredentialListState } from './credentialState';
 type Props = {
   visible: boolean;
   detail?: RepoData;
+  workspace?: string;
   onOk?: () => void;
   onCancel?: () => void;
 };
 
 const { useRepoMutation, useRepoCredentials } = openpitrixStore;
-function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.Element {
+function RepoManagementModal({
+  visible,
+  detail,
+  workspace: workspaceProp,
+  onCancel,
+  onOk,
+}: Props): JSX.Element {
   const [form] = useForm();
-  const { workspace = '' } = useParams();
+  const { workspace: routeWorkspace = '' } = useParams();
+  const workspace = workspaceProp ?? routeWorkspace;
 
   const {
     data: credentialsData,
@@ -218,14 +226,14 @@ function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.El
         <FormItem label={t('ACCESS_CREDENTIAL')}>
           <CredentialCard>
             <span>🔒</span>
-            {credentialListState === 'ready' ? (
-              <Select
-                className="credential-select"
-                value={currentFormData.spec.credentialSecretRef?.name || ''}
-                options={credentialOptions}
-                onChange={(value: string) => handleCredentialChange(value || undefined)}
-              />
-            ) : (
+            <Select
+              className="credential-select"
+              value={currentFormData.spec.credentialSecretRef?.name || ''}
+              options={credentialOptions}
+              disabled={credentialListState === 'loading' || credentialListState === 'error'}
+              onChange={(value: string) => handleCredentialChange(value || undefined)}
+            />
+            {credentialListState !== 'ready' && (
               <CredentialStatus
                 role={credentialListState === 'error' ? 'alert' : 'status'}
                 aria-live="polite"
