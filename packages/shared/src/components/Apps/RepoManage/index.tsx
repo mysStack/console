@@ -57,6 +57,18 @@ const RepoUrl = styled.div`
   text-overflow: ellipsis;
   white-space: nowrap;
 `;
+const RepoTable = styled.div`
+  .repo-table .table-main > table {
+    table-layout: fixed;
+  }
+
+  .repo-table .table-main td {
+    overflow: hidden;
+  }
+`;
+const RepoType = styled.div`
+  white-space: nowrap;
+`;
 
 const { getRepoUrl, useReposDeleteMutation, useRepoSyncMutation } = openpitrixStore;
 
@@ -266,7 +278,7 @@ export function RepoManage(): JSX.Element {
       render: (_, record) => {
         const isSystem =
           record.metadata?.labels?.['kubesphere.io/workspace'] === 'system-workspace';
-        return t(isSystem ? 'SYSTEM_REPO_TYPE' : 'OWNER_REPO_TYPE');
+        return <RepoType>{t(isSystem ? 'SYSTEM_REPO_TYPE' : 'OWNER_REPO_TYPE')}</RepoType>;
       },
     },
     {
@@ -342,36 +354,39 @@ export function RepoManage(): JSX.Element {
           {t('HOW_TO_USE_APP_REPO_A')}
         </BannerTip>
       </Banner>
-      <DataTable
-        ref={tableRef}
-        rowKey="metadata.uid"
-        tableName="APP_REPOSITORY"
-        url={repoListUrl}
-        simpleSearch
-        parameters={tableParameters}
-        disableRowSelect={val => !isWorkspaceRepo(val)}
-        transformRequestParams={transformRequestParams}
-        columns={columns}
-        useStorageState={false}
-        placeholder={t('SEARCH_BY_NAME')}
-        toolbarRight={renderTableActions()}
-        batchActions={renderBatchActions()}
-        // @ts-ignore TODO
-        format={item => ({ ...item, workspace })}
-        serverDataFormat={serverDataFormatter}
-        onChangeData={handleRepoDataChange}
-        emptyOptions={{
-          withoutTable: true,
-          createButton: !!renderTableActions() && (
-            <AddButton color="secondary" onClick={() => setModalType('create')}>
-              {t('ADD')}
-            </AddButton>
-          ),
-          title: t('NO_APP_REPO_FOUND'),
-          image: <Icon name="catalog" size={48} />,
-          description: t('APP_REPOSITORY_EMPTY_DESC'),
-        }}
-      />
+      <RepoTable>
+        <DataTable
+          className="repo-table"
+          ref={tableRef}
+          rowKey="metadata.uid"
+          tableName="APP_REPOSITORY"
+          url={repoListUrl}
+          simpleSearch
+          parameters={tableParameters}
+          disableRowSelect={val => !isWorkspaceRepo(val)}
+          transformRequestParams={transformRequestParams}
+          columns={columns}
+          useStorageState={false}
+          placeholder={t('SEARCH_BY_NAME')}
+          toolbarRight={renderTableActions()}
+          batchActions={renderBatchActions()}
+          // @ts-ignore TODO
+          format={item => ({ ...item, workspace })}
+          serverDataFormat={serverDataFormatter}
+          onChangeData={handleRepoDataChange}
+          emptyOptions={{
+            withoutTable: true,
+            createButton: !!renderTableActions() && (
+              <AddButton color="secondary" onClick={() => setModalType('create')}>
+                {t('ADD')}
+              </AddButton>
+            ),
+            title: t('NO_APP_REPO_FOUND'),
+            image: <Icon name="catalog" size={48} />,
+            description: t('APP_REPOSITORY_EMPTY_DESC'),
+          }}
+        />
+      </RepoTable>
       {['create', 'edit'].includes(modalType) && (
         <RepoManagementModal
           visible={true}
