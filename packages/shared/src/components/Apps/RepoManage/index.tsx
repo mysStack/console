@@ -30,7 +30,7 @@ import {
   getRepoSyncSummary,
   isRepoSyncInProgress,
 } from './syncSummary';
-import { getRepoManageAuthKey } from './repoManageAuth';
+import { getRepoManageActionParams, getRepoManageAuthKey } from './repoManageAuth';
 
 const AddButton = styled(Button)`
   min-width: 96px;
@@ -70,6 +70,7 @@ export function RepoManage(): JSX.Element {
     status: 'active',
   };
   const authKey = getRepoManageAuthKey(location.search, location.hash);
+  const actionParams = getRepoManageActionParams(authKey, params);
 
   useEffect(() => {
     if (pendingRepoSyncNames.length === 0) {
@@ -106,7 +107,7 @@ export function RepoManage(): JSX.Element {
 
   const renderItemActions = useItemActions<RepoData>({
     authKey,
-    params,
+    params: actionParams,
     actions: [
       {
         key: 'sync',
@@ -158,7 +159,7 @@ export function RepoManage(): JSX.Element {
 
   const renderBatchActions = useBatchActions({
     authKey,
-    params,
+    params: actionParams,
     actions: [
       {
         key: 'delete',
@@ -175,7 +176,7 @@ export function RepoManage(): JSX.Element {
   });
   const renderTableActions = useTableActions({
     authKey,
-    params,
+    params: actionParams,
     actions: [
       {
         key: 'create',
