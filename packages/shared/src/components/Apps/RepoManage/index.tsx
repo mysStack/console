@@ -5,7 +5,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { Banner, BannerTip, Button, Field, notify } from '@kubed/components';
 
 import Icon from '../../Icon';
@@ -30,7 +30,11 @@ import {
   getRepoSyncSummary,
   isRepoSyncInProgress,
 } from './syncSummary';
-import { getRepoManageActionParams, getRepoManageAuthKey } from './repoManageAuth';
+import {
+  getRepoManageActionParams,
+  getRepoManageAuthKey,
+  getRepoManageWorkspace,
+} from './repoManageAuth';
 
 const AddButton = styled(Button)`
   min-width: 96px;
@@ -100,7 +104,7 @@ export function RepoManage(): JSX.Element {
 
   function isWorkspaceRepo(val: any) {
     return (
-      val.metadata.labels['kubesphere.io/workspace'] === workspace ||
+      val.metadata.labels['kubesphere.io/workspace'] === getRepoManageWorkspace(workspace) ||
       location.pathname.includes('/apps-manage/repo')
     );
   }
@@ -199,9 +203,11 @@ export function RepoManage(): JSX.Element {
       render: (_, { metadata, spec }) => (
         <Field
           value={
-            metadata?.annotations?.['kubesphere.io/alias-name']
-              ? `${metadata?.annotations?.['kubesphere.io/alias-name']}（${metadata?.name}）`
-              : metadata?.name
+            <Link to={`/workspaces/${getRepoManageWorkspace(workspace)}/repos/${metadata?.name}`}>
+              {metadata?.annotations?.['kubesphere.io/alias-name']
+                ? `${metadata?.annotations?.['kubesphere.io/alias-name']}（${metadata?.name}）`
+                : metadata?.name}
+            </Link>
           }
           // value={<Link to={record.metadata.name}>{name}</Link>}
           label={

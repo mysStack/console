@@ -16,8 +16,10 @@ import {
   normalizeRepoCredentialWorkspace,
   RepoCredentialItem,
 } from './repoCredential';
+import { getRepoDetailUrl } from './repoUrl';
 
 export { getRepoCredentialItems, normalizeRepoCredentialWorkspace } from './repoCredential';
+export { getRepoEventsUrl } from './repoUrl';
 
 type RepoPathParams = PathParams & { repo_name?: string; app_name?: string; versionID?: string };
 
@@ -139,7 +141,7 @@ export function useRepoSyncMutation(workspace: string, options?: { onSuccess?: (
 }
 
 export function fetchRepoDetail(workspace: string, app_name: string): Record<string, any> {
-  const url = getRepoUrl({ workspace, app_name });
+  const url = getRepoDetailUrl(workspace, app_name);
 
   return request.get(url);
 }

@@ -21,27 +21,37 @@ const StyledCard = styled(Card)`
   }
 `;
 
-const { getRepoUrl } = openpitrixStore;
+const { getRepoEventsUrl } = openpitrixStore;
 
 function Events(): JSX.Element {
   const { workspace, repoId } = useParams();
   const columns: Column[] = [
     {
       title: t('CREATION_TIME_TCAP'),
-      field: 'create_time',
+      field: 'lastTimestamp',
       width: '24%',
-      render: create_time => formatTime(create_time, `YYYY-MM-DD HH:mm:ss`),
+      render: lastTimestamp =>
+        lastTimestamp ? formatTime(lastTimestamp, `YYYY-MM-DD HH:mm:ss`) : '-',
     },
     {
       title: t('STATUS'),
-      field: 'status',
+      field: 'type',
       width: '16%',
-      render: status => <StatusIndicator type={status}>{t(status)}</StatusIndicator>,
+      render: type => (
+        <StatusIndicator type={type === 'Warning' ? 'warning' : 'success'}>
+          {type || '-'}
+        </StatusIndicator>
+      ),
+    },
+    {
+      title: t('REASON'),
+      field: 'reason',
+      width: '20%',
     },
     {
       title: t('MESSAGE'),
-      field: 'result',
-      render: result => result || '-',
+      field: 'message',
+      render: message => message || '-',
     },
   ];
 
@@ -50,8 +60,8 @@ function Events(): JSX.Element {
       <DataTable
         tableName="events"
         // @ts-ignore TODO
-        url={getRepoUrl({ workspace, repo_id: repoId, name: 'events' })}
-        rowKey="create_time"
+        url={getRepoEventsUrl(workspace || 'system-workspace', repoId || '')}
+        rowKey="metadata.uid"
         columns={columns}
         format={item => item}
         showFooter={false}

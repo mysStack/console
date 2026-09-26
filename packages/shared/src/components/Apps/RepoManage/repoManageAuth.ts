@@ -8,3 +8,7 @@ export function getRepoManageActionParams(
 ): Record<string, string | undefined> {
   return authKey === 'manage-app' ? {} : params;
 }
+
+export function getRepoManageWorkspace(workspace?: string): string {
+  return workspace || 'system-workspace';
+}
