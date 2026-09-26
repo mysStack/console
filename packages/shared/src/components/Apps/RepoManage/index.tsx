@@ -69,7 +69,7 @@ export function RepoManage(): JSX.Element {
     order: 'creationTimestamp',
     status: 'active',
   };
-  const authKey = getRepoManageAuthKey(location.search);
+  const authKey = getRepoManageAuthKey(location.search, location.hash);
 
   useEffect(() => {
     if (pendingRepoSyncNames.length === 0) {

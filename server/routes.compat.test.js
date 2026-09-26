@@ -8,7 +8,7 @@ const source = fs.readFileSync(path.join(__dirname, 'routes.js'), 'utf8');
 test('keeps the component-dock repository permissions through the compatibility redirect', () => {
   const route =
     ".get('/apps-manage/repo', ctx => {\n" +
-    "    ctx.redirect('/workspaces/system-workspace/app-repos?global=true');\n  })";
+    "    ctx.redirect('/workspaces/system-workspace/app-repos#global');\n  })";
   const routeIndex = source.indexOf(route);
   const catchAllIndex = source.indexOf(".all('(.*)', renderView)");
 

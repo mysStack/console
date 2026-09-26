@@ -1,3 +1,3 @@
-export function getRepoManageAuthKey(search: string): 'app-repos' | 'manage-app' {
-  return new URLSearchParams(search).get('global') === 'true' ? 'manage-app' : 'app-repos';
+export function getRepoManageAuthKey(search: string, hash = ''): 'app-repos' | 'manage-app' {
+  return hash === '#global' ? 'manage-app' : 'app-repos';
 }

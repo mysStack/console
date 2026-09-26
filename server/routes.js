@@ -93,7 +93,7 @@ router
   // Keep its platform permission scope when it is rendered through the
   // workspace implementation.
   .get('/apps-manage/repo', ctx => {
-    ctx.redirect('/workspaces/system-workspace/app-repos?global=true');
+    ctx.redirect('/workspaces/system-workspace/app-repos#global');
   })
 
   // theme static image
