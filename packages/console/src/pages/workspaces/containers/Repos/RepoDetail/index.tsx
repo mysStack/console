@@ -32,6 +32,10 @@ function RepoDetail(): JSX.Element {
   const { mutateAsync, isLoading: isDeleting } = useReposDeleteMutation(workspace);
   const tabs = [
     {
+      path: `${REPO_DETAIL_PATH_PREFIX}/overview`,
+      title: 'REPO_SYNC_DIAGNOSTICS',
+    },
+    {
       path: `${REPO_DETAIL_PATH_PREFIX}/events`,
       title: 'EVENT_PL',
     },

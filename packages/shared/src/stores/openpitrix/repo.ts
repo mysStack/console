@@ -126,6 +126,16 @@ export function getRepoSyncUrl(
   return mode === 'full' ? `${url}?mode=full` : url;
 }
 
+export type RepoSyncResponse = {
+  accepted: boolean;
+  alreadyRunning: boolean;
+  mode: 'incremental' | 'full';
+  repo: {
+    name: string;
+    status: Record<string, unknown>;
+  };
+};
+
 type RepoSyncProps = {
   repo_name: string;
   mode?: 'incremental' | 'full';
@@ -135,7 +145,7 @@ export function useRepoSyncMutation(workspace: string, options?: { onSuccess?: (
   const onSuccess = options?.onSuccess;
   return useMutation(
     ({ repo_name, mode }: RepoSyncProps) =>
-      request.post(getRepoSyncUrl(workspace, repo_name, mode)),
+      request.post<never, RepoSyncResponse>(getRepoSyncUrl(workspace, repo_name, mode)),
     { onSuccess },
   );
 }

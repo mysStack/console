@@ -7,6 +7,7 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 
 import Events from './Events';
+import Overview from './Overview';
 
 import RepoDetail from './index';
 
@@ -19,7 +20,11 @@ export default [
     children: [
       {
         index: true,
-        element: <Navigate to="events" replace />,
+        element: <Navigate to="overview" replace />,
+      },
+      {
+        path: 'overview',
+        element: <Overview />,
       },
       {
         path: 'events',

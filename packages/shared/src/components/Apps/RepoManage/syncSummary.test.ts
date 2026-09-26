@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
   getRepoStatusState,
+  getRepoPresentationState,
   getRepoSyncSummary,
   getRepoStatusDisplayState,
   getPendingRepoSyncNames,
@@ -89,4 +90,29 @@ test('keeps OCI summaries short and excludes last errors', () => {
 
   assert.deepEqual(summary, { key: 'REPO_SYNC_SUMMARY', values: { duration: 12, count: 7 } });
   assert.doesNotMatch(JSON.stringify(summary), /user|token|example\.test/);
+});
+
+test('marks a successful repository stale after two sync periods', () => {
+  assert.equal(
+    getRepoPresentationState(
+      {
+        state: 'successful',
+        sync: { completedAt: '2026-09-27T00:00:00.000Z' },
+      },
+      60,
+      new Date('2026-09-27T00:02:01.000Z'),
+    ),
+    'stale',
+  );
+});
+
+test('keeps a repository ready when the sync period is disabled', () => {
+  assert.equal(
+    getRepoPresentationState(
+      { state: 'successful', sync: { completedAt: '2026-09-27T00:00:00.000Z' } },
+      0,
+      new Date('2026-09-27T01:00:00.000Z'),
+    ),
+    'ready',
+  );
 });

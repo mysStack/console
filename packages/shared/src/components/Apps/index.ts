@@ -23,6 +23,7 @@ export { getRepoManageActionParams, getRepoManageAuthKey } from './RepoManage/re
 export {
   getRepoStatusDisplayState,
   getRepoStatusState,
+  getRepoPresentationState,
   getRepoSyncSummary,
   getPendingRepoSyncNames,
   isRepoSyncInProgress,

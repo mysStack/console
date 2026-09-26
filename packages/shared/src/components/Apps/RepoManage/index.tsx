@@ -26,6 +26,7 @@ import type { RepoData } from '../../../types';
 import {
   getRepoStatusState,
   getPendingRepoSyncNames,
+  getRepoPresentationState,
   getRepoStatusDisplayState,
   getRepoSyncSummary,
   isRepoSyncInProgress,
@@ -249,12 +250,17 @@ export function RepoManage(): JSX.Element {
       width: '20%',
       render: (status = 'syncing', record) => {
         const state = getRepoStatusState(status as string | { state?: string });
-        const displayState = getRepoStatusDisplayState(state);
+        const presentationState = getRepoPresentationState(
+          record?.status,
+          record?.spec?.syncPeriod,
+        );
+        const displayState =
+          presentationState === 'ready' ? getRepoStatusDisplayState(state) : presentationState;
         const summary = getRepoSyncSummary(record?.status?.sync, state);
         return (
           <>
             {/* @ts-ignore TODO */}
-            <StatusIndicator type={displayState}>
+            <StatusIndicator type={displayState === 'stale' ? 'warning' : displayState}>
               {t(`APP_REPO_STATUS_${displayState.toUpperCase()}`)}
             </StatusIndicator>
             {summary && <SyncSummary>{t(summary.key, summary.values)}</SyncSummary>}
