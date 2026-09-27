@@ -11,6 +11,9 @@ interface Globals {
   ksConfig: {
     k8sVersion: string;
     ksVersion: string;
+    extension?: {
+      ignoreCompatibilityVersion?: boolean;
+    };
     multicluster?: any;
   };
   installedExtensions?: any[];

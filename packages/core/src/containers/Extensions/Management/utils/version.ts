@@ -36,9 +36,18 @@ function satisfiesExtensionVersion({
 }) {
   const { isSatisfied: isK8sSatisfied, version: k8sVersion } = satisfiesK8sVersion(k8sVersionRange);
   const { isSatisfied: isKsSatisfied, version: ksVersion } = satisfiesKsVersion(ksVersionRange);
-  const isSatisfied = isK8sSatisfied && isKsSatisfied;
+  const ignoreCompatibilityVersion = Boolean(
+    globals.ksConfig?.extension?.ignoreCompatibilityVersion,
+  );
+  const isSatisfied = ignoreCompatibilityVersion || (isK8sSatisfied && isKsSatisfied);
 
-  return { isSatisfied, isK8sSatisfied, isKsSatisfied, k8sVersion, ksVersion };
+  return {
+    isSatisfied,
+    isK8sSatisfied: ignoreCompatibilityVersion || isK8sSatisfied,
+    isKsSatisfied: ignoreCompatibilityVersion || isKsSatisfied,
+    k8sVersion,
+    ksVersion,
+  };
 }
 
 interface FilterUpdatableSatisfiedFormattedExtensionVersionsOptions {
