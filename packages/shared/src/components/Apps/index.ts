@@ -21,6 +21,10 @@ export { PlacementForm } from './AppForms/AppBaseInfoForm/PlacementForm';
 export { RepoManage } from './RepoManage';
 export { getRepoManageActionParams, getRepoManageAuthKey } from './RepoManage/repoManageAuth';
 export {
+  REPOSITORY_SYNC_COMPLETED_EVENT,
+  shouldRefreshVersionsForRepositorySync,
+} from './repoVersionRefresh';
+export {
   getRepoStatusDisplayState,
   getRepoStatusState,
   getRepoPresentationState,

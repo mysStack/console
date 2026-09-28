@@ -7,3 +7,7 @@ export function getRepoDetailActionKeys(isOCIRepo: boolean): RepoDetailActionKey
 export function isRepoSyncInProgress(state?: string): boolean {
   return state === 'manualTrigger' || state === 'syncing';
 }
+
+export function hasRepoSyncCompleted(previousState: string | undefined, state: string | undefined) {
+  return isRepoSyncInProgress(previousState) && state === 'successful';
+}

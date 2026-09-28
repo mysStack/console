@@ -7,6 +7,7 @@ import {
   getRepoSyncSummary,
   getRepoStatusDisplayState,
   getPendingRepoSyncNames,
+  getSuccessfulRepoSyncNames,
   isRepoSyncInProgress,
 } from './syncSummary';
 
@@ -33,6 +34,19 @@ test('stops polling a triggered repository once the server reports a terminal st
       [
         { metadata: { name: 'redis' }, status: { state: 'syncing' } },
         { metadata: { name: 'traefik' }, status: { state: 'successful' } },
+      ],
+    ),
+    ['redis'],
+  );
+});
+
+test('identifies only successfully completed pending repository syncs', () => {
+  assert.deepEqual(
+    getSuccessfulRepoSyncNames(
+      ['redis', 'traefik'],
+      [
+        { metadata: { name: 'redis' }, status: { state: 'successful' } },
+        { metadata: { name: 'traefik' }, status: { state: 'failed' } },
       ],
     ),
     ['redis'],

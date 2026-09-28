@@ -11,6 +11,10 @@ import { Select, Tag } from '@kubed/components';
 import { AppDetail } from '../../..//types';
 import { LabelText } from '../AppInformation';
 import { openpitrixStore } from '../../../stores';
+import {
+  REPOSITORY_SYNC_COMPLETED_EVENT,
+  shouldRefreshVersionsForRepositorySync,
+} from '../repoVersionRefresh';
 
 const { useAppVersionList } = openpitrixStore;
 
@@ -28,7 +32,7 @@ export function AppVersionSelector({
   selectedVersionChange,
 }: Props): JSX.Element {
   const [selectedVersion, setSelectedVersion] = useState<string>('');
-  const { data: versions = [] } = useAppVersionList(
+  const { data: versions = [], refresh: refreshVersions } = useAppVersionList(
     {
       workspace,
       appName: appDetail.metadata.name,
@@ -49,6 +53,7 @@ export function AppVersionSelector({
     ?.split(',')
     .map((v: any) => v.trim())
     .filter(Boolean);
+  const repositoryName = appDetail.metadata?.labels?.['application.kubesphere.io/repo-name'];
 
   function handleChangeAppVersion(versionID: string): void {
     setSelectedVersion(versionID);
@@ -60,6 +65,23 @@ export function AppVersionSelector({
   }, [versions]);
 
   useEffect(() => selectedVersionChange?.(selectedVersion), [selectedVersion]);
+
+  useEffect(() => {
+    if (!repositoryName) {
+      return undefined;
+    }
+
+    const handleRepositorySyncCompleted = (event: Event) => {
+      const repoName = (event as CustomEvent<{ repoName?: string }>).detail?.repoName;
+      if (shouldRefreshVersionsForRepositorySync(repoName, [repositoryName])) {
+        refreshVersions();
+      }
+    };
+
+    window.addEventListener(REPOSITORY_SYNC_COMPLETED_EVENT, handleRepositorySyncCompleted);
+    return () =>
+      window.removeEventListener(REPOSITORY_SYNC_COMPLETED_EVENT, handleRepositorySyncCompleted);
+  }, [repositoryName, refreshVersions]);
 
   return (
     <>

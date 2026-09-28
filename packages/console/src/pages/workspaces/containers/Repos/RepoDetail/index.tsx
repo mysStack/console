@@ -3,7 +3,7 @@
  * https://github.com/kubesphere/console/blob/master/LICENSE
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { isEmpty } from 'lodash';
 import { Appcenter } from '@kubed/icons';
 import { Loading, notify } from '@kubed/components';
@@ -16,10 +16,15 @@ import {
   formatTime,
   getRepoManageAuthKey,
   openpitrixStore,
+  REPOSITORY_SYNC_COMPLETED_EVENT,
 } from '@ks-console/shared';
 
 import { RepoManagementModal } from '../../../components/Modals';
-import { getRepoDetailActionKeys, isRepoSyncInProgress } from './repoDetailActions';
+import {
+  getRepoDetailActionKeys,
+  hasRepoSyncCompleted,
+  isRepoSyncInProgress,
+} from './repoDetailActions';
 
 const { useRepoDetail, useReposDeleteMutation, useRepoSyncMutation } = openpitrixStore;
 
@@ -30,11 +35,24 @@ function RepoDetail(): JSX.Element {
   const navigate = useNavigate();
   const location = useLocation();
   const [modalType, setModalType] = useState<string>('');
+  const previousSyncState = useRef<string>();
   const { data: detail, isLoading, refetch } = useRepoDetail(workspace, repoId);
   const { mutateAsync, isLoading: isDeleting } = useReposDeleteMutation(workspace);
   const { mutateAsync: syncRepo, isLoading: isSyncing } = useRepoSyncMutation(workspace);
   const isOCIRepo = detail?.spec?.url?.startsWith('oci://') ?? false;
   const detailActionKeys = getRepoDetailActionKeys(isOCIRepo);
+
+  useEffect(() => {
+    const currentState = detail?.status?.state;
+    if (hasRepoSyncCompleted(previousSyncState.current, currentState)) {
+      window.dispatchEvent(
+        new CustomEvent(REPOSITORY_SYNC_COMPLETED_EVENT, {
+          detail: { repoName: repoId },
+        }),
+      );
+    }
+    previousSyncState.current = currentState;
+  }, [detail?.status?.state, repoId]);
 
   useEffect(() => {
     if (!isRepoSyncInProgress(detail?.status?.state)) {

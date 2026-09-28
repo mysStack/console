@@ -29,6 +29,7 @@ import {
   getRepoPresentationState,
   getRepoStatusDisplayState,
   getRepoSyncSummary,
+  getSuccessfulRepoSyncNames,
   isRepoSyncInProgress,
 } from './syncSummary';
 import {
@@ -37,6 +38,7 @@ import {
   getRepoManageWorkspace,
 } from './repoManageAuth';
 import { isRepoActionVisible } from './layout';
+import { REPOSITORY_SYNC_COMPLETED_EVENT } from '../repoVersionRefresh';
 
 const RepoHeader = styled.section`
   margin-bottom: 12px;
@@ -159,6 +161,7 @@ export function RepoManage(): JSX.Element {
   const repoListUrl = getRepoUrl({ workspace });
   const tableRef = useRef<TableRef>();
   const syncPollingTimer = useRef<number>();
+  const completedRepoSyncNames = useRef<Set<string>>(new Set());
   const [modalType, setModalType] = useState<string>('');
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [selectedRows, setSelectedRows] = useState<RepoData[]>();
@@ -191,11 +194,25 @@ export function RepoManage(): JSX.Element {
     };
   }, [pendingRepoSyncNames.length]);
 
-  const handleRepoDataChange = useCallback((records: RepoData[]) => {
-    setPendingRepoSyncNames(names => getPendingRepoSyncNames(names, records));
-  }, []);
+  const handleRepoDataChange = useCallback(
+    (records: RepoData[]) => {
+      getSuccessfulRepoSyncNames(pendingRepoSyncNames, records)
+        .filter(repoName => !completedRepoSyncNames.current.has(repoName))
+        .forEach(repoName => {
+          completedRepoSyncNames.current.add(repoName);
+          window.dispatchEvent(
+            new CustomEvent(REPOSITORY_SYNC_COMPLETED_EVENT, {
+              detail: { repoName },
+            }),
+          );
+        });
+      setPendingRepoSyncNames(names => getPendingRepoSyncNames(names, records));
+    },
+    [pendingRepoSyncNames],
+  );
 
   function triggerRepoSync(repoName: string, mode?: 'full'): Promise<void> {
+    completedRepoSyncNames.current.delete(repoName);
     return syncRepo({ repo_name: repoName, mode }).then(response => {
       setPendingRepoSyncNames(names => (names.includes(repoName) ? names : [...names, repoName]));
       notify.success(

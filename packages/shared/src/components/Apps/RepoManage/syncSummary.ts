@@ -70,6 +70,15 @@ export function getPendingRepoSyncNames(
   return nextNames;
 }
 
+export function getSuccessfulRepoSyncNames(
+  names: string[],
+  records: Array<{ metadata: { name: string }; status?: { state?: string } }>,
+): string[] {
+  return names.filter(name =>
+    records.some(item => item.metadata.name === name && item.status?.state === 'successful'),
+  );
+}
+
 export type RepoSyncSummaryValue =
   | { key: 'REPO_SYNC_STARTED_AT'; values: { time: string } }
   | { key: 'REPO_SYNC_SUMMARY'; values: { duration: number; count: number } };
