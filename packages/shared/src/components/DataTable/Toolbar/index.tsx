@@ -131,12 +131,17 @@ export function Toolbar<T extends Record<string, unknown>>(
           )}
         </div>
         <div className="toolbar-right">
-          <Button variant="text" className="btn-refresh" onClick={refetch}>
+          <Button
+            variant="text"
+            className="btn-refresh"
+            aria-label={t('REFRESH')}
+            onClick={refetch}
+          >
             <Refresh />
           </Button>
           {!hideSettingMenu && (
             <Dropdown content={settingMenu} placement="bottom-end" maxWidth={160}>
-              <Button variant="text" className="btn-setting">
+              <Button variant="text" className="btn-setting" aria-label={t('CUSTOM_COLUMNS')}>
                 <Cogwheel />
               </Button>
             </Dropdown>

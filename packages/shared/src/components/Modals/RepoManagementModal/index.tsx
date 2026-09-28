@@ -14,7 +14,7 @@ import TimeInput from '../../../components/TimeInput';
 import { Pattern } from '../../../constants';
 import { openpitrixStore } from '../../../stores';
 import type { RepoData } from '../../../types';
-import { CredentialCard, CredentialStatus, StyledForm } from './styles';
+import { CredentialCard, CredentialIcon, CredentialStatus, StyledForm } from './styles';
 import RepoCredentialModal from './RepoCredentialModal';
 import { getCredentialListState } from './credentialState';
 
@@ -225,7 +225,7 @@ function RepoManagementModal({
         />
         <FormItem label={t('ACCESS_CREDENTIAL')}>
           <CredentialCard>
-            <span>🔒</span>
+            <CredentialIcon aria-hidden="true">🔒</CredentialIcon>
             <Select
               className="credential-select"
               value={currentFormData.spec.credentialSecretRef?.name || ''}
@@ -235,6 +235,7 @@ function RepoManagementModal({
             />
             {credentialListState !== 'ready' && (
               <CredentialStatus
+                className="credential-status"
                 role={credentialListState === 'error' ? 'alert' : 'status'}
                 aria-live="polite"
               >
@@ -248,7 +249,11 @@ function RepoManagementModal({
                 {t('RETRY')}
               </Button>
             )}
-            <Button variant="text" onClick={() => setCredentialModalVisible(true)}>
+            <Button
+              className="credential-new-button"
+              variant="text"
+              onClick={() => setCredentialModalVisible(true)}
+            >
               {t('NEW_REPO_CREDENTIAL')}
             </Button>
           </CredentialCard>

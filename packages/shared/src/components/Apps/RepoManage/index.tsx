@@ -143,6 +143,19 @@ const RepoTable = styled.div`
   .repo-table .table-main td {
     overflow: hidden;
   }
+
+  @media (max-width: 640px) {
+    .repo-table .table-main > table {
+      min-width: 0;
+    }
+
+    .repo-table .table-main th:nth-child(4),
+    .repo-table .table-main td:nth-child(4),
+    .repo-table .table-main th:nth-child(5),
+    .repo-table .table-main td:nth-child(5) {
+      display: none;
+    }
+  }
 `;
 const RepoType = styled.div`
   white-space: nowrap;

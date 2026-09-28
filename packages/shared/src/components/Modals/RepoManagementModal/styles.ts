@@ -20,6 +20,7 @@ export const StyledForm = styled(Form)`
     .time-input {
       .input-wrapper {
         width: 336px;
+        max-width: 100%;
       }
     }
 
@@ -43,7 +44,9 @@ export const CredentialCard = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  width: 455px;
+  width: min(455px, 100%);
+  max-width: 100%;
+  min-width: 0;
   min-height: 52px;
   padding: 8px 12px;
   border: 1px solid #d8dee8;
@@ -52,10 +55,34 @@ export const CredentialCard = styled.div`
 
   .credential-select.kubed-select {
     flex: 1;
+    min-width: 0;
     width: auto;
 
     .kubed-select-selector {
       width: 100%;
+    }
+  }
+
+  .credential-new-button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 480px) {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+    align-items: start;
+    gap: 8px;
+
+    .credential-select.kubed-select,
+    .credential-status,
+    .credential-new-button {
+      grid-column: 2;
+      min-width: 0;
+    }
+
+    .credential-new-button {
+      justify-self: start;
     }
   }
 `;
@@ -64,4 +91,14 @@ export const CredentialStatus = styled.span`
   flex: 1;
   min-width: 0;
   color: #657d95;
+  overflow-wrap: anywhere;
+`;
+
+export const CredentialIcon = styled.span`
+  flex: 0 0 20px;
+  line-height: 20px;
+
+  @media (max-width: 480px) {
+    align-self: flex-start;
+  }
 `;
