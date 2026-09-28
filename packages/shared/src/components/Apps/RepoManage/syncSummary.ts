@@ -11,7 +11,11 @@ type RepoStatusValue = {
 };
 
 export function getRepoStatusState(status: string | { state?: string } | undefined): string {
-  return typeof status === 'string' ? status : status?.state || 'syncing';
+  if (typeof status === 'string') {
+    return status;
+  }
+
+  return typeof status?.state === 'string' ? status.state : 'syncing';
 }
 
 export function getRepoPresentationState(

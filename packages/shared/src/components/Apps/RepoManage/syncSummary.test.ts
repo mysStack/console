@@ -17,6 +17,13 @@ test('normalizes repository status objects from the v2 API', () => {
   assert.equal(getRepoStatusState(undefined), 'syncing');
 });
 
+test('falls back safely when a repository state is not a string', () => {
+  assert.equal(
+    getRepoStatusState({ state: { value: 'successful' } as unknown as string }),
+    'syncing',
+  );
+});
+
 test('maps the queued manual trigger to the visible syncing state', () => {
   assert.equal(getRepoStatusDisplayState('manualTrigger'), 'syncing');
 });
