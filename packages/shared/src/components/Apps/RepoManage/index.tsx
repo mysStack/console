@@ -6,7 +6,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Link, useLocation, useParams } from 'react-router-dom';
-import { Banner, BannerTip, Button, Field, notify } from '@kubed/components';
+import { Button, Field, notify } from '@kubed/components';
 
 import Icon from '../../Icon';
 import StatusIndicator from '../../StatusIndicator';
@@ -18,7 +18,7 @@ import {
   useItemActions,
   useTableActions,
   useBatchActions,
-  useListQueryParams,
+  useListQueryParams as formatListQueryParams,
 } from '../../../hooks';
 import { openpitrixStore } from '../../../stores';
 import type { Column, TableRef } from '../../DataTable';
@@ -36,6 +36,78 @@ import {
   getRepoManageAuthKey,
   getRepoManageWorkspace,
 } from './repoManageAuth';
+import { isRepoActionVisible } from './layout';
+
+const RepoHeader = styled.section`
+  margin-bottom: 12px;
+  padding: 16px 20px;
+  border: 1px solid ${({ theme }) => theme.palette.accents_2};
+  border-radius: 8px;
+  background: ${({ theme }) => theme.palette.background};
+
+  @media (max-width: 768px) {
+    padding: 14px 16px;
+  }
+`;
+const RepoHeaderMain = styled.div`
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 12px;
+`;
+const RepoHeaderCopy = styled.div`
+  min-width: 0;
+`;
+const RepoHeaderTitle = styled.h1`
+  margin: 0;
+  color: ${({ theme }) => theme.palette.accents_8};
+  font-size: 20px;
+  line-height: 28px;
+`;
+const RepoHeaderDescription = styled.p`
+  margin: 2px 0 0;
+  color: ${({ theme }) => theme.palette.accents_5};
+  font-size: 13px;
+  line-height: 20px;
+`;
+const RepoHelpToggle = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 12px 0 0 52px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: ${({ theme }) => theme.palette.accents_6};
+  font-size: 12px;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    color: ${({ theme }) => theme.palette.accents_8};
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.palette.accents_8};
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 768px) {
+    margin-left: 44px;
+  }
+`;
+const RepoHelpContent = styled.p`
+  margin: 8px 0 0 52px;
+  color: ${({ theme }) => theme.palette.accents_6};
+  font-size: 12px;
+  line-height: 18px;
+  overflow-wrap: anywhere;
+
+  @media (max-width: 768px) {
+    margin-left: 44px;
+  }
+`;
 
 const AddButton = styled(Button)`
   min-width: 96px;
@@ -50,13 +122,16 @@ const SyncSummary = styled.div`
   color: ${({ theme }) => theme.palette.accents_5};
   font-size: 12px;
   margin-top: 4px;
-  white-space: nowrap;
+  line-height: 18px;
+  overflow-wrap: anywhere;
 `;
 const RepoUrl = styled.div`
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 20px;
 `;
 const RepoTable = styled.div`
   .repo-table .table-main > table {
@@ -74,7 +149,7 @@ const RepoType = styled.div`
 const { getRepoUrl, useReposDeleteMutation, useRepoSyncMutation } = openpitrixStore;
 
 export function isOCIRepo(record: RepoData): boolean {
-  return record.spec.url?.startsWith('oci://') ?? false;
+  return record.spec?.url?.startsWith('oci://') ?? false;
 }
 
 export function RepoManage(): JSX.Element {
@@ -85,6 +160,7 @@ export function RepoManage(): JSX.Element {
   const tableRef = useRef<TableRef>();
   const syncPollingTimer = useRef<number>();
   const [modalType, setModalType] = useState<string>('');
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [selectedRows, setSelectedRows] = useState<RepoData[]>();
   const [pendingRepoSyncNames, setPendingRepoSyncNames] = useState<string[]>([]);
   const { mutateAsync, isLoading } = useReposDeleteMutation(workspace);
@@ -135,7 +211,7 @@ export function RepoManage(): JSX.Element {
 
   function isWorkspaceRepo(val: any) {
     return (
-      val.metadata.labels['kubesphere.io/workspace'] === getRepoManageWorkspace(workspace) ||
+      val?.metadata?.labels?.['kubesphere.io/workspace'] === getRepoManageWorkspace(workspace) ||
       location.pathname.includes('/apps-manage/repo')
     );
   }
@@ -149,7 +225,7 @@ export function RepoManage(): JSX.Element {
         icon: <Icon name="refresh" />,
         text: t('SYNC_REPOSITORY'),
         action: 'edit',
-        show: isWorkspaceRepo,
+        show: record => isRepoActionVisible('sync', isWorkspaceRepo(record), isOCIRepo(record)),
         disabled: record => isSyncing || isRepoSyncInProgress(record.status?.state),
         onClick: async (_, record) => {
           await triggerRepoSync(record.metadata.name);
@@ -160,7 +236,7 @@ export function RepoManage(): JSX.Element {
         icon: <Icon name="refresh" />,
         text: t('FULL_REFRESH_REPOSITORY'),
         action: 'edit',
-        show: record => isWorkspaceRepo(record) && isOCIRepo(record),
+        show: record => isRepoActionVisible('fullSync', isWorkspaceRepo(record), isOCIRepo(record)),
         disabled: record => isSyncing || isRepoSyncInProgress(record.status?.state),
         onClick: (_, record) => {
           setSelectedRows([record]);
@@ -172,7 +248,7 @@ export function RepoManage(): JSX.Element {
         icon: <Icon name="pen" />,
         text: t('EDIT_INFORMATION'),
         action: 'edit',
-        show: isWorkspaceRepo,
+        show: record => isRepoActionVisible('edit', isWorkspaceRepo(record), isOCIRepo(record)),
         onClick: (_, record) => {
           setSelectedRows([record]);
           setModalType('edit');
@@ -182,7 +258,7 @@ export function RepoManage(): JSX.Element {
         key: 'delete',
         icon: <Icon name="trash" />,
         text: t('DELETE'),
-        show: isWorkspaceRepo,
+        show: record => isRepoActionVisible('delete', isWorkspaceRepo(record), isOCIRepo(record)),
         action: 'delete',
         onClick: (_, record) => {
           setSelectedRows([record]);
@@ -309,7 +385,7 @@ export function RepoManage(): JSX.Element {
   function transformRequestParams(paramData: Record<string, any>): Record<string, any> {
     const { parameters, pageIndex, filters } = paramData;
     const keyword = filters?.[0]?.value;
-    const formattedParams = useListQueryParams({
+    const formattedParams = formatListQueryParams({
       ...parameters,
       page: pageIndex + 1,
     });
@@ -356,16 +432,24 @@ export function RepoManage(): JSX.Element {
 
   return (
     <>
-      <Banner
-        className="mb12"
-        icon={<Icon name="catalog" />}
-        title={t('APP_REPO')}
-        description={t('APP_REPO_DESC')}
-      >
-        <BannerTip title={t('HOW_TO_USE_APP_REPO_Q')} key="develop">
-          {t('HOW_TO_USE_APP_REPO_A')}
-        </BannerTip>
-      </Banner>
+      <RepoHeader>
+        <RepoHeaderMain>
+          <Icon name="catalog" size={40} />
+          <RepoHeaderCopy>
+            <RepoHeaderTitle>{t('APP_REPO')}</RepoHeaderTitle>
+            <RepoHeaderDescription>{t('APP_REPO_DESC')}</RepoHeaderDescription>
+          </RepoHeaderCopy>
+        </RepoHeaderMain>
+        <RepoHelpToggle
+          type="button"
+          aria-expanded={isHelpOpen}
+          onClick={() => setIsHelpOpen(open => !open)}
+        >
+          <Icon name="question" size={16} />
+          {t('HOW_TO_USE_APP_REPO_Q')}
+        </RepoHelpToggle>
+        {isHelpOpen && <RepoHelpContent>{t('HOW_TO_USE_APP_REPO_A')}</RepoHelpContent>}
+      </RepoHeader>
       <RepoTable>
         <DataTable
           className="repo-table"
