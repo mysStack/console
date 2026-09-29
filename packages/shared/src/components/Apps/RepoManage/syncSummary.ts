@@ -56,10 +56,14 @@ export function getPendingRepoSyncNames(
   names: string[],
   records: Array<{ metadata: { name: string }; status?: { state?: string } }>,
 ): string[] {
-  const nextNames = names.filter(name => {
-    const record = records.find(item => item.metadata.name === name);
-    return record && isRepoSyncInProgress(record.status?.state);
-  });
+  const pendingNames = records
+    .filter(record => isRepoSyncInProgress(record.status?.state))
+    .map(record => record.metadata.name);
+  const pendingNameSet = new Set(pendingNames);
+  const nextNames = [
+    ...names.filter(name => pendingNameSet.has(name)),
+    ...pendingNames.filter(name => !names.includes(name)),
+  ];
 
   // DataTable notifies consumers whenever its formatted data changes. Keep the
   // previous reference when polling has not changed the pending set so React

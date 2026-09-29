@@ -47,6 +47,19 @@ test('stops polling a triggered repository once the server reports a terminal st
   );
 });
 
+test('adopts repositories already syncing when the list is first loaded', () => {
+  assert.deepEqual(
+    getPendingRepoSyncNames(
+      [],
+      [
+        { metadata: { name: 'redis' }, status: { state: 'syncing' } },
+        { metadata: { name: 'traefik' }, status: { state: 'successful' } },
+      ],
+    ),
+    ['redis'],
+  );
+});
+
 test('identifies only successfully completed pending repository syncs', () => {
   assert.deepEqual(
     getSuccessfulRepoSyncNames(
