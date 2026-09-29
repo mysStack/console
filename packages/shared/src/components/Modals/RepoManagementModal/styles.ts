@@ -44,7 +44,7 @@ export const CredentialCard = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  width: min(455px, 100%);
+  width: 100%;
   max-width: 100%;
   min-width: 0;
   min-height: 52px;
