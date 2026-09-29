@@ -3,7 +3,7 @@
  * https://github.com/kubesphere/console/blob/master/LICENSE
  */
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { Button, Field, notify } from '@kubed/components';
@@ -173,7 +173,6 @@ export function RepoManage(): JSX.Element {
   const { workspace = '' } = params;
   const repoListUrl = getRepoUrl({ workspace });
   const tableRef = useRef<TableRef>();
-  const syncPollingTimer = useRef<number>();
   const completedRepoSyncNames = useRef<Set<string>>(new Set());
   const [modalType, setModalType] = useState<string>('');
   const [isHelpOpen, setIsHelpOpen] = useState(false);
@@ -192,20 +191,6 @@ export function RepoManage(): JSX.Element {
     workspace,
   );
   const actionParams = getRepoManageActionParams(authKey, params);
-
-  useEffect(() => {
-    if (pendingRepoSyncNames.length === 0) {
-      return undefined;
-    }
-
-    syncPollingTimer.current = window.setInterval(() => tableRef.current?.refetch(), 3000);
-    return () => {
-      if (syncPollingTimer.current) {
-        window.clearInterval(syncPollingTimer.current);
-        syncPollingTimer.current = undefined;
-      }
-    };
-  }, [pendingRepoSyncNames.length]);
 
   const handleRepoDataChange = useCallback(
     (records: RepoData[]) => {
@@ -500,6 +485,7 @@ export function RepoManage(): JSX.Element {
           format={item => ({ ...item, workspace })}
           serverDataFormat={serverDataFormatter}
           onChangeData={handleRepoDataChange}
+          refreshInterval={pendingRepoSyncNames.length > 0 ? 3000 : false}
           emptyOptions={{
             withoutTable: true,
             createButton: !!renderTableActions() && (

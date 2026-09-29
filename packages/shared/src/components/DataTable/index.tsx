@@ -167,6 +167,7 @@ function DataTableComponent<
     isLoading: isLoadingProp = false,
     skeleton,
     hideSettingMenu = false,
+    refreshInterval,
   } = props;
 
   const [, setStorageState] = useLocalStorage({ key: `tableState:${tableName}` });
@@ -194,6 +195,7 @@ function DataTableComponent<
     },
     tableName,
     transformRequestParams,
+    refreshInterval,
   );
 
   const handleRefresh = () => {

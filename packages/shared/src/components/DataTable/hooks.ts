@@ -27,6 +27,7 @@ export const useData = (
   params: State,
   queryKey?: string,
   transformParamsFn?: (params: any) => any,
+  refreshInterval?: number | false,
 ) => {
   const requestParams = (transformParamsFn || transformRequestParams)(params);
   return useQuery(
@@ -47,6 +48,7 @@ export const useData = (
     {
       keepPreviousData: true,
       staleTime: 15000,
+      refetchInterval: refreshInterval,
     },
   );
 };

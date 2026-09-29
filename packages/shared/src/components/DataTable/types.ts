@@ -117,6 +117,7 @@ export interface TableProps<
   >;
   emptyOptions?: TableEmptyOptions;
   onChangeData?: (data: T[]) => void;
+  refreshInterval?: number | false;
   isLoading?: boolean;
   filteredEmptyOptions?: TableFilteredEmptyOptions;
   skeleton?: TableSkeletonProps;
