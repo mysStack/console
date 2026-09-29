@@ -220,7 +220,6 @@ export function RepoManage(): JSX.Element {
             : 'SYNC_REPOSITORY_TRIGGERED',
         ),
       );
-      tableRef.current?.refetch();
     });
   }
 
