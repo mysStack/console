@@ -5,7 +5,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { get } from 'lodash';
-import { Firewall } from '@kubed/icons';
+import { Firewall, Key } from '@kubed/icons';
 import { useParams } from 'react-router-dom';
 import { RuleObject } from 'rc-field-form/lib/interface';
 import { Button, FormItem, Input, Modal, Select, useForm, Textarea } from '@kubed/components';
@@ -14,7 +14,14 @@ import TimeInput from '../../../components/TimeInput';
 import { Pattern } from '../../../constants';
 import { openpitrixStore } from '../../../stores';
 import type { RepoData } from '../../../types';
-import { CredentialCard, CredentialIcon, CredentialStatus, StyledForm } from './styles';
+import {
+  CredentialCard,
+  CredentialControl,
+  CredentialIcon,
+  CredentialStatus,
+  CredentialStatusRow,
+  StyledForm,
+} from './styles';
 import RepoCredentialModal from './RepoCredentialModal';
 import { getCredentialListState } from './credentialState';
 
@@ -224,39 +231,48 @@ function RepoManagementModal({
           isSubmitting={isLoading}
         />
         <FormItem label={t('ACCESS_CREDENTIAL')}>
-          <CredentialCard>
-            <CredentialIcon aria-hidden="true">🔒</CredentialIcon>
-            <Select
-              className="credential-select"
-              value={currentFormData.spec.credentialSecretRef?.name || ''}
-              options={credentialOptions}
-              disabled={credentialListState === 'loading' || credentialListState === 'error'}
-              onChange={(value: string) => handleCredentialChange(value || undefined)}
-            />
-            {credentialListState !== 'ready' && (
-              <CredentialStatus
-                className="credential-status"
-                role={credentialListState === 'error' ? 'alert' : 'status'}
-                aria-live="polite"
+          <CredentialControl>
+            <CredentialCard>
+              <CredentialIcon aria-hidden="true">
+                <Key size={18} />
+              </CredentialIcon>
+              <Select
+                className="credential-select"
+                value={currentFormData.spec.credentialSecretRef?.name || ''}
+                options={credentialOptions}
+                disabled={credentialListState === 'loading' || credentialListState === 'error'}
+                onChange={(value: string) => handleCredentialChange(value || undefined)}
+              />
+              <Button
+                className="credential-new-button"
+                variant="text"
+                onClick={() => setCredentialModalVisible(true)}
               >
-                {credentialListState === 'loading' && t('LOADING_REPO_CREDENTIALS')}
-                {credentialListState === 'empty' && t('NO_REPO_CREDENTIALS')}
-                {credentialListState === 'error' && t('LOAD_REPO_CREDENTIALS_FAILED')}
-              </CredentialStatus>
-            )}
-            {credentialListState === 'error' && (
-              <Button variant="text" onClick={() => void refetchCredentials()}>
-                {t('RETRY')}
+                {t('NEW_REPO_CREDENTIAL')}
               </Button>
+            </CredentialCard>
+            {credentialListState !== 'ready' && (
+              <CredentialStatusRow>
+                <CredentialStatus
+                  role={credentialListState === 'error' ? 'alert' : 'status'}
+                  aria-live="polite"
+                >
+                  {credentialListState === 'loading' && t('LOADING_REPO_CREDENTIALS')}
+                  {credentialListState === 'empty' && t('NO_REPO_CREDENTIALS')}
+                  {credentialListState === 'error' && t('LOAD_REPO_CREDENTIALS_FAILED')}
+                </CredentialStatus>
+                {credentialListState === 'error' && (
+                  <Button
+                    className="credential-retry-button"
+                    variant="text"
+                    onClick={() => void refetchCredentials()}
+                  >
+                    {t('RETRY')}
+                  </Button>
+                )}
+              </CredentialStatusRow>
             )}
-            <Button
-              className="credential-new-button"
-              variant="text"
-              onClick={() => setCredentialModalVisible(true)}
-            >
-              {t('NEW_REPO_CREDENTIAL')}
-            </Button>
-          </CredentialCard>
+          </CredentialControl>
         </FormItem>
         <FormItem
           name={['spec', 'syncPeriod']}

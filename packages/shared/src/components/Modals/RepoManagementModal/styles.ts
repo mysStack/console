@@ -43,15 +43,15 @@ export const StyledForm = styled(Form)`
 export const CredentialCard = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   width: min(455px, 100%);
   max-width: 100%;
   min-width: 0;
-  min-height: 52px;
-  padding: 8px 12px;
+  min-height: 48px;
+  padding: 6px 8px;
   border: 1px solid #d8dee8;
-  border-radius: 4px;
-  background: #f8fbff;
+  border-radius: 6px;
+  background: #f8fafc;
 
   .credential-select.kubed-select {
     flex: 1;
@@ -66,6 +66,10 @@ export const CredentialCard = styled.div`
   .credential-new-button {
     flex: 0 0 auto;
     white-space: nowrap;
+    min-height: 34px;
+    padding: 0 10px;
+    border-left: 1px solid #d8dee8;
+    border-radius: 0;
   }
 
   @media (max-width: 480px) {
@@ -75,7 +79,6 @@ export const CredentialCard = styled.div`
     gap: 8px;
 
     .credential-select.kubed-select,
-    .credential-status,
     .credential-new-button {
       grid-column: 2;
       min-width: 0;
@@ -87,16 +90,42 @@ export const CredentialCard = styled.div`
   }
 `;
 
-export const CredentialStatus = styled.span`
-  flex: 1;
-  min-width: 0;
+export const CredentialControl = styled.div`
+  width: min(455px, 100%);
+  max-width: 100%;
+
+  @media (max-width: 480px) {
+    width: 100%;
+  }
+`;
+
+export const CredentialStatusRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 20px;
+  margin-top: 6px;
+  padding: 0 2px;
   color: #657d95;
+
+  .credential-retry-button {
+    flex: 0 0 auto;
+    min-height: 24px;
+    padding: 0 4px;
+  }
+`;
+
+export const CredentialStatus = styled.span`
+  min-width: 0;
   overflow-wrap: anywhere;
 `;
 
 export const CredentialIcon = styled.span`
   flex: 0 0 20px;
-  line-height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #657d95;
 
   @media (max-width: 480px) {
     align-self: flex-start;

@@ -13,3 +13,9 @@ test('keeps repository credential controls inside a narrow modal viewport', () =
   assert.match(styles, /grid-template-columns: 20px minmax\(0, 1fr\)/);
   assert.match(styles, /\.credential-new-button/);
 });
+
+test('keeps credential status separate from the primary selector row', () => {
+  assert.match(styles, /export const CredentialControl = styled\.div/);
+  assert.match(styles, /export const CredentialStatusRow = styled\.div/);
+  assert.match(styles, /\.credential-retry-button/);
+});
