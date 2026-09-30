@@ -15,6 +15,10 @@ on:
         required: false
         default: oci-repo
         type: string
+      v3_ref:
+        description: Optional V3 Console release tag; empty keeps the checked-in fallback assets
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -51,6 +55,12 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: Fetch pinned V3 static artifact
+        if: ${{ inputs.v3_ref != '' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/fetch-v3dist.sh "${{ inputs.v3_ref }}"
 
       - name: Prepare console output
         run: make container-cross
