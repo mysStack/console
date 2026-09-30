@@ -4,6 +4,8 @@
  */
 
 module.exports = {
+  LAST_UPDATER: '最后更新人',
+  NO_UPDATE_RECORD: '暂无记录',
   // More > Edit Settings
   CURRENT_APP_SETTINGS_READONLY: '当前应用设置（只读）',
   TARGET_APP_SETTINGS: '目标应用设置',

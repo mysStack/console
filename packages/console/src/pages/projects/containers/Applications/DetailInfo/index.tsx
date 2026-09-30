@@ -23,6 +23,7 @@ import {
 } from '@ks-console/shared';
 
 import { OPAppEditModal, OPTemplateEditModal } from '../../../components';
+import { getLastUpdater } from './lastUpdater';
 
 const { fetchApplicationDetail, deleteOPApp, patchOPApp, upgradeOPApp, useAppVersionList } =
   openpitrixStore;
@@ -144,6 +145,10 @@ function DetailInfo(): JSX.Element {
       {
         label: t('CREATOR'),
         value: detail.owner || '-',
+      },
+      {
+        label: t('LAST_UPDATER'),
+        value: getLastUpdater(detail) || t('NO_UPDATE_RECORD'),
       },
     ];
   }

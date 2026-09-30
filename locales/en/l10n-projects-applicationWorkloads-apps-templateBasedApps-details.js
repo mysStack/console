@@ -4,6 +4,8 @@
  */
 
 module.exports = {
+  LAST_UPDATER: 'Last Updater',
+  NO_UPDATE_RECORD: 'No update record',
   // More > Edit Settings
   CURRENT_APP_SETTINGS_READONLY: 'Current App Settings (read-only)',
   TARGET_APP_SETTINGS: 'Target App Settings',

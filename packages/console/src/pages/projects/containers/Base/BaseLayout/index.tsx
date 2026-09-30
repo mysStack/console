@@ -11,6 +11,8 @@ import { useQueries, useQuery } from 'react-query';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { apis, ClusterDetail, clusterStore, projectStore } from '@ks-console/shared';
 
+import { getConsoleV3ProjectUrl } from './v3Url';
+
 const { fetchDetail: fetchProjectDetail } = projectStore;
 const { fetchDetail: fetchClusterDetail } = clusterStore;
 
@@ -58,8 +60,7 @@ function BaseLayout(): JSX.Element {
   );
 
   useEffect(() => {
-    const basePrefix = `/${workspace}/clusters/${cluster}/projects/${namespace}`;
-    setUrlPrefix(basePrefix);
+    setUrlPrefix(getConsoleV3ProjectUrl(workspace, cluster, namespace));
   }, [cluster, namespace, workspace]);
 
   if (
