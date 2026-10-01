@@ -15,7 +15,7 @@
 
 ## 2. 目标
 
-1. 在 Console 原生工作负载创建、编辑流程中支持 ConfigMap/Secret 的 `envFrom` 引用。
+1. 在 Console 原生 Deployment、StatefulSet、DaemonSet 的创建、编辑流程中支持 ConfigMap/Secret 的 `envFrom` 引用。
 2. 保留现有逐 Key 环境变量引用能力，并允许与 `envFrom` 同时使用。
 3. Console 直接生成 Kubernetes 原生 Pod Template 字段，不依赖 V3 源码、V3 运行时或 Wujie 事件。
 4. 旧 V3 工作负载页面在迁移期间继续可用，并可作为回滚路径。
@@ -23,7 +23,7 @@
 
 ## 3. 非目标
 
-- 本阶段不重写 StatefulSet、DaemonSet、Job、CronJob 的全部页面。
+- 本阶段不迁移 Job、CronJob 的创建或编辑页面。
 - 本阶段不删除 `kse-console-v3` 仓库或 V3 制品。
 - 本阶段不修改 Kubernetes API、ks-apiserver 或 ks-controller-manager。
 - 本阶段不实现 ConfigMap/Secret 文件挂载；文件挂载使用 `volumes` 和 `volumeMounts`，另立 P1 任务。
@@ -34,8 +34,11 @@
 ```text
 Console release-4.1.5
 └── feature/workload-envfrom-console
-    ├── 原生 Deployment 列表/创建/编辑流程
-    ├── ConfigMap/Secret envFrom 选择器
+    ├── 原生标准工作负载创建/编辑表单
+    │   ├── Deployment
+    │   ├── StatefulSet
+    │   └── DaemonSet
+    ├── 共用 ConfigMap/Secret envFrom 选择器
     └── Kubernetes 工作负载序列化
 
 V3 兼容层
@@ -44,17 +47,25 @@ V3 兼容层
 
 Console 不直接 import V3 源码，也不从 V3 制品读取表单状态。V3 只保留为未迁移页面和回滚入口。
 
-### 4.1 迁移顺序
+### 4.1 第一期迁移范围
 
-第一期只切换 Deployment 工作负载：
+第一期迁移三种标准工作负载的创建、编辑流程。列表和详情页继续沿用当前 Console/V3 入口，不在本期重写；创建和编辑成功后返回现有列表或详情页。
 
 ```text
 /workspace/clusters/cluster/projects/namespace/deployments
 /workspace/clusters/cluster/projects/namespace/deployments/new
 /workspace/clusters/cluster/projects/namespace/deployments/:name/edit
+
+/workspace/clusters/cluster/projects/namespace/statefulsets
+/workspace/clusters/cluster/projects/namespace/statefulsets/new
+/workspace/clusters/cluster/projects/namespace/statefulsets/:name/edit
+
+/workspace/clusters/cluster/projects/namespace/daemonsets
+/workspace/clusters/cluster/projects/namespace/daemonsets/new
+/workspace/clusters/cluster/projects/namespace/daemonsets/:name/edit
 ```
 
-StatefulSet、DaemonSet 继续使用 V3，直到各自完成独立迁移和回归。
+三种工作负载复用同一套容器、环境变量和 `envFrom` 组件；控制器特有字段由各自适配器处理：Deployment 的副本和滚动更新、StatefulSet 的 Headless Service 与 `volumeClaimTemplates`、DaemonSet 的节点调度和更新策略。
 
 ### 4.2 回滚策略
 
@@ -109,7 +120,7 @@ envFrom:
 
 1. `EnvFromReference`：只负责 ConfigMap/Secret 选择、加载状态、错误状态和删除交互。
 2. `envFrom` 转换模块：只负责 UI 模型与 Kubernetes 模型互转、重复校验和空项清理。
-3. 工作负载表单适配器：将转换结果写入 Deployment Pod Template，不负责读取 Secret 内容。
+3. 工作负载表单适配器：将转换结果写入 Deployment、StatefulSet、DaemonSet 的 Pod Template，不负责读取 Secret 内容。
 
 转换模块必须是纯函数，便于单元测试和后续复用于 StatefulSet、DaemonSet。
 
@@ -136,8 +147,7 @@ envFrom:
 
 ### 8.2 集成测试
 
-- 创建 Deployment 后检查 Pod Template 中的 `envFrom`；
-- 编辑已有 Deployment 后检查引用可回显；
+- 创建和编辑 Deployment、StatefulSet、DaemonSet 后检查各自 Pod Template 中的 `envFrom`；
 - ConfigMap 和 Secret 各至少验证一次；
 - 通过 `kubectl exec` 或 Pod 环境检查确认变量实际注入；
 - 原有逐 Key `env.valueFrom` 仍然可用。
@@ -158,4 +168,4 @@ envFrom:
 - 以 `console/release-4.1.5` 为基线；
 - 本期没有后端改动，不创建空的后端同名分支；
 - 构建产物使用独立测试 Tag，验证完成后再合并 `release-4.1.5`；
-- V3 制品版本保持不变，直到原生 Deployment 页面完成测试环境验收。
+- V3 制品版本保持不变，直到三种原生标准工作负载页面均完成测试环境验收。
