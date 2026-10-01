@@ -7,6 +7,7 @@ import {
   removeIncompleteEnvFrom,
   serializeEnvFrom,
 } from './envFrom';
+import type { EnvFromSource } from './types';
 
 test('serializes ConfigMap references with a prefix', () => {
   assert.deepEqual(serializeEnvFrom([{ type: 'configMap', name: 'app-config', prefix: 'APP_' }]), [
@@ -33,6 +34,20 @@ test('parses Kubernetes EnvFromSource references', () => {
   );
 });
 
+test('skips malformed and mixed Kubernetes EnvFromSource references', () => {
+  assert.deepEqual(
+    parseEnvFrom([
+      {
+        configMapRef: { name: 'app-config' },
+        secretRef: { name: 'also-secret' },
+      } as unknown as EnvFromSource,
+      { configMapRef: { name: '' } },
+      { secretRef: {} },
+    ]),
+    [],
+  );
+});
+
 test('finds duplicate references by type and name', () => {
   assert.deepEqual(
     findDuplicateEnvFrom([
@@ -41,6 +56,18 @@ test('finds duplicate references by type and name', () => {
       { type: 'secret', name: 'app-config', prefix: '' },
     ]),
     [{ index: 1, name: 'app-config', type: 'configMap' }],
+  );
+});
+
+test('ignores incomplete rows when finding duplicates and preserves original indexes', () => {
+  assert.deepEqual(
+    findDuplicateEnvFrom([
+      { type: 'configMap', name: '', prefix: '' },
+      { type: 'configMap', name: 'app-config', prefix: '' },
+      { type: 'configMap', name: '', prefix: '' },
+      { type: 'configMap', name: 'app-config', prefix: 'OTHER_' },
+    ]),
+    [{ index: 3, name: 'app-config', type: 'configMap' }],
   );
 });
 

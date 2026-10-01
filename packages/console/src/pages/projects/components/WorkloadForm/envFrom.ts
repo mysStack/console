@@ -2,8 +2,10 @@ import { DuplicateEnvFrom, EnvFromReference, EnvFromSource } from './types';
 
 export function parseEnvFrom(items: EnvFromSource[] = []): EnvFromReference[] {
   return items.reduce<EnvFromReference[]>((rows, item) => {
-    const type = item.configMapRef ? 'configMap' : item.secretRef ? 'secret' : undefined;
-    const name = item.configMapRef?.name ?? item.secretRef?.name;
+    const hasConfigMap = Boolean(item.configMapRef);
+    const hasSecret = Boolean(item.secretRef);
+    const type = hasConfigMap === hasSecret ? undefined : hasConfigMap ? 'configMap' : 'secret';
+    const name = hasConfigMap ? item.configMapRef?.name : item.secretRef?.name;
 
     if (type && name) {
       rows.push({ type, name, prefix: item.prefix ?? '' });
@@ -28,6 +30,10 @@ export function findDuplicateEnvFrom(rows: EnvFromReference[]): DuplicateEnvFrom
   const seen = new Set<string>();
 
   return rows.reduce<DuplicateEnvFrom[]>((duplicates, row, index) => {
+    if (!row || !row.type || !row.name) {
+      return duplicates;
+    }
+
     const key = `${row.type}:${row.name}`;
 
     if (seen.has(key)) {
