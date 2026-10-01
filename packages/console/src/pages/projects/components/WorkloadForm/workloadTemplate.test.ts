@@ -1,0 +1,58 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+
+import { toWorkloadForm, toWorkloadManifest } from './workloadTemplate';
+
+const form = {
+  name: 'demo',
+  image: 'nginx:1.27',
+  env: [{ name: 'MODE', value: 'prod' }],
+  envFrom: [{ type: 'secret' as const, name: 'db-credentials', prefix: '' }],
+  serviceName: 'demo-headless',
+};
+
+test('writes env and envFrom into the shared pod template for standard workloads', () => {
+  for (const kind of ['deployments', 'statefulsets', 'daemonsets'] as const) {
+    const manifest = toWorkloadManifest(form, kind);
+    const container = manifest.spec.template.spec.containers[0];
+
+    assert.deepEqual(container.env, form.env);
+    assert.deepEqual(container.envFrom, [{ secretRef: { name: 'db-credentials' } }]);
+  }
+});
+
+test('preserves StatefulSet serviceName without leaking it to other workload kinds', () => {
+  assert.equal(toWorkloadManifest(form, 'statefulsets').spec.serviceName, 'demo-headless');
+  assert.equal(toWorkloadManifest(form, 'deployments').spec.serviceName, undefined);
+  assert.equal(toWorkloadManifest(form, 'daemonsets').spec.serviceName, undefined);
+});
+
+test('reads pod template env and envFrom and keeps metadata.resourceVersion for edits', () => {
+  const resource = {
+    metadata: { name: 'demo', resourceVersion: '42' },
+    spec: {
+      serviceName: 'demo-headless',
+      template: {
+        spec: {
+          containers: [
+            {
+              name: 'demo',
+              image: 'nginx:1.27',
+              env: [{ name: 'MODE', value: 'prod' }],
+              envFrom: [{ secretRef: { name: 'db-credentials' } }],
+            },
+          ],
+        },
+      },
+    },
+  };
+
+  assert.deepEqual(toWorkloadForm(resource, 'statefulsets'), {
+    name: 'demo',
+    image: 'nginx:1.27',
+    env: [{ name: 'MODE', value: 'prod' }],
+    envFrom: [{ type: 'secret', name: 'db-credentials', prefix: '' }],
+    serviceName: 'demo-headless',
+    resourceVersion: '42',
+  });
+});
