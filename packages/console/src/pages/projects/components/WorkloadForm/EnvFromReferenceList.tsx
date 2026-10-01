@@ -24,6 +24,7 @@ interface Props {
 }
 
 const EnvFromReferenceList = ({ cluster, namespace, value, onChange }: Props) => {
+  const rows = useMemo(() => (Array.isArray(value) ? value : []), [value]);
   const [configMaps, setConfigMaps] = useState<Option[]>([]);
   const [secrets, setSecrets] = useState<Option[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,8 +52,8 @@ const EnvFromReferenceList = ({ cluster, namespace, value, onChange }: Props) =>
       active = false;
     };
   }, [cluster, namespace]);
-  const duplicates = useMemo(() => getDuplicateEnvFromIndexes(value), [value]);
-  const viewState = getEnvFromReferenceViewState(loading, error, value);
+  const duplicates = useMemo(() => getDuplicateEnvFromIndexes(rows), [rows]);
+  const viewState = getEnvFromReferenceViewState(loading, error, rows);
   if (viewState.kind === 'loading') return <div role="status">Loading…</div>;
   if (viewState.kind === 'error')
     return <div role="alert">Unable to load ConfigMaps and Secrets</div>;
@@ -60,14 +61,14 @@ const EnvFromReferenceList = ({ cluster, namespace, value, onChange }: Props) =>
     return (
       <div>
         <p>暂无配置/密钥引用</p>
-        <Button type="button" onClick={() => onChange(addEnvFromReference(value))}>
+        <Button type="button" onClick={() => onChange(addEnvFromReference(rows))}>
           添加引用
         </Button>
       </div>
     );
   return (
     <div>
-      {value.map((row, index) => {
+      {rows.map((row, index) => {
         const options = row.type === 'secret' ? secrets : configMaps;
         const duplicate = duplicates.includes(index);
         return (
@@ -81,7 +82,7 @@ const EnvFromReferenceList = ({ cluster, namespace, value, onChange }: Props) =>
                   { label: 'Secret', value: 'secret' },
                 ]}
                 onChange={next =>
-                  onChange(changeEnvFromType(value, index, next as EnvFromReferenceType))
+                  onChange(changeEnvFromType(rows, index, next as EnvFromReferenceType))
                 }
               />
             </FormItem>
@@ -91,7 +92,7 @@ const EnvFromReferenceList = ({ cluster, namespace, value, onChange }: Props) =>
                 value={row.name}
                 options={[{ label: '请选择', value: '' }, ...options]}
                 onChange={next =>
-                  onChange(updateEnvFromReference(value, index, { name: String(next || '') }))
+                  onChange(updateEnvFromReference(rows, index, { name: String(next || '') }))
                 }
               />
             </FormItem>
@@ -100,18 +101,18 @@ const EnvFromReferenceList = ({ cluster, namespace, value, onChange }: Props) =>
                 aria-label="前缀"
                 value={row.prefix}
                 onChange={e =>
-                  onChange(updateEnvFromReference(value, index, { prefix: e.target.value }))
+                  onChange(updateEnvFromReference(rows, index, { prefix: e.target.value }))
                 }
               />
             </FormItem>
             {duplicate && <span role="alert">重复引用</span>}
-            <Button type="button" onClick={() => onChange(removeEnvFromReference(value, index))}>
+            <Button type="button" onClick={() => onChange(removeEnvFromReference(rows, index))}>
               删除
             </Button>
           </div>
         );
       })}
-      <Button type="button" onClick={() => onChange(addEnvFromReference(value))}>
+      <Button type="button" onClick={() => onChange(addEnvFromReference(rows))}>
         添加引用
       </Button>
     </div>

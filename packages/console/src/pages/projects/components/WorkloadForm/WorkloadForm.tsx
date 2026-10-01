@@ -129,12 +129,14 @@ const WorkloadForm = ({
         </div>
       </FormItem>
       <FormItem label="配置/密钥引用（envFrom）">
-        <EnvFromReferenceList
-          cluster={cluster}
-          namespace={namespace}
-          value={values.envFrom}
-          onChange={envFrom => update({ envFrom })}
-        />
+        <div>
+          <EnvFromReferenceList
+            cluster={cluster}
+            namespace={namespace}
+            value={values.envFrom}
+            onChange={envFrom => update({ envFrom })}
+          />
+        </div>
       </FormItem>
       <Group position="right">
         {onCancel && (
