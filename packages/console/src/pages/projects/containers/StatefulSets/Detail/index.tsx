@@ -8,9 +8,12 @@ import WujieReact from 'wujie-react';
 import { useCacheStore as useStore } from '@ks-console/shared';
 import { useParams } from 'react-router-dom';
 
+import { useNativeWorkloadBridge } from '../../Workloads/NativeWorkloadBridge';
+
 function StatefulDetail(): JSX.Element {
   const { name } = useParams<'name'>();
   const [wujieUrlPrefix] = useStore<string>('wujieUrlPrefix');
+  const nativeWorkloadBridge = useNativeWorkloadBridge();
 
   return (
     <WujieReact
@@ -18,6 +21,7 @@ function StatefulDetail(): JSX.Element {
       height="100%"
       name="consolev3"
       url={`${wujieUrlPrefix}/statefulsets/${name}`}
+      props={nativeWorkloadBridge}
       sync={false}
     />
   );

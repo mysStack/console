@@ -7,8 +7,11 @@ import React from 'react';
 import WujieReact from 'wujie-react';
 import { useCacheStore as useStore } from '@ks-console/shared';
 
+import { useNativeWorkloadBridge } from '../Workloads/NativeWorkloadBridge';
+
 function DaemonSets(): JSX.Element {
   const [wujieUrlPrefix] = useStore<string>('wujieUrlPrefix');
+  const nativeWorkloadBridge = useNativeWorkloadBridge();
 
   return (
     <WujieReact
@@ -16,6 +19,7 @@ function DaemonSets(): JSX.Element {
       height="100%"
       name="consolev3"
       url={`${wujieUrlPrefix}/daemonsets`}
+      props={nativeWorkloadBridge}
       sync={false}
     />
   );
