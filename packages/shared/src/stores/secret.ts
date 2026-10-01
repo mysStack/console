@@ -8,6 +8,7 @@ import { get } from 'lodash';
 import baseStore from './store';
 import type { FormattedSecret, OriginalSecret } from '../types';
 import { request, getOriginData, getBaseInfo, safeAtob, parser } from '../utils';
+import { SECRET_METADATA_ACCEPT, toSecretNameList } from './secretNameList';
 
 const module = 'secrets';
 
@@ -46,7 +47,7 @@ const mapper = (item: OriginalSecret): FormattedSecret => {
   };
 };
 
-const { getPath, ...BaseStore } = baseStore<FormattedSecret>({ module, mapper });
+const { getPath, getListUrl, ...BaseStore } = baseStore<FormattedSecret>({ module, mapper });
 
 const validateImageRegistrySecret = async ({
   fedFormTemplate,
@@ -79,10 +80,21 @@ const validateImageRegistrySecret = async ({
 
 const store = {
   getPath,
+  getListUrl,
   ...BaseStore,
   module,
   mapper,
   validateImageRegistrySecret,
+  /** Fetch only Secret metadata names; never maps or decodes Secret.data. */
+  fetchNameListByK8s: async ({ cluster, namespace, ...params }: any = {}): Promise<string[]> => {
+    const result: any = await request.get(getListUrl({ cluster, namespace, module }), {
+      params,
+      headers: {
+        Accept: SECRET_METADATA_ACCEPT,
+      },
+    });
+    return Array.isArray(result?.items) ? toSecretNameList(result.items) : [];
+  },
 };
 
 export default store;
