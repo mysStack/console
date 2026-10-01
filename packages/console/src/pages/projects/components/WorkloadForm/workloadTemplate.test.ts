@@ -16,6 +16,8 @@ test('writes env and envFrom into the shared pod template for standard workloads
     const manifest = toWorkloadManifest(form, kind);
     const container = manifest.spec.template.spec.containers[0];
 
+    assert.deepEqual(manifest.spec.selector.matchLabels, { app: 'demo' });
+    assert.deepEqual(manifest.spec.template.metadata.labels, { app: 'demo' });
     assert.deepEqual(container.env, form.env);
     assert.deepEqual(container.envFrom, [{ secretRef: { name: 'db-credentials' } }]);
   }
@@ -25,6 +27,35 @@ test('preserves StatefulSet serviceName without leaking it to other workload kin
   assert.equal(toWorkloadManifest(form, 'statefulsets').spec.serviceName, 'demo-headless');
   assert.equal(toWorkloadManifest(form, 'deployments').spec.serviceName, undefined);
   assert.equal(toWorkloadManifest(form, 'daemonsets').spec.serviceName, undefined);
+  assert.equal(
+    toWorkloadManifest({ ...form, serviceName: undefined }, 'statefulsets').spec.serviceName,
+    'demo',
+  );
+});
+
+test('preserves existing controller spec fields when editing', () => {
+  const resource = {
+    metadata: { name: 'demo', resourceVersion: '42' },
+    spec: {
+      replicas: 3,
+      paused: true,
+      strategy: { type: 'RollingUpdate' },
+      selector: { matchLabels: { app: 'demo' } },
+      template: {
+        metadata: { labels: { app: 'demo', tier: 'web' } },
+        spec: { containers: [{ name: 'demo', image: 'old', env: [], envFrom: [] }] },
+      },
+    },
+  };
+  const values = toWorkloadForm(resource, 'deployments');
+  const manifest = toWorkloadManifest({ ...values, image: 'new' }, 'deployments');
+
+  assert.equal(manifest.spec.replicas, 3);
+  assert.equal(manifest.spec.paused, true);
+  assert.deepEqual(manifest.spec.strategy, { type: 'RollingUpdate' });
+  assert.deepEqual(manifest.spec.selector, { matchLabels: { app: 'demo' } });
+  assert.deepEqual(manifest.spec.template.metadata.labels, { app: 'demo', tier: 'web' });
+  assert.equal(manifest.spec.template.spec.containers[0].image, 'new');
 });
 
 test('reads pod template env and envFrom and keeps metadata.resourceVersion for edits', () => {
@@ -54,5 +85,6 @@ test('reads pod template env and envFrom and keeps metadata.resourceVersion for 
     envFrom: [{ type: 'secret', name: 'db-credentials', prefix: '' }],
     serviceName: 'demo-headless',
     resourceVersion: '42',
+    resource,
   });
 });
