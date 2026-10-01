@@ -1,4 +1,5 @@
 import type { WorkloadFormValues, WorkloadKind } from './types';
+import { findDuplicateEnvFrom } from './envFrom';
 
 export function createEmptyWorkloadForm(kind: WorkloadKind): WorkloadFormValues {
   const values: WorkloadFormValues = {
@@ -16,6 +17,9 @@ export function validateWorkloadForm(values: WorkloadFormValues) {
   const errors: Record<string, string> = {};
   if (!values.name.trim()) errors.name = '名称不能为空';
   if (!values.image.trim()) errors.image = '镜像不能为空';
+  if (findDuplicateEnvFrom(values.envFrom || []).length) {
+    errors.envFrom = '配置/密钥引用不能重复';
+  }
   return errors;
 }
 

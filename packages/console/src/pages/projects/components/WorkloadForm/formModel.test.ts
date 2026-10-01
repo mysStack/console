@@ -62,3 +62,18 @@ test('requires a name and image while allowing env and envFrom together', () => 
     image: '镜像不能为空',
   });
 });
+
+test('rejects duplicate ConfigMap or Secret envFrom references before submit', () => {
+  assert.deepEqual(
+    validateWorkloadForm({
+      name: 'demo',
+      image: 'nginx:1.27',
+      env: [],
+      envFrom: [
+        { type: 'configMap', name: 'app-config', prefix: '' },
+        { type: 'configMap', name: 'app-config', prefix: 'APP_' },
+      ],
+    }),
+    { envFrom: '配置/密钥引用不能重复' },
+  );
+});

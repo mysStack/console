@@ -128,7 +128,7 @@ const WorkloadForm = ({
           </Button>
         </div>
       </FormItem>
-      <FormItem label="配置/密钥引用（envFrom）">
+      <FormItem label="配置/密钥引用（envFrom）" help={errors.envFrom}>
         <div>
           <EnvFromReferenceList
             cluster={cluster}
