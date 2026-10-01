@@ -89,3 +89,15 @@ test('rejects incomplete envFrom rows instead of silently dropping them', () => 
     { envFrom: '配置/密钥引用必须选择资源' },
   );
 });
+
+test('rejects environment rows without a variable name', () => {
+  assert.deepEqual(
+    validateWorkloadForm({
+      name: 'demo',
+      image: 'nginx:1.27',
+      env: [{ name: '', value: 'prod' }],
+      envFrom: [],
+    }),
+    { env: '环境变量名称不能为空' },
+  );
+});

@@ -107,7 +107,7 @@ const WorkloadForm = ({
           />
         </FormItem>
       )}
-      <FormItem label="环境变量">
+      <FormItem label="环境变量" help={errors.env}>
         <div>
           {values.env.map((item, index) => (
             <div key={index}>

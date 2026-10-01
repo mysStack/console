@@ -17,6 +17,9 @@ export function validateWorkloadForm(values: WorkloadFormValues) {
   const errors: Record<string, string> = {};
   if (!values.name.trim()) errors.name = '名称不能为空';
   if (!values.image.trim()) errors.image = '镜像不能为空';
+  if ((values.env || []).some(row => !String(row?.name || '').trim())) {
+    errors.env = '环境变量名称不能为空';
+  }
   if (findDuplicateEnvFrom(values.envFrom || []).length) {
     errors.envFrom = '配置/密钥引用不能重复';
   } else if ((values.envFrom || []).some(row => !row?.type || !row.name?.trim())) {
