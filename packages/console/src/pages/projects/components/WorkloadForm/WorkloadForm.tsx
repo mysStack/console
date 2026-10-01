@@ -35,6 +35,7 @@ const WorkloadForm = ({
   );
   const initializedIdentity = useRef(getWorkloadFormIdentity(values));
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [envFromValid, setEnvFromValid] = useState(true);
 
   useEffect(() => {
     const next = initialValue || createEmptyWorkloadForm(kind);
@@ -51,6 +52,8 @@ const WorkloadForm = ({
 
   const handleSubmit = () => {
     const nextErrors = validateWorkloadForm(values);
+    if (!envFromValid && !nextErrors.envFrom)
+      nextErrors.envFrom = '配置/密钥引用不可用，请重新选择';
     setErrors(nextErrors);
     if (!Object.keys(nextErrors).length) onSubmit(values);
   };
@@ -135,6 +138,7 @@ const WorkloadForm = ({
             namespace={namespace}
             value={values.envFrom}
             onChange={envFrom => update({ envFrom })}
+            onValidityChange={setEnvFromValid}
           />
         </div>
       </FormItem>

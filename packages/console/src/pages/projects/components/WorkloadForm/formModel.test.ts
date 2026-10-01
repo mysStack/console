@@ -77,3 +77,15 @@ test('rejects duplicate ConfigMap or Secret envFrom references before submit', (
     { envFrom: '配置/密钥引用不能重复' },
   );
 });
+
+test('rejects incomplete envFrom rows instead of silently dropping them', () => {
+  assert.deepEqual(
+    validateWorkloadForm({
+      name: 'demo',
+      image: 'nginx:1.27',
+      env: [],
+      envFrom: [{ type: 'secret', name: '', prefix: '' }],
+    }),
+    { envFrom: '配置/密钥引用必须选择资源' },
+  );
+});

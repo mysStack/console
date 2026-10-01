@@ -5,6 +5,7 @@ import {
   addEnvFromReference,
   changeEnvFromType,
   getDuplicateEnvFromIndexes,
+  getUnavailableEnvFromIndexes,
   getEnvFromReferenceViewState,
   getEnvFromReferenceReloadState,
   removeEnvFromReference,
@@ -21,9 +22,10 @@ interface Props {
   namespace: string;
   value: EnvFromReference[];
   onChange: (rows: EnvFromReference[]) => void;
+  onValidityChange?: (valid: boolean) => void;
 }
 
-const EnvFromReferenceList = ({ cluster, namespace, value, onChange }: Props) => {
+const EnvFromReferenceList = ({ cluster, namespace, value, onChange, onValidityChange }: Props) => {
   const rows = useMemo(() => (Array.isArray(value) ? value : []), [value]);
   const [configMaps, setConfigMaps] = useState<Option[]>([]);
   const [secrets, setSecrets] = useState<Option[]>([]);
@@ -54,6 +56,16 @@ const EnvFromReferenceList = ({ cluster, namespace, value, onChange }: Props) =>
   }, [cluster, namespace]);
   const duplicates = useMemo(() => getDuplicateEnvFromIndexes(rows), [rows]);
   const viewState = getEnvFromReferenceViewState(loading, error, rows);
+  const unavailable = useMemo(
+    () => getUnavailableEnvFromIndexes(rows, configMaps, secrets),
+    [rows, configMaps, secrets],
+  );
+  useEffect(() => {
+    onValidityChange?.(
+      rows.length === 0 ||
+        (viewState.kind === 'ready' && !duplicates.length && !unavailable.length),
+    );
+  }, [duplicates.length, onValidityChange, rows.length, unavailable.length, viewState.kind]);
   if (viewState.kind === 'loading') return <div role="status">Loading…</div>;
   if (viewState.kind === 'error')
     return <div role="alert">Unable to load ConfigMaps and Secrets</div>;
@@ -71,6 +83,14 @@ const EnvFromReferenceList = ({ cluster, namespace, value, onChange }: Props) =>
       {rows.map((row, index) => {
         const options = row.type === 'secret' ? secrets : configMaps;
         const duplicate = duplicates.includes(index);
+        const isUnavailable = unavailable.includes(index);
+        const resourceOptions = [
+          ...(isUnavailable
+            ? [{ label: `${row.name}（不可用）`, value: row.name, disabled: true }]
+            : []),
+          { label: '请选择', value: '' },
+          ...options,
+        ];
         return (
           <div key={index}>
             <FormItem label="引用类型">
@@ -90,7 +110,7 @@ const EnvFromReferenceList = ({ cluster, namespace, value, onChange }: Props) =>
               <Select
                 aria-label="引用资源"
                 value={row.name}
-                options={[{ label: '请选择', value: '' }, ...options]}
+                options={resourceOptions}
                 onChange={next =>
                   onChange(updateEnvFromReference(rows, index, { name: String(next || '') }))
                 }
@@ -106,6 +126,7 @@ const EnvFromReferenceList = ({ cluster, namespace, value, onChange }: Props) =>
               />
             </FormItem>
             {duplicate && <span role="alert">重复引用</span>}
+            {isUnavailable && <span role="alert">引用资源不可用，请重新选择</span>}
             <Button type="button" onClick={() => onChange(removeEnvFromReference(rows, index))}>
               删除
             </Button>

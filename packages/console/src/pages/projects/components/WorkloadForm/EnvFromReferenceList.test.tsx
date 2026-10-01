@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
   getDuplicateEnvFromIndexes,
+  getUnavailableEnvFromIndexes,
   getEnvFromReferenceViewState,
   getEnvFromReferenceReloadState,
   toNameOptions,
@@ -62,6 +63,20 @@ test('finds duplicate reference row indexes', () => {
       { type: 'secret', name: 'db-credentials', prefix: 'APP_' },
     ]),
     [1],
+  );
+});
+
+test('finds references that are no longer available in the current project', () => {
+  assert.deepEqual(
+    getUnavailableEnvFromIndexes(
+      [
+        { type: 'configMap', name: 'removed-config', prefix: '' },
+        { type: 'secret', name: 'db-credentials', prefix: '' },
+      ],
+      [{ label: 'db-credentials', value: 'db-credentials' }],
+      [],
+    ),
+    [0, 1],
   );
 });
 

@@ -19,6 +19,8 @@ export function validateWorkloadForm(values: WorkloadFormValues) {
   if (!values.image.trim()) errors.image = '镜像不能为空';
   if (findDuplicateEnvFrom(values.envFrom || []).length) {
     errors.envFrom = '配置/密钥引用不能重复';
+  } else if ((values.envFrom || []).some(row => !row?.type || !row.name?.trim())) {
+    errors.envFrom = '配置/密钥引用必须选择资源';
   }
   return errors;
 }
