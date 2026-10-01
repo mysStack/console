@@ -2,7 +2,10 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  DEFAULT_NATIVE_WORKLOAD_FORM,
   WORKLOAD_ROUTE_PATHS,
+  getWorkloadCreateUrl,
+  getWorkloadEditUrl,
   getWorkloadKind,
   getWorkloadPath,
   getWorkloadTitle,
@@ -36,5 +39,32 @@ test('builds project list and detail destinations from route params', () => {
   assert.equal(
     getWorkloadPath(params, 'deployments', 'nginx'),
     '/dev/clusters/host/projects/demo/deployments/nginx',
+  );
+});
+
+test('builds native create and edit URLs by default', () => {
+  const params = { workspace: 'dev', cluster: 'host', namespace: 'demo space' };
+
+  assert.equal(DEFAULT_NATIVE_WORKLOAD_FORM, true);
+  assert.equal(
+    getWorkloadCreateUrl('deployments', params),
+    '/dev/clusters/host/projects/demo%20space/deployments/new',
+  );
+  assert.equal(
+    getWorkloadEditUrl('deployments', params, true, 'nginx canary'),
+    '/dev/clusters/host/projects/demo%20space/deployments/nginx%20canary/edit',
+  );
+});
+
+test('falls back to the existing V3 URL when native forms are disabled', () => {
+  const params = { workspace: 'dev', cluster: 'host', namespace: 'demo/blue' };
+
+  assert.equal(
+    getWorkloadCreateUrl('statefulsets', params, false),
+    '/consolev3/dev/clusters/host/projects/demo%2Fblue/statefulsets',
+  );
+  assert.equal(
+    getWorkloadEditUrl('daemonsets', params, false, 'node/a'),
+    '/consolev3/dev/clusters/host/projects/demo%2Fblue/daemonsets/node%2Fa',
   );
 });
