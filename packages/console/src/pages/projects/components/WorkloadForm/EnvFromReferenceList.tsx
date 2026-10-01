@@ -106,36 +106,42 @@ const EnvFromReferenceList = ({ cluster, namespace, value, onChange, onValidityC
         return (
           <div key={index}>
             <FormItem label="引用类型">
-              <Select
-                aria-label="引用类型"
-                value={row.type}
-                options={[
-                  { label: 'ConfigMap', value: 'configMap' },
-                  { label: 'Secret', value: 'secret' },
-                ]}
-                onChange={next =>
-                  onChange(changeEnvFromType(rows, index, next as EnvFromReferenceType))
-                }
-              />
+              {() => (
+                <Select
+                  aria-label="引用类型"
+                  value={row.type}
+                  options={[
+                    { label: 'ConfigMap', value: 'configMap' },
+                    { label: 'Secret', value: 'secret' },
+                  ]}
+                  onChange={next =>
+                    onChange(changeEnvFromType(rows, index, next as EnvFromReferenceType))
+                  }
+                />
+              )}
             </FormItem>
             <FormItem label="引用资源">
-              <Select
-                aria-label="引用资源"
-                value={row.name}
-                options={resourceOptions}
-                onChange={next =>
-                  onChange(updateEnvFromReference(rows, index, { name: String(next || '') }))
-                }
-              />
+              {() => (
+                <Select
+                  aria-label="引用资源"
+                  value={row.name}
+                  options={resourceOptions}
+                  onChange={next =>
+                    onChange(updateEnvFromReference(rows, index, { name: String(next || '') }))
+                  }
+                />
+              )}
             </FormItem>
             <FormItem label="前缀">
-              <Input
-                aria-label="前缀"
-                value={row.prefix}
-                onChange={e =>
-                  onChange(updateEnvFromReference(rows, index, { prefix: e.target.value }))
-                }
-              />
+              {() => (
+                <Input
+                  aria-label="前缀"
+                  value={row.prefix}
+                  onChange={e =>
+                    onChange(updateEnvFromReference(rows, index, { prefix: e.target.value }))
+                  }
+                />
+              )}
             </FormItem>
             {duplicate && <span role="alert">重复引用</span>}
             {isUnavailable && <span role="alert">引用资源不可用，请重新选择</span>}

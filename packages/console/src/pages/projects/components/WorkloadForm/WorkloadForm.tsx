@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Form, FormItem, Group, Input, useForm } from '@kubed/components';
+import { Button, Form, FormItem, Group, Input } from '@kubed/components';
 
 import EnvFromReferenceList from './EnvFromReferenceList';
 import {
@@ -29,7 +29,6 @@ const WorkloadForm = ({
   onSubmit,
   onCancel,
 }: Props) => {
-  const [form] = useForm();
   const [values, setValues] = useState<WorkloadFormValues>(
     initialValue || createEmptyWorkloadForm(kind),
   );
@@ -69,70 +68,80 @@ const WorkloadForm = ({
     });
 
   return (
-    <Form form={form} onFinish={handleSubmit} layout="vertical">
+    <Form onFinish={handleSubmit} layout="vertical">
       <FormItem label="名称" required help={errors.name}>
-        <Input
-          aria-label="名称"
-          value={values.name}
-          disabled={Boolean(values.resourceVersion)}
-          onChange={event => update({ name: event.target.value })}
-        />
+        {() => (
+          <Input
+            aria-label="名称"
+            value={values.name}
+            disabled={Boolean(values.resourceVersion)}
+            onChange={event => update({ name: event.target.value })}
+          />
+        )}
       </FormItem>
       <FormItem label="镜像" required help={errors.image}>
-        <Input
-          aria-label="镜像"
-          value={values.image}
-          onChange={event => update({ image: event.target.value })}
-        />
+        {() => (
+          <Input
+            aria-label="镜像"
+            value={values.image}
+            onChange={event => update({ image: event.target.value })}
+          />
+        )}
       </FormItem>
       <FormItem label="容器端口">
-        <Input
-          aria-label="容器端口"
-          type="number"
-          value={values.containerPort || ''}
-          onChange={event =>
-            update({
-              containerPort: event.target.value ? Number(event.target.value) : undefined,
-              clearContainerPort: !event.target.value,
-            })
-          }
-        />
+        {() => (
+          <Input
+            aria-label="容器端口"
+            type="number"
+            value={values.containerPort || ''}
+            onChange={event =>
+              update({
+                containerPort: event.target.value ? Number(event.target.value) : undefined,
+                clearContainerPort: !event.target.value,
+              })
+            }
+          />
+        )}
       </FormItem>
       {kind === 'statefulsets' && (
         <FormItem label="Service 名称">
-          <Input
-            aria-label="Service 名称"
-            value={values.serviceName || ''}
-            onChange={event => update({ serviceName: event.target.value })}
-          />
+          {() => (
+            <Input
+              aria-label="Service 名称"
+              value={values.serviceName || ''}
+              onChange={event => update({ serviceName: event.target.value })}
+            />
+          )}
         </FormItem>
       )}
       <FormItem label="环境变量" help={errors.env}>
-        <div>
-          {values.env.map((item, index) => (
-            <div key={index}>
-              <Input
-                aria-label={`环境变量名称 ${index + 1}`}
-                value={String(item.name || '')}
-                onChange={event => changeEnv(index, { name: event.target.value })}
-              />
-              <Input
-                aria-label={`环境变量值 ${index + 1}`}
-                value={String(item.value || '')}
-                onChange={event => changeEnv(index, { value: event.target.value })}
-              />
-              <Button type="button" onClick={() => removeEnv(index)}>
-                删除
-              </Button>
-            </div>
-          ))}
-          <Button type="button" onClick={addEnv}>
-            添加环境变量
-          </Button>
-        </div>
+        {() => (
+          <div>
+            {values.env.map((item, index) => (
+              <div key={index}>
+                <Input
+                  aria-label={`环境变量名称 ${index + 1}`}
+                  value={String(item.name || '')}
+                  onChange={event => changeEnv(index, { name: event.target.value })}
+                />
+                <Input
+                  aria-label={`环境变量值 ${index + 1}`}
+                  value={String(item.value || '')}
+                  onChange={event => changeEnv(index, { value: event.target.value })}
+                />
+                <Button type="button" onClick={() => removeEnv(index)}>
+                  删除
+                </Button>
+              </div>
+            ))}
+            <Button type="button" onClick={addEnv}>
+              添加环境变量
+            </Button>
+          </div>
+        )}
       </FormItem>
       <FormItem label="配置/密钥引用（envFrom）" help={errors.envFrom}>
-        <div>
+        {() => (
           <EnvFromReferenceList
             cluster={cluster}
             namespace={namespace}
@@ -140,7 +149,7 @@ const WorkloadForm = ({
             onChange={envFrom => update({ envFrom })}
             onValidityChange={setEnvFromValid}
           />
-        </div>
+        )}
       </FormItem>
       <Group position="right">
         {onCancel && (
