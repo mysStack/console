@@ -169,3 +169,11 @@ envFrom:
 - 本期没有后端改动，不创建空的后端同名分支；
 - 构建产物使用独立测试 Tag，验证完成后再合并 `release-4.1.5`；
 - V3 制品版本保持不变，直到三种原生标准工作负载页面均完成测试环境验收。
+
+## 10. 第一期实现状态与边界
+
+本期已完成 Console 原生创建/编辑表单、ConfigMap/Secret 名称选择、三种标准工作负载的 Pod Template 序列化，以及 native/V3 回退 URL 契约。表单只通过 metadata-only 请求获取 Secret 名称，不读取或传输 Secret `data`。
+
+现有三个工作负载列表仍是 Wujie V3 容器。由于 V3 内部按钮运行在隔离应用中，本期不使用 DOM 或事件劫持，也不修改 V3 制品；原生创建/编辑路由和回退 URL 已独立提供。将旧 V3 列表按钮直接桥接到原生页面，需要后续单独批准的 V3 bridge，或先迁移对应列表页后再接入，避免产生不可维护的跨运行时耦合。
+
+本地验证使用仓库现有 `esno` + Node test runner；生产构建在 Node/OpenSSL 兼容参数 `NODE_OPTIONS=--openssl-legacy-provider` 下通过。浏览器和集群验收仍需在测试环境部署独立镜像后执行，不在本地构建阶段宣称已完成。
