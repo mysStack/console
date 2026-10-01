@@ -56,3 +56,4 @@ export const getEnvFromReferenceReloadState = () => ({
   loading: true,
   error: false,
 });
+export const getNextEnvFromReferenceReloadKey = (current: number) => current + 1;

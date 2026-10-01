@@ -8,6 +8,7 @@ import {
   getUnavailableEnvFromIndexes,
   getEnvFromReferenceViewState,
   getEnvFromReferenceReloadState,
+  getNextEnvFromReferenceReloadKey,
   removeEnvFromReference,
   updateEnvFromReference,
   toNameOptions,
@@ -31,6 +32,7 @@ const EnvFromReferenceList = ({ cluster, namespace, value, onChange, onValidityC
   const [secrets, setSecrets] = useState<Option[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   useEffect(() => {
     let active = true;
     const reload = getEnvFromReferenceReloadState();
@@ -53,7 +55,7 @@ const EnvFromReferenceList = ({ cluster, namespace, value, onChange, onValidityC
     return () => {
       active = false;
     };
-  }, [cluster, namespace]);
+  }, [cluster, namespace, reloadKey]);
   const duplicates = useMemo(() => getDuplicateEnvFromIndexes(rows), [rows]);
   const viewState = getEnvFromReferenceViewState(loading, error, rows);
   const unavailable = useMemo(
@@ -68,7 +70,17 @@ const EnvFromReferenceList = ({ cluster, namespace, value, onChange, onValidityC
   }, [duplicates.length, onValidityChange, rows.length, unavailable.length, viewState.kind]);
   if (viewState.kind === 'loading') return <div role="status">Loading…</div>;
   if (viewState.kind === 'error')
-    return <div role="alert">Unable to load ConfigMaps and Secrets</div>;
+    return (
+      <div role="alert">
+        <span>Unable to load ConfigMaps and Secrets</span>
+        <Button
+          type="button"
+          onClick={() => setReloadKey(current => getNextEnvFromReferenceReloadKey(current))}
+        >
+          重试
+        </Button>
+      </div>
+    );
   if (viewState.kind === 'empty')
     return (
       <div>

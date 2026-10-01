@@ -6,6 +6,7 @@ import {
   getUnavailableEnvFromIndexes,
   getEnvFromReferenceViewState,
   getEnvFromReferenceReloadState,
+  getNextEnvFromReferenceReloadKey,
   toNameOptions,
 } from './envFromReference';
 import {
@@ -87,4 +88,8 @@ test('resets options and errors on reload', () => {
     loading: true,
     error: false,
   });
+});
+
+test('increments the reload key for an explicit retry', () => {
+  assert.equal(getNextEnvFromReferenceReloadKey(3), 4);
 });
