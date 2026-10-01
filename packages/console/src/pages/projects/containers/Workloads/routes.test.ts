@@ -51,7 +51,7 @@ test('builds native create and edit URLs by default', () => {
     '/dev/clusters/host/projects/demo%20space/deployments/new',
   );
   assert.equal(
-    getWorkloadEditUrl('deployments', params, true, 'nginx canary'),
+    getWorkloadEditUrl('deployments', params, 'nginx canary', true),
     '/dev/clusters/host/projects/demo%20space/deployments/nginx%20canary/edit',
   );
 });
@@ -64,7 +64,7 @@ test('falls back to the existing V3 URL when native forms are disabled', () => {
     '/consolev3/dev/clusters/host/projects/demo%2Fblue/statefulsets',
   );
   assert.equal(
-    getWorkloadEditUrl('daemonsets', params, false, 'node/a'),
+    getWorkloadEditUrl('daemonsets', params, 'node/a', false),
     '/consolev3/dev/clusters/host/projects/demo%2Fblue/daemonsets/node%2Fa',
   );
 });

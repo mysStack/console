@@ -59,8 +59,8 @@ export function getWorkloadCreateUrl(
 export function getWorkloadEditUrl(
   kind: WorkloadKind,
   params: WorkloadRouteParams,
-  native = DEFAULT_NATIVE_WORKLOAD_FORM,
   name: string,
+  native = DEFAULT_NATIVE_WORKLOAD_FORM,
 ) {
   const detailPath = `${getWorkloadRouteBase(kind, params, native)}/${encodePathSegment(name)}`;
   return native ? `${detailPath}/edit` : detailPath;
