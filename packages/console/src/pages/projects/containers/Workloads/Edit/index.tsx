@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Loading, notify } from '@kubed/components';
+import { Card, Loading, notify } from '@kubed/components';
 import { workloadStore } from '@ks-console/shared';
 
 import WorkloadForm from '../../../components/WorkloadForm/WorkloadForm';
@@ -9,6 +9,7 @@ import {
   toWorkloadManifest,
 } from '../../../components/WorkloadForm/workloadTemplate';
 import { getWorkloadPath, getWorkloadTitle } from '../routeConfig';
+import { getWorkloadFormIdentity } from '../../../components/WorkloadForm/formModel';
 import type { WorkloadKind } from '../../../components/WorkloadForm/types';
 
 const STORES = {
@@ -36,7 +37,7 @@ export default function WorkloadEdit({ kind }: { kind: WorkloadKind }) {
       },
     },
   );
-  const initialValue = useMemo(() => {
+  const fetchedValue = useMemo(() => {
     if (!detailQuery.data || !kind) return undefined;
     const detail = detailQuery.data as any;
     const original = detail._originData || detail;
@@ -52,11 +53,21 @@ export default function WorkloadEdit({ kind }: { kind: WorkloadKind }) {
       kind,
     );
   }, [detailQuery.data, kind, name]);
+  const [initialValue, setInitialValue] = useState(fetchedValue);
+  const initializedIdentity = useRef('');
+  useEffect(() => {
+    if (!fetchedValue) return;
+    const identity = getWorkloadFormIdentity(fetchedValue);
+    if (identity !== initializedIdentity.current) {
+      initializedIdentity.current = identity;
+      setInitialValue(fetchedValue);
+    }
+  }, [fetchedValue]);
 
   if (detailQuery.isLoading) return <Loading />;
   if (detailQuery.isError || !initialValue) return <div role="alert">工作负载加载失败</div>;
   return (
-    <section>
+    <Card>
       <h1>{getWorkloadTitle(kind, 'edit')}</h1>
       {isSaveError && <div role="alert">工作负载更新失败</div>}
       <WorkloadForm
@@ -68,6 +79,6 @@ export default function WorkloadEdit({ kind }: { kind: WorkloadKind }) {
         onCancel={() => navigate(getWorkloadPath({ workspace, cluster, namespace }, kind, name))}
         onSubmit={values => mutate({ data: toWorkloadManifest(values, kind) })}
       />
-    </section>
+    </Card>
   );
 }

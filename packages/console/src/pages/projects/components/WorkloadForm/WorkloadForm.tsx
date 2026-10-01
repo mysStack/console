@@ -1,8 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Form, FormItem, Input, useForm } from '@kubed/components';
+import React, { useEffect, useRef, useState } from 'react';
+import { Button, Form, FormItem, Group, Input, useForm } from '@kubed/components';
 
 import EnvFromReferenceList from './EnvFromReferenceList';
-import { createEmptyWorkloadForm, validateWorkloadForm } from './formModel';
+import {
+  createEmptyWorkloadForm,
+  getWorkloadFormIdentity,
+  patchEnvVariable,
+  validateWorkloadForm,
+} from './formModel';
 import type { WorkloadFormValues, WorkloadKind } from './types';
 
 interface Props {
@@ -28,11 +33,17 @@ const WorkloadForm = ({
   const [values, setValues] = useState<WorkloadFormValues>(
     initialValue || createEmptyWorkloadForm(kind),
   );
+  const initializedIdentity = useRef(getWorkloadFormIdentity(values));
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    setValues(initialValue || createEmptyWorkloadForm(kind));
-    setErrors({});
+    const next = initialValue || createEmptyWorkloadForm(kind);
+    const identity = getWorkloadFormIdentity(next);
+    if (identity !== initializedIdentity.current) {
+      initializedIdentity.current = identity;
+      setValues(next);
+      setErrors({});
+    }
   }, [initialValue, kind]);
 
   const update = (patch: Partial<WorkloadFormValues>) =>
@@ -50,7 +61,7 @@ const WorkloadForm = ({
   const changeEnv = (index: number, patch: Record<string, unknown>) =>
     update({
       env: values.env.map((item, itemIndex) =>
-        itemIndex === index ? { ...item, ...patch } : item,
+        itemIndex === index ? patchEnvVariable(item, patch) : item,
       ),
     });
 
@@ -77,7 +88,10 @@ const WorkloadForm = ({
           type="number"
           value={values.containerPort || ''}
           onChange={event =>
-            update({ containerPort: event.target.value ? Number(event.target.value) : undefined })
+            update({
+              containerPort: event.target.value ? Number(event.target.value) : undefined,
+              clearContainerPort: !event.target.value,
+            })
           }
         />
       </FormItem>
@@ -90,39 +104,39 @@ const WorkloadForm = ({
           />
         </FormItem>
       )}
-      <fieldset>
-        <legend>环境变量</legend>
-        {values.env.map((item, index) => (
-          <div key={index}>
-            <Input
-              aria-label={`环境变量名称 ${index + 1}`}
-              value={String(item.name || '')}
-              onChange={event => changeEnv(index, { name: event.target.value })}
-            />
-            <Input
-              aria-label={`环境变量值 ${index + 1}`}
-              value={String(item.value || '')}
-              onChange={event => changeEnv(index, { value: event.target.value })}
-            />
-            <Button type="button" onClick={() => removeEnv(index)}>
-              删除
-            </Button>
-          </div>
-        ))}
-        <Button type="button" onClick={addEnv}>
-          添加环境变量
-        </Button>
-      </fieldset>
-      <fieldset>
-        <legend>配置/密钥引用（envFrom）</legend>
+      <FormItem label="环境变量">
+        <div>
+          {values.env.map((item, index) => (
+            <div key={index}>
+              <Input
+                aria-label={`环境变量名称 ${index + 1}`}
+                value={String(item.name || '')}
+                onChange={event => changeEnv(index, { name: event.target.value })}
+              />
+              <Input
+                aria-label={`环境变量值 ${index + 1}`}
+                value={String(item.value || '')}
+                onChange={event => changeEnv(index, { value: event.target.value })}
+              />
+              <Button type="button" onClick={() => removeEnv(index)}>
+                删除
+              </Button>
+            </div>
+          ))}
+          <Button type="button" onClick={addEnv}>
+            添加环境变量
+          </Button>
+        </div>
+      </FormItem>
+      <FormItem label="配置/密钥引用（envFrom）">
         <EnvFromReferenceList
           cluster={cluster}
           namespace={namespace}
           value={values.envFrom}
           onChange={envFrom => update({ envFrom })}
         />
-      </fieldset>
-      <div>
+      </FormItem>
+      <Group position="right">
         {onCancel && (
           <Button type="button" onClick={onCancel}>
             取消
@@ -131,7 +145,7 @@ const WorkloadForm = ({
         <Button type="submit" loading={submitting}>
           保存
         </Button>
-      </div>
+      </Group>
     </Form>
   );
 };

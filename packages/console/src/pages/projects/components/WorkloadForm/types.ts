@@ -13,7 +13,9 @@ export interface WorkloadFormValues {
   image: string;
   env: Array<Record<string, unknown>>;
   envFrom: EnvFromReference[];
+  containerName?: string;
   containerPort?: number;
+  clearContainerPort?: boolean;
   serviceName?: string;
   resourceVersion?: string;
   resource?: WorkloadResource;

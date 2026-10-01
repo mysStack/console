@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { configMapStore, secretStore } from '@ks-console/shared';
+import { Button, FormItem, Input, Select } from '@kubed/components';
 import {
   addEnvFromReference,
   changeEnvFromType,
@@ -59,9 +60,9 @@ const EnvFromReferenceList = ({ cluster, namespace, value, onChange }: Props) =>
     return (
       <div>
         <p>暂无配置/密钥引用</p>
-        <button type="button" onClick={() => onChange(addEnvFromReference(value))}>
+        <Button type="button" onClick={() => onChange(addEnvFromReference(value))}>
           添加引用
-        </button>
+        </Button>
       </div>
     );
   return (
@@ -71,56 +72,48 @@ const EnvFromReferenceList = ({ cluster, namespace, value, onChange }: Props) =>
         const duplicate = duplicates.includes(index);
         return (
           <div key={index}>
-            <label>
-              引用类型
-              <select
+            <FormItem label="引用类型">
+              <Select
                 aria-label="引用类型"
                 value={row.type}
-                onChange={e =>
-                  onChange(changeEnvFromType(value, index, e.target.value as EnvFromReferenceType))
+                options={[
+                  { label: 'ConfigMap', value: 'configMap' },
+                  { label: 'Secret', value: 'secret' },
+                ]}
+                onChange={next =>
+                  onChange(changeEnvFromType(value, index, next as EnvFromReferenceType))
                 }
-              >
-                <option value="configMap">ConfigMap</option>
-                <option value="secret">Secret</option>
-              </select>
-            </label>
-            <label>
-              引用资源
-              <select
+              />
+            </FormItem>
+            <FormItem label="引用资源">
+              <Select
                 aria-label="引用资源"
                 value={row.name}
-                onChange={e =>
-                  onChange(updateEnvFromReference(value, index, { name: e.target.value }))
+                options={[{ label: '请选择', value: '' }, ...options]}
+                onChange={next =>
+                  onChange(updateEnvFromReference(value, index, { name: String(next || '') }))
                 }
-              >
-                <option value="">请选择</option>
-                {options.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              前缀
-              <input
+              />
+            </FormItem>
+            <FormItem label="前缀">
+              <Input
                 aria-label="前缀"
                 value={row.prefix}
                 onChange={e =>
                   onChange(updateEnvFromReference(value, index, { prefix: e.target.value }))
                 }
               />
-            </label>
+            </FormItem>
             {duplicate && <span role="alert">重复引用</span>}
-            <button type="button" onClick={() => onChange(removeEnvFromReference(value, index))}>
+            <Button type="button" onClick={() => onChange(removeEnvFromReference(value, index))}>
               删除
-            </button>
+            </Button>
           </div>
         );
       })}
-      <button type="button" onClick={() => onChange(addEnvFromReference(value))}>
+      <Button type="button" onClick={() => onChange(addEnvFromReference(value))}>
         添加引用
-      </button>
+      </Button>
     </div>
   );
 };

@@ -1,18 +1,16 @@
-import React from 'react';
-
 import WorkloadCreate from './Create';
 import WorkloadEdit from './Edit';
-import { WORKLOAD_KINDS } from './routeConfig';
+import { createNativeWorkloadRoutes } from './routeFactory';
 
-export const createWorkloadRoutes = WORKLOAD_KINDS.map(kind => ({
-  path: `${kind}/new`,
-  element: <WorkloadCreate kind={kind} />,
-}));
+export const createWorkloadRoutes = createNativeWorkloadRoutes(WorkloadCreate, WorkloadEdit).filter(
+  route => route.path.endsWith('/new'),
+);
+
+export { createNativeWorkloadRoutes };
 
 export const editWorkloadRoutes = (PATH: string) =>
-  WORKLOAD_KINDS.map(kind => ({
-    path: `${PATH}/${kind}/:name/edit`,
-    element: <WorkloadEdit kind={kind} />,
-  }));
+  createNativeWorkloadRoutes(WorkloadCreate, WorkloadEdit, PATH).filter(route =>
+    route.path.endsWith('/:name/edit'),
+  );
 
 export default createWorkloadRoutes;

@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { createEmptyWorkloadForm, validateWorkloadForm } from './formModel';
+import {
+  createEmptyWorkloadForm,
+  getWorkloadFormIdentity,
+  patchEnvVariable,
+  validateWorkloadForm,
+} from './formModel';
 
 test('creates the minimum empty values for each native workload kind', () => {
   assert.deepEqual(createEmptyWorkloadForm('deployments'), {
@@ -13,6 +18,34 @@ test('creates the minimum empty values for each native workload kind', () => {
   });
   assert.equal(createEmptyWorkloadForm('statefulsets').serviceName, '');
   assert.equal('serviceName' in createEmptyWorkloadForm('daemonsets'), false);
+});
+
+test('normalizes an env row to avoid value and valueFrom being submitted together', () => {
+  assert.deepEqual(
+    patchEnvVariable(
+      { name: 'POD_NAME', valueFrom: { fieldRef: { fieldPath: 'metadata.name' } } },
+      { value: 'demo' },
+    ),
+    { name: 'POD_NAME', value: 'demo' },
+  );
+  assert.deepEqual(
+    patchEnvVariable(
+      { name: 'POD_NAME', value: 'demo' },
+      { valueFrom: { fieldRef: { fieldPath: 'metadata.name' } } },
+    ),
+    { name: 'POD_NAME', valueFrom: { fieldRef: { fieldPath: 'metadata.name' } } },
+  );
+});
+
+test('uses name and resourceVersion as the stable edit form initialization identity', () => {
+  const first = { ...createEmptyWorkloadForm('deployments'), name: 'demo', resourceVersion: '42' };
+  const refetched = { ...first, image: 'server-refetch' };
+  assert.equal(getWorkloadFormIdentity(first), 'demo:42');
+  assert.equal(getWorkloadFormIdentity(refetched), getWorkloadFormIdentity(first));
+  assert.notEqual(
+    getWorkloadFormIdentity({ ...refetched, resourceVersion: '43' }),
+    getWorkloadFormIdentity(first),
+  );
 });
 
 test('requires a name and image while allowing env and envFrom together', () => {

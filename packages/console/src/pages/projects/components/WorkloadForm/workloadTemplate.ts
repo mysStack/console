@@ -1,4 +1,5 @@
 import { parseEnvFrom, serializeEnvFrom } from './envFrom';
+import { normalizeEnvVariable } from './formModel';
 import type { WorkloadFormValues, WorkloadKind, WorkloadResource } from './types';
 export type { WorkloadFormValues, WorkloadKind, WorkloadResource } from './types';
 
@@ -7,7 +8,7 @@ export function toWorkloadForm(resource: WorkloadResource, kind: WorkloadKind): 
   const values: WorkloadFormValues = {
     name: resource.metadata?.name || '',
     image: container.image || '',
-    env: container.env || [],
+    env: (container.env || []).map(normalizeEnvVariable),
     envFrom: parseEnvFrom(container.envFrom || []),
     resourceVersion: resource.metadata?.resourceVersion,
     resource,
@@ -16,6 +17,8 @@ export function toWorkloadForm(resource: WorkloadResource, kind: WorkloadKind): 
   if (container.ports?.[0]?.containerPort) {
     values.containerPort = container.ports[0].containerPort;
   }
+  if (container.ports) values.clearContainerPort = false;
+  if (container.name) values.containerName = container.name;
 
   if (kind === 'statefulsets') {
     values.serviceName = resource.spec?.serviceName || '';
@@ -59,20 +62,23 @@ export function toWorkloadManifest(form: WorkloadFormValues, kind: WorkloadKind)
           containers: [
             {
               ...existingContainer,
-              name: form.name,
+              name: form.containerName || form.name,
               image: form.image,
-              env: form.env || [],
+              env: (form.env || []).map(normalizeEnvVariable),
               envFrom: serializeEnvFrom(form.envFrom || []),
-              ...(form.containerPort
-                ? {
-                    ports: [
-                      {
-                        ...(existingContainer.ports?.[0] || {}),
-                        containerPort: form.containerPort,
-                      },
-                    ],
-                  }
-                : {}),
+              ...(form.clearContainerPort
+                ? { ports: [] }
+                : form.containerPort
+                  ? {
+                      ports: [
+                        {
+                          ...(existingContainer.ports?.[0] || {}),
+                          containerPort: form.containerPort,
+                        },
+                        ...(existingContainer.ports || []).slice(1),
+                      ],
+                    }
+                  : {}),
             },
             ...containers.slice(1),
           ],

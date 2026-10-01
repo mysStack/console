@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { notify } from '@kubed/components';
+import { Card, notify } from '@kubed/components';
 import { workloadStore } from '@ks-console/shared';
 
 import WorkloadForm from '../../../components/WorkloadForm/WorkloadForm';
@@ -31,7 +31,7 @@ export default function WorkloadCreate({ kind }: { kind: WorkloadKind }) {
   );
 
   return (
-    <section>
+    <Card>
       <h1>{getWorkloadTitle(kind, 'create')}</h1>
       {isError && <div role="alert">工作负载创建失败</div>}
       <WorkloadForm
@@ -43,6 +43,6 @@ export default function WorkloadCreate({ kind }: { kind: WorkloadKind }) {
         onCancel={() => navigate(getWorkloadPath({ workspace, cluster, namespace }, kind))}
         onSubmit={values => mutate({ data: toWorkloadManifest(values, kind) })}
       />
-    </section>
+    </Card>
   );
 }
