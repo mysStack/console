@@ -6,6 +6,32 @@ export interface EnvFromReference {
   prefix: string;
 }
 
+export type WorkloadKind = 'deployments' | 'statefulsets' | 'daemonsets';
+
+export interface WorkloadFormValues {
+  name: string;
+  image: string;
+  env: Array<Record<string, unknown>>;
+  envFrom: EnvFromReference[];
+  containerPort?: number;
+  serviceName?: string;
+  resourceVersion?: string;
+  resource?: WorkloadResource;
+}
+
+export type WorkloadResource = {
+  metadata?: Record<string, any> & { name?: string; resourceVersion?: string };
+  spec?: {
+    [key: string]: any;
+    serviceName?: string;
+    template?: {
+      [key: string]: any;
+      metadata?: Record<string, any>;
+      spec?: { containers?: Array<Record<string, any>> };
+    };
+  };
+};
+
 interface EnvFromSourceBase {
   prefix?: string;
 }

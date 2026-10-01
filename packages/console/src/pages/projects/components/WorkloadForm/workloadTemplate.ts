@@ -1,26 +1,6 @@
 import { parseEnvFrom, serializeEnvFrom } from './envFrom';
-import type { EnvFromReference } from './types';
-
-export type WorkloadKind = 'deployments' | 'statefulsets' | 'daemonsets';
-
-export interface WorkloadFormValues {
-  name: string;
-  image: string;
-  env: Array<Record<string, unknown>>;
-  envFrom: EnvFromReference[];
-  serviceName?: string;
-  resourceVersion?: string;
-  resource?: WorkloadResource;
-}
-
-export type WorkloadResource = {
-  metadata?: Record<string, any> & { name?: string; resourceVersion?: string };
-  spec?: {
-    [key: string]: any;
-    serviceName?: string;
-    template?: { spec?: { containers?: Array<Record<string, any>> } };
-  };
-};
+import type { WorkloadFormValues, WorkloadKind, WorkloadResource } from './types';
+export type { WorkloadFormValues, WorkloadKind, WorkloadResource } from './types';
 
 export function toWorkloadForm(resource: WorkloadResource, kind: WorkloadKind): WorkloadFormValues {
   const container = resource.spec?.template?.spec?.containers?.[0] || {};
@@ -32,6 +12,10 @@ export function toWorkloadForm(resource: WorkloadResource, kind: WorkloadKind): 
     resourceVersion: resource.metadata?.resourceVersion,
     resource,
   };
+
+  if (container.ports?.[0]?.containerPort) {
+    values.containerPort = container.ports[0].containerPort;
+  }
 
   if (kind === 'statefulsets') {
     values.serviceName = resource.spec?.serviceName || '';
@@ -79,6 +63,16 @@ export function toWorkloadManifest(form: WorkloadFormValues, kind: WorkloadKind)
               image: form.image,
               env: form.env || [],
               envFrom: serializeEnvFrom(form.envFrom || []),
+              ...(form.containerPort
+                ? {
+                    ports: [
+                      {
+                        ...(existingContainer.ports?.[0] || {}),
+                        containerPort: form.containerPort,
+                      },
+                    ],
+                  }
+                : {}),
             },
             ...containers.slice(1),
           ],

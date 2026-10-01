@@ -55,9 +55,11 @@ import serviceroutingRoutes from '../containers/SpringCloud/servicerouting/Detai
 import MicroserviceInstancesRoutes from '../containers/SpringCloud/microserviceInstances/Detail/routes';
 import composingDetailRoutes from '../containers/ApplicationComposing/Detail/routes';
 import GatewaysDetailRoutes from '../containers/Gateway/Detail/routes';
+import { editWorkloadRoutes } from '../containers/Workloads/routes';
 
 export default (PATH: string) => [
   ...applicationsDetailRoutes(PATH),
+  ...editWorkloadRoutes(PATH),
   {
     path: `${PATH}/deployments/:name`,
     element: <DeploymentDetail />,

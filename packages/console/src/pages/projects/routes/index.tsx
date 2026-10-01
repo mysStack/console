@@ -38,6 +38,7 @@ import NetworkPolicies from '../containers/Network/Policies';
 import CustomMonitoring from '../containers/CustomMonitoring';
 import AlertingPolicies from '../containers/Alerting/Policies';
 import AlertingMessages from '../containers/Alerting/Messages';
+import { createWorkloadRoutes } from '../containers/Workloads/routes';
 
 import { getDefaultApplicationType } from '../utils';
 
@@ -93,6 +94,7 @@ export default [
             path: 'daemonsets',
             element: <DaemonSets />,
           },
+          ...createWorkloadRoutes,
           {
             path: 'pods',
             element: <Pods />,

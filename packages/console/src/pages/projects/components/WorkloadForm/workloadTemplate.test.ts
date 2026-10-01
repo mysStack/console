@@ -88,3 +88,23 @@ test('reads pod template env and envFrom and keeps metadata.resourceVersion for 
     resource,
   });
 });
+
+test('reads and writes the first optional container port', () => {
+  const resource = {
+    metadata: { name: 'demo' },
+    spec: {
+      template: {
+        spec: {
+          containers: [{ name: 'demo', image: 'nginx', ports: [{ containerPort: 8080 }] }],
+        },
+      },
+    },
+  };
+  const values = toWorkloadForm(resource, 'deployments');
+  assert.equal(values.containerPort, 8080);
+  assert.deepEqual(
+    toWorkloadManifest({ ...values, containerPort: 9090 }, 'deployments').spec.template.spec
+      .containers[0].ports,
+    [{ containerPort: 9090 }],
+  );
+});
