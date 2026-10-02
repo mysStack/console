@@ -79,7 +79,9 @@ function BaseLayout(): JSX.Element {
     };
 
     bus.$on('consoleRouteChange', handleRouteChange);
-    return () => bus.$off('consoleRouteChange', handleRouteChange);
+    return () => {
+      bus.$off('consoleRouteChange', handleRouteChange);
+    };
   }, [cluster, namespace, navigate, workspace]);
 
   if (
