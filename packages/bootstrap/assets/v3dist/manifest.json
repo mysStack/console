@@ -34,25 +34,25 @@
   "entrypoints": {
     "main": {
       "css": [
-        "main.8a2fb8dde1f3f596ec6a.css"
+        "main.6fb804ca7a6d23ebcc34.css"
       ],
       "js": [
-        "main.8a2fb8dde1f3f596ec6a.js"
+        "main.6fb804ca7a6d23ebcc34.js"
       ]
     },
     "terminalEntry": {
       "css": [
-        "terminalEntry.add8b5cb9cb76322142f.css"
+        "terminalEntry.239f8436bed5685034c8.css"
       ],
       "js": [
-        "terminalEntry.add8b5cb9cb76322142f.js"
+        "terminalEntry.239f8436bed5685034c8.js"
       ]
     }
   },
   "fedprojects.css": "8.08039cbdc90812e9ea05.css",
   "fedprojects.js": "8.08039cbdc90812e9ea05.js",
-  "main.css": "main.8a2fb8dde1f3f596ec6a.css",
-  "main.js": "main.8a2fb8dde1f3f596ec6a.js",
+  "main.css": "main.6fb804ca7a6d23ebcc34.css",
+  "main.js": "main.6fb804ca7a6d23ebcc34.js",
   "projects.css": "10.e11f3bd9f9e2e061ff45.css",
   "projects.js": "10.e11f3bd9f9e2e061ff45.js",
   "react-ace.css": "11.d9b12e3b6655269679fb.css",
@@ -61,8 +61,8 @@
   "settings.js": "12.335fafd98d2c327fbcc2.js",
   "terminal.css": "13.e5c753b67af254113d06.css",
   "terminal.js": "13.e5c753b67af254113d06.js",
-  "terminalEntry.css": "terminalEntry.add8b5cb9cb76322142f.css",
-  "terminalEntry.js": "terminalEntry.add8b5cb9cb76322142f.js",
+  "terminalEntry.css": "terminalEntry.239f8436bed5685034c8.css",
+  "terminalEntry.js": "terminalEntry.239f8436bed5685034c8.js",
   "vendor.js": "0.258318e07619bb1c8fc5.js",
   "workspaces.css": "15.3eef70d818cc8f8e66d7.css",
   "workspaces.js": "15.3eef70d818cc8f8e66d7.js"
