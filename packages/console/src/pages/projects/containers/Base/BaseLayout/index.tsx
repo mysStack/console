@@ -66,6 +66,7 @@ function BaseLayout(): JSX.Element {
 
   useEffect(() => {
     const projectPath = `/${workspace}/clusters/${cluster}/projects/${namespace}`;
+    let syncTimer: number | undefined;
     const handleRouteChange = (route: string) => {
       const hostRoute = route.startsWith('/consolev3/') ? route.slice('/consolev3'.length) : null;
 
@@ -74,12 +75,23 @@ function BaseLayout(): JSX.Element {
         hostRoute.startsWith(`${projectPath}/`) &&
         window.location.pathname !== hostRoute
       ) {
-        navigate(hostRoute);
+        if (syncTimer) {
+          window.clearTimeout(syncTimer);
+        }
+        syncTimer = window.setTimeout(() => {
+          if (window.location.pathname !== hostRoute) {
+            navigate(hostRoute);
+          }
+          syncTimer = undefined;
+        }, 0);
       }
     };
 
     bus.$on('consoleRouteChange', handleRouteChange);
     return () => {
+      if (syncTimer) {
+        window.clearTimeout(syncTimer);
+      }
       bus.$off('consoleRouteChange', handleRouteChange);
     };
   }, [cluster, namespace, navigate, workspace]);
