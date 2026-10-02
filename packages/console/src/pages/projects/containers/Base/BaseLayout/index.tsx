@@ -86,13 +86,20 @@ function BaseLayout(): JSX.Element {
         }, 0);
       }
     };
+    const handleMessage = (event: MessageEvent<{ type?: string; route?: string }>) => {
+      if (event.origin === window.location.origin && event.data?.type === 'consoleRouteChange') {
+        handleRouteChange(event.data.route || '');
+      }
+    };
 
     bus.$on('consoleRouteChange', handleRouteChange);
+    window.addEventListener('message', handleMessage);
     return () => {
       if (syncTimer) {
         window.clearTimeout(syncTimer);
       }
       bus.$off('consoleRouteChange', handleRouteChange);
+      window.removeEventListener('message', handleMessage);
     };
   }, [cluster, namespace, navigate, workspace]);
 
