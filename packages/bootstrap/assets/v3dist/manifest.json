@@ -19,8 +19,8 @@
   "/assets/Roboto-Regular.woff2": "/assets/73f0a88bbca1bec19fb1303c689d04c6.woff2",
   "access.css": "2.c9c23cd8f7b000ae8a1a.css",
   "access.js": "2.c9c23cd8f7b000ae8a1a.js",
-  "actions.css": "3.caab7dc7585a1d91ddcb.css",
-  "actions.js": "3.caab7dc7585a1d91ddcb.js",
+  "actions.css": "3.522a345ddd0a748ed7bb.css",
+  "actions.js": "3.522a345ddd0a748ed7bb.js",
   "apps.css": "4.9c5ce31eeea813f8face.css",
   "apps.js": "4.9c5ce31eeea813f8face.js",
   "clusters.css": "5.c7215714a141e3301391.css",
@@ -34,10 +34,10 @@
   "entrypoints": {
     "main": {
       "css": [
-        "main.a8e43bb4cf5d7336d501.css"
+        "main.6a50c87b9100ecde08a2.css"
       ],
       "js": [
-        "main.a8e43bb4cf5d7336d501.js"
+        "main.6a50c87b9100ecde08a2.js"
       ]
     },
     "terminalEntry": {
@@ -51,8 +51,8 @@
   },
   "fedprojects.css": "8.fd452c427bac349bb417.css",
   "fedprojects.js": "8.fd452c427bac349bb417.js",
-  "main.css": "main.a8e43bb4cf5d7336d501.css",
-  "main.js": "main.a8e43bb4cf5d7336d501.js",
+  "main.css": "main.6a50c87b9100ecde08a2.css",
+  "main.js": "main.6a50c87b9100ecde08a2.js",
   "projects.css": "10.00b7aa7b81423c7d121b.css",
   "projects.js": "10.00b7aa7b81423c7d121b.js",
   "react-ace.css": "11.12484ca12a541bee1037.css",

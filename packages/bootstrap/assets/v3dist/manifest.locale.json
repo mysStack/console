@@ -12,7 +12,7 @@
     },
     "locale-en": {
       "json": [
-        "locale-en.4cd948a97e156390f9e4.json"
+        "locale-en.8011a879a8c616e03506.json"
       ]
     },
     "locale-es": {
@@ -62,13 +62,13 @@
     },
     "locale-zh": {
       "json": [
-        "locale-zh.3f6fa8736b01576b91f3.json"
+        "locale-zh.eb9ca75fed26b2fc330a.json"
       ]
     }
   },
   "locale-ar.json": "locale-ar.a199eb3af01c10023cdd.json",
   "locale-de.json": "locale-de.3367167e50e5deffccd1.json",
-  "locale-en.json": "locale-en.4cd948a97e156390f9e4.json",
+  "locale-en.json": "locale-en.8011a879a8c616e03506.json",
   "locale-es.json": "locale-es.001b42a013b163f340dc.json",
   "locale-fr.json": "locale-fr.95c20e1d07d0c3125c81.json",
   "locale-hi.json": "locale-hi.4d459bd4c2dc4a316ee7.json",
@@ -78,5 +78,5 @@
   "locale-pt.json": "locale-pt.f9a4c79db26f80ffadd8.json",
   "locale-tc.json": "locale-tc.b871a093254f45954579.json",
   "locale-tr.json": "locale-tr.1812ab17ebbf998cf295.json",
-  "locale-zh.json": "locale-zh.3f6fa8736b01576b91f3.json"
+  "locale-zh.json": "locale-zh.eb9ca75fed26b2fc330a.json"
 }
