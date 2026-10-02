@@ -80,7 +80,8 @@ function BaseLayout(): JSX.Element {
         }
         syncTimer = window.setTimeout(() => {
           if (window.location.pathname !== hostRoute) {
-            navigate(hostRoute);
+            window.history.pushState({}, '', hostRoute);
+            window.dispatchEvent(new PopStateEvent('popstate'));
           }
           syncTimer = undefined;
         }, 0);
@@ -101,7 +102,7 @@ function BaseLayout(): JSX.Element {
       bus.$off('consoleRouteChange', handleRouteChange);
       window.removeEventListener('message', handleMessage);
     };
-  }, [cluster, namespace, navigate, workspace]);
+  }, [cluster, namespace, workspace]);
 
   if (
     projectResult.isLoading ||
