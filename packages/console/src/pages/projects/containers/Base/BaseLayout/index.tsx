@@ -5,6 +5,7 @@
 
 import React, { useEffect } from 'react';
 import { set } from 'lodash';
+import WujieReact from 'wujie-react';
 import { useCacheStore as useStore } from '@ks-console/shared';
 import { Loading } from '@kubed/components';
 import { useQueries, useQuery } from 'react-query';
@@ -13,6 +14,7 @@ import { apis, ClusterDetail, clusterStore, projectStore } from '@ks-console/sha
 
 const { fetchDetail: fetchProjectDetail } = projectStore;
 const { fetchDetail: fetchClusterDetail } = clusterStore;
+const { bus } = WujieReact;
 
 function BaseLayout(): JSX.Element {
   const navigate = useNavigate();
@@ -61,6 +63,24 @@ function BaseLayout(): JSX.Element {
     const basePrefix = `//${window.location.host}/consolev3/${workspace}/clusters/${cluster}/projects/${namespace}`;
     setUrlPrefix(basePrefix);
   }, [cluster, namespace, workspace]);
+
+  useEffect(() => {
+    const projectPath = `/${workspace}/clusters/${cluster}/projects/${namespace}`;
+    const handleRouteChange = (route: string) => {
+      const hostRoute = route.startsWith('/consolev3/') ? route.slice('/consolev3'.length) : null;
+
+      if (
+        hostRoute &&
+        hostRoute.startsWith(`${projectPath}/`) &&
+        window.location.pathname !== hostRoute
+      ) {
+        navigate(hostRoute);
+      }
+    };
+
+    bus.$on('consoleRouteChange', handleRouteChange);
+    return () => bus.$off('consoleRouteChange', handleRouteChange);
+  }, [cluster, namespace, navigate, workspace]);
 
   if (
     projectResult.isLoading ||
