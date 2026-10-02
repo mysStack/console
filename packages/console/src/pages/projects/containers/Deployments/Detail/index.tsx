@@ -16,7 +16,9 @@ function DeploymentDetail(): JSX.Element {
   // On a hard refresh the project layout has not populated the shared store
   // yet. Build the same V3 prefix from the route so the detail page does not
   // remain on the loading screen.
-  const projectPrefix = wujieUrlPrefix || `/${workspace}/clusters/${cluster}/projects/${namespace}`;
+  const projectPrefix =
+    wujieUrlPrefix ||
+    `//${window.location.host}/consolev3/${workspace}/clusters/${cluster}/projects/${namespace}`;
 
   return (
     <WujieReact

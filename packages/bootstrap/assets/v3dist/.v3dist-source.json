@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "repository": "mysStack/kse-console-v3",
   "ref": "feature/v3-artifact-decouple",
-  "commit": "5a03985f5",
-  "builtAt": "2026-10-02T22:12:22+08:00",
+  "commit": "83f4873ef",
+  "builtAt": "2026-10-02T23:35:10+08:00",
   "publicPath": "/dist/v3dist/"
 }

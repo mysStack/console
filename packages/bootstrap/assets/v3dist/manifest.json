@@ -25,8 +25,8 @@
   "apps.js": "4.ee4ada003f21e576c1eb.js",
   "clusters.css": "5.d64ccb29fbe8c7baa2a0.css",
   "clusters.js": "5.d64ccb29fbe8c7baa2a0.js",
-  "common.css": "1.a2de74125a2ba69bc12d.css",
-  "common.js": "1.a2de74125a2ba69bc12d.js",
+  "common.css": "1.a8b8e9c6ec542be2be4c.css",
+  "common.js": "1.a8b8e9c6ec542be2be4c.js",
   "console.css": "6.e2376e7d1b461d29f05a.css",
   "console.js": "6.e2376e7d1b461d29f05a.js",
   "devops.css": "7.56830bf7ceb0d3a7c3c1.css",
@@ -34,10 +34,10 @@
   "entrypoints": {
     "main": {
       "css": [
-        "main.6fb804ca7a6d23ebcc34.css"
+        "main.6ac7ebb9a73733c3b71f.css"
       ],
       "js": [
-        "main.6fb804ca7a6d23ebcc34.js"
+        "main.6ac7ebb9a73733c3b71f.js"
       ]
     },
     "terminalEntry": {
@@ -51,8 +51,8 @@
   },
   "fedprojects.css": "8.08039cbdc90812e9ea05.css",
   "fedprojects.js": "8.08039cbdc90812e9ea05.js",
-  "main.css": "main.6fb804ca7a6d23ebcc34.css",
-  "main.js": "main.6fb804ca7a6d23ebcc34.js",
+  "main.css": "main.6ac7ebb9a73733c3b71f.css",
+  "main.js": "main.6ac7ebb9a73733c3b71f.js",
   "projects.css": "10.e11f3bd9f9e2e061ff45.css",
   "projects.js": "10.e11f3bd9f9e2e061ff45.js",
   "react-ace.css": "11.d9b12e3b6655269679fb.css",
