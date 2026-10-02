@@ -65,7 +65,7 @@ const renderIndex = async (ctx, params) => {
         useDefaultTheme,
         ...params,
       }),
-    )
+    ),
   });
 };
 
@@ -77,10 +77,21 @@ const renderV3Index = async (ctx, params) => {
   const useDefaultTheme = !startsWith(logo, '/theme');
 
   const manifest = getV3Manifest('main');
+  const sharedManifest = ['vendor', 'common'].reduce(
+    (assets, entry) => {
+      const chunk = getV3Manifest(entry);
+      return {
+        css: [...assets.css, ...(chunk?.css || [])],
+        js: [...assets.js, ...(chunk?.js || [])],
+      };
+    },
+    { css: [], js: [] },
+  );
   const localeManifest = getV3LocaleManifest();
 
   await ctx.render('consolev3', {
     manifest,
+    sharedManifest,
     isDev: global.MODE_DEV,
     title: clientConfig.title,
     hostname: ctx.hostname,
@@ -95,7 +106,7 @@ const renderV3Index = async (ctx, params) => {
 
         ...params,
       }),
-    )
+    ),
   });
 };
 
@@ -180,7 +191,7 @@ const renderTerminal = async ctx => {
           defaultTheme,
           useDefaultTheme,
         }),
-      )
+      ),
     });
   } catch (err) {
     await renderViewErr(ctx, err);

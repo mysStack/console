@@ -270,6 +270,19 @@ const getV3Manifest = entry => {
       data = safeParseJSON(dataStream.toString(), {});
     } catch (error) {}
     manifestCache = get(data, `entrypoints.${entry}`);
+    // Webpack records split chunks (vendor/common) as top-level manifest
+    // entries rather than entrypoints. Wujie executes the V3 app in an
+    // isolated document, so the host's DLL cannot satisfy those globals.
+    // Expose the split chunk through the same helper so the V3 template can
+    // load it before the main bundle, including on a hard refresh.
+    if (!manifestCache) {
+      const js = data[`${entry}.js`];
+      const css = data[`${entry}.css`];
+      manifestCache = {
+        js: js ? [js] : [],
+        css: css ? [css] : [],
+      };
+    }
     cache.set(`${MANIFEST_CACHE_KEY_PREFIX}${entry}`, manifestCache);
   }
 
