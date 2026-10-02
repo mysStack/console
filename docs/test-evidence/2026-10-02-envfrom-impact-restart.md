@@ -10,6 +10,7 @@
 - 测试镜像：`docker.io/mingys/ks-console:oci-repo-20261002-812d0e5`。
 - 192.168.2.131：`ks-console` 已滚动更新，Pod `1/1 Ready`、重启次数 0。
 - 集群内静态验证：`/dist/v3dist/manifest.json` HTTP 200；49 个 manifest 引用均可在制品目录找到；中文 locale 和重启注解字符串可下载。
+- Playwright 登录后打开 `dev-wes/wes-v2-server/edit`：完整 V3 编辑页正常渲染，原有 33 个环境变量行仍在；`配置/密钥引用（envFrom）` 作为同级区域显示，点击“添加引用”后成功加载 ConfigMap 列表（包括 `ewms-postgres-wes-config` 等），未展示 Secret 值。
 
 ## 待在浏览器中验收
 
