@@ -3,5 +3,6 @@
   "repository": "mysStack/kse-console-v3",
   "ref": "feature/v3-artifact-decouple",
   "commit": "1e9658507",
-  "builtAt": "2026-10-02T06:22:00Z"
+  "builtAt": "2026-10-02T11:07:00Z",
+  "publicPath": "/dist/v3dist/"
 }

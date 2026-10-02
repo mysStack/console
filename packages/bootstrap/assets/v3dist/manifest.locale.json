@@ -2,81 +2,81 @@
   "entrypoints": {
     "locale-ar": {
       "json": [
-        "locale-ar.8fd51ddb26ee8204d8df.json"
+        "locale-ar.a199eb3af01c10023cdd.json"
       ]
     },
     "locale-de": {
       "json": [
-        "locale-de.1049efca7f3c21444e51.json"
+        "locale-de.3367167e50e5deffccd1.json"
       ]
     },
     "locale-en": {
       "json": [
-        "locale-en.9d1f3bb4f44ddbacfd5a.json"
+        "locale-en.8011a879a8c616e03506.json"
       ]
     },
     "locale-es": {
       "json": [
-        "locale-es.3f32a760e6845333f7de.json"
+        "locale-es.001b42a013b163f340dc.json"
       ]
     },
     "locale-fr": {
       "json": [
-        "locale-fr.24ded0347441f625702e.json"
+        "locale-fr.95c20e1d07d0c3125c81.json"
       ]
     },
     "locale-hi": {
       "json": [
-        "locale-hi.33d121dbd7f0ee423ba6.json"
+        "locale-hi.4d459bd4c2dc4a316ee7.json"
       ]
     },
     "locale-ko": {
       "json": [
-        "locale-ko.82e34b9efbdfe13c206c.json"
+        "locale-ko.c5df164454aec0e48574.json"
       ]
     },
     "locale-lt": {
       "json": [
-        "locale-lt.876f4dc02136196cf25a.json"
+        "locale-lt.0fe9cb3df92eafcbb3ed.json"
       ]
     },
     "locale-pl": {
       "json": [
-        "locale-pl.47c1b4159cd69b5c5384.json"
+        "locale-pl.0920c723ac954cc73ccb.json"
       ]
     },
     "locale-pt": {
       "json": [
-        "locale-pt.e0b991eab95e3d6ac795.json"
+        "locale-pt.f9a4c79db26f80ffadd8.json"
       ]
     },
     "locale-tc": {
       "json": [
-        "locale-tc.3f1f106fde83e07ec24b.json"
+        "locale-tc.b871a093254f45954579.json"
       ]
     },
     "locale-tr": {
       "json": [
-        "locale-tr.879313f32e7f14997982.json"
+        "locale-tr.1812ab17ebbf998cf295.json"
       ]
     },
     "locale-zh": {
       "json": [
-        "locale-zh.c3f9ea05c1be1852c7e1.json"
+        "locale-zh.eb9ca75fed26b2fc330a.json"
       ]
     }
   },
-  "locale-ar.json": "locale-ar.8fd51ddb26ee8204d8df.json",
-  "locale-de.json": "locale-de.1049efca7f3c21444e51.json",
-  "locale-en.json": "locale-en.9d1f3bb4f44ddbacfd5a.json",
-  "locale-es.json": "locale-es.3f32a760e6845333f7de.json",
-  "locale-fr.json": "locale-fr.24ded0347441f625702e.json",
-  "locale-hi.json": "locale-hi.33d121dbd7f0ee423ba6.json",
-  "locale-ko.json": "locale-ko.82e34b9efbdfe13c206c.json",
-  "locale-lt.json": "locale-lt.876f4dc02136196cf25a.json",
-  "locale-pl.json": "locale-pl.47c1b4159cd69b5c5384.json",
-  "locale-pt.json": "locale-pt.e0b991eab95e3d6ac795.json",
-  "locale-tc.json": "locale-tc.3f1f106fde83e07ec24b.json",
-  "locale-tr.json": "locale-tr.879313f32e7f14997982.json",
-  "locale-zh.json": "locale-zh.c3f9ea05c1be1852c7e1.json"
+  "locale-ar.json": "locale-ar.a199eb3af01c10023cdd.json",
+  "locale-de.json": "locale-de.3367167e50e5deffccd1.json",
+  "locale-en.json": "locale-en.8011a879a8c616e03506.json",
+  "locale-es.json": "locale-es.001b42a013b163f340dc.json",
+  "locale-fr.json": "locale-fr.95c20e1d07d0c3125c81.json",
+  "locale-hi.json": "locale-hi.4d459bd4c2dc4a316ee7.json",
+  "locale-ko.json": "locale-ko.c5df164454aec0e48574.json",
+  "locale-lt.json": "locale-lt.0fe9cb3df92eafcbb3ed.json",
+  "locale-pl.json": "locale-pl.0920c723ac954cc73ccb.json",
+  "locale-pt.json": "locale-pt.f9a4c79db26f80ffadd8.json",
+  "locale-tc.json": "locale-tc.b871a093254f45954579.json",
+  "locale-tr.json": "locale-tr.1812ab17ebbf998cf295.json",
+  "locale-zh.json": "locale-zh.eb9ca75fed26b2fc330a.json"
 }
