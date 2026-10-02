@@ -58,7 +58,7 @@ function BaseLayout(): JSX.Element {
   );
 
   useEffect(() => {
-    const basePrefix = `/${workspace}/clusters/${cluster}/projects/${namespace}`;
+    const basePrefix = `//${window.location.host}/consolev3/${workspace}/clusters/${cluster}/projects/${namespace}`;
     setUrlPrefix(basePrefix);
   }, [cluster, namespace, workspace]);
 
