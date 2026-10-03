@@ -34,10 +34,10 @@
   "entrypoints": {
     "main": {
       "css": [
-        "main.103225f87e68ead83f02.css"
+        "main.42d98a0caa08c88b3e4d.css"
       ],
       "js": [
-        "main.103225f87e68ead83f02.js"
+        "main.42d98a0caa08c88b3e4d.js"
       ]
     },
     "terminalEntry": {
@@ -51,10 +51,10 @@
   },
   "fedprojects.css": "8.85438bfe49ed12b1a453.css",
   "fedprojects.js": "8.85438bfe49ed12b1a453.js",
-  "main.css": "main.103225f87e68ead83f02.css",
-  "main.js": "main.103225f87e68ead83f02.js",
-  "projects.css": "10.7ae947568287712e9c2f.css",
-  "projects.js": "10.7ae947568287712e9c2f.js",
+  "main.css": "main.42d98a0caa08c88b3e4d.css",
+  "main.js": "main.42d98a0caa08c88b3e4d.js",
+  "projects.css": "10.9e8601d55d0fb4907e97.css",
+  "projects.js": "10.9e8601d55d0fb4907e97.js",
   "react-ace.css": "11.e643873aada3cf150f85.css",
   "react-ace.js": "11.e643873aada3cf150f85.js",
   "settings.css": "12.ed9498059b78f757741f.css",
