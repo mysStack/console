@@ -55,9 +55,22 @@ import serviceroutingRoutes from '../containers/SpringCloud/servicerouting/Detai
 import MicroserviceInstancesRoutes from '../containers/SpringCloud/microserviceInstances/Detail/routes';
 import composingDetailRoutes from '../containers/ApplicationComposing/Detail/routes';
 import GatewaysDetailRoutes from '../containers/Gateway/Detail/routes';
+import ConfigReferencePage from '../components/ConfigReference/ConfigReferencePage';
 
 export default (PATH: string) => [
   ...applicationsDetailRoutes(PATH),
+  {
+    path: `${PATH}/deployments/:name/config-reference`,
+    element: <ConfigReferencePage module="deployments" />,
+  },
+  {
+    path: `${PATH}/statefulsets/:name/config-reference`,
+    element: <ConfigReferencePage module="statefulsets" />,
+  },
+  {
+    path: `${PATH}/daemonsets/:name/config-reference`,
+    element: <ConfigReferencePage module="daemonsets" />,
+  },
   {
     path: `${PATH}/deployments/:name`,
     element: <DeploymentDetail />,
