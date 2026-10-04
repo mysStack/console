@@ -19,9 +19,16 @@ test('targets the environment variable actions instead of the workload detail ta
   );
 });
 
-test('injects a matching button before the existing batch-reference action', () => {
-  const buttons: Array<{ dataset: Record<string, string>; textContent: string; before: unknown }> =
-    [];
+test('injects a matching button and forwards activation to the host drawer', () => {
+  const buttons: Array<{
+    dataset: Record<string, string>;
+    textContent: string;
+    before: unknown;
+    click: (event?: { preventDefault: () => void; stopPropagation: () => void }) => void;
+  }> = [];
+  let activated = 0;
+  let injectedClick = (_event?: { preventDefault: () => void; stopPropagation: () => void }) =>
+    undefined;
   const content = { className: 'button-content' } as HTMLElement;
   const createdContent = { className: '', textContent: '' };
   const action = {
@@ -30,16 +37,29 @@ test('injects a matching button before the existing batch-reference action', () 
       querySelector: (selector: string) =>
         selector === CONFIG_REFERENCE_ENTRY_SELECTOR ? null : undefined,
       insertBefore: (
-        entry: { dataset: Record<string, string>; textContent: string },
+        entry: {
+          dataset: Record<string, string>;
+          textContent: string;
+          click: (event?: { preventDefault: () => void; stopPropagation: () => void }) => void;
+        },
         before: unknown,
-      ) => buttons.push({ dataset: entry.dataset, textContent: entry.textContent, before }),
+      ) =>
+        buttons.push({
+          dataset: entry.dataset,
+          textContent: entry.textContent,
+          before,
+          click: injectedClick,
+        }),
     },
     querySelector: () => content,
     cloneNode: () => ({
       dataset: {} as Record<string, string>,
       textContent: '',
       type: '',
-      addEventListener: () => undefined,
+      querySelector: () => null,
+      addEventListener: (_event: string, listener: typeof injectedClick) => {
+        injectedClick = listener;
+      },
       appendChild: function (child: { textContent: string }) {
         this.textContent = child.textContent;
       },
@@ -53,11 +73,15 @@ test('injects a matching button before the existing batch-reference action', () 
   } as unknown as Document;
 
   assert.equal(
-    injectConfigReferenceEntry(fakeDocument, '配置引用', () => undefined),
+    injectConfigReferenceEntry(fakeDocument, '配置引用', () => {
+      activated += 1;
+    }),
     true,
   );
   assert.equal(buttons.length, 1);
   assert.equal(buttons[0].dataset.test, 'config-reference-entry');
   assert.equal(buttons[0].textContent, '配置引用');
   assert.equal(buttons[0].before, action.nextSibling);
+  buttons[0].click({ preventDefault: () => undefined, stopPropagation: () => undefined });
+  assert.equal(activated, 1);
 });

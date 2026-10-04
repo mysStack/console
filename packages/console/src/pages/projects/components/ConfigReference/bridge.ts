@@ -32,15 +32,20 @@ export function injectConfigReferenceEntry(
     return false;
   }
 
-  const entry = action.cloneNode(false) as HTMLButtonElement;
+  const entry = action.cloneNode(true) as HTMLButtonElement;
   entry.type = 'button';
   entry.dataset.test = 'config-reference-entry';
   const actionContent = action.querySelector<HTMLElement>('.button-content');
   if (actionContent) {
-    const content = document.createElement('div');
-    content.className = actionContent.className;
-    content.textContent = label;
-    entry.appendChild(content);
+    const content = entry.querySelector<HTMLElement>('.button-content');
+    if (content) {
+      content.textContent = label;
+    } else {
+      const fallback = document.createElement('div');
+      fallback.className = actionContent.className;
+      fallback.textContent = label;
+      entry.appendChild(fallback);
+    }
   } else {
     entry.textContent = label;
   }

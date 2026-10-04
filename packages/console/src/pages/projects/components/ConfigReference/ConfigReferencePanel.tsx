@@ -17,6 +17,7 @@ interface Props {
   module: WorkloadModule;
   workloadKind: string;
   onBack: () => void;
+  embedded?: boolean;
 }
 
 type NameOption = { label: string; value: string };
@@ -42,6 +43,7 @@ export default function ConfigReferencePanel({
   module,
   workloadKind,
   onBack,
+  embedded = false,
 }: Props) {
   const store = storeByModule[module];
   const detailQuery = store.useGetDetail({ cluster, namespace, name });
@@ -149,18 +151,20 @@ export default function ConfigReferencePanel({
   };
 
   return (
-    <Card padding={24}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-        <Button type="button" onClick={onBack}>
-          {t('CONFIG_REFERENCE_BACK')}
-        </Button>
-        <div>
-          <h1 style={{ margin: 0 }}>{t('CONFIG_REFERENCE')}</h1>
-          <p style={{ margin: '4px 0 0', color: '#79879c' }}>
-            {workloadKind} · {name}
-          </p>
+    <Card padding={embedded ? 20 : 24}>
+      {!embedded && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+          <Button type="button" onClick={onBack}>
+            {t('CONFIG_REFERENCE_BACK')}
+          </Button>
+          <div>
+            <h1 style={{ margin: 0 }}>{t('CONFIG_REFERENCE')}</h1>
+            <p style={{ margin: '4px 0 0', color: '#79879c' }}>
+              {workloadKind} · {name}
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       <div style={{ marginBottom: 24 }}>
         <strong>{t('CONFIG_REFERENCE_CONTAINER')}</strong>
