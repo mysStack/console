@@ -1,7 +1,6 @@
-import React from 'react';
-import styled from 'styled-components';
-import { Button } from '@kubed/components';
+import { useCallback, useMemo, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { injectConfigReferenceEntry } from './bridge';
 
 export type ConfigReferenceWorkloadModule = 'deployments' | 'statefulsets' | 'daemonsets';
 
@@ -26,34 +25,46 @@ export function getConfigReferencePath({
   ].join('');
 }
 
-const Entry = styled.div`
-  position: absolute;
-  top: 20px;
-  right: 24px;
-  z-index: 2;
-`;
-
-export default function ConfigReferenceEntry({
-  module,
-}: {
-  module: ConfigReferenceWorkloadModule;
-}) {
+export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) {
   const navigate = useNavigate();
   const { workspace, cluster, namespace, name } = useParams();
-
-  return (
-    <Entry>
-      <Button
-        type="button"
-        color="secondary"
-        shadow
-        aria-label={t('CONFIG_REFERENCE')}
-        onClick={() =>
-          navigate(getConfigReferencePath({ workspace, cluster, namespace, module, name }))
-        }
-      >
-        {t('CONFIG_REFERENCE')}
-      </Button>
-    </Entry>
+  const observerRef = useRef<MutationObserver | undefined>();
+  const path = useMemo(
+    () => getConfigReferencePath({ workspace, cluster, namespace, module, name }),
+    [workspace, cluster, namespace, module, name],
   );
+
+  const cleanup = useCallback(() => {
+    observerRef.current?.disconnect();
+    observerRef.current = undefined;
+  }, []);
+
+  const afterMount = useCallback(
+    (appWindow: Window) => {
+      cleanup();
+      if (!appWindow?.document) {
+        return;
+      }
+
+      const applyEntry = () => {
+        injectConfigReferenceEntry(appWindow.document, t('CONFIG_REFERENCE'), () => {
+          navigate(path);
+        });
+      };
+
+      applyEntry();
+      const target = appWindow.document.body || appWindow.document.documentElement;
+      if (!target) {
+        return;
+      }
+
+      const Observer = appWindow.document.defaultView?.MutationObserver || MutationObserver;
+      const observer = new Observer(applyEntry);
+      observer.observe(target, { childList: true, subtree: true });
+      observerRef.current = observer;
+    },
+    [cleanup, navigate, path],
+  );
+
+  return { afterMount, afterUnmount: cleanup };
 }

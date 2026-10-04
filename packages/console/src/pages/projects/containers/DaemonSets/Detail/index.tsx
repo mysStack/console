@@ -7,23 +7,23 @@ import React from 'react';
 import WujieReact from 'wujie-react';
 import { useCacheStore as useStore } from '@ks-console/shared';
 import { useParams } from 'react-router-dom';
-import ConfigReferenceEntry from '../../../components/ConfigReference/entry';
+import { useConfigReferenceBridge } from '../../../components/ConfigReference/entry';
 
 function DaemonSetDetail(): JSX.Element {
   const { name } = useParams<'name'>();
   const [wujieUrlPrefix] = useStore<string>('wujieUrlPrefix');
+  const { afterMount, afterUnmount } = useConfigReferenceBridge('daemonsets');
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-      <WujieReact
-        width="100%"
-        height="100%"
-        name="consolev3"
-        url={`${wujieUrlPrefix}/daemonsets/${name}`}
-        sync={false}
-      />
-      <ConfigReferenceEntry module="daemonsets" />
-    </div>
+    <WujieReact
+      width="100%"
+      height="100%"
+      name="consolev3"
+      url={`${wujieUrlPrefix}/daemonsets/${name}`}
+      sync={false}
+      afterMount={afterMount}
+      afterUnmount={afterUnmount}
+    />
   );
 }
 
