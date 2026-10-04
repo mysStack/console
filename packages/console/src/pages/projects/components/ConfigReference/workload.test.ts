@@ -26,7 +26,7 @@ test('reads container names and envFrom from the original workload shape', () =>
   ]);
 });
 
-test('preserves unrelated workload annotations and all containers in the merge patch', () => {
+test('patches only the selected container and Reloader annotation', () => {
   assert.deepEqual(
     buildConfigReferencePatch(
       { _originData: detail } as any,
@@ -34,27 +34,34 @@ test('preserves unrelated workload annotations and all containers in the merge p
       [{ kind: 'configMap', name: 'app-config', prefix: 'APP_' }],
       true,
     ),
-    {
-      metadata: {
-        annotations: {
-          'example.com/owner': 'team-a',
-          'reloader.stakater.com/auto': 'true',
-        },
+    [
+      {
+        op: 'replace',
+        path: '/spec/template/spec/containers/0/envFrom',
+        value: [{ configMapRef: { name: 'app-config' }, prefix: 'APP_' }],
       },
-      spec: {
-        template: {
-          spec: {
-            containers: [
-              {
-                name: 'api',
-                image: 'api:v1',
-                envFrom: [{ configMapRef: { name: 'app-config' }, prefix: 'APP_' }],
-              },
-              { name: 'sidecar', image: 'proxy:v1', envFrom: [] },
-            ],
-          },
-        },
+      {
+        op: 'add',
+        path: '/metadata/annotations/reloader.stakater.com~1auto',
+        value: 'true',
       },
-    },
+    ],
   );
+});
+
+test('replaces an empty envFrom list on the selected container', () => {
+  const patch = buildConfigReferencePatch(
+    { _originData: detail } as any,
+    'sidecar',
+    [{ kind: 'secret', name: 'sidecar-secret', prefix: '' }],
+    false,
+  );
+
+  assert.deepEqual(patch, [
+    {
+      op: 'replace',
+      path: '/spec/template/spec/containers/1/envFrom',
+      value: [{ secretRef: { name: 'sidecar-secret' } }],
+    },
+  ]);
 });

@@ -1,7 +1,6 @@
 import { get } from 'lodash';
 
 import { serializeEnvFrom } from './envFrom';
-import { writeReloaderPolicy } from './reloader';
 import type { ConfigReferenceWorkload, EnvFromReference } from './types';
 
 type WorkloadLike = ConfigReferenceWorkload & {
@@ -45,25 +44,40 @@ export function buildConfigReferencePatch(
   const annotations =
     get(original, 'metadata.annotations', source?.annotations || {}) ||
     ({} as Record<string, string>);
-  const containers = getPodTemplateContainers(source).map(container =>
-    container?.name === containerName
-      ? {
-          ...container,
-          envFrom: serializeEnvFrom(references),
-        }
-      : container,
-  );
+  const containers = getPodTemplateContainers(source);
+  const containerIndex = containers.findIndex(container => container?.name === containerName);
+  if (containerIndex < 0) {
+    return [];
+  }
 
-  return {
-    metadata: {
-      annotations: writeReloaderPolicy(annotations, reloaderEnabled),
-    },
-    spec: {
-      template: {
-        spec: {
-          containers,
-        },
-      },
-    },
-  };
+  const currentEnvFrom = containers[containerIndex]?.envFrom;
+  const nextEnvFrom = serializeEnvFrom(references);
+  const patch: Array<Record<string, any>> = [];
+  const envFromPath = `/spec/template/spec/containers/${containerIndex}/envFrom`;
+
+  if (nextEnvFrom.length > 0) {
+    patch.push({
+      op: Array.isArray(currentEnvFrom) ? 'replace' : 'add',
+      path: envFromPath,
+      value: nextEnvFrom,
+    });
+  } else if (Array.isArray(currentEnvFrom)) {
+    patch.push({ op: 'remove', path: envFromPath });
+  }
+
+  const reloaderPath = '/metadata/annotations/reloader.stakater.com~1auto';
+  const hadAnnotations = Object.keys(annotations).length > 0;
+  const hadReloaderAnnotation = annotations['reloader.stakater.com/auto'] !== undefined;
+
+  if (reloaderEnabled) {
+    patch.push({
+      op: hadReloaderAnnotation ? 'replace' : hadAnnotations ? 'add' : 'add',
+      path: hadAnnotations ? reloaderPath : '/metadata/annotations',
+      value: hadAnnotations ? 'true' : { 'reloader.stakater.com/auto': 'true' },
+    });
+  } else if (hadReloaderAnnotation) {
+    patch.push({ op: 'remove', path: reloaderPath });
+  }
+
+  return patch;
 }

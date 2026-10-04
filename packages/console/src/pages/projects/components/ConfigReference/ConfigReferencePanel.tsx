@@ -98,7 +98,9 @@ export default function ConfigReferencePanel({
 
   const saveMutation = useMutation(
     (data: Record<string, any>) =>
-      request.patch(store.getDetailUrl({ cluster, namespace, name }), data),
+      request.patch(store.getDetailUrl({ cluster, namespace, name }), data, {
+        headers: { 'content-type': 'application/json-patch+json' },
+      }),
     {
       onSuccess: () => {
         notify.success(t('CONFIG_REFERENCE_SAVE_SUCCESS'));
