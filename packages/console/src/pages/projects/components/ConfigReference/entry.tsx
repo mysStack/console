@@ -28,13 +28,9 @@ export function getConfigReferencePath({
 
 const Entry = styled.div`
   position: absolute;
-  top: 108px;
-  left: 292px;
+  top: 20px;
+  right: 24px;
   z-index: 2;
-
-  @media (max-width: 1200px) {
-    left: 288px;
-  }
 `;
 
 export default function ConfigReferenceEntry({
@@ -49,6 +45,8 @@ export default function ConfigReferenceEntry({
     <Entry>
       <Button
         type="button"
+        color="secondary"
+        shadow
         aria-label={t('CONFIG_REFERENCE')}
         onClick={() =>
           navigate(getConfigReferencePath({ workspace, cluster, namespace, module, name }))
