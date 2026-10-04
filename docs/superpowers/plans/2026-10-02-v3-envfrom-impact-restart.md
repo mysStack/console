@@ -1,5 +1,7 @@
 # V3 环境变量引用与配置变更重启 Implementation Plan
 
+> 状态：已废弃。完整 V3 源码不可获得；本计划中的自研影响分析、用户确认重启和 PodTemplate 重启 PATCH 不再执行，由独立 Stakater Reloader 负责配置变更后的自动滚动更新。当前计划见 [`2026-10-04-config-reference-reloader.md`](./2026-10-04-config-reference-reloader.md)。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task with verification checkpoints.
 
 **Goal:** 在不替换或削弱现有 V3 工作负载完整表单的前提下，支持 `envFrom` 整体引用 ConfigMap/Secret，并在保存配置资源后识别受影响工作负载，由用户选择是否异步滚动重启。

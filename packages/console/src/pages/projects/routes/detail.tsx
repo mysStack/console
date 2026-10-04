@@ -56,10 +56,23 @@ import MicroserviceInstancesRoutes from '../containers/SpringCloud/microserviceI
 import composingDetailRoutes from '../containers/ApplicationComposing/Detail/routes';
 import GatewaysDetailRoutes from '../containers/Gateway/Detail/routes';
 import { editWorkloadRoutes } from '../containers/Workloads/routes';
+import ConfigReferencePage from '../components/ConfigReference/ConfigReferencePage';
 
 export default (PATH: string) => [
   ...applicationsDetailRoutes(PATH),
   ...editWorkloadRoutes(PATH),
+  {
+    path: `${PATH}/deployments/:name/config-reference`,
+    element: <ConfigReferencePage module="deployments" />,
+  },
+  {
+    path: `${PATH}/statefulsets/:name/config-reference`,
+    element: <ConfigReferencePage module="statefulsets" />,
+  },
+  {
+    path: `${PATH}/daemonsets/:name/config-reference`,
+    element: <ConfigReferencePage module="daemonsets" />,
+  },
   {
     path: `${PATH}/deployments/:name`,
     element: <DeploymentDetail />,

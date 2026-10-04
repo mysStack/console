@@ -1,5 +1,7 @@
 # 工作负载 ConfigMap/Secret 引用需求与交互设计
 
+> 状态：历史需求基线。原“原生完整表单迁移”与“影响分析后用户确认重启”方案已废弃；当前有效方案见 [`2026-10-04-config-reference-reloader-design.md`](./2026-10-04-config-reference-reloader-design.md)。
+
 ## 1. 背景与问题
 
 当前项目工作负载页面通过 Console 的 Wujie 容器加载独立的 V3 制品。Console 的 `Deployments`、`StatefulSets` 和 `DaemonSets` 页面仍然依赖 V3 的路由、React 运行时、全局样式和表单状态。

@@ -232,6 +232,14 @@ const DaemonSetDetail = () => {
       //   },
       // },
       {
+        key: 'configReference',
+        icon: <Icon name="storage" />,
+        text: t('CONFIG_REFERENCE'),
+        action: 'edit',
+        onClick: () =>
+          navigate(`/clusters/${cluster}/projects/${namespace}/${module}/${name}/config-reference`),
+      },
+      {
         key: 'editConfigTemplate',
         icon: <Icon name="storage" />,
         text: t('EDIT_SETTINGS'),

@@ -13,6 +13,7 @@ import Metadata from './Metadata';
 import EnvVariables from './EnvVariables';
 import Events from './Events';
 import Monitorings from './Monitoring';
+import ConfigReferencePage from '../../../../../components/ConfigReference/ConfigReferencePage';
 
 const getRoutes = (PATH: string) => [
   {
@@ -46,6 +47,10 @@ const getRoutes = (PATH: string) => [
       {
         path: 'events',
         element: <Events />,
+      },
+      {
+        path: 'config-reference',
+        element: <ConfigReferencePage module="deployments" />,
       },
     ],
   },
