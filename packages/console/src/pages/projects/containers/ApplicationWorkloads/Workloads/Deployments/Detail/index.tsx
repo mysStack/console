@@ -272,6 +272,14 @@ const DeploymentDetail = () => {
         },
       },
       {
+        key: 'configReference',
+        icon: <Storage />,
+        text: t('CONFIG_REFERENCE'),
+        action: 'edit',
+        onClick: () =>
+          navigate(`/clusters/${cluster}/projects/${namespace}/${module}/${name}/config-reference`),
+      },
+      {
         key: 'editConfigTemplate',
         icon: <Storage />,
         text: t('EDIT_SETTINGS'),
