@@ -183,6 +183,7 @@ const StatefulSetsDetail = () => {
           { title: t('METADATA'), path: `${path}/metadata` },
           { title: t('MONITORING'), path: `${path}/monitors` },
           { title: t('ENVIRONMENT_VARIABLE_PL'), path: `${path}/env` },
+          { title: t('CONFIG_REFERENCE'), path: `${path}/config-reference` },
           { title: t('EVENT_PL'), path: `${path}/events` },
         ]
       : [
@@ -190,6 +191,7 @@ const StatefulSetsDetail = () => {
           { title: t('REVISION_RECORDS'), path: `${path}/revision-control` },
           { title: t('METADATA'), path: `${path}/metadata` },
           { title: t('ENVIRONMENT_VARIABLE_PL'), path: `${path}/env` },
+          { title: t('CONFIG_REFERENCE'), path: `${path}/config-reference` },
           { title: t('EVENT_PL'), path: `${path}/events` },
         ];
   }, []);
@@ -268,14 +270,6 @@ const StatefulSetsDetail = () => {
         text: t('EDIT_SERVICE'),
         action: 'edit',
         onClick: () => editWorkloadService({ type: 'Headless', detail }),
-      },
-      {
-        key: 'configReference',
-        icon: <Icon name="storage" />,
-        text: t('CONFIG_REFERENCE'),
-        action: 'edit',
-        onClick: () =>
-          navigate(`/clusters/${cluster}/projects/${namespace}/${module}/${name}/config-reference`),
       },
       {
         key: 'editConfigTemplate',
