@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { useMutation } from 'react-query';
 import { configMapStore, Icon, request, secretStore, workloadStore } from '@ks-console/shared';
-import { notify } from '@kubed/components';
+import { Button, Select, Switch, notify } from '@kubed/components';
 
 import { findDuplicateReferences, parseEnvFrom } from './envFrom';
 import { readReloaderPolicy } from './reloader';
@@ -10,7 +10,7 @@ import { buildConfigReferencePatch, getContainerEnvFrom, getContainerNames } fro
 import type { ConfigReferenceKind, EnvFromReference } from './types';
 
 type WorkloadModule = 'deployments' | 'statefulsets' | 'daemonsets';
-type NameOption = { label: string; value: string };
+type NameOption = { label: string; value: string; disabled?: boolean };
 
 interface Props {
   cluster: string;
@@ -35,11 +35,13 @@ const toNameOptions = (items: any[]): NameOption[] =>
     .filter((name): name is string => typeof name === 'string' && name.length > 0)
     .map(name => ({ label: name, value: name }));
 
+const emptyOption: NameOption = { label: '请选择', value: '' };
+
 const controlStyle: React.CSSProperties = {
   boxSizing: 'border-box',
-  minHeight: 36,
+  minHeight: 32,
   width: '100%',
-  padding: '7px 10px',
+  padding: '6px 10px',
   border: '1px solid #b8c4d4',
   borderRadius: 4,
   background: '#fff',
@@ -49,8 +51,14 @@ const controlStyle: React.CSSProperties = {
   fontWeight: 600,
 };
 
+// Select owns its border, arrow and popup styling. Keep only the sizing here so
+// the V3 dark dropdown is not replaced by a second custom border.
+const selectStyle: React.CSSProperties = {
+  width: '100%',
+};
+
 const buttonStyle: React.CSSProperties = {
-  minHeight: 36,
+  minHeight: 32,
   padding: '0 14px',
   border: '1px solid #ccd3db',
   borderRadius: 100,
@@ -247,39 +255,39 @@ export default function ConfigReferenceInline({
           const options = reference.kind === 'secret' ? secrets : configMaps;
           const duplicate = duplicateIndexes.includes(index);
           const unavailable = unavailableIndexes.includes(index);
+          const resourceOptions = [
+            ...(unavailable
+              ? [{ label: `${reference.name}（不可用）`, value: reference.name, disabled: true }]
+              : []),
+            emptyOption,
+            ...options,
+          ];
           return (
             <div key={`${index}-${reference.kind}`} style={referenceRowStyle}>
-              <select
+              <Select
                 aria-label={`引用类型 ${index + 1}`}
-                style={controlStyle}
+                style={selectStyle}
                 value={reference.kind}
-                onChange={event =>
+                options={[
+                  { label: '来自配置字典', value: 'configMap' },
+                  { label: '来自保密字典', value: 'secret' },
+                ]}
+                onChange={value =>
                   updateReference(index, {
-                    kind: event.target.value as ConfigReferenceKind,
+                    kind: value as ConfigReferenceKind,
                     name: '',
                   })
                 }
-              >
-                <option value="configMap">ConfigMap</option>
-                <option value="secret">Secret</option>
-              </select>
-              <select
+              />
+              <Select
                 aria-label={`引用资源 ${index + 1}`}
-                style={controlStyle}
+                style={selectStyle}
                 value={reference.name}
+                options={resourceOptions}
                 disabled={resourceLoading}
-                onChange={event => updateReference(index, { name: event.target.value })}
-              >
-                <option value="">Select</option>
-                {unavailable && (
-                  <option value={reference.name}>{reference.name} (unavailable)</option>
-                )}
-                {options.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                loading={resourceLoading}
+                onChange={value => updateReference(index, { name: String(value || '') })}
+              />
               <input
                 aria-label={`前缀 ${index + 1}`}
                 style={controlStyle}
@@ -287,17 +295,16 @@ export default function ConfigReferenceInline({
                 placeholder={t('CONFIG_REFERENCE_PREFIX_PLACEHOLDER')}
                 onChange={event => updateReference(index, { prefix: event.target.value })}
               />
-              <button
+              <Button
                 type="button"
-                className="button button-default button-size-normal"
-                style={buttonStyle}
+                className="button-flat"
                 aria-label={`删除引用 ${index + 1}`}
                 onClick={() =>
                   setReferences(current => current.filter((_, itemIndex) => itemIndex !== index))
                 }
               >
-                <Icon name="trash" size={16} />
-              </button>
+                <Icon name="trash" />
+              </Button>
               {(duplicate || unavailable) && (
                 <span role="alert" style={{ color: '#d03050', gridColumn: '1 / -1', fontSize: 12 }}>
                   {duplicate ? t('CONFIG_REFERENCE_DUPLICATE') : t('CONFIG_REFERENCE_UNAVAILABLE')}
@@ -308,22 +315,22 @@ export default function ConfigReferenceInline({
         })}
       </div>
 
-      <label style={{ ...headerStyle, marginTop: 18, cursor: 'pointer' }}>
-        <span>
+      <div style={autoReloadStyle}>
+        <div>
           <strong style={{ fontSize: 13, lineHeight: 1.4, fontWeight: 600 }}>
             {t('CONFIG_REFERENCE_AUTO_RELOAD')}
           </strong>
           <div style={{ marginTop: 4, color: '#7b8ba4', fontSize: 12, lineHeight: 1.4 }}>
             {t('CONFIG_REFERENCE_AUTO_RELOAD_DESC')}
           </div>
-        </span>
-        <input
-          type="checkbox"
-          style={{ width: 18, height: 18, accentColor: '#4dbd8b' }}
+        </div>
+        <Switch
+          variant="button"
+          label={t(reloaderEnabled ? 'CONFIG_REFERENCE_ENABLED' : 'CONFIG_REFERENCE_DISABLED')}
           checked={reloaderEnabled}
-          onChange={event => setReloaderEnabled(event.target.checked)}
+          onChange={checked => setReloaderEnabled(checked)}
         />
-      </label>
+      </div>
 
       <div style={footerStyle}>
         <button
@@ -388,6 +395,16 @@ const footerStyle: React.CSSProperties = {
   gap: 10,
   marginTop: 12,
   paddingTop: 10,
+  borderTop: '1px solid #cad5e3',
+};
+
+const autoReloadStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 16,
+  marginTop: 18,
+  paddingTop: 14,
   borderTop: '1px solid #cad5e3',
 };
 

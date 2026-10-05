@@ -1,7 +1,15 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { getConfigReferenceSummaryRows } from './summary';
+import { getConfigReferenceSummaryPrefix, getConfigReferenceSummaryRows } from './summary';
+
+test('does not reserve a visible prefix column when no prefix is configured', () => {
+  assert.equal(getConfigReferenceSummaryPrefix({ kind: 'secret', name: 'wes-secret' }), undefined);
+  assert.equal(
+    getConfigReferenceSummaryPrefix({ kind: 'configMap', name: 'wes-app', prefix: 'APP_' }),
+    'APP_',
+  );
+});
 
 test('builds display rows without reading ConfigMap or Secret data', () => {
   assert.deepEqual(

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { workloadStore } from '@ks-console/shared';
 
-import { getConfigReferenceSummaryRows } from './summary';
+import { getConfigReferenceSummaryPrefix, getConfigReferenceSummaryRows } from './summary';
 import { getContainerEnvFrom, getContainerNames } from './workload';
 
 type WorkloadModule = 'deployments' | 'statefulsets' | 'daemonsets';
@@ -57,7 +57,9 @@ export default function ConfigReferenceSummary({
         <div key={`${reference.kind}-${reference.name}-${index}`} style={rowStyle}>
           <span style={kindStyle}>{reference.label}</span>
           <span style={nameStyle}>{reference.name}</span>
-          <span style={prefixStyle}>{reference.prefix || '—'}</span>
+          {getConfigReferenceSummaryPrefix(reference) && (
+            <span style={prefixStyle}>{getConfigReferenceSummaryPrefix(reference)}</span>
+          )}
         </div>
       ))}
     </div>
@@ -72,7 +74,7 @@ const summaryStyle: React.CSSProperties = {
 
 const rowStyle: React.CSSProperties = {
   display: 'grid',
-  gridTemplateColumns: '130px minmax(180px, 1fr) minmax(130px, 1fr)',
+  gridTemplateColumns: '130px minmax(0, 1fr) minmax(120px, 0.6fr)',
   gap: 8,
   alignItems: 'center',
   minHeight: 40,
@@ -83,8 +85,14 @@ const rowStyle: React.CSSProperties = {
   color: '#36435c',
   fontSize: 12,
   fontWeight: 600,
+  textAlign: 'left',
 };
 
-const kindStyle: React.CSSProperties = { color: '#53657d' };
-const nameStyle: React.CSSProperties = { overflow: 'hidden', textOverflow: 'ellipsis' };
-const prefixStyle: React.CSSProperties = { color: '#7b8ba4' };
+const kindStyle: React.CSSProperties = { color: '#53657d', textAlign: 'left' };
+const nameStyle: React.CSSProperties = {
+  minWidth: 0,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  textAlign: 'left',
+};
+const prefixStyle: React.CSSProperties = { color: '#7b8ba4', textAlign: 'left' };
