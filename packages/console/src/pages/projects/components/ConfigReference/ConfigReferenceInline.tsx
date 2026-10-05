@@ -41,17 +41,21 @@ const controlStyle: React.CSSProperties = {
   borderRadius: 4,
   background: '#fff',
   color: '#27364b',
-  fontSize: 14,
+  fontFamily: 'inherit',
+  fontSize: 12,
+  fontWeight: 600,
 };
 
 const buttonStyle: React.CSSProperties = {
-  minHeight: 34,
-  padding: '6px 14px',
-  border: '1px solid #b8c4d4',
-  borderRadius: 4,
-  background: '#fff',
-  color: '#27364b',
-  fontSize: 14,
+  minHeight: 32,
+  padding: '5px 23px',
+  border: '1px solid #ccd3db',
+  borderRadius: 100,
+  background: '#eff4f9',
+  color: '#36435c',
+  fontFamily: 'inherit',
+  fontSize: 12,
+  fontWeight: 600,
   cursor: 'pointer',
 };
 
@@ -220,6 +224,7 @@ export default function ConfigReferenceInline({
         </div>
         <button
           type="button"
+          className="button button-default button-size-normal"
           style={buttonStyle}
           disabled={resourceLoading}
           onClick={() =>
@@ -294,6 +299,7 @@ export default function ConfigReferenceInline({
               />
               <button
                 type="button"
+                className="button button-default button-size-normal"
                 style={buttonStyle}
                 onClick={() =>
                   setReferences(current => current.filter((_, itemIndex) => itemIndex !== index))
@@ -326,12 +332,18 @@ export default function ConfigReferenceInline({
       </label>
 
       <div style={footerStyle}>
-        <button type="button" style={buttonStyle} onClick={onClose}>
+        <button
+          type="button"
+          className="button button-default button-size-normal"
+          style={buttonStyle}
+          onClick={onClose}
+        >
           {t('CONFIG_REFERENCE_CANCEL')}
         </button>
         <button
           type="button"
-          style={{ ...buttonStyle, background: '#3eaf7c', borderColor: '#3eaf7c', color: '#fff' }}
+          className="button button-control button-size-normal"
+          style={{ ...buttonStyle, background: '#242e42', borderColor: '#242e42', color: '#fff' }}
           disabled={saveMutation.isLoading || resourceLoading}
           onClick={save}
         >
@@ -347,7 +359,7 @@ const sectionStyle: React.CSSProperties = {
   padding: 16,
   border: '1px solid #c8d3e1',
   borderRadius: 6,
-  background: '#f7f9fc',
+  background: '#f6f8fb',
   color: '#27364b',
   textAlign: 'left',
 };
@@ -372,10 +384,10 @@ const referenceRowStyle: React.CSSProperties = {
   gridTemplateColumns: '130px minmax(180px, 1fr) minmax(130px, 1fr) auto',
   gap: 8,
   alignItems: 'center',
-  padding: 8,
-  border: '1px solid #d8e0eb',
-  borderRadius: 5,
-  background: '#fff',
+  padding: '8px 12px',
+  border: '1px solid #c8d3e1',
+  borderRadius: 100,
+  background: '#eff4f9',
 };
 
 const messageStyle: React.CSSProperties = {
@@ -394,10 +406,14 @@ const footerStyle: React.CSSProperties = {
 };
 
 const iconButtonStyle: React.CSSProperties = {
-  border: 0,
-  background: 'transparent',
-  color: '#65758b',
-  fontSize: 24,
+  width: 32,
+  height: 32,
+  border: '1px solid #ccd3db',
+  borderRadius: 100,
+  background: '#eff4f9',
+  color: '#53657d',
+  fontFamily: 'inherit',
+  fontSize: 20,
   lineHeight: 1,
   cursor: 'pointer',
 };
