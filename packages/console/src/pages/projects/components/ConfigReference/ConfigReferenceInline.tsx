@@ -17,6 +17,7 @@ interface Props {
   name: string;
   module: WorkloadModule;
   workloadKind: string;
+  containerName?: string;
   onClose: () => void;
 }
 
@@ -47,14 +48,14 @@ const controlStyle: React.CSSProperties = {
 };
 
 const buttonStyle: React.CSSProperties = {
-  minHeight: 32,
-  padding: '5px 23px',
+  minHeight: 52,
+  padding: '0 28px',
   border: '1px solid #ccd3db',
   borderRadius: 100,
   background: '#eff4f9',
   color: '#36435c',
   fontFamily: 'inherit',
-  fontSize: 12,
+  fontSize: 18,
   fontWeight: 600,
   cursor: 'pointer',
 };
@@ -65,6 +66,7 @@ export default function ConfigReferenceInline({
   name,
   module,
   workloadKind,
+  containerName: targetContainerName,
   onClose,
 }: Props) {
   const store = storeByModule[module];
@@ -74,7 +76,6 @@ export default function ConfigReferenceInline({
   const [resourceLoading, setResourceLoading] = useState(true);
   const [resourceError, setResourceError] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
-  const [containerName, setContainerName] = useState('');
   const [references, setReferences] = useState<EnvFromReference[]>([]);
   const [reloaderEnabled, setReloaderEnabled] = useState(false);
 
@@ -82,18 +83,20 @@ export default function ConfigReferenceInline({
     () => (detailQuery.data ? getContainerNames(detailQuery.data as any) : []),
     [detailQuery.data],
   );
+  const selectedContainer =
+    targetContainerName && containers.includes(targetContainerName)
+      ? targetContainerName
+      : containers[0] || '';
 
   useEffect(() => {
     if (!detailQuery.data) return;
-    const nextContainer = containers[0] || '';
-    setContainerName(nextContainer);
-    setReferences(parseEnvFrom(getContainerEnvFrom(detailQuery.data as any, nextContainer)));
+    setReferences(parseEnvFrom(getContainerEnvFrom(detailQuery.data as any, selectedContainer)));
     const original = (detailQuery.data as any)._originData || detailQuery.data;
     setReloaderEnabled(
       readReloaderPolicy(original?.metadata?.annotations || (detailQuery.data as any).annotations)
         .enabled,
     );
-  }, [containers, detailQuery.data]);
+  }, [detailQuery.data, selectedContainer]);
 
   useEffect(() => {
     let active = true;
@@ -150,7 +153,6 @@ export default function ConfigReferenceInline({
     );
   }
 
-  const selectedContainer = containerName || containers[0];
   const duplicateIndexes = findDuplicateReferences(references);
   const availableNames = {
     configMap: new Set(configMaps.map(option => option.value)),
@@ -161,10 +163,6 @@ export default function ConfigReferenceInline({
     return indexes;
   }, []);
 
-  const updateContainer = (nextName: string) => {
-    setContainerName(nextName);
-    setReferences(parseEnvFrom(getContainerEnvFrom(detailQuery.data as any, nextName)));
-  };
   const updateReference = (index: number, value: Partial<EnvFromReference>) =>
     setReferences(current =>
       current.map((item, itemIndex) => (itemIndex === index ? { ...item, ...value } : item)),
@@ -189,8 +187,10 @@ export default function ConfigReferenceInline({
     <section data-test="config-reference-inline" style={sectionStyle}>
       <div style={headerStyle}>
         <div>
-          <strong style={{ fontSize: 16 }}>{t('CONFIG_REFERENCE')}</strong>
-          <div style={{ marginTop: 4, color: '#79879c', fontSize: 12 }}>
+          <strong style={{ fontSize: 30, lineHeight: 1.2, letterSpacing: '-0.02em' }}>
+            {t('CONFIG_REFERENCE')}
+          </strong>
+          <div style={{ marginTop: 12, color: '#7b8ba4', fontSize: 18, lineHeight: 1.45 }}>
             {t('CONFIG_REFERENCE_SECRET_NOTICE')}
           </div>
         </div>
@@ -199,26 +199,12 @@ export default function ConfigReferenceInline({
         </button>
       </div>
 
-      <label style={labelStyle}>
-        {t('CONFIG_REFERENCE_CONTAINER')}
-        <select
-          aria-label="配置引用容器"
-          style={controlStyle}
-          value={selectedContainer}
-          onChange={event => updateContainer(event.target.value)}
-        >
-          {containers.map(value => (
-            <option key={value} value={value}>
-              {value}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <div style={{ ...headerStyle, marginTop: 14 }}>
+      <div style={{ ...headerStyle, marginTop: 38 }}>
         <div>
-          <strong>{t('CONFIG_REFERENCE_RESOURCES')}</strong>
-          <div style={{ marginTop: 4, color: '#79879c', fontSize: 12 }}>
+          <strong style={{ fontSize: 23, lineHeight: 1.35, fontWeight: 500 }}>
+            {t('CONFIG_REFERENCE_RESOURCES')}
+          </strong>
+          <div style={{ marginTop: 10, color: '#7b8ba4', fontSize: 18, lineHeight: 1.45 }}>
             {t('CONFIG_REFERENCE_SECRET_NOTICE')}
           </div>
         </div>
@@ -317,15 +303,18 @@ export default function ConfigReferenceInline({
         })}
       </div>
 
-      <label style={{ ...headerStyle, marginTop: 14, cursor: 'pointer' }}>
+      <label style={{ ...headerStyle, marginTop: 62, cursor: 'pointer' }}>
         <span>
-          <strong>{t('CONFIG_REFERENCE_AUTO_RELOAD')}</strong>
-          <div style={{ marginTop: 4, color: '#79879c', fontSize: 12 }}>
+          <strong style={{ fontSize: 20, lineHeight: 1.35, fontWeight: 500 }}>
+            {t('CONFIG_REFERENCE_AUTO_RELOAD')}
+          </strong>
+          <div style={{ marginTop: 10, color: '#7b8ba4', fontSize: 18, lineHeight: 1.45 }}>
             {t('CONFIG_REFERENCE_AUTO_RELOAD_DESC')}
           </div>
         </span>
         <input
           type="checkbox"
+          style={{ width: 25, height: 25, accentColor: '#4dbd8b' }}
           checked={reloaderEnabled}
           onChange={event => setReloaderEnabled(event.target.checked)}
         />
@@ -356,10 +345,10 @@ export default function ConfigReferenceInline({
 
 const sectionStyle: React.CSSProperties = {
   marginTop: 12,
-  padding: 16,
-  border: '1px solid #c8d3e1',
-  borderRadius: 6,
-  background: '#f6f8fb',
+  padding: '34px 34px 28px',
+  border: '1px solid #c8d5e4',
+  borderRadius: 9,
+  background: '#f7f9fc',
   color: '#27364b',
   textAlign: 'left',
 };
@@ -369,14 +358,6 @@ const headerStyle: React.CSSProperties = {
   alignItems: 'center',
   justifyContent: 'space-between',
   gap: 12,
-};
-
-const labelStyle: React.CSSProperties = {
-  display: 'grid',
-  gap: 6,
-  marginTop: 14,
-  fontSize: 13,
-  fontWeight: 600,
 };
 
 const referenceRowStyle: React.CSSProperties = {
@@ -391,29 +372,29 @@ const referenceRowStyle: React.CSSProperties = {
 };
 
 const messageStyle: React.CSSProperties = {
-  padding: '12px 0 4px',
-  color: '#79879c',
-  fontSize: 13,
+  padding: '33px 0 4px',
+  color: '#7b8ba4',
+  fontSize: 18,
 };
 
 const footerStyle: React.CSSProperties = {
   display: 'flex',
   justifyContent: 'flex-end',
-  gap: 8,
-  marginTop: 16,
-  paddingTop: 12,
-  borderTop: '1px solid #d8e0eb',
+  gap: 34,
+  marginTop: 24,
+  paddingTop: 24,
+  borderTop: '1px solid #cad5e3',
 };
 
 const iconButtonStyle: React.CSSProperties = {
-  width: 32,
-  height: 32,
+  width: 48,
+  height: 48,
   border: '1px solid #ccd3db',
   borderRadius: 100,
   background: '#eff4f9',
   color: '#53657d',
   fontFamily: 'inherit',
-  fontSize: 20,
+  fontSize: 31,
   lineHeight: 1,
   cursor: 'pointer',
 };

@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useParams } from 'react-router-dom';
 import {
   findConfigReferenceAction,
+  findConfigReferenceContainerName,
   findConfigReferenceMountParent,
   injectConfigReferenceEntry,
 } from './bridge';
@@ -37,10 +38,12 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
   const observerRef = useRef<MutationObserver | undefined>();
   const inlineHostRef = useRef<HTMLElement | null>(null);
   const [inlineHost, setInlineHost] = useState<HTMLElement | null>(null);
+  const [activeContainerName, setActiveContainerName] = useState<string | undefined>();
 
   const closeInline = useCallback(() => {
     const host = inlineHostRef.current;
     inlineHostRef.current = null;
+    setActiveContainerName(undefined);
     setInlineHost(null);
     host?.parentNode?.removeChild(host);
   }, []);
@@ -64,6 +67,7 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
           const parent = findConfigReferenceMountParent(action);
           if (!action || !parent) return;
           closeInline();
+          setActiveContainerName(findConfigReferenceContainerName(appWindow.document));
           const host = appWindow.document.createElement('div');
           host.dataset.test = 'config-reference-inline-host';
           parent.appendChild(host);
@@ -97,6 +101,7 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
             namespace={namespace || ''}
             name={name || ''}
             module={module}
+            containerName={activeContainerName}
             workloadKind={
               module === 'deployments'
                 ? 'Deployment'

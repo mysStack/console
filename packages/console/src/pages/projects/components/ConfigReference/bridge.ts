@@ -13,8 +13,8 @@ export function shouldInjectConfigReferenceEntry({
   return actionExists && !entryExists;
 }
 
-function isVisibleAction(document: Document, action: HTMLButtonElement): boolean {
-  let current: HTMLElement | null = action;
+function isVisibleAction(document: Document, element: HTMLElement): boolean {
+  let current: HTMLElement | null = element;
   while (current) {
     if (current.getAttribute?.('aria-hidden') === 'true') {
       return false;
@@ -26,6 +26,15 @@ function isVisibleAction(document: Document, action: HTMLButtonElement): boolean
     current = current.parentElement as HTMLElement | null;
   }
   return true;
+}
+
+/** Reads the container currently being edited by the embedded V3 form. */
+export function findConfigReferenceContainerName(document: Document): string | undefined {
+  const inputs = Array.from(
+    document.querySelectorAll<HTMLInputElement>('input[placeholder="Container Name*"]'),
+  ).filter(input => isVisibleAction(document, input));
+  const value = inputs[inputs.length - 1]?.value?.trim();
+  return value || undefined;
 }
 
 export function findConfigReferenceAction(document: Document): HTMLButtonElement | undefined {

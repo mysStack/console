@@ -5,6 +5,7 @@ import {
   CONFIG_REFERENCE_ENTRY_SELECTOR,
   CONFIG_REFERENCE_ENVIRONMENT_ACTION_SELECTOR,
   findConfigReferenceAction,
+  findConfigReferenceContainerName,
   findConfigReferenceMountParent,
   injectConfigReferenceEntry,
   shouldInjectConfigReferenceEntry,
@@ -118,4 +119,19 @@ test('mounts the inline editor beside the V3 action row', () => {
   const action = { parentElement: row } as HTMLButtonElement;
 
   assert.equal(findConfigReferenceMountParent(action), rowParent);
+});
+
+test('reads the visible V3 container editor as the configuration target', () => {
+  const visibleInput = {
+    value: 'wes-v2-server',
+    getAttribute: () => null,
+    parentElement: null,
+  } as unknown as HTMLInputElement;
+  const document = {
+    querySelectorAll: (selector: string) =>
+      selector === 'input[placeholder="Container Name*"]' ? [visibleInput] : [],
+    defaultView: { getComputedStyle: () => ({ display: 'block', visibility: 'visible' }) },
+  } as unknown as Document;
+
+  assert.equal(findConfigReferenceContainerName(document), 'wes-v2-server');
 });
