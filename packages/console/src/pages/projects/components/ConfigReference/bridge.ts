@@ -13,14 +13,36 @@ export function shouldInjectConfigReferenceEntry({
   return actionExists && !entryExists;
 }
 
+function isVisibleAction(document: Document, action: HTMLButtonElement): boolean {
+  let current: HTMLElement | null = action;
+  while (current) {
+    if (current.getAttribute?.('aria-hidden') === 'true') {
+      return false;
+    }
+    const style = document.defaultView?.getComputedStyle(current);
+    if (style && (style.display === 'none' || style.visibility === 'hidden')) {
+      return false;
+    }
+    current = current.parentElement as HTMLElement | null;
+  }
+  return true;
+}
+
+export function findConfigReferenceAction(document: Document): HTMLButtonElement | undefined {
+  const actions = Array.from(
+    document.querySelectorAll<HTMLButtonElement>(CONFIG_REFERENCE_ENVIRONMENT_ACTION_SELECTOR),
+  ).filter(action => isVisibleAction(document, action));
+
+  const dialogActions = actions.filter(action => action.closest('[role="dialog"]'));
+  return dialogActions[dialogActions.length - 1] || actions[actions.length - 1];
+}
+
 export function injectConfigReferenceEntry(
   document: Document,
   label: string,
   onActivate: () => void,
 ): boolean {
-  const action = document.querySelector<HTMLButtonElement>(
-    CONFIG_REFERENCE_ENVIRONMENT_ACTION_SELECTOR,
-  );
+  const action = findConfigReferenceAction(document);
   const parent = action?.parentElement;
   const entryExists = Boolean(parent?.querySelector(CONFIG_REFERENCE_ENTRY_SELECTOR));
 

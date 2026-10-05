@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   CONFIG_REFERENCE_ENTRY_SELECTOR,
   CONFIG_REFERENCE_ENVIRONMENT_ACTION_SELECTOR,
+  findConfigReferenceAction,
   injectConfigReferenceEntry,
   shouldInjectConfigReferenceEntry,
 } from './bridge';
@@ -33,6 +34,7 @@ test('injects a matching button and forwards activation to the host drawer', () 
   const createdContent = { className: '', textContent: '' };
   const action = {
     nextSibling: null,
+    getAttribute: () => null,
     parentElement: {
       querySelector: (selector: string) =>
         selector === CONFIG_REFERENCE_ENTRY_SELECTOR ? null : undefined,
@@ -52,6 +54,7 @@ test('injects a matching button and forwards activation to the host drawer', () 
         }),
     },
     querySelector: () => content,
+    closest: () => null,
     cloneNode: () => ({
       dataset: {} as Record<string, string>,
       textContent: '',
@@ -69,6 +72,9 @@ test('injects a matching button and forwards activation to the host drawer', () 
   const fakeDocument = {
     querySelector: (selector: string) =>
       selector === CONFIG_REFERENCE_ENVIRONMENT_ACTION_SELECTOR ? action : null,
+    querySelectorAll: (selector: string) =>
+      selector === CONFIG_REFERENCE_ENVIRONMENT_ACTION_SELECTOR ? [action] : [],
+    defaultView: { getComputedStyle: () => ({ display: 'block', visibility: 'visible' }) },
     createElement: () => createdContent,
   } as unknown as Document;
 
@@ -84,4 +90,23 @@ test('injects a matching button and forwards activation to the host drawer', () 
   assert.equal(buttons[0].before, action.nextSibling);
   buttons[0].click({ preventDefault: () => undefined, stopPropagation: () => undefined });
   assert.equal(activated, 1);
+});
+
+test('prefers the visible action in the active dialog', () => {
+  const hidden = {
+    closest: () => null,
+    getAttribute: () => null,
+    parentElement: null,
+  } as unknown as HTMLButtonElement;
+  const visible = {
+    closest: (selector: string) => (selector === '[role="dialog"]' ? {} : null),
+    getAttribute: () => null,
+    parentElement: null,
+  } as unknown as HTMLButtonElement;
+  const document = {
+    querySelectorAll: () => [hidden, visible],
+    defaultView: { getComputedStyle: () => ({ display: 'block', visibility: 'visible' }) },
+  } as unknown as Document;
+
+  assert.equal(findConfigReferenceAction(document), visible);
 });
