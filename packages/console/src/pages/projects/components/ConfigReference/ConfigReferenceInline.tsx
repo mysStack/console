@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation } from 'react-query';
 import { configMapStore, request, secretStore, workloadStore } from '@ks-console/shared';
 import { notify } from '@kubed/components';
@@ -78,6 +78,8 @@ export default function ConfigReferenceInline({
   const [reloadKey, setReloadKey] = useState(0);
   const [references, setReferences] = useState<EnvFromReference[]>([]);
   const [reloaderEnabled, setReloaderEnabled] = useState(false);
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const initialScrollDone = useRef(false);
 
   const containers = useMemo(
     () => (detailQuery.data ? getContainerNames(detailQuery.data as any) : []),
@@ -117,6 +119,17 @@ export default function ConfigReferenceInline({
       active = false;
     };
   }, [cluster, namespace, reloadKey]);
+
+  useEffect(() => {
+    if (resourceLoading || initialScrollDone.current || !sectionRef.current) return;
+    initialScrollDone.current = true;
+    const timer = window.setTimeout(() => {
+      // The V3 editor has a fixed footer. Scroll the fully-rendered inline
+      // editor after its portal content exists, leaving that footer visible.
+      sectionRef.current?.scrollIntoView({ block: 'end', inline: 'nearest' });
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [resourceLoading]);
 
   const saveMutation = useMutation(
     (data: Record<string, any>) =>
@@ -184,7 +197,7 @@ export default function ConfigReferenceInline({
   };
 
   return (
-    <section data-test="config-reference-inline" style={sectionStyle}>
+    <section ref={sectionRef} data-test="config-reference-inline" style={sectionStyle}>
       <div style={headerStyle}>
         <div>
           <strong style={{ fontSize: 18, lineHeight: 1.25, letterSpacing: '-0.02em' }}>

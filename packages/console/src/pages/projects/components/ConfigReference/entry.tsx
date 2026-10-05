@@ -70,14 +70,10 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
           setActiveContainerName(findConfigReferenceContainerName(appWindow.document));
           const host = appWindow.document.createElement('div');
           host.dataset.test = 'config-reference-inline-host';
+          host.style.scrollMarginBottom = '100px';
           parent.appendChild(host);
           inlineHostRef.current = host;
           setInlineHost(host);
-          appWindow.setTimeout(() => {
-            // Center the editor in the V3 scroll area so the native dialog footer
-            // does not cover the configuration-reference actions.
-            host.scrollIntoView({ block: 'center', inline: 'nearest' });
-          }, 0);
         });
       };
 
