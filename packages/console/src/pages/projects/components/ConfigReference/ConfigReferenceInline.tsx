@@ -48,14 +48,14 @@ const controlStyle: React.CSSProperties = {
 };
 
 const buttonStyle: React.CSSProperties = {
-  minHeight: 52,
-  padding: '0 28px',
+  minHeight: 36,
+  padding: '0 18px',
   border: '1px solid #ccd3db',
   borderRadius: 100,
   background: '#eff4f9',
   color: '#36435c',
   fontFamily: 'inherit',
-  fontSize: 18,
+  fontSize: 12,
   fontWeight: 600,
   cursor: 'pointer',
 };
@@ -187,10 +187,10 @@ export default function ConfigReferenceInline({
     <section data-test="config-reference-inline" style={sectionStyle}>
       <div style={headerStyle}>
         <div>
-          <strong style={{ fontSize: 30, lineHeight: 1.2, letterSpacing: '-0.02em' }}>
+          <strong style={{ fontSize: 20, lineHeight: 1.25, letterSpacing: '-0.02em' }}>
             {t('CONFIG_REFERENCE')}
           </strong>
-          <div style={{ marginTop: 12, color: '#7b8ba4', fontSize: 18, lineHeight: 1.45 }}>
+          <div style={{ marginTop: 6, color: '#7b8ba4', fontSize: 12, lineHeight: 1.45 }}>
             {t('CONFIG_REFERENCE_SECRET_NOTICE')}
           </div>
         </div>
@@ -199,12 +199,12 @@ export default function ConfigReferenceInline({
         </button>
       </div>
 
-      <div style={{ ...headerStyle, marginTop: 38 }}>
+      <div style={{ ...headerStyle, marginTop: 24 }}>
         <div>
-          <strong style={{ fontSize: 23, lineHeight: 1.35, fontWeight: 500 }}>
+          <strong style={{ fontSize: 15, lineHeight: 1.35, fontWeight: 600 }}>
             {t('CONFIG_REFERENCE_RESOURCES')}
           </strong>
-          <div style={{ marginTop: 10, color: '#7b8ba4', fontSize: 18, lineHeight: 1.45 }}>
+          <div style={{ marginTop: 6, color: '#7b8ba4', fontSize: 12, lineHeight: 1.45 }}>
             {t('CONFIG_REFERENCE_SECRET_NOTICE')}
           </div>
         </div>
@@ -303,18 +303,18 @@ export default function ConfigReferenceInline({
         })}
       </div>
 
-      <label style={{ ...headerStyle, marginTop: 62, cursor: 'pointer' }}>
+      <label style={{ ...headerStyle, marginTop: 34, cursor: 'pointer' }}>
         <span>
-          <strong style={{ fontSize: 20, lineHeight: 1.35, fontWeight: 500 }}>
+          <strong style={{ fontSize: 14, lineHeight: 1.35, fontWeight: 600 }}>
             {t('CONFIG_REFERENCE_AUTO_RELOAD')}
           </strong>
-          <div style={{ marginTop: 10, color: '#7b8ba4', fontSize: 18, lineHeight: 1.45 }}>
+          <div style={{ marginTop: 6, color: '#7b8ba4', fontSize: 12, lineHeight: 1.45 }}>
             {t('CONFIG_REFERENCE_AUTO_RELOAD_DESC')}
           </div>
         </span>
         <input
           type="checkbox"
-          style={{ width: 25, height: 25, accentColor: '#4dbd8b' }}
+          style={{ width: 18, height: 18, accentColor: '#4dbd8b' }}
           checked={reloaderEnabled}
           onChange={event => setReloaderEnabled(event.target.checked)}
         />
@@ -345,7 +345,7 @@ export default function ConfigReferenceInline({
 
 const sectionStyle: React.CSSProperties = {
   marginTop: 12,
-  padding: '34px 34px 28px',
+  padding: '20px 20px 16px',
   border: '1px solid #c8d5e4',
   borderRadius: 9,
   background: '#f7f9fc',
@@ -372,29 +372,29 @@ const referenceRowStyle: React.CSSProperties = {
 };
 
 const messageStyle: React.CSSProperties = {
-  padding: '33px 0 4px',
+  padding: '22px 0 4px',
   color: '#7b8ba4',
-  fontSize: 18,
+  fontSize: 13,
 };
 
 const footerStyle: React.CSSProperties = {
   display: 'flex',
   justifyContent: 'flex-end',
-  gap: 34,
-  marginTop: 24,
-  paddingTop: 24,
+  gap: 10,
+  marginTop: 18,
+  paddingTop: 14,
   borderTop: '1px solid #cad5e3',
 };
 
 const iconButtonStyle: React.CSSProperties = {
-  width: 48,
-  height: 48,
+  width: 32,
+  height: 32,
   border: '1px solid #ccd3db',
   borderRadius: 100,
   background: '#eff4f9',
   color: '#53657d',
   fontFamily: 'inherit',
-  fontSize: 31,
+  fontSize: 20,
   lineHeight: 1,
   cursor: 'pointer',
 };
