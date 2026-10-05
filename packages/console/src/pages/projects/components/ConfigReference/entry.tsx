@@ -70,7 +70,6 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
           setActiveContainerName(findConfigReferenceContainerName(appWindow.document));
           const host = appWindow.document.createElement('div');
           host.dataset.test = 'config-reference-inline-host';
-          host.style.scrollMarginBottom = '100px';
           parent.appendChild(host);
           inlineHostRef.current = host;
           setInlineHost(host);

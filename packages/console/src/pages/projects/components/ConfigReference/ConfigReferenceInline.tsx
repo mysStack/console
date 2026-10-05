@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useMutation } from 'react-query';
 import { configMapStore, request, secretStore, workloadStore } from '@ks-console/shared';
 import { notify } from '@kubed/components';
@@ -35,27 +35,27 @@ const toNameOptions = (items: any[]): NameOption[] =>
 
 const controlStyle: React.CSSProperties = {
   boxSizing: 'border-box',
-  minHeight: 36,
+  minHeight: 40,
   width: '100%',
-  padding: '7px 10px',
+  padding: '8px 12px',
   border: '1px solid #b8c4d4',
   borderRadius: 4,
   background: '#fff',
   color: '#27364b',
   fontFamily: 'inherit',
-  fontSize: 12,
+  fontSize: 14,
   fontWeight: 600,
 };
 
 const buttonStyle: React.CSSProperties = {
-  minHeight: 36,
+  minHeight: 40,
   padding: '0 18px',
   border: '1px solid #ccd3db',
   borderRadius: 100,
   background: '#eff4f9',
   color: '#36435c',
   fontFamily: 'inherit',
-  fontSize: 12,
+  fontSize: 14,
   fontWeight: 600,
   cursor: 'pointer',
 };
@@ -78,8 +78,6 @@ export default function ConfigReferenceInline({
   const [reloadKey, setReloadKey] = useState(0);
   const [references, setReferences] = useState<EnvFromReference[]>([]);
   const [reloaderEnabled, setReloaderEnabled] = useState(false);
-  const sectionRef = useRef<HTMLElement | null>(null);
-  const initialScrollDone = useRef(false);
 
   const containers = useMemo(
     () => (detailQuery.data ? getContainerNames(detailQuery.data as any) : []),
@@ -119,17 +117,6 @@ export default function ConfigReferenceInline({
       active = false;
     };
   }, [cluster, namespace, reloadKey]);
-
-  useEffect(() => {
-    if (resourceLoading || initialScrollDone.current || !sectionRef.current) return;
-    initialScrollDone.current = true;
-    const timer = window.setTimeout(() => {
-      // The V3 editor has a fixed footer. Scroll the fully-rendered inline
-      // editor after its portal content exists, leaving that footer visible.
-      sectionRef.current?.scrollIntoView({ block: 'end', inline: 'nearest' });
-    }, 0);
-    return () => window.clearTimeout(timer);
-  }, [resourceLoading]);
 
   const saveMutation = useMutation(
     (data: Record<string, any>) =>
@@ -197,13 +184,13 @@ export default function ConfigReferenceInline({
   };
 
   return (
-    <section ref={sectionRef} data-test="config-reference-inline" style={sectionStyle}>
+    <section data-test="config-reference-inline" style={sectionStyle}>
       <div style={headerStyle}>
         <div>
-          <strong style={{ fontSize: 18, lineHeight: 1.25, letterSpacing: '-0.02em' }}>
+          <strong style={{ fontSize: 16, lineHeight: 1.35, fontWeight: 600 }}>
             {t('CONFIG_REFERENCE')}
           </strong>
-          <div style={{ marginTop: 4, color: '#7b8ba4', fontSize: 11, lineHeight: 1.4 }}>
+          <div style={{ marginTop: 4, color: '#7b8ba4', fontSize: 12, lineHeight: 1.4 }}>
             {t('CONFIG_REFERENCE_SECRET_NOTICE')}
           </div>
         </div>
@@ -214,10 +201,10 @@ export default function ConfigReferenceInline({
 
       <div style={{ ...headerStyle, marginTop: 16 }}>
         <div>
-          <strong style={{ fontSize: 14, lineHeight: 1.35, fontWeight: 600 }}>
+          <strong style={{ fontSize: 14, lineHeight: 1.4, fontWeight: 600 }}>
             {t('CONFIG_REFERENCE_RESOURCES')}
           </strong>
-          <div style={{ marginTop: 4, color: '#7b8ba4', fontSize: 11, lineHeight: 1.4 }}>
+          <div style={{ marginTop: 4, color: '#7b8ba4', fontSize: 12, lineHeight: 1.4 }}>
             {t('CONFIG_REFERENCE_SECRET_NOTICE')}
           </div>
         </div>
@@ -318,10 +305,10 @@ export default function ConfigReferenceInline({
 
       <label style={{ ...headerStyle, marginTop: 26, cursor: 'pointer' }}>
         <span>
-          <strong style={{ fontSize: 13, lineHeight: 1.35, fontWeight: 600 }}>
+          <strong style={{ fontSize: 14, lineHeight: 1.4, fontWeight: 600 }}>
             {t('CONFIG_REFERENCE_AUTO_RELOAD')}
           </strong>
-          <div style={{ marginTop: 4, color: '#7b8ba4', fontSize: 11, lineHeight: 1.4 }}>
+          <div style={{ marginTop: 4, color: '#7b8ba4', fontSize: 12, lineHeight: 1.4 }}>
             {t('CONFIG_REFERENCE_AUTO_RELOAD_DESC')}
           </div>
         </span>
@@ -359,7 +346,6 @@ export default function ConfigReferenceInline({
 const sectionStyle: React.CSSProperties = {
   marginTop: 12,
   padding: '14px 16px 12px',
-  scrollMarginBottom: 120,
   border: '1px solid #c8d5e4',
   borderRadius: 9,
   background: '#f7f9fc',
