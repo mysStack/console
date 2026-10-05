@@ -127,7 +127,7 @@ export default function ConfigReferenceInline({
   if (detailQuery.isLoading) {
     return (
       <div data-test="config-reference-inline" style={sectionStyle}>
-        正在加载配置引用…
+        {t('CONFIG_REFERENCE_LOADING')}
       </div>
     );
   }
@@ -187,16 +187,16 @@ export default function ConfigReferenceInline({
         <div>
           <strong style={{ fontSize: 16 }}>{t('CONFIG_REFERENCE')}</strong>
           <div style={{ marginTop: 4, color: '#79879c', fontSize: 12 }}>
-            从 ConfigMap 或 Secret 批量注入容器环境变量
+            {t('CONFIG_REFERENCE_SECRET_NOTICE')}
           </div>
         </div>
-        <button type="button" style={iconButtonStyle} aria-label="关闭配置引用" onClick={onClose}>
+        <button type="button" style={iconButtonStyle} aria-label="Close" onClick={onClose}>
           ×
         </button>
       </div>
 
       <label style={labelStyle}>
-        容器
+        {t('CONFIG_REFERENCE_CONTAINER')}
         <select
           aria-label="配置引用容器"
           style={controlStyle}
@@ -213,9 +213,9 @@ export default function ConfigReferenceInline({
 
       <div style={{ ...headerStyle, marginTop: 14 }}>
         <div>
-          <strong>配置引用</strong>
+          <strong>{t('CONFIG_REFERENCE_RESOURCES')}</strong>
           <div style={{ marginTop: 4, color: '#79879c', fontSize: 12 }}>
-            保存后会更新当前工作负载的 envFrom 配置
+            {t('CONFIG_REFERENCE_SECRET_NOTICE')}
           </div>
         </div>
         <button
@@ -226,11 +226,11 @@ export default function ConfigReferenceInline({
             setReferences(current => [...current, { kind: 'configMap', name: '', prefix: '' }])
           }
         >
-          添加引用
+          {t('CONFIG_REFERENCE_ADD')}
         </button>
       </div>
 
-      {resourceLoading && <div style={messageStyle}>正在加载 ConfigMap 和 Secret…</div>}
+      {resourceLoading && <div style={messageStyle}>{t('CONFIG_REFERENCE_LOADING')}</div>}
       {resourceError && (
         <div role="alert" style={messageStyle}>
           <span>{t('CONFIG_REFERENCE_LOAD_ERROR')}</span>{' '}
@@ -275,8 +275,10 @@ export default function ConfigReferenceInline({
                 disabled={resourceLoading}
                 onChange={event => updateReference(index, { name: event.target.value })}
               >
-                <option value="">请选择</option>
-                {unavailable && <option value={reference.name}>{reference.name}（不可用）</option>}
+                <option value="">Select</option>
+                {unavailable && (
+                  <option value={reference.name}>{reference.name} (unavailable)</option>
+                )}
                 {options.map(option => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -287,7 +289,7 @@ export default function ConfigReferenceInline({
                 aria-label={`前缀 ${index + 1}`}
                 style={controlStyle}
                 value={reference.prefix || ''}
-                placeholder="前缀（可选）"
+                placeholder={t('CONFIG_REFERENCE_PREFIX_PLACEHOLDER')}
                 onChange={event => updateReference(index, { prefix: event.target.value })}
               />
               <button
@@ -297,7 +299,7 @@ export default function ConfigReferenceInline({
                   setReferences(current => current.filter((_, itemIndex) => itemIndex !== index))
                 }
               >
-                删除
+                Delete
               </button>
               {(duplicate || unavailable) && (
                 <span role="alert" style={{ color: '#d03050', gridColumn: '1 / -1', fontSize: 12 }}>
@@ -311,9 +313,9 @@ export default function ConfigReferenceInline({
 
       <label style={{ ...headerStyle, marginTop: 14, cursor: 'pointer' }}>
         <span>
-          <strong>配置变更自动重启</strong>
+          <strong>{t('CONFIG_REFERENCE_AUTO_RELOAD')}</strong>
           <div style={{ marginTop: 4, color: '#79879c', fontSize: 12 }}>
-            写入 Reloader 注解；需集群安装 Reloader 才会执行滚动更新
+            {t('CONFIG_REFERENCE_AUTO_RELOAD_DESC')}
           </div>
         </span>
         <input
@@ -325,7 +327,7 @@ export default function ConfigReferenceInline({
 
       <div style={footerStyle}>
         <button type="button" style={buttonStyle} onClick={onClose}>
-          取消
+          {t('CONFIG_REFERENCE_CANCEL')}
         </button>
         <button
           type="button"
@@ -333,7 +335,7 @@ export default function ConfigReferenceInline({
           disabled={saveMutation.isLoading || resourceLoading}
           onClick={save}
         >
-          {saveMutation.isLoading ? '保存中…' : '保存配置引用'}
+          {saveMutation.isLoading ? 'Saving…' : t('CONFIG_REFERENCE_SAVE')}
         </button>
       </div>
     </section>

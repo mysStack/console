@@ -69,6 +69,9 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
           parent.appendChild(host);
           inlineHostRef.current = host;
           setInlineHost(host);
+          appWindow.setTimeout(() => {
+            host.scrollIntoView({ block: 'nearest' });
+          }, 0);
         });
       };
 
