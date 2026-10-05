@@ -37,6 +37,19 @@ export function findConfigReferenceAction(document: Document): HTMLButtonElement
   return dialogActions[dialogActions.length - 1] || actions[actions.length - 1];
 }
 
+/**
+ * Returns the V3 action-row container where the injected entry should mount its
+ * inline editor. Keeping this beside the native V3 action row is important:
+ * the editor is part of the existing container dialog, not a second route or
+ * drawer owned by the host console.
+ */
+export function findConfigReferenceMountParent(
+  action: HTMLButtonElement | undefined,
+): HTMLElement | undefined {
+  const actionRow = action?.parentElement;
+  return actionRow?.parentElement || actionRow || undefined;
+}
+
 export function injectConfigReferenceEntry(
   document: Document,
   label: string,

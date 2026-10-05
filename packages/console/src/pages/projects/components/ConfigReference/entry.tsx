@@ -1,6 +1,13 @@
-import { useCallback, useMemo, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { injectConfigReferenceEntry } from './bridge';
+import React, { lazy, useCallback, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { useParams } from 'react-router-dom';
+import {
+  findConfigReferenceAction,
+  findConfigReferenceMountParent,
+  injectConfigReferenceEntry,
+} from './bridge';
+
+const ConfigReferenceInline = lazy(() => import('./ConfigReferenceInline'));
 
 export type ConfigReferenceWorkloadModule = 'deployments' | 'statefulsets' | 'daemonsets';
 
@@ -26,18 +33,23 @@ export function getConfigReferencePath({
 }
 
 export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) {
-  const navigate = useNavigate();
   const { workspace, cluster, namespace, name } = useParams();
   const observerRef = useRef<MutationObserver | undefined>();
-  const path = useMemo(
-    () => getConfigReferencePath({ workspace, cluster, namespace, module, name }),
-    [workspace, cluster, namespace, module, name],
-  );
+  const inlineHostRef = useRef<HTMLElement | null>(null);
+  const [inlineHost, setInlineHost] = useState<HTMLElement | null>(null);
+
+  const closeInline = useCallback(() => {
+    const host = inlineHostRef.current;
+    inlineHostRef.current = null;
+    setInlineHost(null);
+    host?.parentNode?.removeChild(host);
+  }, []);
 
   const cleanup = useCallback(() => {
     observerRef.current?.disconnect();
     observerRef.current = undefined;
-  }, []);
+    closeInline();
+  }, [closeInline]);
 
   const afterMount = useCallback(
     (appWindow: Window) => {
@@ -48,7 +60,15 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
 
       const applyEntry = () => {
         injectConfigReferenceEntry(appWindow.document, t('CONFIG_REFERENCE'), () => {
-          navigate(path);
+          const action = findConfigReferenceAction(appWindow.document);
+          const parent = findConfigReferenceMountParent(action);
+          if (!action || !parent) return;
+          closeInline();
+          const host = appWindow.document.createElement('div');
+          host.dataset.test = 'config-reference-inline-host';
+          parent.appendChild(host);
+          inlineHostRef.current = host;
+          setInlineHost(host);
         });
       };
 
@@ -63,8 +83,30 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
       observer.observe(target, { childList: true, subtree: true });
       observerRef.current = observer;
     },
-    [cleanup, navigate, path],
+    [cleanup, closeInline],
   );
 
-  return { afterMount, afterUnmount: cleanup };
+  const inline = inlineHost
+    ? createPortal(
+        <React.Suspense fallback={<div data-test="config-reference-inline">正在加载配置引用…</div>}>
+          <ConfigReferenceInline
+            cluster={cluster || ''}
+            namespace={namespace || ''}
+            name={name || ''}
+            module={module}
+            workloadKind={
+              module === 'deployments'
+                ? 'Deployment'
+                : module === 'statefulsets'
+                  ? 'StatefulSet'
+                  : 'DaemonSet'
+            }
+            onClose={closeInline}
+          />
+        </React.Suspense>,
+        inlineHost,
+      )
+    : null;
+
+  return { afterMount, afterUnmount: cleanup, inline };
 }

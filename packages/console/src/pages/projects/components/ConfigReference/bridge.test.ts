@@ -5,6 +5,7 @@ import {
   CONFIG_REFERENCE_ENTRY_SELECTOR,
   CONFIG_REFERENCE_ENVIRONMENT_ACTION_SELECTOR,
   findConfigReferenceAction,
+  findConfigReferenceMountParent,
   injectConfigReferenceEntry,
   shouldInjectConfigReferenceEntry,
 } from './bridge';
@@ -20,7 +21,7 @@ test('targets the environment variable actions instead of the workload detail ta
   );
 });
 
-test('injects a matching button and forwards activation to the host drawer', () => {
+test('injects a matching button and forwards activation to the inline editor', () => {
   const buttons: Array<{
     dataset: Record<string, string>;
     textContent: string;
@@ -109,4 +110,12 @@ test('prefers the visible action in the active dialog', () => {
   } as unknown as Document;
 
   assert.equal(findConfigReferenceAction(document), visible);
+});
+
+test('mounts the inline editor beside the V3 action row', () => {
+  const rowParent = { className: 'text-right' } as HTMLElement;
+  const row = { parentElement: rowParent } as HTMLElement;
+  const action = { parentElement: row } as HTMLButtonElement;
+
+  assert.equal(findConfigReferenceMountParent(action), rowParent);
 });
