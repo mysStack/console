@@ -74,7 +74,9 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
           inlineHostRef.current = host;
           setInlineHost(host);
           appWindow.setTimeout(() => {
-            host.scrollIntoView({ block: 'nearest' });
+            // Center the editor in the V3 scroll area so the native dialog footer
+            // does not cover the configuration-reference actions.
+            host.scrollIntoView({ block: 'center', inline: 'nearest' });
           }, 0);
         });
       };

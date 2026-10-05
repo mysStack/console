@@ -187,10 +187,10 @@ export default function ConfigReferenceInline({
     <section data-test="config-reference-inline" style={sectionStyle}>
       <div style={headerStyle}>
         <div>
-          <strong style={{ fontSize: 20, lineHeight: 1.25, letterSpacing: '-0.02em' }}>
+          <strong style={{ fontSize: 18, lineHeight: 1.25, letterSpacing: '-0.02em' }}>
             {t('CONFIG_REFERENCE')}
           </strong>
-          <div style={{ marginTop: 6, color: '#7b8ba4', fontSize: 12, lineHeight: 1.45 }}>
+          <div style={{ marginTop: 4, color: '#7b8ba4', fontSize: 11, lineHeight: 1.4 }}>
             {t('CONFIG_REFERENCE_SECRET_NOTICE')}
           </div>
         </div>
@@ -199,12 +199,12 @@ export default function ConfigReferenceInline({
         </button>
       </div>
 
-      <div style={{ ...headerStyle, marginTop: 24 }}>
+      <div style={{ ...headerStyle, marginTop: 16 }}>
         <div>
-          <strong style={{ fontSize: 15, lineHeight: 1.35, fontWeight: 600 }}>
+          <strong style={{ fontSize: 14, lineHeight: 1.35, fontWeight: 600 }}>
             {t('CONFIG_REFERENCE_RESOURCES')}
           </strong>
-          <div style={{ marginTop: 6, color: '#7b8ba4', fontSize: 12, lineHeight: 1.45 }}>
+          <div style={{ marginTop: 4, color: '#7b8ba4', fontSize: 11, lineHeight: 1.4 }}>
             {t('CONFIG_REFERENCE_SECRET_NOTICE')}
           </div>
         </div>
@@ -303,12 +303,12 @@ export default function ConfigReferenceInline({
         })}
       </div>
 
-      <label style={{ ...headerStyle, marginTop: 34, cursor: 'pointer' }}>
+      <label style={{ ...headerStyle, marginTop: 26, cursor: 'pointer' }}>
         <span>
-          <strong style={{ fontSize: 14, lineHeight: 1.35, fontWeight: 600 }}>
+          <strong style={{ fontSize: 13, lineHeight: 1.35, fontWeight: 600 }}>
             {t('CONFIG_REFERENCE_AUTO_RELOAD')}
           </strong>
-          <div style={{ marginTop: 6, color: '#7b8ba4', fontSize: 12, lineHeight: 1.45 }}>
+          <div style={{ marginTop: 4, color: '#7b8ba4', fontSize: 11, lineHeight: 1.4 }}>
             {t('CONFIG_REFERENCE_AUTO_RELOAD_DESC')}
           </div>
         </span>
@@ -345,7 +345,7 @@ export default function ConfigReferenceInline({
 
 const sectionStyle: React.CSSProperties = {
   marginTop: 12,
-  padding: '20px 20px 16px',
+  padding: '14px 16px 12px',
   border: '1px solid #c8d5e4',
   borderRadius: 9,
   background: '#f7f9fc',
@@ -372,7 +372,7 @@ const referenceRowStyle: React.CSSProperties = {
 };
 
 const messageStyle: React.CSSProperties = {
-  padding: '22px 0 4px',
+  padding: '16px 0 2px',
   color: '#7b8ba4',
   fontSize: 13,
 };
@@ -381,8 +381,8 @@ const footerStyle: React.CSSProperties = {
   display: 'flex',
   justifyContent: 'flex-end',
   gap: 10,
-  marginTop: 18,
-  paddingTop: 14,
+  marginTop: 12,
+  paddingTop: 10,
   borderTop: '1px solid #cad5e3',
 };
 
