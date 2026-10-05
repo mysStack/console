@@ -12,7 +12,7 @@ import { useConfigReferenceBridge } from '../../../components/ConfigReference/en
 function DaemonSetDetail(): JSX.Element {
   const { name } = useParams<'name'>();
   const [wujieUrlPrefix] = useStore<string>('wujieUrlPrefix');
-  const { afterMount, afterUnmount, inline } = useConfigReferenceBridge('daemonsets');
+  const { afterMount, afterUnmount, inline, summary } = useConfigReferenceBridge('daemonsets');
 
   return (
     <>
@@ -26,6 +26,7 @@ function DaemonSetDetail(): JSX.Element {
         afterUnmount={afterUnmount}
       />
       {inline}
+      {summary}
     </>
   );
 }

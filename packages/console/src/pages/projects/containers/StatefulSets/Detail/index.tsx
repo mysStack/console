@@ -12,7 +12,7 @@ import { useConfigReferenceBridge } from '../../../components/ConfigReference/en
 function StatefulDetail(): JSX.Element {
   const { name } = useParams<'name'>();
   const [wujieUrlPrefix] = useStore<string>('wujieUrlPrefix');
-  const { afterMount, afterUnmount, inline } = useConfigReferenceBridge('statefulsets');
+  const { afterMount, afterUnmount, inline, summary } = useConfigReferenceBridge('statefulsets');
 
   return (
     <>
@@ -26,6 +26,7 @@ function StatefulDetail(): JSX.Element {
         afterUnmount={afterUnmount}
       />
       {inline}
+      {summary}
     </>
   );
 }

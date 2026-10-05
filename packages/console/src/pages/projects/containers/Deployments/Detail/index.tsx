@@ -12,7 +12,7 @@ import { useConfigReferenceBridge } from '../../../components/ConfigReference/en
 function DeploymentDetail(): JSX.Element {
   const { name } = useParams<'name'>();
   const [wujieUrlPrefix] = useStore<string>('wujieUrlPrefix');
-  const { afterMount, afterUnmount, inline } = useConfigReferenceBridge('deployments');
+  const { afterMount, afterUnmount, inline, summary } = useConfigReferenceBridge('deployments');
 
   return (
     <>
@@ -26,6 +26,7 @@ function DeploymentDetail(): JSX.Element {
         afterUnmount={afterUnmount}
       />
       {inline}
+      {summary}
     </>
   );
 }

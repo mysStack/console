@@ -9,6 +9,7 @@ import {
 } from './bridge';
 
 const ConfigReferenceInline = lazy(() => import('./ConfigReferenceInline'));
+const ConfigReferenceSummary = lazy(() => import('./ConfigReferenceSummary'));
 
 export type ConfigReferenceWorkloadModule = 'deployments' | 'statefulsets' | 'daemonsets';
 
@@ -34,16 +35,18 @@ export function getConfigReferencePath({
 }
 
 export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) {
-  const { workspace, cluster, namespace, name } = useParams();
+  const { cluster, namespace, name } = useParams();
   const observerRef = useRef<MutationObserver | undefined>();
   const inlineHostRef = useRef<HTMLElement | null>(null);
+  const summaryHostRef = useRef<HTMLElement | null>(null);
   const [inlineHost, setInlineHost] = useState<HTMLElement | null>(null);
+  const [summaryHost, setSummaryHost] = useState<HTMLElement | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [activeContainerName, setActiveContainerName] = useState<string | undefined>();
 
   const closeInline = useCallback(() => {
     const host = inlineHostRef.current;
     inlineHostRef.current = null;
-    setActiveContainerName(undefined);
     setInlineHost(null);
     host?.parentNode?.removeChild(host);
   }, []);
@@ -52,6 +55,9 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
     observerRef.current?.disconnect();
     observerRef.current = undefined;
     closeInline();
+    summaryHostRef.current?.parentNode?.removeChild(summaryHostRef.current);
+    summaryHostRef.current = null;
+    setSummaryHost(null);
   }, [closeInline]);
 
   const afterMount = useCallback(
@@ -62,15 +68,32 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
       }
 
       const applyEntry = () => {
+        const action = findConfigReferenceAction(appWindow.document);
+        const parent = findConfigReferenceMountParent(action);
+        if (action) {
+          setActiveContainerName(findConfigReferenceContainerName(appWindow.document));
+        }
+        if (
+          action &&
+          parent &&
+          (!summaryHostRef.current || !parent.contains(summaryHostRef.current))
+        ) {
+          summaryHostRef.current?.parentNode?.removeChild(summaryHostRef.current);
+          const summary = appWindow.document.createElement('div');
+          summary.dataset.test = 'config-reference-summary-host';
+          parent.appendChild(summary);
+          summaryHostRef.current = summary;
+          setSummaryHost(summary);
+        }
         injectConfigReferenceEntry(appWindow.document, t('CONFIG_REFERENCE'), () => {
-          const action = findConfigReferenceAction(appWindow.document);
-          const parent = findConfigReferenceMountParent(action);
-          if (!action || !parent) return;
+          const currentAction = findConfigReferenceAction(appWindow.document);
+          const currentParent = findConfigReferenceMountParent(currentAction);
+          if (!currentAction || !currentParent) return;
           closeInline();
           setActiveContainerName(findConfigReferenceContainerName(appWindow.document));
           const host = appWindow.document.createElement('div');
           host.dataset.test = 'config-reference-inline-host';
-          parent.appendChild(host);
+          currentParent.appendChild(host);
           inlineHostRef.current = host;
           setInlineHost(host);
         });
@@ -107,11 +130,29 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
                   : 'DaemonSet'
             }
             onClose={closeInline}
+            onSaved={() => setRefreshKey(value => value + 1)}
           />
         </React.Suspense>,
         inlineHost,
       )
     : null;
 
-  return { afterMount, afterUnmount: cleanup, inline };
+  const summary =
+    summaryHost && !inlineHost
+      ? createPortal(
+          <React.Suspense fallback={null}>
+            <ConfigReferenceSummary
+              cluster={cluster || ''}
+              namespace={namespace || ''}
+              name={name || ''}
+              module={module}
+              containerName={activeContainerName}
+              refreshKey={refreshKey}
+            />
+          </React.Suspense>,
+          summaryHost,
+        )
+      : null;
+
+  return { afterMount, afterUnmount: cleanup, inline, summary };
 }

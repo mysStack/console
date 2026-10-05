@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import { useMutation } from 'react-query';
-import { configMapStore, request, secretStore, workloadStore } from '@ks-console/shared';
+import { configMapStore, Icon, request, secretStore, workloadStore } from '@ks-console/shared';
 import { notify } from '@kubed/components';
 
 import { findDuplicateReferences, parseEnvFrom } from './envFrom';
@@ -19,6 +20,7 @@ interface Props {
   workloadKind: string;
   containerName?: string;
   onClose: () => void;
+  onSaved?: () => void;
 }
 
 const storeByModule = {
@@ -35,27 +37,27 @@ const toNameOptions = (items: any[]): NameOption[] =>
 
 const controlStyle: React.CSSProperties = {
   boxSizing: 'border-box',
-  minHeight: 40,
+  minHeight: 36,
   width: '100%',
-  padding: '8px 12px',
+  padding: '7px 10px',
   border: '1px solid #b8c4d4',
   borderRadius: 4,
   background: '#fff',
   color: '#27364b',
   fontFamily: 'inherit',
-  fontSize: 14,
+  fontSize: 12,
   fontWeight: 600,
 };
 
 const buttonStyle: React.CSSProperties = {
-  minHeight: 40,
-  padding: '0 18px',
+  minHeight: 36,
+  padding: '0 14px',
   border: '1px solid #ccd3db',
   borderRadius: 100,
   background: '#eff4f9',
   color: '#36435c',
   fontFamily: 'inherit',
-  fontSize: 14,
+  fontSize: 12,
   fontWeight: 600,
   cursor: 'pointer',
 };
@@ -68,6 +70,7 @@ export default function ConfigReferenceInline({
   workloadKind,
   containerName: targetContainerName,
   onClose,
+  onSaved,
 }: Props) {
   const store = storeByModule[module];
   const detailQuery = store.useGetDetail({ cluster, namespace, name });
@@ -126,6 +129,7 @@ export default function ConfigReferenceInline({
     {
       onSuccess: () => {
         notify.success(t('CONFIG_REFERENCE_SAVE_SUCCESS'));
+        onSaved?.();
         onClose();
       },
     },
@@ -187,7 +191,7 @@ export default function ConfigReferenceInline({
     <section data-test="config-reference-inline" style={sectionStyle}>
       <div style={headerStyle}>
         <div>
-          <strong style={{ fontSize: 16, lineHeight: 1.35, fontWeight: 600 }}>
+          <strong style={{ fontSize: 14, lineHeight: 1.35, fontWeight: 600 }}>
             {t('CONFIG_REFERENCE')}
           </strong>
           <div style={{ marginTop: 4, color: '#7b8ba4', fontSize: 12, lineHeight: 1.4 }}>
@@ -199,9 +203,9 @@ export default function ConfigReferenceInline({
         </button>
       </div>
 
-      <div style={{ ...headerStyle, marginTop: 16 }}>
+      <div style={{ ...headerStyle, marginTop: 12 }}>
         <div>
-          <strong style={{ fontSize: 14, lineHeight: 1.4, fontWeight: 600 }}>
+          <strong style={{ fontSize: 13, lineHeight: 1.4, fontWeight: 600 }}>
             {t('CONFIG_REFERENCE_RESOURCES')}
           </strong>
           <div style={{ marginTop: 4, color: '#7b8ba4', fontSize: 12, lineHeight: 1.4 }}>
@@ -287,11 +291,12 @@ export default function ConfigReferenceInline({
                 type="button"
                 className="button button-default button-size-normal"
                 style={buttonStyle}
+                aria-label={`删除引用 ${index + 1}`}
                 onClick={() =>
                   setReferences(current => current.filter((_, itemIndex) => itemIndex !== index))
                 }
               >
-                Delete
+                <Icon name="trash" size={16} />
               </button>
               {(duplicate || unavailable) && (
                 <span role="alert" style={{ color: '#d03050', gridColumn: '1 / -1', fontSize: 12 }}>
@@ -303,9 +308,9 @@ export default function ConfigReferenceInline({
         })}
       </div>
 
-      <label style={{ ...headerStyle, marginTop: 26, cursor: 'pointer' }}>
+      <label style={{ ...headerStyle, marginTop: 18, cursor: 'pointer' }}>
         <span>
-          <strong style={{ fontSize: 14, lineHeight: 1.4, fontWeight: 600 }}>
+          <strong style={{ fontSize: 13, lineHeight: 1.4, fontWeight: 600 }}>
             {t('CONFIG_REFERENCE_AUTO_RELOAD')}
           </strong>
           <div style={{ marginTop: 4, color: '#7b8ba4', fontSize: 12, lineHeight: 1.4 }}>
@@ -345,7 +350,7 @@ export default function ConfigReferenceInline({
 
 const sectionStyle: React.CSSProperties = {
   marginTop: 12,
-  padding: '14px 16px 12px',
+  padding: '12px 14px 10px',
   border: '1px solid #c8d5e4',
   borderRadius: 9,
   background: '#f7f9fc',
@@ -365,7 +370,7 @@ const referenceRowStyle: React.CSSProperties = {
   gridTemplateColumns: '130px minmax(180px, 1fr) minmax(130px, 1fr) auto',
   gap: 8,
   alignItems: 'center',
-  padding: '8px 12px',
+  padding: '6px 10px',
   border: '1px solid #c8d3e1',
   borderRadius: 100,
   background: '#eff4f9',
