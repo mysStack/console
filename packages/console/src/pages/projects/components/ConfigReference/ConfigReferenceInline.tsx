@@ -359,6 +359,7 @@ export default function ConfigReferenceInline({
 const sectionStyle: React.CSSProperties = {
   marginTop: 12,
   padding: '14px 16px 12px',
+  scrollMarginBottom: 120,
   border: '1px solid #c8d5e4',
   borderRadius: 9,
   background: '#f7f9fc',
