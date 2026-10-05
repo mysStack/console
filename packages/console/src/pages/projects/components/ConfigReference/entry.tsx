@@ -1,8 +1,6 @@
-import React, { lazy, Suspense, useCallback, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useCallback, useMemo, useRef } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { injectConfigReferenceEntry } from './bridge';
-
-const ConfigReferenceDrawer = lazy(() => import('./ConfigReferenceDrawer'));
 
 export type ConfigReferenceWorkloadModule = 'deployments' | 'statefulsets' | 'daemonsets';
 
@@ -28,16 +26,13 @@ export function getConfigReferencePath({
 }
 
 export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) {
-  const { cluster, namespace, name } = useParams();
+  const navigate = useNavigate();
+  const { workspace, cluster, namespace, name } = useParams();
   const observerRef = useRef<MutationObserver | undefined>();
-  const [drawerOpen, setDrawerOpen] = useState(false);
-
-  const workloadKind =
-    module === 'statefulsets'
-      ? 'StatefulSet'
-      : module === 'daemonsets'
-        ? 'DaemonSet'
-        : 'Deployment';
+  const path = useMemo(
+    () => getConfigReferencePath({ workspace, cluster, namespace, module, name }),
+    [workspace, cluster, namespace, module, name],
+  );
 
   const cleanup = useCallback(() => {
     observerRef.current?.disconnect();
@@ -52,9 +47,9 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
       }
 
       const applyEntry = () => {
-        injectConfigReferenceEntry(appWindow.document, t('CONFIG_REFERENCE'), () =>
-          setDrawerOpen(true),
-        );
+        injectConfigReferenceEntry(appWindow.document, t('CONFIG_REFERENCE'), () => {
+          navigate(path);
+        });
       };
 
       applyEntry();
@@ -68,22 +63,8 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
       observer.observe(target, { childList: true, subtree: true });
       observerRef.current = observer;
     },
-    [cleanup],
+    [cleanup, navigate, path],
   );
 
-  const drawer = drawerOpen ? (
-    <Suspense fallback={null}>
-      <ConfigReferenceDrawer
-        visible
-        cluster={cluster || ''}
-        namespace={namespace || ''}
-        name={name || ''}
-        module={module}
-        workloadKind={workloadKind}
-        onClose={() => setDrawerOpen(false)}
-      />
-    </Suspense>
-  ) : null;
-
-  return { afterMount, afterUnmount: cleanup, drawer };
+  return { afterMount, afterUnmount: cleanup };
 }

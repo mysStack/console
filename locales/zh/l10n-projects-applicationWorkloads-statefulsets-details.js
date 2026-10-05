@@ -17,7 +17,6 @@ module.exports = {
   RECREATE: '重新创建',
   RECREATE_SUCCESS_DESC: '重新创建成功。',
   CONFIG_REFERENCE: '配置引用',
-  CONFIG_REFERENCE_CLOSE: '关闭',
   CONFIG_REFERENCE_BACK: '返回',
   CONFIG_REFERENCE_CONTAINER: '容器',
   CONFIG_REFERENCE_RESOURCES: 'ConfigMap / Secret',

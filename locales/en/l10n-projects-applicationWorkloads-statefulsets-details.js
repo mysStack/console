@@ -17,7 +17,6 @@ module.exports = {
   RECREATE: 'Re-create',
   RECREATE_SUCCESS_DESC: 'Re-created successfully.',
   CONFIG_REFERENCE: 'Configuration References',
-  CONFIG_REFERENCE_CLOSE: 'Close',
   CONFIG_REFERENCE_BACK: 'Back',
   CONFIG_REFERENCE_CONTAINER: 'Container',
   CONFIG_REFERENCE_RESOURCES: 'ConfigMap / Secret',
