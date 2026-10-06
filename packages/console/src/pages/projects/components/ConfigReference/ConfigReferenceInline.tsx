@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { useMutation } from 'react-query';
 import { configMapStore, Icon, request, secretStore, workloadStore } from '@ks-console/shared';
-import { Button, Select, Switch, notify } from '@kubed/components';
+import { Button, notify } from '@kubed/components';
 
 import { findDuplicateReferences, parseEnvFrom } from './envFrom';
 import { readReloaderPolicy } from './reloader';
@@ -29,13 +29,50 @@ const storeByModule = {
   daemonsets: workloadStore('daemonsets'),
 } as const;
 
-const toNameOptions = (items: any[]): NameOption[] =>
-  items
+const toNameOptions = (items: unknown): NameOption[] =>
+  (Array.isArray(items)
+    ? items
+    : Array.isArray((items as { items?: unknown[] } | undefined)?.items)
+      ? (items as { items: unknown[] }).items
+      : []
+  )
     .map(item => (typeof item === 'string' ? item : item?.name || item?.metadata?.name))
     .filter((name): name is string => typeof name === 'string' && name.length > 0)
     .map(name => ({ label: name, value: name }));
 
 const emptyOption: NameOption = { label: '请选择', value: '' };
+
+function NativeSelect({
+  options,
+  onValueChange,
+  ...props
+}: Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'onChange'> & {
+  options: NameOption[];
+  onValueChange?: (value: string) => void;
+}) {
+  return (
+    <div style={nativeSelectWrapperStyle}>
+      <select
+        {...props}
+        style={nativeSelectStyle}
+        onChange={event => onValueChange?.(event.target.value)}
+      >
+        {options.map(option => (
+          <option
+            key={`${option.value}-${option.label}`}
+            value={option.value}
+            disabled={option.disabled}
+          >
+            {option.label}
+          </option>
+        ))}
+      </select>
+      <span aria-hidden="true" style={nativeSelectArrowStyle}>
+        ▾
+      </span>
+    </div>
+  );
+}
 
 const controlStyle: React.CSSProperties = {
   boxSizing: 'border-box',
@@ -51,10 +88,28 @@ const controlStyle: React.CSSProperties = {
   fontWeight: 600,
 };
 
-// Select owns its border, arrow and popup styling. Keep only the sizing here so
-// the V3 dark dropdown is not replaced by a second custom border.
-const selectStyle: React.CSSProperties = {
+const nativeSelectWrapperStyle: React.CSSProperties = {
+  position: 'relative',
   width: '100%',
+  minWidth: 0,
+};
+
+const nativeSelectStyle: React.CSSProperties = {
+  ...controlStyle,
+  appearance: 'none',
+  paddingRight: 28,
+  cursor: 'pointer',
+};
+
+const nativeSelectArrowStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: '50%',
+  right: 10,
+  transform: 'translateY(-50%)',
+  pointerEvents: 'none',
+  color: '#53657d',
+  fontSize: 15,
+  lineHeight: 1,
 };
 
 const buttonStyle: React.CSSProperties = {
@@ -119,8 +174,8 @@ export default function ConfigReferenceInline({
     ])
       .then(([maps, names]) => {
         if (!active) return;
-        setConfigMaps(toNameOptions(Array.isArray(maps) ? maps : []));
-        setSecrets(toNameOptions(Array.isArray(names) ? names : []));
+        setConfigMaps(toNameOptions(maps));
+        setSecrets(toNameOptions(names));
       })
       .catch(() => active && setResourceError(true))
       .finally(() => active && setResourceLoading(false));
@@ -264,29 +319,26 @@ export default function ConfigReferenceInline({
           ];
           return (
             <div key={`${index}-${reference.kind}`} style={referenceRowStyle}>
-              <Select
+              <NativeSelect
                 aria-label={`引用类型 ${index + 1}`}
-                style={selectStyle}
                 value={reference.kind}
                 options={[
                   { label: '来自配置字典', value: 'configMap' },
                   { label: '来自保密字典', value: 'secret' },
                 ]}
-                onChange={value =>
+                onValueChange={value =>
                   updateReference(index, {
                     kind: value as ConfigReferenceKind,
                     name: '',
                   })
                 }
               />
-              <Select
+              <NativeSelect
                 aria-label={`引用资源 ${index + 1}`}
-                style={selectStyle}
                 value={reference.name}
                 options={resourceOptions}
                 disabled={resourceLoading}
-                loading={resourceLoading}
-                onChange={value => updateReference(index, { name: String(value || '') })}
+                onValueChange={value => updateReference(index, { name: value })}
               />
               <input
                 aria-label={`前缀 ${index + 1}`}
@@ -324,12 +376,21 @@ export default function ConfigReferenceInline({
             {t('CONFIG_REFERENCE_AUTO_RELOAD_DESC')}
           </div>
         </div>
-        <Switch
-          variant="button"
-          label={t(reloaderEnabled ? 'CONFIG_REFERENCE_ENABLED' : 'CONFIG_REFERENCE_DISABLED')}
-          checked={reloaderEnabled}
-          onChange={checked => setReloaderEnabled(checked)}
-        />
+        <button
+          type="button"
+          role="switch"
+          aria-checked={reloaderEnabled}
+          aria-label={t('CONFIG_REFERENCE_AUTO_RELOAD')}
+          onClick={() => setReloaderEnabled(value => !value)}
+          style={{ ...reloaderSwitchStyle, ...(reloaderEnabled ? reloaderSwitchEnabledStyle : {}) }}
+        >
+          <span>
+            {t(reloaderEnabled ? 'CONFIG_REFERENCE_ENABLED' : 'CONFIG_REFERENCE_DISABLED')}
+          </span>
+          <span
+            style={{ ...reloaderKnobStyle, ...(reloaderEnabled ? reloaderKnobEnabledStyle : {}) }}
+          />
+        </button>
       </div>
 
       <div style={footerStyle}>
@@ -410,6 +471,41 @@ const autoReloadStyle: React.CSSProperties = {
   marginTop: 18,
   paddingTop: 14,
   borderTop: '1px solid #cad5e3',
+};
+
+const reloaderSwitchStyle: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 8,
+  minWidth: 112,
+  height: 32,
+  padding: '0 8px 0 12px',
+  border: 0,
+  borderRadius: 16,
+  background: '#c5ced8',
+  color: '#41546d',
+  fontFamily: 'inherit',
+  fontSize: 12,
+  fontWeight: 600,
+  cursor: 'pointer',
+};
+
+const reloaderSwitchEnabledStyle: React.CSSProperties = {
+  background: '#4bbf91',
+  color: '#fff',
+};
+
+const reloaderKnobStyle: React.CSSProperties = {
+  width: 18,
+  height: 18,
+  borderRadius: '50%',
+  background: '#fff',
+  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.12)',
+};
+
+const reloaderKnobEnabledStyle: React.CSSProperties = {
+  background: '#fff',
 };
 
 const iconButtonStyle: React.CSSProperties = {
