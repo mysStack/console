@@ -7,6 +7,7 @@ import { findDuplicateReferences, parseEnvFrom } from './envFrom';
 import { readReloaderPolicy } from './reloader';
 import { buildConfigReferencePatch, getContainerEnvFrom, getContainerNames } from './workload';
 import type { ConfigReferenceKind, EnvFromReference } from './types';
+import { colors, columns } from './styles';
 
 type WorkloadModule = 'deployments' | 'statefulsets' | 'daemonsets';
 
@@ -156,7 +157,7 @@ export default function ConfigReferencePanel({
         </Button>
         <div>
           <h1 style={{ margin: 0 }}>{t('CONFIG_REFERENCE')}</h1>
-          <p style={{ margin: '4px 0 0', color: '#79879c' }}>
+          <p style={{ margin: '4px 0 0', color: colors.textMutedAlt }}>
             {workloadKind} · {name}
           </p>
         </div>
@@ -176,7 +177,7 @@ export default function ConfigReferencePanel({
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <strong>{t('CONFIG_REFERENCE_RESOURCES')}</strong>
-          <p style={{ margin: '4px 0 0', color: '#79879c' }}>
+          <p style={{ margin: '4px 0 0', color: colors.textMutedAlt }}>
             {t('CONFIG_REFERENCE_SECRET_NOTICE')}
           </p>
         </div>
@@ -199,7 +200,9 @@ export default function ConfigReferencePanel({
         </div>
       )}
       {!resourceLoading && !resourceError && references.length === 0 && (
-        <div style={{ padding: '24px 0', color: '#79879c' }}>{t('CONFIG_REFERENCE_EMPTY')}</div>
+        <div style={{ padding: '24px 0', color: colors.textMutedAlt }}>
+          {t('CONFIG_REFERENCE_EMPTY')}
+        </div>
       )}
       <div style={{ display: 'grid', gap: 12, marginTop: 16 }}>
         {references.map((reference, index) => {
@@ -218,8 +221,7 @@ export default function ConfigReferencePanel({
               key={`${index}-${reference.kind}`}
               style={{
                 display: 'grid',
-                gridTemplateColumns:
-                  'minmax(130px, 0.8fr) minmax(180px, 1.5fr) minmax(140px, 1fr) auto',
+                gridTemplateColumns: columns.panel,
                 gap: 12,
                 alignItems: 'center',
                 padding: 12,
@@ -276,12 +278,12 @@ export default function ConfigReferencePanel({
                 删除
               </Button>
               {duplicate && (
-                <span role="alert" style={{ color: '#d03050', gridColumn: '1 / -1' }}>
+                <span role="alert" style={{ color: colors.danger, gridColumn: '1 / -1' }}>
                   {t('CONFIG_REFERENCE_DUPLICATE')}
                 </span>
               )}
               {unavailable && (
-                <span role="alert" style={{ color: '#d03050', gridColumn: '1 / -1' }}>
+                <span role="alert" style={{ color: colors.danger, gridColumn: '1 / -1' }}>
                   {t('CONFIG_REFERENCE_UNAVAILABLE')}
                 </span>
               )}
@@ -294,7 +296,7 @@ export default function ConfigReferencePanel({
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
             <strong>{t('CONFIG_REFERENCE_AUTO_RELOAD')}</strong>
-            <p style={{ margin: '4px 0 0', color: '#79879c' }}>
+            <p style={{ margin: '4px 0 0', color: colors.textMutedAlt }}>
               {t('CONFIG_REFERENCE_AUTO_RELOAD_DESC')}
             </p>
           </div>

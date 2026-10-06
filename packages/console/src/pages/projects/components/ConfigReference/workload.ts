@@ -71,7 +71,7 @@ export function buildConfigReferencePatch(
 
   if (reloaderEnabled) {
     patch.push({
-      op: hadReloaderAnnotation ? 'replace' : hadAnnotations ? 'add' : 'add',
+      op: hadReloaderAnnotation ? 'replace' : 'add',
       path: hadAnnotations ? reloaderPath : '/metadata/annotations',
       value: hadAnnotations ? 'true' : { 'reloader.stakater.com/auto': 'true' },
     });
