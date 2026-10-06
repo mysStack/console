@@ -8,6 +8,7 @@ import { findDuplicateReferences, parseEnvFrom } from './envFrom';
 import { readReloaderPolicy } from './reloader';
 import { buildConfigReferencePatch, getContainerEnvFrom, getContainerNames } from './workload';
 import type { ConfigReferenceKind, EnvFromReference } from './types';
+import { toNameOptions } from './resourceOptions';
 
 type WorkloadModule = 'deployments' | 'statefulsets' | 'daemonsets';
 type NameOption = { label: string; value: string; disabled?: boolean };
@@ -28,17 +29,6 @@ const storeByModule = {
   statefulsets: workloadStore('statefulsets'),
   daemonsets: workloadStore('daemonsets'),
 } as const;
-
-const toNameOptions = (items: unknown): NameOption[] =>
-  (Array.isArray(items)
-    ? items
-    : Array.isArray((items as { items?: unknown[] } | undefined)?.items)
-      ? (items as { items: unknown[] }).items
-      : []
-  )
-    .map(item => (typeof item === 'string' ? item : item?.name || item?.metadata?.name))
-    .filter((name): name is string => typeof name === 'string' && name.length > 0)
-    .map(name => ({ label: name, value: name }));
 
 const emptyOption: NameOption = { label: '请选择', value: '' };
 
@@ -252,42 +242,25 @@ export default function ConfigReferenceInline({
 
   return (
     <section data-test="config-reference-inline" style={sectionStyle}>
-      <div style={headerStyle}>
-        <div>
-          <strong style={{ fontSize: 14, lineHeight: 1.35, fontWeight: 600 }}>
-            {t('CONFIG_REFERENCE')}
-          </strong>
-          <div style={{ marginTop: 4, color: '#7b8ba4', fontSize: 12, lineHeight: 1.4 }}>
-            {t('CONFIG_REFERENCE_SECRET_NOTICE')}
-          </div>
+      <div style={referenceToolbarStyle}>
+        <div style={referenceToolbarHintStyle}>{t('CONFIG_REFERENCE_SECRET_NOTICE')}</div>
+        <div style={referenceToolbarActionsStyle}>
+          <button
+            type="button"
+            className="button button-default button-size-normal"
+            style={buttonStyle}
+            disabled={resourceLoading}
+            onClick={() =>
+              setReferences(current => [...current, { kind: 'configMap', name: '', prefix: '' }])
+            }
+          >
+            {t('CONFIG_REFERENCE_ADD')}
+          </button>
+          <button type="button" style={iconButtonStyle} aria-label="Close" onClick={onClose}>
+            ×
+          </button>
         </div>
-        <button type="button" style={iconButtonStyle} aria-label="Close" onClick={onClose}>
-          ×
-        </button>
       </div>
-
-      <div style={{ ...headerStyle, marginTop: 12 }}>
-        <div>
-          <strong style={{ fontSize: 13, lineHeight: 1.4, fontWeight: 600 }}>
-            {t('CONFIG_REFERENCE_RESOURCES')}
-          </strong>
-          <div style={{ marginTop: 4, color: '#7b8ba4', fontSize: 12, lineHeight: 1.4 }}>
-            {t('CONFIG_REFERENCE_SECRET_NOTICE')}
-          </div>
-        </div>
-        <button
-          type="button"
-          className="button button-default button-size-normal"
-          style={buttonStyle}
-          disabled={resourceLoading}
-          onClick={() =>
-            setReferences(current => [...current, { kind: 'configMap', name: '', prefix: '' }])
-          }
-        >
-          {t('CONFIG_REFERENCE_ADD')}
-        </button>
-      </div>
-
       {resourceLoading && <div style={messageStyle}>{t('CONFIG_REFERENCE_LOADING')}</div>}
       {resourceError && (
         <div role="alert" style={messageStyle}>
@@ -418,19 +391,30 @@ export default function ConfigReferenceInline({
 
 const sectionStyle: React.CSSProperties = {
   marginTop: 12,
-  padding: '12px 14px 10px',
-  border: '1px solid #c8d5e4',
-  borderRadius: 9,
-  background: '#f7f9fc',
+  padding: '0 0 10px',
+  background: 'transparent',
   color: '#27364b',
   textAlign: 'left',
 };
 
-const headerStyle: React.CSSProperties = {
+const referenceToolbarStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  gap: 12,
+  gap: 16,
+  marginBottom: 10,
+};
+
+const referenceToolbarHintStyle: React.CSSProperties = {
+  color: '#7b8ba4',
+  fontSize: 13,
+  lineHeight: 1.4,
+};
+
+const referenceToolbarActionsStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
 };
 
 const referenceRowStyle: React.CSSProperties = {
@@ -508,6 +492,14 @@ const reloaderKnobEnabledStyle: React.CSSProperties = {
   background: '#fff',
 };
 
+const linkButtonStyle: React.CSSProperties = {
+  border: 0,
+  padding: 0,
+  background: 'transparent',
+  color: '#3182ce',
+  cursor: 'pointer',
+};
+
 const iconButtonStyle: React.CSSProperties = {
   width: 32,
   height: 32,
@@ -518,13 +510,5 @@ const iconButtonStyle: React.CSSProperties = {
   fontFamily: 'inherit',
   fontSize: 20,
   lineHeight: 1,
-  cursor: 'pointer',
-};
-
-const linkButtonStyle: React.CSSProperties = {
-  border: 0,
-  padding: 0,
-  background: 'transparent',
-  color: '#3182ce',
   cursor: 'pointer',
 };
