@@ -297,7 +297,7 @@ export default function ConfigReferenceInline({
               />
               <Button
                 type="button"
-                className="button-flat"
+                className="button-flat button-size-normal has-icon"
                 aria-label={`删除引用 ${index + 1}`}
                 onClick={() =>
                   setReferences(current => current.filter((_, itemIndex) => itemIndex !== index))
@@ -373,11 +373,15 @@ const headerStyle: React.CSSProperties = {
 };
 
 const referenceRowStyle: React.CSSProperties = {
+  boxSizing: 'border-box',
   display: 'grid',
-  gridTemplateColumns: '130px minmax(180px, 1fr) minmax(130px, 1fr) auto',
+  // Match the V3 environment-variable row measured in the live 131 console:
+  // 831px row width, 46px row height, 32px controls, 58px delete action.
+  gridTemplateColumns: '130px minmax(180px, 1fr) minmax(130px, 1fr) 58px',
   gap: 8,
   alignItems: 'center',
   padding: '6px 10px',
+  minHeight: 46,
   border: '1px solid #c8d3e1',
   borderRadius: 100,
   background: '#eff4f9',
