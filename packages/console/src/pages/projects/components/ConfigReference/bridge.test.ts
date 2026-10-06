@@ -11,6 +11,10 @@ import {
   shouldInjectConfigReferenceEntry,
 } from './bridge';
 
+// NOTE: the two selector assertions below only pin the constants this module
+// exports. They can NOT detect the real risk — that the *prebuilt V3 artifact*
+// stopped shipping `data-test="add-env-configmap"`. That can only be caught
+// against a running console; see warnAnchorMissing().
 test('targets the environment variable actions instead of the workload detail tabs', () => {
   assert.equal(CONFIG_REFERENCE_ENVIRONMENT_ACTION_SELECTOR, '[data-test="add-env-configmap"]');
   assert.equal(CONFIG_REFERENCE_ENTRY_SELECTOR, '[data-test="config-reference-entry"]');
@@ -20,6 +24,59 @@ test('targets the environment variable actions instead of the workload detail ta
     shouldInjectConfigReferenceEntry({ actionExists: false, entryExists: false }),
     false,
   );
+});
+
+const fakeDocument = (dialogOpen: boolean) =>
+  ({
+    querySelectorAll: () => [],
+    querySelector: (selector: string) => (selector === '[role="dialog"]' && dialogOpen ? {} : null),
+    defaultView: { getComputedStyle: () => ({ display: 'block', visibility: 'visible' }) },
+  }) as unknown as Document;
+
+const captureWarnings = (run: () => void) => {
+  const warnings: unknown[][] = [];
+  const original = console.warn;
+  console.warn = (...args: unknown[]) => {
+    warnings.push(args);
+  };
+  try {
+    run();
+  } finally {
+    console.warn = original;
+  }
+  return warnings;
+};
+
+test('warns once when a dialog is open but the V3 anchor is gone', () => {
+  const document = fakeDocument(true);
+  const warnings = captureWarnings(() => {
+    // called repeatedly on purpose: the mount hook runs on every DOM mutation
+    assert.equal(
+      injectConfigReferenceEntry(document, '配置引用', () => undefined),
+      false,
+    );
+    assert.equal(
+      injectConfigReferenceEntry(document, '配置引用', () => undefined),
+      false,
+    );
+    assert.equal(
+      injectConfigReferenceEntry(document, '配置引用', () => undefined),
+      false,
+    );
+  });
+  assert.equal(warnings.length, 1);
+  assert.match(String(warnings[0][0]), /add-env-configmap/);
+});
+
+test('stays silent while no container dialog is open', () => {
+  const document = fakeDocument(false);
+  const warnings = captureWarnings(() => {
+    assert.equal(
+      injectConfigReferenceEntry(document, '配置引用', () => undefined),
+      false,
+    );
+  });
+  assert.equal(warnings.length, 0);
 });
 
 test('injects a matching button and forwards activation to the inline editor', () => {

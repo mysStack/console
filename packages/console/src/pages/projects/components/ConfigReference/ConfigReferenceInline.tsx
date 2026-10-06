@@ -9,6 +9,32 @@ import { readReloaderPolicy } from './reloader';
 import { buildConfigReferencePatch, getContainerEnvFrom, getContainerNames } from './workload';
 import type { ConfigReferenceKind, EnvFromReference } from './types';
 import { toNameOptions } from './resourceOptions';
+import ConfigReferencePreview from './ConfigReferencePreview';
+import { PREVIEW_SECRET_KEYS, previewReferences } from './preview';
+import type { ResourceKeys } from './preview';
+import {
+  autoReloadStyle,
+  buttonStyle,
+  colors,
+  controlStyle,
+  footerStyle,
+  iconButtonStyle,
+  linkButtonStyle,
+  messageStyle,
+  nativeSelectArrowStyle,
+  nativeSelectStyle,
+  nativeSelectWrapperStyle,
+  primaryButtonStyle,
+  referenceRowStyle,
+  referenceToolbarActionsStyle,
+  referenceToolbarHintStyle,
+  referenceToolbarStyle,
+  reloaderKnobEnabledStyle,
+  reloaderKnobStyle,
+  reloaderSwitchEnabledStyle,
+  reloaderSwitchStyle,
+  sectionStyle,
+} from './styles';
 
 type WorkloadModule = 'deployments' | 'statefulsets' | 'daemonsets';
 type NameOption = { label: string; value: string; disabled?: boolean };
@@ -20,6 +46,8 @@ interface Props {
   module: WorkloadModule;
   workloadKind: string;
   containerName?: string;
+  /** Names typed into the V3 environment rows, including unsaved edits. */
+  manualEnvNames?: string[];
   onClose: () => void;
   onSaved?: () => void;
 }
@@ -64,57 +92,6 @@ function NativeSelect({
   );
 }
 
-const controlStyle: React.CSSProperties = {
-  boxSizing: 'border-box',
-  minHeight: 32,
-  width: '100%',
-  padding: '6px 10px',
-  border: '1px solid #b8c4d4',
-  borderRadius: 4,
-  background: '#fff',
-  color: '#27364b',
-  fontFamily: 'inherit',
-  fontSize: 12,
-  fontWeight: 600,
-};
-
-const nativeSelectWrapperStyle: React.CSSProperties = {
-  position: 'relative',
-  width: '100%',
-  minWidth: 0,
-};
-
-const nativeSelectStyle: React.CSSProperties = {
-  ...controlStyle,
-  appearance: 'none',
-  paddingRight: 28,
-  cursor: 'pointer',
-};
-
-const nativeSelectArrowStyle: React.CSSProperties = {
-  position: 'absolute',
-  top: '50%',
-  right: 10,
-  transform: 'translateY(-50%)',
-  pointerEvents: 'none',
-  color: '#53657d',
-  fontSize: 15,
-  lineHeight: 1,
-};
-
-const buttonStyle: React.CSSProperties = {
-  minHeight: 32,
-  padding: '0 14px',
-  border: '1px solid #ccd3db',
-  borderRadius: 100,
-  background: '#eff4f9',
-  color: '#36435c',
-  fontFamily: 'inherit',
-  fontSize: 12,
-  fontWeight: 600,
-  cursor: 'pointer',
-};
-
 export default function ConfigReferenceInline({
   cluster,
   namespace,
@@ -122,6 +99,7 @@ export default function ConfigReferenceInline({
   module,
   workloadKind,
   containerName: targetContainerName,
+  manualEnvNames = [],
   onClose,
   onSaved,
 }: Props) {
@@ -134,6 +112,9 @@ export default function ConfigReferenceInline({
   const [reloadKey, setReloadKey] = useState(0);
   const [references, setReferences] = useState<EnvFromReference[]>([]);
   const [reloaderEnabled, setReloaderEnabled] = useState(false);
+  const [resourceKeys, setResourceKeys] = useState<
+    Record<ConfigReferenceKind, Record<string, ResourceKeys>>
+  >({ configMap: {}, secret: {} });
 
   const containers = useMemo(
     () => (detailQuery.data ? getContainerNames(detailQuery.data as any) : []),
@@ -173,6 +154,92 @@ export default function ConfigReferenceInline({
       active = false;
     };
   }, [cluster, namespace, reloadKey]);
+
+  const referencedResources = useMemo(() => {
+    const unique = new Map<string, { kind: ConfigReferenceKind; name: string }>();
+    references.forEach(reference => {
+      if (reference.name) {
+        unique.set(`${reference.kind}:${reference.name}`, {
+          kind: reference.kind,
+          name: reference.name,
+        });
+      }
+    });
+    return Array.from(unique.values());
+  }, [references]);
+
+  // Fetch keys one referenced resource at a time. A namespace-wide list would
+  // also work but transfers every ConfigMap/Secret in the project.
+  useEffect(() => {
+    let active = true;
+    const missing = referencedResources.filter(
+      resource => !(resource.name in (resourceKeys[resource.kind] || {})),
+    );
+    if (!missing.length) {
+      return undefined;
+    }
+
+    Promise.all(
+      missing.map(async resource => {
+        // Secret objects are never fetched while the preview is disabled, which
+        // keeps "只保存资源名称和前缀，不读取或展示 Secret 内容" literally true.
+        if (resource.kind === 'secret' && !PREVIEW_SECRET_KEYS) {
+          return null;
+        }
+        const resourceStore = resource.kind === 'secret' ? secretStore : configMapStore;
+        try {
+          const detail: any = await resourceStore.fetchDetail({
+            cluster,
+            namespace,
+            name: resource.name,
+          });
+          return {
+            kind: resource.kind,
+            name: resource.name,
+            keys: {
+              data: Object.keys(detail?.data || {}),
+              binaryData: Object.keys(detail?.binaryData || {}),
+            } as ResourceKeys,
+          };
+        } catch {
+          return null;
+        }
+      }),
+    ).then(results => {
+      if (!active) {
+        return;
+      }
+      const fresh = results.filter(Boolean) as Array<{
+        kind: ConfigReferenceKind;
+        name: string;
+        keys: ResourceKeys;
+      }>;
+      if (!fresh.length) {
+        return;
+      }
+      setResourceKeys(previous => {
+        const next = { configMap: { ...previous.configMap }, secret: { ...previous.secret } };
+        fresh.forEach(item => {
+          next[item.kind][item.name] = item.keys;
+        });
+        return next;
+      });
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [referencedResources, resourceKeys, cluster, namespace]);
+
+  const previews = useMemo(
+    () =>
+      previewReferences(
+        references,
+        reference => (resourceKeys[reference.kind] || {})[reference.name],
+        { manualEnvNames },
+      ),
+    [references, resourceKeys, manualEnvNames],
+  );
 
   const saveMutation = useMutation(
     (data: Record<string, any>) =>
@@ -291,50 +358,58 @@ export default function ConfigReferenceInline({
             ...options,
           ];
           return (
-            <div key={`${index}-${reference.kind}`} style={referenceRowStyle}>
-              <NativeSelect
-                aria-label={`引用类型 ${index + 1}`}
-                value={reference.kind}
-                options={[
-                  { label: '来自配置字典', value: 'configMap' },
-                  { label: '来自保密字典', value: 'secret' },
-                ]}
-                onValueChange={value =>
-                  updateReference(index, {
-                    kind: value as ConfigReferenceKind,
-                    name: '',
-                  })
+            <div key={`${index}-${reference.kind}`}>
+              <div style={referenceRowStyle}>
+                <NativeSelect
+                  aria-label={`引用类型 ${index + 1}`}
+                  value={reference.kind}
+                  options={[
+                    { label: '来自配置字典', value: 'configMap' },
+                    { label: '来自保密字典', value: 'secret' },
+                  ]}
+                  onValueChange={value =>
+                    updateReference(index, {
+                      kind: value as ConfigReferenceKind,
+                      name: '',
+                    })
+                  }
+                />
+                <NativeSelect
+                  aria-label={`引用资源 ${index + 1}`}
+                  value={reference.name}
+                  options={resourceOptions}
+                  disabled={resourceLoading}
+                  onValueChange={value => updateReference(index, { name: value })}
+                />
+                <input
+                  aria-label={`前缀 ${index + 1}`}
+                  style={controlStyle}
+                  value={reference.prefix || ''}
+                  placeholder={t('CONFIG_REFERENCE_PREFIX_PLACEHOLDER')}
+                  onChange={event => updateReference(index, { prefix: event.target.value })}
+                />
+                <Button
+                  type="button"
+                  className="button-flat button-size-normal has-icon"
+                  aria-label={`删除引用 ${index + 1}`}
+                  onClick={() =>
+                    setReferences(current => current.filter((_, itemIndex) => itemIndex !== index))
+                  }
+                >
+                  <Icon name="trash" />
+                </Button>
+              </div>
+              <ConfigReferencePreview
+                kind={reference.kind}
+                preview={previews[index]}
+                error={
+                  duplicate
+                    ? t('CONFIG_REFERENCE_DUPLICATE')
+                    : unavailable
+                      ? t('CONFIG_REFERENCE_UNAVAILABLE')
+                      : undefined
                 }
               />
-              <NativeSelect
-                aria-label={`引用资源 ${index + 1}`}
-                value={reference.name}
-                options={resourceOptions}
-                disabled={resourceLoading}
-                onValueChange={value => updateReference(index, { name: value })}
-              />
-              <input
-                aria-label={`前缀 ${index + 1}`}
-                style={controlStyle}
-                value={reference.prefix || ''}
-                placeholder={t('CONFIG_REFERENCE_PREFIX_PLACEHOLDER')}
-                onChange={event => updateReference(index, { prefix: event.target.value })}
-              />
-              <Button
-                type="button"
-                className="button-flat button-size-normal has-icon"
-                aria-label={`删除引用 ${index + 1}`}
-                onClick={() =>
-                  setReferences(current => current.filter((_, itemIndex) => itemIndex !== index))
-                }
-              >
-                <Icon name="trash" />
-              </Button>
-              {(duplicate || unavailable) && (
-                <span role="alert" style={{ color: '#d03050', gridColumn: '1 / -1', fontSize: 12 }}>
-                  {duplicate ? t('CONFIG_REFERENCE_DUPLICATE') : t('CONFIG_REFERENCE_UNAVAILABLE')}
-                </span>
-              )}
             </div>
           );
         })}
@@ -345,7 +420,7 @@ export default function ConfigReferenceInline({
           <strong style={{ fontSize: 13, lineHeight: 1.4, fontWeight: 600 }}>
             {t('CONFIG_REFERENCE_AUTO_RELOAD')}
           </strong>
-          <div style={{ marginTop: 4, color: '#7b8ba4', fontSize: 12, lineHeight: 1.4 }}>
+          <div style={{ marginTop: 4, color: colors.textMuted, fontSize: 12, lineHeight: 1.4 }}>
             {t('CONFIG_REFERENCE_AUTO_RELOAD_DESC')}
           </div>
         </div>
@@ -378,7 +453,7 @@ export default function ConfigReferenceInline({
         <button
           type="button"
           className="button button-control button-size-normal"
-          style={{ ...buttonStyle, background: '#242e42', borderColor: '#242e42', color: '#fff' }}
+          style={primaryButtonStyle}
           disabled={saveMutation.isLoading || resourceLoading}
           onClick={save}
         >
@@ -388,127 +463,3 @@ export default function ConfigReferenceInline({
     </section>
   );
 }
-
-const sectionStyle: React.CSSProperties = {
-  marginTop: 12,
-  padding: '0 0 10px',
-  background: 'transparent',
-  color: '#27364b',
-  textAlign: 'left',
-};
-
-const referenceToolbarStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: 16,
-  marginBottom: 10,
-};
-
-const referenceToolbarHintStyle: React.CSSProperties = {
-  color: '#7b8ba4',
-  fontSize: 13,
-  lineHeight: 1.4,
-};
-
-const referenceToolbarActionsStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 8,
-};
-
-const referenceRowStyle: React.CSSProperties = {
-  boxSizing: 'border-box',
-  display: 'grid',
-  // Match the V3 environment-variable row measured in the live 131 console:
-  // 831px row width, 46px row height, 32px controls, 58px delete action.
-  gridTemplateColumns: '130px minmax(180px, 1fr) minmax(130px, 1fr) 58px',
-  gap: 8,
-  alignItems: 'center',
-  padding: '6px 10px',
-  minHeight: 46,
-  border: '1px solid #c8d3e1',
-  borderRadius: 100,
-  background: '#eff4f9',
-};
-
-const messageStyle: React.CSSProperties = {
-  padding: '16px 0 2px',
-  color: '#7b8ba4',
-  fontSize: 13,
-};
-
-const footerStyle: React.CSSProperties = {
-  display: 'flex',
-  justifyContent: 'flex-end',
-  gap: 10,
-  marginTop: 12,
-  paddingTop: 10,
-  borderTop: '1px solid #cad5e3',
-};
-
-const autoReloadStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: 16,
-  marginTop: 18,
-  paddingTop: 14,
-  borderTop: '1px solid #cad5e3',
-};
-
-const reloaderSwitchStyle: React.CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: 8,
-  minWidth: 112,
-  height: 32,
-  padding: '0 8px 0 12px',
-  border: 0,
-  borderRadius: 16,
-  background: '#c5ced8',
-  color: '#41546d',
-  fontFamily: 'inherit',
-  fontSize: 12,
-  fontWeight: 600,
-  cursor: 'pointer',
-};
-
-const reloaderSwitchEnabledStyle: React.CSSProperties = {
-  background: '#4bbf91',
-  color: '#fff',
-};
-
-const reloaderKnobStyle: React.CSSProperties = {
-  width: 18,
-  height: 18,
-  borderRadius: '50%',
-  background: '#fff',
-  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.12)',
-};
-
-const reloaderKnobEnabledStyle: React.CSSProperties = {
-  background: '#fff',
-};
-
-const linkButtonStyle: React.CSSProperties = {
-  border: 0,
-  padding: 0,
-  background: 'transparent',
-  color: '#3182ce',
-  cursor: 'pointer',
-};
-
-const iconButtonStyle: React.CSSProperties = {
-  width: 32,
-  height: 32,
-  border: '1px solid #ccd3db',
-  borderRadius: 100,
-  background: '#eff4f9',
-  color: '#53657d',
-  fontFamily: 'inherit',
-  fontSize: 20,
-  lineHeight: 1,
-  cursor: 'pointer',
-};
