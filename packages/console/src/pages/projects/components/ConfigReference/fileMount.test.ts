@@ -7,6 +7,7 @@ import {
   getWorkloadVolumes,
   isVolumeName,
   planFileMounts,
+  readFileMounts,
   toVolumeName,
   validateFileMounts,
   volumeReferences,
@@ -266,6 +267,65 @@ test("keeps another container's mounts out of the patch", () => {
 
   // main drops it, sidecar keeps it: the volume must stay and only main's mounts change
   assert.deepEqual(buildFileMountPatch(source, 0, 'main', []), [
+    { op: 'remove', path: '/spec/template/spec/containers/0/volumeMounts' },
+  ]);
+});
+
+test('reads file mounts back out of the two layers', () => {
+  const source = workload(
+    [
+      { name: 'cfg', configMap: { name: 'app-config', defaultMode: 420 } },
+      { name: 'sec', secret: { name: 'app-secret' } },
+      { name: 'data', emptyDir: {} },
+      { name: 'keys', configMap: { name: 'partial', items: [{ key: 'a', path: 'a' }] } },
+    ],
+    [
+      {
+        name: 'main',
+        volumeMounts: [
+          { name: 'cfg', mountPath: '/etc/cfg', readOnly: true },
+          { name: 'sec', mountPath: '/etc/sec' },
+          { name: 'data', mountPath: '/data' },
+          { name: 'keys', mountPath: '/etc/keys' },
+        ],
+      },
+    ],
+  );
+
+  assert.deepEqual(readFileMounts(source, 'main'), [
+    { kind: 'configMap', name: 'app-config', mountPath: '/etc/cfg', readOnly: true },
+    { kind: 'secret', name: 'app-secret', mountPath: '/etc/sec', readOnly: false },
+  ]);
+});
+
+test('the regression: seeding from the existing mounts makes a save a no-op', () => {
+  // The defect this guards: starting from an empty list deleted the container's
+  // existing mounts and their volumes. Seeding first must produce no operations.
+  const source = workload(
+    [{ name: 'cfg', configMap: { name: 'app-config', defaultMode: 420 } }],
+    [
+      {
+        name: 'main',
+        envFrom: [{ configMapRef: { name: 'other' } }],
+        volumeMounts: [{ name: 'cfg', mountPath: '/etc/cfg', readOnly: true }],
+      },
+    ],
+  );
+
+  const seeded = readFileMounts(source, 'main');
+  assert.deepEqual(buildFileMountPatch(source, 0, 'main', seeded), []);
+});
+
+test('the contract that made seeding necessary: the list is the complete desired set', () => {
+  // Documented on purpose. An empty list means "this container should mount nothing",
+  // so callers that have not read the existing mounts would drop them.
+  const source = workload(
+    [{ name: 'cfg', configMap: { name: 'app-config' } }],
+    [{ name: 'main', volumeMounts: [{ name: 'cfg', mountPath: '/etc/cfg' }] }],
+  );
+
+  assert.deepEqual(buildFileMountPatch(source, 0, 'main', []), [
+    { op: 'remove', path: '/spec/template/spec/volumes' },
     { op: 'remove', path: '/spec/template/spec/containers/0/volumeMounts' },
   ]);
 });

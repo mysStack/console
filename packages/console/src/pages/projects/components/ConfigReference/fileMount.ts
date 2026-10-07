@@ -79,6 +79,47 @@ export function getContainerVolumeMounts(
   return Array.isArray(container?.volumeMounts) ? container.volumeMounts : [];
 }
 
+/**
+ * Read a container's file mounts back out of the two layers.
+ *
+ * Callers MUST seed their edit state from this. `planFileMounts` treats the reference
+ * list as the complete desired set for the container, so an unseeded (empty) list on a
+ * workload that already mounts something will delete those mounts and their volumes on
+ * the next save. That defect shipped once; this function is the fix.
+ *
+ * Volumes this feature does not own are skipped rather than guessed at: emptyDir,
+ * persistentVolumeClaim, projected, and any configMap/secret volume that projects
+ * individual keys with `items` (a non-goal of this iteration).
+ */
+export function readFileMounts(source: WorkloadLike, containerName?: string): FileMountReference[] {
+  const volumes = getWorkloadVolumes(source);
+  const mounts = getContainerVolumeMounts(source, containerName);
+  const references: FileMountReference[] = [];
+
+  mounts.forEach(mount => {
+    const volume = volumes.find(item => item?.name === mount?.name);
+    if (!volume) {
+      return;
+    }
+    const configMapName = volume.configMap?.name;
+    const secretName = volume.secret?.name;
+    if (!configMapName && !secretName) {
+      return;
+    }
+    if (volume.configMap?.items || volume.secret?.items) {
+      return;
+    }
+    references.push({
+      kind: configMapName ? 'configMap' : 'secret',
+      name: configMapName || secretName,
+      mountPath: mount?.mountPath || '',
+      readOnly: !!mount?.readOnly,
+    });
+  });
+
+  return references;
+}
+
 /** Does this volume already point at the given ConfigMap/Secret? */
 export function volumeReferences(volume: any, kind: ConfigReferenceKind, name: string): boolean {
   const source = kind === 'configMap' ? volume?.configMap : volume?.secret;

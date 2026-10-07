@@ -11,7 +11,7 @@ import type { ConfigReferenceKind, EnvFromReference } from './types';
 import { toNameOptions } from './resourceOptions';
 import ConfigReferencePreview from './ConfigReferencePreview';
 import { useReferencePreviews } from './useReferencePreviews';
-import { validateFileMounts } from './fileMount';
+import { readFileMounts, validateFileMounts } from './fileMount';
 import type { FileMountReference } from './fileMount';
 import {
   autoReloadStyle,
