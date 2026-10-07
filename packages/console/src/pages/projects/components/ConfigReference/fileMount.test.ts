@@ -222,6 +222,22 @@ test('emits both layer operations, and only when they change', () => {
   );
 });
 
+test('ignores the defaults Kubernetes adds to a volume', () => {
+  // The API puts `defaultMode: 420` on a configMap volume; that must not look like a
+  // change, and a replace would drop it.
+  const source = workload(
+    [{ name: 'app-config', configMap: { name: 'app-config', defaultMode: 420 } }],
+    [
+      {
+        name: 'main',
+        volumeMounts: [{ name: 'app-config', mountPath: '/etc/app', readOnly: true }],
+      },
+    ],
+  );
+
+  assert.deepEqual(buildFileMountPatch(source, 0, 'main', [mount('app-config', '/etc/app')]), []);
+});
+
 test('removes both layers when the last mount goes away', () => {
   const source = workload(
     [{ name: 'app-config', configMap: { name: 'app-config' } }],

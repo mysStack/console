@@ -192,10 +192,24 @@ export function buildFileMountPatch(
   const volumesPath = '/spec/template/spec/volumes';
   const mountsPath = `/spec/template/spec/containers/${containerIndex}/volumeMounts`;
 
-  const changed = (current: unknown, next: unknown) =>
-    JSON.stringify(current ?? []) !== JSON.stringify(next ?? []);
+  // Compare only the fields this feature owns. Kubernetes adds defaults of its own —
+  // it puts `defaultMode: 420` on a configMap volume — and a plain deep comparison
+  // treated that as a change on every save: a redundant `replace` that also dropped
+  // the field the API had added. (Found by verifying Reloader against a volume mount.)
+  const projectVolume = (volume: any) => ({
+    name: volume?.name,
+    configMap: volume?.configMap?.name,
+    secret: volume?.secret?.name,
+  });
+  const projectMount = (mount: any) => ({
+    name: mount?.name,
+    mountPath: mount?.mountPath,
+    readOnly: !!mount?.readOnly,
+  });
+  const same = (current: any[], next: any[], project: (item: any) => unknown) =>
+    JSON.stringify((current || []).map(project)) === JSON.stringify((next || []).map(project));
 
-  if (changed(volumes, planned.volumes)) {
+  if (!same(volumes, planned.volumes, projectVolume)) {
     if (planned.volumes.length === 0) {
       patch.push({ op: 'remove', path: volumesPath });
     } else {
@@ -207,7 +221,7 @@ export function buildFileMountPatch(
     }
   }
 
-  if (changed(containerMounts, planned.volumeMounts)) {
+  if (!same(containerMounts, planned.volumeMounts, projectMount)) {
     if (planned.volumeMounts.length === 0) {
       patch.push({ op: 'remove', path: mountsPath });
     } else {
