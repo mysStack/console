@@ -23,9 +23,6 @@ module.exports = {
   DEPLOYMENT_SETTINGS: '部署设置',
   CODE_REPOSITORY_SETTINGS: '代码仓库设置',
   SYNC_STRATEGY_TCAP: '同步策略',
-  AUTO_SYNC_DESC:
-    '在检测到 Git 仓库中的清单与部署资源的实时状态之间存在差异时，根据设置的同步选项，自动触发应用程序同步。',
-  // MANUAL_SYNC_DESC: 'Sync according to custom rules.',
   PRUNE_RESOURCES: '清理资源',
   SELF_HEAL: '自恢复',
   MANIFEST_FILE_PATH: '清单文件路径',

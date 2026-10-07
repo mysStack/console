@@ -144,7 +144,6 @@ module.exports = {
   OPERATION: 'Operation',
   OPERATION_DESC: 'Select an operation to which the rule applies.',
   DATABASE_OPERATION_READ: 'Read',
-  DATABASE_OPERATION_READ: 'Read',
   DATABASE_OPERATION_WRITE: 'Write',
   DATABASE_OPERATION_DELETE: 'Delete',
   DATABASE_OPERATION_ALTER: 'Alter',
@@ -213,8 +212,6 @@ module.exports = {
   DBPARAM_REPLICATION_MODE_DESC:
     'Replication mode of the database cluster. In async mode, performance is ensured while data loss may occur during a primary/standby switchover. In sync mode, data loss is prevented while performance may deteriorate. In semi-sync mode, the system implements the sync mode when all standby nodes are normal and the async mode when a standby node becomes abnormal (the sync mode is restored if the abnormal node becomes normal again).',
   DBPARAM_SET_MAX_INTSET_ENTRIES_DESC:
-    'When a set consists entirely of decimal 64-bit signed integers, special structures are used to encode before how many nodes to save memory space.',
-  DBPARAM_SET_MAX_INTSET_ENTRIES_DESC:
     'Intset encoding is used when a set consists entirely of Base10 64-bit signed integers and the number of elements in the set does not exceed the value of this parameter. ',
   DBPARAM_SLOWLOG_LOG_SLOWER_THAN_DESC:
     'Maximum time in microseconds allowed for operation execution. Operations that exceed the value of this parameter will be recorded in the slowlog.',
@@ -277,7 +274,6 @@ module.exports = {
   DELAYED_BLOCKS: 'Delayed Blocks',
   REJECTED_BLOCKS: 'Rejected Blocks',
   DELAYED_DISTRIBUTED_FILES: 'Delayed Distributed Files',
-  READ_BYTES: 'Read Bytes',
   UNCOMPRESSED: 'Uncompressed',
   COMPRESSED: 'Compressed',
   FILE_DESCRIPTOR: 'File Descriptor',
