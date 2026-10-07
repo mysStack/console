@@ -21,6 +21,19 @@ PROJECT_DIR="$(dirname "$(realpath "$0")")"/..
 ${CONTAINER_CLI} run --rm -v "$PROJECT_DIR":/builder/ \
   node:16.14-alpine3.15 sh -c "cd /builder/ && yarn && yarn build"
 
+# `ksc build:prod` reports webpack errors but still exits 0, so a failed client
+# build used to sail through and produce an image that serves a blank page (the
+# server templates interpolate the missing chunk names as empty strings).
+# Trust the artifacts, not the exit code.
+if [ ! -f "$PROJECT_DIR/dist/manifest.json" ]; then
+  echo "ERROR: client bundle was not produced (dist/manifest.json is missing)" >&2
+  exit 1
+fi
+if ! ls "$PROJECT_DIR"/dist/js/main.*.js >/dev/null 2>&1; then
+  echo "ERROR: client bundle was not produced (dist/js/main.*.js is missing)" >&2
+  exit 1
+fi
+
 sudo chown $(id -u):$(id -g) -R $PROJECT_DIR/dist
 sudo chown $(id -u):$(id -g) -R $PROJECT_DIR/server
 

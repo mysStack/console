@@ -6,7 +6,6 @@ import { getConfigReferenceSummaryPrefix, getConfigReferenceSummaryRows } from '
 import { getContainerEnvFrom, getContainerNames } from './workload';
 import ConfigReferencePreview from './ConfigReferencePreview';
 import { useReferencePreviews } from './useReferencePreviews';
-import type { EnvFromReference } from './preview';
 
 type WorkloadModule = 'deployments' | 'statefulsets' | 'daemonsets';
 
@@ -63,7 +62,7 @@ export default function ConfigReferenceSummary({
     [detailQuery.data, containerName],
   );
 
-  const previews = useReferencePreviews(references as EnvFromReference[], cluster, namespace);
+  const previews = useReferencePreviews(references, cluster, namespace);
 
   if (detailQuery.isLoading || !references.length) {
     return null;
@@ -101,10 +100,8 @@ export default function ConfigReferenceSummary({
             )}
           </div>
           <ConfigReferencePreview
-            kind={(reference as EnvFromReference).kind}
-            identity={`${reference.kind}:${reference.name}:${
-              (reference as EnvFromReference).prefix || ''
-            }`}
+            kind={reference.kind}
+            identity={`${reference.kind}:${reference.name}:${reference.prefix || ''}`}
             preview={previews[index]}
           />
         </div>
