@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useParams } from 'react-router-dom';
 import {
   findConfigReferenceAction,
-  findConfigReferenceEnvTabPane,
+  findConfigReferenceEnvSections,
   findConfigReferenceContainerName,
   findConfigReferenceMountParent,
   findManualEnvScope,
@@ -46,7 +46,12 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
   const [inlineHost, setInlineHost] = useState<HTMLElement | null>(null);
   const [summaryHost, setSummaryHost] = useState<HTMLElement | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [summaryVariant, setSummaryVariant] = useState<'dialog' | 'envTab'>('dialog');
+  // One host per container card on the read-only environment tab, keyed by
+  // container name so a re-render of the page does not move our block.
+  const envHostsRef = useRef<Map<string, HTMLElement>>(new Map());
+  const [envHosts, setEnvHosts] = useState<
+    Array<{ containerName: string; index: number; host: HTMLElement }>
+  >([]);
   const [activeContainerName, setActiveContainerName] = useState<string | undefined>();
   const [manualEnvNames, setManualEnvNames] = useState<string[]>([]);
   const envScopeRef = useRef<HTMLElement | undefined>();
@@ -70,6 +75,9 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
     summaryHostRef.current?.parentNode?.removeChild(summaryHostRef.current);
     summaryHostRef.current = null;
     setSummaryHost(null);
+    envHostsRef.current.forEach(host => host.parentNode?.removeChild(host));
+    envHostsRef.current.clear();
+    setEnvHosts([]);
   }, [closeInline]);
 
   const afterMount = useCallback(
@@ -85,27 +93,62 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
         if (action) {
           setActiveContainerName(findConfigReferenceContainerName(appWindow.document));
         }
-        // Prefer the container editor's action row. When the editor is closed,
-        // fall back to the read-only 环境变量 tab: that page lists `env` only, so
-        // an envFrom-only workload otherwise shows no variables at all.
-        const envPane = parent ? null : findConfigReferenceEnvTabPane(appWindow.document);
-        const mountPoint = parent || envPane;
-        if (
-          mountPoint &&
-          (!summaryHostRef.current || !mountPoint.contains(summaryHostRef.current))
-        ) {
+        // While the container editor is open, one block goes under its action row.
+        if (parent && (!summaryHostRef.current || !parent.contains(summaryHostRef.current))) {
           summaryHostRef.current?.parentNode?.removeChild(summaryHostRef.current);
           const summary = appWindow.document.createElement('div');
           summary.dataset.test = 'config-reference-summary-host';
-          if (envPane) {
-            envPane.insertBefore(summary, envPane.firstChild);
-          } else {
-            parent?.appendChild(summary);
-          }
+          parent.appendChild(summary);
           summaryHostRef.current = summary;
           setSummaryHost(summary);
-          setSummaryVariant(envPane ? 'envTab' : 'dialog');
         }
+
+        // Otherwise attach one block per container card on the read-only 环境变量
+        // tab. That page renders a collapsible card per container and lists `env`
+        // only, so a single page-level block would describe just the first
+        // container of a multi-container pod.
+        const sections = parent ? [] : findConfigReferenceEnvSections(appWindow.document);
+        const present = new Set<string>();
+        sections.forEach(section => {
+          present.add(section.containerName);
+          let host = envHostsRef.current.get(section.containerName);
+          if (host && !section.card.contains(host)) {
+            // The card was re-rendered: drop the stale host and build a new one.
+            host.parentNode?.removeChild(host);
+            envHostsRef.current.delete(section.containerName);
+            host = undefined;
+          }
+          if (!host) {
+            host = appWindow.document.createElement('div');
+            host.dataset.test = 'config-reference-env-host';
+            const heading = section.card.children[0];
+            if (heading && heading.nextSibling) {
+              section.card.insertBefore(host, heading.nextSibling);
+            } else {
+              section.card.appendChild(host);
+            }
+            envHostsRef.current.set(section.containerName, host);
+          }
+        });
+        envHostsRef.current.forEach((host, containerName) => {
+          if (!present.has(containerName)) {
+            host.parentNode?.removeChild(host);
+            envHostsRef.current.delete(containerName);
+          }
+        });
+        const nextEnvHosts = sections
+          .filter(section => envHostsRef.current.has(section.containerName))
+          .map(section => ({
+            containerName: section.containerName,
+            index: section.index,
+            host: envHostsRef.current.get(section.containerName) as HTMLElement,
+          }));
+        setEnvHosts(previous =>
+          previous.length === nextEnvHosts.length &&
+          previous.every((item, position) => item.host === nextEnvHosts[position].host)
+            ? previous
+            : nextEnvHosts,
+        );
         envScopeRef.current = findManualEnvScope(action);
         setManualEnvNames(readManualEnvNames(envScopeRef.current) || []);
         injectConfigReferenceEntry(appWindow.document, t('CONFIG_REFERENCE'), () => {
@@ -176,7 +219,7 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
       )
     : null;
 
-  const summary =
+  const dialogSummary =
     summaryHost && !inlineHost
       ? createPortal(
           <React.Suspense fallback={null}>
@@ -187,12 +230,38 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
               module={module}
               containerName={activeContainerName}
               refreshKey={refreshKey}
-              variant={summaryVariant}
+              variant="dialog"
             />
           </React.Suspense>,
           summaryHost,
         )
       : null;
+
+  // The per-container blocks are returned in the same node the editor block uses,
+  // so whatever renders `summary` renders them too.
+  const containerSummaries = inlineHost
+    ? []
+    : envHosts.map((item, position) => (
+        <React.Fragment key={`${item.containerName}-${item.index}-${position}`}>
+          {createPortal(
+            <React.Suspense fallback={null}>
+              <ConfigReferenceSummary
+                cluster={cluster || ''}
+                namespace={namespace || ''}
+                name={name || ''}
+                module={module}
+                containerName={item.containerName}
+                containerIndex={item.index}
+                refreshKey={refreshKey}
+                variant="envTab"
+              />
+            </React.Suspense>,
+            item.host,
+          )}
+        </React.Fragment>
+      ));
+
+  const summary = [dialogSummary, ...containerSummaries];
 
   return { afterMount, afterUnmount: cleanup, inline, summary };
 }

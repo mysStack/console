@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { workloadStore } from '@ks-console/shared';
 
@@ -6,6 +6,7 @@ import { getConfigReferenceSummaryPrefix, getConfigReferenceSummaryRows } from '
 import { getContainerEnvFrom, getContainerNames } from './workload';
 import ConfigReferencePreview from './ConfigReferencePreview';
 import { useReferencePreviews } from './useReferencePreviews';
+import { summaryHeaderToggleStyle } from './styles';
 
 type WorkloadModule = 'deployments' | 'statefulsets' | 'daemonsets';
 
@@ -15,6 +16,11 @@ interface Props {
   name: string;
   module: WorkloadModule;
   containerName?: string;
+  /**
+   * Position of this block's container card on the page. Used only when
+   * `containerName` cannot be matched against the workload's containers.
+   */
+  containerIndex?: number;
   refreshKey: number;
   /**
    * 'dialog' renders under the container editor's action row; 'envTab' is the
@@ -36,6 +42,7 @@ export default function ConfigReferenceSummary({
   name,
   module,
   containerName: targetContainerName,
+  containerIndex,
   refreshKey,
   variant = 'dialog',
 }: Props) {
@@ -51,7 +58,7 @@ export default function ConfigReferenceSummary({
   const containerName =
     targetContainerName && containerNames.includes(targetContainerName)
       ? targetContainerName
-      : containerNames[0] || '';
+      : containerNames[containerIndex ?? 0] || containerNames[0] || '';
   const references = useMemo(
     () =>
       detailQuery.data
@@ -64,6 +71,11 @@ export default function ConfigReferenceSummary({
 
   const previews = useReferencePreviews(references, cluster, namespace);
 
+  // Expand state lives here rather than inside each row so the header control can
+  // drive every row at once. Default is collapsed: the per-row warning line stays
+  // visible either way, so nothing that matters is hidden by collapsing.
+  const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>({});
+
   if (detailQuery.isLoading || !references.length) {
     return null;
   }
@@ -73,23 +85,41 @@ export default function ConfigReferenceSummary({
     0,
   );
   const unresolved = previews.filter(preview => !preview.resolved).length;
+  const allExpanded = references.every((_, index) => expandedRows[index]);
+  const toggleAll = () => {
+    const next = !allExpanded;
+    const state: Record<number, boolean> = {};
+    references.forEach((_, index) => {
+      state[index] = next;
+    });
+    setExpandedRows(state);
+  };
 
   return (
     <div
       data-test="config-reference-summary"
       style={variant === 'envTab' ? envTabStyle : summaryStyle}
     >
-      {variant === 'envTab' && (
-        <div style={titleStyle}>
-          <span>{t('CONFIG_REFERENCE')}</span>
-          <span style={totalStyle}>
-            {total > 0 ? t('CONFIG_REFERENCE_TOTAL', { count: total }) : ''}
-            {unresolved > 0
-              ? ` · ${t('CONFIG_REFERENCE_TOTAL_PARTIAL', { count: unresolved })}`
-              : ''}
-          </span>
-        </div>
-      )}
+      <div style={titleStyle}>
+        <span>{t('CONFIG_REFERENCE')}</span>
+        <span style={totalStyle}>
+          {total > 0 ? t('CONFIG_REFERENCE_TOTAL', { count: total }) : ''}
+          {unresolved > 0 ? ` · ${t('CONFIG_REFERENCE_TOTAL_PARTIAL', { count: unresolved })}` : ''}
+        </span>
+        <span style={{ flex: 1 }} />
+        <span
+          role="button"
+          tabIndex={0}
+          aria-expanded={allExpanded}
+          style={summaryHeaderToggleStyle}
+          onClick={toggleAll}
+          onKeyDown={event => {
+            if (event.key === 'Enter' || event.key === ' ') toggleAll();
+          }}
+        >
+          {allExpanded ? t('CONFIG_REFERENCE_COLLAPSE_ALL') : t('CONFIG_REFERENCE_EXPAND_ALL')}
+        </span>
+      </div>
       {references.map((reference, index) => (
         <div key={`${reference.kind}-${reference.name}-${index}`} style={rowWrapperStyle}>
           <div style={rowStyle}>
@@ -103,6 +133,9 @@ export default function ConfigReferenceSummary({
             kind={reference.kind}
             identity={`${reference.kind}:${reference.name}:${reference.prefix || ''}`}
             preview={previews[index]}
+            showValues
+            expanded={!!expandedRows[index]}
+            onExpandedChange={next => setExpandedRows(current => ({ ...current, [index]: next }))}
           />
         </div>
       ))}
@@ -132,7 +165,7 @@ const envTabStyle: React.CSSProperties = {
 const titleStyle: React.CSSProperties = {
   display: 'flex',
   gap: 12,
-  alignItems: 'baseline',
+  alignItems: 'center',
   color: '#36435c',
   fontSize: 13,
   fontWeight: 700,

@@ -34,10 +34,23 @@ export const ENV_FROM_NAME_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
  */
 export const PREVIEW_SECRET_KEYS = true;
 
-/** Keys available on a referenced ConfigMap/Secret. Values are never read here. */
+/**
+ * A `data` key, plus its value when it is safe to show one.
+ *
+ * Secret values are deliberately absent: they are never decoded, so there is
+ * nothing to leak and the UI masks them exactly as KubeSphere masks its own
+ * secret-backed environment variables. A ConfigMap value is always a string,
+ * possibly empty — so `undefined` means "not read", never "empty".
+ */
+export interface ResourceKey {
+  key: string;
+  value?: string;
+}
+
+/** Keys available on a referenced ConfigMap/Secret. */
 export interface ResourceKeys {
-  /** Keys of `data` — these are what envFrom turns into environment variables. */
-  data: string[];
+  /** What envFrom turns into environment variables. */
+  data: ResourceKey[];
   /** Keys of `binaryData` (ConfigMap only). envFrom ignores it entirely. */
   binaryData: string[];
 }
@@ -55,6 +68,8 @@ export type PreviewEntry =
       key: string;
       /** The environment variable name it would produce. */
       name: string;
+      /** Absent for Secret-backed keys, whose values are never read. */
+      value?: string;
       /** ok — becomes an environment variable; skipped — invalid name, so kubelet drops it without emitting any event. */
       status: 'ok' | 'skipped';
     }
@@ -126,14 +141,22 @@ export function previewReference(
   const names: string[] = [];
   const skipped: string[] = [];
 
-  (keys.data || []).forEach(key => {
-    const name = buildEnvFromName(prefix, key);
+  (keys.data || []).forEach(entry => {
+    const name = buildEnvFromName(prefix, entry.key);
     const ok = pattern.test(name);
-    entries.push({ key, name, status: ok ? 'ok' : 'skipped' });
+    entries.push({
+      key: entry.key,
+      name,
+      // A value is attached only when there is one to show: a dropped key has none,
+      // and a Secret-backed key never had one read. Omitting the property (rather
+      // than setting it to undefined) keeps entries comparable with deepStrictEqual.
+      ...(ok && entry.value !== undefined ? { value: entry.value } : {}),
+      status: ok ? 'ok' : 'skipped',
+    });
     if (ok) {
       names.push(name);
     } else {
-      skipped.push(key);
+      skipped.push(entry.key);
     }
   });
 

@@ -47,6 +47,8 @@ module.exports = {
   CONFIG_REFERENCE_ARIA_REMOVE: 'Remove reference {index}',
   CONFIG_REFERENCE_ARIA_CONTAINER: 'Container',
   CONFIG_REFERENCE_ARIA_CLOSE: 'Close',
+  CONFIG_REFERENCE_EXPAND_ALL: 'Expand all',
+  CONFIG_REFERENCE_COLLAPSE_ALL: 'Collapse all',
   CONFIG_REFERENCE_TOTAL: '{count} environment variables in total',
   CONFIG_REFERENCE_TOTAL_PARTIAL: '{count} references not read yet',
   CONFIG_REFERENCE_PREVIEW_EMPTY: 'No key will take effect',

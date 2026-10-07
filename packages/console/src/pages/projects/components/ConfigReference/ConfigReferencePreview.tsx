@@ -13,6 +13,13 @@ import {
   previewOkStyle,
   previewStyle,
   previewSummaryStyle,
+  previewValueDroppedStyle,
+  previewValueEmptyStyle,
+  previewValueMaskedStyle,
+  previewValueNameStyle,
+  previewValueRowStyle,
+  previewValueTextStyle,
+  previewValuesStyle,
   previewWarnStyle,
 } from './styles';
 
@@ -26,6 +33,18 @@ interface Props {
   identity: string;
   /** Undefined while no resource is selected, or while its keys are loading. */
   preview?: ReferencePreview;
+  /**
+   * Render the expanded state as `name -> value` rows instead of key chips. Used
+   * where the values are the point; Secret-backed values show up masked.
+   */
+  showValues?: boolean;
+  /**
+   * Controlled expand state. The summary passes it so one header control can
+   * expand every row at once; when omitted the row keeps its own state and
+   * auto-expands while something is wrong.
+   */
+  expanded?: boolean;
+  onExpandedChange?: (next: boolean) => void;
   /** Hard error (duplicate reference / resource gone). Replaces the preview. */
   error?: string;
 }
@@ -45,7 +64,15 @@ const chipStyleFor = (entry: PreviewEntry, conflicted: Set<string>) => {
  * Collapsed to one line while everything is fine; auto-expanded as soon as
  * something would silently not take effect.
  */
-export default function ConfigReferencePreview({ kind, identity, preview, error }: Props) {
+export default function ConfigReferencePreview({
+  kind,
+  identity,
+  preview,
+  showValues,
+  expanded: expandedProp,
+  onExpandedChange,
+  error,
+}: Props) {
   const signature = [
     identity,
     error || '',
@@ -128,7 +155,22 @@ export default function ConfigReferencePreview({ kind, identity, preview, error 
   const conflicted = new Set([...preview.shadowedByEnv, ...preview.duplicated]);
 
   const hasProblems = warnings.length > 0;
-  const expanded = override === null ? hasProblems : override;
+  const isControlled = typeof expandedProp === 'boolean';
+  // An uncontrolled row surfaces problems by opening itself. A controlled row
+  // renders exactly what its parent asked for: the summary defaults to closed and
+  // relies on the warning line, which stays visible either way.
+  const isExpanded = isControlled
+    ? (expandedProp as boolean)
+    : override === null
+      ? hasProblems
+      : override;
+  const toggleExpanded = () => {
+    if (isControlled) {
+      onExpandedChange?.(!isExpanded);
+    } else {
+      setOverride(!isExpanded);
+    }
+  };
   // Nothing to reveal when the resource contributes no key at all.
   const canExpand = preview.entries.length > 0;
 
@@ -152,18 +194,56 @@ export default function ConfigReferencePreview({ kind, identity, preview, error 
           <span
             role="button"
             tabIndex={0}
-            aria-expanded={expanded}
+            aria-expanded={isExpanded}
             style={previewLinkStyle}
-            onClick={() => setOverride(!expanded)}
+            onClick={toggleExpanded}
             onKeyDown={event => {
-              if (event.key === 'Enter' || event.key === ' ') setOverride(!expanded);
+              if (event.key === 'Enter' || event.key === ' ') toggleExpanded();
             }}
           >
-            {expanded ? t('CONFIG_REFERENCE_PREVIEW_HIDE') : t('CONFIG_REFERENCE_PREVIEW_SHOW')}
+            {isExpanded ? t('CONFIG_REFERENCE_PREVIEW_HIDE') : t('CONFIG_REFERENCE_PREVIEW_SHOW')}
           </span>
         )}
       </div>
-      {expanded && canExpand && (
+      {isExpanded && canExpand && showValues && (
+        <div style={previewValuesStyle}>
+          {preview.entries.map((entry, index) => {
+            // binaryData never becomes a variable; the summary line above already
+            // reports how many such keys there are.
+            if (entry.status === 'binary') {
+              return null;
+            }
+            return (
+              <div key={`${entry.key}-${index}`} style={previewValueRowStyle}>
+                <span
+                  style={previewValueNameStyle}
+                  title={entry.name === entry.key ? undefined : entry.key}
+                >
+                  {entry.name}
+                </span>
+                {entry.status === 'skipped' ? (
+                  <span style={previewValueDroppedStyle}>
+                    {t('CONFIG_REFERENCE_PREVIEW_SKIPPED_TIP')}
+                  </span>
+                ) : entry.value === undefined ? (
+                  // Secret-backed: the value was never decoded, so it is masked the
+                  // same way the platform masks its own secret environment variables.
+                  <span style={previewValueMaskedStyle}>******</span>
+                ) : entry.value === '' ? (
+                  // Present but empty. A blank cell reads like a rendering failure,
+                  // and the platform's own env table shows nothing at all here.
+                  <span style={previewValueEmptyStyle}>—</span>
+                ) : (
+                  <span style={previewValueTextStyle} title={entry.value}>
+                    {entry.value}
+                  </span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {isExpanded && canExpand && !showValues && (
         <div style={previewChipsStyle}>
           {preview.entries.map((entry, index) => (
             <span

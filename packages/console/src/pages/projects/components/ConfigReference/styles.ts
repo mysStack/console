@@ -426,3 +426,62 @@ export const previewChipConflictStyle: CSSProperties = {
   borderColor: colors.dangerBorder,
   color: colors.danger,
 };
+
+/** Expanded value list, used where the values themselves are what matters. */
+export const previewValuesStyle: CSSProperties = {
+  display: 'grid',
+  gap: 4,
+  marginTop: 6,
+  marginLeft: 2,
+};
+
+export const previewValueRowStyle: CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'minmax(120px, 240px) minmax(0, 1fr)',
+  gap: 12,
+  alignItems: 'baseline',
+  fontSize: 12,
+};
+
+export const previewValueNameStyle: CSSProperties = {
+  color: colors.textStrong,
+  fontWeight: 600,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  textAlign: 'left',
+};
+
+export const previewValueTextStyle: CSSProperties = {
+  color: colors.textSubtle,
+  wordBreak: 'break-all',
+  textAlign: 'left',
+};
+
+export const previewValueMaskedStyle: CSSProperties = {
+  color: colors.mutedText,
+  letterSpacing: 1,
+  textAlign: 'left',
+};
+
+export const previewValueDroppedStyle: CSSProperties = {
+  color: colors.danger,
+  textAlign: 'left',
+};
+
+export const previewValueEmptyStyle: CSSProperties = {
+  color: colors.mutedText,
+  textAlign: 'left',
+};
+
+export const summaryHeaderToggleStyle: CSSProperties = {
+  color: colors.link,
+  fontSize: 12,
+  fontWeight: 600,
+  cursor: 'pointer',
+  border: '1px solid #cfe0f3',
+  borderRadius: 12,
+  padding: '1px 12px',
+  background: '#f2f8ff',
+  whiteSpace: 'nowrap',
+};

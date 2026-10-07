@@ -71,9 +71,14 @@ export function useReferencePreviews(
               name: target.name,
             });
             const raw: any = await request.get(url);
+            // Names only: the value is never decoded, so none is carried here.
+            // Anything else would be a promise this code cannot keep.
             return {
               token: target.token,
-              keys: { data: Object.keys(raw?.data || {}), binaryData: [] } as ResourceKeys,
+              keys: {
+                data: Object.keys(raw?.data || {}).map(key => ({ key })),
+                binaryData: [],
+              } as ResourceKeys,
             };
           }
 
@@ -85,7 +90,10 @@ export function useReferencePreviews(
           return {
             token: target.token,
             keys: {
-              data: Object.keys(detail?.data || {}),
+              data: Object.entries(detail?.data || {}).map(([key, value]) => ({
+                key,
+                value: String(value),
+              })),
               binaryData: Object.keys(detail?.binaryData || {}),
             } as ResourceKeys,
           };

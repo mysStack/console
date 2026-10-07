@@ -209,10 +209,14 @@ export default function ConfigReferenceInline({
               name: resource.name,
             });
             const raw: any = await request.get(url);
+            // Names only — Secret values are never decoded.
             return {
               kind: resource.kind,
               name: resource.name,
-              keys: { data: Object.keys(raw?.data || {}), binaryData: [] } as ResourceKeys,
+              keys: {
+                data: Object.keys(raw?.data || {}).map(key => ({ key })),
+                binaryData: [],
+              } as ResourceKeys,
             };
           }
 
@@ -225,7 +229,10 @@ export default function ConfigReferenceInline({
             kind: resource.kind,
             name: resource.name,
             keys: {
-              data: Object.keys(detail?.data || {}),
+              data: Object.entries(detail?.data || {}).map(([key, value]) => ({
+                key,
+                value: String(value),
+              })),
               binaryData: Object.keys(detail?.binaryData || {}),
             } as ResourceKeys,
           };

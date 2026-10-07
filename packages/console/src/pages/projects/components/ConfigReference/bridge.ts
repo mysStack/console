@@ -211,3 +211,62 @@ export const findConfigReferenceEnvTabPane = (doc: Document): HTMLElement | null
 
   return content.lastElementChild as HTMLElement;
 };
+
+/**
+ * A container card heading reads "容器：<name>" (or "Container: <name>"). The
+ * label is translated but a container name can never contain a colon, so the name
+ * is whatever follows the last one.
+ */
+export const configReferenceContainerFromHeading = (label: string): string => {
+  const trimmed = label.trim();
+  // ASCII and fullwidth colons, written as escapes so this file stays immune to
+  // whatever encoding the surrounding toolchain happens to use.
+  const cut = [':', '\uFF1A'].reduce(
+    (best, separator) => Math.max(best, trimmed.lastIndexOf(separator)),
+    -1,
+  );
+  return cut >= 0 ? trimmed.slice(cut + 1).trim() : trimmed;
+};
+
+export interface ConfigReferenceEnvSection {
+  containerName: string;
+  /** Zero-based position of the card on the page, used as a matching fallback. */
+  index: number;
+  /** The container card; the block goes right after its heading. */
+  card: HTMLElement;
+}
+
+/**
+ * One section per container on the read-only 环境变量 tab.
+ *
+ * That page renders a collapsible card per container, so a reference block belongs
+ * inside the card of the container it describes. A single page-level block would
+ * silently describe only the first container of a multi-container pod.
+ *
+ * The docker glyph on each heading (`#icon-docker`) is the stable hook: every
+ * class name between the glyph and the card is hashed.
+ */
+export const findConfigReferenceEnvSections = (doc: Document): ConfigReferenceEnvSection[] => {
+  const pane = findConfigReferenceEnvTabPane(doc);
+  if (!pane) return [];
+
+  const sections: ConfigReferenceEnvSection[] = [];
+  Array.from(pane.querySelectorAll('use'))
+    .filter(use => {
+      const href = use.getAttribute('href') || use.getAttribute('xlink:href') || '';
+      return href === '#icon-docker';
+    })
+    .forEach(marker => {
+      let card: HTMLElement | null = marker.parentElement;
+      while (card && card.parentElement !== pane) {
+        card = card.parentElement;
+      }
+      if (!card) return;
+      const containerName = configReferenceContainerFromHeading(
+        card.children[0]?.textContent || '',
+      );
+      if (!containerName) return;
+      sections.push({ containerName, index: sections.length, card });
+    });
+  return sections;
+};

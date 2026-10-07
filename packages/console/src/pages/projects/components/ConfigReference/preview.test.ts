@@ -10,7 +10,14 @@ import {
 import type { ResourceKeys } from './preview';
 import type { EnvFromReference } from './types';
 
-const keys = (data: string[], binaryData: string[] = []): ResourceKeys => ({ data, binaryData });
+// A plain string means "no readable value" (a Secret, or a fixture that does not
+// care about values); a tuple carries one.
+const keys = (data: Array<string | [string, string]>, binaryData: string[] = []): ResourceKeys => ({
+  data: data.map(item =>
+    typeof item === 'string' ? { key: item } : { key: item[0], value: item[1] },
+  ),
+  binaryData,
+});
 
 const lookup =
   (map: Record<string, ResourceKeys>) =>
