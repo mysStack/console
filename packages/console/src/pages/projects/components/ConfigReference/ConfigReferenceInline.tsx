@@ -129,6 +129,12 @@ export default function ConfigReferenceInline({
   useEffect(() => {
     if (!detailQuery.data) return;
     setReferences(parseEnvFrom(getContainerEnvFrom(detailQuery.data as any, selectedContainer)));
+    // Seed the file-mount rows from what the container already has: planFileMounts
+    // treats them as the complete desired set for the container, so an unseeded
+    // (empty) list would delete its existing mounts and their volumes on save.
+    setFileMounts(
+      detailQuery.data ? readFileMounts(detailQuery.data as any, selectedContainer) : [],
+    );
     const original = (detailQuery.data as any)._originData || detailQuery.data;
     setReloaderEnabled(
       readReloaderPolicy(original?.metadata?.annotations || (detailQuery.data as any).annotations)
