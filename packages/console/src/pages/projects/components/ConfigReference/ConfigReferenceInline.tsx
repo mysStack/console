@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useRef, useEffect, useMemo, useState } from 'react';
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { useMutation } from 'react-query';
 import { configMapStore, Icon, request, secretStore, workloadStore } from '@ks-console/shared';
@@ -156,6 +156,15 @@ export default function ConfigReferenceInline({
     };
   }, [cluster, namespace, reloadKey]);
 
+  // Mirror of resourceKeys for the fetch effect below. Going through a ref keeps
+  // resourceKeys out of that effect's dependencies: it used to both read and write
+  // that state, so every successful fetch re-ran the effect and retried the
+  // resource that had just failed, once per sibling that succeeded.
+  const resourceKeysRef = useRef(resourceKeys);
+  useEffect(() => {
+    resourceKeysRef.current = resourceKeys;
+  }, [resourceKeys]);
+
   const referencedResources = useMemo(() => {
     const unique = new Map<string, { kind: ConfigReferenceKind; name: string }>();
     references.forEach(reference => {
@@ -173,8 +182,9 @@ export default function ConfigReferenceInline({
   // also work but transfers every ConfigMap/Secret in the project.
   useEffect(() => {
     let active = true;
+    const have = resourceKeysRef.current;
     const missing = referencedResources.filter(
-      resource => !(resource.name in (resourceKeys[resource.kind] || {})),
+      resource => !(resource.name in (have[resource.kind] || {})),
     );
     if (!missing.length) {
       return undefined;
@@ -247,7 +257,7 @@ export default function ConfigReferenceInline({
     return () => {
       active = false;
     };
-  }, [referencedResources, resourceKeys, cluster, namespace]);
+  }, [referencedResources, cluster, namespace]);
 
   const previews = useMemo(
     () =>
@@ -357,7 +367,12 @@ export default function ConfigReferenceInline({
           >
             {t('CONFIG_REFERENCE_ADD')}
           </button>
-          <button type="button" style={iconButtonStyle} aria-label="Close" onClick={onClose}>
+          <button
+            type="button"
+            style={iconButtonStyle}
+            aria-label={t('CONFIG_REFERENCE_ARIA_CLOSE')}
+            onClick={onClose}
+          >
             ×
           </button>
         </div>
@@ -395,7 +410,7 @@ export default function ConfigReferenceInline({
             <div key={`${index}-${reference.kind}`}>
               <div style={referenceRowStyle}>
                 <NativeSelect
-                  aria-label={`引用类型 ${index + 1}`}
+                  aria-label={t('CONFIG_REFERENCE_ARIA_KIND', { index: index + 1 })}
                   value={reference.kind}
                   options={[
                     { label: '来自配置字典', value: 'configMap' },
@@ -409,14 +424,14 @@ export default function ConfigReferenceInline({
                   }
                 />
                 <NativeSelect
-                  aria-label={`引用资源 ${index + 1}`}
+                  aria-label={t('CONFIG_REFERENCE_ARIA_RESOURCE', { index: index + 1 })}
                   value={reference.name}
                   options={resourceOptions}
                   disabled={resourceLoading}
                   onValueChange={value => updateReference(index, { name: value })}
                 />
                 <input
-                  aria-label={`前缀 ${index + 1}`}
+                  aria-label={t('CONFIG_REFERENCE_ARIA_PREFIX', { index: index + 1 })}
                   style={controlStyle}
                   value={reference.prefix || ''}
                   placeholder={t('CONFIG_REFERENCE_PREFIX_PLACEHOLDER')}
@@ -425,7 +440,7 @@ export default function ConfigReferenceInline({
                 <Button
                   type="button"
                   className="button-flat button-size-normal has-icon"
-                  aria-label={`删除引用 ${index + 1}`}
+                  aria-label={t('CONFIG_REFERENCE_ARIA_REMOVE', { index: index + 1 })}
                   onClick={() =>
                     setReferences(current => current.filter((_, itemIndex) => itemIndex !== index))
                   }

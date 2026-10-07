@@ -30,13 +30,10 @@ interface Props {
   error?: string;
 }
 
-const chipStyleFor = (entry: PreviewEntry, preview: ReferencePreview) => {
+const chipStyleFor = (entry: PreviewEntry, conflicted: Set<string>) => {
   if (entry.status === 'skipped') return previewChipBadStyle;
   if (entry.status === 'binary') return previewChipBinaryStyle;
-  if (preview.shadowedByEnv.includes(entry.name) || preview.duplicated.includes(entry.name)) {
-    return previewChipConflictStyle;
-  }
-  return previewChipStyle;
+  return conflicted.has(entry.name) ? previewChipConflictStyle : previewChipStyle;
 };
 
 /**
@@ -127,6 +124,9 @@ export default function ConfigReferencePreview({ kind, identity, preview, error 
       : '',
   ].filter(Boolean);
 
+  // Built once instead of scanning both arrays for every chip.
+  const conflicted = new Set([...preview.shadowedByEnv, ...preview.duplicated]);
+
   const hasProblems = warnings.length > 0;
   const expanded = override === null ? hasProblems : override;
   // Nothing to reveal when the resource contributes no key at all.
@@ -168,7 +168,7 @@ export default function ConfigReferencePreview({ kind, identity, preview, error 
           {preview.entries.map((entry, index) => (
             <span
               key={`${entry.key}-${index}`}
-              style={chipStyleFor(entry, preview)}
+              style={chipStyleFor(entry, conflicted)}
               title={
                 entry.status === 'skipped' ? t('CONFIG_REFERENCE_PREVIEW_SKIPPED_TIP') : undefined
               }

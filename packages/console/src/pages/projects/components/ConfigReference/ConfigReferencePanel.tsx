@@ -8,6 +8,8 @@ import { readReloaderPolicy } from './reloader';
 import { buildConfigReferencePatch, getContainerEnvFrom, getContainerNames } from './workload';
 import type { ConfigReferenceKind, EnvFromReference } from './types';
 import { colors, columns } from './styles';
+import ConfigReferencePreview from './ConfigReferencePreview';
+import { useReferencePreviews } from './useReferencePreviews';
 
 type WorkloadModule = 'deployments' | 'statefulsets' | 'daemonsets';
 
@@ -110,6 +112,9 @@ export default function ConfigReferencePanel({
     },
   );
 
+  // Must sit above the early returns below: hooks run in a fixed order.
+  const previews = useReferencePreviews(references, cluster, namespace);
+
   if (detailQuery.isLoading) return <Loading className="page-loading" />;
   if (detailQuery.isError || !detailQuery.data) {
     return <div role="alert">{t('CONFIG_REFERENCE_WORKLOAD_LOAD_ERROR')}</div>;
@@ -166,7 +171,7 @@ export default function ConfigReferencePanel({
       <div style={{ marginBottom: 24 }}>
         <strong>{t('CONFIG_REFERENCE_CONTAINER')}</strong>
         <Select
-          aria-label="容器"
+          aria-label={t('CONFIG_REFERENCE_ARIA_CONTAINER')}
           style={{ width: '100%', marginTop: 8 }}
           value={names}
           options={containers.map(value => ({ label: value, value }))}
@@ -217,76 +222,82 @@ export default function ConfigReferencePanel({
             ...options,
           ];
           return (
-            <div
-              key={`${index}-${reference.kind}`}
-              style={{
-                display: 'grid',
-                gridTemplateColumns: columns.panel,
-                gap: 12,
-                alignItems: 'center',
-                padding: 12,
-                border: '1px solid #d8dee9',
-                borderRadius: 6,
-              }}
-            >
-              <Select
-                aria-label={`引用类型 ${index + 1}`}
-                value={reference.kind}
-                options={[
-                  { label: 'ConfigMap', value: 'configMap' },
-                  { label: 'Secret', value: 'secret' },
-                ]}
-                onChange={value =>
-                  setReferences(current =>
-                    current.map((item, itemIndex) =>
-                      itemIndex === index
-                        ? { ...item, kind: value as ConfigReferenceKind, name: '' }
-                        : item,
-                    ),
-                  )
-                }
-              />
-              <Select
-                aria-label={`引用资源 ${index + 1}`}
-                value={reference.name}
-                options={resourceOptions}
-                loading={resourceLoading}
-                onChange={value =>
-                  setReferences(current =>
-                    current.map((item, itemIndex) =>
-                      itemIndex === index ? { ...item, name: String(value || '') } : item,
-                    ),
-                  )
-                }
-              />
-              <Input
-                aria-label={`前缀 ${index + 1}`}
-                value={reference.prefix || ''}
-                placeholder={t('CONFIG_REFERENCE_PREFIX_PLACEHOLDER')}
-                onChange={event =>
-                  setReferences(current =>
-                    current.map((item, itemIndex) =>
-                      itemIndex === index ? { ...item, prefix: event.target.value } : item,
-                    ),
-                  )
-                }
-              />
-              <Button
-                type="button"
-                onClick={() => setReferences(current => current.filter((_, i) => i !== index))}
+            <div key={`${index}-${reference.kind}`} style={{ display: 'grid', gap: 2 }}>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: columns.panel,
+                  gap: 12,
+                  alignItems: 'center',
+                  padding: 12,
+                  border: '1px solid #d8dee9',
+                  borderRadius: 6,
+                }}
               >
-                删除
-              </Button>
-              {duplicate && (
-                <span role="alert" style={{ color: colors.danger, gridColumn: '1 / -1' }}>
-                  {t('CONFIG_REFERENCE_DUPLICATE')}
-                </span>
-              )}
-              {unavailable && (
-                <span role="alert" style={{ color: colors.danger, gridColumn: '1 / -1' }}>
-                  {t('CONFIG_REFERENCE_UNAVAILABLE')}
-                </span>
-              )}
+                <Select
+                  aria-label={t('CONFIG_REFERENCE_ARIA_KIND', { index: index + 1 })}
+                  value={reference.kind}
+                  options={[
+                    { label: 'ConfigMap', value: 'configMap' },
+                    { label: 'Secret', value: 'secret' },
+                  ]}
+                  onChange={value =>
+                    setReferences(current =>
+                      current.map((item, itemIndex) =>
+                        itemIndex === index
+                          ? { ...item, kind: value as ConfigReferenceKind, name: '' }
+                          : item,
+                      ),
+                    )
+                  }
+                />
+                <Select
+                  aria-label={t('CONFIG_REFERENCE_ARIA_RESOURCE', { index: index + 1 })}
+                  value={reference.name}
+                  options={resourceOptions}
+                  loading={resourceLoading}
+                  onChange={value =>
+                    setReferences(current =>
+                      current.map((item, itemIndex) =>
+                        itemIndex === index ? { ...item, name: String(value || '') } : item,
+                      ),
+                    )
+                  }
+                />
+                <Input
+                  aria-label={t('CONFIG_REFERENCE_ARIA_PREFIX', { index: index + 1 })}
+                  value={reference.prefix || ''}
+                  placeholder={t('CONFIG_REFERENCE_PREFIX_PLACEHOLDER')}
+                  onChange={event =>
+                    setReferences(current =>
+                      current.map((item, itemIndex) =>
+                        itemIndex === index ? { ...item, prefix: event.target.value } : item,
+                      ),
+                    )
+                  }
+                />
+                <Button
+                  type="button"
+                  onClick={() => setReferences(current => current.filter((_, i) => i !== index))}
+                >
+                  删除
+                </Button>
+                {duplicate && (
+                  <span role="alert" style={{ color: colors.danger, gridColumn: '1 / -1' }}>
+                    {t('CONFIG_REFERENCE_DUPLICATE')}
+                  </span>
+                )}
+                {unavailable && (
+                  <span role="alert" style={{ color: colors.danger, gridColumn: '1 / -1' }}>
+                    {t('CONFIG_REFERENCE_UNAVAILABLE')}
+                  </span>
+                )}
+              </div>
+              <ConfigReferencePreview
+                kind={reference.kind}
+                identity={`${reference.kind}:${reference.name}:${reference.prefix || ''}`}
+                preview={previews[index]}
+              />
             </div>
           );
         })}

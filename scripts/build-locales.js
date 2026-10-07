@@ -3,8 +3,12 @@
  * https://github.com/kubesphere/console/blob/master/LICENSE
  */
 
-import path from 'path';
-import fs from 'fs-extra';
+// Plain CommonJS on purpose. The script uses __dirname and require() below, so
+// an `import` here made Node's module detection load it as ESM on Node >= 20,
+// where neither exists — it only ever worked because esno rewrote it to CJS.
+// esno still runs this file, and so does plain node.
+const path = require('path');
+const fs = require('fs-extra');
 
 const EXCLUDE_NAMES = ['.DS_Store', 'package.json', 'CHANGELOG.md', 'dist'];
 

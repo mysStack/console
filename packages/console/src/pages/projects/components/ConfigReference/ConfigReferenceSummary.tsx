@@ -1,12 +1,12 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { configMapStore, request, secretStore, workloadStore } from '@ks-console/shared';
+import { workloadStore } from '@ks-console/shared';
 
 import { getConfigReferenceSummaryPrefix, getConfigReferenceSummaryRows } from './summary';
 import { getContainerEnvFrom, getContainerNames } from './workload';
 import ConfigReferencePreview from './ConfigReferencePreview';
-import { previewReferences } from './preview';
-import type { EnvFromReference, ResourceKeys } from './preview';
+import { useReferencePreviews } from './useReferencePreviews';
+import type { EnvFromReference } from './preview';
 
 type WorkloadModule = 'deployments' | 'statefulsets' | 'daemonsets';
 
@@ -63,79 +63,7 @@ export default function ConfigReferenceSummary({
     [detailQuery.data, containerName],
   );
 
-  const keyOf = (reference: EnvFromReference) => `${reference.kind}:${reference.name}`;
-  const wanted = references.map(keyOf).join(',');
-  const [resourceKeys, setResourceKeys] = useState<Record<string, ResourceKeys>>({});
-
-  useEffect(() => {
-    if (!wanted) {
-      return undefined;
-    }
-    let active = true;
-    const targets = wanted.split(',').filter(Boolean);
-    Promise.all(
-      targets.map(async token => {
-        const [kind, ...rest] = token.split(':');
-        const resourceName = rest.join(':');
-        try {
-          if (kind === 'secret') {
-            // Raw request: the shared Secret mapper base64-decodes every value and
-            // only the key names are wanted. Values transit the wire (Kubernetes
-            // has no keys-only API) but are never decoded, stored or rendered.
-            const url = secretStore.getDetailUrl({
-              cluster,
-              namespace,
-              name: resourceName,
-            });
-            const raw: any = await request.get(url);
-            return {
-              token,
-              keys: { data: Object.keys(raw?.data || {}), binaryData: [] } as ResourceKeys,
-            };
-          }
-          const detail: any = await configMapStore.fetchDetail({
-            cluster,
-            namespace,
-            name: resourceName,
-          });
-          return {
-            token,
-            keys: {
-              data: Object.keys(detail?.data || {}),
-              binaryData: Object.keys(detail?.binaryData || {}),
-            } as ResourceKeys,
-          };
-        } catch {
-          return null;
-        }
-      }),
-    ).then(results => {
-      if (!active) {
-        return;
-      }
-      const next: Record<string, ResourceKeys> = {};
-      results.forEach(item => {
-        if (item) next[item.token] = item.keys;
-      });
-      setResourceKeys(next);
-    });
-    return () => {
-      active = false;
-    };
-  }, [wanted, cluster, namespace]);
-
-  const previews = useMemo(
-    // No manualEnvNames here: this variant is read-only and the V3 rows it would
-    // read belong to the editor dialog.
-    // Keys that are still loading resolve to undefined -> `resolved: false`, so a
-    // pending fetch renders nothing instead of a false "no effective keys".
-    () =>
-      previewReferences(
-        references as EnvFromReference[],
-        reference => resourceKeys[keyOf(reference)],
-      ),
-    [references, resourceKeys],
-  );
+  const previews = useReferencePreviews(references as EnvFromReference[], cluster, namespace);
 
   if (detailQuery.isLoading || !references.length) {
     return null;

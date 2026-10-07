@@ -44,20 +44,25 @@ export interface ResourceKeys {
 
 export const EMPTY_RESOURCE_KEYS: ResourceKeys = { data: [], binaryData: [] };
 
-export type PreviewEntryStatus = 'ok' | 'skipped' | 'binary';
-
-export interface PreviewEntry {
-  /** The key as it appears on the resource. */
-  key: string;
-  /** The environment variable name it would produce. */
-  name: string;
-  /**
-   * ok      — becomes an environment variable
-   * skipped — invalid name; kubelet drops it without any event
-   * binary  — lives in binaryData; envFrom never reads it
-   */
-  status: PreviewEntryStatus;
-}
+/**
+ * A discriminated union rather than one interface with an optional `name`: a
+ * binaryData key never becomes an environment variable, so carrying a computed
+ * name for it was data nothing could legitimately read.
+ */
+export type PreviewEntry =
+  | {
+      /** The key as it appears on the resource. */
+      key: string;
+      /** The environment variable name it would produce. */
+      name: string;
+      /** ok — becomes an environment variable; skipped — invalid name, so kubelet drops it without emitting any event. */
+      status: 'ok' | 'skipped';
+    }
+  | {
+      key: string;
+      /** lives in binaryData; envFrom never reads it */
+      status: 'binary';
+    };
 
 export interface ReferencePreview {
   /** False when the referenced resource's keys could not be loaded. */
@@ -134,7 +139,7 @@ export function previewReference(
 
   const ignoredBinary = [...(keys.binaryData || [])];
   ignoredBinary.forEach(key => {
-    entries.push({ key, name: buildEnvFromName(prefix, key), status: 'binary' });
+    entries.push({ key, status: 'binary' });
   });
 
   return { resolved: true, entries, names, skipped, ignoredBinary, invalidPrefix: false };
