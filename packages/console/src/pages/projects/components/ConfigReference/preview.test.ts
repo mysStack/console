@@ -144,6 +144,6 @@ test('ignores blank and non-string manual environment names', () => {
   assert.deepEqual(result[0].shadowedByEnv, ['AMS_URL']);
 });
 
-test('Secret key preview stays disabled so Secret objects are never fetched', () => {
-  assert.equal(PREVIEW_SECRET_KEYS, false);
+test('Secret key preview is enabled so Secret keys take part in the checks', () => {
+  assert.equal(PREVIEW_SECRET_KEYS, true);
 });

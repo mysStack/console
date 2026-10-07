@@ -18,6 +18,12 @@ import {
 
 interface Props {
   kind: ConfigReferenceKind;
+  /**
+   * Identity of everything this preview depends on (kind / resource / prefix).
+   * A change resets the manual expand override, so a row that develops a problem
+   * auto-expands again instead of staying silently collapsed.
+   */
+  identity: string;
   /** Undefined while no resource is selected, or while its keys are loading. */
   preview?: ReferencePreview;
   /** Hard error (duplicate reference / resource gone). Replaces the preview. */
@@ -35,15 +41,42 @@ const chipStyleFor = (entry: PreviewEntry, preview: ReferencePreview) => {
 
 /**
  * Explains what a single ConfigMap/Secret reference will actually put into the
- * container, and — more importantly — what it will NOT: kubelet drops keys
- * whose name is invalid without emitting any event (kubernetes#130099), and
- * envFrom never reads binaryData at all.
+ * container, and — more importantly — what it will NOT: kubelet drops keys whose
+ * name is invalid without emitting any event (kubernetes#130099), and envFrom
+ * never reads binaryData at all.
  *
  * Collapsed to one line while everything is fine; auto-expanded as soon as
  * something would silently not take effect.
  */
-export default function ConfigReferencePreview({ kind, preview, error }: Props) {
-  const [override, setOverride] = useState<boolean | null>(null);
+export default function ConfigReferencePreview({ kind, identity, preview, error }: Props) {
+  const signature = [
+    identity,
+    error || '',
+    preview
+      ? [
+          preview.resolved,
+          preview.entries.length,
+          preview.skipped.length,
+          preview.ignoredBinary.length,
+          preview.shadowedByEnv.length,
+          preview.duplicated.length,
+        ].join(',')
+      : 'none',
+  ].join('|');
+
+  const [state, setState] = useState<{ signature: string; override: boolean | null }>({
+    signature,
+    override: null,
+  });
+
+  // Reset the manual expand/collapse choice whenever the content changes. Done
+  // during render (the supported "adjust state on prop change" pattern) so the
+  // value below is correct on this very render.
+  if (state.signature !== signature) {
+    setState({ signature, override: null });
+  }
+  const override = state.signature === signature ? state.override : null;
+  const setOverride = (value: boolean) => setState({ signature, override: value });
 
   if (error) {
     return (
@@ -55,15 +88,21 @@ export default function ConfigReferencePreview({ kind, preview, error }: Props) 
     );
   }
 
-  if (kind === 'secret' && !PREVIEW_SECRET_KEYS) {
-    return <div style={previewStyle}>{t('CONFIG_REFERENCE_PREVIEW_SECRET')}</div>;
-  }
-
+  // Must come BEFORE the Secret shortcut: a Secret row with no resource selected
+  // (or whose keys could not be read) has nothing to preview.
   if (!preview || !preview.resolved) {
     return null;
   }
 
-  const conflicts = Array.from(new Set([...preview.shadowedByEnv, ...preview.duplicated]));
+  if (kind === 'secret' && !PREVIEW_SECRET_KEYS) {
+    return <div style={previewStyle}>{t('CONFIG_REFERENCE_PREVIEW_SECRET')}</div>;
+  }
+
+  // Names can be shadowed by a manual environment variable, or produced by
+  // another reference row. They are different problems and are reported apart.
+  const shadowed = preview.shadowedByEnv;
+  const crossReferenced = preview.duplicated.filter(name => !shadowed.includes(name));
+
   const warnings = [
     preview.skipped.length
       ? t('CONFIG_REFERENCE_PREVIEW_SKIPPED', { count: preview.skipped.length })
@@ -71,11 +110,16 @@ export default function ConfigReferencePreview({ kind, preview, error }: Props) 
     preview.ignoredBinary.length
       ? t('CONFIG_REFERENCE_PREVIEW_BINARY', { count: preview.ignoredBinary.length })
       : '',
-    conflicts.length ? t('CONFIG_REFERENCE_PREVIEW_CONFLICT', { count: conflicts.length }) : '',
+    shadowed.length ? t('CONFIG_REFERENCE_PREVIEW_CONFLICT', { count: shadowed.length }) : '',
+    crossReferenced.length
+      ? t('CONFIG_REFERENCE_PREVIEW_DUPLICATED', { count: crossReferenced.length })
+      : '',
   ].filter(Boolean);
 
   const hasProblems = warnings.length > 0;
   const expanded = override === null ? hasProblems : override;
+  // Nothing to reveal when the resource contributes no key at all.
+  const canExpand = preview.entries.length > 0;
 
   return (
     <div style={previewStyle}>
@@ -93,19 +137,22 @@ export default function ConfigReferencePreview({ kind, preview, error }: Props) 
             {text}
           </span>
         ))}
-        <span
-          role="button"
-          tabIndex={0}
-          style={previewLinkStyle}
-          onClick={() => setOverride(!expanded)}
-          onKeyDown={event => {
-            if (event.key === 'Enter' || event.key === ' ') setOverride(!expanded);
-          }}
-        >
-          {expanded ? t('CONFIG_REFERENCE_PREVIEW_HIDE') : t('CONFIG_REFERENCE_PREVIEW_SHOW')}
-        </span>
+        {canExpand && (
+          <span
+            role="button"
+            tabIndex={0}
+            aria-expanded={expanded}
+            style={previewLinkStyle}
+            onClick={() => setOverride(!expanded)}
+            onKeyDown={event => {
+              if (event.key === 'Enter' || event.key === ' ') setOverride(!expanded);
+            }}
+          >
+            {expanded ? t('CONFIG_REFERENCE_PREVIEW_HIDE') : t('CONFIG_REFERENCE_PREVIEW_SHOW')}
+          </span>
+        )}
       </div>
-      {expanded && (
+      {expanded && canExpand && (
         <div style={previewChipsStyle}>
           {preview.entries.map((entry, index) => (
             <span

@@ -17,16 +17,22 @@ import type { EnvFromReference } from './types';
 export const ENV_FROM_NAME_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
 /**
- * Secret key names cannot be read without transferring `Secret.data` over the
- * wire: Kubernetes has no keys-only API (PartialObjectMetadataList returns
- * metadata only, not even a key count). Leaving this off keeps the panel's
- * promise —「不读取或展示 Secret 内容」— literally true, because Secret objects
- * are never fetched at all.
+ * Secret key names cannot be obtained without transferring `Secret.data` over
+ * the wire: Kubernetes has no keys-only API (PartialObjectMetadataList returns
+ * metadata only, not even a key count).
  *
- * Turning it on requires updating CONFIG_REFERENCE_SECRET_NOTICE: values are
- * still never decoded, stored or displayed, but they do reach the browser.
+ * Enabled, because the panel is useless for the case that matters most — a
+ * Secret contributes 4 of 25 variables on a real deployment, and while this was
+ * off those keys took part in neither the duplicate check nor the
+ * dropped-key check. KubeSphere already shows Secret-derived variable NAMES in
+ * the environment tab and only masks the values, so showing names is consistent.
+ *
+ * The keys are read with a RAW request (see ConfigReferenceInline) that bypasses
+ * the shared Secret mapper, so values are never base64-decoded, stored or
+ * rendered. They do still transit the wire. CONFIG_REFERENCE_SECRET_NOTICE says
+ * exactly that and no more.
  */
-export const PREVIEW_SECRET_KEYS = false;
+export const PREVIEW_SECRET_KEYS = true;
 
 /** Keys available on a referenced ConfigMap/Secret. Values are never read here. */
 export interface ResourceKeys {

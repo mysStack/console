@@ -186,9 +186,26 @@ export default function ConfigReferenceInline({
         if (resource.kind === 'secret' && !PREVIEW_SECRET_KEYS) {
           return null;
         }
-        const resourceStore = resource.kind === 'secret' ? secretStore : configMapStore;
         try {
-          const detail: any = await resourceStore.fetchDetail({
+          if (resource.kind === 'secret') {
+            // Raw request on purpose: the shared Secret mapper runs safeAtob
+            // over every value, and only the key names are needed here. Values
+            // still transit the wire — Kubernetes has no keys-only API — but
+            // they are never decoded, stored or rendered.
+            const url = secretStore.getDetailUrl({
+              cluster,
+              namespace,
+              name: resource.name,
+            });
+            const raw: any = await request.get(url);
+            return {
+              kind: resource.kind,
+              name: resource.name,
+              keys: { data: Object.keys(raw?.data || {}), binaryData: [] } as ResourceKeys,
+            };
+          }
+
+          const detail: any = await configMapStore.fetchDetail({
             cluster,
             namespace,
             name: resource.name,
@@ -401,6 +418,7 @@ export default function ConfigReferenceInline({
               </div>
               <ConfigReferencePreview
                 kind={reference.kind}
+                identity={`${reference.kind}:${reference.name}:${reference.prefix || ''}`}
                 preview={previews[index]}
                 error={
                   duplicate

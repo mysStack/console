@@ -9,7 +9,7 @@ module.exports = {
   CONFIG_REFERENCE_CONTAINER: 'Container',
   CONFIG_REFERENCE_RESOURCES: 'ConfigMap / Secret',
   CONFIG_REFERENCE_SECRET_NOTICE:
-    'Only resource names and prefixes are stored. Secret values are never read or displayed.',
+    'Only resource names, prefixes and key names are stored. Secret values are never displayed.',
   CONFIG_REFERENCE_ADD: 'Add reference',
   CONFIG_REFERENCE_LOADING: 'Loading resource list…',
   CONFIG_REFERENCE_LOAD_ERROR: 'Unable to load the ConfigMap/Secret list.',
@@ -37,6 +37,7 @@ module.exports = {
     'Not a valid environment variable name. Kubernetes drops it silently and emits no event.',
   CONFIG_REFERENCE_PREVIEW_BINARY: '{count} binaryData key(s) not read',
   CONFIG_REFERENCE_PREVIEW_CONFLICT: '{count} collide with environment variables',
+  CONFIG_REFERENCE_PREVIEW_DUPLICATED: '{count} duplicated by another reference',
   CONFIG_REFERENCE_PREVIEW_EMPTY: 'No key will take effect',
   CONFIG_REFERENCE_PREVIEW_SECRET:
     'All keys of this Secret will be imported (key names are not previewed)',

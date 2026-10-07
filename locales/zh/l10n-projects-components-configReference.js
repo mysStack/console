@@ -8,7 +8,7 @@ module.exports = {
   CONFIG_REFERENCE_BACK: '返回',
   CONFIG_REFERENCE_CONTAINER: '容器',
   CONFIG_REFERENCE_RESOURCES: 'ConfigMap / Secret',
-  CONFIG_REFERENCE_SECRET_NOTICE: '只保存资源名称和前缀，不读取或展示 Secret 内容。',
+  CONFIG_REFERENCE_SECRET_NOTICE: '只保存资源名称、前缀与键名；不展示 Secret 的值。',
   CONFIG_REFERENCE_ADD: '添加引用',
   CONFIG_REFERENCE_LOADING: '正在加载资源列表…',
   CONFIG_REFERENCE_LOAD_ERROR: 'ConfigMap/Secret 列表加载失败。',
@@ -36,6 +36,7 @@ module.exports = {
     '名称不是合法的环境变量名，K8s 会静默丢弃，且不会产生任何事件。',
   CONFIG_REFERENCE_PREVIEW_BINARY: '{count} 个 binaryData 不读取',
   CONFIG_REFERENCE_PREVIEW_CONFLICT: '{count} 个与环境变量重名',
+  CONFIG_REFERENCE_PREVIEW_DUPLICATED: '{count} 个与其它引用重名',
   CONFIG_REFERENCE_PREVIEW_EMPTY: '没有可生效的键',
   CONFIG_REFERENCE_PREVIEW_SECRET: '将引入该保密字典的全部键（键名不可预览）',
 };
