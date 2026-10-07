@@ -485,3 +485,18 @@ export const summaryHeaderToggleStyle: CSSProperties = {
   background: '#f2f8ff',
   whiteSpace: 'nowrap',
 };
+
+// File mounts: a per-row validation message and an informational key-count note.
+export const previewProblemStyle: React.CSSProperties = {
+  color: colors.danger,
+  fontSize: 12,
+  lineHeight: '20px',
+  marginTop: 4,
+};
+
+export const previewNoteStyle: React.CSSProperties = {
+  color: colors.textSubtle,
+  fontSize: 12,
+  lineHeight: '20px',
+  marginTop: 4,
+};
