@@ -6,8 +6,10 @@ import { configMapStore, request, secretStore, workloadStore } from '@ks-console
 import { findDuplicateReferences, parseEnvFrom } from './envFrom';
 import { readReloaderPolicy } from './reloader';
 import { buildConfigReferencePatch, getContainerEnvFrom, getContainerNames } from './workload';
+import { readFileMounts, validateFileMounts } from './fileMount';
+import type { FileMountReference } from './fileMount';
 import type { ConfigReferenceKind, EnvFromReference } from './types';
-import { colors, columns } from './styles';
+import { colors, columns, previewNoteStyle, previewProblemStyle } from './styles';
 import ConfigReferencePreview from './ConfigReferencePreview';
 import { useReferencePreviews } from './useReferencePreviews';
 
@@ -55,6 +57,7 @@ export default function ConfigReferencePanel({
   const [reloadKey, setReloadKey] = useState(0);
   const [containerName, setContainerName] = useState('');
   const [references, setReferences] = useState<EnvFromReference[]>([]);
+  const [fileMounts, setFileMounts] = useState<FileMountReference[]>([]);
   const [reloaderEnabled, setReloaderEnabled] = useState(false);
   const [saveError, setSaveError] = useState<{ index: number; message: string } | null>(null);
 
@@ -68,6 +71,7 @@ export default function ConfigReferencePanel({
     const nextContainer = containers[0] || '';
     setContainerName(nextContainer);
     setReferences(parseEnvFrom(getContainerEnvFrom(detailQuery.data as any, nextContainer)));
+    setFileMounts(readFileMounts(detailQuery.data as any, nextContainer));
     const original = (detailQuery.data as any)._originData || detailQuery.data;
     setReloaderEnabled(
       readReloaderPolicy(original?.metadata?.annotations || (detailQuery.data as any).annotations)
@@ -95,9 +99,15 @@ export default function ConfigReferencePanel({
     };
   }, [cluster, namespace, reloadKey]);
 
+  const fileMountProblems = validateFileMounts(fileMounts);
+  const updateFileMount = (index: number, value: Partial<FileMountReference>) =>
+    setFileMounts(current =>
+      current.map((item, itemIndex) => (itemIndex === index ? { ...item, ...value } : item)),
+    );
   const updateContainer = (nextName: string) => {
     setContainerName(nextName);
     setReferences(parseEnvFrom(getContainerEnvFrom(detailQuery.data as any, nextName)));
+    setFileMounts(readFileMounts(detailQuery.data as any, nextName));
   };
 
   const saveMutation = useMutation(
@@ -129,6 +139,11 @@ export default function ConfigReferencePanel({
 
   // Must sit above the early returns below: hooks run in a fixed order.
   const previews = useReferencePreviews(references, cluster, namespace);
+  const fileMountReferences = useMemo(
+    () => fileMounts.map(mount => ({ kind: mount.kind, name: mount.name, prefix: '' })),
+    [fileMounts],
+  );
+  const fileMountPreviews = useReferencePreviews(fileMountReferences, cluster, namespace);
 
   if (detailQuery.isLoading) return <Loading className="page-loading" />;
   if (detailQuery.isError || !detailQuery.data) {
@@ -165,8 +180,18 @@ export default function ConfigReferencePanel({
       notify.error(t('CONFIG_REFERENCE_UNAVAILABLE'));
       return;
     }
+    if (fileMountProblems.length) {
+      notify.error(t(`CONFIG_REFERENCE_FILE_MOUNT_${fileMountProblems[0].code}`));
+      return;
+    }
     saveMutation.mutate(
-      buildConfigReferencePatch(detailQuery.data as any, names, references, reloaderEnabled),
+      buildConfigReferencePatch(
+        detailQuery.data as any,
+        names,
+        references,
+        reloaderEnabled,
+        fileMounts,
+      ),
     );
   };
 
@@ -318,6 +343,105 @@ export default function ConfigReferencePanel({
             </div>
           );
         })}
+      </div>
+
+      <div style={{ marginTop: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <strong>{t('CONFIG_REFERENCE_FILE_MOUNTS')}</strong>
+          <Button
+            type="button"
+            disabled={resourceLoading}
+            onClick={() =>
+              setFileMounts(current => [
+                ...current,
+                { kind: 'configMap', name: '', mountPath: '', readOnly: true },
+              ])
+            }
+          >
+            {t('CONFIG_REFERENCE_FILE_MOUNT_ADD')}
+          </Button>
+        </div>
+        {fileMounts.length === 0 && (
+          <p style={{ margin: '8px 0 0', color: colors.textMutedAlt }}>
+            {t('CONFIG_REFERENCE_EMPTY')}
+          </p>
+        )}
+        <div style={{ display: 'grid', gap: 8, marginTop: 10 }}>
+          {fileMounts.map((mount, index) => {
+            const options = mount.kind === 'secret' ? secrets : configMaps;
+            const problem = mount.name
+              ? fileMountProblems.find(item => item.index === index)
+              : undefined;
+            const preview = fileMountPreviews[index];
+            return (
+              <div key={`mount-${index}-${mount.kind}`}>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <select
+                    aria-label={t('CONFIG_REFERENCE_ARIA_KIND', { index: index + 1 })}
+                    value={mount.kind}
+                    onChange={event =>
+                      updateFileMount(index, {
+                        kind: event.target.value as ConfigReferenceKind,
+                        name: '',
+                      })
+                    }
+                  >
+                    <option value="configMap">来自配置字典</option>
+                    <option value="secret">来自保密字典</option>
+                  </select>
+                  <select
+                    aria-label={t('CONFIG_REFERENCE_ARIA_RESOURCE', { index: index + 1 })}
+                    value={mount.name}
+                    disabled={resourceLoading}
+                    onChange={event => updateFileMount(index, { name: event.target.value })}
+                  >
+                    <option value="">{t('CONFIG_REFERENCE_EMPTY')}</option>
+                    {mount.name && !options.some(option => option.value === mount.name) && (
+                      <option value={mount.name}>{`${mount.name}（不可用）`}</option>
+                    )}
+                    {options.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    aria-label={t('CONFIG_REFERENCE_FILE_MOUNT_PATH')}
+                    value={mount.mountPath}
+                    placeholder="/etc/app/config"
+                    onChange={event => updateFileMount(index, { mountPath: event.target.value })}
+                  />
+                  <Switch
+                    variant="button"
+                    label={t('CONFIG_REFERENCE_FILE_MOUNT_READ_ONLY')}
+                    checked={mount.readOnly}
+                    onChange={checked => updateFileMount(index, { readOnly: checked })}
+                  />
+                  <Button
+                    type="button"
+                    onClick={() =>
+                      setFileMounts(current =>
+                        current.filter((_, itemIndex) => itemIndex !== index),
+                      )
+                    }
+                  >
+                    {t('CONFIG_REFERENCE_ARIA_REMOVE', { index: index + 1 })}
+                  </Button>
+                </div>
+                {problem && (
+                  <div role="alert" style={previewProblemStyle}>
+                    {t(`CONFIG_REFERENCE_FILE_MOUNT_${problem.code}`)}
+                  </div>
+                )}
+                {!problem && preview && preview.resolved && preview.entries.length > 0 && (
+                  <div style={previewNoteStyle}>
+                    {t('CONFIG_REFERENCE_FILE_MOUNT_PREVIEW', { count: preview.entries.length })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <div style={{ marginTop: 28, paddingTop: 20, borderTop: '1px solid #e5e9f2' }}>
