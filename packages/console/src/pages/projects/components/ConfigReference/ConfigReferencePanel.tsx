@@ -56,6 +56,7 @@ export default function ConfigReferencePanel({
   const [containerName, setContainerName] = useState('');
   const [references, setReferences] = useState<EnvFromReference[]>([]);
   const [reloaderEnabled, setReloaderEnabled] = useState(false);
+  const [saveError, setSaveError] = useState<{ index: number; message: string } | null>(null);
 
   const containers = useMemo(
     () => (detailQuery.data ? getContainerNames(detailQuery.data as any) : []),
@@ -106,8 +107,22 @@ export default function ConfigReferencePanel({
       }),
     {
       onSuccess: () => {
+        setSaveError(null);
         notify.success(t('CONFIG_REFERENCE_SAVE_SUCCESS'));
         detailQuery.refetch();
+      },
+      onError: (error: any) => {
+        // Same handling as the inline editor: the API answers with e.g.
+        //   ... envFrom[0].prefix: Invalid value: "1BAD": ...
+        // so the failing row can be pointed at instead of a bare toast.
+        const message =
+          error?.response?.data?.message || error?.response?.data?.error || error?.message || '';
+        const matched = /envFrom\[(\d+)\]/.exec(String(message));
+        setSaveError({
+          index: matched ? Number(matched[1]) : -1,
+          message: String(message).slice(0, 300) || t('CONFIG_REFERENCE_SAVE_FAILED'),
+        });
+        notify.error(t('CONFIG_REFERENCE_SAVE_FAILED'));
       },
     },
   );
@@ -137,6 +152,7 @@ export default function ConfigReferencePanel({
     setReferences(current => [...current, { kind: 'configMap', name: '', prefix: '' }]);
 
   const save = () => {
+    setSaveError(null);
     if (duplicateIndexes.length) {
       notify.error(t('CONFIG_REFERENCE_DUPLICATE'));
       return;
@@ -297,6 +313,7 @@ export default function ConfigReferencePanel({
                 kind={reference.kind}
                 identity={`${reference.kind}:${reference.name}:${reference.prefix || ''}`}
                 preview={previews[index]}
+                error={saveError && saveError.index === index ? saveError.message : undefined}
               />
             </div>
           );

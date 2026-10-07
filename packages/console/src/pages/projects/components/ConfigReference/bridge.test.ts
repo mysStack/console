@@ -4,7 +4,9 @@ import test from 'node:test';
 import {
   CONFIG_REFERENCE_ENTRY_SELECTOR,
   CONFIG_REFERENCE_ENVIRONMENT_ACTION_SELECTOR,
+  configReferenceContainerFromHeading,
   findConfigReferenceAction,
+  findConfigReferenceEnvSections,
   findConfigReferenceContainerName,
   findConfigReferenceMountParent,
   injectConfigReferenceEntry,
@@ -191,4 +193,91 @@ test('reads the visible V3 container editor as the configuration target', () => 
   } as unknown as Document;
 
   assert.equal(findConfigReferenceContainerName(document), 'wes-v2-server');
+});
+
+interface FakeCard {
+  name: string;
+  href?: string;
+}
+
+/**
+ * Stand-in for the read-only environment tab: `div.detail-page-content` holding a
+ * tab bar and a pane, the pane holding one card per container, each card holding a
+ * heading whose first child is the container glyph.
+ */
+const fakeEnvTabDocument = (cards: FakeCard[], activeHref = '/env') => {
+  const pane: any = {
+    children: [],
+    querySelectorAll: (selector: string) =>
+      selector === 'use' ? pane.children.map((card: any) => card.children[0].children[0]) : [],
+  };
+
+  pane.children = cards.map(card => {
+    const marker: any = {
+      parentElement: undefined,
+      getAttribute: (attribute: string) =>
+        attribute === 'href' ? card.href || '#icon-docker' : null,
+    };
+    const heading: any = {
+      textContent: `容器：${card.name}`,
+      children: [marker],
+      parentElement: undefined,
+    };
+    const wrapper: any = { children: [heading], parentElement: pane };
+    marker.parentElement = heading;
+    heading.parentElement = wrapper;
+    return wrapper;
+  });
+
+  const content: any = {
+    children: [{}, pane],
+    lastElementChild: pane,
+    querySelector: (selector: string) =>
+      selector === 'a[aria-current="page"]' ? { getAttribute: () => activeHref } : null,
+  };
+
+  return {
+    querySelector: (selector: string) => (selector === 'div.detail-page-content' ? content : null),
+    defaultView: { location: { pathname: activeHref } },
+  } as unknown as Document;
+};
+
+test('reads the container name out of a card heading, in either script', () => {
+  assert.equal(configReferenceContainerFromHeading('容器：ams-server'), 'ams-server');
+  assert.equal(configReferenceContainerFromHeading('Container: log-sidecar'), 'log-sidecar');
+  assert.equal(configReferenceContainerFromHeading('容器：  spaced  '), 'spaced');
+  // a container name can never contain a colon, so the last separator wins
+  assert.equal(configReferenceContainerFromHeading('a: b: main'), 'main');
+  assert.equal(configReferenceContainerFromHeading('no-separator'), 'no-separator');
+  assert.equal(configReferenceContainerFromHeading(''), '');
+});
+
+test('finds one section per container card, in page order', () => {
+  const sections = findConfigReferenceEnvSections(
+    fakeEnvTabDocument([{ name: 'main' }, { name: 'sidecar' }]),
+  );
+  assert.deepEqual(
+    sections.map(section => [section.containerName, section.index]),
+    [
+      ['main', 0],
+      ['sidecar', 1],
+    ],
+  );
+});
+
+test('ignores headings that are not container cards', () => {
+  const sections = findConfigReferenceEnvSections(
+    fakeEnvTabDocument([{ name: 'main' }, { name: 'other', href: '#icon-something-else' }]),
+  );
+  assert.deepEqual(
+    sections.map(section => section.containerName),
+    ['main'],
+  );
+});
+
+test('finds no section while another tab is active', () => {
+  assert.deepEqual(
+    findConfigReferenceEnvSections(fakeEnvTabDocument([{ name: 'main' }], '/resource-status')),
+    [],
+  );
 });

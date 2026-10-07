@@ -252,6 +252,7 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
                 module={module}
                 containerName={item.containerName}
                 containerIndex={item.index}
+                containerCount={envHosts.length}
                 refreshKey={refreshKey}
                 variant="envTab"
               />

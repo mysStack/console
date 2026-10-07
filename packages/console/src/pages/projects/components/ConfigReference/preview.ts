@@ -55,8 +55,6 @@ export interface ResourceKeys {
   binaryData: string[];
 }
 
-export const EMPTY_RESOURCE_KEYS: ResourceKeys = { data: [], binaryData: [] };
-
 /**
  * A discriminated union rather than one interface with an optional `name`: a
  * binaryData key never becomes an environment variable, so carrying a computed

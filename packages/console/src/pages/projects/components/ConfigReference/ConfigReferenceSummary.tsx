@@ -21,6 +21,11 @@ interface Props {
    * `containerName` cannot be matched against the workload's containers.
    */
   containerIndex?: number;
+  /**
+   * How many container cards the page rendered. The positional fallback below is
+   * only safe when there is exactly one card per container.
+   */
+  containerCount?: number;
   refreshKey: number;
   /**
    * 'dialog' renders under the container editor's action row; 'envTab' is the
@@ -43,6 +48,7 @@ export default function ConfigReferenceSummary({
   module,
   containerName: targetContainerName,
   containerIndex,
+  containerCount,
   refreshKey,
   variant = 'dialog',
 }: Props) {
@@ -55,13 +61,27 @@ export default function ConfigReferenceSummary({
     () => (detailQuery.data ? getContainerNames(detailQuery.data as any) : []),
     [detailQuery.data],
   );
-  const containerName =
-    targetContainerName && containerNames.includes(targetContainerName)
-      ? targetContainerName
-      : containerNames[containerIndex ?? 0] || containerNames[0] || '';
+  /**
+   * Which container this block describes.
+   *
+   * Only a name that actually matches the workload's containers is trusted. The
+   * positional fallback applies solely when the page rendered exactly one card per
+   * container: with init containers it renders more, and matching by position would
+   * then put one container's references under another container's heading — worse
+   * than showing nothing at all, so an unresolvable card renders nothing.
+   */
+  const containerName = useMemo(() => {
+    if (targetContainerName && containerNames.includes(targetContainerName)) {
+      return targetContainerName;
+    }
+    if (containerCount !== undefined && containerCount === containerNames.length) {
+      return containerNames[containerIndex ?? 0] || '';
+    }
+    return '';
+  }, [targetContainerName, containerIndex, containerCount, containerNames]);
   const references = useMemo(
     () =>
-      detailQuery.data
+      detailQuery.data && containerName
         ? getConfigReferenceSummaryRows({
             envFrom: getContainerEnvFrom(detailQuery.data as any, containerName),
           })
