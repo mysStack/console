@@ -45,7 +45,11 @@ test('serializes valid rows and omits incomplete rows', () => {
   );
 });
 
-test('reports duplicate references by type and name regardless of prefix', () => {
+/**
+ * The prefix is part of the identity. `kind:name` alone used to be treated as the
+ * duplicate key, which made a legal and useful configuration unsaveable.
+ */
+test('reports duplicates only when type, name and prefix all match', () => {
   assert.deepEqual(
     findDuplicateReferences([
       { kind: 'secret', name: 'db', prefix: '' },
@@ -53,6 +57,19 @@ test('reports duplicate references by type and name regardless of prefix', () =>
       { kind: 'secret', name: 'db', prefix: 'APP_' },
       { kind: 'configMap', name: 'db', prefix: '' },
     ]),
-    [1, 2],
+    [1],
+  );
+});
+
+test('allows the same resource twice under different prefixes', () => {
+  // envFrom renders prefix + key, so A_/B_ on one resource yields disjoint names.
+  // Importing a shared resource under two prefixes is how collisions are avoided,
+  // and it must therefore not be reported as a duplicate.
+  assert.deepEqual(
+    findDuplicateReferences([
+      { kind: 'configMap', name: 'shared', prefix: 'A_' },
+      { kind: 'configMap', name: 'shared', prefix: 'B_' },
+    ]),
+    [],
   );
 });
