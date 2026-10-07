@@ -44,7 +44,10 @@ function DetailInfo(): JSX.Element {
     refetch,
   } = useQuery(
     ['apps', 'detail', appName],
-    () => fetchApplicationDetail({ workspace, namespace, cluster, appName }),
+    // Only namespace and appName: getBaseOpenPitrixPath adds /workspaces/... and
+    // /clusters/... when they are passed, and the API serves neither for this call
+    // (it answers 404). The sibling copy in packages/shared calls it the same way.
+    () => fetchApplicationDetail({ namespace, appName }),
     {
       enabled: !!appName,
       onSuccess: setAppDetail,
