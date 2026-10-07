@@ -65,3 +65,29 @@ test('replaces an empty envFrom list on the selected container', () => {
     },
   ]);
 });
+
+test('carries file mounts into the same patch, and stays unchanged without them', () => {
+  const source = {
+    spec: { template: { spec: { volumes: [], containers: [{ name: 'main' }] } } },
+  } as any;
+
+  const without = buildConfigReferencePatch(source, 'main', [], false);
+  assert.ok(
+    without.every(op => !String(op.path).includes('/volumes')),
+    'an envFrom-only save must not touch volumes',
+  );
+
+  const withMounts = buildConfigReferencePatch(source, 'main', [], false, [
+    { kind: 'configMap', name: 'app-config', mountPath: '/etc/app', readOnly: true },
+  ]);
+  assert.deepEqual(
+    withMounts.map(op => `${op.op} ${op.path}`),
+    ['add /spec/template/spec/volumes', 'add /spec/template/spec/containers/0/volumeMounts'],
+  );
+  assert.deepEqual(withMounts[0].value, [
+    { name: 'app-config', configMap: { name: 'app-config' } },
+  ]);
+  assert.deepEqual(withMounts[1].value, [
+    { name: 'app-config', mountPath: '/etc/app', readOnly: true },
+  ]);
+});

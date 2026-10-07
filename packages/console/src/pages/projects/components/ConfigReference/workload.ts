@@ -1,6 +1,8 @@
 import { get } from 'lodash';
 
 import { serializeEnvFrom } from './envFrom';
+import { buildFileMountPatch } from './fileMount';
+import type { FileMountReference } from './fileMount';
 import type { ConfigReferenceWorkload, EnvFromReference } from './types';
 
 type WorkloadLike = ConfigReferenceWorkload & {
@@ -39,6 +41,7 @@ export function buildConfigReferencePatch(
   containerName: string,
   references: EnvFromReference[],
   reloaderEnabled: boolean,
+  fileMounts?: FileMountReference[],
 ) {
   const original = source?._originData || source;
   const annotations =
@@ -63,6 +66,12 @@ export function buildConfigReferencePatch(
     });
   } else if (Array.isArray(currentEnvFrom)) {
     patch.push({ op: 'remove', path: envFromPath });
+  }
+
+  // File mounts live on two other paths; the module owns that mapping and emits
+  // nothing when the plan is unchanged, so an envFrom-only save leaves volumes alone.
+  if (fileMounts) {
+    patch.push(...buildFileMountPatch(source, containerIndex, containerName, fileMounts));
   }
 
   const reloaderPath = '/metadata/annotations/reloader.stakater.com~1auto';
