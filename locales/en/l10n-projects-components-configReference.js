@@ -54,4 +54,15 @@ module.exports = {
   CONFIG_REFERENCE_PREVIEW_EMPTY: 'No key will take effect',
   CONFIG_REFERENCE_PREVIEW_SECRET:
     'All keys of this Secret will be imported (key names are not previewed)',
+  CONFIG_REFERENCE_FILE_MOUNTS: 'File mounts',
+  CONFIG_REFERENCE_FILE_MOUNT_ADD: 'Add file mount',
+  CONFIG_REFERENCE_FILE_MOUNT_PATH: 'Mount path',
+  CONFIG_REFERENCE_FILE_MOUNT_READ_ONLY: 'Read-only',
+  CONFIG_REFERENCE_FILE_MOUNT_PREVIEW: 'Will mount {count} files',
+  CONFIG_REFERENCE_FILE_MOUNT_NAME_REQUIRED: 'Select a resource to mount',
+  CONFIG_REFERENCE_FILE_MOUNT_PATH_ABSOLUTE: 'The mount path must be absolute',
+  CONFIG_REFERENCE_FILE_MOUNT_PATH_DUPLICATE:
+    'A container cannot mount two volumes at the same path',
+  CONFIG_REFERENCE_FILE_MOUNT_RESOURCE_DUPLICATE:
+    'A container cannot mount the same resource twice',
 };
