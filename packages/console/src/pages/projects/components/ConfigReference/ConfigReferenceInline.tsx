@@ -112,6 +112,7 @@ export default function ConfigReferenceInline({
   const [reloadKey, setReloadKey] = useState(0);
   const [references, setReferences] = useState<EnvFromReference[]>([]);
   const [reloaderEnabled, setReloaderEnabled] = useState(false);
+  const [saveError, setSaveError] = useState<{ index: number; message: string } | null>(null);
   const [resourceKeys, setResourceKeys] = useState<
     Record<ConfigReferenceKind, Record<string, ResourceKeys>>
   >({ configMap: {}, secret: {} });
@@ -265,9 +266,24 @@ export default function ConfigReferenceInline({
       }),
     {
       onSuccess: () => {
+        setSaveError(null);
         notify.success(t('CONFIG_REFERENCE_SAVE_SUCCESS'));
         onSaved?.();
         onClose();
+      },
+      onError: (error: any) => {
+        // The API answers with e.g.
+        //   ... envFrom[0].prefix: Invalid value: "1BAD": a valid environment
+        //   variable name must consist of ...
+        // so the failing row can be pointed at instead of a bare toast.
+        const message =
+          error?.response?.data?.message || error?.response?.data?.error || error?.message || '';
+        const matched = /envFrom\[(\d+)\]/.exec(String(message));
+        setSaveError({
+          index: matched ? Number(matched[1]) : -1,
+          message: String(message).slice(0, 300) || t('CONFIG_REFERENCE_SAVE_FAILED'),
+        });
+        notify.error(t('CONFIG_REFERENCE_SAVE_FAILED'));
       },
     },
   );
@@ -309,6 +325,7 @@ export default function ConfigReferenceInline({
       current.map((item, itemIndex) => (itemIndex === index ? { ...item, ...value } : item)),
     );
   const save = () => {
+    setSaveError(null);
     if (duplicateIndexes.length) return notify.error(t('CONFIG_REFERENCE_DUPLICATE'));
     if (references.some(reference => !reference.name.trim())) {
       return notify.error(t('CONFIG_REFERENCE_NAME_REQUIRED'));
@@ -425,7 +442,9 @@ export default function ConfigReferenceInline({
                     ? t('CONFIG_REFERENCE_DUPLICATE')
                     : unavailable
                       ? t('CONFIG_REFERENCE_UNAVAILABLE')
-                      : undefined
+                      : saveError && saveError.index === index
+                        ? saveError.message
+                        : undefined
                 }
               />
             </div>

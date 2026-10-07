@@ -70,7 +70,10 @@ export function findDuplicateReferences(rows: EnvFromReference[]): number[] {
 
     // A resource referenced more than once can produce colliding environment
     // names even when the prefixes differ; keep one reference per kind/name.
-    const key = `${row.kind}:${name}`;
+    // The prefix is part of the identity: importing the same resource twice
+    // under different prefixes is legal and is exactly how collisions are
+    // avoided, so only an identical (kind, name, prefix) triple is a duplicate.
+    const key = `${row.kind}:${name}:${typeof row.prefix === 'string' ? row.prefix : ''}`;
     if (seen.has(key)) {
       duplicates.push(index);
     } else {

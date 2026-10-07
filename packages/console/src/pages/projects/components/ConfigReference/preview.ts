@@ -74,6 +74,11 @@ export interface ReferencePreview {
   duplicated: string[];
   /** Names a manually defined environment variable already occupies. */
   shadowedByEnv: string[];
+  /**
+   * The prefix is not a valid environment variable name, so the API rejects the
+   * whole save (422) — per-key "will be dropped" reporting would be misleading.
+   */
+  invalidPrefix: boolean;
 }
 
 export type KeysLookup = (reference: EnvFromReference) => ResourceKeys;
@@ -95,6 +100,18 @@ export function previewReference(
   pattern: RegExp = ENV_FROM_NAME_PATTERN,
 ): Omit<ReferencePreview, 'duplicated' | 'shadowedByEnv'> {
   const prefix = typeof reference.prefix === 'string' ? reference.prefix : '';
+
+  if (prefix !== '' && !pattern.test(prefix)) {
+    return {
+      resolved: true,
+      entries: [],
+      names: [],
+      skipped: [],
+      ignoredBinary: [],
+      invalidPrefix: true,
+    };
+  }
+
   const entries: PreviewEntry[] = [];
   const names: string[] = [];
   const skipped: string[] = [];
@@ -115,7 +132,7 @@ export function previewReference(
     entries.push({ key, name: buildEnvFromName(prefix, key), status: 'binary' });
   });
 
-  return { resolved: true, entries, names, skipped, ignoredBinary };
+  return { resolved: true, entries, names, skipped, ignoredBinary, invalidPrefix: false };
 }
 
 /**
@@ -138,7 +155,14 @@ export function previewReferences(
 
   const partials = rows.map(row => {
     if (!row || !row.name) {
-      return { resolved: false, entries: [], names: [], skipped: [], ignoredBinary: [] };
+      return {
+        resolved: false,
+        entries: [],
+        names: [],
+        skipped: [],
+        ignoredBinary: [],
+        invalidPrefix: false,
+      };
     }
     return previewReference(row, keysOf(row) || EMPTY_RESOURCE_KEYS, pattern);
   });

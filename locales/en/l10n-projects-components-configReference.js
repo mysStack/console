@@ -24,8 +24,8 @@ module.exports = {
     'Stakater Reloader must be installed in the cluster. Turning this off only removes the Reloader annotation from this workload.',
   CONFIG_REFERENCE_ENABLED: 'Enabled',
   CONFIG_REFERENCE_DISABLED: 'Disabled',
-  CONFIG_REFERENCE_CANCEL: 'Cancel',
-  CONFIG_REFERENCE_SAVE: 'Save',
+  CONFIG_REFERENCE_CANCEL: 'Close',
+  CONFIG_REFERENCE_SAVE: 'Apply',
   CONFIG_REFERENCE_SAVE_SUCCESS: 'Configuration references saved.',
   CONFIG_REFERENCE_WORKLOAD_LOAD_ERROR: 'Unable to load the workload. Go back and retry.',
   CONFIG_REFERENCE_NO_CONTAINERS: 'No configurable containers in this {kind}.',
@@ -37,6 +37,9 @@ module.exports = {
     'Not a valid environment variable name. Kubernetes drops it silently and emits no event.',
   CONFIG_REFERENCE_PREVIEW_BINARY: '{count} binaryData key(s) not read',
   CONFIG_REFERENCE_PREVIEW_CONFLICT: '{count} collide with environment variables',
+  CONFIG_REFERENCE_PREVIEW_BAD_PREFIX:
+    'The prefix is not a valid environment variable name (it must not start with a digit), so the cluster rejects the save.',
+  CONFIG_REFERENCE_SAVE_FAILED: 'Failed to save configuration references.',
   CONFIG_REFERENCE_PREVIEW_DUPLICATED: '{count} duplicated by another reference',
   CONFIG_REFERENCE_PREVIEW_EMPTY: 'No key will take effect',
   CONFIG_REFERENCE_PREVIEW_SECRET:

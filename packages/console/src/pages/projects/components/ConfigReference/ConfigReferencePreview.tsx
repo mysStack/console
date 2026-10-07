@@ -60,6 +60,7 @@ export default function ConfigReferencePreview({ kind, identity, preview, error 
           preview.ignoredBinary.length,
           preview.shadowedByEnv.length,
           preview.duplicated.length,
+          preview.invalidPrefix,
         ].join(',')
       : 'none',
   ].join('|');
@@ -92,6 +93,16 @@ export default function ConfigReferencePreview({ kind, identity, preview, error 
   // (or whose keys could not be read) has nothing to preview.
   if (!preview || !preview.resolved) {
     return null;
+  }
+
+  if (preview.invalidPrefix) {
+    return (
+      <div style={previewStyle}>
+        <span role="alert" style={previewWarnStyle}>
+          {t('CONFIG_REFERENCE_PREVIEW_BAD_PREFIX')}
+        </span>
+      </div>
+    );
   }
 
   if (kind === 'secret' && !PREVIEW_SECRET_KEYS) {
