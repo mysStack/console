@@ -81,7 +81,12 @@ export interface ReferencePreview {
   invalidPrefix: boolean;
 }
 
-export type KeysLookup = (reference: EnvFromReference) => ResourceKeys;
+/**
+ * Returns undefined while the keys are unknown — not loaded yet, or the fetch
+ * failed. That is deliberately distinct from an empty ResourceKeys, which means
+ * the resource really has no keys.
+ */
+export type KeysLookup = (reference: EnvFromReference) => ResourceKeys | undefined;
 
 export interface PreviewOptions {
   pattern?: RegExp;
@@ -164,7 +169,20 @@ export function previewReferences(
         invalidPrefix: false,
       };
     }
-    return previewReference(row, keysOf(row) || EMPTY_RESOURCE_KEYS, pattern);
+    const keys = keysOf(row);
+    if (!keys) {
+      // Reporting "no effective keys" here would be wrong twice over: it would be
+      // a lie, and it is the exact symptom a genuinely empty resource shows.
+      return {
+        resolved: false,
+        entries: [],
+        names: [],
+        skipped: [],
+        ignoredBinary: [],
+        invalidPrefix: false,
+      };
+    }
+    return previewReference(row, keys, pattern);
   });
 
   const seen = new Map<string, number>();

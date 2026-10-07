@@ -187,3 +187,27 @@ export function injectConfigReferenceEntry(
   parent.insertBefore(entry, action.nextSibling);
   return true;
 }
+
+/**
+ * Mount point for the read-only 环境变量 tab.
+ *
+ * Detail pages render every tab inside `div.detail-page-content`, whose first
+ * child is the tab bar and whose last child is the active pane. That class name
+ * is semantic (unlike the hashed ones around it). Which tab is active cannot be
+ * read from the label — it is translated — so two locale-independent signals are
+ * accepted: the active tab's href, and the route itself.
+ */
+export const findConfigReferenceEnvTabPane = (doc: Document): HTMLElement | null => {
+  if (!doc) return null;
+  const content = doc.querySelector('div.detail-page-content') as HTMLElement | null;
+  if (!content || content.children.length < 2) return null;
+
+  const activeHref =
+    (content.querySelector('a[aria-current="page"]') as HTMLAnchorElement | null)?.getAttribute(
+      'href',
+    ) || '';
+  const pathname = doc.defaultView?.location?.pathname || '';
+  if (!/\/env\/?$/.test(activeHref) && !/\/env\/?$/.test(pathname)) return null;
+
+  return content.lastElementChild as HTMLElement;
+};

@@ -41,6 +41,8 @@ module.exports = {
     'The prefix is not a valid environment variable name (it must not start with a digit), so the cluster rejects the save.',
   CONFIG_REFERENCE_SAVE_FAILED: 'Failed to save configuration references.',
   CONFIG_REFERENCE_PREVIEW_DUPLICATED: '{count} duplicated by another reference',
+  CONFIG_REFERENCE_TOTAL: '{count} environment variables in total',
+  CONFIG_REFERENCE_TOTAL_PARTIAL: '{count} references not read yet',
   CONFIG_REFERENCE_PREVIEW_EMPTY: 'No key will take effect',
   CONFIG_REFERENCE_PREVIEW_SECRET:
     'All keys of this Secret will be imported (key names are not previewed)',

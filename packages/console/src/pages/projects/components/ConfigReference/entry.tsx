@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useParams } from 'react-router-dom';
 import {
   findConfigReferenceAction,
+  findConfigReferenceEnvTabPane,
   findConfigReferenceContainerName,
   findConfigReferenceMountParent,
   findManualEnvScope,
@@ -45,6 +46,7 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
   const [inlineHost, setInlineHost] = useState<HTMLElement | null>(null);
   const [summaryHost, setSummaryHost] = useState<HTMLElement | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [summaryVariant, setSummaryVariant] = useState<'dialog' | 'envTab'>('dialog');
   const [activeContainerName, setActiveContainerName] = useState<string | undefined>();
   const [manualEnvNames, setManualEnvNames] = useState<string[]>([]);
   const envScopeRef = useRef<HTMLElement | undefined>();
@@ -83,17 +85,26 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
         if (action) {
           setActiveContainerName(findConfigReferenceContainerName(appWindow.document));
         }
+        // Prefer the container editor's action row. When the editor is closed,
+        // fall back to the read-only 环境变量 tab: that page lists `env` only, so
+        // an envFrom-only workload otherwise shows no variables at all.
+        const envPane = parent ? null : findConfigReferenceEnvTabPane(appWindow.document);
+        const mountPoint = parent || envPane;
         if (
-          action &&
-          parent &&
-          (!summaryHostRef.current || !parent.contains(summaryHostRef.current))
+          mountPoint &&
+          (!summaryHostRef.current || !mountPoint.contains(summaryHostRef.current))
         ) {
           summaryHostRef.current?.parentNode?.removeChild(summaryHostRef.current);
           const summary = appWindow.document.createElement('div');
           summary.dataset.test = 'config-reference-summary-host';
-          parent.appendChild(summary);
+          if (envPane) {
+            envPane.insertBefore(summary, envPane.firstChild);
+          } else {
+            parent?.appendChild(summary);
+          }
           summaryHostRef.current = summary;
           setSummaryHost(summary);
+          setSummaryVariant(envPane ? 'envTab' : 'dialog');
         }
         envScopeRef.current = findManualEnvScope(action);
         setManualEnvNames(readManualEnvNames(envScopeRef.current) || []);
@@ -176,6 +187,7 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
               module={module}
               containerName={activeContainerName}
               refreshKey={refreshKey}
+              variant={summaryVariant}
             />
           </React.Suspense>,
           summaryHost,
