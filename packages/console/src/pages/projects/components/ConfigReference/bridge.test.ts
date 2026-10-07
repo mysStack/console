@@ -89,8 +89,12 @@ test('injects a matching button and forwards activation to the inline editor', (
     click: (event?: { preventDefault: () => void; stopPropagation: () => void }) => void;
   }> = [];
   let activated = 0;
-  let injectedClick = (_event?: { preventDefault: () => void; stopPropagation: () => void }) =>
-    undefined;
+  // Declared with the event signature so `typeof injectedClick` still matches the
+  // listener the bridge registers; the implementation takes no argument.
+  let injectedClick: (event?: {
+    preventDefault: () => void;
+    stopPropagation: () => void;
+  }) => void = () => undefined;
   const content = { className: 'button-content' } as HTMLElement;
   const createdContent = { className: '', textContent: '' };
   const action = {
@@ -130,7 +134,7 @@ test('injects a matching button and forwards activation to the inline editor', (
     }),
     addEventListener: () => undefined,
   } as unknown as HTMLButtonElement;
-  const fakeDocument = {
+  const documentWithAction = {
     querySelector: (selector: string) =>
       selector === CONFIG_REFERENCE_ENVIRONMENT_ACTION_SELECTOR ? action : null,
     querySelectorAll: (selector: string) =>
@@ -140,7 +144,7 @@ test('injects a matching button and forwards activation to the inline editor', (
   } as unknown as Document;
 
   assert.equal(
-    injectConfigReferenceEntry(fakeDocument, '配置引用', () => {
+    injectConfigReferenceEntry(documentWithAction, '配置引用', () => {
       activated += 1;
     }),
     true,

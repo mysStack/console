@@ -6,7 +6,7 @@ const resolve = dir => path.resolve(__dirname, dir);
 module.exports = {
   root: true,
   parserOptions: {
-    project: ['./tsconfig.json'],
+    project: ['./tsconfig.eslint.json'],
   },
   extends: ['kubesphere'],
   settings: {

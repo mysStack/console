@@ -1,0 +1,7 @@
+{
+  // Lint-only project. `tsconfig.json` cannot be used for type-aware linting of
+  // tests because tsconfig.base.json excludes **/*.test.ts, and a child config
+  // inherits that. Widening `exclude` here leaves the build config alone.
+  "extends": "./tsconfig.json",
+  "exclude": ["node_modules", "lib", "esm", "cjs", "**/v3dist"]
+}

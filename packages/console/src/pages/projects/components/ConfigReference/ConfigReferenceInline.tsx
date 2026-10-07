@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { useMutation } from 'react-query';
 import { configMapStore, Icon, request, secretStore, workloadStore } from '@ks-console/shared';
@@ -10,8 +10,7 @@ import { buildConfigReferencePatch, getContainerEnvFrom, getContainerNames } fro
 import type { ConfigReferenceKind, EnvFromReference } from './types';
 import { toNameOptions } from './resourceOptions';
 import ConfigReferencePreview from './ConfigReferencePreview';
-import { PREVIEW_SECRET_KEYS, previewReferences } from './preview';
-import type { ResourceKeys } from './preview';
+import { useReferencePreviews } from './useReferencePreviews';
 import {
   autoReloadStyle,
   buttonStyle,
@@ -113,10 +112,6 @@ export default function ConfigReferenceInline({
   const [references, setReferences] = useState<EnvFromReference[]>([]);
   const [reloaderEnabled, setReloaderEnabled] = useState(false);
   const [saveError, setSaveError] = useState<{ index: number; message: string } | null>(null);
-  const [resourceKeys, setResourceKeys] = useState<
-    Record<ConfigReferenceKind, Record<string, ResourceKeys>>
-  >({ configMap: {}, secret: {} });
-
   const containers = useMemo(
     () => (detailQuery.data ? getContainerNames(detailQuery.data as any) : []),
     [detailQuery.data],
@@ -156,125 +151,9 @@ export default function ConfigReferenceInline({
     };
   }, [cluster, namespace, reloadKey]);
 
-  // Mirror of resourceKeys for the fetch effect below. Going through a ref keeps
-  // resourceKeys out of that effect's dependencies: it used to both read and write
-  // that state, so every successful fetch re-ran the effect and retried the
-  // resource that had just failed, once per sibling that succeeded.
-  const resourceKeysRef = useRef(resourceKeys);
-  useEffect(() => {
-    resourceKeysRef.current = resourceKeys;
-  }, [resourceKeys]);
-
-  const referencedResources = useMemo(() => {
-    const unique = new Map<string, { kind: ConfigReferenceKind; name: string }>();
-    references.forEach(reference => {
-      if (reference.name) {
-        unique.set(`${reference.kind}:${reference.name}`, {
-          kind: reference.kind,
-          name: reference.name,
-        });
-      }
-    });
-    return Array.from(unique.values());
-  }, [references]);
-
-  // Fetch keys one referenced resource at a time. A namespace-wide list would
-  // also work but transfers every ConfigMap/Secret in the project.
-  useEffect(() => {
-    let active = true;
-    const have = resourceKeysRef.current;
-    const missing = referencedResources.filter(
-      resource => !(resource.name in (have[resource.kind] || {})),
-    );
-    if (!missing.length) {
-      return undefined;
-    }
-
-    Promise.all(
-      missing.map(async resource => {
-        // Secret objects are never fetched while the preview is disabled, which
-        // keeps "只保存资源名称和前缀，不读取或展示 Secret 内容" literally true.
-        if (resource.kind === 'secret' && !PREVIEW_SECRET_KEYS) {
-          return null;
-        }
-        try {
-          if (resource.kind === 'secret') {
-            // Raw request on purpose: the shared Secret mapper runs safeAtob
-            // over every value, and only the key names are needed here. Values
-            // still transit the wire — Kubernetes has no keys-only API — but
-            // they are never decoded, stored or rendered.
-            const url = secretStore.getDetailUrl({
-              cluster,
-              namespace,
-              name: resource.name,
-            });
-            const raw: any = await request.get(url);
-            // Names only — Secret values are never decoded.
-            return {
-              kind: resource.kind,
-              name: resource.name,
-              keys: {
-                data: Object.keys(raw?.data || {}).map(key => ({ key })),
-                binaryData: [],
-              } as ResourceKeys,
-            };
-          }
-
-          const detail: any = await configMapStore.fetchDetail({
-            cluster,
-            namespace,
-            name: resource.name,
-          });
-          return {
-            kind: resource.kind,
-            name: resource.name,
-            keys: {
-              data: Object.entries(detail?.data || {}).map(([key, value]) => ({
-                key,
-                value: String(value),
-              })),
-              binaryData: Object.keys(detail?.binaryData || {}),
-            } as ResourceKeys,
-          };
-        } catch {
-          return null;
-        }
-      }),
-    ).then(results => {
-      if (!active) {
-        return;
-      }
-      const fresh = results.filter(Boolean) as Array<{
-        kind: ConfigReferenceKind;
-        name: string;
-        keys: ResourceKeys;
-      }>;
-      if (!fresh.length) {
-        return;
-      }
-      setResourceKeys(previous => {
-        const next = { configMap: { ...previous.configMap }, secret: { ...previous.secret } };
-        fresh.forEach(item => {
-          next[item.kind][item.name] = item.keys;
-        });
-        return next;
-      });
-    });
-
-    return () => {
-      active = false;
-    };
-  }, [referencedResources, cluster, namespace]);
-
-  const previews = useMemo(
-    () =>
-      previewReferences(
-        references,
-        reference => (resourceKeys[reference.kind] || {})[reference.name],
-        { manualEnvNames },
-      ),
-    [references, resourceKeys, manualEnvNames],
-  );
+  // Keys, values and the resulting per-row preview all come from the shared hook,
+  // the same one the panel and the summary use.
+  const previews = useReferencePreviews(references, cluster, namespace, { manualEnvNames });
 
   const saveMutation = useMutation(
     (data: Record<string, any>) =>
