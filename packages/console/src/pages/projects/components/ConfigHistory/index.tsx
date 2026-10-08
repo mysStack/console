@@ -6,7 +6,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Loading } from '@kubed/components';
 import { DiffViewer } from '@kubed/diff-viewer';
-import { request, secretStore } from '@ks-console/shared';
+import { request } from '@ks-console/shared';
 
 import {
   HistoryRecord,
@@ -79,13 +79,16 @@ function ConfigHistoryPage({
     setFailed(false);
     let attemptedUrl = '';
     try {
-      // The platform's own URL for a single resource, rather than a hand built path: the
-      // console prefixes the cluster, which a guessed path does not.
-      attemptedUrl = secretStore.getDetailUrl({
-        cluster,
-        namespace,
-        name: historySecretName(name),
-      });
+      // Built explicitly rather than through secretStore.getDetailUrl, which returns
+      // "api/v1/klusters/<cluster>/namespaces/..." for this case. Two defects in that string,
+      // both verified in the browser: the host is spelled "klusters", and the missing leading
+      // slash makes the browser resolve it against the current page, so the request lands on
+      // a path that serves the SPA's index.html instead of JSON. Measured: the relative form
+      // comes back as HTML, /api/v1/klusters/... comes back 404, and the form below comes back
+      // 200 with data.records -- with and without the /clusters/<cluster> prefix.
+      attemptedUrl = `/clusters/${cluster}/api/v1/namespaces/${namespace}/secrets/${historySecretName(
+        name,
+      )}`;
       const body = await request.get(attemptedUrl);
       // request may hand back the resource itself or an axios-style wrapper around it, so
       // accept either rather than assuming one and failing silently.
