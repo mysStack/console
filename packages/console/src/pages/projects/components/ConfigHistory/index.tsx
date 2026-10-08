@@ -77,15 +77,16 @@ function ConfigHistoryPage({
   const load = useCallback(async () => {
     setLoading(true);
     setFailed(false);
+    let attemptedUrl = '';
     try {
       // The platform's own URL for a single resource, rather than a hand built path: the
       // console prefixes the cluster, which a guessed path does not.
-      const url = secretStore.getDetailUrl({
+      attemptedUrl = secretStore.getDetailUrl({
         cluster,
         namespace,
         name: historySecretName(name),
       });
-      const body = await request.get(url);
+      const body = await request.get(attemptedUrl);
       // request may hand back the resource itself or an axios-style wrapper around it, so
       // accept either rather than assuming one and failing silently.
       const secret = (body as any)?.data?.data ? (body as any).data : body;
@@ -105,7 +106,9 @@ function ConfigHistoryPage({
           (error as any)?.response?.statusText ||
           (error as any)?.message ||
           String(error);
-        setFailedReason(String(message).slice(0, 300));
+        // Include the target: "Failed to fetch" alone says nothing about which URL was asked
+        // for, and that is the one thing needed to fix it.
+        setFailedReason(`${String(message).slice(0, 160)} | url=${attemptedUrl}`.slice(0, 400));
         setFailed(true);
       }
     } finally {
