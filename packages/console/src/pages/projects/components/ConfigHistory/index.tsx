@@ -6,7 +6,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Loading } from '@kubed/components';
 import { DiffViewer } from '@kubed/diff-viewer';
-import { request } from '@ks-console/shared';
+import { request, secretStore } from '@ks-console/shared';
 
 import {
   HistoryRecord,
@@ -77,9 +77,14 @@ function ConfigHistoryPage({
     setLoading(true);
     setFailed(false);
     try {
-      const secret = await request.get(
-        `api/v1/namespaces/${namespace}/secrets/${historySecretName(name)}`,
-      );
+      // The platform's own URL for a single resource, rather than a hand built path: the
+      // console prefixes the cluster, which a guessed path does not.
+      const url = secretStore.getDetailUrl({
+        cluster,
+        namespace,
+        name: historySecretName(name),
+      });
+      const secret = await request.get(url);
       const payload = secret?.data?.records;
       setRecords(await decodeHistoryPayload(payload));
       setExpanded(undefined);
@@ -94,7 +99,7 @@ function ConfigHistoryPage({
     } finally {
       setLoading(false);
     }
-  }, [name, namespace]);
+  }, [cluster, name, namespace]);
 
   useEffect(() => {
     load();
