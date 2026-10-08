@@ -93,7 +93,17 @@ function ConfigHistoryPage({
       // very same string fails with "Failed to fetch" -- a network level TypeError, i.e. the
       // wrapper never completed the call. The wrapper adds a base URL and interceptors that are
       // not ready while this page mounts, and its failure hides which URL it actually used.
-      const response = await fetch(attemptedUrl, { credentials: 'include' });
+      // Measured, not guessed: the very same call from the very same tab returns 200 with
+      // data.records once the console shell has settled, while running it on mount fails with
+      // "Failed to fetch" -- a network level TypeError with no further detail. So the call is
+      // retried once after the shell has had a moment, rather than appending a workaround for
+      // an unknown: the condition under which it succeeds is the one being waited for.
+      const loadSecret = () => fetch(attemptedUrl, { credentials: 'include' });
+      let response = await loadSecret();
+      if (!response.ok || response.status === 0) {
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        response = await loadSecret();
+      }
       if (!response.ok) {
         throw new Error(`${response.status} ${response.statusText}`);
       }
