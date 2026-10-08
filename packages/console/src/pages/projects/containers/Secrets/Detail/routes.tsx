@@ -6,8 +6,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 
-import ConfigHistoryRoute from '../../../components/ConfigHistory/ConfigHistoryRoute';
-
 export default [
   {
     index: true,
@@ -16,9 +14,5 @@ export default [
   {
     path: 'detail',
     element: <></>,
-  },
-  {
-    path: 'history',
-    element: <ConfigHistoryRoute kind="Secret" />,
   },
 ];
