@@ -145,15 +145,17 @@ function DetailInfo(): JSX.Element {
       },
       {
         label: t('CREATION_TIME_TCAP'),
-        value: formatTime(get(detail, 'create_time'), 'YYYY-MM-DD HH:mm:ss'),
+        value: formatTime(get(detail, 'metadata.creationTimestamp'), 'YYYY-MM-DD HH:mm:ss'),
       },
       {
+        // The controller's last status write; create_time / status_time are not
+        // present on the ApplicationRelease response, so those rendered empty.
         label: t('UPDATE_TIME_TCAP'),
-        value: formatTime(get(detail, 'status_time'), 'YYYY-MM-DD HH:mm:ss'),
+        value: formatTime(get(detail, '_status.lastUpdate'), 'YYYY-MM-DD HH:mm:ss'),
       },
       {
         label: t('CREATOR'),
-        value: getAnnotationsName(detail, 'kubesphere.io/creator'),
+        value: getAnnotationsName(detail, 'kubesphere.io/creator') || '-',
       },
     ];
   }
