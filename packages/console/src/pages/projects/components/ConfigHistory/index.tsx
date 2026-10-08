@@ -71,6 +71,7 @@ function ConfigHistoryPage({
   const [records, setRecords] = useState<HistoryRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
+  const [failedReason, setFailedReason] = useState('');
   const [expanded, setExpanded] = useState<number | undefined>();
 
   const load = useCallback(async () => {
@@ -84,8 +85,11 @@ function ConfigHistoryPage({
         namespace,
         name: historySecretName(name),
       });
-      const secret = await request.get(url);
-      const payload = secret?.data?.records;
+      const body = await request.get(url);
+      // request may hand back the resource itself or an axios-style wrapper around it, so
+      // accept either rather than assuming one and failing silently.
+      const secret = (body as any)?.data?.data ? (body as any).data : body;
+      const payload = (secret as any)?.data?.records;
       setRecords(await decodeHistoryPayload(payload));
       setExpanded(undefined);
     } catch (error) {
@@ -94,6 +98,14 @@ function ConfigHistoryPage({
       if (status === 404) {
         setRecords([]);
       } else {
+        // Say what failed: an error state that hides the reason cannot be diagnosed from a
+        // screenshot, which is exactly how this one was found.
+        const message =
+          (error as any)?.response?.data?.message ||
+          (error as any)?.response?.statusText ||
+          (error as any)?.message ||
+          String(error);
+        setFailedReason(String(message).slice(0, 300));
         setFailed(true);
       }
     } finally {
@@ -141,7 +153,8 @@ function ConfigHistoryPage({
 
       {!loading && failed && (
         <div role="alert" style={{ color: '#d03050', marginBottom: 12 }}>
-          {t('CONFIG_HISTORY_LOAD_ERROR')}{' '}
+          {t('CONFIG_HISTORY_LOAD_ERROR')}
+          {failedReason ? ` (${failedReason})` : ''}{' '}
           <Button type="button" onClick={load}>
             {t('RETRY')}
           </Button>
