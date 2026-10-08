@@ -14,7 +14,7 @@ import DetailInfo from './index';
 
 export default (path: string) => [
   {
-    path: `${path}/applications/:appType/:appId`,
+    path: `${path}/applications/:appType/:appName`,
     element: <DetailInfo />,
     children: [
       {

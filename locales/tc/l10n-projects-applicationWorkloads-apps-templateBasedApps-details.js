@@ -4,6 +4,7 @@
  */
 
 module.exports = {
+  LAST_UPDATER: 'Last updated by',
   // More > Edit Settings
   CURRENT_APP_SETTINGS_READONLY: '當前應用配置',
   TARGET_APP_SETTINGS: 'Target App Settings',

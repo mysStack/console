@@ -13,6 +13,7 @@ import { Loading, notify, Tooltip } from '@kubed/components';
 import {
   Image,
   DetailPagee,
+  getAnnotationsName,
   formatTime,
   getDisplayName,
   StatusIndicator,
@@ -43,7 +44,10 @@ function DetailInfo(): JSX.Element {
     refetch,
   } = useQuery(
     ['apps', 'detail', appName],
-    () => fetchApplicationDetail({ workspace, namespace, cluster, appName }),
+    // Only namespace and appName: getBaseOpenPitrixPath adds /workspaces/... and
+    // /clusters/... when they are passed, and the API serves neither for this call
+    // (it answers 404). The sibling copy in packages/shared calls it the same way.
+    () => fetchApplicationDetail({ namespace, appName }),
     {
       enabled: !!appName,
       onSuccess: setAppDetail,
@@ -135,15 +139,21 @@ function DetailInfo(): JSX.Element {
       },
       {
         label: t('CREATION_TIME_TCAP'),
-        value: formatTime(get(detail, 'create_time'), 'YYYY-MM-DD HH:mm:ss'),
+        value: formatTime(get(detail, 'metadata.creationTimestamp'), 'YYYY-MM-DD HH:mm:ss'),
       },
       {
+        // The controller's last status write. Kept on the existing shared label so
+        // other pages are unaffected; the audit pair below is what identifies the user.
         label: t('UPDATE_TIME_TCAP'),
-        value: formatTime(get(detail, 'status_time'), 'YYYY-MM-DD HH:mm:ss'),
+        value: formatTime(get(detail, '_status.lastUpdate'), 'YYYY-MM-DD HH:mm:ss'),
       },
       {
         label: t('CREATOR'),
-        value: detail.owner || '-',
+        value: getAnnotationsName(detail, 'kubesphere.io/creator') || '-',
+      },
+      {
+        label: t('LAST_UPDATER'),
+        value: getAnnotationsName(detail, 'kubesphere.io/last-updater') || '-',
       },
     ];
   }

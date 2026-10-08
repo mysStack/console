@@ -24,9 +24,6 @@ module.exports = {
   DEPLOYMENT_SETTINGS: 'Deployment Settings',
   CODE_REPOSITORY_SETTINGS: 'Code Repository Settings',
   SYNC_STRATEGY_TCAP: 'Sync Strategy',
-  AUTO_SYNC_DESC:
-    'Automatically trigger application sync when there is a difference between the manifest in Git and the real-time state of the deployed resources, according to the set sync options.',
-  // MANUAL_SYNC_DESC: 'Sync according to custom rules.',
   PRUNE_RESOURCES: 'Prune resources',
   SELF_HEAL: 'Self-heal',
   MANIFEST_FILE_PATH: 'Manifest File Path',

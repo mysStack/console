@@ -39,7 +39,8 @@
     "release:packages": "changeset version && changeset publish",
     "release:packages:local": "yarn clean && yarn build:locales && yarn build:server && yarn build:packages && esno scripts/publish-packages.local.ts",
     "release:packages:snapshot": "bash scripts/release.packages.snapshot.sh",
-    "serve": "NODE_ENV=production node server/server.js"
+    "serve": "NODE_ENV=production node server/server.js",
+    "test": "sh scripts/test.sh"
   },
   "browserslist": [
     "> 1%",

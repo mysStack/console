@@ -12,6 +12,7 @@ import RevisionControl from './RevisionControl';
 import Metadata from './Metadata';
 import Env from './EnvVariables';
 import Events from './Events';
+import ConfigReferencePage from '../../../../../components/ConfigReference/ConfigReferencePage';
 import Monitorings from '../../Deployments/Detail/Monitoring';
 
 const getRoutes = (PATH: string): RouteObject[] => [
@@ -46,6 +47,10 @@ const getRoutes = (PATH: string): RouteObject[] => [
       {
         path: 'events',
         element: <Events />,
+      },
+      {
+        path: 'config-reference',
+        element: <ConfigReferencePage module="daemonsets" />,
       },
     ],
   },

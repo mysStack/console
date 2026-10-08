@@ -77,6 +77,7 @@ const DeploymentDetail = () => {
           { title: t('METADATA'), path: `${path}/metadata` },
           { title: t('MONITORING'), path: `${path}/monitors` },
           { title: t('ENVIRONMENT_VARIABLE_PL'), path: `${path}/env` },
+          { title: t('CONFIG_REFERENCE'), path: `${path}/config-reference` },
           { title: t('EVENT_PL'), path: `${path}/events` },
         ]
       : [
@@ -84,6 +85,7 @@ const DeploymentDetail = () => {
           { title: t('REVISION_RECORDS'), path: `${path}/revision-control` },
           { title: t('METADATA'), path: `${path}/metadata` },
           { title: t('ENVIRONMENT_VARIABLE_PL'), path: `${path}/env` },
+          { title: t('CONFIG_REFERENCE'), path: `${path}/config-reference` },
           { title: t('EVENT_PL'), path: `${path}/events` },
         ];
   }, []);

@@ -100,10 +100,7 @@ module.exports = {
   CONFIGURE: 'Configure',
   CURRENT_THIRD_PARTY_LOGIN_CONFIGURATIONS: 'Current third-party login configurations',
   NOT_CONFIGURED: 'not configured',
-  PLEASE_INPUT_CLIENT_ID: 'Please input client id',
-  PLEASE_INPUT_SERVER_ADDRESS: 'Please input server address',
   PROTOCOL_TYPE: 'Protocol Type',
-  SERVER_ADDRESS: 'Server Address',
   THIRD_PARTY_LOGIN: 'Third-party Login',
   THIRD_PARTY_LOGIN_DESC:
     'When a third part service is used for login, users need to enter related information. After that, a local user will be created which is associated with the user for the secure login in the environment.',

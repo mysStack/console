@@ -19,8 +19,6 @@ module.exports = {
   PERMISSION_WORKSPACES_CREATE_DESC:
     'Create a workspace and become the administrator of the created workspace.',
   WORKSPACE_PL: 'Workspace',
-  WORKSPACE_DESC:
-    'A workspace is a logical unit that organizes your projects and DevOps projects, manages resource access permissions, and shares resources within teams. It can serve as an independent workspace for team work.',
   CREATE_WORKSPACE: 'Create Workspace',
   WORKSPACE_NAME_EMPTY_DESC: 'Please enter a workspace name.',
   WORKSPACE_CREATE_DESC: 'Set the basic information for the workspace.',
@@ -63,19 +61,8 @@ module.exports = {
   SELECT_WORKSPACE_DESC: 'Select a workspace.',
   VISIBILITY_PARTIAL: 'Visible to partial workspaces',
   VISIBILITY_PUBLIC: 'Visible to all workspaces',
-  PROJECT_ADMINISTRATOR_DESC: 'Select a user in the workspace as the project administrator.',
-  PROJECT_ASSIGN_DESC:
-    "Once a project is assigned to a workspace, it is not allowed to change the project's associated workspace.",
-  AUTHORIZATION_RULES_DESC:
-    'Set authorization rules so that users can only use storage classes in specific projects and workspaces.',
   KS_CONTROLLER_MANAGER_DESC:
     'Implements business logic. For example, when creating a workspace, it creates corresponding permissions; when creating a service policy, it generates corresponding Istio configurations.',
-  DEVOPS_PROJECT_MEMBER_EMPTY_DESC:
-    'Please invite members of the current workspace to the current DevOps project.',
-  INVITE_MEMBER_DESC_DEVOPS:
-    'Invite members of the current workspace to the current DevOps project.',
-  HOW_TO_INVITE_MEMBER_A:
-    'Business administrators or users with member invitation permissions can invite members within the current workspace to join the project.',
   ACCESS_CONTROL_DESC: 'Unified management of workspaces, users, and roles in the platform.',
   CURRENT_WORKSPACE: 'Current Workspace',
   FROM_APP_TEMPLATE_DESC:
@@ -87,29 +74,7 @@ module.exports = {
     'Resource reservations and resource limits cannot exceed the workspace resource limit.',
   NETWORK_ISOLATION_DESC:
     'Control the traffic between pods within the same workspace and from external sources by configuring network isolation, thus isolating applications and enhancing application security.',
-  INTERNAL_ALLOWLIST_TIP: 'Add services and projects within the workspace to the allowlist.',
-  INTERNAL_ALLOWLIST_DESC:
-    'Allow pods within the current project to communicate with services in other projects within the same workspace.',
   EXTERNAL_ALLOWLIST_TIP: 'Add external CIDRs and ports to the allowlist.',
-  EXTERNAL_ALLOWLIST_DESC:
-    'Allow pods within the current project to communicate with specific external CIDRs and ports.',
-  EXTERNAL_TRAFFIC_DIRECTION_DESC:
-    'Outbound indicates traffic from the current project to outside the workspace. Inbound indicates traffic from outside the workspace to the current project.',
-  PROJECT_MEMBER_DESC:
-    'Project members can view or manage project resources. Project administrators can invite workspace members to the project and manage project members.',
-  INVITE_MEMBER_DESC: 'Invite members of the current workspace to the current project.',
-  PROJECT_MEMBER_EMPTY_DESC:
-    'Please invite members of the current workspace to the current project.',
-  AUDIT_LOG_WORKSPACE_TIP: 'Enter the workspace name to search for audit logs.',
-  METERING_AND_BILLING_DESC: 'View resource consumption for clusters and workspaces.',
-  WORKSPACE_CONSUMPTION: 'Workspace Resource Consumption',
-  WORKSPACE_CONSUMPTION_DESC: 'View resource consumption for the workspace.',
-  WORKSPACE_RESOURCE_CONSUMPTION_DESC:
-    'CPU, memory, volume, and other resource consumption in the <strong>workspace</strong>',
-  WORKSPACE_PROJECT_CONSUMPTION_DESC:
-    'CPU, memory, volume, and other resource consumption in <strong>projects</strong> within the workspace',
-  RESOURCE_EVENT_WORKSPACE_TIP: 'Enter the workspace name to search for resource events.',
-  SEARCH_BY_WORKSPACE: 'Search by Workspace',
   AUDIT_LOG_WORKSPACE_TIP: 'Enter the workspace name to search for audit logs.',
   METERING_AND_BILLING_DESC: 'View resource consumption for clusters and workspaces.',
   WORKSPACE_SCAP: 'Workspace',
@@ -118,13 +83,9 @@ module.exports = {
   WORKSPACE_CONSUMPTION_DESC: 'View resource consumption for the workspace.',
   WORKSPACE_RESOURCE_CONSUMPTION_DESC:
     'CPU, memory, volume, and other resource consumption in the <strong>workspace</strong>',
-  WORKSPACE_PROJECT_CONSUMPTION_DESC:
-    'CPU, memory, volume, and other resource consumption in <strong>projects</strong> within the workspace',
   RESOURCE_EVENT_WORKSPACE_TIP: 'Enter the workspace name to search for resource events.',
   SEARCH_BY_WORKSPACE: 'Search by Workspace',
   WORKBENCH_WORKSPACE: 'Workspace',
-  HOW_TO_USE_APP_REPO_A:
-    'You need to go to the project under that workspace. When deploying a new application, choose <b>From App Template</b> and select your app repository from the drop-down list to deploy applications from the app repository.',
   HOW_PUBLISH_APP_DESC:
     'You can upload the Helm chart as an app template for the workspace, and once approved, the app will be published in the app store.',
   HOW_TO_APPLY_MORE_CLUSTER_Q: 'How to apply for more clusters for the workspace?',
@@ -145,8 +106,6 @@ module.exports = {
     'deleted, it cannot be recovered, and all resources under the workspace will also be destroyed.',
   DELETE_WORKSPACE_TIP:
     'Are you sure you want to delete workspace <strong>{resource}</strong>? After deletion, it cannot be recovered, and all resources under the workspace will also be destroyed.',
-  DEPARTMENT_DESC:
-    'Departments in a workspace are logical units for managing permissions. You can set workspace roles, multiple project roles, and multiple DevOps project roles within a department, and assign users to departments to manage user permissions in bulk.',
   WORKSPACE_ROLE: 'Workspace Role',
   GROUP_WORKSPACE_ROLE_DESC:
     'Workspace roles will grant permissions to all users in the department.',
@@ -157,21 +116,14 @@ module.exports = {
   WORKSPACE_MEMBER_EMPTY_DESC: 'Please invite a user to the current workspace.',
   INVITE_WORKSPACE_MEMBER_DESC: 'Invite a user to the current workspace.',
   WORKSPACE_QUOTA_PL: 'Workspace Quota',
-  WORKSPACE_QUOTAS_DESC:
-    'Workspace quotas are used to manage the total resource usage of all projects and DevOps projects in the workspace.',
   EDIT_WORKSPACE_QUOTAS: 'Edit Workspace Quotas',
   WORKSPACE_ROLE_PL: 'Workspace Role',
   WORKSPACE_ROLE_DESC:
     'Workspace roles define the permissions that a user has under the current workspace.',
   WORKSPACE_ROLE_EMPTY_DESC: 'Please create a workspace role.',
   ROLE_WORKSPACE_ADMIN: 'Manage all resources in the workspace.',
-  ROLE_WORKSPACE_REGULAR: 'View workspace settings.',
   ROLE_WORKSPACE_VIEWER: 'View all resources in the workspace.',
   CREATE_WORKSPACE_ROLE: 'Create Workspace Role',
-  PERMISSION_PROJECTS_VIEW_DESC: 'View all projects in the workspace.',
-  PERMISSION_PROJECTS_MANAGEMENT_DESC: 'Create, edit, and delete projects in the workspace.',
-  PERMISSION_DEVOPS_VIEW_DESC: 'View all DevOps projects in the workspace.',
-  PERMISSION_DEVOPS_MANAGEMENT_DESC: 'Create, edit, and delete DevOps projects in the workspace.',
   PERMISSION_WORKSPACE_APP_REPOS_VIEW_DESC: 'View app repositories in the workspace.',
   PERMISSION_WORKSPACE_APP_REPOS_MANAGEMENT_DESC:
     'Create, edit, and delete app repositories in the workspace.',
@@ -192,42 +144,8 @@ module.exports = {
     'Manage the basic information, network policy, and other settings of the workspace.',
   'Clean Workspace': 'Clean Workspace',
 
-  // Projects
-  DEVOPS_PROJECT_SETTINGS: 'DevOps Project Management',
-  DEVOPS_PROJECT_ROLE_SCAP: 'DevOps Project Role',
-  DEVOPS_PROJECT_SCAP: 'DevOps Project',
-  DEVOPS_PROJECT_ROLE_PL_SCAP: 'DevOps Project Roles',
   CREDENTIAL_EMPTY_DESC: 'Please create a credential in the DevOps project.',
-  DEVOPS_PROJECT_MEMBER_PL: 'DevOps Project Members',
-  DEVOPS_PROJECT_MEM_DESC: 'Manage members and assign roles within the project.',
-  INVITE_MEMBER_DESC_DEVOPS: 'You can invite current workspace members to this DevOps project.',
-  DEVOPS_PROJECT_ROLE_PL: 'DevOps Project Roles',
-  DEVOPS_PROJECT_ROLES_DESC:
-    'Member roles define the permissions a user has in the current DevOps project.',
-  ROLE_DEVOPS_VIEWER: 'DevOps project observer, can view all resources under the DevOps project.',
-  ROLE_DEVOPS_OPERATOR:
-    'DevOps project ordinary member, can create pipelines, credentials, etc., in the DevOps project.',
-  DEVOPS_PROJECT: 'DevOps Project',
-  WORKBENCH_DEVOPS: 'DevOps Project',
-  CREATE_DEVOPS_PROJECT: 'Create DevOps Project',
-  DEVOPS_ADMIN_DESC: 'Designate a member within the project as an administrator.',
-  DELETE_DEVOPS_PROJECT: 'Delete DevOps Project',
-  DEVOPS_PROJECT_TCAP: 'DevOps Project',
-  DEVOPS_PROJECT_LOW: 'DevOps project',
-  DEVOPS_PROJECT_ROLE: 'DevOps Project Role',
-  ADD_DEVOPS_PROJECT: 'Add DevOps Project',
   ROLE_WORKSPACE_REGULAR: 'Workspace regular member, cannot create DevOps projects and items.',
-  ROLE_WORKSPACE_SELF_PROVISIONER:
-    'Workspace regular member, can create DevOps projects and items under the workspace.',
-  pipeline_owner: 'Owner of the DevOps project, can perform all operations on the DevOps project',
-  pipeline_maintainer:
-    'Main maintainer of the DevOps project, can perform project internal credential configuration, pipeline configuration and other operations',
-  pipeline_developer: 'Developer of the DevOps project, can trigger pipelines and view',
-  pipeline_reporter: 'Observer of the DevOps project, can view the running status of pipelines',
-  DEVOPS_PROJECT_DESC:
-    "DevOps project is used to group resources for management and control different users' resource management permissions.",
-
-  // Project
   'Please select project': 'Please select a project',
   NAV_PROJECTS: 'Projects',
   SET_AS_DEFAULT_REGISTRY_DESC:
@@ -445,15 +363,10 @@ module.exports = {
   PERMISSION_PROJECT_SETTINGS: 'Project Settings Management',
   PERMISSION_PROJECT_SETTINGS_DESC:
     'Manage project settings, including basic information, external access settings, network policies, resource quotas, log collection settings, etc.',
-  AUDIT_LOG_PROJECT_TIP: 'Enter the project name to find audit logs.',
-  SEARCH_BY_PROJECT: 'Search by Project',
-  CONTAINER_LOG_PROJECT_TIP: 'Enter the project name to find container logs.',
-  PROJECT_SCAP: 'Project',
   WORKSPACE_PROJECT_CONSUMPTION_DESC:
     'CPU, memory, volume, and other resource consumption in <strong>projects</strong> within the workspace',
   PROJECT_CONSUMPTION_DESC:
     'CPU, memory, volume, and other resource consumption in <strong>applications</strong>, <strong>services</strong>, <strong>pods</strong> within the project',
-  RESOURCE_EVENT_PROJECT_TIP: 'Enter the project name to find resource events.',
   AUDIT_LOG_PROJECT_TIP: 'Enter the project name to find audit logs.',
   SEARCH_BY_PROJECT: 'Search by Project',
   CONTAINER_LOG_PROJECT_TIP: 'Enter the project name to find container logs.',
