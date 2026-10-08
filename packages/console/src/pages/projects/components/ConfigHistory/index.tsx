@@ -6,7 +6,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Loading } from '@kubed/components';
 import { DiffViewer } from '@kubed/diff-viewer';
-import { request } from '@ks-console/shared';
 
 import {
   HistoryRecord,
@@ -89,7 +88,16 @@ function ConfigHistoryPage({
       attemptedUrl = `/clusters/${cluster}/api/v1/namespaces/${namespace}/secrets/${historySecretName(
         name,
       )}`;
-      const body = await request.get(attemptedUrl);
+      // Plain fetch with credentials, not the console's request wrapper. The same URL returns
+      // 200 with data.records through fetch in the logged-in console, while request.get on the
+      // very same string fails with "Failed to fetch" -- a network level TypeError, i.e. the
+      // wrapper never completed the call. The wrapper adds a base URL and interceptors that are
+      // not ready while this page mounts, and its failure hides which URL it actually used.
+      const response = await fetch(attemptedUrl, { credentials: 'include' });
+      if (!response.ok) {
+        throw new Error(`${response.status} ${response.statusText}`);
+      }
+      const body = await response.json();
       // request may hand back the resource itself or an axios-style wrapper around it, so
       // accept either rather than assuming one and failing silently.
       const secret = (body as any)?.data?.data ? (body as any).data : body;
