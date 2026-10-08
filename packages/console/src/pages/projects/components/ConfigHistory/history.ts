@@ -59,8 +59,21 @@ export async function decodeHistoryPayload(payload?: string | null): Promise<His
     bytes[i] = binary.charCodeAt(i);
   }
 
-  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
-  const json = await new Response(stream).text();
+  // DecompressionStream is not in this project's TS lib yet, so the runtime construct is
+  // reached through a narrow cast instead of widening the whole module to any. It exists in
+  // the console's runtime (Chromium) and in Node, which is where the tests run.
+  const DecompressionStreamCtor = (
+    globalThis as unknown as { DecompressionStream?: new (format: string) => unknown }
+  ).DecompressionStream;
+  if (!DecompressionStreamCtor) {
+    throw new Error('this runtime cannot decompress the history payload');
+  }
+  const stream = (
+    new Blob([bytes]).stream() as unknown as {
+      pipeThrough: (transform: unknown) => ReadableStream;
+    }
+  ).pipeThrough(new DecompressionStreamCtor('gzip'));
+  const json = await new Response(stream as unknown as BodyInit).text();
   const parsed = JSON.parse(json);
   if (!Array.isArray(parsed)) {
     throw new Error('history payload is not a list of records');
