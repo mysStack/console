@@ -92,7 +92,12 @@ export function setNativeContentVisible(root: ShadowRoot, visible: boolean): voi
  * The entry, as a second item in the page's real tab strip. It copies the native item's classes so
  * the strip keeps its own look, and the native item is only marked inactive rather than rebuilt.
  */
-export function injectHistoryNavItem(root: ShadowRoot, label: string, onOpen: () => void): boolean {
+export function injectHistoryNavItem(
+  root: ShadowRoot,
+  label: string,
+  onOpen: () => void,
+  onLeave: () => void,
+): boolean {
   if (root.querySelector(`[data-test="${NAV_ITEM_ATTR}"]`)) {
     return false;
   }
@@ -109,6 +114,12 @@ export function injectHistoryNavItem(root: ShadowRoot, label: string, onOpen: ()
   item.style.cursor = 'pointer';
   item.addEventListener('click', onOpen);
   nav.appendChild(item);
+  // The page's own tab is an <a> pointing at the page it is already on, so clicking it does
+  // nothing. With the history open that leaves no way back, so it is wired to leave the history.
+  if (!nativeItem.getAttribute('data-history-leave-bound')) {
+    nativeItem.setAttribute('data-history-leave-bound', 'true');
+    nativeItem.addEventListener('click', () => onLeave());
+  }
   return true;
 }
 
@@ -202,7 +213,12 @@ export function useConfigHistoryEntry(
       if (nextHost) {
         setHost(previous => (previous === nextHost ? previous : nextHost));
       }
-      injectHistoryNavItem(root, label, () => setOpen(true));
+      injectHistoryNavItem(
+        root,
+        label,
+        () => setOpen(true),
+        () => setOpen(false),
+      );
     }, 800);
     return () => window.clearInterval(timer);
   }, [label]);
