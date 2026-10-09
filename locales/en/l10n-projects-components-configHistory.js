@@ -25,7 +25,7 @@ module.exports = {
   CONFIG_HISTORY_SERIAL: 'Serial number',
   CONFIG_HISTORY_CHANGED_AT: 'Changed at',
   CONFIG_HISTORY_MANAGED_BY: 'Managed by',
-  CONFIG_HISTORY_SOURCE_VERSION: 'Source version',
+  CONFIG_HISTORY_SOURCE_VERSION_FORMAT: '(source version {version})',
   CONFIG_HISTORY_MANAGED_BY_ATTRIBUTE: 'Managed by',
   CONFIG_HISTORY_UPDATED_AT: 'Updated at',
   CONFIG_HISTORY_SOURCE_NOTE:

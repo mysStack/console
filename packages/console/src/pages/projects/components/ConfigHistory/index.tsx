@@ -462,7 +462,9 @@ function ConfigHistoryPage({
                       <b>
                         {t(managedByLabelKey(record.managedBy))}
                         {record.managedByRef
-                          ? `（${t('CONFIG_HISTORY_SOURCE_VERSION')} ${record.managedByRef}）`
+                          ? t('CONFIG_HISTORY_SOURCE_VERSION_FORMAT', {
+                              version: record.managedByRef,
+                            })
                           : ''}
                       </b>
                     </div>
