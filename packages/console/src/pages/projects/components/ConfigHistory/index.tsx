@@ -245,6 +245,9 @@ function ConfigHistoryPage({
                   padding: '12px 16px',
                   border: `1px solid ${isOpen ? '#55bc8a' : '#d8e0e8'}`,
                   borderRadius: 4,
+                  // The native cards in this console carry this shadow; measured from the page's own
+                  // property panel and content card, both 4px radius with this exact shadow.
+                  boxShadow: '0 4px 8px rgba(36, 46, 66, 0.06)',
                   cursor: 'pointer',
                   background: '#fff',
                 }}
@@ -253,8 +256,8 @@ function ConfigHistoryPage({
                 <span
                   style={{
                     fontSize: 11,
-                    padding: '2px 8px',
-                    borderRadius: 2,
+                    padding: '2px 10px',
+                    borderRadius: 4,
                     background: '#e8f7ef',
                     color: '#189a4d',
                   }}
@@ -283,6 +286,7 @@ function ConfigHistoryPage({
                       borderBottom: 'none',
                       borderRadius: '4px 4px 0 0',
                       background: '#fff',
+                      boxShadow: '0 4px 8px rgba(36, 46, 66, 0.06)',
                     }}
                   >
                     <div>
