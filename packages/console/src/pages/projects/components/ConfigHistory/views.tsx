@@ -119,14 +119,18 @@ export function MetadataView({
 }) {
   const { object, failed } = useObject(cluster, namespace, name, kind);
   if (failed) {
-    return <div style={emptyStyle}>读取元数据失败 ({failed})</div>;
+    return (
+      <div style={emptyStyle}>
+        {t('CONFIG_HISTORY_METADATA_LOAD_ERROR')} ({failed})
+      </div>
+    );
   }
   const labels = Object.entries(object?.metadata?.labels || {}) as [string, string][];
   const annotations = Object.entries(object?.metadata?.annotations || {}) as [string, string][];
   return (
     <div>
-      <Table title="标签" entries={labels} />
-      <Table title="注解" entries={annotations} />
+      <Table title={t('CONFIG_HISTORY_LABELS')} entries={labels} />
+      <Table title={t('CONFIG_HISTORY_ANNOTATIONS')} entries={annotations} />
     </div>
   );
 }
@@ -184,17 +188,21 @@ export function EventsView({
     void load();
   }, [load]);
   if (failed) {
-    return <div style={emptyStyle}>读取事件失败 ({failed})</div>;
+    return (
+      <div style={emptyStyle}>
+        {t('CONFIG_HISTORY_EVENTS_LOAD_ERROR')} ({failed})
+      </div>
+    );
   }
   if (loading) {
-    return <div style={emptyStyle}>加载中…</div>;
+    return <div style={emptyStyle}>{t('CONFIG_HISTORY_EVENTS_LOADING')}</div>;
   }
   if (items.length === 0) {
-    return <div style={emptyStyle}>暂无事件</div>;
+    return <div style={emptyStyle}>{t('CONFIG_HISTORY_EVENTS_EMPTY')}</div>;
   }
   return (
     <div style={{ ...panelStyle }}>
-      <div style={headStyle}>事件</div>
+      <div style={headStyle}>{t('CONFIG_HISTORY_EVENTS')}</div>
       {items.map((item, index) => (
         <div
           key={`${item.reason}-${index}`}

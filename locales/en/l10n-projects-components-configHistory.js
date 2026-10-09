@@ -30,4 +30,11 @@ module.exports = {
   CONFIG_HISTORY_UPDATED_AT: 'Updated at',
   CONFIG_HISTORY_SOURCE_NOTE:
     'This line is not who changed it. managedFields is empty in this cluster, so the caller cannot be derived; what is shown is the reliably derivable managed-by classification.',
+  CONFIG_HISTORY_LABELS: 'Labels',
+  CONFIG_HISTORY_ANNOTATIONS: 'Annotations',
+  CONFIG_HISTORY_EVENTS: 'Events',
+  CONFIG_HISTORY_METADATA_LOAD_ERROR: 'Could not read metadata',
+  CONFIG_HISTORY_EVENTS_LOAD_ERROR: 'Could not read events',
+  CONFIG_HISTORY_EVENTS_LOADING: 'Loading events…',
+  CONFIG_HISTORY_EVENTS_EMPTY: 'No events',
 };

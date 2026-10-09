@@ -29,4 +29,11 @@ module.exports = {
   CONFIG_HISTORY_UPDATED_AT: '更新时间',
   CONFIG_HISTORY_SOURCE_NOTE:
     '这一行不是「谁改的」——实测本集群的 managedFields 为空，无法推导出 Helm / kubectl / 控制台等具体调用者。这里显示的是可可靠推导的管理方式：Helm 管理（对象上有 meta.helm.sh/release-name）、replicator 同步（对象上有 replicator.v1.mittwald.de/*）、其余归为直接管理。',
+  CONFIG_HISTORY_LABELS: '标签',
+  CONFIG_HISTORY_ANNOTATIONS: '注解',
+  CONFIG_HISTORY_EVENTS: '事件',
+  CONFIG_HISTORY_METADATA_LOAD_ERROR: '读取元数据失败',
+  CONFIG_HISTORY_EVENTS_LOAD_ERROR: '读取事件失败',
+  CONFIG_HISTORY_EVENTS_LOADING: '加载中…',
+  CONFIG_HISTORY_EVENTS_EMPTY: '暂无事件',
 };
