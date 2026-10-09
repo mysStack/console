@@ -145,7 +145,10 @@ export async function encodeRecords(records: HistoryRecord[]): Promise<string> {
   new Uint8Array(buffer).forEach(byte => {
     binary += String.fromCharCode(byte);
   });
-  return btoa(binary);
+  // Twice, not once: the controller's Encode() supplies the inner layer and the Secret's data field
+  // supplies the outer one, so a record written here has to carry both or the reader -- which peels
+  // two layers off every record -- fails on the second.
+  return btoa(btoa(binary));
 }
 
 /** The content of an object as the controller would record it. */
