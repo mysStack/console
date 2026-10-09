@@ -29,7 +29,7 @@ function ConfigHistoryRoute({ kind }: ConfigHistoryRouteProps): JSX.Element {
       cluster={cluster || ''}
       namespace={namespace || ''}
       name={name || ''}
-      onBack={() => navigate('../detail', { relative: 'path' })}
+      onBack={() => navigate(-1)}
     />
   );
 }

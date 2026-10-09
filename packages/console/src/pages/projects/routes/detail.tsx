@@ -39,7 +39,6 @@ import volumeDetailRoutes from '../containers/Volumes/Detail/routes';
 import cronJobDetailRoutes from '../containers/CronJobs/Detail/routes';
 import serviceDetailRoutes from '../containers/Services/Detail/routes';
 import configMapDetailRoutes from '../containers/ConfigMaps/Detail/routes';
-import ConfigHistoryRoute from '../components/ConfigHistory/ConfigHistoryRoute';
 import daemonSetDetailRoutes from '../containers/DaemonSets/Detail/routes';
 import deploymentDetailRoutes from '../containers/Deployments/Detail/routes';
 import statefulSetDetailRoutes from '../containers/StatefulSets/Detail/routes';
@@ -133,19 +132,9 @@ export default (PATH: string) => [
     children: [...secretDetailRoutes],
   },
   {
-    path: `${PATH}/secrets/:name/history`,
-    element: <ConfigHistoryRoute kind="Secret" />,
-  },
-  {
     path: `${PATH}/configmaps/:name`,
     element: <ConfigMapDetail />,
     children: [...configMapDetailRoutes],
-  },
-  {
-    // A sibling route, not a child: ConfigMapDetail renders only the embedded V3 page and has
-    // no Outlet, so a child route would never mount.
-    path: `${PATH}/configmaps/:name/history`,
-    element: <ConfigHistoryRoute kind="ConfigMap" />,
   },
   {
     path: `${PATH}/serviceAccounts/:name`,
