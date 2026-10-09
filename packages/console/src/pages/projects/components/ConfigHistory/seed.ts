@@ -16,8 +16,13 @@
  * therefore reproduced exactly: SHA-256 over the keys in sorted order, each contributing
  * "key\0value\0", UTF-8 -- the same bytes the Go side feeds to its hash.
  *
- * Failures are reported rather than swallowed. An earlier version returned a bare false and the whole
- * seeding step went silent: the page showed no records and nothing anywhere said why.
+ * SHA-256 is implemented here rather than taken from crypto.subtle, because crypto.subtle is only
+ * available in a secure context and the console is served over plain http. Reaching for it threw
+ * immediately, and because the throw happened inside this module's error handling the feature simply
+ * stayed silent.
+ *
+ * Failures are reported rather than swallowed, for the same reason: an earlier version returned a bare
+ * false and left nothing anywhere to explain why nothing had been written.
  */
 
 import { HistoryRecord, managedByFromAnnotations } from './history';
@@ -28,14 +33,93 @@ const HISTORY_LABEL_KEY = 'config-history.kubesphere.io/for';
 const HISTORY_LABEL_VALUE = 'true';
 const LOG_PREFIX = '[config-history]';
 
+/** SHA-256 of a UTF-8 string, as lowercase hex. */
+export function sha256Hex(input: string): string {
+  const bytes: number[] = [];
+  for (let i = 0; i < input.length; i += 1) {
+    let code = input.charCodeAt(i);
+    if (code < 0x80) {
+      bytes.push(code);
+    } else if (code < 0x800) {
+      bytes.push(0xc0 | (code >> 6), 0x80 | (code & 0x3f));
+    } else if (code < 0xd800 || code >= 0xe000) {
+      bytes.push(0xe0 | (code >> 12), 0x80 | ((code >> 6) & 0x3f), 0x80 | (code & 0x3f));
+    } else {
+      i += 1;
+      code = 0x10000 + (((code & 0x3ff) << 10) | (input.charCodeAt(i) & 0x3ff));
+      bytes.push(
+        0xf0 | (code >> 18),
+        0x80 | ((code >> 12) & 0x3f),
+        0x80 | ((code >> 6) & 0x3f),
+        0x80 | (code & 0x3f),
+      );
+    }
+  }
+  const bitLength = bytes.length * 8;
+  bytes.push(0x80);
+  while (bytes.length % 64 !== 56) {
+    bytes.push(0);
+  }
+  for (let i = 7; i >= 0; i -= 1) {
+    bytes.push(Math.floor(bitLength / 2 ** (i * 8)) & 0xff);
+  }
+
+  const k = [
+    0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+    0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+    0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+    0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+    0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+    0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+    0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+    0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
+  ];
+  const h = [
+    0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19,
+  ];
+  const words = new Array<number>(64);
+  for (let offset = 0; offset < bytes.length; offset += 64) {
+    for (let i = 0; i < 16; i += 1) {
+      const j = offset + i * 4;
+      words[i] = (bytes[j] << 24) | (bytes[j + 1] << 16) | (bytes[j + 2] << 8) | bytes[j + 3];
+    }
+    for (let i = 16; i < 64; i += 1) {
+      const w15 = words[i - 15];
+      const w2 = words[i - 2];
+      const s0 = ((w15 >>> 7) | (w15 << 25)) ^ ((w15 >>> 18) | (w15 << 14)) ^ (w15 >>> 3);
+      const s1 = ((w2 >>> 17) | (w2 << 15)) ^ ((w2 >>> 19) | (w2 << 13)) ^ (w2 >>> 10);
+      words[i] = (words[i - 16] + s0 + words[i - 7] + s1) | 0;
+    }
+    let [a, b, c, d, e, f, g, hh] = h;
+    for (let i = 0; i < 64; i += 1) {
+      const S1 = ((e >>> 6) | (e << 26)) ^ ((e >>> 11) | (e << 21)) ^ ((e >>> 25) | (e << 7));
+      const ch = (e & f) ^ (~e & g);
+      const t1 = (hh + S1 + ch + k[i] + words[i]) | 0;
+      const S0 = ((a >>> 2) | (a << 30)) ^ ((a >>> 13) | (a << 19)) ^ ((a >>> 22) | (a << 10));
+      const maj = (a & b) ^ (a & c) ^ (b & c);
+      const t2 = (S0 + maj) | 0;
+      hh = g;
+      g = f;
+      f = e;
+      e = (d + t1) | 0;
+      d = c;
+      c = b;
+      b = a;
+      a = (t1 + t2) | 0;
+    }
+    const next = [a, b, c, d, e, f, g, hh];
+    for (let i = 0; i < 8; i += 1) {
+      h[i] = (h[i] + next[i]) | 0;
+    }
+  }
+  return h.map(value => (value >>> 0).toString(16).padStart(8, '0')).join('');
+}
+
 /** Same bytes as the controller's ContentHash: sorted keys, "key\0value\0" each, UTF-8. */
-export async function contentHash(content: Record<string, string>): Promise<string> {
+export function contentHash(content: Record<string, string>): string {
   const keys = Object.keys(content).sort();
   const parts = keys.map(key => `${key}\u0000${content[key]}\u0000`).join('');
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(parts));
-  return Array.from(new Uint8Array(digest))
-    .map(byte => byte.toString(16).padStart(2, '0'))
-    .join('');
+  return sha256Hex(parts);
 }
 
 /**
@@ -119,7 +203,7 @@ export async function seedHistory(params: {
         createdAt: new Date().toISOString(),
         managedBy: owner.managedBy,
         managedByRef: owner.managedByRef,
-        contentHash: await contentHash(content),
+        contentHash: contentHash(content),
         content,
       },
     ];
@@ -139,18 +223,14 @@ export async function seedHistory(params: {
     const headers = { 'Content-Type': 'application/json' };
 
     const put = await fetch(detailUrl, { method: 'PUT', credentials: 'include', headers, body });
-    if (put.ok) {
+    if (put.ok || put.status === 409) {
+      // 409 means the controller created it first, which is fine: a history exists either way.
       return true;
     }
-    if (put.status === 409) {
-      // The controller created it first, which is fine: a history exists either way.
-      return true;
-    }
-    const putBody = await describe(put);
     console.error(`${LOG_PREFIX} seed via PUT failed`, {
       url: detailUrl,
       status: put.status,
-      body: putBody,
+      body: await describe(put),
     });
 
     const post = await fetch(collectionUrl, {
@@ -187,6 +267,7 @@ export async function seedHistoryFor(params: {
   const { cluster, namespace, kind, name } = params;
   const module = kind === 'ConfigMap' ? 'configmaps' : 'secrets';
   const url = `/clusters/${cluster}/api/v1/namespaces/${namespace}/${module}/${name}`;
+  console.info(`${LOG_PREFIX} no history yet, writing the baseline`, { url });
   try {
     const response = await fetch(url, { credentials: 'include' });
     if (!response.ok) {
