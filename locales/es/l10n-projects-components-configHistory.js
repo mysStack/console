@@ -16,4 +16,9 @@ module.exports = {
   CONFIG_HISTORY_MANAGED_BY_HELM: 'Helm managed',
   CONFIG_HISTORY_MANAGED_BY_REPLICATOR: 'replicator synced',
   CONFIG_HISTORY_MANAGED_BY_DIRECT: 'directly managed',
+  CONFIG_HISTORY_SERIAL: 'Serial number',
+  CONFIG_HISTORY_CHANGED_AT: 'Changed at',
+  CONFIG_HISTORY_MANAGED_BY: 'Managed by',
+  CONFIG_HISTORY_SOURCE_NOTE:
+    'This line is not who changed it. managedFields is empty in this cluster, so the caller cannot be derived; what is shown is the reliably derivable managed-by classification.',
 };

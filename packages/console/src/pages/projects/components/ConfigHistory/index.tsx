@@ -127,8 +127,10 @@ function ConfigHistoryPage({
       // accept either rather than assuming one and failing silently.
       const secret = (body as any)?.data?.data ? (body as any).data : body;
       const payload = (secret as any)?.data?.records;
-      setRecords(await decodeHistoryPayload(payload));
-      setExpanded(undefined);
+      const loaded = await decodeHistoryPayload(payload);
+      setRecords(loaded);
+      // The newest record is the current state, so it opens by default; the rest stay collapsed.
+      setExpanded(loaded[0]?.revision);
     } catch (error) {
       // A missing history Secret simply means nothing has been recorded yet.
       const status = (error as { response?: { status?: number } })?.response?.status;
@@ -204,6 +206,23 @@ function ConfigHistoryPage({
         <div style={{ color: '#79879c' }}>{t('CONFIG_HISTORY_EMPTY')}</div>
       )}
 
+      {!loading && !failed && records.length > 0 && (
+        <div
+          style={{
+            marginTop: 16,
+            marginBottom: 4,
+            padding: '10px 14px',
+            background: '#fdf1f4',
+            borderLeft: '3px solid #d03050',
+            color: '#8c4a58',
+            fontSize: 12,
+            lineHeight: 1.85,
+          }}
+        >
+          {t('CONFIG_HISTORY_SOURCE_NOTE')}
+        </div>
+      )}
+
       {!loading &&
         !failed &&
         records.map(record => {
@@ -252,7 +271,45 @@ function ConfigHistoryPage({
                   </span>
                 )}
               </div>
-              {isOpen && <div style={{ marginTop: 8 }}>{renderDiff(record)}</div>}
+              {isOpen && (
+                <div style={{ marginTop: 8 }}>
+                  {/* The three facts the design puts above the diff. */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: 56,
+                      padding: '12px 16px',
+                      border: '1px solid #e3e9ef',
+                      borderBottom: 'none',
+                      borderRadius: '4px 4px 0 0',
+                      background: '#fff',
+                    }}
+                  >
+                    <div>
+                      <div style={{ color: '#79879c', fontSize: 12, marginBottom: 4 }}>
+                        {t('CONFIG_HISTORY_SERIAL')}
+                      </div>
+                      <b>#{record.revision}</b>
+                    </div>
+                    <div>
+                      <div style={{ color: '#79879c', fontSize: 12, marginBottom: 4 }}>
+                        {t('CONFIG_HISTORY_CHANGED_AT')}
+                      </div>
+                      <b>{formatTime(record.createdAt)}</b>
+                    </div>
+                    <div>
+                      <div style={{ color: '#79879c', fontSize: 12, marginBottom: 4 }}>
+                        {t('CONFIG_HISTORY_MANAGED_BY')}
+                      </div>
+                      <b>
+                        {t(managedByLabelKey(record.managedBy))}
+                        {record.managedByRef ? `?${record.managedByRef}?` : ''}
+                      </b>
+                    </div>
+                  </div>
+                  {renderDiff(record)}
+                </div>
+              )}
             </div>
           );
         })}
