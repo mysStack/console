@@ -17,6 +17,7 @@ import {
   diffPair,
   historySecretName,
 } from './history';
+import { seedHistoryFor } from './seed';
 
 /**
  * Modification history page for a ConfigMap or a Secret.
@@ -131,6 +132,13 @@ function ConfigHistoryPage({
 
       let response = await loadSecret();
       if (response.status === 404) {
+        // First view of an object that has not changed yet: write the baseline so the list is
+        // not empty. Only objects somebody opens get one; the cluster is not seeded at startup.
+        void seedHistoryFor({ cluster, namespace, kind, name }).then(seeded => {
+          if (seeded) {
+            load();
+          }
+        });
         setRecords([]);
         setExpanded(undefined);
         // Report anyway: the attributes need the managed-by value even when nothing is recorded yet.
@@ -142,6 +150,13 @@ function ConfigHistoryPage({
         response = await loadSecret();
       }
       if (response.status === 404) {
+        // First view of an object that has not changed yet: write the baseline so the list is
+        // not empty. Only objects somebody opens get one; the cluster is not seeded at startup.
+        void seedHistoryFor({ cluster, namespace, kind, name }).then(seeded => {
+          if (seeded) {
+            load();
+          }
+        });
         setRecords([]);
         setExpanded(undefined);
         // Report anyway: the attributes need the managed-by value even when nothing is recorded yet.
