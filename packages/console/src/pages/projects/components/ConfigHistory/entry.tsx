@@ -70,8 +70,13 @@ export function setNativeContentVisible(root: ShadowRoot, visible: boolean): voi
     }
     // The page's own tab strip stays: it carries the entry, and the design shows both tabs with
     // ???? current while the history is open. Only what sits beside it is swapped out.
-    const isNav = child.matches?.(NAV_SELECTOR) || !!child.querySelector?.(NAV_SELECTOR);
-    if (isNav) {
+    // The strip itself is left completely alone: an earlier version treated it as a container and
+    // hid its children, which are the tabs, so the strip rendered empty.
+    if (child.matches?.(NAV_SELECTOR)) {
+      return;
+    }
+    // A wrapper around the strip keeps it and swaps out its siblings.
+    if (child.querySelector?.(NAV_SELECTOR)) {
       Array.from((child as HTMLElement).children).forEach(grandChild => {
         if (!grandChild.matches?.(NAV_SELECTOR)) {
           (grandChild as HTMLElement).style.display = visible ? '' : 'none';
