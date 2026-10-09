@@ -12,17 +12,22 @@ import ConfigHistoryPage from './index';
 /**
  * Modification history, rendered inside the ConfigMap / Secret page.
  *
- * The design keeps that page's own frame and puts the history where the page's own content goes, so
- * this portals into the content area rather than opening a page of its own. The entry is a second
- * item in the page's real tab strip, following the design, and the object's own attributes gain the
- * two rows the design shows.
+ * Two peer views, switched by the page's own tab strip:
+ *   数据      shows the page's own data
+ *   修改记录  shows the modification history
+ * Whichever was clicked last is shown and marked current. This is not "open a panel, then find your
+ * way back": the page's own tab is read as one half of a switch, which is what it looks like.
  *
- * Measured in the live page, inside the wujie shadow root:
+ * Measured on the live page, and the measurement is the only reason the tab strip is handled the way
+ * it is: the ConfigMap and Secret detail pages have exactly ONE native tab (数据). The
+ * 资源状态 / 元数据 / 事件 tabs belong to the workload pages, and an early mockup borrowed them by
+ * mistake. Searching the wujie shadow root and both iframes for 元数据 and 事件 finds nothing.
+ *
  *   div.detail-page
- *     div.detail-page-sider          property column; holds [data-test="detail-attrs"]
- *     div.detail-page-content        content area; holds div.detail-page-nav (the ?? tab)
- * The tab item is an <a> styled 4px radius, padding 0 14px, background #55bc8a, 12px white.
- * Attribute rows are <li><div><span>??: </span></div><div><span>host</span></div></li>.
+ *     div.detail-page-sider   property column, holds [data-test="detail-attrs"]
+ *     div.detail-page-content content area, holds div.detail-page-nav with its single tab
+ * The tab is an <a> pointing at the page it is already on, so its click must be taken over with
+ * preventDefault -- otherwise it would reload the embedded page instead of switching the view.
  */
 
 const NAV_ITEM_ATTR = 'config-history-nav';
@@ -33,6 +38,8 @@ const CONTENT_SELECTOR = 'div.detail-page-content';
 const NAV_SELECTOR = 'div.detail-page-nav';
 const ATTRS_SELECTOR = '[data-test="detail-attrs"]';
 const ACTIVE_TAB_CLASS_FRAGMENT = '_2wmp-lQI4i6jOfSemwExp2';
+
+type View = 'data' | 'history';
 
 function findWujieRoot(): ShadowRoot | undefined {
   const app = document.querySelector('wujie-app');
@@ -56,8 +63,9 @@ export function ensureHistoryHost(root: ShadowRoot): HTMLElement | undefined {
 }
 
 /**
- * Shows the host and hides the page's own content, or the reverse. Only display is touched, so
- * nothing of the embedded page is destroyed and closing restores it exactly.
+ * Hides what sits beside the history host while the history is shown, and restores it for the data
+ * view. The tab strip is skipped entirely -- not its children, the strip itself -- because an earlier
+ * version treated the strip as a wrapper and hid the tabs, leaving an empty bar.
  */
 export function setNativeContentVisible(root: ShadowRoot, visible: boolean): void {
   const content = root.querySelector(CONTENT_SELECTOR);
@@ -68,14 +76,9 @@ export function setNativeContentVisible(root: ShadowRoot, visible: boolean): voi
     if (child.getAttribute('data-test') === HOST_TEST_ATTR) {
       return;
     }
-    // The page's own tab strip stays: it carries the entry, and the design shows both tabs with
-    // ???? current while the history is open. Only what sits beside it is swapped out.
-    // The strip itself is left completely alone: an earlier version treated it as a container and
-    // hid its children, which are the tabs, so the strip rendered empty.
     if (child.matches?.(NAV_SELECTOR)) {
       return;
     }
-    // A wrapper around the strip keeps it and swaps out its siblings.
     if (child.querySelector?.(NAV_SELECTOR)) {
       Array.from((child as HTMLElement).children).forEach(grandChild => {
         if (!grandChild.matches?.(NAV_SELECTOR)) {
@@ -89,41 +92,58 @@ export function setNativeContentVisible(root: ShadowRoot, visible: boolean): voi
 }
 
 /**
- * The entry, as a second item in the page's real tab strip. It copies the native item's classes so
- * the strip keeps its own look, and the native item is only marked inactive rather than rebuilt.
+ * The entry, as a second item in the page's own tab strip, placed directly after the native tab so
+ * the strip reads 数据 | 修改记录.
+ *
+ * Both items take their click here. The native one is an <a> aimed at the page it already shows, so
+ * without preventDefault "back to the data" would be a no-op, and letting it navigate would reload
+ * the embedded page.
  */
 export function injectHistoryNavItem(
   root: ShadowRoot,
   label: string,
-  onOpen: () => void,
-  onLeave: () => void,
+  onSelectData: () => void,
+  onSelectHistory: () => void,
 ): boolean {
-  if (root.querySelector(`[data-test="${NAV_ITEM_ATTR}"]`)) {
-    return false;
-  }
   const nav = root.querySelector(NAV_SELECTOR);
   const nativeItem = nav && (nav.querySelector('a') as HTMLAnchorElement | null);
   if (!nav || !nativeItem) {
     return false;
   }
-  const item = nativeItem.cloneNode(false) as HTMLAnchorElement;
-  item.setAttribute('data-test', NAV_ITEM_ATTR);
-  item.removeAttribute('aria-current');
-  item.removeAttribute('href');
-  item.textContent = label;
-  item.style.cursor = 'pointer';
-  item.addEventListener('click', onOpen);
-  nav.appendChild(item);
-  // The page's own tab is an <a> pointing at the page it is already on, so clicking it does
-  // nothing. With the history open that leaves no way back, so it is wired to leave the history.
-  if (!nativeItem.getAttribute('data-history-leave-bound')) {
-    nativeItem.setAttribute('data-history-leave-bound', 'true');
-    nativeItem.addEventListener('click', () => onLeave());
+  if (!nativeItem.getAttribute('data-history-bound')) {
+    nativeItem.setAttribute('data-history-bound', 'true');
+    // Remember the native classes so the current-tab marking can be handed back untouched.
+    nativeItem.setAttribute('data-history-native-class', nativeItem.className || '');
+    nativeItem.style.cursor = 'pointer';
+    nativeItem.addEventListener('click', event => {
+      event.preventDefault();
+      onSelectData();
+    });
+  }
+  if (!root.querySelector(`[data-test="${NAV_ITEM_ATTR}"]`)) {
+    const item = nativeItem.cloneNode(false) as HTMLAnchorElement;
+    item.setAttribute('data-test', NAV_ITEM_ATTR);
+    item.removeAttribute('aria-current');
+    item.removeAttribute('href');
+    item.textContent = label;
+    item.style.cursor = 'pointer';
+    item.addEventListener('click', event => {
+      event.preventDefault();
+      onSelectHistory();
+    });
+    if (nativeItem.nextSibling) {
+      nav.insertBefore(item, nativeItem.nextSibling);
+    } else {
+      nav.appendChild(item);
+    }
   }
   return true;
 }
 
-/** Reflects which of the two tab items is the current one, without touching any other styling. */
+/**
+ * Marks whichever view is current. For the data view the native item's original classes are put back
+ * exactly as they were, so the embedded page keeps owning its own appearance.
+ */
 export function setActiveTab(root: ShadowRoot, historyActive: boolean): void {
   const nav = root.querySelector(NAV_SELECTOR);
   if (!nav) {
@@ -131,16 +151,28 @@ export function setActiveTab(root: ShadowRoot, historyActive: boolean): void {
   }
   Array.from(nav.querySelectorAll('a')).forEach(item => {
     const isHistory = item.getAttribute('data-test') === NAV_ITEM_ATTR;
-    const active = isHistory === historyActive;
     const classes = (item.className || '').split(/\s+/).filter(Boolean);
     const withoutActive = classes.filter(name => name !== ACTIVE_TAB_CLASS_FRAGMENT);
-    item.className = (active ? [...withoutActive, ACTIVE_TAB_CLASS_FRAGMENT] : withoutActive).join(
-      ' ',
-    );
-    if (active) {
-      item.setAttribute('aria-current', 'page');
-    } else {
+    if (isHistory) {
+      item.className = (
+        historyActive ? [...withoutActive, ACTIVE_TAB_CLASS_FRAGMENT] : withoutActive
+      ).join(' ');
+      if (historyActive) {
+        item.setAttribute('aria-current', 'page');
+      } else {
+        item.removeAttribute('aria-current');
+      }
+      return;
+    }
+    const original = item.getAttribute('data-history-native-class');
+    if (historyActive) {
+      item.className = withoutActive.join(' ');
       item.removeAttribute('aria-current');
+    } else if (original !== null) {
+      item.className = original;
+      if (original.includes(ACTIVE_TAB_CLASS_FRAGMENT)) {
+        item.setAttribute('aria-current', 'page');
+      }
     }
   });
 }
@@ -178,6 +210,12 @@ export function setAttributeRows(
   });
 }
 
+interface HistorySummary {
+  managedBy: string;
+  managedByRef?: string;
+  createdAt: string;
+}
+
 /**
  * Retries while the detail page is mounted, because the embedded page appears asynchronously and
  * re-renders as the user moves inside it. Every step is idempotent.
@@ -187,21 +225,14 @@ export function useConfigHistoryEntry(
   label: string,
   managedByLabel: (record: { managedBy: string; managedByRef?: string }) => string,
   formatTime: (value: string) => string,
-): {
-  portal: React.ReactPortal | null;
-  setSummary: (
-    summary: { managedBy: string; managedByRef?: string; createdAt: string } | undefined,
-  ) => void;
-} {
+): { portal: React.ReactPortal | null } {
   const { cluster, namespace, name } = useParams();
   const [host, setHost] = useState<HTMLElement | null>(null);
-  const [open, setOpen] = useState(false);
-  const [summary, setSummary] = useState<
-    { managedBy: string; managedByRef?: string; createdAt: string } | undefined
-  >();
-  const close = useCallback(() => setOpen(false), []);
-  const summaryRef = React.useRef(summary);
+  const [view, setView] = useState<View>('data');
+  const [summary, setSummary] = useState<HistorySummary | undefined>();
+  const summaryRef = React.useRef<HistorySummary | undefined>(summary);
   summaryRef.current = summary;
+  const close = useCallback(() => setView('data'), []);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -216,8 +247,8 @@ export function useConfigHistoryEntry(
       injectHistoryNavItem(
         root,
         label,
-        () => setOpen(true),
-        () => setOpen(false),
+        () => setView('data'),
+        () => setView('history'),
       );
     }, 800);
     return () => window.clearInterval(timer);
@@ -228,22 +259,23 @@ export function useConfigHistoryEntry(
     if (!root) {
       return;
     }
-    setNativeContentVisible(root, !open);
-    setActiveTab(root, open);
+    const showingHistory = view === 'history';
+    setNativeContentVisible(root, !showingHistory);
+    setActiveTab(root, showingHistory);
     if (host) {
-      host.style.display = open ? '' : 'none';
+      host.style.display = showingHistory ? '' : 'none';
     }
-  }, [open, host]);
+  }, [view, host]);
 
   // Applied from the same retry loop as the tab: the embedded page re-renders as the user moves
   // inside it, so one shot is not enough. Every call is idempotent.
   useEffect(() => {
     const timer = window.setInterval(() => {
       const root = findWujieRoot();
-      if (!root || !summaryRef.current) {
+      const current = summaryRef.current;
+      if (!root || !current) {
         return;
       }
-      const current = summaryRef.current;
       setAttributeRows(root, [
         {
           attr: MANAGED_BY_ATTR,
@@ -261,7 +293,7 @@ export function useConfigHistoryEntry(
   }, [managedByLabel, formatTime]);
 
   if (!host) {
-    return { portal: null, setSummary };
+    return { portal: null };
   }
   return {
     portal: createPortal(
@@ -275,6 +307,5 @@ export function useConfigHistoryEntry(
       />,
       host,
     ),
-    setSummary,
   };
 }
