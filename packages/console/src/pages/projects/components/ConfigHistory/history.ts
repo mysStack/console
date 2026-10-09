@@ -131,3 +131,32 @@ export function diffPair(
 
 /** The newest record, which is the current state of the object. */
 export const currentRecord = (records: HistoryRecord[]): HistoryRecord | undefined => records[0];
+
+/**
+ * Derives the managed-by classification from an object's annotations, with the same three rules the
+ * controller applies. Reading it from the object matters for an object that has no history yet: the
+ * newest record is not available then, and defaulting to "directly managed" would mislabel anything
+ * that Helm or the replicator owns.
+ */
+export function managedByFromAnnotations(annotations?: Record<string, string>): {
+  managedBy: string;
+  managedByRef?: string;
+} {
+  if (!annotations) {
+    return { managedBy: MANAGED_BY_DIRECT };
+  }
+  const release = annotations['meta.helm.sh/release-name'];
+  if (release) {
+    return { managedBy: MANAGED_BY_HELM, managedByRef: release };
+  }
+  const replicatorKey = Object.keys(annotations).find(key =>
+    key.startsWith('replicator.v1.mittwald.de/'),
+  );
+  if (replicatorKey) {
+    return {
+      managedBy: MANAGED_BY_REPLICATOR,
+      managedByRef: annotations['replicator.v1.mittwald.de/replicated-from-version'],
+    };
+  }
+  return { managedBy: MANAGED_BY_DIRECT };
+}

@@ -173,6 +173,8 @@ export function useConfigHistoryEntry(
     { managedBy: string; managedByRef?: string; createdAt: string } | undefined
   >();
   const close = useCallback(() => setOpen(false), []);
+  const summaryRef = React.useRef(summary);
+  summaryRef.current = summary;
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -201,16 +203,30 @@ export function useConfigHistoryEntry(
     }
   }, [open, host]);
 
+  // Applied from the same retry loop as the tab: the embedded page re-renders as the user moves
+  // inside it, so one shot is not enough. Every call is idempotent.
   useEffect(() => {
-    const root = findWujieRoot();
-    if (!root || !summary) {
-      return;
-    }
-    setAttributeRows(root, [
-      { attr: MANAGED_BY_ATTR, label: '????', value: managedByLabel(summary) },
-      { attr: UPDATED_AT_ATTR, label: '????', value: formatTime(summary.createdAt) },
-    ]);
-  }, [summary, managedByLabel, formatTime]);
+    const timer = window.setInterval(() => {
+      const root = findWujieRoot();
+      if (!root || !summaryRef.current) {
+        return;
+      }
+      const current = summaryRef.current;
+      setAttributeRows(root, [
+        {
+          attr: MANAGED_BY_ATTR,
+          label: t('CONFIG_HISTORY_MANAGED_BY'),
+          value: managedByLabel(current),
+        },
+        {
+          attr: UPDATED_AT_ATTR,
+          label: t('CONFIG_HISTORY_CHANGED_AT'),
+          value: current.createdAt ? formatTime(current.createdAt) : '-',
+        },
+      ]);
+    }, 800);
+    return () => window.clearInterval(timer);
+  }, [managedByLabel, formatTime]);
 
   if (!host) {
     return { portal: null, setSummary };

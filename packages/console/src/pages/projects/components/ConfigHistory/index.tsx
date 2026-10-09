@@ -9,6 +9,7 @@ import { DiffViewer } from '@kubed/diff-viewer';
 
 import {
   HistoryRecord,
+  managedByFromAnnotations,
   MANAGED_BY_DIRECT,
   MANAGED_BY_HELM,
   MANAGED_BY_REPLICATOR,
@@ -73,7 +74,12 @@ function ConfigHistoryPage({
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [failedReason, setFailedReason] = useState('');
+  const [owner, setOwner] = useState<{ managedBy: string; managedByRef?: string }>();
   const [expanded, setExpanded] = useState<number | undefined>();
+
+  // Kept in a ref so load() does not have to depend on the owner fetch's timing.
+  const ownerRef = React.useRef<{ managedBy: string; managedByRef?: string } | undefined>();
+  ownerRef.current = owner;
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -106,10 +112,29 @@ function ConfigHistoryPage({
       // has to be checked on the response status -- the earlier version read it off an axios style
       // error, which stopped applying when the call moved to fetch, and a plain 404 then rendered
       // as an error.
+      // The object itself is needed for the attributes: ???? has to come from its own
+      // annotations, because an object with no history yet has no record to read it from.
+      const objectUrl = `/clusters/${cluster}/api/v1/namespaces/${namespace}/${
+        kind === 'ConfigMap' ? 'configmaps' : 'secrets'
+      }/${name}`;
+      let managed = managedByFromAnnotations(undefined);
+      try {
+        const objectResponse = await fetch(objectUrl, { credentials: 'include' });
+        if (objectResponse.ok) {
+          const object: any = await objectResponse.json();
+          managed = managedByFromAnnotations(object?.metadata?.annotations);
+        }
+      } catch {
+        // Keep the conservative default; the attribute row still renders.
+      }
+      setOwner(managed);
+
       let response = await loadSecret();
       if (response.status === 404) {
         setRecords([]);
         setExpanded(undefined);
+        // Report anyway: the attributes need the managed-by value even when nothing is recorded yet.
+        onLoaded?.({ ...managed, createdAt: '' });
         return;
       }
       if (!response.ok) {
@@ -119,6 +144,8 @@ function ConfigHistoryPage({
       if (response.status === 404) {
         setRecords([]);
         setExpanded(undefined);
+        // Report anyway: the attributes need the managed-by value even when nothing is recorded yet.
+        onLoaded?.({ ...managed, createdAt: '' });
         return;
       }
       if (!response.ok) {
@@ -131,7 +158,7 @@ function ConfigHistoryPage({
       const payload = (secret as any)?.data?.records;
       const loaded = await decodeHistoryPayload(payload);
       setRecords(loaded);
-      onLoaded?.(loaded[0] ?? { managedBy: 'direct', createdAt: '' });
+      onLoaded?.({ ...managed, createdAt: loaded[0]?.createdAt || '' });
       // The newest record is the current state, so it opens by default; the rest stay collapsed.
       setExpanded(loaded[0]?.revision);
     } catch (error) {
@@ -155,7 +182,7 @@ function ConfigHistoryPage({
     } finally {
       setLoading(false);
     }
-  }, [cluster, name, namespace]);
+  }, [cluster, kind, name, namespace, onLoaded]);
 
   useEffect(() => {
     load();
