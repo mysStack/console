@@ -205,6 +205,26 @@ function ConfigHistoryPage({
 
   const renderDiff = (record: HistoryRecord) => {
     const pair = diffPair(records, record.revision);
+    // The oldest record has nothing before it. Handing the viewer an "added from
+    // nothing" pair gives it a hunk header it cannot parse, and it says so on the
+    // console -- so the diff is left out entirely and the note is shown instead.
+    if (!pair.comparedRevision) {
+      return (
+        <div
+          style={{
+            padding: '10px 16px',
+            color: '#79879c',
+            fontSize: 12,
+            border: '1px solid #e3e9ef',
+            borderTop: 'none',
+            borderRadius: '0 0 4px 4px',
+            background: '#fff',
+          }}
+        >
+          {t('CONFIG_HISTORY_FIRST_REVISION')}
+        </div>
+      );
+    }
     return (
       <DiffViewer
         oldValue={pair.oldValue}
