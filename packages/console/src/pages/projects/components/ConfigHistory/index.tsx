@@ -28,7 +28,18 @@ import { seedHistoryFor } from './seed';
  * entry already uses.
  */
 
-export interface ConfigHistoryPageProps {
+export const MANAGED_BY_TAG_COLORS: Record<string, { background: string; color: string }> = {
+  helm: { background: '#eef2fb', color: '#3b6fd4' },
+  replicator: { background: '#e8f7ef', color: '#189a4d' },
+  direct: { background: '#f2f4f7', color: '#79879c' },
+};
+
+/** Tag colours from the design: Helm blue, replicator green, everything else grey. */
+function managedByColors(managedBy: string): { background: string; color: string } {
+  return MANAGED_BY_TAG_COLORS[managedBy] || MANAGED_BY_TAG_COLORS.direct;
+}
+
+interface ConfigHistoryPageProps {
   kind: 'ConfigMap' | 'Secret';
   cluster: string;
   namespace: string;
@@ -317,27 +328,63 @@ function ConfigHistoryPage({
                   background: '#fff',
                 }}
               >
+                {/* The design gives every record a round mark on the left. */}
+                <span
+                  style={{
+                    width: 30,
+                    height: 30,
+                    flex: '0 0 30px',
+                    borderRadius: '50%',
+                    border: '2px solid #b6c2cd',
+                    position: 'relative',
+                  }}
+                >
+                  <span
+                    style={{
+                      position: 'absolute',
+                      left: 12,
+                      top: 6,
+                      width: 2,
+                      height: 9,
+                      background: '#b6c2cd',
+                    }}
+                  />
+                  <span
+                    style={{
+                      position: 'absolute',
+                      left: 12,
+                      top: 14,
+                      width: 6,
+                      height: 2,
+                      background: '#b6c2cd',
+                    }}
+                  />
+                </span>
                 <strong>#{record.revision}</strong>
                 <span
                   style={{
                     fontSize: 11,
                     padding: '2px 10px',
                     borderRadius: 4,
-                    background: '#e8f7ef',
-                    color: '#189a4d',
+                    background: managedByColors(record.managedBy).background,
+                    color: managedByColors(record.managedBy).color,
                   }}
                 >
                   {t(managedByLabelKey(record.managedBy))}
-                  {record.managedByRef ? ` · ${record.managedByRef}` : ''}
                 </span>
                 <span style={{ color: '#79879c', fontSize: 12 }}>
                   {formatTime(record.createdAt)}
+                  {record.managedByRef ? ` · ${record.managedByRef}` : ''}
                 </span>
                 {record.contentOmitted && (
                   <span style={{ color: '#f5a623', fontSize: 12 }}>
                     {t('CONFIG_HISTORY_CONTENT_OMITTED')}
                   </span>
                 )}
+                {/* The design puts a chevron at the right end: down when open, right when closed. */}
+                <span style={{ marginLeft: 'auto', color: '#b6c2cd', fontSize: 16 }}>
+                  {isOpen ? '⌄' : '›'}
+                </span>
               </div>
               {isOpen && (
                 <div style={{ marginTop: 8 }}>
