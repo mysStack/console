@@ -221,76 +221,37 @@ function ConfigHistoryPage({
     const hasPrevious = !!pair.comparedRevision;
     const oldText = pair.oldValue || '';
     const newText = pair.newValue || '';
-    // The viewer expects both sides to be present. Handing it an empty one produces a hunk header it
-    // cannot parse -- -1,-1 for the oldest record, -0,0 when a change removed lines and added none --
-    // and it reports that on the console. Those two cases get a plain listing instead.
-    const bothSides = oldText.length > 0 && newText.length > 0;
-    const rows = (text: string, mark: string, background: string, color: string) =>
-      text
-        .split('\n')
-        .filter(Boolean)
-        .map((line, index) => (
-          <div
-            key={`${mark}-${index}`}
-            style={{ display: 'flex', background, color, lineHeight: 2, fontFamily: MONO }}
-          >
-            <div
-              style={{
-                width: 54,
-                flex: '0 0 54px',
-                textAlign: 'right',
-                paddingRight: 12,
-                color: '#a8b3c0',
-                background: '#fafbfc',
-              }}
-            />
-            <div style={{ flex: 1, paddingLeft: 12, whiteSpace: 'pre' }}>
-              <span style={{ padding: '0 6px', fontWeight: 700 }}>{mark}</span>
-              {line}
-            </div>
-          </div>
-        ));
-    return (
-      <div>
-        {/* The bar the design draws: the data fold on the left, the comparison on the right. */}
+    // The viewer counts lines by splitting on the trailing newline, so a value without one registers as
+    // empty: it then produced a hunk header of -0,0 +1,-1 and reported that it could not parse the
+    // lines. Both sides are terminated here.
+    const terminated = (text: string) => (text.endsWith('\n') ? text : `${text}\n`);
+    if (!hasPrevious) {
+      // Nothing before it: the viewer needs both sides, and inventing an empty one is what it cannot
+      // parse. The list is left out entirely.
+      return (
         <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '12px 16px',
+            padding: '10px 16px',
             border: '1px solid #e3e9ef',
             borderTop: 'none',
+            borderRadius: '0 0 4px 4px',
             background: '#fff',
+            color: '#79879c',
+            fontSize: 12,
           }}
         >
-          <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
-            {'\u25be '}
-            {t('CONFIG_HISTORY_CONTENT')}
-            {'\u3000\u203a'}
-          </span>
-          <span style={{ color: '#55bc8a', fontSize: 12 }}>
-            {hasPrevious
-              ? t('COMPARE_WITH', { version: `#${pair.comparedRevision}` })
-              : t('CONFIG_HISTORY_FIRST_REVISION')}
-          </span>
+          {t('CONFIG_HISTORY_FIRST_REVISION')}
         </div>
-        {bothSides ? (
-          <DiffViewer oldValue={oldText} newValue={newText} />
-        ) : (
-          <div
-            style={{
-              border: '1px solid #e3e9ef',
-              borderTop: 'none',
-              fontFamily: MONO,
-              fontSize: 12,
-            }}
-          >
-            {rows(oldText, '-', '#fdf1f4', '#d03050')}
-            {rows(newText, '+', '#eefaf3', '#189a4d')}
-          </div>
-        )}
-      </div>
+      );
+    }
+    // The bar is the viewer's own header, so it is drawn once rather than twice.
+    return (
+      <DiffViewer
+        oldValue={terminated(oldText)}
+        newValue={terminated(newText)}
+        title={`\u25be ${t('CONFIG_HISTORY_CONTENT')}\u3000\u203a`}
+        description={t('COMPARE_WITH', { version: `#${pair.comparedRevision}` })}
+      />
     );
   };
 
