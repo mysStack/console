@@ -188,6 +188,19 @@ export function setAttributeRows(
   if (!list || !template) {
     return;
   }
+  // A cell is not always a plain span: some rows hold a switch, whose second cell is markup. Writing
+  // only into an existing span left those rows showing the template's own text, which is how the
+  // Secret page ended up reporting ???? as ?.
+  const cellFor = (cell: Element): HTMLElement => {
+    const existing = cell.querySelector('span');
+    if (existing) {
+      return existing as HTMLElement;
+    }
+    cell.textContent = '';
+    const created = document.createElement('span');
+    cell.appendChild(created);
+    return created;
+  };
   rows.forEach(row => {
     let item = list.querySelector(`li[data-test="${row.attr}"]`) as HTMLLIElement | null;
     if (!item) {
@@ -196,17 +209,14 @@ export function setAttributeRows(
       list.appendChild(item);
     }
     const cells = item.querySelectorAll('div');
-    if (cells.length >= 2) {
-      const label = cells[0].querySelector('span');
-      const value = cells[1].querySelector('span');
-      if (label) {
-        label.textContent = `${row.label}: `;
-      }
-      if (value) {
-        value.textContent = row.value;
-        value.setAttribute('title', row.value);
-      }
+    if (cells.length < 2) {
+      return;
     }
+    const label = cellFor(cells[0]);
+    const value = cellFor(cells[1]);
+    label.textContent = `${row.label}: `;
+    value.textContent = row.value;
+    value.setAttribute('title', row.value);
   });
 }
 
