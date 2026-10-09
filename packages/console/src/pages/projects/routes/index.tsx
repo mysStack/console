@@ -42,6 +42,7 @@ import AlertingMessages from '../containers/Alerting/Messages';
 import { getDefaultApplicationType } from '../utils';
 
 import detailsRoutes from './detail';
+import ConfigHistoryRoute from '../components/ConfigHistory/ConfigHistoryRoute';
 import grayReleaseRoutes from './gray-release';
 
 const defaultAppType = getDefaultApplicationType();
@@ -138,12 +139,26 @@ export default [
             element: <ConfigMaps />,
           },
           {
+            // Inside ProjectListLayout on purpose. Registered in the resource-detail family
+            // instead, this page rendered without the project frame and without the console's
+            // provider stack, so its own request could not authenticate.
+            path: 'configmaps/:name/history',
+            element: <ConfigHistoryRoute kind="ConfigMap" />,
+          },
+          {
             path: 'serviceaccounts',
             element: <ServiceAccounts />,
           },
           {
             path: 'secrets',
             element: <Secrets />,
+          },
+          {
+            // Inside ProjectListLayout on purpose. Registered in the resource-detail family
+            // instead, this page rendered without the project frame and without the console's
+            // provider stack, so its own request could not authenticate.
+            path: 'secrets/:name/history',
+            element: <ConfigHistoryRoute kind="Secret" />,
           },
           {
             path: 'roles',
