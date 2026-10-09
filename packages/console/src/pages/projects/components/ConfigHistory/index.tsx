@@ -81,7 +81,6 @@ function ConfigHistoryPage({
   cluster,
   namespace,
   name,
-  onBack,
   onLoaded,
 }: ConfigHistoryPageProps): JSX.Element {
   const [records, setRecords] = useState<HistoryRecord[]>([]);
@@ -321,20 +320,10 @@ function ConfigHistoryPage({
   };
 
   return (
-    <div style={{ padding: 24 }} data-test="config-history-page">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-        <Button type="button" onClick={onBack}>
-          {t('BACK')}
-        </Button>
-        <div>
-          <h1 style={{ margin: 0, fontSize: 18 }}>{t('REVISION_RECORDS')}</h1>
-          <p style={{ margin: '4px 0 0', color: '#79879c', fontSize: 12 }}>
-            {kind} · {cluster} / {namespace} / {name}
-          </p>
-        </div>
-      </div>
-
-      <p style={{ color: '#79879c', fontSize: 12, marginBottom: 16 }}>{t('CONFIG_HISTORY_HINT')}</p>
+    <div style={{ padding: '8px 24px 24px' }} data-test="config-history-page">
+      <p style={{ color: '#79879c', fontSize: 12, lineHeight: 1.6, margin: '0 0 16px' }}>
+        {t('CONFIG_HISTORY_HINT')}
+      </p>
 
       {loading && <Loading />}
 
@@ -350,23 +339,6 @@ function ConfigHistoryPage({
 
       {!loading && !failed && records.length === 0 && (
         <div style={{ color: '#79879c' }}>{t('CONFIG_HISTORY_EMPTY')}</div>
-      )}
-
-      {!loading && !failed && records.length > 0 && (
-        <div
-          style={{
-            marginTop: 16,
-            marginBottom: 4,
-            padding: '10px 14px',
-            background: '#fdf1f4',
-            borderLeft: '3px solid #d03050',
-            color: '#8c4a58',
-            fontSize: 12,
-            lineHeight: 1.85,
-          }}
-        >
-          {t('CONFIG_HISTORY_SOURCE_NOTE')}
-        </div>
       )}
 
       {!loading &&
@@ -493,12 +465,29 @@ function ConfigHistoryPage({
                       </b>
                     </div>
                   </div>
-                  {renderDiff(record)}
+                  <div style={{ overflowX: 'auto' }}>{renderDiff(record)}</div>
                 </div>
               )}
             </div>
           );
         })}
+
+      {!loading && !failed && records.length > 0 && (
+        <div
+          style={{
+            marginTop: 16,
+            padding: '10px 14px',
+            background: '#fdf1f4',
+            border: '1px solid #f1d6dc',
+            borderRadius: 4,
+            color: '#8c4a58',
+            fontSize: 12,
+            lineHeight: 1.85,
+          }}
+        >
+          {t('CONFIG_HISTORY_SOURCE_NOTE')}
+        </div>
+      )}
     </div>
   );
 }

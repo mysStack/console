@@ -5,6 +5,11 @@
 
 module.exports = {
   CONFIG_HISTORY_TITLE: 'Modification records',
+  CONFIG_HISTORY_TAB_DATA: 'Data',
+  CONFIG_HISTORY_TAB_HISTORY: 'Modification records',
+  CONFIG_HISTORY_TAB_METADATA: 'Metadata',
+  CONFIG_HISTORY_TAB_EVENTS: 'Events',
+  CONFIG_HISTORY_NEW: 'New',
   CONFIG_HISTORY_BACK: 'Back',
   CONFIG_HISTORY_HINT:
     'Records are created after a ConfigMap or Secret changes. Use them to review what changed and to compare against earlier revisions. At most 10 records are kept.',
@@ -20,8 +25,8 @@ module.exports = {
   CONFIG_HISTORY_SERIAL: 'Serial number',
   CONFIG_HISTORY_CHANGED_AT: 'Changed at',
   CONFIG_HISTORY_MANAGED_BY: 'Managed by',
-  CONFIG_HISTORY_SOURCE_NOTE:
-    'This line is not who changed it. managedFields is empty in this cluster, so the caller cannot be derived; what is shown is the reliably derivable managed-by classification.',
+  CONFIG_HISTORY_MANAGED_BY_ATTRIBUTE: 'Managed by',
+  CONFIG_HISTORY_UPDATED_AT: 'Updated at',
   CONFIG_HISTORY_SOURCE_NOTE:
     'This line is not who changed it. managedFields is empty in this cluster, so the caller cannot be derived; what is shown is the reliably derivable managed-by classification.',
 };

@@ -9,6 +9,7 @@ import { useParams } from 'react-router-dom';
 
 import ConfigHistoryPage from './index';
 import { EventsView, MetadataView } from './views';
+import { CONFIG_HISTORY_VIEW_ITEMS, ConfigHistoryView } from './labels';
 
 /**
  * The history, plus the two views the design puts beside it, rendered inside the ConfigMap / Secret
@@ -43,15 +44,6 @@ const NAV_SELECTOR = 'div.detail-page-nav';
 const ATTRS_SELECTOR = '[data-test="detail-attrs"]';
 const ACTIVE_TAB_CLASS_FRAGMENT = '_2wmp-lQI4i6jOfSemwExp2';
 const NEW_BADGE_ATTR = 'config-history-badge';
-
-type View = 'data' | 'history' | 'metadata' | 'events';
-
-/** The three views added beside the page's own tab, in the order the design draws them. */
-const VIEW_ITEMS: Array<{ key: Exclude<View, 'data'>; label: string; badge?: string }> = [
-  { key: 'history', label: '修改记录', badge: '新' },
-  { key: 'metadata', label: '元数据' },
-  { key: 'events', label: '事件' },
-];
 
 function findWujieRoot(): ShadowRoot | undefined {
   const app = document.querySelector('wujie-app');
@@ -108,7 +100,10 @@ export function setNativeContentVisible(root: ShadowRoot, visible: boolean): voi
  * 数据 | 修改记录 | 元数据 | 事件. Every click is taken over here: the native tab is an <a> aimed at
  * the page it already shows, so without preventDefault "back to the data" would be a no-op.
  */
-export function injectHistoryNavItem(root: ShadowRoot, onSelect: (view: View) => void): boolean {
+export function injectHistoryNavItem(
+  root: ShadowRoot,
+  onSelect: (view: ConfigHistoryView) => void,
+): boolean {
   const nav = root.querySelector(NAV_SELECTOR);
   const nativeItem = nav && (nav.querySelector('a') as HTMLAnchorElement | null);
   if (!nav || !nativeItem) {
@@ -124,7 +119,7 @@ export function injectHistoryNavItem(root: ShadowRoot, onSelect: (view: View) =>
       onSelect('data');
     });
   }
-  VIEW_ITEMS.forEach((entry, index) => {
+  CONFIG_HISTORY_VIEW_ITEMS.forEach((entry, index) => {
     const attr = `${NAV_ITEM_ATTR}-${entry.key}`;
     if (nav.querySelector(`[data-test="${attr}"]`)) {
       return;
@@ -135,11 +130,11 @@ export function injectHistoryNavItem(root: ShadowRoot, onSelect: (view: View) =>
     item.removeAttribute('aria-current');
     item.removeAttribute('href');
     item.style.cursor = 'pointer';
-    item.textContent = entry.label;
-    if (entry.badge) {
+    item.textContent = t(entry.labelKey);
+    if (entry.badgeKey) {
       const badge = document.createElement('span');
       badge.setAttribute('data-test', NEW_BADGE_ATTR);
-      badge.textContent = entry.badge;
+      badge.textContent = t(entry.badgeKey);
       badge.style.cssText =
         'margin-left:6px;background:#f5a623;color:#fff;font-size:9px;line-height:1;padding:2px 4px;border-radius:4px;vertical-align:middle';
       item.appendChild(badge);
@@ -154,7 +149,7 @@ export function injectHistoryNavItem(root: ShadowRoot, onSelect: (view: View) =>
       index === 0
         ? nativeItem
         : (nav.querySelector(
-            `[data-test="${NAV_ITEM_ATTR}-${VIEW_ITEMS[index - 1].key}"]`,
+            `[data-test="${NAV_ITEM_ATTR}-${CONFIG_HISTORY_VIEW_ITEMS[index - 1].key}"]`,
           ) as HTMLElement | null);
     if (previous && previous.nextSibling) {
       nav.insertBefore(item, previous.nextSibling);
@@ -171,7 +166,7 @@ export function injectHistoryNavItem(root: ShadowRoot, onSelect: (view: View) =>
  * Marks whichever view is current. For the data view the native item's original classes are put back
  * exactly as they were, so the embedded page keeps owning its own appearance.
  */
-export function setActiveTab(root: ShadowRoot, active: View): void {
+export function setActiveTab(root: ShadowRoot, active: ConfigHistoryView): void {
   const nav = root.querySelector(NAV_SELECTOR);
   if (!nav) {
     return;
@@ -265,7 +260,7 @@ export function useConfigHistoryEntry(
 ): { portal: React.ReactPortal | null } {
   const { cluster, namespace, name } = useParams();
   const [host, setHost] = useState<HTMLElement | null>(null);
-  const [view, setView] = useState<View>('data');
+  const [view, setView] = useState<ConfigHistoryView>('data');
   const [summary, setSummary] = useState<HistorySummary | undefined>();
   const summaryRef = React.useRef<HistorySummary | undefined>(summary);
   summaryRef.current = summary;
@@ -311,12 +306,12 @@ export function useConfigHistoryEntry(
       setAttributeRows(root, [
         {
           attr: MANAGED_BY_ATTR,
-          label: '变更来源',
+          label: t('CONFIG_HISTORY_MANAGED_BY_ATTRIBUTE'),
           value: managedByLabel(current),
         },
         {
           attr: UPDATED_AT_ATTR,
-          label: '更新时间',
+          label: t('CONFIG_HISTORY_UPDATED_AT'),
           value: current.createdAt ? formatTime(current.createdAt) : '-',
         },
       ]);
