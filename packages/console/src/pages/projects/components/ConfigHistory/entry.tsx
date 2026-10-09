@@ -68,6 +68,17 @@ export function setNativeContentVisible(root: ShadowRoot, visible: boolean): voi
     if (child.getAttribute('data-test') === HOST_TEST_ATTR) {
       return;
     }
+    // The page's own tab strip stays: it carries the entry, and the design shows both tabs with
+    // ???? current while the history is open. Only what sits beside it is swapped out.
+    const isNav = child.matches?.(NAV_SELECTOR) || !!child.querySelector?.(NAV_SELECTOR);
+    if (isNav) {
+      Array.from((child as HTMLElement).children).forEach(grandChild => {
+        if (!grandChild.matches?.(NAV_SELECTOR)) {
+          (grandChild as HTMLElement).style.display = visible ? '' : 'none';
+        }
+      });
+      return;
+    }
     (child as HTMLElement).style.display = visible ? '' : 'none';
   });
 }
