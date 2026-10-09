@@ -21,4 +21,6 @@ module.exports = {
   CONFIG_HISTORY_MANAGED_BY: 'Managed by',
   CONFIG_HISTORY_SOURCE_NOTE:
     'This line is not who changed it. managedFields is empty in this cluster, so the caller cannot be derived; what is shown is the reliably derivable managed-by classification.',
+  CONFIG_HISTORY_SOURCE_NOTE:
+    'This line is not who changed it. managedFields is empty in this cluster, so the caller cannot be derived; what is shown is the reliably derivable managed-by classification.',
 };
