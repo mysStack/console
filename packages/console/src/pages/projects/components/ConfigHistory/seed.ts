@@ -6,15 +6,18 @@
 /**
  * First-view baseline for the modification history.
  *
- * History is deliberately not seeded for the whole cluster: an early version recorded every object
- * in scope at startup and created several hundred objects on an idle cluster. The baseline is written
- * the first time somebody actually looks at an object instead, so only objects people care about get
- * one, and the page never opens on an empty list for an object that has not changed yet.
+ * History is deliberately not seeded for the whole cluster: an early version recorded every object in
+ * scope at startup and created several hundred objects on an idle cluster. The baseline is written the
+ * first time somebody actually looks at an object instead, so only objects people care about get one,
+ * and the page never opens on an empty list for an object that has not changed yet.
  *
  * The record written here has to be byte-compatible with the controller's, or the controller will see
  * a hash it does not recognise and append a duplicate of the same content. The content hash is
  * therefore reproduced exactly: SHA-256 over the keys in sorted order, each contributing
  * "key\0value\0", UTF-8 -- the same bytes the Go side feeds to its hash.
+ *
+ * Failures are reported rather than swallowed. An earlier version returned a bare false and the whole
+ * seeding step went silent: the page showed no records and nothing anywhere said why.
  */
 
 import { HistoryRecord, managedByFromAnnotations } from './history';
@@ -23,6 +26,7 @@ const HISTORY_SECRET_SUFFIX = '-history';
 const HISTORY_DATA_KEY = 'records';
 const HISTORY_LABEL_KEY = 'config-history.kubesphere.io/for';
 const HISTORY_LABEL_VALUE = 'true';
+const LOG_PREFIX = '[config-history]';
 
 /** Same bytes as the controller's ContentHash: sorted keys, "key\0value\0" each, UTF-8. */
 export async function contentHash(content: Record<string, string>): Promise<string> {
@@ -84,10 +88,18 @@ export function contentOfObject(object: any, kind: 'ConfigMap' | 'Secret'): Reco
   return out;
 }
 
+async function describe(response: Response): Promise<string> {
+  try {
+    return (await response.text()).slice(0, 300);
+  } catch {
+    return '(body unreadable)';
+  }
+}
+
 /**
- * Writes the baseline record for an object that has no history yet. Returns true when a history
- * exists afterwards. Anything that fails is left to the caller: an unwritten baseline only means the
- * list stays empty until the object changes, which is the previous behaviour.
+ * Writes the baseline record for an object that has no history yet. Returns true when a history exists
+ * afterwards. Every failure is logged with the request, the status and the body, so the next round of
+ * testing has something to read instead of a silent no-op.
  */
 export async function seedHistory(params: {
   cluster: string;
@@ -97,41 +109,72 @@ export async function seedHistory(params: {
   object: any;
 }): Promise<boolean> {
   const { cluster, namespace, kind, name, object } = params;
-  const content = contentOfObject(object, kind);
-  const owner = managedByFromAnnotations(object?.metadata?.annotations);
-  const records: HistoryRecord[] = [
-    {
-      revision: 1,
-      createdAt: new Date().toISOString(),
-      managedBy: owner.managedBy,
-      managedByRef: owner.managedByRef,
-      contentHash: await contentHash(content),
-      content,
-    },
-  ];
-  const name2 = `${name}${HISTORY_SECRET_SUFFIX}`;
-  const url = `/clusters/${cluster}/api/v1/namespaces/${namespace}/secrets/${name2}`;
-  const response = await fetch(url, {
-    method: 'PUT',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
+  const secretName = `${name}${HISTORY_SECRET_SUFFIX}`;
+  try {
+    const content = contentOfObject(object, kind);
+    const owner = managedByFromAnnotations(object?.metadata?.annotations);
+    const records: HistoryRecord[] = [
+      {
+        revision: 1,
+        createdAt: new Date().toISOString(),
+        managedBy: owner.managedBy,
+        managedByRef: owner.managedByRef,
+        contentHash: await contentHash(content),
+        content,
+      },
+    ];
+    const body = JSON.stringify({
       apiVersion: 'v1',
       kind: 'Secret',
       metadata: {
-        name: name2,
+        name: secretName,
         namespace,
         labels: { [HISTORY_LABEL_KEY]: HISTORY_LABEL_VALUE },
       },
       type: 'Opaque',
       data: { [HISTORY_DATA_KEY]: await encodeRecords(records) },
-    }),
-  });
-  if (response.ok) {
-    return true;
+    });
+    const detailUrl = `/clusters/${cluster}/api/v1/namespaces/${namespace}/secrets/${secretName}`;
+    const collectionUrl = `/clusters/${cluster}/api/v1/namespaces/${namespace}/secrets`;
+    const headers = { 'Content-Type': 'application/json' };
+
+    const put = await fetch(detailUrl, { method: 'PUT', credentials: 'include', headers, body });
+    if (put.ok) {
+      return true;
+    }
+    if (put.status === 409) {
+      // The controller created it first, which is fine: a history exists either way.
+      return true;
+    }
+    const putBody = await describe(put);
+    console.error(`${LOG_PREFIX} seed via PUT failed`, {
+      url: detailUrl,
+      status: put.status,
+      body: putBody,
+    });
+
+    const post = await fetch(collectionUrl, {
+      method: 'POST',
+      credentials: 'include',
+      headers,
+      body,
+    });
+    if (post.ok || post.status === 409) {
+      return true;
+    }
+    console.error(`${LOG_PREFIX} seed via POST failed`, {
+      url: collectionUrl,
+      status: post.status,
+      body: await describe(post),
+    });
+    return false;
+  } catch (error) {
+    console.error(`${LOG_PREFIX} seed threw`, {
+      secret: secretName,
+      message: (error as Error)?.message,
+    });
+    return false;
   }
-  // 409 means the controller created it first, which is fine: a history exists either way.
-  return response.status === 409;
 }
 
 /** Fetches the object itself, then writes the baseline. Keeps the format logic above transport free. */
@@ -144,10 +187,23 @@ export async function seedHistoryFor(params: {
   const { cluster, namespace, kind, name } = params;
   const module = kind === 'ConfigMap' ? 'configmaps' : 'secrets';
   const url = `/clusters/${cluster}/api/v1/namespaces/${namespace}/${module}/${name}`;
-  const response = await fetch(url, { credentials: 'include' });
-  if (!response.ok) {
+  try {
+    const response = await fetch(url, { credentials: 'include' });
+    if (!response.ok) {
+      console.error(`${LOG_PREFIX} seed could not read the object`, {
+        url,
+        status: response.status,
+        body: await describe(response),
+      });
+      return false;
+    }
+    const object = await response.json();
+    return await seedHistory({ cluster, namespace, kind, name, object });
+  } catch (error) {
+    console.error(`${LOG_PREFIX} reading the object threw`, {
+      url,
+      message: (error as Error)?.message,
+    });
     return false;
   }
-  const object = await response.json();
-  return seedHistory({ cluster, namespace, kind, name, object });
 }
