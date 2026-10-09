@@ -99,10 +99,25 @@ function ConfigHistoryPage({
       // retried once after the shell has had a moment, rather than appending a workaround for
       // an unknown: the condition under which it succeeds is the one being waited for.
       const loadSecret = () => fetch(attemptedUrl, { credentials: 'include' });
+      // A missing history Secret is not a failure: it means nothing has been recorded yet, which
+      // is the normal state for an object that has not changed since the controller started. This
+      // has to be checked on the response status -- the earlier version read it off an axios style
+      // error, which stopped applying when the call moved to fetch, and a plain 404 then rendered
+      // as an error.
       let response = await loadSecret();
-      if (!response.ok || response.status === 0) {
+      if (response.status === 404) {
+        setRecords([]);
+        setExpanded(undefined);
+        return;
+      }
+      if (!response.ok) {
         await new Promise(resolve => setTimeout(resolve, 1500));
         response = await loadSecret();
+      }
+      if (response.status === 404) {
+        setRecords([]);
+        setExpanded(undefined);
+        return;
       }
       if (!response.ok) {
         throw new Error(`${response.status} ${response.statusText}`);
