@@ -15,16 +15,19 @@ function SecretDetail(): JSX.Element {
   const [wujieUrlPrefix] = useStore<string>('wujieUrlPrefix');
 
   // The embedded V3 page has no source to edit, so the entry is injected into its shadow root.
-  useConfigHistoryEntry('Secret', t('CONFIG_HISTORY_TITLE'));
+  const historyPortal = useConfigHistoryEntry('Secret', t('CONFIG_HISTORY_TITLE'));
 
   return (
-    <WujieReact
-      width="100%"
-      height="100%"
-      name="consolev3"
-      url={`${wujieUrlPrefix}/secrets/${name}`}
-      sync={false}
-    />
+    <>
+      {historyPortal}
+      <WujieReact
+        width="100%"
+        height="100%"
+        name="consolev3"
+        url={`${wujieUrlPrefix}/secrets/${name}`}
+        sync={false}
+      />
+    </>
   );
 }
 
