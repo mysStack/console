@@ -148,10 +148,18 @@ export function injectHistoryNavItem(root: ShadowRoot, onSelect: (view: View) =>
       event.preventDefault();
       onSelect(entry.key);
     });
-    // Kept in the design's order: the first goes right after the native tab, the rest follow it.
-    const anchor = index === 0 ? nativeItem.nextSibling : nav.children[nav.children.length - 1];
-    if (anchor) {
-      nav.insertBefore(item, anchor);
+    // A cursor chain, so the strip reads 数据 | 修改记录 | 元数据 | 事件 no matter what the DOM does
+    // between insertions. Anchoring the later ones on the last child reordered them instead.
+    const previous =
+      index === 0
+        ? nativeItem
+        : (nav.querySelector(
+            `[data-test="${NAV_ITEM_ATTR}-${VIEW_ITEMS[index - 1].key}"]`,
+          ) as HTMLElement | null);
+    if (previous && previous.nextSibling) {
+      nav.insertBefore(item, previous.nextSibling);
+    } else if (previous) {
+      nav.appendChild(item);
     } else {
       nav.appendChild(item);
     }

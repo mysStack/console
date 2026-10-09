@@ -28,7 +28,9 @@ import { seedHistoryFor } from './seed';
  * entry already uses.
  */
 
-export const MANAGED_BY_TAG_COLORS: Record<string, { background: string; color: string }> = {
+export const MONO = "'SFMono-Regular', Consolas, monospace";
+
+const MANAGED_BY_TAG_COLORS: Record<string, { background: string; color: string }> = {
   helm: { background: '#eef2fb', color: '#3b6fd4' },
   replicator: { background: '#e8f7ef', color: '#189a4d' },
   direct: { background: '#f2f4f7', color: '#79879c' },
@@ -216,37 +218,79 @@ function ConfigHistoryPage({
 
   const renderDiff = (record: HistoryRecord) => {
     const pair = diffPair(records, record.revision);
-    // The oldest record has nothing before it. Handing the viewer an "added from
-    // nothing" pair gives it a hunk header it cannot parse, and it says so on the
-    // console -- so the diff is left out entirely and the note is shown instead.
-    if (!pair.comparedRevision) {
-      return (
+    const hasPrevious = !!pair.comparedRevision;
+    const oldText = pair.oldValue || '';
+    const newText = pair.newValue || '';
+    // The viewer expects both sides to be present. Handing it an empty one produces a hunk header it
+    // cannot parse -- -1,-1 for the oldest record, -0,0 when a change removed lines and added none --
+    // and it reports that on the console. Those two cases get a plain listing instead.
+    const bothSides = oldText.length > 0 && newText.length > 0;
+    const rows = (text: string, mark: string, background: string, color: string) =>
+      text
+        .split('\n')
+        .filter(Boolean)
+        .map((line, index) => (
+          <div
+            key={`${mark}-${index}`}
+            style={{ display: 'flex', background, color, lineHeight: 2, fontFamily: MONO }}
+          >
+            <div
+              style={{
+                width: 54,
+                flex: '0 0 54px',
+                textAlign: 'right',
+                paddingRight: 12,
+                color: '#a8b3c0',
+                background: '#fafbfc',
+              }}
+            />
+            <div style={{ flex: 1, paddingLeft: 12, whiteSpace: 'pre' }}>
+              <span style={{ padding: '0 6px', fontWeight: 700 }}>{mark}</span>
+              {line}
+            </div>
+          </div>
+        ));
+    return (
+      <div>
+        {/* The bar the design draws: the data fold on the left, the comparison on the right. */}
         <div
           style={{
-            padding: '10px 16px',
-            color: '#79879c',
-            fontSize: 12,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '12px 16px',
             border: '1px solid #e3e9ef',
             borderTop: 'none',
-            borderRadius: '0 0 4px 4px',
             background: '#fff',
           }}
         >
-          {t('CONFIG_HISTORY_FIRST_REVISION')}
+          <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
+            {'\u25be '}
+            {t('CONFIG_HISTORY_CONTENT')}
+            {'\u3000\u203a'}
+          </span>
+          <span style={{ color: '#55bc8a', fontSize: 12 }}>
+            {hasPrevious
+              ? t('COMPARE_WITH', { version: `#${pair.comparedRevision}` })
+              : t('CONFIG_HISTORY_FIRST_REVISION')}
+          </span>
         </div>
-      );
-    }
-    return (
-      <DiffViewer
-        oldValue={pair.oldValue}
-        newValue={pair.newValue}
-        title={t('CONFIG_HISTORY_CONTENT')}
-        description={
-          pair.comparedRevision
-            ? t('COMPARE_WITH', { version: `#${pair.comparedRevision}` })
-            : t('CONFIG_HISTORY_FIRST_REVISION')
-        }
-      />
+        {bothSides ? (
+          <DiffViewer oldValue={oldText} newValue={newText} />
+        ) : (
+          <div
+            style={{
+              border: '1px solid #e3e9ef',
+              borderTop: 'none',
+              fontFamily: MONO,
+              fontSize: 12,
+            }}
+          >
+            {rows(oldText, '-', '#fdf1f4', '#d03050')}
+            {rows(newText, '+', '#eefaf3', '#189a4d')}
+          </div>
+        )}
+      </div>
     );
   };
 
