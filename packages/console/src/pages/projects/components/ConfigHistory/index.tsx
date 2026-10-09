@@ -218,14 +218,7 @@ function ConfigHistoryPage({
 
   const renderDiff = (record: HistoryRecord) => {
     const pair = diffPair(records, record.revision);
-    const hasPrevious = !!pair.comparedRevision;
-    const oldText = pair.oldValue || '';
-    const newText = pair.newValue || '';
-    // The viewer counts lines by splitting on the trailing newline, so a value without one registers as
-    // empty: it then produced a hunk header of -0,0 +1,-1 and reported that it could not parse the
-    // lines. Both sides are terminated here.
-    const terminated = (text: string) => (text.endsWith('\n') ? text : `${text}\n`);
-    if (!hasPrevious) {
+    if (!pair.comparedRevision) {
       // Nothing before it: the viewer needs both sides, and inventing an empty one is what it cannot
       // parse. The list is left out entirely.
       return (
@@ -244,11 +237,83 @@ function ConfigHistoryPage({
         </div>
       );
     }
+    const oldText = pair.oldValue || '';
+    const newText = pair.newValue || '';
+    const oldLines = oldText.split('\n').filter(Boolean);
+    const newLines = newText.split('\n').filter(Boolean);
+    // A change that only removes lines makes the viewer emit a hunk header with a negative count
+    // (-0,0 +1,-1) and report that it cannot parse the lines. Its rendering of that case is right, but
+    // the complaint is not, so the listing is drawn here instead.
+    const onlyRemovals = newLines.length > 0 && newLines.every(line => oldLines.indexOf(line) >= 0);
+    const line = (text: string, mark: string, background: string, color: string) => (
+      <div style={{ display: 'flex', background, color, lineHeight: 2, fontFamily: MONO }}>
+        <div
+          style={{
+            width: 54,
+            flex: '0 0 54px',
+            textAlign: 'right',
+            paddingRight: 12,
+            color: '#a8b3c0',
+            background: '#fafbfc',
+          }}
+        />
+        <div style={{ flex: 1, paddingLeft: 12, whiteSpace: 'pre' }}>
+          <span style={{ padding: '0 6px', fontWeight: 700 }}>{mark}</span>
+          {text}
+        </div>
+      </div>
+    );
+    if (onlyRemovals) {
+      const removed = oldLines.filter(item => newLines.indexOf(item) < 0);
+      return (
+        <div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '12px 16px',
+              border: '1px solid #e3e9ef',
+              borderTop: 'none',
+              background: '#fff',
+            }}
+          >
+            <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
+              {'\u25be '}
+              {t('CONFIG_HISTORY_CONTENT')}
+              {'\u3000\u203a'}
+            </span>
+            <span style={{ color: '#55bc8a', fontSize: 12 }}>
+              {t('COMPARE_WITH', { version: `#${pair.comparedRevision}` })}
+            </span>
+          </div>
+          <div
+            style={{
+              border: '1px solid #e3e9ef',
+              borderTop: 'none',
+              fontFamily: MONO,
+              fontSize: 12,
+            }}
+          >
+            {removed.map((item, index) => (
+              <React.Fragment key={`del-${index}`}>
+                {line(item, '-', '#fdf1f4', '#d03050')}
+              </React.Fragment>
+            ))}
+            {newLines.map((item, index) => (
+              <React.Fragment key={`ctx-${index}`}>
+                {line(item, ' ', '#fff', '#36435c')}
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+      );
+    }
     // The bar is the viewer's own header, so it is drawn once rather than twice.
     return (
       <DiffViewer
-        oldValue={terminated(oldText)}
-        newValue={terminated(newText)}
+        oldValue={oldText}
+        newValue={newText}
         title={`\u25be ${t('CONFIG_HISTORY_CONTENT')}\u3000\u203a`}
         description={t('COMPARE_WITH', { version: `#${pair.comparedRevision}` })}
       />
