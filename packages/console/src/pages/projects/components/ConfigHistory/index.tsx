@@ -461,7 +461,9 @@ function ConfigHistoryPage({
                       </div>
                       <b>
                         {t(managedByLabelKey(record.managedBy))}
-                        {record.managedByRef ? `（源版本 ${record.managedByRef}）` : ''}
+                        {record.managedByRef
+                          ? `（${t('CONFIG_HISTORY_SOURCE_VERSION')} ${record.managedByRef}）`
+                          : ''}
                       </b>
                     </div>
                   </div>
