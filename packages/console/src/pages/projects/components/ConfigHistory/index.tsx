@@ -32,9 +32,10 @@ export interface ConfigHistoryPageProps {
   namespace: string;
   name: string;
   onBack: () => void;
+  onLoaded?: (record: { managedBy: string; managedByRef?: string; createdAt: string }) => void;
 }
 
-const managedByLabelKey = (managedBy: string): string => {
+export const managedByLabelKey = (managedBy: string): string => {
   switch (managedBy) {
     case MANAGED_BY_HELM:
       return 'CONFIG_HISTORY_MANAGED_BY_HELM';
@@ -46,7 +47,7 @@ const managedByLabelKey = (managedBy: string): string => {
   }
 };
 
-const formatTime = (value: string): string => {
+export const formatTime = (value: string): string => {
   if (!value) {
     return '-';
   }
@@ -66,6 +67,7 @@ function ConfigHistoryPage({
   namespace,
   name,
   onBack,
+  onLoaded,
 }: ConfigHistoryPageProps): JSX.Element {
   const [records, setRecords] = useState<HistoryRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -129,6 +131,7 @@ function ConfigHistoryPage({
       const payload = (secret as any)?.data?.records;
       const loaded = await decodeHistoryPayload(payload);
       setRecords(loaded);
+      onLoaded?.(loaded[0] ?? { managedBy: 'direct', createdAt: '' });
       // The newest record is the current state, so it opens by default; the rest stay collapsed.
       setExpanded(loaded[0]?.revision);
     } catch (error) {
