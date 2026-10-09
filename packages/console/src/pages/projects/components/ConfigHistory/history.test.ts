@@ -17,11 +17,16 @@ import {
 } from './history';
 
 /**
- * Builds a payload the same way the Go controller does: base64(gzip(json array)).
- * Using node:zlib here keeps the test independent of the decoder under test.
+ * Builds a payload the same way the controller plus Kubernetes produces it, and both layers
+ * matter: the controller stores base64(gzip(json)), and Kubernetes base64 encodes that again in
+ * the Secret's data field. An earlier version of this helper modelled only the first layer, so it
+ * agreed with a decoder that was missing the second one -- the page failed while the test passed.
  */
 const encodeLikeTheController = (records: unknown): string =>
-  gzipSync(Buffer.from(JSON.stringify(records), 'utf8')).toString('base64');
+  Buffer.from(
+    gzipSync(Buffer.from(JSON.stringify(records), 'utf8')).toString('base64'),
+    'utf8',
+  ).toString('base64');
 
 const sample = [
   {

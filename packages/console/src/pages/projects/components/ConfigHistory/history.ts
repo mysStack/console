@@ -53,10 +53,21 @@ export async function decodeHistoryPayload(payload?: string | null): Promise<His
     return [];
   }
 
-  const binary = atob(trimmed);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i += 1) {
-    bytes[i] = binary.charCodeAt(i);
+  // Two base64 layers, and forgetting the second one is the trap here. Kubernetes base64
+  // encodes every Secret data value, and our own payload is base64(gzip(json)) inside that.
+  // Decoding once yields the text "H4sI..." rather than gzip bytes, the decompression stream
+  // then errors, and reading that errored stream through a Response throws
+  // "TypeError: Failed to fetch" -- which is why this looked like a network problem for
+  // several rounds while the request itself was returning 200.
+  const outerBinary = atob(trimmed);
+  const outerBytes = new Uint8Array(outerBinary.length);
+  for (let i = 0; i < outerBinary.length; i += 1) {
+    outerBytes[i] = outerBinary.charCodeAt(i);
+  }
+  const innerBinary = atob(new TextDecoder().decode(outerBytes));
+  const bytes = new Uint8Array(innerBinary.length);
+  for (let i = 0; i < innerBinary.length; i += 1) {
+    bytes[i] = innerBinary.charCodeAt(i);
   }
 
   // DecompressionStream is not in this project's TS lib yet, so the runtime construct is
