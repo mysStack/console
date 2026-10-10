@@ -5,14 +5,17 @@
 
 import React, { useEffect } from 'react';
 import { set } from 'lodash';
+import WujieReact from 'wujie-react';
 import { useCacheStore as useStore } from '@ks-console/shared';
 import { Loading } from '@kubed/components';
 import { useQueries, useQuery } from 'react-query';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { apis, ClusterDetail, clusterStore, projectStore } from '@ks-console/shared';
+import { getConsoleV3ProjectPrefix, getHostRouteFromEmbeddedRoute } from './route';
 
 const { fetchDetail: fetchProjectDetail } = projectStore;
 const { fetchDetail: fetchClusterDetail } = clusterStore;
+const { bus } = WujieReact;
 
 function BaseLayout(): JSX.Element {
   const navigate = useNavigate();
@@ -58,8 +61,50 @@ function BaseLayout(): JSX.Element {
   );
 
   useEffect(() => {
-    const basePrefix = `/${workspace}/clusters/${cluster}/projects/${namespace}`;
+    const basePrefix = getConsoleV3ProjectPrefix({
+      host: window.location.host,
+      workspace,
+      cluster,
+      namespace,
+    });
     setUrlPrefix(basePrefix);
+  }, [cluster, namespace, setUrlPrefix, workspace]);
+
+  useEffect(() => {
+    const projectPath = `/${workspace}/clusters/${cluster}/projects/${namespace}`;
+    let syncTimer: number | undefined;
+    const handleRouteChange = (route: string) => {
+      const hostRoute = getHostRouteFromEmbeddedRoute(route, projectPath);
+      if (!hostRoute || window.location.pathname === hostRoute) {
+        return;
+      }
+
+      if (syncTimer) {
+        window.clearTimeout(syncTimer);
+      }
+      syncTimer = window.setTimeout(() => {
+        if (window.location.pathname !== hostRoute) {
+          window.history.pushState({}, '', hostRoute);
+          window.dispatchEvent(new PopStateEvent('popstate'));
+        }
+        syncTimer = undefined;
+      }, 0);
+    };
+    const handleMessage = (event: MessageEvent<{ type?: string; route?: string }>) => {
+      if (event.origin === window.location.origin && event.data?.type === 'consoleRouteChange') {
+        handleRouteChange(event.data.route || '');
+      }
+    };
+
+    bus.$on('consoleRouteChange', handleRouteChange);
+    window.addEventListener('message', handleMessage);
+    return () => {
+      if (syncTimer) {
+        window.clearTimeout(syncTimer);
+      }
+      bus.$off('consoleRouteChange', handleRouteChange);
+      window.removeEventListener('message', handleMessage);
+    };
   }, [cluster, namespace, workspace]);
 
   if (

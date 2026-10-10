@@ -6,13 +6,33 @@
 import React from 'react';
 import WujieReact from 'wujie-react';
 import { useCacheStore as useStore } from '@ks-console/shared';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { useConfigReferenceBridge } from '../../../components/ConfigReference/entry';
+import { getConsoleV3DetailUrl, getConsoleV3ProjectPrefix } from '../../Base/BaseLayout/route';
 
 function DeploymentDetail(): JSX.Element {
-  const { name } = useParams<'name'>();
+  const { workspace, cluster, namespace, name } = useParams<
+    'workspace' | 'cluster' | 'namespace' | 'name'
+  >();
+  const location = useLocation();
   const [wujieUrlPrefix] = useStore<string>('wujieUrlPrefix');
   const { afterMount, afterUnmount, inline, summary } = useConfigReferenceBridge('deployments');
+  const projectPrefix =
+    wujieUrlPrefix ||
+    getConsoleV3ProjectPrefix({
+      host: window.location.host,
+      workspace,
+      cluster,
+      namespace,
+    });
+  const hostProjectPath = `/${workspace}/clusters/${cluster}/projects/${namespace}`;
+  const hostDetailPath = `${hostProjectPath}/deployments/${name}`;
+  const embeddedUrl = getConsoleV3DetailUrl({
+    projectPrefix,
+    name,
+    hostPath: location.pathname,
+    hostDetailPath,
+  });
 
   return (
     <>
@@ -20,7 +40,7 @@ function DeploymentDetail(): JSX.Element {
         width="100%"
         height="100%"
         name="consolev3"
-        url={`${wujieUrlPrefix}/deployments/${name}`}
+        url={embeddedUrl}
         sync={false}
         afterMount={afterMount}
         afterUnmount={afterUnmount}
