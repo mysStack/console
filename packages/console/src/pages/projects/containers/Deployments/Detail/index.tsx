@@ -48,7 +48,7 @@ function DeploymentDetail(): JSX.Element {
         return;
       }
       appWindow.history.pushState({}, '', embeddedPath);
-      appWindow.dispatchEvent(new appWindow.PopStateEvent('popstate'));
+      appWindow.dispatchEvent(new PopStateEvent('popstate'));
     },
     [afterMount, embeddedPath, hostDetailPath, location.pathname],
   );
