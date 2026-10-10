@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  getConsoleV3DetailPath,
   getConsoleV3DetailUrl,
   getConsoleV3ProjectPrefix,
   getHostRouteFromEmbeddedRoute,
@@ -45,12 +46,23 @@ test('preserves a host detail sub-route when bootstrapping the embedded page', (
       projectPrefix:
         '//192.168.2.131:30880/consolev3/test-workspace/clusters/host/projects/test-wes',
       name: 'ams-server',
-      hostPath: '/test-workspace/clusters/host/projects/test-wes/deployments/ams-server/env',
-      hostDetailPath: '/test-workspace/clusters/host/projects/test-wes/deployments/ams-server',
     }),
     [
       '//192.168.2.131:30880/consolev3/test-workspace/clusters/host/projects/test-wes',
-      '/deployments/ams-server/env',
+      '/deployments/ams-server',
     ].join(''),
+  );
+});
+
+test('maps a host detail sub-route to the already-mounted V3 app', () => {
+  assert.equal(
+    getConsoleV3DetailPath({
+      projectPrefix:
+        '//192.168.2.131:30880/consolev3/test-workspace/clusters/host/projects/test-wes',
+      name: 'ams-server',
+      hostPath: '/test-workspace/clusters/host/projects/test-wes/deployments/ams-server/env',
+      hostDetailPath: '/test-workspace/clusters/host/projects/test-wes/deployments/ams-server',
+    }),
+    '/consolev3/test-workspace/clusters/host/projects/test-wes/deployments/ams-server/env',
   );
 });
