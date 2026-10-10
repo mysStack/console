@@ -202,6 +202,8 @@ test('reads the visible V3 container editor as the configuration target', () => 
 interface FakeCard {
   name: string;
   href?: string;
+  nested?: boolean;
+  fullHref?: boolean;
 }
 
 /**
@@ -210,27 +212,42 @@ interface FakeCard {
  * heading whose first child is the container glyph.
  */
 const fakeEnvTabDocument = (cards: FakeCard[], activeHref = '/env') => {
+  const firstMarker = (node: any): any => {
+    if (!node) return undefined;
+    if (typeof node.getAttribute === 'function') return node;
+    return (node.children || []).map(firstMarker).find(Boolean);
+  };
   const pane: any = {
     children: [],
     querySelectorAll: (selector: string) =>
-      selector === 'use' ? pane.children.map((card: any) => card.children[0].children[0]) : [],
+      selector === 'use' ? pane.children.map(firstMarker).filter(Boolean) : [],
   };
 
   pane.children = cards.map(card => {
     const marker: any = {
       parentElement: undefined,
       getAttribute: (attribute: string) =>
-        attribute === 'href' ? card.href || '#icon-docker' : null,
+        attribute === 'href'
+          ? card.href || (card.fullHref ? '/assets/icons.svg#icon-docker' : '#icon-docker')
+          : null,
     };
     const heading: any = {
       textContent: `容器：${card.name}`,
       children: [marker],
       parentElement: undefined,
+      contains: (node: any) => node === marker,
     };
-    const wrapper: any = { children: [heading], parentElement: pane };
+    const wrapper: any = {
+      children: [heading],
+      parentElement: pane,
+      contains: (node: any) => node === heading || heading.contains(node),
+    };
     marker.parentElement = heading;
     heading.parentElement = wrapper;
-    return wrapper;
+    if (!card.nested) return wrapper;
+    const list: any = { children: [wrapper], parentElement: pane };
+    wrapper.parentElement = list;
+    return list;
   });
 
   const content: any = {
@@ -272,6 +289,16 @@ test('finds one section per container card, in page order', () => {
 test('ignores headings that are not container cards', () => {
   const sections = findConfigReferenceEnvSections(
     fakeEnvTabDocument([{ name: 'main' }, { name: 'other', href: '#icon-something-else' }]),
+  );
+  assert.deepEqual(
+    sections.map(section => section.containerName),
+    ['main'],
+  );
+});
+
+test('finds cards nested below the active environment pane and accepts sprite URLs', () => {
+  const sections = findConfigReferenceEnvSections(
+    fakeEnvTabDocument([{ name: 'main', nested: true, fullHref: true }]),
   );
   assert.deepEqual(
     sections.map(section => section.containerName),

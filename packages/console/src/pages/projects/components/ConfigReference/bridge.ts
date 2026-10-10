@@ -236,6 +236,27 @@ export interface ConfigReferenceEnvSection {
   card: HTMLElement;
 }
 
+function isDockerGlyph(use: SVGUseElement): boolean {
+  const href = use.getAttribute('href') || use.getAttribute('xlink:href') || '';
+  // The embedded V3 bundle has used both a fragment and an asset URL ending in
+  // that fragment.  Only the fragment itself is stable across the two builds.
+  return href === '#icon-docker' || href.endsWith('#icon-docker');
+}
+
+function findContainerCard(marker: SVGUseElement, pane: HTMLElement): HTMLElement | null {
+  let current = marker.parentElement as HTMLElement | null;
+  while (current && current !== pane) {
+    const heading = Array.from(current.children).find(
+      child => child === marker || child.contains?.(marker),
+    );
+    if (heading && /[:\uFF1A]/.test(heading.textContent || '')) {
+      return current;
+    }
+    current = current.parentElement as HTMLElement | null;
+  }
+  return null;
+}
+
 /**
  * One section per container on the read-only 环境变量 tab.
  *
@@ -251,17 +272,14 @@ export const findConfigReferenceEnvSections = (doc: Document): ConfigReferenceEn
   if (!pane) return [];
 
   const sections: ConfigReferenceEnvSection[] = [];
+  const cards = new Set<HTMLElement>();
   Array.from(pane.querySelectorAll('use'))
-    .filter(use => {
-      const href = use.getAttribute('href') || use.getAttribute('xlink:href') || '';
-      return href === '#icon-docker';
-    })
+    .filter(isDockerGlyph)
     .forEach(marker => {
-      let card: HTMLElement | null = marker.parentElement;
-      while (card && card.parentElement !== pane) {
-        card = card.parentElement;
-      }
+      const card = findContainerCard(marker, pane);
       if (!card) return;
+      if (cards.has(card)) return;
+      cards.add(card);
       const containerName = configReferenceContainerFromHeading(
         card.children[0]?.textContent || '',
       );
