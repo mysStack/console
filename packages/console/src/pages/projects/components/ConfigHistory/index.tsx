@@ -4,8 +4,12 @@
  */
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button, Loading } from '@kubed/components';
+import { Alert, Button, Card, Loading, Tag } from '@kubed/components';
 import { DiffViewer } from '@kubed/diff-viewer';
+import { Icon } from '@ks-console/shared';
+
+import Text from '../../../clusters/components/Text';
+import { DiffWrapper, YamlHeader } from '../../../clusters/components/RevisionControl/styles';
 
 import {
   HistoryRecord,
@@ -30,15 +34,14 @@ import { seedHistoryFor } from './seed';
 
 export const MONO = "'SFMono-Regular', Consolas, monospace";
 
-const MANAGED_BY_TAG_COLORS: Record<string, { background: string; color: string }> = {
-  helm: { background: '#eef2fb', color: '#3b6fd4' },
-  replicator: { background: '#e8f7ef', color: '#189a4d' },
-  direct: { background: '#f2f4f7', color: '#79879c' },
-};
-
-/** Tag colours from the design: Helm blue, replicator green, everything else grey. */
-function managedByColors(managedBy: string): { background: string; color: string } {
-  return MANAGED_BY_TAG_COLORS[managedBy] || MANAGED_BY_TAG_COLORS.direct;
+function managedByTagColor(managedBy: string): 'success' | 'info' | 'secondary' {
+  if (managedBy === MANAGED_BY_REPLICATOR) {
+    return 'success';
+  }
+  if (managedBy === MANAGED_BY_HELM) {
+    return 'info';
+  }
+  return 'secondary';
 }
 
 interface ConfigHistoryPageProps {
@@ -106,9 +109,10 @@ function ConfigHistoryPage({
       // a path that serves the SPA's index.html instead of JSON. Measured: the relative form
       // comes back as HTML, /api/v1/klusters/... comes back 404, and the form below comes back
       // 200 with data.records -- with and without the /clusters/<cluster> prefix.
-      attemptedUrl = `/clusters/${cluster}/api/v1/namespaces/${namespace}/secrets/${historySecretName(
-        name,
-      )}`;
+      attemptedUrl = [
+        `/clusters/${cluster}/api/v1/namespaces/${namespace}/secrets`,
+        historySecretName(name),
+      ].join('/');
       // Plain fetch with credentials, not the console's request wrapper. The same URL returns
       // 200 with data.records through fetch in the logged-in console, while request.get on the
       // very same string fails with "Failed to fetch" -- a network level TypeError, i.e. the
@@ -220,21 +224,7 @@ function ConfigHistoryPage({
     if (!pair.comparedRevision) {
       // Nothing before it: the viewer needs both sides, and inventing an empty one is what it cannot
       // parse. The list is left out entirely.
-      return (
-        <div
-          style={{
-            padding: '10px 16px',
-            border: '1px solid #e3e9ef',
-            borderTop: 'none',
-            borderRadius: '0 0 4px 4px',
-            background: '#fff',
-            color: '#79879c',
-            fontSize: 12,
-          }}
-        >
-          {t('CONFIG_HISTORY_FIRST_REVISION')}
-        </div>
-      );
+      return <Alert showIcon={false}>{t('CONFIG_HISTORY_FIRST_REVISION')}</Alert>;
     }
     const oldText = pair.oldValue || '';
     const newText = pair.newValue || '';
@@ -271,7 +261,7 @@ function ConfigHistoryPage({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              padding: '12px 16px',
+              padding: '14px 20px',
               border: '1px solid #e3e9ef',
               borderTop: 'none',
               background: '#fff',
@@ -320,10 +310,10 @@ function ConfigHistoryPage({
   };
 
   return (
-    <div style={{ padding: '8px 24px 24px' }} data-test="config-history-page">
-      <p style={{ color: '#79879c', fontSize: 12, lineHeight: 1.6, margin: '0 0 16px' }}>
+    <div style={{ padding: '12px 24px 28px' }} data-test="config-history-page">
+      <Alert className="mb12" showIcon={false}>
         {t('CONFIG_HISTORY_HINT')}
-      </p>
+      </Alert>
 
       {loading && <Loading />}
 
@@ -346,21 +336,26 @@ function ConfigHistoryPage({
         records.map(record => {
           const isOpen = expanded === record.revision;
           return (
-            <div key={record.revision} style={{ marginBottom: 12 }}>
-              <div
-                role="button"
-                tabIndex={0}
+            <div key={record.revision} style={{ marginBottom: 16 }}>
+              <button
+                type="button"
+                aria-expanded={isOpen}
+                aria-controls={`config-history-detail-${record.revision}`}
+                data-test={`config-history-record-${record.revision}`}
                 onClick={() => setExpanded(isOpen ? undefined : record.revision)}
                 onKeyDown={event => {
-                  if (event.key === 'Enter') {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
                     setExpanded(isOpen ? undefined : record.revision);
                   }
                 }}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 12,
-                  padding: '12px 16px',
+                  width: '100%',
+                  gap: 16,
+                  minHeight: 72,
+                  padding: '16px 20px',
                   border: `1px solid ${isOpen ? '#55bc8a' : '#d8e0e8'}`,
                   borderRadius: 4,
                   // The native cards in this console carry this shadow; measured from the page's own
@@ -368,108 +363,64 @@ function ConfigHistoryPage({
                   boxShadow: '0 4px 8px rgba(36, 46, 66, 0.06)',
                   cursor: 'pointer',
                   background: '#fff',
+                  color: '#36435c',
+                  textAlign: 'left',
+                  font: 'inherit',
                 }}
               >
-                {/* The design gives every record a round mark on the left. */}
-                <span
-                  style={{
-                    width: 30,
-                    height: 30,
-                    flex: '0 0 30px',
-                    borderRadius: '50%',
-                    border: '2px solid #b6c2cd',
-                    position: 'relative',
-                  }}
-                >
-                  <span
-                    style={{
-                      position: 'absolute',
-                      left: 12,
-                      top: 6,
-                      width: 2,
-                      height: 9,
-                      background: '#b6c2cd',
-                    }}
-                  />
-                  <span
-                    style={{
-                      position: 'absolute',
-                      left: 12,
-                      top: 14,
-                      width: 6,
-                      height: 2,
-                      background: '#b6c2cd',
-                    }}
-                  />
-                </span>
-                <strong>#{record.revision}</strong>
-                <span
-                  style={{
-                    fontSize: 11,
-                    padding: '2px 10px',
-                    borderRadius: 4,
-                    background: managedByColors(record.managedBy).background,
-                    color: managedByColors(record.managedBy).color,
-                  }}
-                >
-                  {t(managedByLabelKey(record.managedBy))}
-                </span>
-                <span style={{ color: '#79879c', fontSize: 12 }}>
-                  {formatTime(record.createdAt)}
-                  {record.managedByRef ? ` · ${record.managedByRef}` : ''}
-                </span>
-                {record.contentOmitted && (
-                  <span style={{ color: '#f5a623', fontSize: 12 }}>
-                    {t('CONFIG_HISTORY_CONTENT_OMITTED')}
+                <Icon name="timed-task" size={40} />
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <strong style={{ fontSize: 14, lineHeight: 1.67 }}>#{record.revision}</strong>
+                    <Tag color={managedByTagColor(record.managedBy)}>
+                      {t(managedByLabelKey(record.managedBy))}
+                    </Tag>
+                    {record.contentOmitted && (
+                      <Tag color="warning">{t('CONFIG_HISTORY_CONTENT_OMITTED')}</Tag>
+                    )}
                   </span>
-                )}
-                {/* The design puts a chevron at the right end: down when open, right when closed. */}
-                <span style={{ marginLeft: 'auto', color: '#b6c2cd', fontSize: 16 }}>
-                  {isOpen ? '⌄' : '›'}
-                </span>
-              </div>
-              {isOpen && (
-                <div style={{ marginTop: 8 }}>
-                  {/* The three facts the design puts above the diff. */}
-                  <div
+                  <span
                     style={{
-                      display: 'flex',
-                      gap: 56,
-                      padding: '12px 16px',
-                      border: '1px solid #e3e9ef',
-                      borderBottom: 'none',
-                      borderRadius: '4px 4px 0 0',
-                      background: '#fff',
-                      boxShadow: '0 4px 8px rgba(36, 46, 66, 0.06)',
+                      display: 'block',
+                      color: '#79879c',
+                      fontSize: 14,
+                      lineHeight: 1.67,
                     }}
                   >
-                    <div>
-                      <div style={{ color: '#79879c', fontSize: 12, marginBottom: 4 }}>
-                        {t('CONFIG_HISTORY_SERIAL')}
-                      </div>
-                      <b>#{record.revision}</b>
-                    </div>
-                    <div>
-                      <div style={{ color: '#79879c', fontSize: 12, marginBottom: 4 }}>
-                        {t('CONFIG_HISTORY_CHANGED_AT')}
-                      </div>
-                      <b>{formatTime(record.createdAt)}</b>
-                    </div>
-                    <div>
-                      <div style={{ color: '#79879c', fontSize: 12, marginBottom: 4 }}>
-                        {t('CONFIG_HISTORY_MANAGED_BY')}
-                      </div>
-                      <b>
-                        {t(managedByLabelKey(record.managedBy))}
-                        {record.managedByRef
-                          ? t('CONFIG_HISTORY_SOURCE_VERSION_FORMAT', {
-                              version: record.managedByRef,
-                            })
-                          : ''}
-                      </b>
-                    </div>
-                  </div>
-                  <div style={{ overflowX: 'auto' }}>{renderDiff(record)}</div>
+                    {formatTime(record.createdAt)}
+                    {record.managedByRef ? ` · ${record.managedByRef}` : ''}
+                  </span>
+                </span>
+                {/* The design puts a chevron at the right end: down when open, right when closed. */}
+                <span aria-hidden="true" style={{ color: '#b6c2cd', fontSize: 20 }}>
+                  {isOpen ? '⌄' : '›'}
+                </span>
+              </button>
+              {isOpen && (
+                <div id={`config-history-detail-${record.revision}`} className="mt12">
+                  <Card>
+                    <YamlHeader style={{ flexWrap: 'wrap', rowGap: 12 }}>
+                      <Text
+                        title={`#${record.revision}`}
+                        description={t('CONFIG_HISTORY_SERIAL')}
+                      />
+                      <Text
+                        title={formatTime(record.createdAt)}
+                        description={t('CONFIG_HISTORY_CHANGED_AT')}
+                      />
+                      <Text
+                        title={`${t(managedByLabelKey(record.managedBy))}${
+                          record.managedByRef
+                            ? t('CONFIG_HISTORY_SOURCE_VERSION_FORMAT', {
+                                version: record.managedByRef,
+                              })
+                            : ''
+                        }`}
+                        description={t('CONFIG_HISTORY_MANAGED_BY')}
+                      />
+                    </YamlHeader>
+                    <DiffWrapper style={{ overflowX: 'auto' }}>{renderDiff(record)}</DiffWrapper>
+                  </Card>
                 </div>
               )}
             </div>
@@ -477,20 +428,9 @@ function ConfigHistoryPage({
         })}
 
       {!loading && !failed && records.length > 0 && (
-        <div
-          style={{
-            marginTop: 16,
-            padding: '10px 14px',
-            background: '#fdf1f4',
-            border: '1px solid #f1d6dc',
-            borderRadius: 4,
-            color: '#8c4a58',
-            fontSize: 12,
-            lineHeight: 1.85,
-          }}
-        >
+        <Alert className="mt12" showIcon={false}>
           {t('CONFIG_HISTORY_SOURCE_NOTE')}
-        </div>
+        </Alert>
       )}
     </div>
   );

@@ -4,6 +4,10 @@
  */
 
 import React, { useCallback, useEffect, useState } from 'react';
+import { Loading } from '@kubed/components';
+import { MetaData } from '@ks-console/shared';
+
+import { metadataDetail } from './metadata';
 
 /**
  * The two views the design puts beside 修改记录, built here because the embedded ConfigMap and Secret
@@ -13,6 +17,13 @@ import React, { useCallback, useEffect, useState } from 'react';
  * prefix is built by hand rather than through secretStore.getDetailUrl, which returns a misspelled
  * "klusters" segment and no leading slash for this case.
  */
+
+const emptyStyle: React.CSSProperties = {
+  padding: '28px 16px',
+  color: '#79879c',
+  fontSize: 12,
+  textAlign: 'center',
+};
 
 const panelStyle: React.CSSProperties = {
   border: '1px solid #e3e9ef',
@@ -36,30 +47,6 @@ const rowStyle: React.CSSProperties = {
   lineHeight: '20px',
 };
 
-const keyStyle: React.CSSProperties = {
-  width: 260,
-  flex: '0 0 260px',
-  padding: '8px 16px',
-  color: '#79879c',
-  background: '#fafbfc',
-  wordBreak: 'break-all',
-};
-
-const valStyle: React.CSSProperties = {
-  flex: 1,
-  padding: '8px 16px',
-  color: '#36435c',
-  wordBreak: 'break-all',
-  whiteSpace: 'pre-wrap',
-};
-
-const emptyStyle: React.CSSProperties = {
-  padding: '28px 16px',
-  color: '#79879c',
-  fontSize: 12,
-  textAlign: 'center',
-};
-
 const modules: Record<string, string> = { ConfigMap: 'configmaps', Secret: 'secrets' };
 
 function useObject(cluster: string, namespace: string, name: string, kind: string) {
@@ -69,7 +56,8 @@ function useObject(cluster: string, namespace: string, name: string, kind: strin
     if (!cluster || !namespace || !name) {
       return;
     }
-    const url = `/clusters/${cluster}/api/v1/namespaces/${namespace}/${modules[kind] || 'configmaps'}/${name}`;
+    const resource = modules[kind] || 'configmaps';
+    const url = `/clusters/${cluster}/api/v1/namespaces/${namespace}/${resource}/${name}`;
     try {
       const response = await fetch(url, { credentials: 'include' });
       if (!response.ok) {
@@ -85,24 +73,6 @@ function useObject(cluster: string, namespace: string, name: string, kind: strin
     void load();
   }, [load]);
   return { object, failed };
-}
-
-function Table({ title, entries }: { title: string; entries: [string, string][] }) {
-  return (
-    <div style={{ ...panelStyle, marginBottom: 16 }}>
-      <div style={headStyle}>{title}</div>
-      {entries.length === 0 ? (
-        <div style={emptyStyle}>—</div>
-      ) : (
-        entries.map(([key, value]) => (
-          <div key={key} style={rowStyle}>
-            <div style={keyStyle}>{key}</div>
-            <div style={valStyle}>{value}</div>
-          </div>
-        ))
-      )}
-    </div>
-  );
 }
 
 /** The object's own labels and annotations, read only. */
@@ -125,14 +95,10 @@ export function MetadataView({
       </div>
     );
   }
-  const labels = Object.entries(object?.metadata?.labels || {}) as [string, string][];
-  const annotations = Object.entries(object?.metadata?.annotations || {}) as [string, string][];
-  return (
-    <div>
-      <Table title={t('CONFIG_HISTORY_LABELS')} entries={labels} />
-      <Table title={t('CONFIG_HISTORY_ANNOTATIONS')} entries={annotations} />
-    </div>
-  );
+  if (!object) {
+    return <Loading className="page-loading" />;
+  }
+  return <MetaData detail={metadataDetail(object)} />;
 }
 
 interface EventItem {
@@ -163,7 +129,10 @@ export function EventsView({
     }
     setLoading(true);
     const selector = encodeURIComponent(`involvedObject.name=${name}`);
-    const url = `/clusters/${cluster}/api/v1/namespaces/${namespace}/events?fieldSelector=${selector}`;
+    const url = [
+      `/clusters/${cluster}/api/v1/namespaces/${namespace}/events`,
+      `?fieldSelector=${selector}`,
+    ].join('');
     try {
       const response = await fetch(url, { credentials: 'include' });
       if (!response.ok) {
