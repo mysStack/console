@@ -306,6 +306,55 @@ test('finds cards nested below the active environment pane and accepts sprite UR
   );
 });
 
+test('uses the complete container card when the docker heading has nested leading controls', () => {
+  const contains = (root: any, target: any): boolean =>
+    root === target || (root.children || []).some((child: any) => contains(child, target));
+  const node = (textContent = '', children: any[] = []) => {
+    const element: any = {
+      textContent,
+      children,
+      parentElement: undefined,
+      contains(target: any) {
+        return contains(this, target);
+      },
+    };
+    children.forEach(child => {
+      child.parentElement = element;
+    });
+    return element;
+  };
+
+  const marker: any = {
+    getAttribute: (attribute: string) => (attribute === 'href' ? '#icon-docker' : null),
+    parentElement: undefined,
+  };
+  const glyph = node('', [marker]);
+  const headingContent = node('Container: ams-server', [glyph]);
+  // The live V3 heading has an empty leading control before the translated title.
+  // Treating this heading wrapper as the card makes children[0] empty and loses
+  // the container name, which is the regression this fixture protects against.
+  const headingWrapper = node('Container: ams-server', [node(''), headingContent]);
+  const card = node('Container: ams-serverNo Environment Variable Found', [
+    headingWrapper,
+    node('No Environment Variable Found'),
+  ]);
+  const pane: any = node(card.textContent, [card]);
+  pane.querySelectorAll = (selector: string) => (selector === 'use' ? [marker] : []);
+  const content: any = node(pane.textContent, [node('tabs'), pane]);
+  content.lastElementChild = pane;
+  content.querySelector = (selector: string) =>
+    selector === 'a[aria-current="page"]' ? { getAttribute: () => '/env' } : null;
+  const document = {
+    querySelector: (selector: string) => (selector === 'div.detail-page-content' ? content : null),
+    defaultView: { location: { pathname: '/env' } },
+  } as unknown as Document;
+
+  const sections = findConfigReferenceEnvSections(document);
+  assert.equal(sections.length, 1);
+  assert.equal(sections[0].containerName, 'ams-server');
+  assert.equal(sections[0].card, card);
+});
+
 test('finds no section while another tab is active', () => {
   assert.deepEqual(
     findConfigReferenceEnvSections(fakeEnvTabDocument([{ name: 'main' }], '/resource-status')),

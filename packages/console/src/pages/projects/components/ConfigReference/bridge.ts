@@ -246,15 +246,24 @@ function isDockerGlyph(use: SVGUseElement): boolean {
 function findContainerCard(marker: SVGUseElement, pane: HTMLElement): HTMLElement | null {
   let current = marker.parentElement as HTMLElement | null;
   while (current && current !== pane) {
-    const heading = Array.from(current.children).find(
-      child => child === marker || child.contains?.(marker),
-    );
-    if (heading && /[:\uFF1A]/.test(heading.textContent || '')) {
+    if (current.parentElement === pane) {
       return current;
     }
     current = current.parentElement as HTMLElement | null;
   }
   return null;
+}
+
+function findContainerHeadingLabel(marker: SVGUseElement, card: HTMLElement): string {
+  let current = marker.parentElement as HTMLElement | null;
+  while (current && current !== card) {
+    const label = current.textContent || '';
+    if (/[:\uFF1A]/.test(label)) {
+      return label;
+    }
+    current = current.parentElement as HTMLElement | null;
+  }
+  return card.children[0]?.textContent || '';
 }
 
 /**
@@ -281,7 +290,7 @@ export const findConfigReferenceEnvSections = (doc: Document): ConfigReferenceEn
       if (cards.has(card)) return;
       cards.add(card);
       const containerName = configReferenceContainerFromHeading(
-        card.children[0]?.textContent || '',
+        findContainerHeadingLabel(marker, card),
       );
       if (!containerName) return;
       sections.push({ containerName, index: sections.length, card });
