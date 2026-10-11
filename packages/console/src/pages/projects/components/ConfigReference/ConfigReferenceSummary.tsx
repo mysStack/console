@@ -119,6 +119,9 @@ export default function ConfigReferenceSummary({
     <div
       data-test="config-reference-summary"
       style={variant === 'envTab' ? envTabStyle : summaryStyle}
+      // The native V3 card toggles on bubbled clicks, not just its heading.
+      // Expanding a reference preview must not also close the entire container.
+      onClick={event => event.stopPropagation()}
     >
       <div style={titleStyle}>
         <span>{t('CONFIG_REFERENCE')}</span>
