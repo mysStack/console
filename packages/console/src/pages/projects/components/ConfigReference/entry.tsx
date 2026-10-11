@@ -2,6 +2,7 @@ import React, { lazy, useCallback, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useParams } from 'react-router-dom';
 import {
+  ConfigReferenceDomRoot,
   findConfigReferenceAction,
   findConfigReferenceEnvSections,
   findConfigReferenceContainerName,
@@ -40,7 +41,7 @@ export function getConfigReferencePath({
 export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) {
   const { cluster, namespace, name } = useParams();
   const observerRef = useRef<MutationObserver | undefined>();
-  const appWindowRef = useRef<Window | undefined>();
+  const domRootRef = useRef<ConfigReferenceDomRoot | undefined>();
   const inlineHostRef = useRef<HTMLElement | null>(null);
   const summaryHostRef = useRef<HTMLElement | null>(null);
   const [inlineHost, setInlineHost] = useState<HTMLElement | null>(null);
@@ -67,9 +68,10 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
   const cleanup = useCallback(() => {
     observerRef.current?.disconnect();
     observerRef.current = undefined;
-    if (appWindowRef.current && inputHandlerRef.current) {
-      appWindowRef.current.document.removeEventListener('input', inputHandlerRef.current, true);
+    if (domRootRef.current && inputHandlerRef.current) {
+      domRootRef.current.removeEventListener('input', inputHandlerRef.current, true);
     }
+    domRootRef.current = undefined;
     inputHandlerRef.current = undefined;
     closeInline();
     summaryHostRef.current?.parentNode?.removeChild(summaryHostRef.current);
@@ -86,17 +88,20 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
       if (!appWindow?.document) {
         return;
       }
+      const app = document.querySelector('wujie-app');
+      const root = app?.shadowRoot || appWindow.document;
+      const rootDocument = (root as ShadowRoot).ownerDocument || (root as Document);
 
       const applyEntry = () => {
-        const action = findConfigReferenceAction(appWindow.document);
+        const action = findConfigReferenceAction(root);
         const parent = findConfigReferenceMountParent(action);
         if (action) {
-          setActiveContainerName(findConfigReferenceContainerName(appWindow.document));
+          setActiveContainerName(findConfigReferenceContainerName(root));
         }
         // While the container editor is open, one block goes under its action row.
         if (parent && (!summaryHostRef.current || !parent.contains(summaryHostRef.current))) {
           summaryHostRef.current?.parentNode?.removeChild(summaryHostRef.current);
-          const summary = appWindow.document.createElement('div');
+          const summary = rootDocument.createElement('div');
           summary.dataset.test = 'config-reference-summary-host';
           parent.appendChild(summary);
           summaryHostRef.current = summary;
@@ -107,7 +112,7 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
         // tab. That page renders a collapsible card per container and lists `env`
         // only, so a single page-level block would describe just the first
         // container of a multi-container pod.
-        const sections = parent ? [] : findConfigReferenceEnvSections(appWindow.document);
+        const sections = parent ? [] : findConfigReferenceEnvSections(root);
         const present = new Set<string>();
         sections.forEach(section => {
           present.add(section.containerName);
@@ -119,7 +124,7 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
             host = undefined;
           }
           if (!host) {
-            host = appWindow.document.createElement('div');
+            host = rootDocument.createElement('div');
             host.dataset.test = 'config-reference-env-host';
             const heading = section.card.children[0];
             if (heading && heading.nextSibling) {
@@ -151,13 +156,13 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
         );
         envScopeRef.current = findManualEnvScope(action);
         setManualEnvNames(readManualEnvNames(envScopeRef.current) || []);
-        injectConfigReferenceEntry(appWindow.document, t('CONFIG_REFERENCE'), () => {
-          const currentAction = findConfigReferenceAction(appWindow.document);
+        injectConfigReferenceEntry(root, t('CONFIG_REFERENCE'), () => {
+          const currentAction = findConfigReferenceAction(root);
           const currentParent = findConfigReferenceMountParent(currentAction);
           if (!currentAction || !currentParent) return;
           closeInline();
-          setActiveContainerName(findConfigReferenceContainerName(appWindow.document));
-          const host = appWindow.document.createElement('div');
+          setActiveContainerName(findConfigReferenceContainerName(root));
+          const host = rootDocument.createElement('div');
           host.dataset.test = 'config-reference-inline-host';
           currentParent.appendChild(host);
           inlineHostRef.current = host;
@@ -166,12 +171,12 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
       };
 
       applyEntry();
-      const target = appWindow.document.body || appWindow.document.documentElement;
+      const target = root;
       if (!target) {
         return;
       }
 
-      const Observer = appWindow.document.defaultView?.MutationObserver || MutationObserver;
+      const Observer = rootDocument.defaultView?.MutationObserver || MutationObserver;
       const observer = new Observer(applyEntry);
       observer.observe(target, { childList: true, subtree: true });
       observerRef.current = observer;
@@ -187,9 +192,9 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
             : next,
         );
       };
-      appWindowRef.current = appWindow;
+      domRootRef.current = root;
       inputHandlerRef.current = handleInput;
-      appWindow.document.addEventListener('input', handleInput, true);
+      root.addEventListener('input', handleInput, true);
     },
     [cleanup, closeInline],
   );

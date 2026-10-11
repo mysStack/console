@@ -6,6 +6,12 @@ export interface ConfigReferenceInjectionState {
   entryExists: boolean;
 }
 
+export type ConfigReferenceDomRoot = Document | ShadowRoot;
+
+function getRootDocument(root: ConfigReferenceDomRoot): Document {
+  return (root as ShadowRoot).ownerDocument || (root as Document);
+}
+
 export function shouldInjectConfigReferenceEntry({
   actionExists,
   entryExists,
@@ -13,13 +19,13 @@ export function shouldInjectConfigReferenceEntry({
   return actionExists && !entryExists;
 }
 
-function isVisibleAction(document: Document, element: HTMLElement): boolean {
+function isVisibleAction(root: ConfigReferenceDomRoot, element: HTMLElement): boolean {
   let current: HTMLElement | null = element;
   while (current) {
     if (current.getAttribute?.('aria-hidden') === 'true') {
       return false;
     }
-    const style = document.defaultView?.getComputedStyle(current);
+    const style = getRootDocument(root).defaultView?.getComputedStyle(current);
     if (style && (style.display === 'none' || style.visibility === 'hidden')) {
       return false;
     }
@@ -29,18 +35,20 @@ function isVisibleAction(document: Document, element: HTMLElement): boolean {
 }
 
 /** Reads the container currently being edited by the embedded V3 form. */
-export function findConfigReferenceContainerName(document: Document): string | undefined {
+export function findConfigReferenceContainerName(root: ConfigReferenceDomRoot): string | undefined {
   const inputs = Array.from(
-    document.querySelectorAll<HTMLInputElement>('input[placeholder="Container Name*"]'),
-  ).filter(input => isVisibleAction(document, input));
+    root.querySelectorAll<HTMLInputElement>('input[placeholder="Container Name*"]'),
+  ).filter(input => isVisibleAction(root, input));
   const value = inputs[inputs.length - 1]?.value?.trim();
   return value || undefined;
 }
 
-export function findConfigReferenceAction(document: Document): HTMLButtonElement | undefined {
+export function findConfigReferenceAction(
+  root: ConfigReferenceDomRoot,
+): HTMLButtonElement | undefined {
   const actions = Array.from(
-    document.querySelectorAll<HTMLButtonElement>(CONFIG_REFERENCE_ENVIRONMENT_ACTION_SELECTOR),
-  ).filter(action => isVisibleAction(document, action));
+    root.querySelectorAll<HTMLButtonElement>(CONFIG_REFERENCE_ENVIRONMENT_ACTION_SELECTOR),
+  ).filter(action => isVisibleAction(root, action));
 
   const dialogActions = actions.filter(action => action.closest('[role="dialog"]'));
   return dialogActions[dialogActions.length - 1] || actions[actions.length - 1];
@@ -64,7 +72,7 @@ export function findConfigReferenceMountParent(
  * mutation, so an un-guarded warning would flood the console while no container
  * dialog is open.
  */
-const anchorWarnedDocuments = new WeakSet<Document>();
+const anchorWarnedRoots = new WeakSet<ConfigReferenceDomRoot>();
 
 /**
  * Surfaces the silent-failure mode of this bridge: the embedded V3 console is a
@@ -74,14 +82,14 @@ const anchorWarnedDocuments = new WeakSet<Document>();
  * We only warn while a container dialog is actually open, and only once per
  * document until the anchor is found again.
  */
-function warnAnchorMissing(document: Document): void {
-  if (anchorWarnedDocuments.has(document)) {
+function warnAnchorMissing(root: ConfigReferenceDomRoot): void {
+  if (anchorWarnedRoots.has(root)) {
     return;
   }
-  if (!document.querySelector('[role="dialog"]')) {
+  if (!root.querySelector('[role="dialog"]')) {
     return;
   }
-  anchorWarnedDocuments.add(document);
+  anchorWarnedRoots.add(root);
   // eslint-disable-next-line no-console
   console.warn(
     `[config-reference] no element matched ${CONFIG_REFERENCE_ENVIRONMENT_ACTION_SELECTOR} ` +
@@ -141,16 +149,16 @@ export function readManualEnvNames(scope: HTMLElement | undefined): string[] | u
 }
 
 export function injectConfigReferenceEntry(
-  document: Document,
+  root: ConfigReferenceDomRoot,
   label: string,
   onActivate: () => void,
 ): boolean {
-  const action = findConfigReferenceAction(document);
+  const action = findConfigReferenceAction(root);
   const parent = action?.parentElement;
   const entryExists = Boolean(parent?.querySelector(CONFIG_REFERENCE_ENTRY_SELECTOR));
 
   if (!action || !parent) {
-    warnAnchorMissing(document);
+    warnAnchorMissing(root);
     return false;
   }
 
@@ -159,7 +167,7 @@ export function injectConfigReferenceEntry(
   }
 
   // The anchor is back; allow a future regression to warn again.
-  anchorWarnedDocuments.delete(document);
+  anchorWarnedRoots.delete(root);
 
   const entry = action.cloneNode(true) as HTMLButtonElement;
   entry.type = 'button';
@@ -170,7 +178,7 @@ export function injectConfigReferenceEntry(
     if (content) {
       content.textContent = label;
     } else {
-      const fallback = document.createElement('div');
+      const fallback = getRootDocument(root).createElement('div');
       fallback.className = actionContent.className;
       fallback.textContent = label;
       entry.appendChild(fallback);
@@ -197,16 +205,16 @@ export function injectConfigReferenceEntry(
  * read from the label — it is translated — so two locale-independent signals are
  * accepted: the active tab's href, and the route itself.
  */
-export const findConfigReferenceEnvTabPane = (doc: Document): HTMLElement | null => {
-  if (!doc) return null;
-  const content = doc.querySelector('div.detail-page-content') as HTMLElement | null;
+export const findConfigReferenceEnvTabPane = (root: ConfigReferenceDomRoot): HTMLElement | null => {
+  if (!root) return null;
+  const content = root.querySelector('div.detail-page-content') as HTMLElement | null;
   if (!content || content.children.length < 2) return null;
 
   const activeHref =
     (content.querySelector('a[aria-current="page"]') as HTMLAnchorElement | null)?.getAttribute(
       'href',
     ) || '';
-  const pathname = doc.defaultView?.location?.pathname || '';
+  const pathname = getRootDocument(root).defaultView?.location?.pathname || '';
   if (!/\/env\/?$/.test(activeHref) && !/\/env\/?$/.test(pathname)) return null;
 
   return content.lastElementChild as HTMLElement;
@@ -276,8 +284,10 @@ function findContainerHeadingLabel(marker: SVGUseElement, card: HTMLElement): st
  * The docker glyph on each heading (`#icon-docker`) is the stable hook: every
  * class name between the glyph and the card is hashed.
  */
-export const findConfigReferenceEnvSections = (doc: Document): ConfigReferenceEnvSection[] => {
-  const pane = findConfigReferenceEnvTabPane(doc);
+export const findConfigReferenceEnvSections = (
+  root: ConfigReferenceDomRoot,
+): ConfigReferenceEnvSection[] => {
+  const pane = findConfigReferenceEnvTabPane(root);
   if (!pane) return [];
 
   const sections: ConfigReferenceEnvSection[] = [];
