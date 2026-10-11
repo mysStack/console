@@ -3,14 +3,13 @@
  * https://github.com/kubesphere/console/blob/master/LICENSE
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { set } from 'lodash';
 import { useCacheStore as useStore } from '@ks-console/shared';
 import { Loading } from '@kubed/components';
 import { useQueries, useQuery } from 'react-query';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { apis, ClusterDetail, clusterStore, projectStore } from '@ks-console/shared';
-import { getConsoleV3ProjectPrefix } from './route';
 
 const { fetchDetail: fetchProjectDetail } = projectStore;
 const { fetchDetail: fetchClusterDetail } = clusterStore;
@@ -20,6 +19,7 @@ function BaseLayout(): JSX.Element {
   const userName = globals.user.username;
   const { cluster, namespace, workspace } = useParams<'workspace' | 'namespace' | 'cluster'>();
   const [, setUrlPrefix] = useStore<string>('wujieUrlPrefix');
+  const setUrlPrefixStable = useRef(setUrlPrefix).current;
   const [, setProject] = useStore<any>('project');
   const [, setCluster] = useStore<ClusterDetail>('cluster');
   const [projectResult, clusterResult, workspaceRuleResult] = useQueries([
@@ -59,13 +59,9 @@ function BaseLayout(): JSX.Element {
   );
 
   useEffect(() => {
-    const basePrefix = getConsoleV3ProjectPrefix({
-      workspace,
-      cluster,
-      namespace,
-    });
-    setUrlPrefix(basePrefix);
-  }, [cluster, namespace, setUrlPrefix, workspace]);
+    const basePrefix = `/${workspace}/clusters/${cluster}/projects/${namespace}`;
+    setUrlPrefixStable(basePrefix);
+  }, [cluster, namespace, setUrlPrefixStable, workspace]);
 
   if (
     projectResult.isLoading ||
