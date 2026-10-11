@@ -8,11 +8,32 @@ import {
   findConfigReferenceAction,
   findConfigReferenceEnvSections,
   findConfigReferenceContainerName,
+  isConfigReferenceFormConfirmation,
   findConfigReferenceMountParent,
   injectConfigReferenceEntry,
   installConfigReferenceNativeEdit,
   shouldInjectConfigReferenceEntry,
 } from './bridge';
+
+test('the container form reset is distinct from the enclosing container confirmation', () => {
+  // The live V3 form wrapper contains one footer; the enclosing container
+  // contains that footer plus its own. Hashes and translated labels are irrelevant.
+  const wrapper = (hasName: boolean, footers: number, parentElement: any = null) => ({
+    parentElement,
+    querySelector: () => (hasName ? {} : null),
+    querySelectorAll: () => Array.from({ length: footers }, () => ({})),
+  });
+  const group = wrapper(true, 2);
+  const form = wrapper(true, 1, group);
+  const formFooter = wrapper(false, 1, form);
+  const groupFooter = wrapper(false, 1, group);
+  assert.equal(isConfigReferenceFormConfirmation({ parentElement: formFooter } as any), true);
+  assert.equal(isConfigReferenceFormConfirmation({ parentElement: groupFooter } as any), false);
+  assert.equal(
+    isConfigReferenceFormConfirmation({ parentElement: wrapper(false, 1) } as any),
+    false,
+  );
+});
 
 test('native settings activation opens the controlled action before the old editor and leaves other actions untouched', () => {
   const root = new EventTarget();

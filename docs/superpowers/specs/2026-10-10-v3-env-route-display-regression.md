@@ -113,7 +113,7 @@ V3 原始的 `No Environment Variable Found` 只表示普通 `env` 为空，不�
   不拦截全局 XHR/fetch。只有运行时证明可以保留原生校验、加载、错误及关闭流程后，才接入正式实现。
 - 无可用安全接入点时不得用独立 PATCH、强制刷新或丢弃其他草稿代替此保存契约。
 
-### 2026-10-11 实测阻塞项（未完成验收）
+### 2026-10-11 早期实测阻塞项（历史记录）
 
 在 131 专用 Deployment `test-wes/codex-envfrom-regression-20261011` 中，
 `ams-server` 同时显示手工 `DB=111`、ConfigMap 和 Secret；两个容器的原生折叠与引用展示独立。
@@ -124,6 +124,18 @@ V3 原始的 `No Environment Variable Found` 只表示普通 `env` 为空，不�
 新增未保存容器当前被安全拦截，创建时直接配置仍未完成；浏览器后退的宿主路径与 V3 Tab 不一致也尚未修复。
 实际证据保存在工作区 `output/playwright/2026-10-11-envfrom-131-verification.md`，
 最终保留镜像为 `config-history-20261011-8ab5e2c`，没有替换 V3 制品或修改 133 环境。
+
+### 2026-10-11 最新部署复测（827c061）
+
+- 当前131运行镜像为 `config-history-20261011-827c061`，Action38123226541成功；实际imageID与两仓CI日志一致。
+- 已将引用合并到公共原生 action 最终提交；局部Apply零写入，完整外层OK只产生一次PUT。
+  nginx引用删除后不恢复；新增nginx-new从空引用开始，同次外层保存自己的CM与WORKER\_前缀，main仍CM+Secret。
+- 实际Pod最终3/3 Running，分别exec验证DB与专属变量存在性，没有输出Secret值。
+  首次新增容器测试镜像默认registry/命令输入错误已分层记录，修正fixture不作为该原生字段编辑通过证据。
+- 三个核心场景、外层取消/关闭、容器步骤取消、普通Tab切换与三种英文视口测量已实测；中文DOM翻译通过。
+- 浏览器Back仍导致宿主metadata/V3 env不一致；原生第一层重置/取消、实际保存失败重试、重命名、
+  StatefulSet/DaemonSet环境验收未完成。headless中文字形缺失，不能宣布中文截图视觉通过。
+- 上述早期失败不再描述当前完整保存实现，但这些剩余项未通过之前，整体验收不能标完成。
 
 镜像部署成功不等于浏览器验收成功。测试记录必须包含镜像 tag、Action run、Deployment rollout、直接打开 `/env`
 后的宿主路径和 V3 实际路径、页面关键断言以及控制台新增异常。若出现空白页，先回滚到上一已验证镜像，再继续修复；

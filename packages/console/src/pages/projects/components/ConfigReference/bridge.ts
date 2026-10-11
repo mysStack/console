@@ -64,6 +64,18 @@ export function findConfigReferenceContainerName(root: ConfigReferenceDomRoot): 
   return value || undefined;
 }
 
+/** The form checkpoint stays open; its enclosing container footer exits it. */
+export function isConfigReferenceFormConfirmation(confirmation: Element): boolean {
+  let wrapper = confirmation.parentElement;
+  while (wrapper) {
+    if (wrapper.querySelector('input[name="name"][id="name"][maxlength="63"]')) {
+      return wrapper.querySelectorAll('[data-test="confirm-ok"]').length === 1;
+    }
+    wrapper = wrapper.parentElement;
+  }
+  return false;
+}
+
 export function findConfigReferenceAction(
   root: ConfigReferenceDomRoot,
 ): HTMLButtonElement | undefined {
