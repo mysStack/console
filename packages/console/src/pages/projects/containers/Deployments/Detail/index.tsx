@@ -19,6 +19,8 @@ function DeploymentDetail(): JSX.Element {
   >();
   const location = useLocation();
   const { afterMount, afterUnmount, inline, summary } = useConfigReferenceBridge('deployments');
+  const appWindowRef = useRef<Window>();
+  const routeSyncFrameRef = useRef<number>();
   const projectPrefix = getConsoleV3ProjectPrefix({
     workspace,
     cluster,
@@ -28,6 +30,7 @@ function DeploymentDetail(): JSX.Element {
   const hostDetailPath = `${hostProjectPath}/deployments/${name}`;
   const initialHostPath = useRef(location.pathname);
   const embeddedUrl = getConsoleV3DetailUrl({
+    host: window.location.host,
     projectPrefix,
     name,
   });
@@ -40,17 +43,42 @@ function DeploymentDetail(): JSX.Element {
   const handleAfterMount = useCallback(
     (appWindow: Window) => {
       afterMount(appWindow);
+      appWindowRef.current = appWindow;
       if (
         initialHostPath.current === hostDetailPath ||
         appWindow.location.pathname === embeddedPath
       ) {
         return;
       }
-      appWindow.history.pushState({}, '', embeddedPath);
-      appWindow.dispatchEvent(new PopStateEvent('popstate'));
+
+      let framesRemaining = 300;
+      const syncRoute = () => {
+        const root = appWindow.document.getElementById('root');
+        if (!root?.hasChildNodes() && framesRemaining > 0) {
+          framesRemaining -= 1;
+          routeSyncFrameRef.current = appWindow.requestAnimationFrame(syncRoute);
+          return;
+        }
+        if (!root?.hasChildNodes()) {
+          routeSyncFrameRef.current = undefined;
+          return;
+        }
+        appWindow.history.pushState({}, '', embeddedPath);
+        appWindow.dispatchEvent(new PopStateEvent('popstate'));
+        routeSyncFrameRef.current = undefined;
+      };
+      syncRoute();
     },
     [afterMount, embeddedPath, hostDetailPath],
   );
+  const handleAfterUnmount = useCallback(() => {
+    if (appWindowRef.current && routeSyncFrameRef.current !== undefined) {
+      appWindowRef.current.cancelAnimationFrame(routeSyncFrameRef.current);
+    }
+    appWindowRef.current = undefined;
+    routeSyncFrameRef.current = undefined;
+    afterUnmount();
+  }, [afterUnmount]);
 
   return (
     <>
@@ -61,7 +89,7 @@ function DeploymentDetail(): JSX.Element {
         url={embeddedUrl}
         sync={false}
         afterMount={handleAfterMount}
-        afterUnmount={afterUnmount}
+        afterUnmount={handleAfterUnmount}
       />
       {inline}
       {summary}

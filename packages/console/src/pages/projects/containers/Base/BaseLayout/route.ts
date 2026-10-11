@@ -5,11 +5,12 @@ interface ProjectRouteParts {
 }
 
 interface EmbeddedDetailRoute {
+  host: string;
   projectPrefix: string;
   name?: string;
 }
 
-interface EmbeddedDetailPath extends EmbeddedDetailRoute {
+interface EmbeddedDetailPath extends Omit<EmbeddedDetailRoute, 'host'> {
   hostPath: string;
   hostDetailPath: string;
 }
@@ -29,8 +30,12 @@ export function getConsoleV3ProjectPrefix({
   return `/${workspace}/clusters/${cluster}/projects/${namespace}`;
 }
 
-export function getConsoleV3DetailUrl({ projectPrefix, name = '' }: EmbeddedDetailRoute): string {
-  return `${projectPrefix}/deployments/${name}`;
+export function getConsoleV3DetailUrl({
+  host,
+  projectPrefix,
+  name = '',
+}: EmbeddedDetailRoute): string {
+  return `//${host}/consolev3${projectPrefix}/deployments/${name}`;
 }
 
 /**

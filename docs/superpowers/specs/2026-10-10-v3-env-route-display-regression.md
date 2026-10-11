@@ -40,11 +40,11 @@
 
 路径末尾允许存在或不存在 `/`，并且必须支持带 workspace、cluster、project 和 workload 名称的完整路径。
 
-Wujie 中 `consolev3` 已统一注册在 `/consolev3/`。工作负载详情组件必须先用项目相对的稳定根路径启动缓存应用，例如
-`/test-workspace/clusters/host/projects/test-wes/deployments/ams-server`；不得在启动 URL 中拼接 origin、`/consolev3`
-或 `/env` 深链，否则会绕过预加载实例的正常激活流程并造成嵌入文档空白。应用挂载完成后，由宿主自动将 V3
-browser history 切换到 `/consolev3/.../env` 并派发 `popstate`，以恢复用户直接打开的 Tab。该同步是产品代码的一部分，
-不得依赖测试人员在 DevTools 中手工修改 iframe history。
+Wujie 中 `consolev3` 已统一注册在 `/consolev3/`。工作负载详情组件必须用带 origin 和 `/consolev3` 的稳定工作负载根路径
+启动应用，例如 `//192.168.2.131:30880/consolev3/test-workspace/clusters/host/projects/test-wes/deployments/ams-server`。
+启动 URL 不得直接包含 `/env` 深链；直接以深链启动缓存应用会造成嵌入文档空白。应用挂载并确认 V3 根节点已经渲染后，
+由宿主自动将 V3 browser history 切换到 `/consolev3/.../env` 并派发 `popstate`，以恢复用户直接打开的 Tab。
+该同步是产品代码的一部分，不得依赖测试人员在 DevTools 中手工修改 iframe history。
 
 ### 容器定位
 

@@ -17,10 +17,14 @@ test('builds the project-relative Wujie route used by the preloaded V3 app', () 
 test('boots the cached V3 app at the stable workload root', () => {
   assert.equal(
     getConsoleV3DetailUrl({
+      host: '192.168.2.131:30880',
       projectPrefix: '/test-workspace/clusters/host/projects/test-wes',
       name: 'ams-server',
     }),
-    '/test-workspace/clusters/host/projects/test-wes/deployments/ams-server',
+    [
+      '//192.168.2.131:30880/consolev3/test-workspace/clusters/host/projects/test-wes',
+      '/deployments/ams-server',
+    ].join(''),
   );
 });
 
