@@ -7,6 +7,9 @@ interface ProjectRouteParts {
 interface EmbeddedDetailRoute {
   projectPrefix: string;
   name?: string;
+}
+
+interface EmbeddedDetailPath extends EmbeddedDetailRoute {
   hostPath: string;
   hostDetailPath: string;
 }
@@ -26,17 +29,23 @@ export function getConsoleV3ProjectPrefix({
   return `/${workspace}/clusters/${cluster}/projects/${namespace}`;
 }
 
+export function getConsoleV3DetailUrl({ projectPrefix, name = '' }: EmbeddedDetailRoute): string {
+  return `${projectPrefix}/deployments/${name}`;
+}
+
 /**
- * Preserve the host detail sub-route in the relative V3 bootstrap URL.
+ * Convert a directly opened host tab into the browser path used by the mounted
+ * V3 application. The app must first boot at the stable workload root above;
+ * starting the cached Wujie app at a deep link leaves its document empty.
  */
-export function getConsoleV3DetailUrl({
+export function getConsoleV3DetailPath({
   projectPrefix,
   name = '',
   hostPath,
   hostDetailPath,
-}: EmbeddedDetailRoute): string {
+}: EmbeddedDetailPath): string {
   const suffix = hostPath.startsWith(`${hostDetailPath}/`)
     ? hostPath.slice(hostDetailPath.length)
     : '';
-  return `${projectPrefix}/deployments/${name}${suffix}`;
+  return `/consolev3${projectPrefix}/deployments/${name}${suffix}`;
 }

@@ -40,10 +40,11 @@
 
 路径末尾允许存在或不存在 `/`，并且必须支持带 workspace、cluster、project 和 workload 名称的完整路径。
 
-Wujie 中 `consolev3` 已统一注册在 `/consolev3/`，工作负载详情组件传入的启动 URL 必须保持项目相对形式，例如
-`/test-workspace/clusters/host/projects/test-wes/deployments/ams-server/env`。不得再次拼接 origin 或
-`/consolev3`，否则会绕过预加载实例的正常激活流程并造成嵌入文档空白。`env` 子路由应直接包含在首次启动 URL 中，
-不能把“挂载后手工修改 iframe history”作为产品实现或验收依据。
+Wujie 中 `consolev3` 已统一注册在 `/consolev3/`。工作负载详情组件必须先用项目相对的稳定根路径启动缓存应用，例如
+`/test-workspace/clusters/host/projects/test-wes/deployments/ams-server`；不得在启动 URL 中拼接 origin、`/consolev3`
+或 `/env` 深链，否则会绕过预加载实例的正常激活流程并造成嵌入文档空白。应用挂载完成后，由宿主自动将 V3
+browser history 切换到 `/consolev3/.../env` 并派发 `popstate`，以恢复用户直接打开的 Tab。该同步是产品代码的一部分，
+不得依赖测试人员在 DevTools 中手工修改 iframe history。
 
 ### 容器定位
 
@@ -95,7 +96,8 @@ V3 原始的 `No Environment Variable Found` 只表示普通 `env` 为空，不�
 
 镜像部署成功不等于浏览器验收成功。测试记录必须包含镜像 tag、Action run、Deployment rollout、直接打开 `/env`
 后的宿主路径和 V3 实际路径、页面关键断言以及控制台新增异常。若出现空白页，先回滚到上一已验证镜像，再继续修复；
-不得把手工调用 `history.pushState` 后临时显示的结果记为通过。
+产品代码必须自动完成挂载后的 history 同步；测试人员在 DevTools 中手工调用 `history.pushState` 后临时显示的结果
+不得记为通过。
 
 ## 回滚边界
 

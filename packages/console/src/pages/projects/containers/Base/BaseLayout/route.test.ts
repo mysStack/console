@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { getConsoleV3DetailUrl, getConsoleV3ProjectPrefix } from './route';
+import { getConsoleV3DetailPath, getConsoleV3DetailUrl, getConsoleV3ProjectPrefix } from './route';
 
 test('builds the project-relative Wujie route used by the preloaded V3 app', () => {
   assert.equal(
@@ -14,14 +14,24 @@ test('builds the project-relative Wujie route used by the preloaded V3 app', () 
   );
 });
 
-test('preserves a host detail sub-route when bootstrapping the embedded page', () => {
+test('boots the cached V3 app at the stable workload root', () => {
   assert.equal(
     getConsoleV3DetailUrl({
+      projectPrefix: '/test-workspace/clusters/host/projects/test-wes',
+      name: 'ams-server',
+    }),
+    '/test-workspace/clusters/host/projects/test-wes/deployments/ams-server',
+  );
+});
+
+test('converts a direct host sub-route to the mounted V3 browser path', () => {
+  assert.equal(
+    getConsoleV3DetailPath({
       projectPrefix: '/test-workspace/clusters/host/projects/test-wes',
       name: 'ams-server',
       hostPath: '/test-workspace/clusters/host/projects/test-wes/deployments/ams-server/env',
       hostDetailPath: '/test-workspace/clusters/host/projects/test-wes/deployments/ams-server',
     }),
-    ['/test-workspace/clusters/host/projects/test-wes', '/deployments/ams-server/env'].join(''),
+    '/consolev3/test-workspace/clusters/host/projects/test-wes/deployments/ams-server/env',
   );
 });
