@@ -10,6 +10,14 @@
 
 **Spec:** `docs/superpowers/specs/2026-10-10-v3-env-route-display-regression.md`
 
+## 2026-10-11 用户调整：不重复提供文件挂载
+
+- 配置引用只负责当前容器的 envFrom 与工作负载的 Reloader 注解；移除内联和独立配置引用页面中的“文件挂载/添加文件挂载”区块。
+- 文件挂载继续使用原生“存储”步骤。配置引用提交不传 fileMounts，不修改原生 volumes/volumeMounts。
+- 空引用行仍要求选中实际资源；修复 PLEASE_SELECT 原始翻译键，显示“请选择 ConfigMap 或 Secret”。不通过跳过校验或自动删除空行来伪装保存成功。
+- 新增真实浏览器回归 `output/playwright/envfrom-no-file-mount-regression-20261011.js`（工作区证据，不提交制品）：修改前在131失败于重复挂载按钮仍显示，写请求为零；修改后待精确镜像部署验收。
+- 本轮本地 `sh scripts/test.sh`：34文件、165项通过，0失败。131部署和新镜像验收尚未完成。
+
 ## Global Constraints
 
 - 131 为部署测试环境，133 仅对照且不修改。

@@ -11,6 +11,7 @@
 
 module.exports = {
   CONFIG_REFERENCE: 'Configuration References',
+  CONFIG_REFERENCE_SELECT_RESOURCE: '請選擇 ConfigMap 或 Secret',
   CONFIG_REFERENCE_BACK: 'Back',
   CONFIG_REFERENCE_CONTAINER: 'Container',
   CONFIG_REFERENCE_RESOURCES: 'ConfigMap / Secret',

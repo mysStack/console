@@ -14,6 +14,7 @@ module.exports = {
   CONFIG_REFERENCE_LOAD_ERROR: 'ConfigMap/Secret 列表加载失败。',
   CONFIG_REFERENCE_RETRY: '重试',
   CONFIG_REFERENCE_EMPTY: '当前没有配置引用。',
+  CONFIG_REFERENCE_SELECT_RESOURCE: '请选择 ConfigMap 或 Secret',
   CONFIG_REFERENCE_PREFIX_PLACEHOLDER: '可选前缀',
   CONFIG_REFERENCE_DUPLICATE: '存在重复的配置引用，请先修正。',
   CONFIG_REFERENCE_NAME_REQUIRED: '请为每一行选择 ConfigMap 或 Secret。',

@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { isEqual } from 'lodash';
 import { configMapStore, Icon, secretStore, workloadStore } from '@ks-console/shared';
 import { Button, notify } from '@kubed/components';
 
@@ -15,8 +14,6 @@ import type { ConfigReferenceKind, EnvFromReference } from './types';
 import { toNameOptions } from './resourceOptions';
 import ConfigReferencePreview from './ConfigReferencePreview';
 import { useReferencePreviews } from './useReferencePreviews';
-import { readFileMounts, validateFileMounts } from './fileMount';
-import type { FileMountReference } from './fileMount';
 import type { ConfigReferenceDraftChange } from './draft';
 import {
   autoReloadStyle,
@@ -30,8 +27,6 @@ import {
   nativeSelectArrowStyle,
   nativeSelectStyle,
   nativeSelectWrapperStyle,
-  previewNoteStyle,
-  previewProblemStyle,
   primaryButtonStyle,
   referenceRowStyle,
   referenceToolbarActionsStyle,
@@ -112,7 +107,7 @@ export default function ConfigReferenceInline({
   onApplyDraft,
 }: Props) {
   const store = storeByModule[module];
-  const emptyOption: NameOption = { label: t('PLEASE_SELECT'), value: '' };
+  const emptyOption: NameOption = { label: t('CONFIG_REFERENCE_SELECT_RESOURCE'), value: '' };
   const detailQuery = store.useGetDetail({ cluster, namespace, name });
   const source = draftSource || detailQuery.data;
   const [configMaps, setConfigMaps] = useState<NameOption[]>([]);
@@ -121,7 +116,6 @@ export default function ConfigReferenceInline({
   const [resourceError, setResourceError] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
   const [references, setReferences] = useState<EnvFromReference[]>([]);
-  const [fileMounts, setFileMounts] = useState<FileMountReference[]>([]);
   const [reloaderEnabled, setReloaderEnabled] = useState(false);
   const [saveError, setSaveError] = useState<{ index: number; message: string } | null>(null);
   const containers = useMemo(() => (source ? getContainerNames(source as any) : []), [source]);
@@ -133,14 +127,9 @@ export default function ConfigReferenceInline({
     if (!source) return;
     if (!selectedContainer) {
       setReferences([]);
-      setFileMounts([]);
       return;
     }
     setReferences(parseEnvFrom(getContainerEnvFrom(source as any, selectedContainer)));
-    // Seed the file-mount rows from what the container already has: planFileMounts
-    // treats them as the complete desired set for the container, so an unseeded
-    // (empty) list would delete its existing mounts and their volumes on save.
-    setFileMounts(readFileMounts(source as any, selectedContainer));
     const original = (source as any)._originData || source;
     setReloaderEnabled(
       readReloaderPolicy(original?.metadata?.annotations || (source as any).annotations).enabled,
@@ -170,13 +159,6 @@ export default function ConfigReferenceInline({
   // Keys, values and the resulting per-row preview all come from the shared hook,
   // the same one the panel and the summary use.
   const previews = useReferencePreviews(references, cluster, namespace, { manualEnvNames });
-  // Same hook as envFrom: file mounts need the resource's key list too. Memoized
-  // because the hook keys its fetch effect off this array's identity.
-  const fileMountReferences = useMemo(
-    () => fileMounts.map(mount => ({ kind: mount.kind, name: mount.name, prefix: '' })),
-    [fileMounts],
-  );
-  const fileMountPreviews = useReferencePreviews(fileMountReferences, cluster, namespace);
 
   if (!draftSource && detailQuery.isLoading) {
     return (
@@ -220,11 +202,6 @@ export default function ConfigReferenceInline({
     return indexes;
   }, []);
 
-  const fileMountProblems = validateFileMounts(fileMounts);
-  const updateFileMount = (index: number, value: Partial<FileMountReference>) =>
-    setFileMounts(current =>
-      current.map((item, itemIndex) => (itemIndex === index ? { ...item, ...value } : item)),
-    );
   const updateReference = (index: number, value: Partial<EnvFromReference>) =>
     setReferences(current =>
       current.map((item, itemIndex) => (itemIndex === index ? { ...item, ...value } : item)),
@@ -237,17 +214,11 @@ export default function ConfigReferenceInline({
       return notify.error(t('CONFIG_REFERENCE_NAME_REQUIRED'));
     }
     if (unavailableIndexes.length) return notify.error(t('CONFIG_REFERENCE_UNAVAILABLE'));
-    if (fileMountProblems.length) {
-      return notify.error(t(`CONFIG_REFERENCE_FILE_MOUNT_${fileMountProblems[0].code}`));
-    }
     if (!onApplyDraft || !draftSource) return;
-    const initialMounts = readFileMounts(draftSource, selectedContainer);
     onApplyDraft({
       containerName: selectedContainer,
       references,
       reloaderEnabled,
-      // Leave concurrently edited native volume fields alone when untouched.
-      ...(!isEqual(initialMounts, fileMounts) ? { fileMounts } : {}),
     });
     notify.success(t('CONFIG_REFERENCE_DRAFT_APPLIED'));
     onClose();
@@ -364,108 +335,6 @@ export default function ConfigReferenceInline({
                         : undefined
                 }
               />
-            </div>
-          );
-        })}
-      </div>
-
-      <div style={{ ...referenceToolbarStyle, marginTop: 18 }}>
-        <div style={referenceToolbarHintStyle}>
-          <strong>{t('CONFIG_REFERENCE_FILE_MOUNTS')}</strong>
-        </div>
-        <div style={referenceToolbarActionsStyle}>
-          <button
-            type="button"
-            className="button button-default button-size-normal"
-            style={buttonStyle}
-            disabled={resourceLoading}
-            onClick={() =>
-              setFileMounts(current => [
-                ...current,
-                { kind: 'configMap', name: '', mountPath: '', readOnly: true },
-              ])
-            }
-          >
-            {t('CONFIG_REFERENCE_FILE_MOUNT_ADD')}
-          </button>
-        </div>
-      </div>
-      {fileMounts.length === 0 && <div style={messageStyle}>{t('CONFIG_REFERENCE_EMPTY')}</div>}
-      <div style={{ display: 'grid', gap: 8, marginTop: 10 }}>
-        {fileMounts.map((mount, index) => {
-          const options = mount.kind === 'secret' ? secrets : configMaps;
-          // Only complain once a resource is chosen: an empty new row is not an error,
-          // and the mount path is meaningless until then.
-          const problem = mount.name
-            ? fileMountProblems.find(item => item.index === index)
-            : undefined;
-          const preview = fileMountPreviews[index];
-          const resourceOptions = [
-            ...(mount.name && !options.some(option => option.value === mount.name)
-              ? [{ label: `${mount.name}（不可用）`, value: mount.name, disabled: true }]
-              : []),
-            emptyOption,
-            ...options,
-          ];
-          return (
-            <div key={`mount-${index}-${mount.kind}`}>
-              <div style={referenceRowStyle}>
-                <NativeSelect
-                  aria-label={t('CONFIG_REFERENCE_ARIA_KIND', { index: index + 1 })}
-                  value={mount.kind}
-                  options={[
-                    { label: t('FROM_CONFIGMAP'), value: 'configMap' },
-                    { label: t('FROM_SECRET'), value: 'secret' },
-                  ]}
-                  onValueChange={value =>
-                    updateFileMount(index, { kind: value as ConfigReferenceKind, name: '' })
-                  }
-                />
-                <NativeSelect
-                  aria-label={t('CONFIG_REFERENCE_ARIA_RESOURCE', { index: index + 1 })}
-                  value={mount.name}
-                  options={resourceOptions}
-                  disabled={resourceLoading}
-                  onValueChange={value => updateFileMount(index, { name: value })}
-                />
-                <input
-                  aria-label={t('CONFIG_REFERENCE_FILE_MOUNT_PATH')}
-                  style={controlStyle}
-                  value={mount.mountPath}
-                  placeholder="/etc/app/config"
-                  onChange={event => updateFileMount(index, { mountPath: event.target.value })}
-                />
-                <label
-                  style={{ display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={mount.readOnly}
-                    onChange={event => updateFileMount(index, { readOnly: event.target.checked })}
-                  />
-                  {t('CONFIG_REFERENCE_FILE_MOUNT_READ_ONLY')}
-                </label>
-                <Button
-                  type="button"
-                  className="button-flat button-size-normal has-icon"
-                  aria-label={t('CONFIG_REFERENCE_ARIA_REMOVE', { index: index + 1 })}
-                  onClick={() =>
-                    setFileMounts(current => current.filter((_, itemIndex) => itemIndex !== index))
-                  }
-                >
-                  <Icon name="trash" />
-                </Button>
-              </div>
-              {problem && (
-                <div role="alert" style={previewProblemStyle}>
-                  {t(`CONFIG_REFERENCE_FILE_MOUNT_${problem.code}`)}
-                </div>
-              )}
-              {!problem && preview && preview.resolved && preview.entries.length > 0 && (
-                <div style={previewNoteStyle}>
-                  {t('CONFIG_REFERENCE_FILE_MOUNT_PREVIEW', { count: preview.entries.length })}
-                </div>
-              )}
             </div>
           );
         })}

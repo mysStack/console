@@ -5,6 +5,7 @@
 
 module.exports = {
   CONFIG_REFERENCE: 'Configuration References',
+  CONFIG_REFERENCE_SELECT_RESOURCE: 'Select a ConfigMap or Secret',
   CONFIG_REFERENCE_BACK: 'Back',
   CONFIG_REFERENCE_CONTAINER: 'Container',
   CONFIG_REFERENCE_RESOURCES: 'ConfigMap / Secret',
