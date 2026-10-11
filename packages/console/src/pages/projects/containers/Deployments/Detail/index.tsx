@@ -11,7 +11,7 @@ import {
   getConsoleV3DetailPath,
   getConsoleV3DetailUrl,
   getConsoleV3ProjectPrefix,
-  scheduleConsoleV3DetailRoute,
+  syncConsoleV3DetailRoute,
 } from '../../Base/BaseLayout/route';
 
 function DeploymentDetail(): JSX.Element {
@@ -21,7 +21,7 @@ function DeploymentDetail(): JSX.Element {
   const location = useLocation();
   const { afterMount, afterUnmount, inline, summary } = useConfigReferenceBridge('deployments');
   const appWindowRef = useRef<Window>();
-  const cancelRouteSyncRef = useRef<() => void>();
+  const routeSyncFrameRef = useRef<number>();
   const projectPrefix = getConsoleV3ProjectPrefix({
     workspace,
     cluster,
@@ -29,48 +29,71 @@ function DeploymentDetail(): JSX.Element {
   });
   const hostProjectPath = `/${workspace}/clusters/${cluster}/projects/${namespace}`;
   const hostDetailPath = `${hostProjectPath}/deployments/${name}`;
-  const currentHostPath = useRef(location.pathname);
-  currentHostPath.current = location.pathname;
+  const initialHostPath = useRef(location.pathname);
   const embeddedUrl = getConsoleV3DetailUrl({
     host: window.location.host,
     projectPrefix,
     name,
   });
-  const syncHostRoute = useCallback(
-    (appWindow: Window) => {
-      cancelRouteSyncRef.current?.();
-      if (currentHostPath.current === hostDetailPath) return;
-      cancelRouteSyncRef.current = scheduleConsoleV3DetailRoute(
-        appWindow,
-        getConsoleV3DetailPath({
-          projectPrefix,
-          name,
-          hostPath: currentHostPath.current,
-          hostDetailPath,
-        }),
-      );
-    },
-    [hostDetailPath, name, projectPrefix],
-  );
+  const embeddedPath = getConsoleV3DetailPath({
+    projectPrefix,
+    name,
+    hostPath: initialHostPath.current,
+    hostDetailPath,
+  });
   const handleAfterMount = useCallback(
     (appWindow: Window) => {
       afterMount(appWindow);
       appWindowRef.current = appWindow;
-      syncHostRoute(appWindow);
+      if (
+        initialHostPath.current === hostDetailPath ||
+        appWindow.location.pathname === embeddedPath
+      ) {
+        return;
+      }
+
+      let framesRemaining = 300;
+      const syncRoute = () => {
+        const root = appWindow.document.getElementById('root');
+        if (!root?.hasChildNodes() && framesRemaining > 0) {
+          framesRemaining -= 1;
+          routeSyncFrameRef.current = appWindow.requestAnimationFrame(syncRoute);
+          return;
+        }
+        if (!root?.hasChildNodes()) {
+          routeSyncFrameRef.current = undefined;
+          return;
+        }
+        appWindow.history.pushState({}, '', embeddedPath);
+        appWindow.dispatchEvent(new PopStateEvent('popstate'));
+        routeSyncFrameRef.current = undefined;
+      };
+      syncRoute();
     },
-    [afterMount, syncHostRoute],
+    [afterMount, embeddedPath, hostDetailPath],
   );
   const handleAfterUnmount = useCallback(() => {
-    cancelRouteSyncRef.current?.();
+    if (appWindowRef.current && routeSyncFrameRef.current !== undefined) {
+      appWindowRef.current.cancelAnimationFrame(routeSyncFrameRef.current);
+    }
     appWindowRef.current = undefined;
-    cancelRouteSyncRef.current = undefined;
+    routeSyncFrameRef.current = undefined;
     afterUnmount();
   }, [afterUnmount]);
 
   useEffect(() => {
     const appWindow = appWindowRef.current;
-    if (appWindow) syncHostRoute(appWindow);
-  }, [location.pathname, syncHostRoute]);
+    if (!appWindow || location.pathname === hostDetailPath) return;
+    syncConsoleV3DetailRoute(
+      appWindow,
+      getConsoleV3DetailPath({
+        projectPrefix,
+        name,
+        hostPath: location.pathname,
+        hostDetailPath,
+      }),
+    );
+  }, [hostDetailPath, location.pathname, name, projectPrefix]);
 
   return (
     <>

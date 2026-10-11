@@ -67,27 +67,3 @@ export function syncConsoleV3DetailRoute(appWindow: Window, embeddedPath: string
   appWindow.dispatchEvent(new PopStateEvent('popstate'));
   return true;
 }
-
-/** Cached V3 may mount asynchronously. Retry briefly and cancel stale targets. */
-export function scheduleConsoleV3DetailRoute(appWindow: Window, embeddedPath: string): () => void {
-  let cancelled = false;
-  let frame: number | undefined;
-  let framesRemaining = 300;
-  const sync = () => {
-    frame = undefined;
-    if (cancelled || appWindow.location.pathname === embeddedPath) return;
-    if (!appWindow.document.getElementById('root')?.hasChildNodes()) {
-      if (framesRemaining > 0) {
-        framesRemaining -= 1;
-        frame = appWindow.requestAnimationFrame(sync);
-      }
-      return;
-    }
-    syncConsoleV3DetailRoute(appWindow, embeddedPath);
-  };
-  sync();
-  return () => {
-    cancelled = true;
-    if (frame !== undefined) appWindow.cancelAnimationFrame(frame);
-  };
-}
