@@ -126,6 +126,11 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
           if (!host) {
             host = rootDocument.createElement('div');
             host.dataset.test = 'config-reference-env-host';
+            // V3 positions its empty-state body absolutely after the heading.
+            // Keep the envFrom summary above that body so it is visible without
+            // first collapsing the native container card.
+            host.style.position = 'relative';
+            host.style.zIndex = '1';
             const heading = section.card.children[0];
             if (heading && heading.nextSibling) {
               section.card.insertBefore(host, heading.nextSibling);
