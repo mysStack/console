@@ -16,7 +16,7 @@
 - 文件挂载继续使用原生“存储”步骤。配置引用提交不传 fileMounts，不修改原生 volumes/volumeMounts。
 - 空引用行仍要求选中实际资源；修复 PLEASE_SELECT 原始翻译键，显示“请选择 ConfigMap 或 Secret”。不通过跳过校验或自动删除空行来伪装保存成功。
 - 新增真实浏览器回归 `output/playwright/envfrom-no-file-mount-regression-20261011.js`（工作区证据，不提交制品）：修改前在131失败于重复挂载按钮仍显示，写请求为零；修改后待精确镜像部署验收。
-- 本轮本地 `sh scripts/test.sh`：34文件、165项通过，0失败。131部署和新镜像验收尚未完成。
+- 修改阶段本地 `sh scripts/test.sh`：34文件、165项通过，0失败；随后131部署与新镜像验收结果见下文。
 
 ### 该调整的最终131验收
 
@@ -24,7 +24,7 @@
 
 新增/删除CM+Secret和普通DB共同经过两次真实原生PUT200，刷新重开及完整PodSpec回读通过；main/worker未变，fixture已恢复。三容器env混合展示/整体折叠/取消零写入、18项路由Back/Forward/刷新及三种中文视口均通过；真实Pod3/3 Running、分别exec验证存在性，不输出Secret值。
 
-完整命令、结果、脚本失败归因和范围限制记录在工作区 `output/playwright/2026-10-11-envfrom-no-file-mount-verification.md`。本轮尚未新增英文完整切换、STS/DS及Reloader控制器验收，不把这些写成通过。
+完整命令、结果、脚本失败归因和范围限制记录在工作区 `output/playwright/2026-10-11-envfrom-no-file-mount-verification.md`。英文完整切换与三种视口已在最终审计中补验；STS/DS及Reloader控制器实际滚动不属于本轮三个缺陷的完成声明，不把这些写成通过。
 
 ## Global Constraints
 
@@ -72,8 +72,20 @@
 - [x] 删除 nginx 引用、局部确认、原生容器确认、外层确定；刷新、重新打开，旧引用不得恢复。主容器CM+Secret不变，nginx引用为空。
 - [x] 同时编辑普通变量及原生端口/其他字段，确认同次保存保留；重复编辑、外层取消或关闭不得写入资源。端口82/DB111与删除引用同次保存；原生内层重置不在本项已通过范围。
 - [x] kubectl 回读容器引用、等待真实 Pod rollout，检查合成变量存在性，不输出 Secret 值。首次测试镜像/命令输入错误导致rollout失败；仅修正fixture这三个字段后3/3 Running，分别exec验证隔离。不能把fixture patch当成原生镜像/命令UI验收。
-- [ ] 路由刷新/切换/前进后退、中文/英文及 1280/1440/1920 下回归；失败分层记录，不以 CI 替代浏览器。
-- [ ] 逐条比对规格与证据；任何未通过项保留目标 active，不宣称全部完成。
+- [x] 路由刷新/切换/前进后退、中文/英文及 1280/1440/1920 下回归；失败分层记录，不以 CI 替代浏览器。最终中文与英文均真实切换验证，宿主/子应用路由18个检查点通过，两种语言的三种视口无横向溢出。
+- [x] 逐条比对规格与证据；三个缺陷、原生完整保存、空资源校验、重复文件挂载移除及回归边界均有当前131证据，完成审计见下节。
+
+## 2026-10-11 最终完成审计（ad8a0a5）
+
+- **部署身份：** `feature/config-history` 产品提交 `ad8a0a5b1b310275df6c636609c6bbe126ea6c93`；Action `38145147733` 成功，CI 30 文件 157/157；131 运行 `docker.io/mingys/ks-console:config-history-20261011-ad8a0a5`，实际 imageID digest 为 `sha256:8aeaacb834f9e35dd570fb612abbe9bfe89040f844164ffc79c65ad584626c6b`，Deployment generation/observedGeneration 426/426、ready/updated 1/1。
+- **三个核心缺陷：** 真实浏览器在三容器专用 Deployment 中同时显示普通 `DB=111/111/335` 与各自引用；引用摘要数量分别为 1/0/1。逐卡片使用原生绿色折叠按钮时，只隐藏本容器普通 env 与 envFrom，其他容器保持展开。取消编辑产生写请求 0，resourceVersion 保持 `121812537`。
+- **隔离与完整保存：** nginx 新增 ConfigMap、Secret、`NGINX_` 前缀及 `DB=112` 后，经局部 Apply、原生容器确认和外层确定只产生一次 PUT 200；另一次 PUT 200 删除两份引用并恢复 DB=111。回读版本 `121812414`→`121812537`，其他两个容器与 volumes 未变，最终完整 PodSpec 与基线一致，旧引用未恢复。
+- **真实运行：** 专用 Deployment rollout 成功，Pod 3/3 Running、0 重启；逐容器 exec 只检查变量存在性，不输出 Secret 值。main 仅有 main/secret 合成变量，nginx 无引用变量，worker 仅有 `WORKER_` 变量，隔离与 API 回读一致。
+- **真实业务只读对照：** `test-wes/ams-server` 两个容器分别为普通 env/引用 1/8 与 0/2，浏览器实际显示两份独立摘要，写请求 0、监听期 pageerror 0；没有修改业务工作负载。
+- **路由与语言布局：** 直接打开、Tab 切换、刷新、Back/Forward 共18个检查点中，宿主与 V3 子应用路径一致；非 env 页摘要为0，env页3个容器/2份摘要。账号通过真实“用户设置”先切换 English 再恢复简体中文；英文资源类型、摘要与资源选择占位正确。1280/1440/1920 的 host/child `scrollWidth == clientWidth`，无横向溢出；英文截图为工作区 `output/playwright/envfrom-ad8a0a5-en-1920-131.png`。
+- **用户追加调整：** 配置引用内的“添加文件挂载/文件挂载”均不存在；原生“存储”仍保留“挂载卷/挂载配置字典或保密字典”。空资源行显示“请选择 ConfigMap 或 Secret”且拒绝应用，实际 ConfigMap/Secret 可选，外层取消写请求0。
+- **自动化：** 当前工作树 `sh scripts/test.sh` 为34文件165/165；`git diff --check` 通过。测试还覆盖加载/失败/空列表、四种 env/envFrom 组合、Secret不泄露、容器名称匹配、草稿合并及保存竞态。
+- **范围边界：** 133未修改。已有扩展兼容日志和 imageconfig 400 不属于本修复，不能据此宣称整个 Console 零错误；StatefulSet/DaemonSet 保存、Reloader 控制器实际自动滚动及服务端4xx/5xx不是这三个 Deployment 缺陷的完成证据，仍不写成已验证。
 
 ## 2026-10-11 接入前审查（历史记录）
 
