@@ -20,8 +20,8 @@ test('builds display rows without reading ConfigMap or Secret data', () => {
       ],
     }),
     [
-      { kind: 'configMap', name: 'wes-app', prefix: 'APP_', label: '来自配置字典' },
-      { kind: 'secret', name: 'wes-secret', label: '来自保密字典' },
+      { kind: 'configMap', name: 'wes-app', prefix: 'APP_', label: 'FROM_CONFIGMAP' },
+      { kind: 'secret', name: 'wes-secret', label: 'FROM_SECRET' },
     ],
   );
 });
@@ -31,6 +31,6 @@ test('omits malformed references from the display', () => {
     getConfigReferenceSummaryRows({
       envFrom: [{ configMapRef: { name: '' } }, { secretRef: { name: 'valid' } }],
     }),
-    [{ kind: 'secret', name: 'valid', label: '来自保密字典' }],
+    [{ kind: 'secret', name: 'valid', label: 'FROM_SECRET' }],
   );
 });

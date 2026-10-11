@@ -3,16 +3,12 @@
  * https://github.com/kubesphere/console/blob/master/LICENSE
  */
 
-import React, { useCallback } from 'react';
+import React from 'react';
 import WujieReact from 'wujie-react';
 import { useCacheStore as useStore } from '@ks-console/shared';
 import { useLocation, useParams } from 'react-router-dom';
 import { useConfigReferenceBridge } from '../../../components/ConfigReference/entry';
-import {
-  getConsoleV3DetailPath,
-  getConsoleV3DetailUrl,
-  getConsoleV3ProjectPrefix,
-} from '../../Base/BaseLayout/route';
+import { getConsoleV3DetailUrl, getConsoleV3ProjectPrefix } from '../../Base/BaseLayout/route';
 
 function DeploymentDetail(): JSX.Element {
   const { workspace, cluster, namespace, name } = useParams<
@@ -24,7 +20,6 @@ function DeploymentDetail(): JSX.Element {
   const projectPrefix =
     wujieUrlPrefix ||
     getConsoleV3ProjectPrefix({
-      host: window.location.host,
       workspace,
       cluster,
       namespace,
@@ -34,24 +29,9 @@ function DeploymentDetail(): JSX.Element {
   const embeddedUrl = getConsoleV3DetailUrl({
     projectPrefix,
     name,
-  });
-  const embeddedPath = getConsoleV3DetailPath({
-    projectPrefix,
-    name,
     hostPath: location.pathname,
     hostDetailPath,
   });
-  const handleAfterMount = useCallback(
-    (appWindow: Window) => {
-      afterMount(appWindow);
-      if (location.pathname === hostDetailPath || appWindow.location.pathname === embeddedPath) {
-        return;
-      }
-      appWindow.history.pushState({}, '', embeddedPath);
-      appWindow.dispatchEvent(new PopStateEvent('popstate'));
-    },
-    [afterMount, embeddedPath, hostDetailPath, location.pathname],
-  );
 
   return (
     <>
@@ -61,7 +41,7 @@ function DeploymentDetail(): JSX.Element {
         name="consolev3"
         url={embeddedUrl}
         sync={false}
-        afterMount={handleAfterMount}
+        afterMount={afterMount}
         afterUnmount={afterUnmount}
       />
       {inline}

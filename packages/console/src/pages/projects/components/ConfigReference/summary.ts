@@ -2,7 +2,7 @@ import { parseEnvFrom } from './envFrom';
 import type { EnvFromReference } from './types';
 
 export interface ConfigReferenceSummaryRow extends EnvFromReference {
-  label: '来自配置字典' | '来自保密字典';
+  label: 'FROM_CONFIGMAP' | 'FROM_SECRET';
 }
 
 export function getConfigReferenceSummaryPrefix(reference: EnvFromReference): string | undefined {
@@ -12,6 +12,6 @@ export function getConfigReferenceSummaryPrefix(reference: EnvFromReference): st
 export function getConfigReferenceSummaryRows(container: unknown): ConfigReferenceSummaryRow[] {
   return parseEnvFrom((container as { envFrom?: unknown } | undefined)?.envFrom).map(reference => ({
     ...reference,
-    label: reference.kind === 'configMap' ? '来自配置字典' : '来自保密字典',
+    label: reference.kind === 'configMap' ? 'FROM_CONFIGMAP' : 'FROM_SECRET',
   }));
 }

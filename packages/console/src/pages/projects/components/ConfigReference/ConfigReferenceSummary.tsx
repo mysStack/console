@@ -143,7 +143,7 @@ export default function ConfigReferenceSummary({
       {references.map((reference, index) => (
         <div key={`${reference.kind}-${reference.name}-${index}`} style={rowWrapperStyle}>
           <div style={rowStyle}>
-            <span style={kindStyle}>{reference.label}</span>
+            <span style={kindStyle}>{t(reference.label)}</span>
             <span style={nameStyle}>{reference.name}</span>
             {getConfigReferenceSummaryPrefix(reference) && (
               <span style={prefixStyle}>{getConfigReferenceSummaryPrefix(reference)}</span>
