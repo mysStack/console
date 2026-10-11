@@ -192,11 +192,21 @@ test('reads the visible V3 container editor as the configuration target', () => 
   } as unknown as HTMLInputElement;
   const document = {
     querySelectorAll: (selector: string) =>
-      selector === 'input[placeholder="Container Name*"]' ? [visibleInput] : [],
+      selector.includes('input[placeholder="Container Name*"]') ? [visibleInput] : [],
     defaultView: { getComputedStyle: () => ({ display: 'block', visibility: 'visible' }) },
   } as unknown as Document;
 
   assert.equal(findConfigReferenceContainerName(document), 'wes-v2-server');
+});
+
+test('identifies the Chinese editor container without guessing the main container', () => {
+  const input = { value: 'nginx', getAttribute: () => null, parentElement: null };
+  const document = {
+    querySelectorAll: (selector: string) =>
+      selector.includes('input[placeholder="容器名称*"]') ? [input] : [],
+    defaultView: { getComputedStyle: () => ({ display: 'block', visibility: 'visible' }) },
+  } as unknown as Document;
+  assert.equal(findConfigReferenceContainerName(document), 'nginx');
 });
 
 interface FakeCard {
@@ -238,7 +248,7 @@ const fakeEnvTabDocument = (cards: FakeCard[], activeHref = '/env') => {
       contains: (node: any) => node === marker,
     };
     const wrapper: any = {
-      children: [heading],
+      children: [heading, { textContent: 'DB111', children: [] }],
       parentElement: pane,
       contains: (node: any) => node === heading || heading.contains(node),
     };
@@ -304,6 +314,30 @@ test('finds cards nested below the active environment pane and accepts sprite UR
     sections.map(section => section.containerName),
     ['main'],
   );
+});
+
+test('shares the native body with manual env and container collapse', () => {
+  const sections = findConfigReferenceEnvSections(fakeEnvTabDocument([{ name: 'main' }]));
+  assert.equal(sections[0].body, sections[0].card.children[1]);
+});
+
+test('does not mistake a shared multi-container list wrapper for a container card', () => {
+  const document = fakeEnvTabDocument([{ name: 'main' }, { name: 'nginx' }]);
+  const pane: any = document.querySelector('div.detail-page-content')?.lastElementChild;
+  const cards = pane.children;
+  const list: any = { children: cards, parentElement: pane };
+  cards.forEach((card: any) => {
+    card.parentElement = list;
+  });
+  pane.children = [list];
+  pane.querySelectorAll = () => cards.map((card: any) => card.children[0].children[0]);
+  const sections = findConfigReferenceEnvSections(document);
+  assert.deepEqual(
+    sections.map(section => section.containerName),
+    ['main', 'nginx'],
+  );
+  assert.equal(sections[0].card, cards[0]);
+  assert.equal(sections[1].card, cards[1]);
 });
 
 test('uses the complete container card when the docker heading has nested leading controls', () => {

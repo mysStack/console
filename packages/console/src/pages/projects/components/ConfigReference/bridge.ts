@@ -37,7 +37,10 @@ function isVisibleAction(root: ConfigReferenceDomRoot, element: HTMLElement): bo
 /** Reads the container currently being edited by the embedded V3 form. */
 export function findConfigReferenceContainerName(root: ConfigReferenceDomRoot): string | undefined {
   const inputs = Array.from(
-    root.querySelectorAll<HTMLInputElement>('input[placeholder="Container Name*"]'),
+    root.querySelectorAll<HTMLInputElement>(
+      'input[placeholder="Container Name*"], input[placeholder="容器名称*"], ' +
+        'input[data-test="container-name"]',
+    ),
   ).filter(input => isVisibleAction(root, input));
   const value = inputs[inputs.length - 1]?.value?.trim();
   return value || undefined;
@@ -240,8 +243,9 @@ export interface ConfigReferenceEnvSection {
   containerName: string;
   /** Zero-based position of the card on the page, used as a matching fallback. */
   index: number;
-  /** The container card; the block goes right after its heading. */
+  /** Native card and collapsible body; envFrom belongs inside the same body as env. */
   card: HTMLElement;
+  body: HTMLElement;
 }
 
 function isDockerGlyph(use: SVGUseElement): boolean {
@@ -254,7 +258,8 @@ function isDockerGlyph(use: SVGUseElement): boolean {
 function findContainerCard(marker: SVGUseElement, pane: HTMLElement): HTMLElement | null {
   let current = marker.parentElement as HTMLElement | null;
   while (current && current !== pane) {
-    if (current.parentElement === pane) {
+    const heading = current.children[0];
+    if (current.children.length >= 2 && (heading === marker || heading?.contains(marker))) {
       return current;
     }
     current = current.parentElement as HTMLElement | null;
@@ -303,7 +308,12 @@ export const findConfigReferenceEnvSections = (
         findContainerHeadingLabel(marker, card),
       );
       if (!containerName) return;
-      sections.push({ containerName, index: sections.length, card });
+      const body = Array.from(card.children).find(
+        (child, index) =>
+          index > 0 && !(child as HTMLElement).dataset?.test?.startsWith('config-reference-'),
+      ) as HTMLElement | undefined;
+      if (!body) return;
+      sections.push({ containerName, index: sections.length, card, body });
     });
   return sections;
 };

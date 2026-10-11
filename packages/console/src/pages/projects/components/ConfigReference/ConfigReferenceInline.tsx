@@ -6,7 +6,12 @@ import { Button, notify } from '@kubed/components';
 
 import { findDuplicateReferences, parseEnvFrom } from './envFrom';
 import { readReloaderPolicy } from './reloader';
-import { buildConfigReferencePatch, getContainerEnvFrom, getContainerNames } from './workload';
+import {
+  buildConfigReferencePatch,
+  getContainerEnvFrom,
+  getContainerNames,
+  resolveConfigReferenceContainer,
+} from './workload';
 import type { ConfigReferenceKind, EnvFromReference } from './types';
 import { toNameOptions } from './resourceOptions';
 import ConfigReferencePreview from './ConfigReferencePreview';
@@ -121,13 +126,17 @@ export default function ConfigReferenceInline({
     () => (detailQuery.data ? getContainerNames(detailQuery.data as any) : []),
     [detailQuery.data],
   );
-  const selectedContainer =
-    targetContainerName && containers.includes(targetContainerName)
-      ? targetContainerName
-      : containers[0] || '';
+  const selectedContainer = detailQuery.data
+    ? resolveConfigReferenceContainer(detailQuery.data as any, targetContainerName)
+    : '';
 
   useEffect(() => {
     if (!detailQuery.data) return;
+    if (!selectedContainer) {
+      setReferences([]);
+      setFileMounts([]);
+      return;
+    }
     setReferences(parseEnvFrom(getContainerEnvFrom(detailQuery.data as any, selectedContainer)));
     // Seed the file-mount rows from what the container already has: planFileMounts
     // treats them as the complete desired set for the container, so an unseeded
@@ -223,6 +232,16 @@ export default function ConfigReferenceInline({
       </div>
     );
   }
+  if (!selectedContainer) {
+    return (
+      <div data-test="config-reference-inline" role="alert" style={sectionStyle}>
+        {t('CONFIG_REFERENCE_CONTAINER_UNAVAILABLE')}
+        <Button style={buttonStyle} onClick={onClose}>
+          {t('CANCEL')}
+        </Button>
+      </div>
+    );
+  }
 
   const duplicateIndexes = findDuplicateReferences(references);
   const availableNames = {
@@ -245,6 +264,7 @@ export default function ConfigReferenceInline({
     );
   const save = () => {
     setSaveError(null);
+    if (!selectedContainer) return;
     if (duplicateIndexes.length) return notify.error(t('CONFIG_REFERENCE_DUPLICATE'));
     if (references.some(reference => !reference.name.trim())) {
       return notify.error(t('CONFIG_REFERENCE_NAME_REQUIRED'));

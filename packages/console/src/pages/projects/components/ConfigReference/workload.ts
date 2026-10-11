@@ -27,6 +27,19 @@ export function getContainerNames(source: WorkloadLike): string[] {
     .filter((name): name is string => typeof name === 'string' && name.length > 0);
 }
 
+export function resolveConfigReferenceContainer(
+  source: WorkloadLike,
+  targetContainerName?: string,
+) {
+  const containers = getContainerNames(source);
+  // A new/renamed container exists in the native form before it exists in the
+  // saved workload. Never read or patch the first container on its behalf.
+  if (targetContainerName !== undefined) {
+    return containers.includes(targetContainerName) ? targetContainerName : '';
+  }
+  return '';
+}
+
 export function getContainerEnvFrom(source: WorkloadLike, containerName?: string): unknown[] {
   const containers = getPodTemplateContainers(source);
   const container = containerName

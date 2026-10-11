@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { buildConfigReferencePatch, getContainerEnvFrom, getContainerNames } from './workload';
+import {
+  buildConfigReferencePatch,
+  getContainerEnvFrom,
+  getContainerNames,
+  resolveConfigReferenceContainer,
+} from './workload';
 
 const detail = {
   metadata: {
@@ -22,6 +27,35 @@ const detail = {
 test('reads container names and envFrom from the original workload shape', () => {
   assert.deepEqual(getContainerNames({ _originData: detail } as any), ['api', 'sidecar']);
   assert.deepEqual(getContainerEnvFrom({ _originData: detail } as any, 'api'), [
+    { secretRef: { name: 'api-secret' } },
+  ]);
+});
+
+test('does not borrow the first container when editing a new unsaved container', () => {
+  assert.equal(resolveConfigReferenceContainer(detail as any, 'nginx'), '');
+});
+
+test('requires an explicit target instead of guessing in a multi-container editor', () => {
+  assert.equal(resolveConfigReferenceContainer(detail as any), '');
+  assert.equal(resolveConfigReferenceContainer(detail as any, 'sidecar'), 'sidecar');
+});
+
+test('does not guess a single saved container when the editor target cannot be identified', () => {
+  const source = {
+    spec: { template: { spec: { containers: [{ name: 'api' }] } } },
+  } as any;
+  assert.equal(resolveConfigReferenceContainer(source), '');
+  assert.equal(resolveConfigReferenceContainer(source, 'api'), 'api');
+  assert.equal(resolveConfigReferenceContainer(source, 'nginx'), '');
+});
+
+test('deleting sidecar references emits no patch for the main container', () => {
+  const source = structuredClone(detail);
+  source.spec.template.spec.containers[1].envFrom = [{ secretRef: { name: 'sidecar-secret' } }];
+  assert.deepEqual(buildConfigReferencePatch(source as any, 'sidecar', [], false), [
+    { op: 'remove', path: '/spec/template/spec/containers/1/envFrom' },
+  ]);
+  assert.deepEqual(source.spec.template.spec.containers[0].envFrom, [
     { secretRef: { name: 'api-secret' } },
   ]);
 });

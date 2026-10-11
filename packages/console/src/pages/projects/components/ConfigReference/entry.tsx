@@ -91,6 +91,23 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
       const app = document.querySelector('wujie-app');
       const root = app?.shadowRoot || appWindow.document;
       const rootDocument = (root as ShadowRoot).ownerDocument || (root as Document);
+      // Empty env bodies are absolutely positioned by V3. Only when envFrom
+      // contributes content, put that body back into normal flow and suppress its
+      // text placeholder. Keep V3's display rule untouched: it owns collapse.
+      if (!root.querySelector('[data-test="config-reference-env-layout"]')) {
+        const style = rootDocument.createElement('style');
+        style.dataset.test = 'config-reference-env-layout';
+        style.textContent = `
+          [data-config-reference-empty="true"]:has([data-test="config-reference-summary"]) {
+            position: static !important; transform: none !important;
+            height: auto !important; min-height: 0 !important; width: auto !important;
+            font-size: 0 !important; padding-top: 20px;
+          }
+          [data-test="config-reference-env-host"] { width: 100%; font-size: 12px; }
+          div:has(> [data-test="config-reference-env-host"]) { flex-direction: column; }
+        `;
+        (root instanceof ShadowRoot ? root : root.head).appendChild(style);
+      }
 
       const applyEntry = () => {
         const action = findConfigReferenceAction(root);
@@ -126,17 +143,12 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
           if (!host) {
             host = rootDocument.createElement('div');
             host.dataset.test = 'config-reference-env-host';
-            // V3 positions its empty-state body absolutely after the heading.
-            // Keep the envFrom summary above that body so it is visible without
-            // first collapsing the native container card.
-            host.style.position = 'relative';
-            host.style.zIndex = '1';
-            const heading = section.card.children[0];
-            if (heading && heading.nextSibling) {
-              section.card.insertBefore(host, heading.nextSibling);
-            } else {
-              section.card.appendChild(host);
+            // Never insert a third sibling into the native card: V3 hides its
+            // last child on collapse. Both env and envFrom must share that body.
+            if (!section.body.children.length) {
+              section.body.dataset.configReferenceEmpty = 'true';
             }
+            section.body.appendChild(host);
             envHostsRef.current.set(section.containerName, host);
           }
         });
@@ -160,7 +172,13 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
             : nextEnvHosts,
         );
         envScopeRef.current = findManualEnvScope(action);
-        setManualEnvNames(readManualEnvNames(envScopeRef.current) || []);
+        const nextNames = readManualEnvNames(envScopeRef.current) || [];
+        setManualEnvNames(previous =>
+          previous.length === nextNames.length &&
+          previous.every((value, i) => value === nextNames[i])
+            ? previous
+            : nextNames,
+        );
         injectConfigReferenceEntry(root, t('CONFIG_REFERENCE'), () => {
           const currentAction = findConfigReferenceAction(root);
           const currentParent = findConfigReferenceMountParent(currentAction);
@@ -190,6 +208,9 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
       // never fires for it. Capture input events to keep the conflict hints
       // in step with unsaved edits.
       const handleInput = () => {
+        if (findConfigReferenceAction(root)) {
+          setActiveContainerName(findConfigReferenceContainerName(root));
+        }
         const next = readManualEnvNames(envScopeRef.current) || [];
         setManualEnvNames(previous =>
           previous.length === next.length && previous.every((envName, i) => envName === next[i])
@@ -208,6 +229,7 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
     ? createPortal(
         <React.Suspense fallback={<div data-test="config-reference-inline">正在加载配置引用…</div>}>
           <ConfigReferenceInline
+            key={activeContainerName || 'unidentified-container'}
             cluster={cluster || ''}
             namespace={namespace || ''}
             name={name || ''}

@@ -28,6 +28,8 @@ module.exports = {
   CONFIG_REFERENCE_SAVE_SUCCESS: '配置引用已保存',
   CONFIG_REFERENCE_WORKLOAD_LOAD_ERROR: '工作负载加载失败，请返回后重试。',
   CONFIG_REFERENCE_NO_CONTAINERS: '当前 {kind} 没有可配置的容器。',
+  CONFIG_REFERENCE_CONTAINER_UNAVAILABLE:
+    '无法定位已保存的目标容器。新增或修改容器名称后，请先保存工作负载，再配置引用。',
   CONFIG_REFERENCE_PREVIEW_OK: '✓ 将生成 {count} 个环境变量',
   CONFIG_REFERENCE_PREVIEW_SHOW: '查看',
   CONFIG_REFERENCE_PREVIEW_HIDE: '收起',
