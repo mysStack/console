@@ -264,25 +264,3 @@ test('a new-container empty-reference default does not undo a workload-wide Relo
   assert.equal(submitted.metadata.annotations['reloader.stakater.com/auto'], 'true');
   assert.equal('envFrom' in submitted.spec.template.spec.containers[2], false);
 });
-
-test('native form reset restores its last accepted refs while leaving the same container editable', () => {
-  const session = createConfigReferenceDraftSession(nativeSubmission);
-  session.beginContainer('nginx');
-  session.stage({ containerName: 'nginx', references: [] });
-  session.resetContainerForm();
-  assert.deepEqual(session.getSource('nginx').spec.template.spec.containers[1].envFrom, [
-    { secretRef: { name: 'nginx-config' } },
-  ]);
-  session.stage({ containerName: 'nginx', references: [{ kind: 'configMap', name: 'accepted' }] });
-  session.confirmContainerForm();
-  session.stage({ containerName: 'nginx', references: [] });
-  session.resetContainerForm();
-  assert.deepEqual(session.getSource('nginx').spec.template.spec.containers[1].envFrom, [
-    { configMapRef: { name: 'accepted' } },
-  ]);
-  assert.deepEqual(session.getSubmittedChanges(), [], 'a form checkpoint is not an API submission');
-  session.cancelContainer();
-  assert.deepEqual(session.getSource('nginx').spec.template.spec.containers[1].envFrom, [
-    { secretRef: { name: 'nginx-config' } },
-  ]);
-});

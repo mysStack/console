@@ -19,12 +19,10 @@ export function createConfigReferenceDraftSession(source: Record<string, any>) {
   let submittedChanges: ConfigReferenceDraftChange[] = [];
   let activeName: string | undefined;
   let beforeContainer: ConfigReferenceDraftChange[] | undefined;
-  let beforeForm: ConfigReferenceDraftChange[] | undefined;
   const cancelContainer = () => {
     if (beforeContainer) changes = beforeContainer;
     activeName = undefined;
     beforeContainer = undefined;
-    beforeForm = undefined;
   };
   return {
     beginContainer: (name: string) => {
@@ -45,7 +43,6 @@ export function createConfigReferenceDraftSession(source: Record<string, any>) {
           references: [],
         });
       }
-      beforeForm = cloneDeep(changes);
     },
     stage: (change: ConfigReferenceDraftChange) => {
       if (!change.containerName || change.containerName !== activeName) {
@@ -60,13 +57,6 @@ export function createConfigReferenceDraftSession(source: Record<string, any>) {
     confirmContainer: () => {
       activeName = undefined;
       beforeContainer = undefined;
-      beforeForm = undefined;
-    },
-    confirmContainerForm: () => {
-      if (activeName) beforeForm = cloneDeep(changes);
-    },
-    resetContainerForm: () => {
-      if (beforeForm) changes = cloneDeep(beforeForm);
     },
     cancelContainer,
     confirmGroup: () => {

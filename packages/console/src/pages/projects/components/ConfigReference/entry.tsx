@@ -17,7 +17,6 @@ import {
   findManualEnvScope,
   injectConfigReferenceEntry,
   installConfigReferenceNativeEdit,
-  isConfigReferenceFormConfirmation,
   readManualEnvNames,
 } from './bridge';
 
@@ -227,7 +226,6 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
           openEditorRef.current?.(),
         );
       } else {
-        let formConfirmationObserver: MutationObserver | undefined;
         const handleConfirmation = (event: Event) => {
           const target = event.target as Element | null;
           const confirmation = target?.closest(
@@ -235,41 +233,8 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
           );
           const session = sessionRef.current;
           if (!session) return;
-          formConfirmationObserver?.disconnect();
-          formConfirmationObserver = undefined;
           if (confirmation) {
             const confirmed = confirmation.getAttribute('data-test') === 'confirm-ok';
-            if (isConfigReferenceFormConfirmation(confirmation)) {
-              if (!confirmed) {
-                // Native reset restores the last form checkpoint without
-                // leaving the editor. Do not wait for a container-name change.
-                session.resetContainerForm();
-                closeInline();
-                setDraftVersion(value => value + 1);
-              } else {
-                const footer = confirmation.parentElement!;
-                const before = new Set(Array.from(footer.classList));
-                const containerName = findConfigReferenceContainerName(root);
-                const Observer = rootDocument.defaultView?.MutationObserver || MutationObserver;
-                formConfirmationObserver = new Observer(() => {
-                  // V3 removes the footer's active class only after native
-                  // validation succeeds. Failed validation keeps it active.
-                  const after = Array.from(footer.classList);
-                  if (after.length < before.size && after.every(value => before.has(value))) {
-                    formConfirmationObserver?.disconnect();
-                    formConfirmationObserver = undefined;
-                    if (findConfigReferenceContainerName(root) === containerName) {
-                      session.confirmContainerForm();
-                    }
-                  }
-                });
-                formConfirmationObserver.observe(footer, {
-                  attributes: true,
-                  attributeFilter: ['class'],
-                });
-              }
-              return;
-            }
             if (findConfigReferenceContainerName(root)) {
               // Validation may leave the inner editor open. Promote its draft
               // only once the native editor actually leaves that container.
@@ -289,10 +254,8 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
           }
         };
         root.addEventListener('click', handleConfirmation, true);
-        removeConfirmationListenerRef.current = () => {
-          formConfirmationObserver?.disconnect();
+        removeConfirmationListenerRef.current = () =>
           root.removeEventListener('click', handleConfirmation, true);
-        };
       }
 
       applyEntry();
