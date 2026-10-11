@@ -9,7 +9,7 @@ import { readReloaderPolicy } from './reloader';
 export interface ConfigReferenceDraftChange {
   containerName: string;
   references: EnvFromReference[];
-  reloaderEnabled: boolean;
+  reloaderEnabled?: boolean;
   fileMounts?: FileMountReference[];
 }
 
@@ -41,7 +41,6 @@ export function createConfigReferenceDraftSession(source: Record<string, any>) {
         changes.push({
           containerName: name,
           references: [],
-          reloaderEnabled: readReloaderPolicy(original.metadata?.annotations || {}).enabled,
         });
       }
     },
@@ -92,14 +91,17 @@ export function mergeConfigReferenceDrafts<T extends Record<string, any>>(
   for (const change of changes) {
     // A container removed in the native editor must stay removed. Never borrow
     // the first container or recreate the stale draft's target.
-    if (!change.containerName || !containers.some(item => item.name === change.containerName)) {
+    if (
+      !change.containerName ||
+      !containers.some((item: Record<string, any>) => item.name === change.containerName)
+    ) {
       continue;
     }
     const patch = buildConfigReferencePatch(
       result as any,
       change.containerName,
       change.references,
-      change.reloaderEnabled,
+      change.reloaderEnabled ?? readReloaderPolicy(result.metadata?.annotations || {}).enabled,
       change.fileMounts,
     );
     // Reuse the same feature-owned paths as independent editing, but apply them

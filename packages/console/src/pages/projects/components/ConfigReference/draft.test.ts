@@ -246,3 +246,21 @@ test('only native containers-step confirmation promotes staged references into t
     { configMapRef: { name: 'main-config' } },
   ]);
 });
+
+test('a new-container empty-reference default does not undo a workload-wide Reloader choice', () => {
+  const session = createConfigReferenceDraftSession(nativeSubmission);
+  session.beginContainer('ams-server');
+  session.stage({ containerName: 'ams-server', references: [], reloaderEnabled: true });
+  session.confirmContainer();
+  session.beginContainer('worker');
+  session.confirmContainer();
+  session.confirmGroup();
+  const template = structuredClone(nativeSubmission);
+  template.spec.template.spec.containers.push({
+    ...structuredClone(template.spec.template.spec.containers[0]),
+    name: 'worker',
+  });
+  const submitted = mergeConfigReferenceDrafts(template, session.getSubmittedChanges());
+  assert.equal(submitted.metadata.annotations['reloader.stakater.com/auto'], 'true');
+  assert.equal('envFrom' in submitted.spec.template.spec.containers[2], false);
+});
