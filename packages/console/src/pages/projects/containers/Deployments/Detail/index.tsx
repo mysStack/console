@@ -3,7 +3,7 @@
  * https://github.com/kubesphere/console/blob/master/LICENSE
  */
 
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import WujieReact from 'wujie-react';
 import { useLocation, useParams } from 'react-router-dom';
 import { useConfigReferenceBridge } from '../../../components/ConfigReference/entry';
@@ -11,7 +11,6 @@ import {
   getConsoleV3DetailPath,
   getConsoleV3DetailUrl,
   getConsoleV3ProjectPrefix,
-  syncConsoleV3DetailRoute,
 } from '../../Base/BaseLayout/route';
 
 function DeploymentDetail(): JSX.Element {
@@ -80,20 +79,6 @@ function DeploymentDetail(): JSX.Element {
     routeSyncFrameRef.current = undefined;
     afterUnmount();
   }, [afterUnmount]);
-
-  useEffect(() => {
-    const appWindow = appWindowRef.current;
-    if (!appWindow || location.pathname === hostDetailPath) return;
-    syncConsoleV3DetailRoute(
-      appWindow,
-      getConsoleV3DetailPath({
-        projectPrefix,
-        name,
-        hostPath: location.pathname,
-        hostDetailPath,
-      }),
-    );
-  }, [hostDetailPath, location.pathname, name, projectPrefix]);
 
   return (
     <>

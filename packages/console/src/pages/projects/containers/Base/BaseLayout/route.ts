@@ -54,16 +54,3 @@ export function getConsoleV3DetailPath({
     : '';
   return `/consolev3${projectPrefix}/deployments/${name}${suffix}`;
 }
-
-/** Follow host back/forward navigation without creating another history entry. */
-export function syncConsoleV3DetailRoute(appWindow: Window, embeddedPath: string): boolean {
-  if (
-    appWindow.location.pathname === embeddedPath ||
-    !appWindow.document.getElementById('root')?.hasChildNodes()
-  ) {
-    return false;
-  }
-  appWindow.history.replaceState(appWindow.history.state, '', embeddedPath);
-  appWindow.dispatchEvent(new PopStateEvent('popstate'));
-  return true;
-}
