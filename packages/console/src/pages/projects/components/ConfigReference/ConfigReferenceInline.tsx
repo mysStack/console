@@ -1,13 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { useMutation } from 'react-query';
-import { configMapStore, Icon, request, secretStore, workloadStore } from '@ks-console/shared';
+import { isEqual } from 'lodash';
+import { configMapStore, Icon, secretStore, workloadStore } from '@ks-console/shared';
 import { Button, notify } from '@kubed/components';
 
 import { findDuplicateReferences, parseEnvFrom } from './envFrom';
 import { readReloaderPolicy } from './reloader';
 import {
-  buildConfigReferencePatch,
   getContainerEnvFrom,
   getContainerNames,
   resolveConfigReferenceContainer,
@@ -18,6 +17,7 @@ import ConfigReferencePreview from './ConfigReferencePreview';
 import { useReferencePreviews } from './useReferencePreviews';
 import { readFileMounts, validateFileMounts } from './fileMount';
 import type { FileMountReference } from './fileMount';
+import type { ConfigReferenceDraftChange } from './draft';
 import {
   autoReloadStyle,
   buttonStyle,
@@ -57,7 +57,8 @@ interface Props {
   /** Names typed into the V3 environment rows, including unsaved edits. */
   manualEnvNames?: string[];
   onClose: () => void;
-  onSaved?: () => void;
+  draftSource?: Record<string, any>;
+  onApplyDraft?: (change: ConfigReferenceDraftChange) => void;
 }
 
 const storeByModule = {
@@ -65,8 +66,6 @@ const storeByModule = {
   statefulsets: workloadStore('statefulsets'),
   daemonsets: workloadStore('daemonsets'),
 } as const;
-
-const emptyOption: NameOption = { label: '请选择', value: '' };
 
 function NativeSelect({
   options,
@@ -109,10 +108,13 @@ export default function ConfigReferenceInline({
   containerName: targetContainerName,
   manualEnvNames = [],
   onClose,
-  onSaved,
+  draftSource,
+  onApplyDraft,
 }: Props) {
   const store = storeByModule[module];
+  const emptyOption: NameOption = { label: t('PLEASE_SELECT'), value: '' };
   const detailQuery = store.useGetDetail({ cluster, namespace, name });
+  const source = draftSource || detailQuery.data;
   const [configMaps, setConfigMaps] = useState<NameOption[]>([]);
   const [secrets, setSecrets] = useState<NameOption[]>([]);
   const [resourceLoading, setResourceLoading] = useState(true);
@@ -122,34 +124,28 @@ export default function ConfigReferenceInline({
   const [fileMounts, setFileMounts] = useState<FileMountReference[]>([]);
   const [reloaderEnabled, setReloaderEnabled] = useState(false);
   const [saveError, setSaveError] = useState<{ index: number; message: string } | null>(null);
-  const containers = useMemo(
-    () => (detailQuery.data ? getContainerNames(detailQuery.data as any) : []),
-    [detailQuery.data],
-  );
-  const selectedContainer = detailQuery.data
-    ? resolveConfigReferenceContainer(detailQuery.data as any, targetContainerName)
+  const containers = useMemo(() => (source ? getContainerNames(source as any) : []), [source]);
+  const selectedContainer = source
+    ? resolveConfigReferenceContainer(source as any, targetContainerName)
     : '';
 
   useEffect(() => {
-    if (!detailQuery.data) return;
+    if (!source) return;
     if (!selectedContainer) {
       setReferences([]);
       setFileMounts([]);
       return;
     }
-    setReferences(parseEnvFrom(getContainerEnvFrom(detailQuery.data as any, selectedContainer)));
+    setReferences(parseEnvFrom(getContainerEnvFrom(source as any, selectedContainer)));
     // Seed the file-mount rows from what the container already has: planFileMounts
     // treats them as the complete desired set for the container, so an unseeded
     // (empty) list would delete its existing mounts and their volumes on save.
-    setFileMounts(
-      detailQuery.data ? readFileMounts(detailQuery.data as any, selectedContainer) : [],
-    );
-    const original = (detailQuery.data as any)._originData || detailQuery.data;
+    setFileMounts(readFileMounts(source as any, selectedContainer));
+    const original = (source as any)._originData || source;
     setReloaderEnabled(
-      readReloaderPolicy(original?.metadata?.annotations || (detailQuery.data as any).annotations)
-        .enabled,
+      readReloaderPolicy(original?.metadata?.annotations || (source as any).annotations).enabled,
     );
-  }, [detailQuery.data, selectedContainer]);
+  }, [source, selectedContainer]);
 
   useEffect(() => {
     let active = true;
@@ -182,43 +178,14 @@ export default function ConfigReferenceInline({
   );
   const fileMountPreviews = useReferencePreviews(fileMountReferences, cluster, namespace);
 
-  const saveMutation = useMutation(
-    (data: Record<string, any>) =>
-      request.patch(store.getDetailUrl({ cluster, namespace, name }), data, {
-        headers: { 'content-type': 'application/json-patch+json' },
-      }),
-    {
-      onSuccess: () => {
-        setSaveError(null);
-        notify.success(t('CONFIG_REFERENCE_SAVE_SUCCESS'));
-        onSaved?.();
-        onClose();
-      },
-      onError: (error: any) => {
-        // The API answers with e.g.
-        //   ... envFrom[0].prefix: Invalid value: "1BAD": a valid environment
-        //   variable name must consist of ...
-        // so the failing row can be pointed at instead of a bare toast.
-        const message =
-          error?.response?.data?.message || error?.response?.data?.error || error?.message || '';
-        const matched = /envFrom\[(\d+)\]/.exec(String(message));
-        setSaveError({
-          index: matched ? Number(matched[1]) : -1,
-          message: String(message).slice(0, 300) || t('CONFIG_REFERENCE_SAVE_FAILED'),
-        });
-        notify.error(t('CONFIG_REFERENCE_SAVE_FAILED'));
-      },
-    },
-  );
-
-  if (detailQuery.isLoading) {
+  if (!draftSource && detailQuery.isLoading) {
     return (
       <div data-test="config-reference-inline" style={sectionStyle}>
         {t('CONFIG_REFERENCE_LOADING')}
       </div>
     );
   }
-  if (detailQuery.isError || !detailQuery.data) {
+  if (!source || (!draftSource && detailQuery.isError)) {
     return (
       <div data-test="config-reference-inline" role="alert" style={sectionStyle}>
         {t('CONFIG_REFERENCE_WORKLOAD_LOAD_ERROR')}
@@ -232,7 +199,7 @@ export default function ConfigReferenceInline({
       </div>
     );
   }
-  if (!selectedContainer) {
+  if (!selectedContainer || !draftSource || !onApplyDraft) {
     return (
       <div data-test="config-reference-inline" role="alert" style={sectionStyle}>
         {t('CONFIG_REFERENCE_CONTAINER_UNAVAILABLE')}
@@ -273,15 +240,17 @@ export default function ConfigReferenceInline({
     if (fileMountProblems.length) {
       return notify.error(t(`CONFIG_REFERENCE_FILE_MOUNT_${fileMountProblems[0].code}`));
     }
-    saveMutation.mutate(
-      buildConfigReferencePatch(
-        detailQuery.data as any,
-        selectedContainer,
-        references,
-        reloaderEnabled,
-        fileMounts,
-      ),
-    );
+    if (!onApplyDraft || !draftSource) return;
+    const initialMounts = readFileMounts(draftSource, selectedContainer);
+    onApplyDraft({
+      containerName: selectedContainer,
+      references,
+      reloaderEnabled,
+      // Leave concurrently edited native volume fields alone when untouched.
+      ...(!isEqual(initialMounts, fileMounts) ? { fileMounts } : {}),
+    });
+    notify.success(t('CONFIG_REFERENCE_DRAFT_APPLIED'));
+    onClose();
   };
 
   return (
@@ -346,8 +315,8 @@ export default function ConfigReferenceInline({
                   aria-label={t('CONFIG_REFERENCE_ARIA_KIND', { index: index + 1 })}
                   value={reference.kind}
                   options={[
-                    { label: '来自配置字典', value: 'configMap' },
-                    { label: '来自保密字典', value: 'secret' },
+                    { label: t('FROM_CONFIGMAP'), value: 'configMap' },
+                    { label: t('FROM_SECRET'), value: 'secret' },
                   ]}
                   onValueChange={value =>
                     updateReference(index, {
@@ -445,8 +414,8 @@ export default function ConfigReferenceInline({
                   aria-label={t('CONFIG_REFERENCE_ARIA_KIND', { index: index + 1 })}
                   value={mount.kind}
                   options={[
-                    { label: '来自配置字典', value: 'configMap' },
-                    { label: '来自保密字典', value: 'secret' },
+                    { label: t('FROM_CONFIGMAP'), value: 'configMap' },
+                    { label: t('FROM_SECRET'), value: 'secret' },
                   ]}
                   onValueChange={value =>
                     updateFileMount(index, { kind: value as ConfigReferenceKind, name: '' })
@@ -541,10 +510,10 @@ export default function ConfigReferenceInline({
           type="button"
           className="button button-control button-size-normal"
           style={primaryButtonStyle}
-          disabled={saveMutation.isLoading || resourceLoading}
+          disabled={resourceLoading || resourceError}
           onClick={save}
         >
-          {saveMutation.isLoading ? 'Saving…' : t('CONFIG_REFERENCE_SAVE')}
+          {t('CONFIG_REFERENCE_SAVE')}
         </button>
       </div>
     </section>

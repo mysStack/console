@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { getConfigReferencePath } from './entry';
+import { getConfigReferencePath } from './path';
 
 test('builds a project workload config-reference path', () => {
   assert.equal(

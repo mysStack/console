@@ -8,6 +8,24 @@ export interface ConfigReferenceInjectionState {
 
 export type ConfigReferenceDomRoot = Document | ShadowRoot;
 
+export function installConfigReferenceNativeEdit(root: ConfigReferenceDomRoot, onOpen: () => void) {
+  const handleClick = (event: Event) => {
+    const target = event.target as Element | null;
+    if (
+      !target?.closest?.(
+        '[data-test="detail-editConfigTemplate"], li.menu-item:has([data-test="detail-editConfigTemplate"])',
+      )
+    )
+      return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    onOpen();
+  };
+  // Capture before the native delegated React handler creates its own modal.
+  root.addEventListener('click', handleClick, { capture: true });
+  return () => root.removeEventListener('click', handleClick, { capture: true });
+}
+
 function getRootDocument(root: ConfigReferenceDomRoot): Document {
   return (root as ShadowRoot).ownerDocument || (root as Document);
 }

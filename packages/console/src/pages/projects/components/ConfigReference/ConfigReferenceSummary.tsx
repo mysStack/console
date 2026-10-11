@@ -33,6 +33,7 @@ interface Props {
    * show what envFrom actually contributes (that page lists `env` only).
    */
   variant?: 'dialog' | 'envTab';
+  draftSource?: Record<string, any>;
 }
 
 const storeByModule = {
@@ -51,16 +52,15 @@ export default function ConfigReferenceSummary({
   containerCount,
   refreshKey,
   variant = 'dialog',
+  draftSource,
 }: Props) {
   const detailQuery = storeByModule[module].useGetDetail({ cluster, namespace, name });
+  const source = draftSource || detailQuery.data;
   const { refetch } = detailQuery;
   React.useEffect(() => {
     if (refreshKey > 0) refetch?.();
   }, [refetch, refreshKey]);
-  const containerNames = useMemo(
-    () => (detailQuery.data ? getContainerNames(detailQuery.data as any) : []),
-    [detailQuery.data],
-  );
+  const containerNames = useMemo(() => (source ? getContainerNames(source as any) : []), [source]);
   /**
    * Which container this block describes.
    *
@@ -81,12 +81,12 @@ export default function ConfigReferenceSummary({
   }, [targetContainerName, containerIndex, containerCount, containerNames]);
   const references = useMemo(
     () =>
-      detailQuery.data && containerName
+      source && containerName
         ? getConfigReferenceSummaryRows({
-            envFrom: getContainerEnvFrom(detailQuery.data as any, containerName),
+            envFrom: getContainerEnvFrom(source as any, containerName),
           })
         : [],
-    [detailQuery.data, containerName],
+    [source, containerName],
   );
 
   const previews = useReferencePreviews(references, cluster, namespace);
@@ -96,7 +96,7 @@ export default function ConfigReferenceSummary({
   // visible either way, so nothing that matters is hidden by collapsing.
   const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>({});
 
-  if (detailQuery.isLoading || !references.length) {
+  if ((!draftSource && detailQuery.isLoading) || !references.length) {
     return null;
   }
 

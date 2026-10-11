@@ -34,7 +34,7 @@ export const useV3action = () => {
     }, time);
   };
 
-  const render = () => {
+  const render = (lifecycles?: { afterMount?: (appWindow: Window) => void }) => {
     if (!visible) {
       return null;
     }
@@ -45,6 +45,7 @@ export const useV3action = () => {
         name="consoleV3Actions"
         url={`//${window.location.host}/consolev3/dashboard`}
         sync={false}
+        {...lifecycles}
       />
     );
   };

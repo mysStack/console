@@ -10,8 +10,43 @@ import {
   findConfigReferenceContainerName,
   findConfigReferenceMountParent,
   injectConfigReferenceEntry,
+  installConfigReferenceNativeEdit,
   shouldInjectConfigReferenceEntry,
 } from './bridge';
+
+test('native settings activation opens the controlled action before the old editor and leaves other actions untouched', () => {
+  const root = new EventTarget();
+  let opened = 0,
+    oldOpened = 0;
+  const uninstall = installConfigReferenceNativeEdit(root as unknown as Document, () => {
+    opened += 1;
+  });
+  root.addEventListener('click', () => {
+    oldOpened += 1;
+  });
+  const nativeClick = () => {
+    const event = new Event('click', { cancelable: true });
+    Object.defineProperty(event, 'target', {
+      value: {
+        closest: (selector: string) => (selector.includes('detail-editConfigTemplate') ? {} : null),
+      },
+    });
+    root.dispatchEvent(event);
+    return event;
+  };
+  assert.equal(nativeClick().defaultPrevented, true);
+  assert.equal(opened, 1);
+  assert.equal(oldOpened, 0, 'the old modal must not open as well');
+  const other = new Event('click', { cancelable: true });
+  Object.defineProperty(other, 'target', { value: { closest: () => null } });
+  root.dispatchEvent(other);
+  assert.equal(opened, 1);
+  assert.equal(oldOpened, 1);
+  uninstall();
+  nativeClick();
+  assert.equal(opened, 1);
+  assert.equal(oldOpened, 2);
+});
 
 // NOTE: the two selector assertions below only pin the constants this module
 // exports. They can NOT detect the real risk — that the *prebuilt V3 artifact*
