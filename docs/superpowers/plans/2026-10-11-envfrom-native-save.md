@@ -18,6 +18,14 @@
 - 新增真实浏览器回归 `output/playwright/envfrom-no-file-mount-regression-20261011.js`（工作区证据，不提交制品）：修改前在131失败于重复挂载按钮仍显示，写请求为零；修改后待精确镜像部署验收。
 - 本轮本地 `sh scripts/test.sh`：34文件、165项通过，0失败。131部署和新镜像验收尚未完成。
 
+### 该调整的最终131验收
+
+源码ad8a0a5已push，精确Action38145147733成功（CI157/157），两仓manifest digest一致，131实际Pod imageID匹配，rollout成功。内联重复文件挂载区块已移除；原生存储的两类挂载入口实测保留。PLEASE_SELECT改为中文资源选择提示，空行仍拒绝，真实CM/Secret下拉可选。
+
+新增/删除CM+Secret和普通DB共同经过两次真实原生PUT200，刷新重开及完整PodSpec回读通过；main/worker未变，fixture已恢复。三容器env混合展示/整体折叠/取消零写入、18项路由Back/Forward/刷新及三种中文视口均通过；真实Pod3/3 Running、分别exec验证存在性，不输出Secret值。
+
+完整命令、结果、脚本失败归因和范围限制记录在工作区 `output/playwright/2026-10-11-envfrom-no-file-mount-verification.md`。本轮尚未新增英文完整切换、STS/DS及Reloader控制器验收，不把这些写成通过。
+
 ## Global Constraints
 
 - 131 为部署测试环境，133 仅对照且不修改。
