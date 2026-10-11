@@ -39,7 +39,7 @@ export function findConfigReferenceContainerName(root: ConfigReferenceDomRoot): 
   const inputs = Array.from(
     root.querySelectorAll<HTMLInputElement>(
       'input[placeholder="Container Name*"], input[placeholder="容器名称*"], ' +
-        'input[data-test="container-name"]',
+        'input[data-test="container-name"], input[name="name"][id="name"][maxlength="63"]',
     ),
   ).filter(input => isVisibleAction(root, input));
   const value = inputs[inputs.length - 1]?.value?.trim();

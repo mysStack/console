@@ -209,6 +209,16 @@ test('identifies the Chinese editor container without guessing the main containe
   assert.equal(findConfigReferenceContainerName(document), 'nginx');
 });
 
+test('identifies the native container name field which has no placeholder', () => {
+  const input = { value: 'nginx', getAttribute: () => null, parentElement: null };
+  const document = {
+    querySelectorAll: (selector: string) =>
+      selector.includes('input[name="name"][id="name"][maxlength="63"]') ? [input] : [],
+    defaultView: { getComputedStyle: () => ({ display: 'block', visibility: 'visible' }) },
+  } as unknown as Document;
+  assert.equal(findConfigReferenceContainerName(document), 'nginx');
+});
+
 interface FakeCard {
   name: string;
   href?: string;
