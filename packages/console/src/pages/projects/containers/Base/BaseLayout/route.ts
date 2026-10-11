@@ -54,3 +54,28 @@ export function getConsoleV3DetailPath({
     : '';
   return `/consolev3${projectPrefix}/deployments/${name}${suffix}`;
 }
+
+export function bindConsoleV3DetailHistory(
+  hostWindow: Window,
+  appWindow: Window,
+  route: Omit<EmbeddedDetailPath, 'hostPath'>,
+): () => void {
+  const followHistory = () => {
+    const hostPath = hostWindow.location.pathname;
+    if (hostPath !== route.hostDetailPath && !hostPath.startsWith(`${route.hostDetailPath}/`)) {
+      return;
+    }
+    const path = getConsoleV3DetailPath({ ...route, hostPath });
+    if (appWindow.location.pathname === path) return;
+    // Native browser Back emits on the host only (Wujie sync=false). Keep
+    // both history entries intact; notify V3's router in its own document.
+    appWindow.history.replaceState(appWindow.history.state, '', path);
+    // The Wujie app window may be a proxy without event constructors.
+    const event = new PopStateEvent('popstate', {
+      state: appWindow.history.state,
+    });
+    appWindow.dispatchEvent(event);
+  };
+  hostWindow.addEventListener('popstate', followHistory);
+  return () => hostWindow.removeEventListener('popstate', followHistory);
+}

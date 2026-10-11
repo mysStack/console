@@ -3,7 +3,7 @@
  * https://github.com/kubesphere/console/blob/master/LICENSE
  */
 
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import WujieReact from 'wujie-react';
 import { useLocation, useParams } from 'react-router-dom';
 import { useConfigReferenceBridge } from '../../../components/ConfigReference/entry';
@@ -11,6 +11,7 @@ import {
   getConsoleV3DetailPath,
   getConsoleV3DetailUrl,
   getConsoleV3ProjectPrefix,
+  bindConsoleV3DetailHistory,
 } from '../../Base/BaseLayout/route';
 
 function DeploymentDetail(): JSX.Element {
@@ -21,6 +22,7 @@ function DeploymentDetail(): JSX.Element {
   const { afterMount, afterUnmount, inline, summary } = useConfigReferenceBridge('deployments');
   const appWindowRef = useRef<Window>();
   const routeSyncFrameRef = useRef<number>();
+  const removeHostHistoryRef = useRef<() => void>();
   const projectPrefix = getConsoleV3ProjectPrefix({
     workspace,
     cluster,
@@ -44,6 +46,12 @@ function DeploymentDetail(): JSX.Element {
     (appWindow: Window) => {
       afterMount(appWindow);
       appWindowRef.current = appWindow;
+      removeHostHistoryRef.current?.();
+      removeHostHistoryRef.current = bindConsoleV3DetailHistory(window, appWindow, {
+        projectPrefix,
+        name,
+        hostDetailPath,
+      });
       if (
         initialHostPath.current === hostDetailPath ||
         appWindow.location.pathname === embeddedPath
@@ -69,9 +77,11 @@ function DeploymentDetail(): JSX.Element {
       };
       syncRoute();
     },
-    [afterMount, embeddedPath, hostDetailPath],
+    [afterMount, embeddedPath, hostDetailPath, name, projectPrefix],
   );
   const handleAfterUnmount = useCallback(() => {
+    removeHostHistoryRef.current?.();
+    removeHostHistoryRef.current = undefined;
     if (appWindowRef.current && routeSyncFrameRef.current !== undefined) {
       appWindowRef.current.cancelAnimationFrame(routeSyncFrameRef.current);
     }
@@ -79,6 +89,8 @@ function DeploymentDetail(): JSX.Element {
     routeSyncFrameRef.current = undefined;
     afterUnmount();
   }, [afterUnmount]);
+
+  useEffect(() => () => removeHostHistoryRef.current?.(), []);
 
   return (
     <>

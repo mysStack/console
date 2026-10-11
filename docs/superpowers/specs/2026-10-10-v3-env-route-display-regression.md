@@ -133,14 +133,21 @@ V3 原始的 `No Environment Variable Found` 只表示普通 `env` 为空，不�
 - 实际Pod最终3/3 Running，分别exec验证DB与专属变量存在性，没有输出Secret值。
   首次新增容器测试镜像默认registry/命令输入错误已分层记录，修正fixture不作为该原生字段编辑通过证据。
 - 三个核心场景、外层取消/关闭、容器步骤取消、普通Tab切换与三种英文视口测量已实测；中文DOM翻译通过。
-- 浏览器Back仍导致宿主metadata/V3 env不一致；原生第一层重置/取消、实际保存失败重试、重命名、
-  StatefulSet/DaemonSet环境验收未完成。headless中文字形缺失，不能宣布中文截图视觉通过。
+- 浏览器Back仍导致宿主metadata/V3 env不一致；StatefulSet/DaemonSet环境验收未执行。
+  headless中文字形缺失，不能宣布中文截图视觉通过。实际激活的容器步骤取消、重命名完整保存、
+  保存前断网及PUT连接失败后的草稿保留/恢复网络真实重试已补验收；这不代表服务端4xx/5xx均已验证。
 - 上述早期失败不再描述当前完整保存实现，但这些剩余项未通过之前，整体验收不能标完成。
 
 镜像部署成功不等于浏览器验收成功。测试记录必须包含镜像 tag、Action run、Deployment rollout、直接打开 `/env`
 后的宿主路径和 V3 实际路径、页面关键断言以及控制台新增异常。若出现空白页，先回滚到上一已验证镜像，再继续修复；
 产品代码必须自动完成挂载后的 history 同步；测试人员在 DevTools 中手工调用 `history.pushState` 后临时显示的结果
 不得记为通过。
+
+### 重命名及失败重试补充证据
+
+131 专用工作负载中的 nginx-new 重命名为 nginx-renamed，自己的CM/WORKER\_与DB334、端口83/84共同经过一次原生外层PUT200保存；主容器和nginx完整对象未变。
+保存失败验证分别覆盖原生store.update保存前GET断网、实际PUT的浏览器连接失败注入。失败后Modal及DB335、CM/WORKER\_草稿保留，资源版本不变；解除故障后由用户路径重新确认，一次真实PUT200保存成功，真实Pod exec验证DB335和worker变量。
+不伪造API成功响应、不通过kubectl补写引用、不操作业务ams-server或133；测试故障注入不冒充正常网络或服务端错误响应。
 
 ## 回滚边界
 
