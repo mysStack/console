@@ -16,6 +16,8 @@ module.exports = {
   CONFIG_HISTORY_EMPTY: 'No modification records yet',
   CONFIG_HISTORY_LOAD_ERROR: 'Could not read the records',
   CONFIG_HISTORY_CONTENT: 'Data',
+  CONFIG_HISTORY_DIFF_TITLE: 'Version comparison',
+  CONFIG_HISTORY_DIFF_VERSIONS: 'Old revision #{previous} → current revision #{current}',
   CONFIG_HISTORY_CONTENT_OMITTED: 'Content omitted, it is too large',
   CONFIG_HISTORY_FIRST_REVISION:
     'This is the earliest record; there is nothing before it to compare',

@@ -7,6 +7,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, Button, Card, Loading, Tag } from '@kubed/components';
 import { DiffViewer } from '@kubed/diff-viewer';
 import { Icon } from '@ks-console/shared';
+import styled from 'styled-components';
 
 import Text from '../../../clusters/components/Text';
 import { DiffWrapper, YamlHeader } from '../../../clusters/components/RevisionControl/styles';
@@ -33,6 +34,14 @@ import { seedHistoryFor } from './seed';
  */
 
 export const MONO = "'SFMono-Regular', Consolas, monospace";
+
+const HistoryDiff = styled.div`
+  overflow-x: auto;
+
+  .d2h-wrapper {
+    min-width: 720px;
+  }
+`;
 
 function managedByTagColor(managedBy: string): 'success' | 'info' | 'secondary' {
   if (managedBy === MANAGED_BY_REPLICATOR) {
@@ -267,13 +276,12 @@ function ConfigHistoryPage({
               background: '#fff',
             }}
           >
-            <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
-              {'\u25be '}
-              {t('CONFIG_HISTORY_CONTENT')}
-              {'\u3000\u203a'}
-            </span>
+            <strong style={{ fontSize: 13 }}>{t('CONFIG_HISTORY_DIFF_TITLE')}</strong>
             <span style={{ color: '#55bc8a', fontSize: 12 }}>
-              {t('COMPARE_WITH', { version: `#${pair.comparedRevision}` })}
+              {t('CONFIG_HISTORY_DIFF_VERSIONS', {
+                previous: pair.comparedRevision,
+                current: record.revision,
+              })}
             </span>
           </div>
           <div
@@ -300,12 +308,17 @@ function ConfigHistoryPage({
     }
     // The bar is the viewer's own header, so it is drawn once rather than twice.
     return (
-      <DiffViewer
-        oldValue={oldText}
-        newValue={newText}
-        title={`\u25be ${t('CONFIG_HISTORY_CONTENT')}\u3000\u203a`}
-        description={t('COMPARE_WITH', { version: `#${pair.comparedRevision}` })}
-      />
+      <HistoryDiff>
+        <DiffViewer
+          oldValue={oldText}
+          newValue={newText}
+          title={t('CONFIG_HISTORY_DIFF_TITLE')}
+          description={t('CONFIG_HISTORY_DIFF_VERSIONS', {
+            previous: pair.comparedRevision,
+            current: record.revision,
+          })}
+        />
+      </HistoryDiff>
     );
   };
 
