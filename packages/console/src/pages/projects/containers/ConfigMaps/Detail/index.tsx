@@ -28,6 +28,9 @@ export default function ConfigMapDetail(): JSX.Element {
   >();
   const configMapSettingEditModal = useDisclosure();
   const ref = useRef<DetailPageRef<FormattedConfigMap>>(null);
+  const listPrefix = workspace
+    ? `/${workspace}/clusters/${cluster}/projects/${namespace}/configmaps`
+    : `/clusters/${cluster}/configmaps`;
   const prefix = workspace
     ? `/${workspace}/clusters/${cluster}/projects/${namespace}`
     : `/clusters/${cluster}/configmaps`;
@@ -145,7 +148,7 @@ export default function ConfigMapDetail(): JSX.Element {
           icon: <Icon name="hammer" size={28} style={{ verticalAlign: 'middle' }} />,
           breadcrumbs: {
             label: t('CONFIGMAP_PL'),
-            url: prefix,
+            url: listPrefix,
             listName: 'configuration-configmap',
           },
           description: ref.current?.detail.description,

@@ -28,6 +28,9 @@ export default function SecretDetail(): JSX.Element {
   >();
   const secretSettingEditModal = useDisclosure();
   const ref = useRef<DetailPageRef<FormattedSecret>>(null);
+  const listPrefix = workspace
+    ? `/${workspace}/clusters/${cluster}/projects/${namespace}/secrets`
+    : `/clusters/${cluster}/secrets`;
   const prefix = workspace
     ? `/${workspace}/clusters/${cluster}/projects/${namespace}`
     : `/clusters/${cluster}/secrets`;
@@ -144,7 +147,7 @@ export default function SecretDetail(): JSX.Element {
           icon: <Icon name="key" size={28} style={{ verticalAlign: 'middle' }} />,
           breadcrumbs: {
             label: t('SECRET_PL'),
-            url: prefix,
+            url: listPrefix,
             listName: 'configuration-secret',
           },
           description: ref.current?.detail.description,
