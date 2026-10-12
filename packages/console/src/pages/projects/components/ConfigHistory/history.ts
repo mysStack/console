@@ -25,36 +25,6 @@ export interface HistoryRecord {
   contentOmitted?: boolean;
 }
 
-/** Compare by key, preserving the distinction between absent and empty values. */
-export function compareConfigEntries(
-  previous: Record<string, string>,
-  selected: Record<string, string>,
-): Array<{
-  key: string;
-  previous: string | undefined;
-  selected: string | undefined;
-  change: 'added' | 'removed' | 'modified' | 'unchanged';
-}> {
-  return Array.from(new Set([...Object.keys(previous), ...Object.keys(selected)]))
-    .sort()
-    .map(key => {
-      const hasPrevious = Object.prototype.hasOwnProperty.call(previous, key);
-      const hasSelected = Object.prototype.hasOwnProperty.call(selected, key);
-      return {
-        key,
-        previous: hasPrevious ? previous[key] : undefined,
-        selected: hasSelected ? selected[key] : undefined,
-        change: !hasPrevious
-          ? 'added'
-          : !hasSelected
-            ? 'removed'
-            : previous[key] === selected[key]
-              ? 'unchanged'
-              : 'modified',
-      };
-    });
-}
-
 export const HISTORY_SECRET_SUFFIX = '-history';
 export const HISTORY_DATA_KEY = 'records';
 
