@@ -1,5 +1,13 @@
 import { parseEnvFrom } from './envFrom';
 import type { EnvFromReference } from './types';
+import { getPodTemplateContainers } from './workload';
+
+/** `env` includes literal and valueFrom entries, but never the keys from envFrom. */
+export function getContainerEnvironmentVariableCount(source: unknown, name: string): number {
+  const container = getPodTemplateContainers(source as any).find(item => item?.name === name);
+  const env = container?.env;
+  return Array.isArray(env) ? env.length : 0;
+}
 
 export interface ConfigReferenceSummaryRow extends EnvFromReference {
   label: 'FROM_CONFIGMAP' | 'FROM_SECRET';

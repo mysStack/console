@@ -55,6 +55,11 @@ module.exports = {
   CONFIG_REFERENCE_EXPAND_ALL: 'Expand all',
   CONFIG_REFERENCE_COLLAPSE_ALL: 'Collapse all',
   CONFIG_REFERENCE_TOTAL: '{count} environment variables in total',
+  CONFIG_REFERENCE_ENV_TOTAL: '{count} environment variables',
+  CONFIG_REFERENCE_ENV_SECTION_DESC:
+    'Individually configured variables. Variables imported from an entire ConfigMap or Secret are shown separately under Configuration References below.',
+  CONFIG_REFERENCE_ENV_EMPTY: 'No individually configured environment variables.',
+  CONFIG_REFERENCE_PREFIX_LABEL: 'Prefix: {prefix}',
   CONFIG_REFERENCE_TOTAL_PARTIAL: '{count} references not read yet',
   CONFIG_REFERENCE_PREVIEW_EMPTY: 'No key will take effect',
   CONFIG_REFERENCE_PREVIEW_SECRET:

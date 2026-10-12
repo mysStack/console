@@ -53,6 +53,11 @@ module.exports = {
   CONFIG_REFERENCE_EXPAND_ALL: '全部展开',
   CONFIG_REFERENCE_COLLAPSE_ALL: '全部收起',
   CONFIG_REFERENCE_TOTAL: '共 {count} 个环境变量',
+  CONFIG_REFERENCE_ENV_TOTAL: '共 {count} 个环境变量',
+  CONFIG_REFERENCE_ENV_SECTION_DESC:
+    '逐项设置的环境变量；整份 ConfigMap / Secret 引入的变量在下方“配置引用”中展示。',
+  CONFIG_REFERENCE_ENV_EMPTY: '当前没有逐项设置的环境变量。',
+  CONFIG_REFERENCE_PREFIX_LABEL: '前缀：{prefix}',
   CONFIG_REFERENCE_TOTAL_PARTIAL: '{count} 条引用的键名尚未读取完成',
   CONFIG_REFERENCE_PREVIEW_EMPTY: '没有可生效的键',
   CONFIG_REFERENCE_PREVIEW_SECRET: '将引入该保密字典的全部键（键名不可预览）',

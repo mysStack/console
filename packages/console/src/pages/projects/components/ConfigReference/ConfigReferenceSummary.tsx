@@ -1,12 +1,26 @@
 import React, { useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { workloadStore } from '@ks-console/shared';
 
-import { getConfigReferenceSummaryPrefix, getConfigReferenceSummaryRows } from './summary';
+import {
+  getConfigReferenceSummaryPrefix,
+  getConfigReferenceSummaryRows,
+  getContainerEnvironmentVariableCount,
+} from './summary';
 import { getContainerEnvFrom, getContainerNames } from './workload';
 import ConfigReferencePreview from './ConfigReferencePreview';
 import { useReferencePreviews } from './useReferencePreviews';
-import { summaryHeaderToggleStyle } from './styles';
+import {
+  summaryHeaderToggleStyle,
+  environmentHeadingStyle,
+  environmentTitleStyle,
+  environmentDescriptionStyle,
+  envTabSummaryStyle,
+  envTabResourceRowStyle,
+  envTabResourceTextStyle,
+  envTabToggleStyle,
+} from './styles';
 
 type WorkloadModule = 'deployments' | 'statefulsets' | 'daemonsets';
 
@@ -34,6 +48,8 @@ interface Props {
    */
   variant?: 'dialog' | 'envTab';
   draftSource?: Record<string, any>;
+  /** Header stays before the untouched V3 env rows, in their collapsible body. */
+  environmentHeadingHost?: HTMLElement;
 }
 
 const storeByModule = {
@@ -53,6 +69,7 @@ export default function ConfigReferenceSummary({
   refreshKey,
   variant = 'dialog',
   draftSource,
+  environmentHeadingHost,
 }: Props) {
   const detailQuery = storeByModule[module].useGetDetail({ cluster, namespace, name });
   const source = draftSource || detailQuery.data;
@@ -96,9 +113,33 @@ export default function ConfigReferenceSummary({
   // visible either way, so nothing that matters is hidden by collapsing.
   const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>({});
 
-  if ((!draftSource && detailQuery.isLoading) || !references.length) {
+  if ((!draftSource && detailQuery.isLoading) || !containerName) {
     return null;
   }
+
+  const envCount = getContainerEnvironmentVariableCount(source, containerName);
+  const environmentHeading =
+    variant === 'envTab' && environmentHeadingHost
+      ? createPortal(
+          <section data-test="environment-variable-section-heading" style={environmentHeadingStyle}>
+            <h3 style={environmentTitleStyle}>
+              <span>{t('ENVIRONMENT_VARIABLE_PL')}</span>
+              <span style={{ ...environmentDescriptionStyle, margin: 0 }}>
+                {t('CONFIG_REFERENCE_ENV_TOTAL', { count: envCount })}
+              </span>
+            </h3>
+            <p style={environmentDescriptionStyle}>{t('CONFIG_REFERENCE_ENV_SECTION_DESC')}</p>
+            {envCount === 0 && (
+              <p style={{ ...environmentDescriptionStyle, marginTop: 12 }}>
+                {t('CONFIG_REFERENCE_ENV_EMPTY')}
+              </p>
+            )}
+          </section>,
+          environmentHeadingHost,
+        )
+      : null;
+
+  if (!references.length) return environmentHeading;
 
   const total = previews.reduce(
     (sum, preview) => sum + (preview.resolved ? preview.names.length : 0),
@@ -116,56 +157,67 @@ export default function ConfigReferenceSummary({
   };
 
   return (
-    <div
-      data-test="config-reference-summary"
-      style={variant === 'envTab' ? envTabStyle : summaryStyle}
-      // The native V3 card toggles on bubbled clicks, not just its heading.
-      // Expanding a reference preview must not also close the entire container.
-      onClick={event => event.stopPropagation()}
-    >
-      <div style={titleStyle}>
-        <span>{t('CONFIG_REFERENCE')}</span>
-        <span style={totalStyle}>
-          {total > 0 ? t('CONFIG_REFERENCE_TOTAL', { count: total }) : ''}
-          {unresolved > 0 ? ` · ${t('CONFIG_REFERENCE_TOTAL_PARTIAL', { count: unresolved })}` : ''}
-        </span>
-        <span style={{ flex: 1 }} />
-        <span
-          role="button"
-          tabIndex={0}
-          aria-expanded={allExpanded}
-          style={summaryHeaderToggleStyle}
-          onClick={toggleAll}
-          onKeyDown={event => {
-            if (event.key === 'Enter' || event.key === ' ') toggleAll();
-          }}
-        >
-          {allExpanded ? t('CONFIG_REFERENCE_COLLAPSE_ALL') : t('CONFIG_REFERENCE_EXPAND_ALL')}
-        </span>
-      </div>
-      {references.map((reference, index) => (
-        <div key={`${reference.kind}-${reference.name}-${index}`} style={rowWrapperStyle}>
-          <div style={rowStyle}>
-            <span style={kindStyle}>{t(reference.label)}</span>
-            <span style={nameStyle}>{reference.name}</span>
-            {getConfigReferenceSummaryPrefix(reference) && (
-              <span style={prefixStyle}>{getConfigReferenceSummaryPrefix(reference)}</span>
-            )}
-          </div>
-          <ConfigReferencePreview
-            kind={reference.kind}
-            identity={`${reference.kind}:${reference.name}:${reference.prefix || ''}`}
-            preview={previews[index]}
-            showValues
-            expanded={!!expandedRows[index]}
-            onExpandedChange={next => setExpandedRows(current => ({ ...current, [index]: next }))}
-          />
+    <>
+      {environmentHeading}
+      <div
+        data-test="config-reference-summary"
+        style={variant === 'envTab' ? envTabSummaryStyle : summaryStyle}
+        // The native V3 card toggles on bubbled clicks, not just its heading.
+        // Expanding a reference preview must not also close the entire container.
+        onClick={event => event.stopPropagation()}
+      >
+        <div style={{ ...titleStyle, fontWeight: 600 }}>
+          <span>{t('CONFIG_REFERENCE')}</span>
+          <span style={totalStyle}>
+            {total > 0 ? t('CONFIG_REFERENCE_TOTAL', { count: total }) : ''}
+            {unresolved > 0
+              ? ` · ${t('CONFIG_REFERENCE_TOTAL_PARTIAL', { count: unresolved })}`
+              : ''}
+          </span>
+          <span style={{ flex: 1 }} />
+          <button
+            type="button"
+            aria-expanded={allExpanded}
+            style={variant === 'envTab' ? envTabToggleStyle : summaryHeaderToggleStyle}
+            onClick={toggleAll}
+          >
+            {allExpanded ? t('CONFIG_REFERENCE_COLLAPSE_ALL') : t('CONFIG_REFERENCE_EXPAND_ALL')}
+          </button>
         </div>
-      ))}
-      {variant === 'envTab' && total === 0 && unresolved === 0 && (
-        <div style={hintStyle}>{t('CONFIG_REFERENCE_PREVIEW_EMPTY')}</div>
-      )}
-    </div>
+        {references.map((reference, index) => (
+          <div key={`${reference.kind}-${reference.name}-${index}`} style={rowWrapperStyle}>
+            <div style={variant === 'envTab' ? envTabResourceRowStyle : rowStyle}>
+              <span style={variant === 'envTab' ? envTabResourceTextStyle : kindStyle}>
+                {t(reference.label)}
+              </span>
+              <span style={variant === 'envTab' ? envTabResourceTextStyle : nameStyle}>
+                {reference.name}
+                {variant === 'envTab' && getConfigReferenceSummaryPrefix(reference) && (
+                  <span style={{ ...prefixStyle, display: 'block' }}>
+                    {t('CONFIG_REFERENCE_PREFIX_LABEL', { prefix: reference.prefix })}
+                  </span>
+                )}
+              </span>
+              {variant !== 'envTab' && getConfigReferenceSummaryPrefix(reference) && (
+                <span style={prefixStyle}>{getConfigReferenceSummaryPrefix(reference)}</span>
+              )}
+            </div>
+            <ConfigReferencePreview
+              kind={reference.kind}
+              identity={`${reference.kind}:${reference.name}:${reference.prefix || ''}`}
+              preview={previews[index]}
+              showValues
+              nested={variant === 'envTab'}
+              expanded={!!expandedRows[index]}
+              onExpandedChange={next => setExpandedRows(current => ({ ...current, [index]: next }))}
+            />
+          </div>
+        ))}
+        {variant === 'envTab' && total === 0 && unresolved === 0 && (
+          <div style={hintStyle}>{t('CONFIG_REFERENCE_PREVIEW_EMPTY')}</div>
+        )}
+      </div>
+    </>
   );
 }
 
@@ -173,16 +225,6 @@ const summaryStyle: React.CSSProperties = {
   display: 'grid',
   gap: 8,
   marginTop: 12,
-};
-
-const envTabStyle: React.CSSProperties = {
-  display: 'grid',
-  gap: 8,
-  marginBottom: 16,
-  padding: '12px 16px',
-  border: '1px solid #e5e9f2',
-  borderRadius: 4,
-  background: '#f7f9fb',
 };
 
 const titleStyle: React.CSSProperties = {

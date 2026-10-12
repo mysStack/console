@@ -44,8 +44,9 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
   // One host per container card on the read-only environment tab, keyed by
   // container name so a re-render of the page does not move our block.
   const envHostsRef = useRef<Map<string, HTMLElement>>(new Map());
+  const envHeadingHostsRef = useRef<Map<string, HTMLElement>>(new Map());
   const [envHosts, setEnvHosts] = useState<
-    Array<{ containerName: string; index: number; host: HTMLElement }>
+    Array<{ containerName: string; index: number; host: HTMLElement; headingHost: HTMLElement }>
   >([]);
   const [activeContainerName, setActiveContainerName] = useState<string | undefined>();
   const [manualEnvNames, setManualEnvNames] = useState<string[]>([]);
@@ -77,6 +78,8 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
     setSummaryHost(null);
     envHostsRef.current.forEach(host => host.parentNode?.removeChild(host));
     envHostsRef.current.clear();
+    envHeadingHostsRef.current.forEach(host => host.remove());
+    envHeadingHostsRef.current.clear();
     setEnvHosts([]);
   }, [closeInline]);
 
@@ -89,19 +92,20 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
       const app = document.querySelector(`wujie-app[data-wujie-id="${appName}"]`);
       const root = app?.shadowRoot || appWindow.document;
       const rootDocument = (root as ShadowRoot).ownerDocument || (root as Document);
-      // Empty env bodies are absolutely positioned by V3. Only when envFrom
+      // Empty env bodies are absolutely positioned by V3. When our section heading
       // contributes content, put that body back into normal flow and suppress its
       // text placeholder. Keep V3's display rule untouched: it owns collapse.
       if (!root.querySelector('[data-test="config-reference-env-layout"]')) {
         const style = rootDocument.createElement('style');
         style.dataset.test = 'config-reference-env-layout';
         style.textContent = `
-          [data-config-reference-empty="true"]:has([data-test="config-reference-summary"]) {
+          [data-config-reference-empty="true"]:has([data-test="config-reference-env-heading-host"]) {
             position: static !important; transform: none !important;
             height: auto !important; min-height: 0 !important; width: auto !important;
             font-size: 0 !important; padding-top: 20px;
           }
           [data-test="config-reference-env-host"] { width: 100%; font-size: 12px; }
+          [data-test="config-reference-env-heading-host"] { width: 100%; font-size: 12px; }
           div:has(> [data-test="config-reference-env-host"]) { flex-direction: column; }
         `;
         (root instanceof ShadowRoot ? root : root.head).appendChild(style);
@@ -156,10 +160,18 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
         sections.forEach(section => {
           present.add(section.containerName);
           let host = envHostsRef.current.get(section.containerName);
-          if (host && !section.card.contains(host)) {
+          const currentHeading = envHeadingHostsRef.current.get(section.containerName);
+          if (
+            host &&
+            (!section.card.contains(host) ||
+              !currentHeading ||
+              !section.card.contains(currentHeading))
+          ) {
             // The card was re-rendered: drop the stale host and build a new one.
             host.parentNode?.removeChild(host);
+            currentHeading?.remove();
             envHostsRef.current.delete(section.containerName);
+            envHeadingHostsRef.current.delete(section.containerName);
             host = undefined;
           }
           if (!host) {
@@ -169,7 +181,15 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
             // last child on collapse. Both env and envFrom must share that body.
             if (!section.body.children.length) {
               section.body.dataset.configReferenceEmpty = 'true';
+            } else {
+              delete section.body.dataset.configReferenceEmpty;
             }
+            const previousHeading = envHeadingHostsRef.current.get(section.containerName);
+            previousHeading?.remove();
+            const headingHost = rootDocument.createElement('div');
+            headingHost.dataset.test = 'config-reference-env-heading-host';
+            section.body.insertBefore(headingHost, section.body.firstChild);
+            envHeadingHostsRef.current.set(section.containerName, headingHost);
             section.body.appendChild(host);
             envHostsRef.current.set(section.containerName, host);
           }
@@ -178,6 +198,8 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
           if (!present.has(containerName)) {
             host.parentNode?.removeChild(host);
             envHostsRef.current.delete(containerName);
+            envHeadingHostsRef.current.get(containerName)?.remove();
+            envHeadingHostsRef.current.delete(containerName);
           }
         });
         const nextEnvHosts = sections
@@ -186,6 +208,7 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
             containerName: section.containerName,
             index: section.index,
             host: envHostsRef.current.get(section.containerName) as HTMLElement,
+            headingHost: envHeadingHostsRef.current.get(section.containerName) as HTMLElement,
           }));
         setEnvHosts(previous =>
           previous.length === nextEnvHosts.length &&
@@ -431,6 +454,7 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
                 containerCount={envHosts.length}
                 refreshKey={refreshKey}
                 variant="envTab"
+                environmentHeadingHost={item.headingHost}
               />
             </React.Suspense>,
             item.host,

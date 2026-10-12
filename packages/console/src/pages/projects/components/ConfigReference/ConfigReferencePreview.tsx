@@ -4,6 +4,11 @@ import { PREVIEW_SECRET_KEYS } from './preview';
 import type { ConfigReferenceKind } from './types';
 import type { PreviewEntry, ReferencePreview } from './preview';
 import {
+  envTabPreviewStyle,
+  envTabPreviewValuesStyle,
+  envTabPreviewValueRowStyle,
+  envTabPreviewNameStyle,
+  envTabPreviewTextStyle,
   previewChipBadStyle,
   previewChipBinaryStyle,
   previewChipConflictStyle,
@@ -38,6 +43,8 @@ interface Props {
    * where the values are the point; Secret-backed values show up masked.
    */
   showValues?: boolean;
+  /** Read-only tab: variable details are children of a resource, not pill rows. */
+  nested?: boolean;
   /**
    * Controlled expand state. The summary passes it so one header control can
    * expand every row at once; when omitted the row keeps its own state and
@@ -69,6 +76,7 @@ export default function ConfigReferencePreview({
   identity,
   preview,
   showValues,
+  nested = false,
   expanded: expandedProp,
   onExpandedChange,
   error,
@@ -175,7 +183,7 @@ export default function ConfigReferencePreview({
   const canExpand = preview.entries.length > 0;
 
   return (
-    <div style={previewStyle}>
+    <div style={nested ? envTabPreviewStyle : previewStyle}>
       <div style={previewSummaryStyle}>
         {preview.names.length > 0 ? (
           <span style={previewOkStyle}>
@@ -206,7 +214,7 @@ export default function ConfigReferencePreview({
         )}
       </div>
       {isExpanded && canExpand && showValues && (
-        <div style={previewValuesStyle}>
+        <div style={nested ? envTabPreviewValuesStyle : previewValuesStyle}>
           {preview.entries.map((entry, index) => {
             // binaryData never becomes a variable; the summary line above already
             // reports how many such keys there are.
@@ -214,9 +222,20 @@ export default function ConfigReferencePreview({
               return null;
             }
             return (
-              <div key={`${entry.key}-${index}`} style={previewValueRowStyle}>
+              <div
+                key={`${entry.key}-${index}`}
+                data-test="config-reference-preview-value"
+                style={
+                  nested
+                    ? {
+                        ...envTabPreviewValueRowStyle,
+                        ...(index === preview.entries.length - 1 ? { borderBottom: 0 } : {}),
+                      }
+                    : previewValueRowStyle
+                }
+              >
                 <span
-                  style={previewValueNameStyle}
+                  style={nested ? envTabPreviewNameStyle : previewValueNameStyle}
                   title={entry.name === entry.key ? undefined : entry.key}
                 >
                   {entry.name}
@@ -234,7 +253,10 @@ export default function ConfigReferencePreview({
                   // and the platform's own env table shows nothing at all here.
                   <span style={previewValueEmptyStyle}>—</span>
                 ) : (
-                  <span style={previewValueTextStyle} title={entry.value}>
+                  <span
+                    style={nested ? envTabPreviewTextStyle : previewValueTextStyle}
+                    title={entry.value}
+                  >
                     {entry.value}
                   </span>
                 )}
