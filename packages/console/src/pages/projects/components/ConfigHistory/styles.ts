@@ -26,7 +26,7 @@ export const ComparisonTable = styled.table`
   color: #36435c;
 
   caption {
-    padding: 0 0 12px;
+    padding: 0 0 10px;
     text-align: left;
     font-size: 14px;
     font-weight: 600;
@@ -34,7 +34,7 @@ export const ComparisonTable = styled.table`
 
   th,
   td {
-    padding: 12px 16px;
+    padding: 10px 14px;
     border: 1px solid #e3e9ef;
     text-align: left;
     vertical-align: top;
@@ -43,6 +43,9 @@ export const ComparisonTable = styled.table`
 
   thead th {
     background: #eff4f9;
+    color: #36435c;
+    font-size: 12px;
+    font-weight: 600;
   }
 
   thead span {
@@ -54,9 +57,15 @@ export const ComparisonTable = styled.table`
 
   tbody th {
     font-weight: 500;
+    white-space: nowrap;
   }
 
-  pre {
+  tbody tr:hover {
+    background: #f8fafd;
+  }
+
+  pre,
+  .value {
     margin: 0;
     font-family: 'SFMono-Regular', Consolas, monospace;
     font-size: 12px;
@@ -65,15 +74,52 @@ export const ComparisonTable = styled.table`
     overflow-wrap: anywhere;
   }
 
+  .value {
+    display: block;
+    color: #36435c;
+  }
+
   td[data-change='removed'] {
     background: #fdf1f4;
+    color: #b42344;
   }
 
   td[data-change='added'] {
     background: #e5f5ec;
+    color: #247a52;
   }
 
   td[data-empty='true'] {
     color: #5f708a;
   }
+`;
+
+export const ChangeLabel = styled.span<{ change: 'added' | 'removed' | 'modified' | 'unchanged' }>`
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: ${props =>
+    ({ added: '#247a52', removed: '#b42344', modified: '#8b5a00', unchanged: '#5f708a' })[
+      props.change
+    ]};
+  background: ${props =>
+    ({ added: '#e5f5ec', removed: '#fdf1f4', modified: '#fff4d6', unchanged: '#eff4f9' })[
+      props.change
+    ]};
+`;
+
+export const Value = styled.span`
+  display: block;
+  min-height: 22px;
+  color: inherit;
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 `;

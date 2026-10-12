@@ -21,7 +21,7 @@ import {
   historySecretName,
 } from './history';
 import { seedHistoryFor } from './seed';
-import { ComparisonTable, HistoryMetadata } from './styles';
+import { ChangeLabel, ComparisonTable, HistoryMetadata, Value } from './styles';
 
 function managedByTagColor(managedBy: string): 'success' | 'info' | 'secondary' {
   if (managedBy === MANAGED_BY_REPLICATOR) {
@@ -233,7 +233,7 @@ function ConfigHistoryPage({
       ) : value === '' ? (
         t('CONFIG_HISTORY_VALUE_EMPTY')
       ) : (
-        <pre>{value}</pre>
+        <Value>{value}</Value>
       );
 
     return (
@@ -263,7 +263,9 @@ function ConfigHistoryPage({
           {entries.map(entry => (
             <tr key={entry.key}>
               <th scope="row">{entry.key}</th>
-              <td>{t(changeLabels[entry.change])}</td>
+              <td>
+                <ChangeLabel change={entry.change}>{t(changeLabels[entry.change])}</ChangeLabel>
+              </td>
               <td
                 data-change={
                   entry.change === 'removed' || entry.change === 'modified' ? 'removed' : undefined
