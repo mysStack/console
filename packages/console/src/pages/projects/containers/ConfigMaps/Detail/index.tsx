@@ -142,7 +142,7 @@ export default function ConfigMapDetail(): JSX.Element {
         sideProps={{
           actions,
           attrs,
-          icon: <Icon name="layers" size={28} style={{ verticalAlign: 'middle' }} />,
+          icon: <Icon name="hammer" size={28} style={{ verticalAlign: 'middle' }} />,
           breadcrumbs: {
             label: t('CONFIGMAP_PL'),
             url: prefix,
