@@ -5,11 +5,10 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, Button, Card, Loading, Tag } from '@kubed/components';
-import { DiffViewer } from '@kubed/diff-viewer';
 import { Icon } from '@ks-console/shared';
 
 import Text from '../../../clusters/components/Text';
-import { DiffWrapper, YamlHeader } from '../../../clusters/components/RevisionControl/styles';
+import { DiffWrapper } from '../../../clusters/components/RevisionControl/styles';
 
 import {
   HistoryRecord,
@@ -18,21 +17,11 @@ import {
   MANAGED_BY_HELM,
   MANAGED_BY_REPLICATOR,
   decodeHistoryPayload,
-  diffPair,
+  compareConfigEntries,
   historySecretName,
 } from './history';
 import { seedHistoryFor } from './seed';
-
-/**
- * Modification history page for a ConfigMap or a Secret.
- *
- * The ConfigMap and Secret detail pages are the V3 console embedded through wujie, so their
- * tab bars cannot be extended from here. This page is therefore a v4 route of its own, and
- * the source pages link to it through the same injection mechanism the config reference
- * entry already uses.
- */
-
-export const MONO = "'SFMono-Regular', Consolas, monospace";
+import { ComparisonTable, HistoryMetadata } from './styles';
 
 function managedByTagColor(managedBy: string): 'success' | 'info' | 'secondary' {
   if (managedBy === MANAGED_BY_REPLICATOR) {
@@ -220,92 +209,81 @@ function ConfigHistoryPage({
   }, [load]);
 
   const renderDiff = (record: HistoryRecord) => {
-    const pair = diffPair(records, record.revision);
-    if (!pair.comparedRevision) {
-      // Nothing before it: the viewer needs both sides, and inventing an empty one is what it cannot
-      // parse. The list is left out entirely.
+    const index = records.findIndex(item => item.revision === record.revision);
+    const previous = records[index + 1];
+    if (!previous) {
       return <Alert showIcon={false}>{t('CONFIG_HISTORY_FIRST_REVISION')}</Alert>;
     }
-    const oldText = pair.oldValue || '';
-    const newText = pair.newValue || '';
-    const oldLines = oldText.split('\n').filter(Boolean);
-    const newLines = newText.split('\n').filter(Boolean);
-    // A change that only removes lines makes the viewer emit a hunk header with a negative count
-    // (-0,0 +1,-1) and report that it cannot parse the lines. Its rendering of that case is right, but
-    // the complaint is not, so the listing is drawn here instead.
-    const onlyRemovals = newLines.length > 0 && newLines.every(line => oldLines.indexOf(line) >= 0);
-    const line = (text: string, mark: string, background: string, color: string) => (
-      <div style={{ display: 'flex', background, color, lineHeight: 2, fontFamily: MONO }}>
-        <div
-          style={{
-            width: 54,
-            flex: '0 0 54px',
-            textAlign: 'right',
-            paddingRight: 12,
-            color: '#a8b3c0',
-            background: '#fafbfc',
-          }}
-        />
-        <div style={{ flex: 1, paddingLeft: 12, whiteSpace: 'pre' }}>
-          <span style={{ padding: '0 6px', fontWeight: 700 }}>{mark}</span>
-          {text}
-        </div>
-      </div>
-    );
-    if (onlyRemovals) {
-      const removed = oldLines.filter(item => newLines.indexOf(item) < 0);
-      return (
-        <div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '14px 20px',
-              border: '1px solid #e3e9ef',
-              borderTop: 'none',
-              background: '#fff',
-            }}
-          >
-            <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
-              {'\u25be '}
-              {t('CONFIG_HISTORY_CONTENT')}
-              {'\u3000\u203a'}
-            </span>
-            <span style={{ color: '#55bc8a', fontSize: 12 }}>
-              {t('COMPARE_WITH', { version: `#${pair.comparedRevision}` })}
-            </span>
-          </div>
-          <div
-            style={{
-              border: '1px solid #e3e9ef',
-              borderTop: 'none',
-              fontFamily: MONO,
-              fontSize: 12,
-            }}
-          >
-            {removed.map((item, index) => (
-              <React.Fragment key={`del-${index}`}>
-                {line(item, '-', '#fdf1f4', '#d03050')}
-              </React.Fragment>
-            ))}
-            {newLines.map((item, index) => (
-              <React.Fragment key={`ctx-${index}`}>
-                {line(item, ' ', '#fff', '#36435c')}
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
-      );
+    if (record.contentOmitted || previous.contentOmitted) {
+      return <Alert showIcon={false}>{t('CONFIG_HISTORY_COMPARE_OMITTED')}</Alert>;
     }
-    // The bar is the viewer's own header, so it is drawn once rather than twice.
+    const entries = compareConfigEntries(previous.content || {}, record.content || {});
+    if (!entries.length) {
+      return <Alert showIcon={false}>{t('CONFIG_HISTORY_NO_DATA')}</Alert>;
+    }
+    const changeLabels = {
+      added: 'CONFIG_HISTORY_CHANGE_ADDED',
+      removed: 'CONFIG_HISTORY_CHANGE_REMOVED',
+      modified: 'CONFIG_HISTORY_CHANGE_MODIFIED',
+      unchanged: 'CONFIG_HISTORY_CHANGE_UNCHANGED',
+    };
+    const renderValue = (value: string | undefined) =>
+      value === undefined ? (
+        t('CONFIG_HISTORY_VALUE_ABSENT')
+      ) : value === '' ? (
+        t('CONFIG_HISTORY_VALUE_EMPTY')
+      ) : (
+        <pre>{value}</pre>
+      );
+
     return (
-      <DiffViewer
-        oldValue={oldText}
-        newValue={newText}
-        title={`\u25be ${t('CONFIG_HISTORY_CONTENT')}\u3000\u203a`}
-        description={t('COMPARE_WITH', { version: `#${pair.comparedRevision}` })}
-      />
+      <ComparisonTable data-test="config-history-comparison">
+        <caption>{t('CONFIG_HISTORY_DIFF_TITLE')}</caption>
+        <colgroup>
+          <col style={{ width: '20%' }} />
+          <col style={{ width: '12%' }} />
+          <col style={{ width: '34%' }} />
+          <col style={{ width: '34%' }} />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col">{t('CONFIG_HISTORY_CONFIG_KEY')}</th>
+            <th scope="col">{t('CONFIG_HISTORY_CHANGE_TYPE')}</th>
+            <th scope="col">
+              {t('CONFIG_HISTORY_DIFF_BEFORE', { version: previous.revision })}
+              <span>{formatTime(previous.createdAt)}</span>
+            </th>
+            <th scope="col">
+              {t('CONFIG_HISTORY_DIFF_AFTER', { version: record.revision })}
+              <span>{formatTime(record.createdAt)}</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {entries.map(entry => (
+            <tr key={entry.key}>
+              <th scope="row">{entry.key}</th>
+              <td>{t(changeLabels[entry.change])}</td>
+              <td
+                data-change={
+                  entry.change === 'removed' || entry.change === 'modified' ? 'removed' : undefined
+                }
+                data-empty={entry.previous === undefined || entry.previous === ''}
+              >
+                {renderValue(entry.previous)}
+              </td>
+              <td
+                data-change={
+                  entry.change === 'added' || entry.change === 'modified' ? 'added' : undefined
+                }
+                data-empty={entry.selected === undefined || entry.selected === ''}
+              >
+                {renderValue(entry.selected)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </ComparisonTable>
     );
   };
 
@@ -399,7 +377,7 @@ function ConfigHistoryPage({
               {isOpen && (
                 <div id={`config-history-detail-${record.revision}`} className="mt12">
                   <Card>
-                    <YamlHeader style={{ flexWrap: 'wrap', rowGap: 12 }}>
+                    <HistoryMetadata>
                       <Text
                         title={`#${record.revision}`}
                         description={t('CONFIG_HISTORY_SERIAL')}
@@ -418,7 +396,7 @@ function ConfigHistoryPage({
                         }`}
                         description={t('CONFIG_HISTORY_MANAGED_BY')}
                       />
-                    </YamlHeader>
+                    </HistoryMetadata>
                     <DiffWrapper style={{ overflowX: 'auto' }}>{renderDiff(record)}</DiffWrapper>
                   </Card>
                 </div>

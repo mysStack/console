@@ -11,6 +11,7 @@ import {
   HISTORY_SECRET_SUFFIX,
   decodeHistoryPayload,
   diffPair,
+  compareConfigEntries,
   historySecretName,
   isHistorySecretName,
   recordText,
@@ -121,4 +122,46 @@ test('diffPair on the oldest record compares against nothing', () => {
 
 test('diffPair on an unknown revision returns empty values', () => {
   assert.deepEqual(diffPair(sample, 99), { oldValue: '', newValue: '' });
+});
+
+test('adding a key leaves existing configuration values unchanged', () => {
+  assert.deepEqual(
+    compareConfigEntries(
+      { NGINX_ONLY: 'nginx-test-value' },
+      { NGINX_ONLY: 'nginx-test-value', NGINX_PORT: '111' },
+    ),
+    [
+      {
+        key: 'NGINX_ONLY',
+        previous: 'nginx-test-value',
+        selected: 'nginx-test-value',
+        change: 'unchanged',
+      },
+      { key: 'NGINX_PORT', previous: undefined, selected: '111', change: 'added' },
+    ],
+  );
+});
+
+test('configuration comparison distinguishes empty values, removals and multiline changes', () => {
+  assert.deepEqual(
+    compareConfigEntries(
+      { REMOVED: '', UPDATED: 'first\nsecond', EMPTY: '' },
+      { ADDED: '', UPDATED: 'first\nthird', EMPTY: '' },
+    ),
+    [
+      { key: 'ADDED', previous: undefined, selected: '', change: 'added' },
+      { key: 'EMPTY', previous: '', selected: '', change: 'unchanged' },
+      { key: 'REMOVED', previous: '', selected: undefined, change: 'removed' },
+      {
+        key: 'UPDATED',
+        previous: 'first\nsecond',
+        selected: 'first\nthird',
+        change: 'modified',
+      },
+    ],
+  );
+  assert.deepEqual(compareConfigEntries({}, {}), []);
+  assert.deepEqual(compareConfigEntries({ LAST: 'value' }, {}), [
+    { key: 'LAST', previous: 'value', selected: undefined, change: 'removed' },
+  ]);
 });
