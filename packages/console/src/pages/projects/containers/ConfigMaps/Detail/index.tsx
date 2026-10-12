@@ -35,7 +35,7 @@ export default function ConfigMapDetail(): JSX.Element {
     { path: 'detail', title: t('DATA') },
     { path: 'revision-control', title: t('CONFIG_HISTORY_TITLE') },
     { path: 'metadata', title: t('METADATA') },
-    { path: 'events', title: t('EVENTS_PL') },
+    { path: 'events', title: t('Events') },
   ];
 
   const navigate = useNavigate();
