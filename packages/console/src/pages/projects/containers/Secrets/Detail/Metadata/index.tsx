@@ -9,6 +9,7 @@ import type { FormattedSecret } from '@ks-console/shared';
 
 function SecretMetadata(): JSX.Element {
   const { detail } = useDetailPage<FormattedSecret>();
+  if (!detail) return <></>;
   return <MetaData detail={detail} />;
 }
 

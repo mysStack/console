@@ -9,6 +9,7 @@ import type { FormattedConfigMap } from '@ks-console/shared';
 
 function ConfigMapMetadata(): JSX.Element {
   const { detail } = useDetailPage<FormattedConfigMap>();
+  if (!detail) return <></>;
   return <MetaData detail={detail} />;
 }
 

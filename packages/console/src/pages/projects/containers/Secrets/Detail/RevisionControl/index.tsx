@@ -6,7 +6,7 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import ConfigHistoryPage from '../../../components/ConfigHistory/index.tsx';
+import ConfigHistoryPage from '../../../../components/ConfigHistory';
 
 function SecretRevisionControl(): JSX.Element {
   const { cluster = '', namespace = '', name = '' } = useParams();

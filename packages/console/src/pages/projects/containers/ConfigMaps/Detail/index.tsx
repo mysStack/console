@@ -19,8 +19,7 @@ import {
 } from '@ks-console/shared';
 import type { FormattedConfigMap } from '@ks-console/shared';
 
-import { ConfigMapEditModal } from '../../../clusters/components/ConfigMapEditModal/index.tsx';
-import routes from './routes';
+import ConfigMapEditModal from '../../../../clusters/components/ConfigMapEditModal';
 
 export default function ConfigMapDetail(): JSX.Element {
   const { module } = configMapStore;
@@ -105,16 +104,18 @@ export default function ConfigMapDetail(): JSX.Element {
     },
   ];
 
-  const { mutate: mutateConfigMapSettingEdit, isLoading: isEditConfigMapLoading } = usePutMutation(
-    {},
-    {
-      onSuccess: () => {
-        configMapSettingEditModal.close();
-        notify.success(t('UPDATE_SUCCESSFUL'));
-        ref.current?.refetch();
+  const { usePutMutation: useConfigMapPutMutation } = configMapStore;
+  const { mutate: mutateConfigMapSettingEdit, isLoading: isEditConfigMapLoading } =
+    useConfigMapPutMutation(
+      {},
+      {
+        onSuccess: () => {
+          configMapSettingEditModal.close();
+          notify.success(t('UPDATE_SUCCESSFUL'));
+          ref.current?.refetch();
+        },
       },
-    },
-  );
+    );
 
   const handleEditConfigMap = (info: object) => {
     const detailData = ref.current?.detail;
@@ -149,9 +150,7 @@ export default function ConfigMapDetail(): JSX.Element {
           },
           description: ref.current?.detail.description,
         }}
-      >
-        {routes}
-      </DetailPage>
+      />
       {ref.current?.detail && configMapSettingEditModal.isOpen && (
         <ConfigMapEditModal
           visible={true}

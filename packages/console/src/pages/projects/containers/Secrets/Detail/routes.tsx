@@ -6,7 +6,10 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 
-import SecretDetail from './index';
+import SecretData from './Data';
+import SecretEvents from './Events';
+import SecretMetadata from './Metadata';
+import SecretRevisionControl from './RevisionControl';
 
 export default [
   {
@@ -15,7 +18,7 @@ export default [
   },
   {
     path: 'detail',
-    element: <SecretDetail />,
+    element: <SecretData />,
   },
   {
     path: 'revision-control',

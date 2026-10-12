@@ -19,8 +19,7 @@ import {
 } from '@ks-console/shared';
 import type { FormattedSecret } from '@ks-console/shared';
 
-import SecretSettingEditModal from '../../../clusters/components/SecretEditModal/index.tsx';
-import routes from './routes';
+import SecretSettingEditModal from '../../../../clusters/components/SecretEditModal';
 
 export default function SecretDetail(): JSX.Element {
   const { module } = secretStore;
@@ -105,7 +104,8 @@ export default function SecretDetail(): JSX.Element {
     },
   ];
 
-  const { mutate: mutateSecretSettingEdit, isLoading: isEditSecretLoading } = usePutMutation(
+  const { usePutMutation: useSecretPutMutation } = secretStore;
+  const { mutate: mutateSecretSettingEdit, isLoading: isEditSecretLoading } = useSecretPutMutation(
     {},
     {
       onSuccess: () => {
@@ -149,9 +149,7 @@ export default function SecretDetail(): JSX.Element {
           },
           description: ref.current?.detail.description,
         }}
-      >
-        {routes}
-      </DetailPage>
+      />
       {ref.current?.detail && secretSettingEditModal.isOpen && (
         <SecretSettingEditModal
           visible={true}
