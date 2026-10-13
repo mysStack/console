@@ -41,6 +41,10 @@ export default function ConsoleV3ResourceList({
   const now = Date.now();
   const lastUsedAt = lastScopeUseAt.get(scopeKey);
   const cacheExpired = isConsoleV3ListCacheExpired(lastUsedAt, now, cacheTtlMs);
+  const resourceUrl =
+    revision === '0:0'
+      ? url
+      : `${url}${url.includes('?') ? '&' : '?'}ksConsoleV4ListRevision=${revision}`;
   const keepAlive =
     isReady &&
     !cacheExpired &&
@@ -50,10 +54,6 @@ export default function ConsoleV3ResourceList({
     activeScopeKey = scopeKey;
     lastScopeUseAt.set(scopeKey, now);
   }
-  const resourceUrl =
-    revision === '0:0'
-      ? url
-      : `${url}${url.includes('?') ? '&' : '?'}ksConsoleV4ListRevision=${revision}`;
   const lifecycle = useMemo(
     () =>
       (
