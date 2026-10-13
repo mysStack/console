@@ -5,6 +5,7 @@ import {
   bindConsoleV3DetailHistory,
   getConsoleV3DetailPath,
   getConsoleV3DetailUrl,
+  getConsoleV3DeploymentListPath,
   getConsoleV3ProjectPrefix,
   shouldSyncConsoleV3DetailRoute,
 } from './route';
@@ -106,10 +107,14 @@ test('forwards host back/forward only within the mounted workload and stops afte
 });
 
 test('syncs the detail route after the V3 app boots at the workload list', () => {
+  const listPath = getConsoleV3DeploymentListPath(
+    '/test-workspace/clusters/host/projects/test-wes',
+  );
   assert.equal(
     shouldSyncConsoleV3DetailRoute(
-      '/consolev3/test-workspace/clusters/host/projects/test-wes/deployments',
+      listPath,
       '/consolev3/test-workspace/clusters/host/projects/test-wes/deployments/ams-server',
+      listPath,
     ),
     true,
   );
@@ -117,7 +122,17 @@ test('syncs the detail route after the V3 app boots at the workload list', () =>
     shouldSyncConsoleV3DetailRoute(
       '/consolev3/test-workspace/clusters/host/projects/test-wes/deployments/ams-server',
       '/consolev3/test-workspace/clusters/host/projects/test-wes/deployments/ams-server',
+      listPath,
     ),
     false,
+  );
+  assert.equal(
+    shouldSyncConsoleV3DetailRoute(
+      '/consolev3/dashboard',
+      '/consolev3/test-workspace/clusters/host/projects/test-wes/deployments/ams-server',
+      listPath,
+    ),
+    false,
+    'a stale preloaded dashboard must not receive a deep detail route',
   );
 });

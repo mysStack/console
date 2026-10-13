@@ -9,6 +9,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import { useConfigReferenceBridge } from '../../../components/ConfigReference/entry';
 import {
   getConsoleV3DetailPath,
+  getConsoleV3DeploymentListPath,
   getConsoleV3DetailUrl,
   getConsoleV3ProjectPrefix,
   bindConsoleV3DetailHistory,
@@ -43,29 +44,36 @@ function DeploymentDetail(): JSX.Element {
     hostPath: initialHostPath.current,
     hostDetailPath,
   });
-  const handleAfterMount = useCallback(
+  const listPath = getConsoleV3DeploymentListPath(projectPrefix);
+  const syncDetailRoute = useCallback(
     (appWindow: Window) => {
-      afterMount(appWindow);
-      appWindowRef.current = appWindow;
-      removeHostHistoryRef.current?.();
-      removeHostHistoryRef.current = bindConsoleV3DetailHistory(window, appWindow, {
-        projectPrefix,
-        name,
-        hostDetailPath,
-      });
-      if (!shouldSyncConsoleV3DetailRoute(appWindow.location.pathname, embeddedPath)) {
-        return;
+      if (appWindow.location.pathname === embeddedPath) return;
+      if (routeSyncFrameRef.current !== undefined) {
+        appWindow.cancelAnimationFrame(routeSyncFrameRef.current);
       }
 
       let framesRemaining = 300;
+      let stableFrames = 0;
+      let previousRootSignature = '';
       const syncRoute = () => {
         const root = appWindow.document.getElementById('root');
-        if (!root?.hasChildNodes() && framesRemaining > 0) {
+        const rootSignature = `${root?.childElementCount ?? 0}:${root?.textContent?.trim() ?? ''}`;
+        const routeReady =
+          shouldSyncConsoleV3DetailRoute(appWindow.location.pathname, embeddedPath, listPath) &&
+          Boolean(root?.hasChildNodes());
+        if (routeReady && rootSignature === previousRootSignature) {
+          stableFrames += 1;
+        } else {
+          stableFrames = 0;
+        }
+        previousRootSignature = rootSignature;
+
+        if ((!routeReady || stableFrames < 3) && framesRemaining > 0) {
           framesRemaining -= 1;
           routeSyncFrameRef.current = appWindow.requestAnimationFrame(syncRoute);
           return;
         }
-        if (!root?.hasChildNodes()) {
+        if (!routeReady || stableFrames < 3) {
           routeSyncFrameRef.current = undefined;
           return;
         }
@@ -75,7 +83,33 @@ function DeploymentDetail(): JSX.Element {
       };
       syncRoute();
     },
-    [afterMount, embeddedPath, hostDetailPath, name, projectPrefix],
+    [embeddedPath, listPath],
+  );
+  const bindHistory = useCallback(
+    (appWindow: Window) => {
+      appWindowRef.current = appWindow;
+      removeHostHistoryRef.current?.();
+      removeHostHistoryRef.current = bindConsoleV3DetailHistory(window, appWindow, {
+        projectPrefix,
+        name,
+        hostDetailPath,
+      });
+      syncDetailRoute(appWindow);
+    },
+    [hostDetailPath, name, projectPrefix, syncDetailRoute],
+  );
+  const handleAfterMount = useCallback(
+    (appWindow: Window) => {
+      afterMount(appWindow);
+      bindHistory(appWindow);
+    },
+    [afterMount, bindHistory],
+  );
+  const handleActivated = useCallback(
+    (appWindow: Window) => {
+      bindHistory(appWindow);
+    },
+    [bindHistory],
   );
   const handleAfterUnmount = useCallback(() => {
     removeHostHistoryRef.current?.();
@@ -98,7 +132,9 @@ function DeploymentDetail(): JSX.Element {
         name="consolev3"
         url={embeddedUrl}
         sync={false}
+        alive
         afterMount={handleAfterMount}
+        activated={handleActivated}
         afterUnmount={handleAfterUnmount}
       />
       {inline}

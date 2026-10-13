@@ -34,8 +34,16 @@ export function getConsoleV3DetailUrl({ host, projectPrefix }: EmbeddedDetailRou
   return `//${host}/consolev3${projectPrefix}/deployments`;
 }
 
-export function shouldSyncConsoleV3DetailRoute(appPath: string, embeddedPath: string): boolean {
-  return appPath !== embeddedPath;
+export function getConsoleV3DeploymentListPath(projectPrefix: string): string {
+  return `/consolev3${projectPrefix}/deployments`;
+}
+
+export function shouldSyncConsoleV3DetailRoute(
+  appPath: string,
+  embeddedPath: string,
+  listPath: string,
+): boolean {
+  return appPath === listPath && appPath !== embeddedPath;
 }
 
 /**
