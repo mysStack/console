@@ -13,6 +13,8 @@ import {
 let activeScopeKey: string | undefined;
 const lastScopeUseAt = new Map<string, number>();
 const mountedResourceUrls = new Map<string, string>();
+const mountedRevisions = new Map<string, string>();
+const deactivatedScopes = new Set<string>();
 export const DEFAULT_CONSOLE_V3_LIST_CACHE_TTL = 30_000;
 
 export interface ConsoleV3ResourceListProps {
@@ -42,13 +44,13 @@ export default function ConsoleV3ResourceList({
   const now = Date.now();
   const lastUsedAt = lastScopeUseAt.get(scopeKey);
   const cacheExpired = isConsoleV3ListCacheExpired(lastUsedAt, now, cacheTtlMs);
-  const resourceUrl =
-    revision === '0:0'
-      ? url
-      : `${url}${url.includes('?') ? '&' : '?'}ksConsoleV4ListRevision=${revision}`;
+  // Keep the iframe URL stable. The revision is used only to decide whether a
+  // deactivated instance must be rebuilt after a resource mutation.
+  const resourceUrl = url;
   const canRestore =
     !cacheExpired &&
     mountedResourceUrls.get(scopeKey) === resourceUrl &&
+    (!deactivatedScopes.has(scopeKey) || mountedRevisions.get(scopeKey) === revision) &&
     shouldKeepConsoleV3Alive(activeScopeKey, scopeKey);
   if (isReady) {
     activeScopeKey = scopeKey;
@@ -71,6 +73,7 @@ export default function ConsoleV3ResourceList({
             phase === 'afterMount'
               ? () => {
                   mountedResourceUrls.set(scopeKey, resourceUrl);
+                  mountedRevisions.set(scopeKey, revision);
                   markConsoleV3Phase('afterMount', resourceUrl);
                 }
               : phase === 'afterUnmount'
@@ -79,6 +82,7 @@ export default function ConsoleV3ResourceList({
                   }
                 : phase === 'activated'
                   ? (appWindow?: Window) => {
+                      deactivatedScopes.delete(scopeKey);
                       markConsoleV3Phase('activated', resourceUrl);
                       if (appWindow?.requestAnimationFrame) {
                         appWindow.requestAnimationFrame(() =>
@@ -90,12 +94,17 @@ export default function ConsoleV3ResourceList({
                         );
                       }
                     }
-                  : () => markConsoleV3Phase(phase, resourceUrl);
+                  : phase === 'deactivated'
+                    ? () => {
+                        deactivatedScopes.add(scopeKey);
+                        markConsoleV3Phase('deactivated', resourceUrl);
+                      }
+                    : () => markConsoleV3Phase(phase, resourceUrl);
           return callbacks;
         },
         {} as Record<string, (appWindow?: Window) => string | void>,
       ),
-    [resourceUrl],
+    [resourceUrl, revision, scopeKey],
   );
 
   useEffect(() => {
