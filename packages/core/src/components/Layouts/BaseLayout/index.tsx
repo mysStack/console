@@ -95,7 +95,10 @@ export default function BaseLayout() {
       const pathname = normalizeNativeResourceDetailPath(path.pathname);
 
       if (pathname !== location.pathname) {
-        navigate(`${pathname}${path.search}`);
+        // Replace Wujie's temporary `/resource/name` entry with the native V4
+        // detail route. Otherwise browser Back visits the temporary entry
+        // first and appears to require two clicks before reaching the list.
+        navigate(`${pathname}${path.search}`, { replace: pathname !== path.pathname });
       } else if (pathname === location.pathname && path.search !== location.search) {
         // @ts-ignore
         const url = new URL(`${location.origin}${pathname}${path.search}`);
