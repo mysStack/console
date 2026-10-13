@@ -15,5 +15,5 @@ test('resource host reuses the consolev3 app and exposes activation lifecycle ma
   assert.match(source, /activated/);
   assert.match(source, /render/);
   assert.match(source, /deactivated/);
-  assert.match(source, /!url\.includes\('\/consolev3\/'\)/);
+  assert.match(source, /const isReady = url\.includes\('\/consolev3\/'\)/);
 });

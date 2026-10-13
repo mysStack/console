@@ -12,6 +12,7 @@ import {
 
 let activeScopeKey: string | undefined;
 const lastScopeUseAt = new Map<string, number>();
+const mountedScopes = new Set<string>();
 export const DEFAULT_CONSOLE_V3_LIST_CACHE_TTL = 30_000;
 
 export interface ConsoleV3ResourceListProps {
@@ -33,18 +34,22 @@ export default function ConsoleV3ResourceList({
   // The project layout writes the Wujie URL prefix in an effect. Avoid an
   // initial mount with `undefined/...`; that mount would create a non-reusable
   // Wujie instance before the real resource URL is available.
-  if (!url.includes('/consolev3/')) {
-    return <></>;
-  }
+  const isReady = url.includes('/consolev3/');
   const revision = getResourceListCacheVersion(resource);
   const user = globals?.user?.username || 'anonymous';
-  const scopeKey = getConsoleV3ScopeKey(resource, url, user);
+  const scopeKey = isReady ? getConsoleV3ScopeKey(resource, url, user) : '';
   const now = Date.now();
   const lastUsedAt = lastScopeUseAt.get(scopeKey);
   const cacheExpired = isConsoleV3ListCacheExpired(lastUsedAt, now, cacheTtlMs);
-  const keepAlive = !cacheExpired && shouldKeepConsoleV3Alive(activeScopeKey, scopeKey);
-  activeScopeKey = scopeKey;
-  lastScopeUseAt.set(scopeKey, now);
+  const keepAlive =
+    isReady &&
+    !cacheExpired &&
+    mountedScopes.has(scopeKey) &&
+    shouldKeepConsoleV3Alive(activeScopeKey, scopeKey);
+  if (isReady) {
+    activeScopeKey = scopeKey;
+    lastScopeUseAt.set(scopeKey, now);
+  }
   const resourceUrl =
     revision === '0:0'
       ? url
@@ -63,24 +68,40 @@ export default function ConsoleV3ResourceList({
       ).reduce(
         (callbacks, phase) => {
           callbacks[phase] =
-            phase === 'activated'
-              ? (appWindow?: Window) => {
-                  markConsoleV3Phase('activated', resourceUrl);
-                  if (appWindow?.requestAnimationFrame) {
-                    appWindow.requestAnimationFrame(() =>
-                      markConsoleV3Phase('render', resourceUrl),
-                    );
-                  } else {
-                    window.requestAnimationFrame(() => markConsoleV3Phase('render', resourceUrl));
-                  }
+            phase === 'afterMount'
+              ? () => {
+                  mountedScopes.add(scopeKey);
+                  markConsoleV3Phase('afterMount', resourceUrl);
                 }
-              : () => markConsoleV3Phase(phase, resourceUrl);
+              : phase === 'afterUnmount'
+                ? () => {
+                    mountedScopes.delete(scopeKey);
+                    markConsoleV3Phase('afterUnmount', resourceUrl);
+                  }
+                : phase === 'activated'
+                  ? (appWindow?: Window) => {
+                      markConsoleV3Phase('activated', resourceUrl);
+                      if (appWindow?.requestAnimationFrame) {
+                        appWindow.requestAnimationFrame(() =>
+                          markConsoleV3Phase('render', resourceUrl),
+                        );
+                      } else {
+                        window.requestAnimationFrame(() =>
+                          markConsoleV3Phase('render', resourceUrl),
+                        );
+                      }
+                    }
+                  : () => markConsoleV3Phase(phase, resourceUrl);
           return callbacks;
         },
         {} as Record<string, (appWindow?: Window) => string | void>,
       ),
     [resourceUrl],
   );
+
+  if (!isReady) {
+    return <></>;
+  }
 
   return (
     <WujieReact
