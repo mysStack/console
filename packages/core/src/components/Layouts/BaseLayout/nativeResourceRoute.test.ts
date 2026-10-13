@@ -18,6 +18,21 @@ test('normalizes project ConfigMap and Secret V3 routes to native detail routes'
   );
 });
 
+test('normalizes project Deployment V3 routes to the native resource status route', () => {
+  assert.equal(
+    normalizeNativeResourceDetailPath(
+      '/dev-workspace/clusters/host/projects/dev-wes/deployments/wes-v2-server',
+    ),
+    '/dev-workspace/clusters/host/projects/dev-wes/deployments/wes-v2-server/resource-status',
+  );
+  assert.equal(
+    normalizeNativeResourceDetailPath(
+      '/dev-workspace/clusters/host/projects/dev-wes/deployments/wes-v2-server?tab=events',
+    ),
+    '/dev-workspace/clusters/host/projects/dev-wes/deployments/wes-v2-server/resource-status?tab=events',
+  );
+});
+
 test('leaves list, history, and non-project V3 routes unchanged', () => {
   assert.equal(
     normalizeNativeResourceDetailPath('/test-workspace/clusters/host/projects/test-wes/configmaps'),
