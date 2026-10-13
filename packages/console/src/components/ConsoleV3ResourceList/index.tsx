@@ -30,6 +30,12 @@ export default function ConsoleV3ResourceList({
   url,
   cacheTtlMs = DEFAULT_CONSOLE_V3_LIST_CACHE_TTL,
 }: ConsoleV3ResourceListProps): JSX.Element {
+  // The project layout writes the Wujie URL prefix in an effect. Avoid an
+  // initial mount with `undefined/...`; that mount would create a non-reusable
+  // Wujie instance before the real resource URL is available.
+  if (!url.includes('/consolev3/')) {
+    return <></>;
+  }
   const revision = getResourceListCacheVersion(resource);
   const user = globals?.user?.username || 'anonymous';
   const scopeKey = getConsoleV3ScopeKey(resource, url, user);
