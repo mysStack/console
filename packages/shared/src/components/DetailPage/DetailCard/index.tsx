@@ -47,7 +47,7 @@ export interface SideProps {
   customAttrs?: ReactNode;
 }
 
-const getListUrl = (url: string, listName?: string) => {
+const useListUrl = (url: string, listName?: string) => {
   if (listName) {
     const [storageState] = useLocalStorage({ key: `tableState:${listName}`, defaultValue: '{}' });
     const parsedStorageState: State = JSON.parse(storageState);
@@ -121,7 +121,7 @@ function DetailCard({
 
   const renderBreadCrumbs = () => {
     if (breadcrumbs) {
-      const listUrl = getListUrl(breadcrumbs.url, breadcrumbs.listName);
+      const listUrl = useListUrl(breadcrumbs.url, breadcrumbs.listName);
       return (
         <BackLink
           to={listUrl}
