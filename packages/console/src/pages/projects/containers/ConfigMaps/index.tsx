@@ -14,8 +14,9 @@ function ConfigMaps(): JSX.Element {
     <WujieReact
       width="100%"
       height="100%"
-      name="consolev3"
+      name="consolev3-configmaps"
       url={`${wujieUrlPrefix}/configmaps`}
+      alive={true}
       sync={false}
     />
   );
