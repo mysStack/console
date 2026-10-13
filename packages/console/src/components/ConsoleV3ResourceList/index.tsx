@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import WujieReact from 'wujie-react';
 
 import { getResourceListCacheVersion } from '@ks-console/shared';
@@ -31,6 +31,7 @@ export default function ConsoleV3ResourceList({
   url,
   cacheTtlMs = DEFAULT_CONSOLE_V3_LIST_CACHE_TTL,
 }: ConsoleV3ResourceListProps): JSX.Element {
+  const [instanceReady, setInstanceReady] = useState(false);
   // The project layout writes the Wujie URL prefix in an effect. Avoid an
   // initial mount with `undefined/...`; that mount would create a non-reusable
   // Wujie instance before the real resource URL is available.
@@ -45,8 +46,7 @@ export default function ConsoleV3ResourceList({
     revision === '0:0'
       ? url
       : `${url}${url.includes('?') ? '&' : '?'}ksConsoleV4ListRevision=${revision}`;
-  const keepAlive =
-    isReady &&
+  const canRestore =
     !cacheExpired &&
     mountedResourceUrls.get(scopeKey) === resourceUrl &&
     shouldKeepConsoleV3Alive(activeScopeKey, scopeKey);
@@ -98,7 +98,15 @@ export default function ConsoleV3ResourceList({
     [resourceUrl],
   );
 
-  if (!isReady) {
+  useEffect(() => {
+    if (!isReady) return;
+    if (!canRestore) {
+      WujieReact.destroyApp('consolev3');
+    }
+    setInstanceReady(true);
+  }, [canRestore, isReady, resourceUrl]);
+
+  if (!isReady || !instanceReady) {
     return <></>;
   }
 
@@ -108,7 +116,7 @@ export default function ConsoleV3ResourceList({
       height="100%"
       name="consolev3"
       url={resourceUrl}
-      alive={keepAlive}
+      alive
       sync={false}
       {...lifecycle}
     />
