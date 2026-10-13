@@ -16,6 +16,7 @@ import {
   DetailPageRef,
   configMapStore,
   useCommonActions,
+  invalidateResourceList,
 } from '@ks-console/shared';
 import type { FormattedConfigMap } from '@ks-console/shared';
 
@@ -128,6 +129,7 @@ export default function ConfigMapDetail(): JSX.Element {
         onSuccess: () => {
           configMapSettingEditModal.close();
           notify.success(t('UPDATE_SUCCESSFUL'));
+          invalidateResourceList('configmaps');
           ref.current?.refetch();
         },
       },

@@ -21,6 +21,7 @@ import yaml from '../../utils/yaml';
 import type { DeleteConfirmContentProps } from '../../components/Modals/DeleteConfirm/DeleteConfirm';
 import { DeleteConfirmContent } from '../../components/Modals/DeleteConfirm/DeleteConfirm';
 import type { PathParams } from '../../types';
+import { invalidateResourceList } from '../../utils/resourceListInvalidation';
 
 interface BaseInfoProps extends Record<string, any> {
   initialValues?: any;
@@ -60,6 +61,7 @@ const useCommonActions = ({ store, callback = () => {}, params = {} }: CommonAct
       onOk = async (data: any) => {
         await store.patch({ ...initialValues, ...params }, data, undefined, k8sVersion);
         notify.success(t('UPDATE_SUCCESSFUL'));
+        invalidateResourceList(store?.module);
         callback('editBaseInfo');
       };
     } else {
@@ -125,6 +127,7 @@ const useCommonActions = ({ store, callback = () => {}, params = {} }: CommonAct
       onOk = async (data: any) => {
         await store.put({ ...initialValues, ...params }, yaml.load(data), false, k8sVersion);
         notify.success(t('UPDATE_SUCCESSFUL'));
+        invalidateResourceList(store?.module);
         callback('editYaml');
       };
     }
@@ -169,6 +172,7 @@ const useCommonActions = ({ store, callback = () => {}, params = {} }: CommonAct
       }));
       await store.batchDelete(deleteParams, k8sVersion);
       notify.success(t('DELETED_SUCCESSFULLY'));
+      invalidateResourceList(store?.module);
       callback('delete');
     };
 

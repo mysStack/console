@@ -37,14 +37,17 @@ const App = () => {
     setThemeLocalValue(theme);
   }, []);
 
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        refetchOnWindowFocus: false,
-        retry: false,
-      },
-    },
-  });
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            refetchOnWindowFocus: false,
+            retry: false,
+          },
+        },
+      }),
+  );
 
   return (
     <QueryClientProvider contextSharing={true} client={queryClient}>

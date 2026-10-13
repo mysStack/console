@@ -4,20 +4,14 @@
  */
 
 import React from 'react';
-import WujieReact from 'wujie-react';
+import ConsoleV3ResourceList from '../../../../../components/ConsoleV3ResourceList';
 import { useCacheStore as useStore } from '@ks-console/shared';
 
 function NetworkPolicies(): JSX.Element {
   const [wujieUrlPrefix] = useStore<string>('wujieUrlPrefix');
 
   return (
-    <WujieReact
-      width="100%"
-      height="100%"
-      name="consolev3"
-      url={`${wujieUrlPrefix}/networkpolicies`}
-      sync={false}
-    />
+    <ConsoleV3ResourceList resource="networkpolicies" url={`${wujieUrlPrefix}/networkpolicies`} />
   );
 }
 

@@ -16,6 +16,7 @@ import {
   DetailPageRef,
   secretStore,
   useCommonActions,
+  invalidateResourceList,
 } from '@ks-console/shared';
 import type { FormattedSecret } from '@ks-console/shared';
 
@@ -127,6 +128,7 @@ export default function SecretDetail(): JSX.Element {
       onSuccess: () => {
         secretSettingEditModal.close();
         notify.success(t('UPDATE_SUCCESSFUL'));
+        invalidateResourceList('secrets');
         ref.current?.refetch();
       },
     },
