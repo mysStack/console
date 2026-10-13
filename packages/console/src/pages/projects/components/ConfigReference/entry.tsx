@@ -9,6 +9,7 @@ import type { ConfigReferenceWorkloadModule } from './path';
 export { getConfigReferencePath } from './path';
 export type { ConfigReferencePathParams, ConfigReferenceWorkloadModule } from './path';
 import {
+  CONFIG_REFERENCE_ENTRY_SELECTOR,
   ConfigReferenceDomRoot,
   findConfigReferenceAction,
   findConfigReferenceEnvSections,
@@ -18,6 +19,7 @@ import {
   injectConfigReferenceEntry,
   installConfigReferenceNativeEdit,
   readManualEnvNames,
+  shouldRetryConfigReferenceInjection,
 } from './bridge';
 
 const ConfigReferenceInline = lazy(() => import('./ConfigReferenceInline'));
@@ -35,6 +37,7 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
   const removeConfirmationListenerRef = useRef<() => void>();
   const [draftVersion, setDraftVersion] = useState(0);
   const observerRef = useRef<MutationObserver | undefined>();
+  const entryRetryTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const domRootRef = useRef<ConfigReferenceDomRoot | undefined>();
   const inlineHostRef = useRef<HTMLElement | null>(null);
   const summaryHostRef = useRef<HTMLElement | null>(null);
@@ -61,6 +64,10 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
   }, []);
 
   const cleanup = useCallback(() => {
+    if (entryRetryTimerRef.current) {
+      clearTimeout(entryRetryTimerRef.current);
+      entryRetryTimerRef.current = undefined;
+    }
     observerRef.current?.disconnect();
     observerRef.current = undefined;
     removeEditListenerRef.current?.();
@@ -291,6 +298,24 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
       const observer = new Observer(applyEntry);
       observer.observe(target, { childList: true, subtree: true });
       observerRef.current = observer;
+
+      // The action form is lazy and can replace its toolbar after the first
+      // mutation. A short bounded retry closes that window without keeping a
+      // timer alive for the lifetime of the page.
+      let attempt = 0;
+      const retryEntry = () => {
+        applyEntry();
+        if (
+          !root.querySelector(CONFIG_REFERENCE_ENTRY_SELECTOR) &&
+          shouldRetryConfigReferenceInjection(attempt)
+        ) {
+          attempt += 1;
+          entryRetryTimerRef.current = setTimeout(retryEntry, 100);
+        } else {
+          entryRetryTimerRef.current = undefined;
+        }
+      };
+      retryEntry();
 
       // Typing does not mutate the DOM tree, so the MutationObserver above
       // never fires for it. Capture input events to keep the conflict hints

@@ -6,6 +6,13 @@ export interface ConfigReferenceInjectionState {
   entryExists: boolean;
 }
 
+export const CONFIG_REFERENCE_INJECTION_RETRY_LIMIT = 50;
+
+/** Keep the editor action visible while the embedded V3 form finishes loading. */
+export function shouldRetryConfigReferenceInjection(attempt: number): boolean {
+  return attempt < CONFIG_REFERENCE_INJECTION_RETRY_LIMIT;
+}
+
 export type ConfigReferenceDomRoot = Document | ShadowRoot;
 
 export function installConfigReferenceNativeEdit(root: ConfigReferenceDomRoot, onOpen: () => void) {

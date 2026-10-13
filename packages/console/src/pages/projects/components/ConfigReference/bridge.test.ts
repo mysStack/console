@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   CONFIG_REFERENCE_ENTRY_SELECTOR,
   CONFIG_REFERENCE_ENVIRONMENT_ACTION_SELECTOR,
+  CONFIG_REFERENCE_INJECTION_RETRY_LIMIT,
   configReferenceContainerFromHeading,
   findConfigReferenceAction,
   findConfigReferenceEnvSections,
@@ -12,7 +13,17 @@ import {
   injectConfigReferenceEntry,
   installConfigReferenceNativeEdit,
   shouldInjectConfigReferenceEntry,
+  shouldRetryConfigReferenceInjection,
 } from './bridge';
+
+test('keeps retrying configuration reference injection for a still-loading V3 form', () => {
+  assert.equal(shouldRetryConfigReferenceInjection(0), true);
+  assert.equal(
+    shouldRetryConfigReferenceInjection(CONFIG_REFERENCE_INJECTION_RETRY_LIMIT - 1),
+    true,
+  );
+  assert.equal(shouldRetryConfigReferenceInjection(CONFIG_REFERENCE_INJECTION_RETRY_LIMIT), false);
+});
 
 test('native settings activation opens the controlled action before the old editor and leaves other actions untouched', () => {
   const root = new EventTarget();
