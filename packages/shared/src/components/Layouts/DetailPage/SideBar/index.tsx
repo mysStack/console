@@ -31,7 +31,12 @@ import {
 } from './styles';
 
 export interface SideBarProps<T> {
-  breadcrumbs?: { label: string; url: string; listName?: string };
+  breadcrumbs?: {
+    label: string;
+    url: string;
+    listName?: string;
+    onBack?: () => void;
+  };
   icon?: ReactNode;
   attrs?: (data: T) => { label: string; value: string | ReactNode; show?: boolean }[];
   title?: string | ReactNode;
@@ -100,7 +105,15 @@ const SideBar = <T extends Record<string, any>>({
       const listName = breadcrumbs.listName ?? `${store?.module}:table:list`;
       const listUrl = getListUrl(breadcrumbs.url, listName);
       return (
-        <BackLink to={listUrl}>
+        <BackLink
+          to={listUrl}
+          onClick={event => {
+            if (breadcrumbs.onBack) {
+              event.preventDefault();
+              breadcrumbs.onBack();
+            }
+          }}
+        >
           <ChevronLeft size={20} />
           {breadcrumbs.label}
         </BackLink>

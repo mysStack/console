@@ -36,7 +36,12 @@ export interface SideProps {
   actions?: DetailAction[];
   actionOptions?: ActionOptions;
   attrs?: { label: string; value: string | ReactNode; show?: boolean }[];
-  breadcrumbs?: { label: string; url: string; listName?: string };
+  breadcrumbs?: {
+    label: string;
+    url: string;
+    listName?: string;
+    onBack?: () => void;
+  };
   icon?: ReactNode;
   labels?: Record<string, string>;
   customAttrs?: ReactNode;
@@ -118,7 +123,15 @@ function DetailCard({
     if (breadcrumbs) {
       const listUrl = getListUrl(breadcrumbs.url, breadcrumbs.listName);
       return (
-        <BackLink to={listUrl}>
+        <BackLink
+          to={listUrl}
+          onClick={event => {
+            if (breadcrumbs.onBack) {
+              event.preventDefault();
+              breadcrumbs.onBack();
+            }
+          }}
+        >
           <ChevronLeft size={20} />
           {breadcrumbs.label}
         </BackLink>

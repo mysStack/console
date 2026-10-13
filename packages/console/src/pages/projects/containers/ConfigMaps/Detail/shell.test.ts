@@ -16,3 +16,9 @@ test('ConfigMap detail shell uses the native DetailPage container', () => {
 test('ConfigMap detail shell drops the Wujie injection', () => {
   assert.doesNotMatch(source, /WujieReact|useConfigHistoryEntry|wujie-react/);
 });
+
+test('ConfigMap detail keeps the originating list when returning from a pushed route', () => {
+  assert.match(source, /onBack: handleBack/);
+  assert.match(source, /navigationType === 'PUSH'/);
+  assert.match(source, /location\.pathname\.endsWith\('\/detail'\)/);
+});

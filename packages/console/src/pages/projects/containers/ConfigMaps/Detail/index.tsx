@@ -7,7 +7,7 @@ import React, { useRef } from 'react';
 import { merge, omit } from 'lodash';
 import { notify } from '@kubed/components';
 import { useDisclosure } from '@kubed/hooks';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useNavigationType, useParams } from 'react-router-dom';
 
 import {
   Icon,
@@ -42,6 +42,19 @@ export default function ConfigMapDetail(): JSX.Element {
   ];
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const navigationType = useNavigationType();
+  const handleBack = () => {
+    if (
+      navigationType === 'PUSH' &&
+      location.key !== 'default' &&
+      location.pathname.endsWith('/detail')
+    ) {
+      navigate(-1);
+      return;
+    }
+    navigate(listPrefix);
+  };
 
   const attrs = (data: FormattedConfigMap) => [
     { label: t('CLUSTER_PL'), value: cluster ? cluster : '' },
@@ -150,6 +163,7 @@ export default function ConfigMapDetail(): JSX.Element {
             label: t('CONFIGMAP_PL'),
             url: listPrefix,
             listName: 'configuration-configmap',
+            onBack: handleBack,
           },
           description: ref.current?.detail.description,
         }}
