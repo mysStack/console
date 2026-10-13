@@ -37,11 +37,12 @@ export function scheduleConsoleV3ListRouteSync(
   resourceUrl: string,
 ): void {
   const sync = () => syncConsoleV3ListRoute(appWindow, resourceUrl);
-  if (!appWindow.requestAnimationFrame) {
+  const requestAnimationFrame = appWindow.requestAnimationFrame;
+  if (!requestAnimationFrame) {
     setTimeout(sync, 0);
     return;
   }
   // Wujie attaches the reused shadow root before the child router's React
   // listener is restored. Two frames put the popstate after that activation.
-  appWindow.requestAnimationFrame(() => appWindow.requestAnimationFrame(sync));
+  requestAnimationFrame(() => requestAnimationFrame(sync));
 }
