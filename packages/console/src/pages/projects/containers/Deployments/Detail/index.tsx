@@ -12,6 +12,7 @@ import {
   getConsoleV3DetailUrl,
   getConsoleV3ProjectPrefix,
   bindConsoleV3DetailHistory,
+  shouldSyncConsoleV3DetailRoute,
 } from '../../Base/BaseLayout/route';
 
 function DeploymentDetail(): JSX.Element {
@@ -52,10 +53,7 @@ function DeploymentDetail(): JSX.Element {
         name,
         hostDetailPath,
       });
-      if (
-        initialHostPath.current === hostDetailPath ||
-        appWindow.location.pathname === embeddedPath
-      ) {
+      if (!shouldSyncConsoleV3DetailRoute(appWindow.location.pathname, embeddedPath)) {
         return;
       }
 

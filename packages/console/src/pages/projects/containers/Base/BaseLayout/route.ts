@@ -30,12 +30,12 @@ export function getConsoleV3ProjectPrefix({
   return `/${workspace}/clusters/${cluster}/projects/${namespace}`;
 }
 
-export function getConsoleV3DetailUrl({
-  host,
-  projectPrefix,
-  name = '',
-}: EmbeddedDetailRoute): string {
-  return `//${host}/consolev3${projectPrefix}/deployments/${name}`;
+export function getConsoleV3DetailUrl({ host, projectPrefix }: EmbeddedDetailRoute): string {
+  return `//${host}/consolev3${projectPrefix}/deployments`;
+}
+
+export function shouldSyncConsoleV3DetailRoute(appPath: string, embeddedPath: string): boolean {
+  return appPath !== embeddedPath;
 }
 
 /**

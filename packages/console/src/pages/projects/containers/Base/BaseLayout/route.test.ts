@@ -6,6 +6,7 @@ import {
   getConsoleV3DetailPath,
   getConsoleV3DetailUrl,
   getConsoleV3ProjectPrefix,
+  shouldSyncConsoleV3DetailRoute,
 } from './route';
 
 test('builds the project-relative Wujie route used by the preloaded V3 app', () => {
@@ -26,10 +27,7 @@ test('boots the cached V3 app at the stable workload root', () => {
       projectPrefix: '/test-workspace/clusters/host/projects/test-wes',
       name: 'ams-server',
     }),
-    [
-      '//192.168.2.131:30880/consolev3/test-workspace/clusters/host/projects/test-wes',
-      '/deployments/ams-server',
-    ].join(''),
+    '//192.168.2.131:30880/consolev3/test-workspace/clusters/host/projects/test-wes/deployments',
   );
 });
 
@@ -105,4 +103,21 @@ test('forwards host back/forward only within the mounted workload and stops afte
   host.dispatchEvent(new Event('popstate'));
   assert.equal(child.location.pathname, `/consolev3${detail}/env`);
   assert.equal(delivered, 2);
+});
+
+test('syncs the detail route after the V3 app boots at the workload list', () => {
+  assert.equal(
+    shouldSyncConsoleV3DetailRoute(
+      '/consolev3/test-workspace/clusters/host/projects/test-wes/deployments',
+      '/consolev3/test-workspace/clusters/host/projects/test-wes/deployments/ams-server',
+    ),
+    true,
+  );
+  assert.equal(
+    shouldSyncConsoleV3DetailRoute(
+      '/consolev3/test-workspace/clusters/host/projects/test-wes/deployments/ams-server',
+      '/consolev3/test-workspace/clusters/host/projects/test-wes/deployments/ams-server',
+    ),
+    false,
+  );
 });
