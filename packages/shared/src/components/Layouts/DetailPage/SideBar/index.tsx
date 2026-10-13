@@ -46,7 +46,7 @@ export interface SideBarProps<T> {
   extra?: ReactNode;
 }
 
-const useListUrl = (url: string, listName?: string) => {
+const getListUrl = (url: string, listName?: string) => {
   const [storageState] = useLocalStorage({ key: `tableState:${listName}`, defaultValue: '{}' });
   if (listName) {
     const parsedStorageState: State = JSON.parse(storageState);
@@ -103,7 +103,7 @@ const SideBar = <T extends Record<string, any>>({
   const renderBreadCrumbs = () => {
     if (breadcrumbs) {
       const listName = breadcrumbs.listName ?? `${store?.module}:table:list`;
-      const listUrl = useListUrl(breadcrumbs.url, listName);
+      const listUrl = getListUrl(breadcrumbs.url, listName);
       return (
         <BackLink
           to={listUrl}
