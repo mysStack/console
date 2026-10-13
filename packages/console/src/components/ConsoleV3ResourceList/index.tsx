@@ -75,7 +75,6 @@ export default function ConsoleV3ResourceList({
                 }
               : phase === 'afterUnmount'
                 ? () => {
-                    mountedScopes.delete(scopeKey);
                     markConsoleV3Phase('afterUnmount', resourceUrl);
                   }
                 : phase === 'activated'
