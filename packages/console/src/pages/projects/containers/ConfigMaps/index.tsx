@@ -16,7 +16,6 @@ function ConfigMaps(): JSX.Element {
       height="100%"
       name="consolev3"
       url={`${wujieUrlPrefix}/configmaps`}
-      alive={true}
       sync={false}
     />
   );
