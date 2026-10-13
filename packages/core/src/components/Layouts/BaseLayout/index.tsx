@@ -21,6 +21,7 @@ import Toolbox from '../../../containers/Toolbox';
 import Header from '../Header';
 import { Main } from './styles';
 import v3Notify from './v3Notify';
+import { normalizeNativeResourceDetailPath } from './nativeResourceRoute';
 
 const GlobalStyle = createGlobalStyle<{ $navbarHeight?: number; $licenseTipHeight?: number }>`
   :root {
@@ -91,12 +92,13 @@ export default function BaseLayout() {
     document.addEventListener('click', eventer);
     bus.$on('subRouteChange', (name: any, path: any) => {
       const { location } = window;
+      const pathname = normalizeNativeResourceDetailPath(path.pathname);
 
-      if (path.pathname !== location.pathname) {
-        navigate(`${path.pathname}${path.search}`);
-      } else if (path.pathname === location.pathname && path.search !== location.search) {
+      if (pathname !== location.pathname) {
+        navigate(`${pathname}${path.search}`);
+      } else if (pathname === location.pathname && path.search !== location.search) {
         // @ts-ignore
-        const url = new URL(`${location.origin}${path.pathname}${path.search}`);
+        const url = new URL(`${location.origin}${pathname}${path.search}`);
         window.history.pushState('', '', url);
       }
     });
