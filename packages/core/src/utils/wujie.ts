@@ -26,6 +26,12 @@ export function initWujie() {
   });
 
   setupApp({
+    name: 'consolev3-configmaps',
+    url: `//${window.location.host}/consolev3/`,
+    exec: true,
+  });
+
+  setupApp({
     name: 'consoleV3Actions',
     url: `//${window.location.host}/consolev3/`,
     exec: true,
@@ -47,6 +53,11 @@ export function initWujie() {
 
   preloadApp({
     name: 'consolev3',
+    url: `//${window.location.host}/consolev3/dashboard`,
+  });
+
+  preloadApp({
+    name: 'consolev3-configmaps',
     url: `//${window.location.host}/consolev3/dashboard`,
   });
 }
