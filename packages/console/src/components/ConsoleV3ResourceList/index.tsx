@@ -9,6 +9,7 @@ import {
   markConsoleV3Phase,
   shouldKeepConsoleV3Alive,
 } from './metrics';
+import { syncConsoleV3ListRoute } from './route';
 
 let activeScopeKey: string | undefined;
 const lastScopeUseAt = new Map<string, number>();
@@ -83,6 +84,9 @@ export default function ConsoleV3ResourceList({
                 : phase === 'activated'
                   ? (appWindow?: Window) => {
                       deactivatedScopes.delete(scopeKey);
+                      if (appWindow) {
+                        syncConsoleV3ListRoute(appWindow, resourceUrl);
+                      }
                       markConsoleV3Phase('activated', resourceUrl);
                       if (appWindow?.requestAnimationFrame) {
                         appWindow.requestAnimationFrame(() =>
