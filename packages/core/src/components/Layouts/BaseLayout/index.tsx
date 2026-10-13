@@ -21,7 +21,10 @@ import Toolbox from '../../../containers/Toolbox';
 import Header from '../Header';
 import { Main } from './styles';
 import v3Notify from './v3Notify';
-import { normalizeNativeResourceDetailPath } from './nativeResourceRoute';
+import {
+  normalizeNativeResourceDetailPath,
+  shouldReplaceNativeResourceRoute,
+} from './nativeResourceRoute';
 
 const GlobalStyle = createGlobalStyle<{ $navbarHeight?: number; $licenseTipHeight?: number }>`
   :root {
@@ -98,7 +101,12 @@ export default function BaseLayout() {
         // Replace Wujie's temporary `/resource/name` entry with the native V4
         // detail route. Otherwise browser Back visits the temporary entry
         // first and appears to require two clicks before reaching the list.
-        navigate(`${pathname}${path.search}`, { replace: pathname !== path.pathname });
+        // A list-to-detail transition must push a new entry so the list stays
+        // in browser history. The replace case only applies when the host is
+        // already on the temporary V3 detail entry (or an equivalent native
+        // path) and V3 is subsequently reporting its canonical sub-route.
+        const replaceTemporaryEntry = shouldReplaceNativeResourceRoute(location.pathname, pathname);
+        navigate(`${pathname}${path.search}`, { replace: replaceTemporaryEntry });
       } else if (pathname === location.pathname && path.search !== location.search) {
         // @ts-ignore
         const url = new URL(`${location.origin}${pathname}${path.search}`);

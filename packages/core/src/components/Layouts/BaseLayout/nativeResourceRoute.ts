@@ -10,3 +10,7 @@ export function normalizeNativeResourceDetailPath(pathname: string): string {
     .replace(NATIVE_PROJECT_RESOURCE_STATUS, '$1/resource-status');
   return `${normalizedPath}${match[2] || ''}`;
 }
+
+export function shouldReplaceNativeResourceRoute(currentPath: string, nextPath: string): boolean {
+  return normalizeNativeResourceDetailPath(currentPath) === nextPath;
+}

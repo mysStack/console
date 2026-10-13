@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { normalizeNativeResourceDetailPath } from './nativeResourceRoute';
+import {
+  normalizeNativeResourceDetailPath,
+  shouldReplaceNativeResourceRoute,
+} from './nativeResourceRoute';
 
 test('normalizes project ConfigMap and Secret V3 routes to native detail routes', () => {
   assert.equal(
@@ -48,4 +51,14 @@ test('leaves list, history, and non-project V3 routes unchanged', () => {
     normalizeNativeResourceDetailPath('/clusters/host/configmaps/example'),
     '/clusters/host/configmaps/example',
   );
+});
+
+test('only replaces an existing temporary detail entry', () => {
+  const list = '/dev-workspace/clusters/host/projects/dev-wes/deployments';
+  const temporary = `${list}/wes-v2-server`;
+  const native = `${temporary}/resource-status`;
+
+  assert.equal(shouldReplaceNativeResourceRoute(list, native), false);
+  assert.equal(shouldReplaceNativeResourceRoute(temporary, native), true);
+  assert.equal(shouldReplaceNativeResourceRoute(native, native), true);
 });
