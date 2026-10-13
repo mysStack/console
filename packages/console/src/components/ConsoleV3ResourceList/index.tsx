@@ -12,7 +12,7 @@ import {
 
 let activeScopeKey: string | undefined;
 const lastScopeUseAt = new Map<string, number>();
-const mountedScopes = new Set<string>();
+const mountedResourceUrls = new Map<string, string>();
 export const DEFAULT_CONSOLE_V3_LIST_CACHE_TTL = 30_000;
 
 export interface ConsoleV3ResourceListProps {
@@ -44,7 +44,7 @@ export default function ConsoleV3ResourceList({
   const keepAlive =
     isReady &&
     !cacheExpired &&
-    mountedScopes.has(scopeKey) &&
+    mountedResourceUrls.get(scopeKey) === resourceUrl &&
     shouldKeepConsoleV3Alive(activeScopeKey, scopeKey);
   if (isReady) {
     activeScopeKey = scopeKey;
@@ -70,7 +70,7 @@ export default function ConsoleV3ResourceList({
           callbacks[phase] =
             phase === 'afterMount'
               ? () => {
-                  mountedScopes.add(scopeKey);
+                  mountedResourceUrls.set(scopeKey, resourceUrl);
                   markConsoleV3Phase('afterMount', resourceUrl);
                 }
               : phase === 'afterUnmount'
