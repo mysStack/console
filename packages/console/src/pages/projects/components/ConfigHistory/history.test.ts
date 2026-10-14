@@ -11,6 +11,7 @@ import {
   HISTORY_SECRET_SUFFIX,
   decodeHistoryPayload,
   diffPair,
+  buildSimpleDiffRows,
   historySecretName,
   isHistorySecretName,
   recordText,
@@ -134,4 +135,20 @@ test('diffPair on the oldest record compares against nothing', () => {
 
 test('diffPair on an unknown revision returns empty values', () => {
   assert.deepEqual(diffPair(sample, 99), { oldValue: '', newValue: '' });
+});
+
+test('buildSimpleDiffRows keeps line numbers aligned for additions', () => {
+  assert.deepEqual(buildSimpleDiffRows('A\nB\n', 'A\nX\nB\n'), [
+    { type: 'context', oldLine: 1, newLine: 1, text: 'A' },
+    { type: 'insert', newLine: 2, text: 'X' },
+    { type: 'context', oldLine: 2, newLine: 3, text: 'B' },
+  ]);
+});
+
+test('buildSimpleDiffRows keeps line numbers aligned for removals', () => {
+  assert.deepEqual(buildSimpleDiffRows('A\nX\nB\n', 'A\nB\n'), [
+    { type: 'context', oldLine: 1, newLine: 1, text: 'A' },
+    { type: 'delete', oldLine: 2, text: 'X' },
+    { type: 'context', oldLine: 3, newLine: 2, text: 'B' },
+  ]);
 });

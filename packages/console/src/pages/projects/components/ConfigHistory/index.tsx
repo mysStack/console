@@ -20,7 +20,9 @@ import {
   MANAGED_BY_REPLICATOR,
   decodeHistoryPayload,
   diffPair,
+  buildSimpleDiffRows,
   historySecretName,
+  SimpleDiffRow,
 } from './history';
 import { seedHistoryFor } from './seed';
 
@@ -42,6 +44,94 @@ const HistoryDiff = styled.div`
     min-width: 720px;
   }
 `;
+
+function SimpleDiffTable({ rows, description }: { rows: SimpleDiffRow[]; description: string }) {
+  const oldRows = rows.filter(row => row.type !== 'insert');
+  const newRows = rows.filter(row => row.type !== 'delete');
+  const oldStart = oldRows[0]?.oldLine || 1;
+  const newStart = newRows[0]?.newLine || 1;
+  const background = {
+    context: '#fff',
+    insert: '#c4e8d3',
+    delete: '#f9dfe4',
+  } as const;
+  const color = {
+    context: '#36435c',
+    insert: '#36435c',
+    delete: '#36435c',
+  } as const;
+  return (
+    <div style={{ border: '1px solid #ccd3db', borderRadius: '4px', overflow: 'hidden' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          minHeight: 40,
+          padding: '0 12px',
+          background: '#eff4f9',
+          fontSize: 12,
+          fontWeight: 600,
+        }}
+      >
+        <Icon name="terminal" size={20} />
+        <span style={{ marginLeft: 8 }}>{t('CONFIG_FILE')}</span>
+        <span style={{ marginLeft: 8, fontSize: 18 }}>⌄</span>
+        <span style={{ marginLeft: 8, fontSize: 18 }}>›</span>
+        <span style={{ marginLeft: 'auto' }}>{description}</span>
+      </div>
+      <table
+        style={{
+          width: '100%',
+          borderCollapse: 'collapse',
+          fontFamily: MONO,
+          fontSize: 12,
+          lineHeight: 1.67,
+        }}
+      >
+        <tbody>
+          <tr>
+            <td
+              colSpan={2}
+              style={{ padding: '4px 12px', color: '#a8b3c0', background: '#f9fbfd' }}
+            >
+              {`@@ -${oldStart},${oldRows.length} +${newStart},${newRows.length} @@`}
+            </td>
+          </tr>
+          {rows.map((row, index) => (
+            <tr key={`${row.type}-${row.oldLine || ''}-${row.newLine || ''}-${index}`}>
+              <td
+                style={{
+                  width: 64,
+                  padding: '0 8px',
+                  color: '#a8b3c0',
+                  textAlign: 'right',
+                  background: '#fafbfc',
+                  whiteSpace: 'pre',
+                }}
+              >
+                <span style={{ display: 'inline-block', width: 28 }}>{row.oldLine || ''}</span>
+                <span style={{ display: 'inline-block', width: 28 }}>{row.newLine || ''}</span>
+              </td>
+              <td
+                style={{
+                  padding: '0 12px',
+                  color: color[row.type],
+                  background: background[row.type],
+                  whiteSpace: 'pre',
+                }}
+              >
+                <strong style={{ display: 'inline-block', width: 18 }}>
+                  {row.type === 'insert' ? '+' : row.type === 'delete' ? '-' : ' '}
+                </strong>
+                {row.text}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 function managedByTagColor(managedBy: string): 'success' | 'info' | 'secondary' {
   if (managedBy === MANAGED_BY_REPLICATOR) {
@@ -237,70 +327,13 @@ function ConfigHistoryPage({
     }
     const oldText = pair.oldValue || '';
     const newText = pair.newValue || '';
-    const oldLines = oldText.split('\n').filter(Boolean);
-    const newLines = newText.split('\n').filter(Boolean);
-    // A change that only removes lines makes the viewer emit a hunk header with a negative count
-    // (-0,0 +1,-1) and report that it cannot parse the lines. Its rendering of that case is right, but
-    // the complaint is not, so the listing is drawn here instead.
-    const onlyRemovals = newLines.length > 0 && newLines.every(line => oldLines.indexOf(line) >= 0);
-    const line = (text: string, mark: string, background: string, color: string) => (
-      <div style={{ display: 'flex', background, color, lineHeight: 2, fontFamily: MONO }}>
-        <div
-          style={{
-            width: 54,
-            flex: '0 0 54px',
-            textAlign: 'right',
-            paddingRight: 12,
-            color: '#a8b3c0',
-            background: '#fafbfc',
-          }}
-        />
-        <div style={{ flex: 1, paddingLeft: 12, whiteSpace: 'pre' }}>
-          <span style={{ padding: '0 6px', fontWeight: 700 }}>{mark}</span>
-          {text}
-        </div>
-      </div>
-    );
-    if (onlyRemovals) {
-      const removed = oldLines.filter(item => newLines.indexOf(item) < 0);
+    const simpleRows = buildSimpleDiffRows(oldText, newText);
+    if (simpleRows) {
       return (
-        <div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '14px 20px',
-              border: '1px solid #e3e9ef',
-              borderTop: 'none',
-              background: '#fff',
-            }}
-          >
-            <strong style={{ fontSize: 13 }}>{t('CONFIG_FILE')}</strong>
-            <span style={{ color: '#55bc8a', fontSize: 12 }}>
-              {t('COMPARE_WITH', { version: `#${pair.comparedRevision}` })}
-            </span>
-          </div>
-          <div
-            style={{
-              border: '1px solid #e3e9ef',
-              borderTop: 'none',
-              fontFamily: MONO,
-              fontSize: 12,
-            }}
-          >
-            {removed.map((item, index) => (
-              <React.Fragment key={`del-${index}`}>
-                {line(item, '-', '#fdf1f4', '#d03050')}
-              </React.Fragment>
-            ))}
-            {newLines.map((item, index) => (
-              <React.Fragment key={`ctx-${index}`}>
-                {line(item, ' ', '#fff', '#36435c')}
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
+        <SimpleDiffTable
+          rows={simpleRows}
+          description={t('COMPARE_WITH', { version: `#${pair.comparedRevision}` })}
+        />
       );
     }
     // The bar is the viewer's own header, so it is drawn once rather than twice.

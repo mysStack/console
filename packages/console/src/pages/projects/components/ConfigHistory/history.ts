@@ -121,6 +121,73 @@ export function recordText(record: HistoryRecord): string {
   return keys.map(key => `${key}: ${scalar(content[key])}`).join('\n') + '\n';
 }
 
+export interface SimpleDiffRow {
+  type: 'context' | 'insert' | 'delete';
+  oldLine?: number;
+  newLine?: number;
+  text: string;
+}
+
+/**
+ * Builds the unambiguous line table for a change that only adds or only removes
+ * lines. The shared DiffViewer uses a negative context value and misnumbers this
+ * particular shape, so these rows are rendered with the native line-number layout.
+ */
+export function buildSimpleDiffRows(
+  oldValue: string,
+  newValue: string,
+): SimpleDiffRow[] | undefined {
+  const oldLines = oldValue.split('\n').filter(Boolean);
+  const newLines = newValue.split('\n').filter(Boolean);
+  if (oldLines.length === newLines.length) {
+    return undefined;
+  }
+  const rows: SimpleDiffRow[] = [];
+  let oldIndex = 0;
+  let newIndex = 0;
+  let sawInsert = false;
+  let sawDelete = false;
+  while (oldIndex < oldLines.length || newIndex < newLines.length) {
+    if (oldIndex >= oldLines.length) {
+      rows.push({ type: 'insert', newLine: newIndex + 1, text: newLines[newIndex] });
+      newIndex += 1;
+      sawInsert = true;
+      continue;
+    }
+    if (newIndex >= newLines.length) {
+      rows.push({ type: 'delete', oldLine: oldIndex + 1, text: oldLines[oldIndex] });
+      oldIndex += 1;
+      sawDelete = true;
+      continue;
+    }
+    if (oldLines[oldIndex] === newLines[newIndex]) {
+      rows.push({
+        type: 'context',
+        oldLine: oldIndex + 1,
+        newLine: newIndex + 1,
+        text: oldLines[oldIndex],
+      });
+      oldIndex += 1;
+      newIndex += 1;
+      continue;
+    }
+    if (oldLines[oldIndex] !== undefined && oldLines[oldIndex] === newLines[newIndex + 1]) {
+      rows.push({ type: 'insert', newLine: newIndex + 1, text: newLines[newIndex] });
+      newIndex += 1;
+      sawInsert = true;
+      continue;
+    }
+    if (newLines[newIndex] !== undefined && oldLines[oldIndex + 1] === newLines[newIndex]) {
+      rows.push({ type: 'delete', oldLine: oldIndex + 1, text: oldLines[oldIndex] });
+      oldIndex += 1;
+      sawDelete = true;
+      continue;
+    }
+    return undefined;
+  }
+  return sawInsert !== sawDelete ? rows : undefined;
+}
+
 /**
  * The pair of texts for comparing a record against the previous one, which is the shape
  * @kubed/diff-viewer expects.
