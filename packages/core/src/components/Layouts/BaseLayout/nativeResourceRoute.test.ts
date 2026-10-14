@@ -36,6 +36,13 @@ test('normalizes project Deployment V3 routes to the native resource status rout
   );
 });
 
+test('normalizes other project workload V3 detail routes to their resource status route', () => {
+  for (const resource of ['services', 'volumes', 'statefulsets', 'daemonsets']) {
+    const detail = `/dev-workspace/clusters/host/projects/dev-wes/${resource}/example`;
+    assert.equal(normalizeNativeResourceDetailPath(detail), `${detail}/resource-status`);
+  }
+});
+
 test('leaves list, history, and non-project V3 routes unchanged', () => {
   assert.equal(
     normalizeNativeResourceDetailPath('/test-workspace/clusters/host/projects/test-wes/configmaps'),
