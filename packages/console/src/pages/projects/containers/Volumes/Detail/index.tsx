@@ -18,6 +18,7 @@ function VolumeDetail(): JSX.Element {
       height="100%"
       name="consolev3"
       url={`${wujieUrlPrefix}/volumes/${name}`}
+      alive
       sync={false}
     />
   );

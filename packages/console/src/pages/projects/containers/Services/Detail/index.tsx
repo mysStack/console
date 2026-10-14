@@ -18,6 +18,7 @@ function ServiceDetail(): JSX.Element {
       height="100%"
       name="consolev3"
       url={`${wujieUrlPrefix}/services/${name}`}
+      alive
       sync={false}
     />
   );
