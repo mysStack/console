@@ -48,7 +48,6 @@ function DeploymentDetail(): JSX.Element {
   const listPath = getConsoleV3DeploymentListPath(projectPrefix);
   const syncDetailRoute = useCallback(
     (appWindow: Window) => {
-      if (appWindow.location.pathname === embeddedPath) return;
       if (routeSyncFrameRef.current !== undefined) {
         appWindow.cancelAnimationFrame(routeSyncFrameRef.current);
       }
@@ -66,9 +65,12 @@ function DeploymentDetail(): JSX.Element {
       const syncRoute = () => {
         const root = appWindow.document.getElementById('root');
         const rootSignature = `${root?.childElementCount ?? 0}:${root?.textContent?.trim() ?? ''}`;
-        const routeReady =
+        const detailRouteReady =
+          appWindow.location.pathname === embeddedPath && Boolean(root?.hasChildNodes());
+        const listRouteReady =
           shouldSyncConsoleV3DetailRoute(appWindow.location.pathname, embeddedPath, listPath) &&
           Boolean(root?.hasChildNodes());
+        const routeReady = detailRouteReady || listRouteReady;
         if (routeReady && rootSignature === previousRootSignature) {
           stableFrames += 1;
         } else {
@@ -79,6 +81,10 @@ function DeploymentDetail(): JSX.Element {
         if ((!routeReady || stableFrames < 3) && framesRemaining > 0) {
           framesRemaining -= 1;
           routeSyncFrameRef.current = appWindow.requestAnimationFrame(syncRoute);
+          return;
+        }
+        if (detailRouteReady && stableFrames >= 3) {
+          routeSyncFrameRef.current = undefined;
           return;
         }
         if (!routeReady || stableFrames < 3) {
