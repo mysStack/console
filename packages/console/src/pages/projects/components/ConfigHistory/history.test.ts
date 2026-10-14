@@ -15,6 +15,7 @@ import {
   historySecretName,
   isHistorySecretName,
   recordText,
+  sortHistoryRecords,
 } from './history';
 
 /**
@@ -151,4 +152,21 @@ test('buildSimpleDiffRows keeps line numbers aligned for removals', () => {
     { type: 'delete', oldLine: 2, text: 'X' },
     { type: 'context', oldLine: 3, newLine: 2, text: 'B' },
   ]);
+});
+
+test('sortHistoryRecords puts the newest revision first without mutating records', () => {
+  const records = [
+    { ...sample[0], revision: 2 },
+    { ...sample[1], revision: 1 },
+    { ...sample[0], revision: 3 },
+  ];
+
+  assert.deepEqual(
+    sortHistoryRecords(records).map(record => record.revision),
+    [3, 2, 1],
+  );
+  assert.deepEqual(
+    records.map(record => record.revision),
+    [2, 1, 3],
+  );
 });

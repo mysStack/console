@@ -4,7 +4,7 @@
  */
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { Alert, Button, Card, Loading, Tag } from '@kubed/components';
+import { Alert, Button, Card, Loading, Tag, TypeSelect } from '@kubed/components';
 import { DiffViewer } from '@kubed/diff-viewer';
 import { Icon } from '@ks-console/shared';
 import styled from 'styled-components';
@@ -23,6 +23,7 @@ import {
   buildSimpleDiffRows,
   historySecretName,
   SimpleDiffRow,
+  sortHistoryRecords,
 } from './history';
 import { seedHistoryFor } from './seed';
 
@@ -190,7 +191,7 @@ function ConfigHistoryPage({
   const [failed, setFailed] = useState(false);
   const [failedReason, setFailedReason] = useState('');
   const [owner, setOwner] = useState<{ managedBy: string; managedByRef?: string }>();
-  const [expanded, setExpanded] = useState<number | undefined>();
+  const [selectedRevision, setSelectedRevision] = useState<number | undefined>();
 
   // Kept in a ref so load() does not have to depend on the owner fetch's timing.
   const ownerRef = React.useRef<{ managedBy: string; managedByRef?: string } | undefined>();
@@ -255,7 +256,7 @@ function ConfigHistoryPage({
           }
         });
         setRecords([]);
-        setExpanded(undefined);
+        setSelectedRevision(undefined);
         // Report anyway: the attributes need the managed-by value even when nothing is recorded yet.
         onLoaded?.({ ...managed, createdAt: '' });
         return;
@@ -273,7 +274,7 @@ function ConfigHistoryPage({
           }
         });
         setRecords([]);
-        setExpanded(undefined);
+        setSelectedRevision(undefined);
         // Report anyway: the attributes need the managed-by value even when nothing is recorded yet.
         onLoaded?.({ ...managed, createdAt: '' });
         return;
@@ -289,8 +290,8 @@ function ConfigHistoryPage({
       const loaded = await decodeHistoryPayload(payload);
       setRecords(loaded);
       onLoaded?.({ ...managed, createdAt: loaded[0]?.createdAt || '' });
-      // The newest record is the current state, so it opens by default; the rest stay collapsed.
-      setExpanded(loaded[0]?.revision);
+      // The newest record is the current state, so it is selected by default in the version menu.
+      setSelectedRevision(sortHistoryRecords(loaded)[0]?.revision);
     } catch (error) {
       // A missing history Secret simply means nothing has been recorded yet.
       const status = (error as { response?: { status?: number } })?.response?.status;
@@ -349,12 +350,25 @@ function ConfigHistoryPage({
     );
   };
 
+  const sortedRecords = sortHistoryRecords(records);
+  const selectedRecord = records.find(record => record.revision === selectedRevision);
+  const revisionOptions = sortedRecords.map(record => ({
+    label: (
+      <span>
+        <span>#{record.revision}</span>{' '}
+        <Tag color={managedByTagColor(record.managedBy)}>
+          {t(managedByLabelKey(record.managedBy))}
+        </Tag>
+        {record.contentOmitted && <Tag color="warning">{t('CONFIG_HISTORY_CONTENT_OMITTED')}</Tag>}
+      </span>
+    ),
+    description: formatTime(record.createdAt),
+    icon: <Icon name="timed-task" size={40} />,
+    value: record.revision,
+  }));
+
   return (
     <div style={{ padding: '12px 24px 28px' }} data-test="config-history-page">
-      <Alert className="mb12" showIcon={false}>
-        {t('CONFIG_HISTORY_HINT')}
-      </Alert>
-
       {loading && <Loading />}
 
       {!loading && failed && (
@@ -367,105 +381,45 @@ function ConfigHistoryPage({
         </div>
       )}
 
-      {!loading && !failed && records.length === 0 && (
-        <div style={{ color: '#79879c' }}>{t('CONFIG_HISTORY_EMPTY')}</div>
+      {!loading && !failed && (
+        <Card sectionTitle={t('REVISION_RECORDS')}>
+          <Alert className="mb12" showIcon={false}>
+            {t('CONFIG_HISTORY_HINT')}
+          </Alert>
+          {records.length > 0 ? (
+            <TypeSelect
+              options={revisionOptions}
+              defaultValue={selectedRevision}
+              onChange={(revision: number) => setSelectedRevision(revision)}
+            />
+          ) : (
+            <div style={{ color: '#79879c' }}>{t('CONFIG_HISTORY_EMPTY')}</div>
+          )}
+        </Card>
       )}
 
-      {!loading &&
-        !failed &&
-        records.map(record => {
-          const isOpen = expanded === record.revision;
-          return (
-            <div key={record.revision} style={{ marginBottom: 16 }}>
-              <button
-                type="button"
-                aria-expanded={isOpen}
-                aria-controls={`config-history-detail-${record.revision}`}
-                data-test={`config-history-record-${record.revision}`}
-                onClick={() => setExpanded(isOpen ? undefined : record.revision)}
-                onKeyDown={event => {
-                  if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    setExpanded(isOpen ? undefined : record.revision);
-                  }
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  width: '100%',
-                  gap: 16,
-                  minHeight: 72,
-                  padding: '16px 20px',
-                  border: `1px solid ${isOpen ? '#55bc8a' : '#d8e0e8'}`,
-                  borderRadius: 4,
-                  // The native cards in this console carry this shadow; measured from the page's own
-                  // property panel and content card, both 4px radius with this exact shadow.
-                  boxShadow: '0 4px 8px rgba(36, 46, 66, 0.06)',
-                  cursor: 'pointer',
-                  background: '#fff',
-                  color: '#36435c',
-                  textAlign: 'left',
-                  font: 'inherit',
-                }}
-              >
-                <Icon name="timed-task" size={40} />
-                <span style={{ flex: 1, minWidth: 0 }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <strong style={{ fontSize: 14, lineHeight: 1.67 }}>#{record.revision}</strong>
-                    <Tag color={managedByTagColor(record.managedBy)}>
-                      {t(managedByLabelKey(record.managedBy))}
-                    </Tag>
-                    {record.contentOmitted && (
-                      <Tag color="warning">{t('CONFIG_HISTORY_CONTENT_OMITTED')}</Tag>
-                    )}
-                  </span>
-                  <span
-                    style={{
-                      display: 'block',
-                      color: '#79879c',
-                      fontSize: 14,
-                      lineHeight: 1.67,
-                    }}
-                  >
-                    {formatTime(record.createdAt)}
-                    {record.managedByRef ? ` · ${record.managedByRef}` : ''}
-                  </span>
-                </span>
-                {/* The design puts a chevron at the right end: down when open, right when closed. */}
-                <span aria-hidden="true" style={{ color: '#b6c2cd', fontSize: 20 }}>
-                  {isOpen ? '⌄' : '›'}
-                </span>
-              </button>
-              {isOpen && (
-                <div id={`config-history-detail-${record.revision}`} className="mt12">
-                  <Card>
-                    <YamlHeader style={{ flexWrap: 'wrap', rowGap: 12 }}>
-                      <Text
-                        title={`#${record.revision}`}
-                        description={t('CONFIG_HISTORY_SERIAL')}
-                      />
-                      <Text
-                        title={formatTime(record.createdAt)}
-                        description={t('CONFIG_HISTORY_CHANGED_AT')}
-                      />
-                      <Text
-                        title={`${t(managedByLabelKey(record.managedBy))}${
-                          record.managedByRef
-                            ? t('CONFIG_HISTORY_SOURCE_VERSION_FORMAT', {
-                                version: record.managedByRef,
-                              })
-                            : ''
-                        }`}
-                        description={t('CONFIG_HISTORY_MANAGED_BY')}
-                      />
-                    </YamlHeader>
-                    <DiffWrapper style={{ overflowX: 'auto' }}>{renderDiff(record)}</DiffWrapper>
-                  </Card>
-                </div>
-              )}
-            </div>
-          );
-        })}
+      {!loading && !failed && selectedRecord && (
+        <Card className="mt12">
+          <YamlHeader style={{ flexWrap: 'wrap', rowGap: 12 }}>
+            <Text title={`#${selectedRecord.revision}`} description={t('CONFIG_HISTORY_SERIAL')} />
+            <Text
+              title={formatTime(selectedRecord.createdAt)}
+              description={t('CONFIG_HISTORY_CHANGED_AT')}
+            />
+            <Text
+              title={`${t(managedByLabelKey(selectedRecord.managedBy))}${
+                selectedRecord.managedByRef
+                  ? t('CONFIG_HISTORY_SOURCE_VERSION_FORMAT', {
+                      version: selectedRecord.managedByRef,
+                    })
+                  : ''
+              }`}
+              description={t('CONFIG_HISTORY_MANAGED_BY')}
+            />
+          </YamlHeader>
+          <DiffWrapper style={{ overflowX: 'auto' }}>{renderDiff(selectedRecord)}</DiffWrapper>
+        </Card>
+      )}
 
       {!loading && !failed && records.length > 0 && (
         <Alert className="mt12" showIcon={false}>

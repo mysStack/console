@@ -128,6 +128,10 @@ export interface SimpleDiffRow {
   text: string;
 }
 
+export function sortHistoryRecords(records: HistoryRecord[]): HistoryRecord[] {
+  return [...records].sort((left, right) => right.revision - left.revision);
+}
+
 /**
  * Builds the unambiguous line table for a change that only adds or only removes
  * lines. The shared DiffViewer uses a negative context value and misnumbers this
