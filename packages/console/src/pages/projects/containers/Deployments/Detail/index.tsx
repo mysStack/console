@@ -109,8 +109,9 @@ function DeploymentDetail(): JSX.Element {
     },
     [embeddedPath, listPath],
   );
-  const bindHistory = useCallback(
+  const handleAfterMount = useCallback(
     (appWindow: Window) => {
+      afterMount(appWindow);
       appWindowRef.current = appWindow;
       removeHostHistoryRef.current?.();
       removeHostHistoryRef.current = bindConsoleV3DetailHistory(window, appWindow, {
@@ -120,20 +121,7 @@ function DeploymentDetail(): JSX.Element {
       });
       syncDetailRoute(appWindow);
     },
-    [hostDetailPath, name, projectPrefix, syncDetailRoute],
-  );
-  const handleAfterMount = useCallback(
-    (appWindow: Window) => {
-      afterMount(appWindow);
-      bindHistory(appWindow);
-    },
-    [afterMount, bindHistory],
-  );
-  const handleActivated = useCallback(
-    (appWindow: Window) => {
-      bindHistory(appWindow);
-    },
-    [bindHistory],
+    [afterMount, hostDetailPath, name, projectPrefix, syncDetailRoute],
   );
   const handleAfterUnmount = useCallback(() => {
     removeHostHistoryRef.current?.();
@@ -155,10 +143,8 @@ function DeploymentDetail(): JSX.Element {
         height="100%"
         name="consolev3"
         url={embeddedUrl}
-        alive
         sync={false}
         afterMount={handleAfterMount}
-        activated={handleActivated}
         afterUnmount={handleAfterUnmount}
       />
       {inline}
