@@ -13,8 +13,19 @@ import {
   injectConfigReferenceEntry,
   installConfigReferenceNativeEdit,
   shouldInjectConfigReferenceEntry,
+  shouldWaitForConfigReferenceShadowRoot,
   shouldRetryConfigReferenceInjection,
 } from './bridge';
+
+test('waits for the action Wujie shadow root before binding the bridge', () => {
+  const host = {} as HTMLElement;
+  assert.equal(shouldWaitForConfigReferenceShadowRoot(host, 'consoleV3Actions'), true);
+  assert.equal(shouldWaitForConfigReferenceShadowRoot(host, 'consolev3'), false);
+  assert.equal(
+    shouldWaitForConfigReferenceShadowRoot({ shadowRoot: {} } as HTMLElement, 'consoleV3Actions'),
+    false,
+  );
+});
 
 test('keeps retrying configuration reference injection for a still-loading V3 form', () => {
   assert.equal(shouldRetryConfigReferenceInjection(0), true);

@@ -19,6 +19,7 @@ import {
   injectConfigReferenceEntry,
   installConfigReferenceNativeEdit,
   readManualEnvNames,
+  shouldWaitForConfigReferenceShadowRoot,
   shouldRetryConfigReferenceInjection,
 } from './bridge';
 
@@ -38,6 +39,7 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
   const [draftVersion, setDraftVersion] = useState(0);
   const observerRef = useRef<MutationObserver | undefined>();
   const entryRetryTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const rootRetryTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const domRootRef = useRef<ConfigReferenceDomRoot | undefined>();
   const inlineHostRef = useRef<HTMLElement | null>(null);
   const summaryHostRef = useRef<HTMLElement | null>(null);
@@ -68,6 +70,10 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
       clearTimeout(entryRetryTimerRef.current);
       entryRetryTimerRef.current = undefined;
     }
+    if (rootRetryTimerRef.current) {
+      clearTimeout(rootRetryTimerRef.current);
+      rootRetryTimerRef.current = undefined;
+    }
     observerRef.current?.disconnect();
     observerRef.current = undefined;
     removeEditListenerRef.current?.();
@@ -96,7 +102,14 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
       if (!appWindow?.document) {
         return;
       }
-      const app = document.querySelector(`wujie-app[data-wujie-id="${appName}"]`);
+      const app = document.querySelector<HTMLElement>(`wujie-app[data-wujie-id="${appName}"]`);
+      if (shouldWaitForConfigReferenceShadowRoot(app, appName)) {
+        rootRetryTimerRef.current = setTimeout(() => {
+          rootRetryTimerRef.current = undefined;
+          bindRoot(appWindow, appName);
+        }, 50);
+        return;
+      }
       const root = app?.shadowRoot || appWindow.document;
       const rootDocument = (root as ShadowRoot).ownerDocument || (root as Document);
       // Empty env bodies are absolutely positioned by V3. When our section heading

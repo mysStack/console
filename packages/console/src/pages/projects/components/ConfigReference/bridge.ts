@@ -13,6 +13,18 @@ export function shouldRetryConfigReferenceInjection(attempt: number): boolean {
   return attempt < CONFIG_REFERENCE_INJECTION_RETRY_LIMIT;
 }
 
+/**
+ * Wujie can notify afterMount before the action app has attached its shadow
+ * root. Binding to the iframe document at that point misses the form that is
+ * mounted into the shadow root a moment later.
+ */
+export function shouldWaitForConfigReferenceShadowRoot(
+  host: HTMLElement | null | undefined,
+  appName: 'consolev3' | 'consoleV3Actions',
+): boolean {
+  return appName === 'consoleV3Actions' && Boolean(host) && !host?.shadowRoot;
+}
+
 export type ConfigReferenceDomRoot = Document | ShadowRoot;
 
 export function installConfigReferenceNativeEdit(root: ConfigReferenceDomRoot, onOpen: () => void) {
