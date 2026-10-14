@@ -46,6 +46,16 @@ export function shouldSyncConsoleV3DetailRoute(
   return appPath === listPath && appPath !== embeddedPath;
 }
 
+/** Change the embedded router path without adding a temporary history entry. */
+export function replaceConsoleV3Route(
+  appWindow: Pick<Window, 'history' | 'dispatchEvent'>,
+  path: string,
+): void {
+  const state = appWindow.history.state;
+  appWindow.history.replaceState(state, '', path);
+  appWindow.dispatchEvent(new PopStateEvent('popstate', { state }));
+}
+
 /**
  * Convert a directly opened host tab into the browser path used by the mounted
  * V3 application. The app must first boot at the stable workload root above;
@@ -77,12 +87,7 @@ export function bindConsoleV3DetailHistory(
     if (appWindow.location.pathname === path) return;
     // Native browser Back emits on the host only (Wujie sync=false). Keep
     // both history entries intact; notify V3's router in its own document.
-    appWindow.history.replaceState(appWindow.history.state, '', path);
-    // The Wujie app window may be a proxy without event constructors.
-    const event = new PopStateEvent('popstate', {
-      state: appWindow.history.state,
-    });
-    appWindow.dispatchEvent(event);
+    replaceConsoleV3Route(appWindow, path);
   };
   hostWindow.addEventListener('popstate', followHistory);
   return () => hostWindow.removeEventListener('popstate', followHistory);

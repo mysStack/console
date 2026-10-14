@@ -13,6 +13,7 @@ import {
   getConsoleV3DetailUrl,
   getConsoleV3ProjectPrefix,
   bindConsoleV3DetailHistory,
+  replaceConsoleV3Route,
   shouldSyncConsoleV3DetailRoute,
 } from '../../Base/BaseLayout/route';
 
@@ -52,6 +53,13 @@ function DeploymentDetail(): JSX.Element {
         appWindow.cancelAnimationFrame(routeSyncFrameRef.current);
       }
 
+      // A reused/preloaded instance may still be on dashboard or another
+      // namespace. Bring it to this workload list first so the detail route
+      // event is handled by the mounted V3 router instead of a stale page.
+      if (appWindow.location.pathname !== listPath) {
+        replaceConsoleV3Route(appWindow, listPath);
+      }
+
       let framesRemaining = 300;
       let stableFrames = 0;
       let previousRootSignature = '';
@@ -74,11 +82,21 @@ function DeploymentDetail(): JSX.Element {
           return;
         }
         if (!routeReady || stableFrames < 3) {
+          // Keep this diagnostic until the route synchronization race is
+          // eliminated; a blank detail page must never fail silently.
+          // eslint-disable-next-line no-console
+          console.error('[Wujie Deployment] Detail route sync timeout', {
+            currentPath: appWindow.location.pathname,
+            expectedPath: embeddedPath,
+            listPath,
+            framesRemaining,
+            stableFrames,
+            rootExists: Boolean(appWindow.document.getElementById('root')),
+          });
           routeSyncFrameRef.current = undefined;
           return;
         }
-        appWindow.history.pushState({}, '', embeddedPath);
-        appWindow.dispatchEvent(new PopStateEvent('popstate'));
+        replaceConsoleV3Route(appWindow, embeddedPath);
         routeSyncFrameRef.current = undefined;
       };
       syncRoute();

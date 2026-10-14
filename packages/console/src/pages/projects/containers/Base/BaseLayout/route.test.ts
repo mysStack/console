@@ -7,6 +7,7 @@ import {
   getConsoleV3DetailUrl,
   getConsoleV3DeploymentListPath,
   getConsoleV3ProjectPrefix,
+  replaceConsoleV3Route,
   shouldSyncConsoleV3DetailRoute,
 } from './route';
 
@@ -104,6 +105,45 @@ test('forwards host back/forward only within the mounted workload and stops afte
   host.dispatchEvent(new Event('popstate'));
   assert.equal(child.location.pathname, `/consolev3${detail}/env`);
   assert.equal(delivered, 2);
+});
+
+test('replaces the child route and preserves history state when notifying the V3 router', t => {
+  class NativePopStateEvent extends Event {
+    state: unknown;
+    constructor(type: string, init: { state: unknown }) {
+      super(type);
+      this.state = init.state;
+    }
+  }
+  const original = Object.getOwnPropertyDescriptor(globalThis, 'PopStateEvent');
+  Object.defineProperty(globalThis, 'PopStateEvent', {
+    configurable: true,
+    value: NativePopStateEvent,
+  });
+  t.after(() => {
+    if (original) Object.defineProperty(globalThis, 'PopStateEvent', original);
+    else Reflect.deleteProperty(globalThis, 'PopStateEvent');
+  });
+  const events: Event[] = [];
+  const child = Object.assign(new EventTarget(), {
+    location: { pathname: '/consolev3/dashboard' },
+    history: {
+      state: { key: 'keep-state' },
+      replaceState(state: unknown, title: string, path: string) {
+        assert.deepEqual(state, { key: 'keep-state' });
+        assert.equal(title, '');
+        child.location.pathname = path;
+      },
+    },
+    dispatchEvent(event: Event) {
+      events.push(event);
+      return true;
+    },
+  });
+  replaceConsoleV3Route(child as unknown as Window, '/consolev3/projects/wes/deployments');
+  assert.equal(child.location.pathname, '/consolev3/projects/wes/deployments');
+  assert.equal(events.length, 1);
+  assert.deepEqual((events[0] as PopStateEvent).state, { key: 'keep-state' });
 });
 
 test('syncs the detail route after the V3 app boots at the workload list', () => {
