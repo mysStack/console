@@ -276,12 +276,9 @@ function ConfigHistoryPage({
               background: '#fff',
             }}
           >
-            <strong style={{ fontSize: 13 }}>{t('CONFIG_HISTORY_DIFF_TITLE')}</strong>
+            <strong style={{ fontSize: 13 }}>{t('CONFIG_FILE')}</strong>
             <span style={{ color: '#55bc8a', fontSize: 12 }}>
-              {t('CONFIG_HISTORY_DIFF_VERSIONS', {
-                previous: pair.comparedRevision,
-                current: record.revision,
-              })}
+              {t('COMPARE_WITH', { version: `#${pair.comparedRevision}` })}
             </span>
           </div>
           <div
@@ -312,11 +309,8 @@ function ConfigHistoryPage({
         <DiffViewer
           oldValue={oldText}
           newValue={newText}
-          title={t('CONFIG_HISTORY_DIFF_TITLE')}
-          description={t('CONFIG_HISTORY_DIFF_VERSIONS', {
-            previous: pair.comparedRevision,
-            current: record.revision,
-          })}
+          title={t('CONFIG_FILE')}
+          description={t('COMPARE_WITH', { version: `#${pair.comparedRevision}` })}
         />
       </HistoryDiff>
     );

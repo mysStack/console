@@ -98,14 +98,27 @@ export async function decodeHistoryPayload(payload?: string | null): Promise<His
  */
 export function recordText(record: HistoryRecord): string {
   if (record.contentOmitted) {
-    return '// content omitted: this revision was larger than the recorded limit';
+    return '// content omitted: this revision was larger than the recorded limit\n';
   }
   const content = record.content || {};
   const keys = Object.keys(content).sort();
   if (!keys.length) {
     return '';
   }
-  return keys.map(key => `${key}: ${content[key]}`).join('\n');
+  // Keep the payload in the same complete-document shape consumed by the native
+  // revision page. DiffViewer delegates line numbering and hunk generation to
+  // diff2html; a terminal newline prevents it from treating the last data row as
+  // an unterminated fragment and producing invalid hunk counts.
+  const scalar = (value: string): string => {
+    const needsQuotes =
+      !value ||
+      /^(?:true|false|null|~)$/i.test(value) ||
+      /^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(value) ||
+      /^\d{4}-\d{2}-\d{2}(?:$|T)/.test(value) ||
+      /^\s|\s$|[\n\r:#{}[\],&*!|>'"%@`]/.test(value);
+    return needsQuotes ? `'${value.replace(/'/g, "''")}'` : value;
+  };
+  return keys.map(key => `${key}: ${scalar(content[key])}`).join('\n') + '\n';
 }
 
 /**

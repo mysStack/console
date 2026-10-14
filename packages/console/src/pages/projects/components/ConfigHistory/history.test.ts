@@ -90,8 +90,21 @@ test('recordText sorts keys so the diff shows changes rather than reordering', (
       contentHash: 'h',
       content: { Z: 'last', A: 'first', M: 'middle' },
     }),
-    'A: first\nM: middle\nZ: last',
+    'A: first\nM: middle\nZ: last\n',
   );
+});
+
+test('recordText emits a complete YAML document for the native diff viewer', () => {
+  const text = recordText({
+    revision: 1,
+    createdAt: '',
+    managedBy: 'direct',
+    contentHash: 'h',
+    content: { PORT: '111', ENABLED: 'true' },
+  });
+
+  assert.equal(text, "ENABLED: 'true'\nPORT: '111'\n");
+  assert.equal(text.endsWith('\n'), true);
 });
 
 test('recordText states plainly when the content was omitted', () => {
