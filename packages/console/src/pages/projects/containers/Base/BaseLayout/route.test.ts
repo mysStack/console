@@ -8,8 +8,31 @@ import {
   getConsoleV3DeploymentListPath,
   getConsoleV3ProjectPrefix,
   replaceConsoleV3Route,
+  replaceConsoleV3RouteSilently,
   shouldSyncConsoleV3DetailRoute,
 } from './route';
+
+test('replaces a reused child route without notifying the host router', () => {
+  const events: Event[] = [];
+  const child = Object.assign(new EventTarget(), {
+    location: { pathname: '/consolev3/dashboard' },
+    history: {
+      state: { key: 'keep-state' },
+      replaceState(state: unknown, title: string, path: string) {
+        assert.deepEqual(state, { key: 'keep-state' });
+        assert.equal(title, '');
+        child.location.pathname = path;
+      },
+    },
+    dispatchEvent(event: Event) {
+      events.push(event);
+      return true;
+    },
+  });
+  replaceConsoleV3RouteSilently(child as unknown as Window, '/consolev3/projects/wes/deployments');
+  assert.equal(child.location.pathname, '/consolev3/projects/wes/deployments');
+  assert.equal(events.length, 0);
+});
 
 test('builds the project-relative Wujie route used by the preloaded V3 app', () => {
   assert.equal(

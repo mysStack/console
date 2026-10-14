@@ -56,6 +56,13 @@ export function replaceConsoleV3Route(
   appWindow.dispatchEvent(new PopStateEvent('popstate', { state }));
 }
 
+/** Update a reused child route without emitting Wujie's host route event. */
+export function replaceConsoleV3RouteSilently(appWindow: Window, path: string): void {
+  const rawWindow = (appWindow as Window & { __WUJIE_RAW_WINDOW__?: Window }).__WUJIE_RAW_WINDOW__;
+  const target = rawWindow || appWindow;
+  target.history.replaceState(target.history.state, '', path);
+}
+
 /**
  * Convert a directly opened host tab into the browser path used by the mounted
  * V3 application. The app must first boot at the stable workload root above;

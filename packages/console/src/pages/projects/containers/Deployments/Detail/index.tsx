@@ -14,6 +14,7 @@ import {
   getConsoleV3ProjectPrefix,
   bindConsoleV3DetailHistory,
   replaceConsoleV3Route,
+  replaceConsoleV3RouteSilently,
   shouldSyncConsoleV3DetailRoute,
 } from '../../Base/BaseLayout/route';
 
@@ -56,7 +57,7 @@ function DeploymentDetail(): JSX.Element {
       // namespace. Bring it to this workload list first so the detail route
       // event is handled by the mounted V3 router instead of a stale page.
       if (appWindow.location.pathname !== listPath) {
-        replaceConsoleV3Route(appWindow, listPath);
+        replaceConsoleV3RouteSilently(appWindow, listPath);
       }
 
       let framesRemaining = 300;
