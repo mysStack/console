@@ -63,7 +63,18 @@ function DeploymentDetail(): JSX.Element {
       let stableFrames = 0;
       let previousRootSignature = '';
       const syncRoute = () => {
-        const root = appWindow.document.getElementById('root');
+        let root: Element | null = null;
+        try {
+          root = appWindow.document?.getElementById?.('root') ?? null;
+        } catch {
+          // Wujie can briefly expose a document proxy without its backing
+          // document during activation. The shadow root is already mounted on
+          // the host, so use it while the proxy is being restored.
+          root =
+            window.document
+              .querySelector('wujie-app[data-wujie-id="consolev3"]')
+              ?.shadowRoot?.querySelector('#root') ?? null;
+        }
         const rootSignature = `${root?.childElementCount ?? 0}:${root?.textContent?.trim() ?? ''}`;
         const detailRouteReady =
           appWindow.location.pathname === embeddedPath && Boolean(root?.hasChildNodes());
