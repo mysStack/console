@@ -400,7 +400,7 @@ function ConfigHistoryPage({
 
       {!loading && !failed && selectedRecord && (
         <Card className="mt12">
-          <YamlHeader style={{ flexWrap: 'wrap', rowGap: 12 }}>
+          <YamlHeader style={{ flexWrap: 'wrap', rowGap: 12, columnGap: 96 }}>
             <Text title={`#${selectedRecord.revision}`} description={t('CONFIG_HISTORY_SERIAL')} />
             <Text
               title={formatTime(selectedRecord.createdAt)}
