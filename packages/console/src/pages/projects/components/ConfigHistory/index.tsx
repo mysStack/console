@@ -46,6 +46,33 @@ const HistoryDiff = styled.div`
   }
 `;
 
+const HistoryMeta = styled(YamlHeader)`
+  display: grid;
+  grid-template-columns: repeat(3, minmax(160px, max-content));
+  column-gap: 56px;
+  row-gap: 16px;
+  align-items: start;
+  padding: 4px 8px 20px;
+
+  & > div {
+    min-width: 160px;
+    margin-right: 0;
+  }
+
+  @media (max-width: 720px) {
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
+    column-gap: 24px;
+
+    & > div {
+      min-width: 140px;
+    }
+  }
+
+  @media (max-width: 460px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
 function SimpleDiffTable({ rows, description }: { rows: SimpleDiffRow[]; description: string }) {
   const oldRows = rows.filter(row => row.type !== 'insert');
   const newRows = rows.filter(row => row.type !== 'delete');
@@ -400,7 +427,7 @@ function ConfigHistoryPage({
 
       {!loading && !failed && selectedRecord && (
         <Card className="mt12">
-          <YamlHeader style={{ flexWrap: 'wrap', rowGap: 12, columnGap: 96 }}>
+          <HistoryMeta>
             <Text title={`#${selectedRecord.revision}`} description={t('CONFIG_HISTORY_SERIAL')} />
             <Text
               title={formatTime(selectedRecord.createdAt)}
@@ -416,7 +443,7 @@ function ConfigHistoryPage({
               }`}
               description={t('CONFIG_HISTORY_MANAGED_BY')}
             />
-          </YamlHeader>
+          </HistoryMeta>
           <DiffWrapper style={{ overflowX: 'auto' }}>{renderDiff(selectedRecord)}</DiffWrapper>
         </Card>
       )}
