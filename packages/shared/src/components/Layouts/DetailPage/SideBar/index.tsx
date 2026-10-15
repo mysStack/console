@@ -31,7 +31,12 @@ import {
 } from './styles';
 
 export interface SideBarProps<T> {
-  breadcrumbs?: { label: string; url: string; listName?: string };
+  breadcrumbs?: {
+    label: string;
+    url: string;
+    listName?: string;
+    onBack?: () => void;
+  };
   icon?: ReactNode;
   attrs?: (data: T) => { label: string; value: string | ReactNode; show?: boolean }[];
   title?: string | ReactNode;
@@ -41,8 +46,7 @@ export interface SideBarProps<T> {
   extra?: ReactNode;
 }
 
-const getListUrl = (url: string, listName?: string) => {
-  const [storageState] = useLocalStorage({ key: `tableState:${listName}`, defaultValue: '{}' });
+const getListUrl = (url: string, listName?: string, storageState = '{}') => {
   if (listName) {
     const parsedStorageState: State = JSON.parse(storageState);
     if (isEmpty(parsedStorageState)) {
@@ -89,6 +93,8 @@ const SideBar = <T extends Record<string, any>>({
   actions = [],
 }: SideBarProps<T>) => {
   const { detail = {} as T, params, store, authKey } = useDetailPage<T>();
+  const listName = breadcrumbs?.listName ?? `${store?.module}:table:list`;
+  const [storageState] = useLocalStorage({ key: `tableState:${listName}`, defaultValue: '{}' });
   const iconEl = icon || <Icon name={ICON_TYPES[store.module] || 'appcenter'} size={28} />;
   const titleEl = (isFunction(title) ? title(detail) : title) || getDisplayName(detail);
   const detailEl =
@@ -97,10 +103,17 @@ const SideBar = <T extends Record<string, any>>({
 
   const renderBreadCrumbs = () => {
     if (breadcrumbs) {
-      const listName = breadcrumbs.listName ?? `${store?.module}:table:list`;
-      const listUrl = getListUrl(breadcrumbs.url, listName);
+      const listUrl = getListUrl(breadcrumbs.url, listName, storageState);
       return (
-        <BackLink to={listUrl}>
+        <BackLink
+          to={listUrl}
+          onClick={event => {
+            if (breadcrumbs.onBack) {
+              event.preventDefault();
+              breadcrumbs.onBack();
+            }
+          }}
+        >
           <ChevronLeft size={20} />
           {breadcrumbs.label}
         </BackLink>

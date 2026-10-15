@@ -21,6 +21,7 @@ function DaemonSetDetail(): JSX.Element {
         height="100%"
         name="consolev3"
         url={`${wujieUrlPrefix}/daemonsets/${name}`}
+        alive
         sync={false}
         afterMount={afterMount}
         afterUnmount={afterUnmount}

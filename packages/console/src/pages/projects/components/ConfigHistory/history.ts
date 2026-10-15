@@ -98,14 +98,98 @@ export async function decodeHistoryPayload(payload?: string | null): Promise<His
  */
 export function recordText(record: HistoryRecord): string {
   if (record.contentOmitted) {
-    return '// content omitted: this revision was larger than the recorded limit';
+    return '// content omitted: this revision was larger than the recorded limit\n';
   }
   const content = record.content || {};
   const keys = Object.keys(content).sort();
   if (!keys.length) {
     return '';
   }
-  return keys.map(key => `${key}: ${content[key]}`).join('\n');
+  // Keep the payload in the same complete-document shape consumed by the native
+  // revision page. DiffViewer delegates line numbering and hunk generation to
+  // diff2html; a terminal newline prevents it from treating the last data row as
+  // an unterminated fragment and producing invalid hunk counts.
+  const scalar = (value: string): string => {
+    const needsQuotes =
+      !value ||
+      /^(?:true|false|null|~)$/i.test(value) ||
+      /^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(value) ||
+      /^\d{4}-\d{2}-\d{2}(?:$|T)/.test(value) ||
+      /^\s|\s$|[\n\r:#{}[\],&*!|>'"%@`]/.test(value);
+    return needsQuotes ? `'${value.replace(/'/g, "''")}'` : value;
+  };
+  return keys.map(key => `${key}: ${scalar(content[key])}`).join('\n') + '\n';
+}
+
+export interface SimpleDiffRow {
+  type: 'context' | 'insert' | 'delete';
+  oldLine?: number;
+  newLine?: number;
+  text: string;
+}
+
+export function sortHistoryRecords(records: HistoryRecord[]): HistoryRecord[] {
+  return [...records].sort((left, right) => right.revision - left.revision);
+}
+
+/**
+ * Builds the unambiguous line table for a change that only adds or only removes
+ * lines. The shared DiffViewer uses a negative context value and misnumbers this
+ * particular shape, so these rows are rendered with the native line-number layout.
+ */
+export function buildSimpleDiffRows(
+  oldValue: string,
+  newValue: string,
+): SimpleDiffRow[] | undefined {
+  const oldLines = oldValue.split('\n').filter(Boolean);
+  const newLines = newValue.split('\n').filter(Boolean);
+  if (oldLines.length === newLines.length) {
+    return undefined;
+  }
+  const rows: SimpleDiffRow[] = [];
+  let oldIndex = 0;
+  let newIndex = 0;
+  let sawInsert = false;
+  let sawDelete = false;
+  while (oldIndex < oldLines.length || newIndex < newLines.length) {
+    if (oldIndex >= oldLines.length) {
+      rows.push({ type: 'insert', newLine: newIndex + 1, text: newLines[newIndex] });
+      newIndex += 1;
+      sawInsert = true;
+      continue;
+    }
+    if (newIndex >= newLines.length) {
+      rows.push({ type: 'delete', oldLine: oldIndex + 1, text: oldLines[oldIndex] });
+      oldIndex += 1;
+      sawDelete = true;
+      continue;
+    }
+    if (oldLines[oldIndex] === newLines[newIndex]) {
+      rows.push({
+        type: 'context',
+        oldLine: oldIndex + 1,
+        newLine: newIndex + 1,
+        text: oldLines[oldIndex],
+      });
+      oldIndex += 1;
+      newIndex += 1;
+      continue;
+    }
+    if (oldLines[oldIndex] !== undefined && oldLines[oldIndex] === newLines[newIndex + 1]) {
+      rows.push({ type: 'insert', newLine: newIndex + 1, text: newLines[newIndex] });
+      newIndex += 1;
+      sawInsert = true;
+      continue;
+    }
+    if (newLines[newIndex] !== undefined && oldLines[oldIndex + 1] === newLines[newIndex]) {
+      rows.push({ type: 'delete', oldLine: oldIndex + 1, text: oldLines[oldIndex] });
+      oldIndex += 1;
+      sawDelete = true;
+      continue;
+    }
+    return undefined;
+  }
+  return sawInsert !== sawDelete ? rows : undefined;
 }
 
 /**

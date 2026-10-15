@@ -486,6 +486,115 @@ export const summaryHeaderToggleStyle: CSSProperties = {
   whiteSpace: 'nowrap',
 };
 
+// Read-only env tab: env and envFrom are sibling sections, not one merged list.
+export const environmentHeadingStyle: CSSProperties = {
+  fontSize: 12,
+  lineHeight: '20px',
+  color: colors.textStrong,
+  marginBottom: 20,
+  textAlign: 'left',
+};
+
+export const environmentTitleStyle: CSSProperties = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  alignItems: 'center',
+  gap: 12,
+  margin: '0 0 8px',
+  fontSize: 13,
+  fontWeight: 600,
+};
+
+export const environmentDescriptionStyle: CSSProperties = {
+  margin: 0,
+  color: colors.textSubtle,
+  fontSize: 12,
+  fontWeight: 400,
+  lineHeight: '20px',
+};
+
+export const envTabSummaryStyle: CSSProperties = {
+  display: 'grid',
+  gap: 12,
+  marginTop: 22,
+  paddingTop: 20,
+  borderTop: `1px solid ${colors.dividerAlt}`,
+  fontSize: 12,
+  lineHeight: '20px',
+};
+
+export const envTabResourceRowStyle: CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 3fr)',
+  gap: 24,
+  alignItems: 'start',
+  minHeight: 44,
+  padding: '11px 32px',
+  border: `1px solid ${colors.rowBorder}`,
+  borderRadius: 24,
+  background: colors.rowBackground,
+  color: colors.textStrong,
+  fontSize: 12,
+  fontWeight: 400,
+  lineHeight: '20px',
+  textAlign: 'left',
+};
+
+export const envTabResourceTextStyle: CSSProperties = {
+  minWidth: 0,
+  overflowWrap: 'anywhere',
+  whiteSpace: 'normal',
+};
+
+export const envTabToggleStyle: CSSProperties = {
+  border: 0,
+  padding: '2px 0',
+  background: 'transparent',
+  color: colors.link,
+  font: 'inherit',
+  fontWeight: 400,
+  cursor: 'pointer',
+};
+
+export const envTabPreviewStyle: CSSProperties = {
+  ...previewStyle,
+  margin: '6px 32px 0',
+  lineHeight: '20px',
+};
+
+export const envTabPreviewValuesStyle: CSSProperties = {
+  display: 'grid',
+  gap: 0,
+  marginTop: 4,
+};
+
+export const envTabPreviewValueRowStyle: CSSProperties = {
+  ...previewValueRowStyle,
+  gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 3fr)',
+  alignItems: 'start',
+  lineHeight: '20px',
+  gap: 24,
+  minHeight: 40,
+  padding: '10px 32px',
+  borderBottom: `1px solid ${colors.dividerAlt}`,
+};
+
+export const envTabPreviewNameStyle: CSSProperties = {
+  color: colors.textStrong,
+  fontWeight: 400,
+  minWidth: 0,
+  overflowWrap: 'anywhere',
+  whiteSpace: 'normal',
+  textAlign: 'left',
+};
+
+export const envTabPreviewTextStyle: CSSProperties = {
+  color: colors.textSubtle,
+  minWidth: 0,
+  overflowWrap: 'anywhere',
+  textAlign: 'left',
+};
+
 // File mounts: a per-row validation message and an informational key-count note.
 export const previewProblemStyle: React.CSSProperties = {
   color: colors.danger,

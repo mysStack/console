@@ -11,6 +11,7 @@
 
 module.exports = {
   CONFIG_REFERENCE: 'Configuration References',
+  CONFIG_REFERENCE_SELECT_RESOURCE: 'Selecciona un ConfigMap o Secret',
   CONFIG_REFERENCE_BACK: 'Back',
   CONFIG_REFERENCE_CONTAINER: 'Container',
   CONFIG_REFERENCE_RESOURCES: 'ConfigMap / Secret',
@@ -33,8 +34,12 @@ module.exports = {
   CONFIG_REFERENCE_CANCEL: 'Close',
   CONFIG_REFERENCE_SAVE: 'Apply',
   CONFIG_REFERENCE_SAVE_SUCCESS: 'Configuration references saved.',
+  CONFIG_REFERENCE_DRAFT_APPLIED:
+    'References applied to the draft. Use the outer OK button to save the workload.',
   CONFIG_REFERENCE_WORKLOAD_LOAD_ERROR: 'Unable to load the workload. Go back and retry.',
   CONFIG_REFERENCE_NO_CONTAINERS: 'No configurable containers in this {kind}.',
+  CONFIG_REFERENCE_CONTAINER_UNAVAILABLE:
+    'The active container or native editing session could not be identified. Close this editor and reopen Edit Settings.',
   CONFIG_REFERENCE_PREVIEW_OK: '✓ Will create {count} environment variable(s)',
   CONFIG_REFERENCE_PREVIEW_SHOW: 'Show',
   CONFIG_REFERENCE_PREVIEW_HIDE: 'Hide',

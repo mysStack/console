@@ -6,6 +6,11 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 
+import ConfigMapData from './Data';
+import ConfigMapEvents from './Events';
+import ConfigMapMetadata from './Metadata';
+import ConfigMapRevisionControl from './RevisionControl';
+
 export default [
   {
     index: true,
@@ -13,6 +18,18 @@ export default [
   },
   {
     path: 'detail',
-    element: <></>,
+    element: <ConfigMapData />,
+  },
+  {
+    path: 'revision-control',
+    element: <ConfigMapRevisionControl />,
+  },
+  {
+    path: 'metadata',
+    element: <ConfigMapMetadata />,
+  },
+  {
+    path: 'events',
+    element: <ConfigMapEvents />,
   },
 ];

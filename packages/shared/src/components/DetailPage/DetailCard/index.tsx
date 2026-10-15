@@ -36,15 +36,19 @@ export interface SideProps {
   actions?: DetailAction[];
   actionOptions?: ActionOptions;
   attrs?: { label: string; value: string | ReactNode; show?: boolean }[];
-  breadcrumbs?: { label: string; url: string; listName?: string };
+  breadcrumbs?: {
+    label: string;
+    url: string;
+    listName?: string;
+    onBack?: () => void;
+  };
   icon?: ReactNode;
   labels?: Record<string, string>;
   customAttrs?: ReactNode;
 }
 
-const getListUrl = (url: string, listName?: string) => {
+const getListUrl = (url: string, listName?: string, storageState = '{}') => {
   if (listName) {
-    const [storageState] = useLocalStorage({ key: `tableState:${listName}`, defaultValue: '{}' });
     const parsedStorageState: State = JSON.parse(storageState);
     const { pageIndex, pageSize, filters = [], sortBy } = parsedStorageState;
 
@@ -107,6 +111,9 @@ function DetailCard({
     return null;
   };
 
+  const listName = breadcrumbs?.listName ?? `${module}:table:list`;
+  const [storageState] = useLocalStorage({ key: `tableState:${listName}`, defaultValue: '{}' });
+
   const renderDetailButton = useDetailActions({
     authKey: authKey || module,
     actions,
@@ -116,9 +123,17 @@ function DetailCard({
 
   const renderBreadCrumbs = () => {
     if (breadcrumbs) {
-      const listUrl = getListUrl(breadcrumbs.url, breadcrumbs.listName);
+      const listUrl = getListUrl(breadcrumbs.url, breadcrumbs.listName, storageState);
       return (
-        <BackLink to={listUrl}>
+        <BackLink
+          to={listUrl}
+          onClick={event => {
+            if (breadcrumbs.onBack) {
+              event.preventDefault();
+              breadcrumbs.onBack();
+            }
+          }}
+        >
           <ChevronLeft size={20} />
           {breadcrumbs.label}
         </BackLink>

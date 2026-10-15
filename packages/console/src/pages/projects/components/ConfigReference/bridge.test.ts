@@ -4,14 +4,71 @@ import test from 'node:test';
 import {
   CONFIG_REFERENCE_ENTRY_SELECTOR,
   CONFIG_REFERENCE_ENVIRONMENT_ACTION_SELECTOR,
+  CONFIG_REFERENCE_INJECTION_RETRY_LIMIT,
   configReferenceContainerFromHeading,
   findConfigReferenceAction,
   findConfigReferenceEnvSections,
   findConfigReferenceContainerName,
   findConfigReferenceMountParent,
   injectConfigReferenceEntry,
+  installConfigReferenceNativeEdit,
   shouldInjectConfigReferenceEntry,
+  shouldWaitForConfigReferenceShadowRoot,
+  shouldRetryConfigReferenceInjection,
 } from './bridge';
+
+test('waits for the action Wujie shadow root before binding the bridge', () => {
+  const host = {} as HTMLElement;
+  assert.equal(shouldWaitForConfigReferenceShadowRoot(host, 'consoleV3Actions'), true);
+  assert.equal(shouldWaitForConfigReferenceShadowRoot(host, 'consolev3'), false);
+  assert.equal(
+    shouldWaitForConfigReferenceShadowRoot({ shadowRoot: {} } as HTMLElement, 'consoleV3Actions'),
+    false,
+  );
+});
+
+test('keeps retrying configuration reference injection for a still-loading V3 form', () => {
+  assert.equal(shouldRetryConfigReferenceInjection(0), true);
+  assert.equal(
+    shouldRetryConfigReferenceInjection(CONFIG_REFERENCE_INJECTION_RETRY_LIMIT - 1),
+    true,
+  );
+  assert.equal(shouldRetryConfigReferenceInjection(CONFIG_REFERENCE_INJECTION_RETRY_LIMIT), false);
+});
+
+test('native settings activation opens the controlled action before the old editor and leaves other actions untouched', () => {
+  const root = new EventTarget();
+  let opened = 0,
+    oldOpened = 0;
+  const uninstall = installConfigReferenceNativeEdit(root as unknown as Document, () => {
+    opened += 1;
+  });
+  root.addEventListener('click', () => {
+    oldOpened += 1;
+  });
+  const nativeClick = () => {
+    const event = new Event('click', { cancelable: true });
+    Object.defineProperty(event, 'target', {
+      value: {
+        closest: (selector: string) => (selector.includes('detail-editConfigTemplate') ? {} : null),
+      },
+    });
+    root.dispatchEvent(event);
+    return event;
+  };
+  assert.equal(nativeClick().defaultPrevented, true);
+  assert.equal(opened, 1);
+  assert.equal(oldOpened, 0, 'the old modal must not open as well');
+  const other = new Event('click', { cancelable: true });
+  Object.defineProperty(other, 'target', { value: { closest: () => null } });
+  root.dispatchEvent(other);
+  assert.equal(opened, 1);
+  assert.equal(oldOpened, 1);
+  uninstall();
+  nativeClick();
+  assert.equal(opened, 1);
+  assert.equal(oldOpened, 2);
+});
 
 // NOTE: the two selector assertions below only pin the constants this module
 // exports. They can NOT detect the real risk — that the *prebuilt V3 artifact*
@@ -192,16 +249,38 @@ test('reads the visible V3 container editor as the configuration target', () => 
   } as unknown as HTMLInputElement;
   const document = {
     querySelectorAll: (selector: string) =>
-      selector === 'input[placeholder="Container Name*"]' ? [visibleInput] : [],
+      selector.includes('input[placeholder="Container Name*"]') ? [visibleInput] : [],
     defaultView: { getComputedStyle: () => ({ display: 'block', visibility: 'visible' }) },
   } as unknown as Document;
 
   assert.equal(findConfigReferenceContainerName(document), 'wes-v2-server');
 });
 
+test('identifies the Chinese editor container without guessing the main container', () => {
+  const input = { value: 'nginx', getAttribute: () => null, parentElement: null };
+  const document = {
+    querySelectorAll: (selector: string) =>
+      selector.includes('input[placeholder="容器名称*"]') ? [input] : [],
+    defaultView: { getComputedStyle: () => ({ display: 'block', visibility: 'visible' }) },
+  } as unknown as Document;
+  assert.equal(findConfigReferenceContainerName(document), 'nginx');
+});
+
+test('identifies the native container name field which has no placeholder', () => {
+  const input = { value: 'nginx', getAttribute: () => null, parentElement: null };
+  const document = {
+    querySelectorAll: (selector: string) =>
+      selector.includes('input[name="name"][id="name"][maxlength="63"]') ? [input] : [],
+    defaultView: { getComputedStyle: () => ({ display: 'block', visibility: 'visible' }) },
+  } as unknown as Document;
+  assert.equal(findConfigReferenceContainerName(document), 'nginx');
+});
+
 interface FakeCard {
   name: string;
   href?: string;
+  nested?: boolean;
+  fullHref?: boolean;
 }
 
 /**
@@ -210,27 +289,42 @@ interface FakeCard {
  * heading whose first child is the container glyph.
  */
 const fakeEnvTabDocument = (cards: FakeCard[], activeHref = '/env') => {
+  const firstMarker = (node: any): any => {
+    if (!node) return undefined;
+    if (typeof node.getAttribute === 'function') return node;
+    return (node.children || []).map(firstMarker).find(Boolean);
+  };
   const pane: any = {
     children: [],
     querySelectorAll: (selector: string) =>
-      selector === 'use' ? pane.children.map((card: any) => card.children[0].children[0]) : [],
+      selector === 'use' ? pane.children.map(firstMarker).filter(Boolean) : [],
   };
 
   pane.children = cards.map(card => {
     const marker: any = {
       parentElement: undefined,
       getAttribute: (attribute: string) =>
-        attribute === 'href' ? card.href || '#icon-docker' : null,
+        attribute === 'href'
+          ? card.href || (card.fullHref ? '/assets/icons.svg#icon-docker' : '#icon-docker')
+          : null,
     };
     const heading: any = {
       textContent: `容器：${card.name}`,
       children: [marker],
       parentElement: undefined,
+      contains: (node: any) => node === marker,
     };
-    const wrapper: any = { children: [heading], parentElement: pane };
+    const wrapper: any = {
+      children: [heading, { textContent: 'DB111', children: [] }],
+      parentElement: pane,
+      contains: (node: any) => node === heading || heading.contains(node),
+    };
     marker.parentElement = heading;
     heading.parentElement = wrapper;
-    return wrapper;
+    if (!card.nested) return wrapper;
+    const list: any = { children: [wrapper], parentElement: pane };
+    wrapper.parentElement = list;
+    return list;
   });
 
   const content: any = {
@@ -277,6 +371,89 @@ test('ignores headings that are not container cards', () => {
     sections.map(section => section.containerName),
     ['main'],
   );
+});
+
+test('finds cards nested below the active environment pane and accepts sprite URLs', () => {
+  const sections = findConfigReferenceEnvSections(
+    fakeEnvTabDocument([{ name: 'main', nested: true, fullHref: true }]),
+  );
+  assert.deepEqual(
+    sections.map(section => section.containerName),
+    ['main'],
+  );
+});
+
+test('shares the native body with manual env and container collapse', () => {
+  const sections = findConfigReferenceEnvSections(fakeEnvTabDocument([{ name: 'main' }]));
+  assert.equal(sections[0].body, sections[0].card.children[1]);
+});
+
+test('does not mistake a shared multi-container list wrapper for a container card', () => {
+  const document = fakeEnvTabDocument([{ name: 'main' }, { name: 'nginx' }]);
+  const pane: any = document.querySelector('div.detail-page-content')?.lastElementChild;
+  const cards = pane.children;
+  const list: any = { children: cards, parentElement: pane };
+  cards.forEach((card: any) => {
+    card.parentElement = list;
+  });
+  pane.children = [list];
+  pane.querySelectorAll = () => cards.map((card: any) => card.children[0].children[0]);
+  const sections = findConfigReferenceEnvSections(document);
+  assert.deepEqual(
+    sections.map(section => section.containerName),
+    ['main', 'nginx'],
+  );
+  assert.equal(sections[0].card, cards[0]);
+  assert.equal(sections[1].card, cards[1]);
+});
+
+test('uses the complete container card when the docker heading has nested leading controls', () => {
+  const contains = (root: any, target: any): boolean =>
+    root === target || (root.children || []).some((child: any) => contains(child, target));
+  const node = (textContent = '', children: any[] = []) => {
+    const element: any = {
+      textContent,
+      children,
+      parentElement: undefined,
+      contains(target: any) {
+        return contains(this, target);
+      },
+    };
+    children.forEach(child => {
+      child.parentElement = element;
+    });
+    return element;
+  };
+
+  const marker: any = {
+    getAttribute: (attribute: string) => (attribute === 'href' ? '#icon-docker' : null),
+    parentElement: undefined,
+  };
+  const glyph = node('', [marker]);
+  const headingContent = node('Container: ams-server', [glyph]);
+  // The live V3 heading has an empty leading control before the translated title.
+  // Treating this heading wrapper as the card makes children[0] empty and loses
+  // the container name, which is the regression this fixture protects against.
+  const headingWrapper = node('Container: ams-server', [node(''), headingContent]);
+  const card = node('Container: ams-serverNo Environment Variable Found', [
+    headingWrapper,
+    node('No Environment Variable Found'),
+  ]);
+  const pane: any = node(card.textContent, [card]);
+  pane.querySelectorAll = (selector: string) => (selector === 'use' ? [marker] : []);
+  const content: any = node(pane.textContent, [node('tabs'), pane]);
+  content.lastElementChild = pane;
+  content.querySelector = (selector: string) =>
+    selector === 'a[aria-current="page"]' ? { getAttribute: () => '/env' } : null;
+  const document = {
+    querySelector: (selector: string) => (selector === 'div.detail-page-content' ? content : null),
+    defaultView: { location: { pathname: '/env' } },
+  } as unknown as Document;
+
+  const sections = findConfigReferenceEnvSections(document);
+  assert.equal(sections.length, 1);
+  assert.equal(sections[0].containerName, 'ams-server');
+  assert.equal(sections[0].card, card);
 });
 
 test('finds no section while another tab is active', () => {

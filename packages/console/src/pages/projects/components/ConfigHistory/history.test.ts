@@ -11,9 +11,11 @@ import {
   HISTORY_SECRET_SUFFIX,
   decodeHistoryPayload,
   diffPair,
+  buildSimpleDiffRows,
   historySecretName,
   isHistorySecretName,
   recordText,
+  sortHistoryRecords,
 } from './history';
 
 /**
@@ -90,8 +92,21 @@ test('recordText sorts keys so the diff shows changes rather than reordering', (
       contentHash: 'h',
       content: { Z: 'last', A: 'first', M: 'middle' },
     }),
-    'A: first\nM: middle\nZ: last',
+    'A: first\nM: middle\nZ: last\n',
   );
+});
+
+test('recordText emits a complete YAML document for the native diff viewer', () => {
+  const text = recordText({
+    revision: 1,
+    createdAt: '',
+    managedBy: 'direct',
+    contentHash: 'h',
+    content: { PORT: '111', ENABLED: 'true' },
+  });
+
+  assert.equal(text, "ENABLED: 'true'\nPORT: '111'\n");
+  assert.equal(text.endsWith('\n'), true);
 });
 
 test('recordText states plainly when the content was omitted', () => {
@@ -121,4 +136,37 @@ test('diffPair on the oldest record compares against nothing', () => {
 
 test('diffPair on an unknown revision returns empty values', () => {
   assert.deepEqual(diffPair(sample, 99), { oldValue: '', newValue: '' });
+});
+
+test('buildSimpleDiffRows keeps line numbers aligned for additions', () => {
+  assert.deepEqual(buildSimpleDiffRows('A\nB\n', 'A\nX\nB\n'), [
+    { type: 'context', oldLine: 1, newLine: 1, text: 'A' },
+    { type: 'insert', newLine: 2, text: 'X' },
+    { type: 'context', oldLine: 2, newLine: 3, text: 'B' },
+  ]);
+});
+
+test('buildSimpleDiffRows keeps line numbers aligned for removals', () => {
+  assert.deepEqual(buildSimpleDiffRows('A\nX\nB\n', 'A\nB\n'), [
+    { type: 'context', oldLine: 1, newLine: 1, text: 'A' },
+    { type: 'delete', oldLine: 2, text: 'X' },
+    { type: 'context', oldLine: 3, newLine: 2, text: 'B' },
+  ]);
+});
+
+test('sortHistoryRecords puts the newest revision first without mutating records', () => {
+  const records = [
+    { ...sample[0], revision: 2 },
+    { ...sample[1], revision: 1 },
+    { ...sample[0], revision: 3 },
+  ];
+
+  assert.deepEqual(
+    sortHistoryRecords(records).map(record => record.revision),
+    [3, 2, 1],
+  );
+  assert.deepEqual(
+    records.map(record => record.revision),
+    [2, 1, 3],
+  );
 });

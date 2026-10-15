@@ -3,7 +3,7 @@
  * https://github.com/kubesphere/console/blob/master/LICENSE
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { set } from 'lodash';
 import { useCacheStore as useStore } from '@ks-console/shared';
 import { Loading } from '@kubed/components';
@@ -19,6 +19,7 @@ function BaseLayout(): JSX.Element {
   const userName = globals.user.username;
   const { cluster, namespace, workspace } = useParams<'workspace' | 'namespace' | 'cluster'>();
   const [, setUrlPrefix] = useStore<string>('wujieUrlPrefix');
+  const setUrlPrefixStable = useRef(setUrlPrefix).current;
   const [, setProject] = useStore<any>('project');
   const [, setCluster] = useStore<ClusterDetail>('cluster');
   const [projectResult, clusterResult, workspaceRuleResult] = useQueries([
@@ -35,13 +36,13 @@ function BaseLayout(): JSX.Element {
       enabled: !!cluster,
     },
     {
-      queryKey: ['workspaceRule', workspace],
+      queryKey: ['workspaceRule', userName, workspace],
       queryFn: () => apis.fetchRules({ workspace, name: userName }),
       enabled: !!workspace,
     },
   ]);
   const holeRules = useQuery(
-    ['holeRules'],
+    ['holeRules', userName, cluster, workspace, namespace],
     () => apis.fetchRules({ cluster, workspace, namespace, name: userName }),
     {
       enabled: projectResult.isSuccess && clusterResult.isSuccess && workspaceRuleResult.isSuccess,
@@ -59,8 +60,8 @@ function BaseLayout(): JSX.Element {
 
   useEffect(() => {
     const basePrefix = `/${workspace}/clusters/${cluster}/projects/${namespace}`;
-    setUrlPrefix(basePrefix);
-  }, [cluster, namespace, workspace]);
+    setUrlPrefixStable(basePrefix);
+  }, [cluster, namespace, setUrlPrefixStable, workspace]);
 
   if (
     projectResult.isLoading ||

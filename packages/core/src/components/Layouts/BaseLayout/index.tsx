@@ -21,6 +21,10 @@ import Toolbox from '../../../containers/Toolbox';
 import Header from '../Header';
 import { Main } from './styles';
 import v3Notify from './v3Notify';
+import {
+  normalizeNativeResourceDetailPath,
+  shouldReplaceNativeResourceRoute,
+} from './nativeResourceRoute';
 
 const GlobalStyle = createGlobalStyle<{ $navbarHeight?: number; $licenseTipHeight?: number }>`
   :root {
@@ -91,12 +95,21 @@ export default function BaseLayout() {
     document.addEventListener('click', eventer);
     bus.$on('subRouteChange', (name: any, path: any) => {
       const { location } = window;
+      const pathname = normalizeNativeResourceDetailPath(path.pathname);
 
-      if (path.pathname !== location.pathname) {
-        navigate(`${path.pathname}${path.search}`);
-      } else if (path.pathname === location.pathname && path.search !== location.search) {
+      if (pathname !== location.pathname) {
+        // Replace Wujie's temporary `/resource/name` entry with the native V4
+        // detail route. Otherwise browser Back visits the temporary entry
+        // first and appears to require two clicks before reaching the list.
+        // A list-to-detail transition must push a new entry so the list stays
+        // in browser history. The replace case only applies when the host is
+        // already on the temporary V3 detail entry (or an equivalent native
+        // path) and V3 is subsequently reporting its canonical sub-route.
+        const replaceTemporaryEntry = shouldReplaceNativeResourceRoute(location.pathname, pathname);
+        navigate(`${pathname}${path.search}`, { replace: replaceTemporaryEntry });
+      } else if (pathname === location.pathname && path.search !== location.search) {
         // @ts-ignore
-        const url = new URL(`${location.origin}${path.pathname}${path.search}`);
+        const url = new URL(`${location.origin}${pathname}${path.search}`);
         window.history.pushState('', '', url);
       }
     });

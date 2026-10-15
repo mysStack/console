@@ -11,6 +11,8 @@ module.exports = {
   CONFIG_HISTORY_EMPTY: 'No modification records yet',
   CONFIG_HISTORY_LOAD_ERROR: '读取修改记录失败',
   CONFIG_HISTORY_CONTENT: '配置数据',
+  CONFIG_HISTORY_DIFF_TITLE: '版本對比',
+  CONFIG_HISTORY_DIFF_VERSIONS: '舊版本 #{previous} → 目前版本 #{current}',
   CONFIG_HISTORY_CONTENT_OMITTED: '内容过大，已省略',
   CONFIG_HISTORY_FIRST_REVISION: '本条是最早的记录，没有可对比的上一条',
   CONFIG_HISTORY_MANAGED_BY_HELM: 'Helm managed',

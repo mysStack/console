@@ -9,6 +9,7 @@ import { getActions } from './nav';
 import { PathParams } from '../types';
 import { safeParseJSON } from './parser';
 import { Constants } from '../constants';
+import { clearResourceListRevisions } from './resourceListInvalidation';
 
 export const getUserModule = ({ cluster, workspace, namespace, devops }: PathParams = {}) => {
   if (namespace || devops) {
@@ -29,6 +30,9 @@ export const getUserModule = ({ cluster, workspace, namespace, devops }: PathPar
 type Rules = Record<string, any>;
 
 export const fetchRules = async (params: PathParams): Promise<Rules> => {
+  // Permission changes invalidate resource list snapshots. The next list mount
+  // must not reuse a V3 app initialized under the previous rule set.
+  clearResourceListRevisions();
   let module = 'globalroles';
   let urlParams = '';
   if (params.namespace || params.devops) {

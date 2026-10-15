@@ -4,8 +4,13 @@
  */
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button, Loading } from '@kubed/components';
+import { Alert, Button, Card, Loading, Tag, TypeSelect } from '@kubed/components';
 import { DiffViewer } from '@kubed/diff-viewer';
+import { Icon } from '@ks-console/shared';
+import styled from 'styled-components';
+
+import Text from '../../../clusters/components/Text';
+import { DiffWrapper, YamlHeader } from '../../../clusters/components/RevisionControl/styles';
 
 import {
   HistoryRecord,
@@ -15,7 +20,10 @@ import {
   MANAGED_BY_REPLICATOR,
   decodeHistoryPayload,
   diffPair,
+  buildSimpleDiffRows,
   historySecretName,
+  SimpleDiffRow,
+  sortHistoryRecords,
 } from './history';
 import { seedHistoryFor } from './seed';
 
@@ -28,7 +36,142 @@ import { seedHistoryFor } from './seed';
  * entry already uses.
  */
 
-export interface ConfigHistoryPageProps {
+export const MONO = "'SFMono-Regular', Consolas, monospace";
+
+const HistoryDiff = styled.div`
+  overflow-x: auto;
+
+  .d2h-wrapper {
+    min-width: 720px;
+  }
+`;
+
+const HistoryMeta = styled(YamlHeader)`
+  display: grid;
+  grid-template-columns: repeat(3, minmax(160px, max-content));
+  column-gap: 56px;
+  row-gap: 16px;
+  align-items: start;
+  padding: 4px 8px 20px;
+
+  & > div {
+    min-width: 160px;
+    margin-right: 0;
+  }
+
+  @media (max-width: 720px) {
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
+    column-gap: 24px;
+
+    & > div {
+      min-width: 140px;
+    }
+  }
+
+  @media (max-width: 460px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+function SimpleDiffTable({ rows, description }: { rows: SimpleDiffRow[]; description: string }) {
+  const oldRows = rows.filter(row => row.type !== 'insert');
+  const newRows = rows.filter(row => row.type !== 'delete');
+  const oldStart = oldRows[0]?.oldLine || 1;
+  const newStart = newRows[0]?.newLine || 1;
+  const background = {
+    context: '#fff',
+    insert: '#c4e8d3',
+    delete: '#f9dfe4',
+  } as const;
+  const color = {
+    context: '#36435c',
+    insert: '#36435c',
+    delete: '#36435c',
+  } as const;
+  return (
+    <div style={{ border: '1px solid #ccd3db', borderRadius: '4px', overflow: 'hidden' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          minHeight: 40,
+          padding: '0 12px',
+          background: '#eff4f9',
+          fontSize: 12,
+          fontWeight: 600,
+        }}
+      >
+        <Icon name="terminal" size={20} />
+        <span style={{ marginLeft: 8 }}>{t('CONFIG_FILE')}</span>
+        <span style={{ marginLeft: 8, fontSize: 18 }}>⌄</span>
+        <span style={{ marginLeft: 8, fontSize: 18 }}>›</span>
+        <span style={{ marginLeft: 'auto' }}>{description}</span>
+      </div>
+      <table
+        style={{
+          width: '100%',
+          borderCollapse: 'collapse',
+          fontFamily: MONO,
+          fontSize: 12,
+          lineHeight: 1.67,
+        }}
+      >
+        <tbody>
+          <tr>
+            <td
+              colSpan={2}
+              style={{ padding: '4px 12px', color: '#a8b3c0', background: '#f9fbfd' }}
+            >
+              {`@@ -${oldStart},${oldRows.length} +${newStart},${newRows.length} @@`}
+            </td>
+          </tr>
+          {rows.map((row, index) => (
+            <tr key={`${row.type}-${row.oldLine || ''}-${row.newLine || ''}-${index}`}>
+              <td
+                style={{
+                  width: 64,
+                  padding: '0 8px',
+                  color: '#a8b3c0',
+                  textAlign: 'right',
+                  background: '#fafbfc',
+                  whiteSpace: 'pre',
+                }}
+              >
+                <span style={{ display: 'inline-block', width: 28 }}>{row.oldLine || ''}</span>
+                <span style={{ display: 'inline-block', width: 28 }}>{row.newLine || ''}</span>
+              </td>
+              <td
+                style={{
+                  padding: '0 12px',
+                  color: color[row.type],
+                  background: background[row.type],
+                  whiteSpace: 'pre',
+                }}
+              >
+                <strong style={{ display: 'inline-block', width: 18 }}>
+                  {row.type === 'insert' ? '+' : row.type === 'delete' ? '-' : ' '}
+                </strong>
+                {row.text}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function managedByTagColor(managedBy: string): 'success' | 'info' | 'secondary' {
+  if (managedBy === MANAGED_BY_REPLICATOR) {
+    return 'success';
+  }
+  if (managedBy === MANAGED_BY_HELM) {
+    return 'info';
+  }
+  return 'secondary';
+}
+
+interface ConfigHistoryPageProps {
   kind: 'ConfigMap' | 'Secret';
   cluster: string;
   namespace: string;
@@ -68,7 +211,6 @@ function ConfigHistoryPage({
   cluster,
   namespace,
   name,
-  onBack,
   onLoaded,
 }: ConfigHistoryPageProps): JSX.Element {
   const [records, setRecords] = useState<HistoryRecord[]>([]);
@@ -76,7 +218,7 @@ function ConfigHistoryPage({
   const [failed, setFailed] = useState(false);
   const [failedReason, setFailedReason] = useState('');
   const [owner, setOwner] = useState<{ managedBy: string; managedByRef?: string }>();
-  const [expanded, setExpanded] = useState<number | undefined>();
+  const [selectedRevision, setSelectedRevision] = useState<number | undefined>();
 
   // Kept in a ref so load() does not have to depend on the owner fetch's timing.
   const ownerRef = React.useRef<{ managedBy: string; managedByRef?: string } | undefined>();
@@ -94,9 +236,10 @@ function ConfigHistoryPage({
       // a path that serves the SPA's index.html instead of JSON. Measured: the relative form
       // comes back as HTML, /api/v1/klusters/... comes back 404, and the form below comes back
       // 200 with data.records -- with and without the /clusters/<cluster> prefix.
-      attemptedUrl = `/clusters/${cluster}/api/v1/namespaces/${namespace}/secrets/${historySecretName(
-        name,
-      )}`;
+      attemptedUrl = [
+        `/clusters/${cluster}/api/v1/namespaces/${namespace}/secrets`,
+        historySecretName(name),
+      ].join('/');
       // Plain fetch with credentials, not the console's request wrapper. The same URL returns
       // 200 with data.records through fetch in the logged-in console, while request.get on the
       // very same string fails with "Failed to fetch" -- a network level TypeError, i.e. the
@@ -140,7 +283,7 @@ function ConfigHistoryPage({
           }
         });
         setRecords([]);
-        setExpanded(undefined);
+        setSelectedRevision(undefined);
         // Report anyway: the attributes need the managed-by value even when nothing is recorded yet.
         onLoaded?.({ ...managed, createdAt: '' });
         return;
@@ -158,7 +301,7 @@ function ConfigHistoryPage({
           }
         });
         setRecords([]);
-        setExpanded(undefined);
+        setSelectedRevision(undefined);
         // Report anyway: the attributes need the managed-by value even when nothing is recorded yet.
         onLoaded?.({ ...managed, createdAt: '' });
         return;
@@ -174,8 +317,8 @@ function ConfigHistoryPage({
       const loaded = await decodeHistoryPayload(payload);
       setRecords(loaded);
       onLoaded?.({ ...managed, createdAt: loaded[0]?.createdAt || '' });
-      // The newest record is the current state, so it opens by default; the rest stay collapsed.
-      setExpanded(loaded[0]?.revision);
+      // The newest record is the current state, so it is selected by default in the version menu.
+      setSelectedRevision(sortHistoryRecords(loaded)[0]?.revision);
     } catch (error) {
       // A missing history Secret simply means nothing has been recorded yet.
       const status = (error as { response?: { status?: number } })?.response?.status;
@@ -205,36 +348,54 @@ function ConfigHistoryPage({
 
   const renderDiff = (record: HistoryRecord) => {
     const pair = diffPair(records, record.revision);
+    if (!pair.comparedRevision) {
+      // Nothing before it: the viewer needs both sides, and inventing an empty one is what it cannot
+      // parse. The list is left out entirely.
+      return <Alert showIcon={false}>{t('CONFIG_HISTORY_FIRST_REVISION')}</Alert>;
+    }
+    const oldText = pair.oldValue || '';
+    const newText = pair.newValue || '';
+    const simpleRows = buildSimpleDiffRows(oldText, newText);
+    if (simpleRows) {
+      return (
+        <SimpleDiffTable
+          rows={simpleRows}
+          description={t('COMPARE_WITH', { version: `#${pair.comparedRevision}` })}
+        />
+      );
+    }
+    // The bar is the viewer's own header, so it is drawn once rather than twice.
     return (
-      <DiffViewer
-        oldValue={pair.oldValue}
-        newValue={pair.newValue}
-        title={t('CONFIG_HISTORY_CONTENT')}
-        description={
-          pair.comparedRevision
-            ? t('COMPARE_WITH', { version: `#${pair.comparedRevision}` })
-            : t('CONFIG_HISTORY_FIRST_REVISION')
-        }
-      />
+      <HistoryDiff>
+        <DiffViewer
+          oldValue={oldText}
+          newValue={newText}
+          title={t('CONFIG_FILE')}
+          description={t('COMPARE_WITH', { version: `#${pair.comparedRevision}` })}
+        />
+      </HistoryDiff>
     );
   };
 
+  const sortedRecords = sortHistoryRecords(records);
+  const selectedRecord = records.find(record => record.revision === selectedRevision);
+  const revisionOptions = sortedRecords.map(record => ({
+    label: (
+      <span>
+        <span>#{record.revision}</span>{' '}
+        <Tag color={managedByTagColor(record.managedBy)}>
+          {t(managedByLabelKey(record.managedBy))}
+        </Tag>
+        {record.contentOmitted && <Tag color="warning">{t('CONFIG_HISTORY_CONTENT_OMITTED')}</Tag>}
+      </span>
+    ),
+    description: formatTime(record.createdAt),
+    icon: <Icon name="timed-task" size={40} />,
+    value: record.revision,
+  }));
+
   return (
-    <div style={{ padding: 24 }} data-test="config-history-page">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-        <Button type="button" onClick={onBack}>
-          {t('BACK')}
-        </Button>
-        <div>
-          <h1 style={{ margin: 0, fontSize: 18 }}>{t('REVISION_RECORDS')}</h1>
-          <p style={{ margin: '4px 0 0', color: '#79879c', fontSize: 12 }}>
-            {kind} · {cluster} / {namespace} / {name}
-          </p>
-        </div>
-      </div>
-
-      <p style={{ color: '#79879c', fontSize: 12, marginBottom: 16 }}>{t('CONFIG_HISTORY_HINT')}</p>
-
+    <div style={{ padding: '12px 24px 28px' }} data-test="config-history-page">
       {loading && <Loading />}
 
       {!loading && failed && (
@@ -247,121 +408,51 @@ function ConfigHistoryPage({
         </div>
       )}
 
-      {!loading && !failed && records.length === 0 && (
-        <div style={{ color: '#79879c' }}>{t('CONFIG_HISTORY_EMPTY')}</div>
+      {!loading && !failed && (
+        <Card sectionTitle={t('REVISION_RECORDS')}>
+          <Alert className="mb12" showIcon={false}>
+            {t('CONFIG_HISTORY_HINT')}
+          </Alert>
+          {records.length > 0 ? (
+            <TypeSelect
+              options={revisionOptions}
+              defaultValue={selectedRevision}
+              onChange={(revision: number) => setSelectedRevision(revision)}
+            />
+          ) : (
+            <div style={{ color: '#79879c' }}>{t('CONFIG_HISTORY_EMPTY')}</div>
+          )}
+        </Card>
+      )}
+
+      {!loading && !failed && selectedRecord && (
+        <Card className="mt12">
+          <HistoryMeta>
+            <Text title={`#${selectedRecord.revision}`} description={t('CONFIG_HISTORY_SERIAL')} />
+            <Text
+              title={formatTime(selectedRecord.createdAt)}
+              description={t('CONFIG_HISTORY_CHANGED_AT')}
+            />
+            <Text
+              title={`${t(managedByLabelKey(selectedRecord.managedBy))}${
+                selectedRecord.managedByRef
+                  ? t('CONFIG_HISTORY_SOURCE_VERSION_FORMAT', {
+                      version: selectedRecord.managedByRef,
+                    })
+                  : ''
+              }`}
+              description={t('CONFIG_HISTORY_MANAGED_BY')}
+            />
+          </HistoryMeta>
+          <DiffWrapper style={{ overflowX: 'auto' }}>{renderDiff(selectedRecord)}</DiffWrapper>
+        </Card>
       )}
 
       {!loading && !failed && records.length > 0 && (
-        <div
-          style={{
-            marginTop: 16,
-            marginBottom: 4,
-            padding: '10px 14px',
-            background: '#fdf1f4',
-            borderLeft: '3px solid #d03050',
-            color: '#8c4a58',
-            fontSize: 12,
-            lineHeight: 1.85,
-          }}
-        >
+        <Alert className="mt12" showIcon={false}>
           {t('CONFIG_HISTORY_SOURCE_NOTE')}
-        </div>
+        </Alert>
       )}
-
-      {!loading &&
-        !failed &&
-        records.map(record => {
-          const isOpen = expanded === record.revision;
-          return (
-            <div key={record.revision} style={{ marginBottom: 12 }}>
-              <div
-                role="button"
-                tabIndex={0}
-                onClick={() => setExpanded(isOpen ? undefined : record.revision)}
-                onKeyDown={event => {
-                  if (event.key === 'Enter') {
-                    setExpanded(isOpen ? undefined : record.revision);
-                  }
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: '12px 16px',
-                  border: `1px solid ${isOpen ? '#55bc8a' : '#d8e0e8'}`,
-                  borderRadius: 4,
-                  // The native cards in this console carry this shadow; measured from the page's own
-                  // property panel and content card, both 4px radius with this exact shadow.
-                  boxShadow: '0 4px 8px rgba(36, 46, 66, 0.06)',
-                  cursor: 'pointer',
-                  background: '#fff',
-                }}
-              >
-                <strong>#{record.revision}</strong>
-                <span
-                  style={{
-                    fontSize: 11,
-                    padding: '2px 10px',
-                    borderRadius: 4,
-                    background: '#e8f7ef',
-                    color: '#189a4d',
-                  }}
-                >
-                  {t(managedByLabelKey(record.managedBy))}
-                  {record.managedByRef ? ` · ${record.managedByRef}` : ''}
-                </span>
-                <span style={{ color: '#79879c', fontSize: 12 }}>
-                  {formatTime(record.createdAt)}
-                </span>
-                {record.contentOmitted && (
-                  <span style={{ color: '#f5a623', fontSize: 12 }}>
-                    {t('CONFIG_HISTORY_CONTENT_OMITTED')}
-                  </span>
-                )}
-              </div>
-              {isOpen && (
-                <div style={{ marginTop: 8 }}>
-                  {/* The three facts the design puts above the diff. */}
-                  <div
-                    style={{
-                      display: 'flex',
-                      gap: 56,
-                      padding: '12px 16px',
-                      border: '1px solid #e3e9ef',
-                      borderBottom: 'none',
-                      borderRadius: '4px 4px 0 0',
-                      background: '#fff',
-                      boxShadow: '0 4px 8px rgba(36, 46, 66, 0.06)',
-                    }}
-                  >
-                    <div>
-                      <div style={{ color: '#79879c', fontSize: 12, marginBottom: 4 }}>
-                        {t('CONFIG_HISTORY_SERIAL')}
-                      </div>
-                      <b>#{record.revision}</b>
-                    </div>
-                    <div>
-                      <div style={{ color: '#79879c', fontSize: 12, marginBottom: 4 }}>
-                        {t('CONFIG_HISTORY_CHANGED_AT')}
-                      </div>
-                      <b>{formatTime(record.createdAt)}</b>
-                    </div>
-                    <div>
-                      <div style={{ color: '#79879c', fontSize: 12, marginBottom: 4 }}>
-                        {t('CONFIG_HISTORY_MANAGED_BY')}
-                      </div>
-                      <b>
-                        {t(managedByLabelKey(record.managedBy))}
-                        {record.managedByRef ? `（源版本 ${record.managedByRef}）` : ''}
-                      </b>
-                    </div>
-                  </div>
-                  {renderDiff(record)}
-                </div>
-              )}
-            </div>
-          );
-        })}
     </div>
   );
 }

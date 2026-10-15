@@ -36,13 +36,13 @@ function BaseLayout(): JSX.Element {
       enabled: !!cluster,
     },
     {
-      queryKey: ['workspaceRule', workspace],
+      queryKey: ['workspaceRule', userName, workspace],
       queryFn: () => fetchRules({ workspace, name: userName }),
       enabled: !!workspace,
     },
   ]);
   const holeRules = useQuery(
-    ['holeRules'],
+    ['holeRules', userName, cluster, workspace, namespace],
     () => fetchRules({ cluster, workspace, namespace, name: userName }),
     {
       enabled: projectResult.isSuccess && clusterResult.isSuccess && workspaceRuleResult.isSuccess,

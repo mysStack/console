@@ -18,7 +18,7 @@ import { Dropdown, Field, Menu, MenuItem, useModal } from '@kubed/components';
 import { LoginWrapper, NotLogin, Avatar, NotifiContext } from './styles';
 import About from '../About';
 import UserSetting from '../UserSetting';
-import { hasKSModule, useV3action } from '@ks-console/shared';
+import { clearResourceListRevisions, hasKSModule, useV3action } from '@ks-console/shared';
 import WujieReact from 'wujie-react';
 
 import {
@@ -103,7 +103,7 @@ const ProfileMenu = ({ isLogin }: ProfileMenuProps) => {
           <NotifiContext>{t('NOTIFICATION_SETTINGS')}</NotifiContext>
         </MenuItem>
       )}
-      <MenuItem icon={<Logout />} as="a" href="/logout">
+      <MenuItem icon={<Logout />} as="a" href="/logout" onClick={clearResourceListRevisions}>
         {t('LOG_OUT')}
       </MenuItem>
       <MenuItem icon={<Information />} onClick={openAboutModal}>
