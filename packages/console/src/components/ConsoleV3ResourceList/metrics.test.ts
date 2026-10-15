@@ -40,7 +40,7 @@ test('ConsoleV3 scope guard distinguishes resource scopes', () => {
   assert.equal(shouldKeepConsoleV3Alive(listScope, otherNamespace), false);
 });
 
-test('ConsoleV3 keeps the shared app alive when switching resource scopes', () => {
+test('ConsoleV3 rebuilds the shared app when switching resource scopes', () => {
   assert.equal(
     shouldRebuildConsoleV3Instance({
       activeScopeKey: 'admin:deployments:/consolev3/test-wes/deployments',
@@ -52,7 +52,7 @@ test('ConsoleV3 keeps the shared app alive when switching resource scopes', () =
       mountedRevision: undefined,
       revision: '0:0',
     }),
-    false,
+    true,
   );
 });
 

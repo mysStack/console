@@ -36,9 +36,10 @@ export interface ConsoleV3RebuildInput {
 }
 
 /**
- * A shared Wujie app only needs rebuilding when the cached instance for the
- * same list scope is stale. Switching from one resource list to another must
- * keep the app alive so activation can deliver the new list route.
+ * The shared `consolev3` name is also used by project overview and detail
+ * pages. Reusing that instance across scopes can leave an empty ShadowRoot
+ * when the previous caller did not use `alive`. Only reuse a mounted instance
+ * for the same list scope; every scope switch starts from a clean instance.
  */
 export const shouldRebuildConsoleV3Instance = ({
   activeScopeKey,
@@ -52,7 +53,7 @@ export const shouldRebuildConsoleV3Instance = ({
 }: ConsoleV3RebuildInput): boolean => {
   const sameMountedScope = activeScopeKey === scopeKey && mountedResourceUrl === resourceUrl;
 
-  return sameMountedScope && (cacheExpired || (deactivated && mountedRevision !== revision));
+  return !sameMountedScope || cacheExpired || (deactivated && mountedRevision !== revision);
 };
 
 export const isConsoleV3ListCacheExpired = (
