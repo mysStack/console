@@ -24,6 +24,37 @@ export const shouldKeepConsoleV3Alive = (
   nextScopeKey: string,
 ): boolean => activeScopeKey === undefined || activeScopeKey === nextScopeKey;
 
+export interface ConsoleV3RebuildInput {
+  activeScopeKey: string | undefined;
+  scopeKey: string;
+  resourceUrl: string;
+  mountedResourceUrl: string | undefined;
+  cacheExpired: boolean;
+  deactivated: boolean;
+  mountedRevision: string | undefined;
+  revision: string;
+}
+
+/**
+ * A shared Wujie app only needs rebuilding when the cached instance for the
+ * same list scope is stale. Switching from one resource list to another must
+ * keep the app alive so activation can deliver the new list route.
+ */
+export const shouldRebuildConsoleV3Instance = ({
+  activeScopeKey,
+  scopeKey,
+  resourceUrl,
+  mountedResourceUrl,
+  cacheExpired,
+  deactivated,
+  mountedRevision,
+  revision,
+}: ConsoleV3RebuildInput): boolean => {
+  const sameMountedScope = activeScopeKey === scopeKey && mountedResourceUrl === resourceUrl;
+
+  return sameMountedScope && (cacheExpired || (deactivated && mountedRevision !== revision));
+};
+
 export const isConsoleV3ListCacheExpired = (
   lastUsedAt: number | undefined,
   now: number,

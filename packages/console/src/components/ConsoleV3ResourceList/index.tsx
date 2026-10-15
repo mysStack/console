@@ -7,7 +7,7 @@ import {
   getConsoleV3ScopeKey,
   isConsoleV3ListCacheExpired,
   markConsoleV3Phase,
-  shouldKeepConsoleV3Alive,
+  shouldRebuildConsoleV3Instance,
 } from './metrics';
 import { scheduleConsoleV3ListRouteSync } from './route';
 
@@ -48,11 +48,16 @@ export default function ConsoleV3ResourceList({
   // Keep the iframe URL stable. The revision is used only to decide whether a
   // deactivated instance must be rebuilt after a resource mutation.
   const resourceUrl = url;
-  const canRestore =
-    !cacheExpired &&
-    mountedResourceUrls.get(scopeKey) === resourceUrl &&
-    (!deactivatedScopes.has(scopeKey) || mountedRevisions.get(scopeKey) === revision) &&
-    shouldKeepConsoleV3Alive(activeScopeKey, scopeKey);
+  const shouldRebuild = shouldRebuildConsoleV3Instance({
+    activeScopeKey,
+    scopeKey,
+    resourceUrl,
+    mountedResourceUrl: mountedResourceUrls.get(scopeKey),
+    cacheExpired,
+    deactivated: deactivatedScopes.has(scopeKey),
+    mountedRevision: mountedRevisions.get(scopeKey),
+    revision,
+  });
   if (isReady) {
     activeScopeKey = scopeKey;
     lastScopeUseAt.set(scopeKey, now);
@@ -113,11 +118,11 @@ export default function ConsoleV3ResourceList({
 
   useEffect(() => {
     if (!isReady) return;
-    if (!canRestore) {
+    if (shouldRebuild) {
       WujieReact.destroyApp('consolev3');
     }
     setInstanceReady(true);
-  }, [canRestore, isReady, resourceUrl]);
+  }, [isReady, resourceUrl, shouldRebuild]);
 
   if (!isReady || !instanceReady) {
     return <></>;

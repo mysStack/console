@@ -5,6 +5,7 @@ import {
   getConsoleV3ScopeKey,
   isConsoleV3ListCacheExpired,
   markConsoleV3Phase,
+  shouldRebuildConsoleV3Instance,
   shouldKeepConsoleV3Alive,
 } from './metrics';
 
@@ -37,6 +38,41 @@ test('ConsoleV3 does not reuse an app across resource scopes', () => {
   assert.equal(shouldKeepConsoleV3Alive(undefined, listScope), true);
   assert.equal(shouldKeepConsoleV3Alive(listScope, listScope), true);
   assert.equal(shouldKeepConsoleV3Alive(listScope, otherNamespace), false);
+});
+
+test('ConsoleV3 keeps the shared app alive when switching resource scopes', () => {
+  assert.equal(
+    shouldRebuildConsoleV3Instance({
+      activeScopeKey: 'admin:deployments:/consolev3/test-wes/deployments',
+      scopeKey: 'admin:services:/consolev3/test-wes/services',
+      resourceUrl: '/consolev3/test-wes/services',
+      mountedResourceUrl: undefined,
+      cacheExpired: false,
+      deactivated: false,
+      mountedRevision: undefined,
+      revision: '0:0',
+    }),
+    false,
+  );
+});
+
+test('ConsoleV3 rebuilds a stale cached scope after mutation or TTL expiry', () => {
+  const input = {
+    activeScopeKey: 'admin:services:/consolev3/test-wes/services',
+    scopeKey: 'admin:services:/consolev3/test-wes/services',
+    resourceUrl: '/consolev3/test-wes/services',
+    mountedResourceUrl: '/consolev3/test-wes/services',
+    cacheExpired: false,
+    deactivated: true,
+    mountedRevision: '0:0',
+    revision: '1:1',
+  };
+
+  assert.equal(shouldRebuildConsoleV3Instance(input), true);
+  assert.equal(
+    shouldRebuildConsoleV3Instance({ ...input, cacheExpired: true, deactivated: false }),
+    true,
+  );
 });
 
 test('ConsoleV3 list cache expires after the configured TTL', () => {
