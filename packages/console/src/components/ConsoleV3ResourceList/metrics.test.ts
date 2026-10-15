@@ -31,7 +31,7 @@ test('ConsoleV3 scope keys include user and resource route', () => {
   );
 });
 
-test('ConsoleV3 does not reuse an app across resource scopes', () => {
+test('ConsoleV3 scope guard distinguishes resource scopes', () => {
   const listScope = 'admin:configmaps:/consolev3/test-wes/clusters/host/projects/a/configmaps';
   const otherNamespace = 'admin:configmaps:/consolev3/test-wes/clusters/host/projects/b/configmaps';
 
