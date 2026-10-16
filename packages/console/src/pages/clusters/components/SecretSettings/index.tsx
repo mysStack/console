@@ -71,7 +71,7 @@ function SecretSettings(
   }, []);
 
   useEffect(() => {
-    form.resetFields();
+    form.resetFields(['data']);
   }, [secretChanged]);
 
   useEffect(() => {
