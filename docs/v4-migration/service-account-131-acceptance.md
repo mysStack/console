@@ -54,3 +54,14 @@ ServiceAccount 的列表、详情、创建弹窗、路由和项目作用域已�
 在当前已部署制品 `feature-v4-configmaps-secrets-20261016-170820-277e50781a04` 上新增测试 ServiceAccount，Playwright 发起的创建请求返回 `201 Created`，随后通过 Kubernetes API 确认资源位于 `test-wes` namespace；再通过原生操作菜单打开“修改角色”，但当前测试项目没有可用项目角色（接口返回 `No Data`），因此没有伪造角色修改成功证据。最后通过原生删除确认弹窗完成删除，API 返回 `200 OK`，并通过 Kubernetes API 确认资源已不存在。
 
 编辑信息、角色修改成功路径、权限差异和 Secret 数据关联仍未完成，模块继续保持“测试中”。
+
+## 第二轮真实编辑、角色和 RBAC 复验（2026-10-16）
+
+为补齐上一轮缺口，在同一 131 制品上使用测试项目 `test-wes` 执行受控复验：
+
+- 通过 Kubernetes API 创建临时 ServiceAccount `codex-v4-e2e-sa-edit-20261016`，再通过原生“编辑信息”修改描述；列表回读显示新描述，确认编辑请求生效。
+- 通过 Kubernetes API 创建临时项目角色 `codex-v4-e2e-role-20261016`，使“修改角色”弹窗具备可选项；通过原生弹窗为 ServiceAccount 设置该角色，列表回读显示角色名称，确认角色修改请求成功。
+- 通过 `kubectl auth can-i` 以该 ServiceAccount 身份执行一组 RBAC 正负校验：允许读取项目 Pod，拒绝删除项目 Pod；角色绑定由平台自动生成并指向该 ServiceAccount。
+- 通过原生删除确认弹窗删除临时 ServiceAccount，API 返回成功；随后清理临时项目角色，并确认关联 RoleBinding 已不存在。
+
+本轮仅验证一组最小 RBAC 正负权限，完整权限矩阵、不同用户权限差异和 Secret 数据关联仍待补齐，模块继续保持“测试中”。
