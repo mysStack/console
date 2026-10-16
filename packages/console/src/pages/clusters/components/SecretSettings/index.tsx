@@ -71,12 +71,6 @@ function SecretSettings(
   }, []);
 
   useEffect(() => {
-    if (secretChanged) {
-      form.resetFields(['data']);
-    }
-  }, [secretChanged]);
-
-  useEffect(() => {
     if (state !== 'data') {
       form.setFieldsValue(fedFormTemplate);
     }
@@ -108,6 +102,7 @@ function SecretSettings(
     if (!type || SECRET_TYPES.includes(type)) {
       set(fedFormTemplate, 'data', {});
     }
+    form.resetFields(['data']);
     setSecretChanged(true);
     setType(value);
   };
