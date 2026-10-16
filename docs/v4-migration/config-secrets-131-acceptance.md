@@ -92,7 +92,7 @@
 - 镜像 digest：`sha256:04650b2ddbb79dcb19443fafa639cabbb62cb08d8c0087b7a8f850402bd3e018`
 - Pod：`ks-console-789d5765fd-dsp5v`
 - Pod imageID：`ghcr.io/mysstack/ks-console@sha256:04650b2ddbb79dcb19443fafa639cabbb62cb08d8c0087b7a8f850402bd3e018`
-- ConfigMap 创建请求返回 `201 Created`，Kubernetes API 回读确认资源位于 `test-biz-config`，数据键存在。
-- Secret 创建请求返回 `201 Created`，Kubernetes API 回读确认资源位于 `test-biz-config`、类型为 `Opaque`，数据键存在；验收记录不写入 Secret 明文或编码值。
+- ConfigMap 创建请求返回 `201 Created`，Kubernetes API 回读确认资源位于 `test-biz-config`，数据键存在；随后通过“编辑设置”提交修改并回读确认新值，最后通过确认删除完成清理。
+- Secret 创建请求返回 `201 Created`，Kubernetes API 回读确认资源位于 `test-biz-config`、类型为 `Opaque`，数据键存在；随后通过“编辑设置”提交修改并以编码值比对确认，最后通过确认删除完成清理。验收记录不写入 Secret 明文或编码值。
 
 本轮测试资源已删除。编辑成功提交、批量删除、权限差异和完整作用域回归仍未完成，模块继续保持“测试中”。
