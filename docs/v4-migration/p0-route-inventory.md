@@ -110,3 +110,17 @@ servicerouting, custom-monitoring, base-info
 4. 将每个仍被启用的 V3 入口回链到 V4 替代文件或明确列入后续迁移任务。
 
 本清单只关闭了 P0-U002 的静态盘点部分；启用状态、运行时行为和动态 Action 仍未关闭，不能据此宣布 P0-REA 通过。
+
+## 5. 当前 V4 路由注册中的关键对照
+
+进一步读取各作用域 `routes` 文件后，确认以下 V4 路由已经在源码路由树中注册：
+
+| 文件 | 已观察到的路径 | 迁移核对意义 |
+| --- | --- | --- |
+| `packages/console/src/pages/projects/routes/index.tsx` | `deployments`、`statefulsets`、`daemonsets`、`pods`、`jobs`、`cronjobs`、`services`、`ingresses`、`volumes`、`volume-snapshots`、`configmaps`、`serviceaccounts`、`secrets`、`roles` 等 | ConfigMap、Secret、ServiceAccount 已有 V4 路由入口，但不能据此证明所有旧入口和操作已等价 |
+| `packages/console/src/pages/projects/routes/detail.tsx` | 对应资源的 `:name` 详情、`config-reference` 和历史等子路径 | 需要分别核对直达、刷新、返回、权限和错误态 |
+| `packages/console/src/pages/clusters/routes/index.tsx` | `overview`、`nodes`、`edgenodes`、`components`、`workloads`、`pods`、`customresources` 等 | 集群主路由存在 V4 页面；源码中仍有集群级 V3 Embed 消费者，二者需按菜单和权限对照 |
+| `packages/console/src/pages/fedprojects/routes/index.tsx` | `overview`、`applications`、`services`、`workloads`、`deployments`、`statefulsets`、`ingresses`、`volumes`、`configmaps`、`secrets` 等 | 联邦项目仍有大量 V3 URL 消费者，不能沿用项目作用域的 V4 结论 |
+| `packages/console/src/pages/workspaces/routes/index.tsx` | `overview`、`projects`、`federatedprojects`、`devops`、`apps`、`repos`、`base-info`、`quota`、`roles`、`members`、`gateways` | Workspace 下的 V3 Embed 需要单独核对启用扩展和权限 |
+
+这一步只证明“源码路由树存在对应 V4 注册项”。V3 Embed 可能由同一页面的组件、重定向或旧入口消费，仍必须通过 131 制品的菜单、直达、刷新、返回和 Network 证据完成运行时映射。
