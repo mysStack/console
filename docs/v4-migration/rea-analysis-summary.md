@@ -113,7 +113,7 @@ REA 不要求对整个大型 Bundle 取得无截断的语义图；门禁要求�
 
 | 任务 | 证据文档 | 分支提交 | 当前结论 |
 | --- | --- | --- | --- |
-| P0-Audit | [静态盘点证据](./p0-audit-evidence.md)、[V3 路由入口库存](./p0-route-inventory.md) | `feature/v4-p0-audit` / `e34b36503`（首轮证据已汇入当前协调分支） | 已形成首轮 Wujie、V3 ResourceList、V3 Action、扩展、路由字符串和构建入口清单；启用入口仍需运行时核对 |
+| P0-Audit | [静态盘点证据](./p0-audit-evidence.md)、[V3 路由入口库存](./p0-route-inventory.md) | `feature/v4-p0-audit` / `e98e58216`（首轮证据已汇入当前协调分支） | 已形成首轮 Wujie、V3 ResourceList、V3 Action、扩展、路由字符串、V4 路由注册和构建入口清单；启用入口仍需运行时核对 |
 | P0-REA | [制品分析证据](./p0-rea-evidence.md) | `feature/v4-p0-rea` / `5a0874d2e`（已汇入当前协调分支为 `4d93b4f81`） | focused REA 视图完成，但 semantic/application coverage 仍为 partial，432 个文件在视图外 |
 | P0-Baseline | [基线边界证据](./p0-baseline-evidence.md) | `feature/v4-p0-baseline` / `9ea1dbbf1`（已汇入当前协调分支为 `37077100e`） | Git refs 和制品摘要已固定；旧源码来源及源码与制品的对应关系仍未关闭 |
 
