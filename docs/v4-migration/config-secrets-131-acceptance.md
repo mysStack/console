@@ -61,7 +61,7 @@
 - Pod：`ks-console-bd75c476b-6h8v9`
 - Pod imageID：`ghcr.io/mysstack/ks-console@sha256:e7a9e8ab4b341ba1eba04c86d4436ddc4a27776226dee3618a71d896f3230c21`
 
-## 未通过或待补项
+## 前两轮未通过或待补项（后续复验见下文）
 
 - 已补齐 ConfigMap/Secret 原生创建弹窗，并在第二轮部署制品上验证打开和取消；尚未执行真实提交。
 - 尚未执行真实创建、编辑、删除、批量删除及权限差异流程，因此不能把本模块标记为“已验收”。
