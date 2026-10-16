@@ -53,7 +53,7 @@ Pn-REA → Pn-DEV → Pn-VERIFY → Pn-PR
 复核时核验到：
 
 - `origin/feature/v4-migration`：`3e09afd6a`
-- `origin/feature/v4-configmaps-secrets`：`0175dcd94`
+- `origin/feature/v4-configmaps-secrets`：`c8fbdd112`
 - `v4.1.5^{commit}`：`fc1253cbe`
 - `release-4.1.5`：`fc1253cbe`
 - 旧 `feature/config-history`：未发现本地或远程分支引用
