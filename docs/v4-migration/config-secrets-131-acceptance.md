@@ -81,3 +81,18 @@
 - Playwright 创建请求返回 `201 Created`；随后通过 Kubernetes API 回读测试 ConfigMap，确认 namespace 为 `test-biz-config` 且 `data.test-key` 为 `test-value`。
 
 本轮创建后已删除测试资源。编辑、批量删除、权限差异和完整 Secret CRUD 仍未完成，模块继续保持“测试中”。
+
+## 第四轮真实创建复验（2026-10-16）
+
+在修正数据编辑器返回和表单状态同步后，使用最新制品再次验证 ConfigMap 与 Secret 的真实创建：
+
+- GitHub Actions Run：`38878257473`
+- 提交：`277e50781a041274ce05473ed59b5ee117ccba75`
+- 镜像 tag：`feature-v4-configmaps-secrets-20261016-170820-277e50781a04`
+- 镜像 digest：`sha256:04650b2ddbb79dcb19443fafa639cabbb62cb08d8c0087b7a8f850402bd3e018`
+- Pod：`ks-console-789d5765fd-dsp5v`
+- Pod imageID：`ghcr.io/mysstack/ks-console@sha256:04650b2ddbb79dcb19443fafa639cabbb62cb08d8c0087b7a8f850402bd3e018`
+- ConfigMap 创建请求返回 `201 Created`，Kubernetes API 回读确认资源位于 `test-biz-config`，数据键存在。
+- Secret 创建请求返回 `201 Created`，Kubernetes API 回读确认资源位于 `test-biz-config`、类型为 `Opaque`，数据键存在；验收记录不写入 Secret 明文或编码值。
+
+本轮测试资源已删除。编辑成功提交、批量删除、权限差异和完整作用域回归仍未完成，模块继续保持“测试中”。
