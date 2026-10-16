@@ -1,6 +1,6 @@
 # Deployment V3 / V4 缺口矩阵
 
-> 事实基线：`release-4.1.5` / `fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`；文档复核：2026-10-17。本文是 P0/P3-REA 分析输入，P3-REA 未通过前，表中已有 V4 代码和先行测试不能视为正式开发或验收。
+> 事实基线：`release-4.1.5` / `fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`；文档复核：2026-10-17。本文是 P0/P3-REA 分析输入，P3-REA 尚未开始正式门禁复核，表中已有 V4 代码和先行测试不能视为正式开发或验收。
 
 > 第一轮 `v3dist` REA 的 Evidence ID、覆盖范围和限制见[REA 阶段分析总结](./rea-analysis-summary.md)；Deployment 的路由、API、Store 和操作链见[Deployment V3/V4 证据记录](./deployment-v3-evidence.md)。
 
