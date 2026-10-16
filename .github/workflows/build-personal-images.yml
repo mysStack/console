@@ -7,13 +7,8 @@ on:
   workflow_dispatch:
     inputs:
       source_ref:
-        description: Optional branch, tag, or commit SHA; defaults to the branch selected in Actions
+        description: 可选的分支、标签或 commit SHA；未填写时使用 Actions 当前选择的分支
         required: false
-        type: string
-      tag:
-        description: Base image tag (defaults to oci-repo for test builds)
-        required: false
-        default: oci-repo
         type: string
 
 permissions:
@@ -55,16 +50,15 @@ jobs:
 
       - name: Generate image tag
         id: image_tag
-        env:
-          BASE_TAG: ${{ inputs.tag || github.ref_name }}
         run: |
-          # Stable release tags are immutable release identifiers. Test and
-          # manual builds keep the date/commit suffix to avoid collisions.
-          if [[ "${GITHUB_REF_TYPE}" == "tag" && "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            value="${BASE_TAG}"
-          else
-            value="${BASE_TAG}-$(TZ=Asia/Shanghai date +%Y%m%d)-$(git rev-parse --short=7 HEAD)"
-          fi
+          # 每个镜像 tag 都包含检出的分支（或标签）、上海时间和 commit。
+          # Docker tag 不能包含 '/'，因此先规范化分支或标签名称。
+          source_ref='${{ inputs.source_ref || github.ref_name }}'
+          source_ref="$(git symbolic-ref --short HEAD 2>/dev/null || printf '%s' "$source_ref")"
+          ref_tag="$(printf '%s' "$source_ref" | tr '/_' '--' | tr -cs '[:alnum:].-' '-' | sed 's/^-*//; s/-*$//')"
+          timestamp="$(TZ=Asia/Shanghai date +%Y%m%d-%H%M%S)"
+          commit_id="$(git rev-parse --short=12 HEAD)"
+          value="${ref_tag}-${timestamp}-${commit_id}"
           echo "value=${value}" >> "$GITHUB_OUTPUT"
 
       - name: Set up QEMU
