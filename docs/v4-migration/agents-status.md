@@ -17,7 +17,7 @@
 
 | 任务        | 负责人             | Worktree                                      | 分支                  | 当前进度 | 证据交付                               | 阻塞项/下一步                                      |
 | ----------- | ------------------ | --------------------------------------------- | --------------------- | -------- | -------------------------------------- | -------------------------------------------------- |
-| P0-Audit    | `/root/p0_audit`   | `/home/bruce/code/ks-develop/console-p0-audit`   | `feature/v4-p0-audit`   | 首轮证据已提交（协调 Agent 临时代执行） | `p0-audit-evidence.md`，`b82ca4658` | V3/Wujie、路由、Action、扩展和构建依赖静态盘点；待统一复核 |
+| P0-Audit    | `/root/p0_audit`   | `/home/bruce/code/ks-develop/console-p0-audit`   | `feature/v4-p0-audit`   | 首轮证据已提交（协调 Agent 临时代执行） | `p0-audit-evidence.md`，`p0-route-inventory.md`，`e34b36503` | 已补充按作用域的 V3 URL 候选库存；启用状态和运行时仍待核对 |
 | P0-REA      | `/root/p0_rea`     | `/home/bruce/code/ks-develop/console-p0-rea`     | `feature/v4-p0-rea`     | 首轮证据已提交（协调 Agent 临时代执行） | `p0-rea-evidence.md`，`5a0874d2e` | focused REA、Evidence ID、覆盖范围和限制；待统一复核 |
 | P0-Baseline | `/root/p0_baseline` | `/home/bruce/code/ks-develop/console-p0-baseline` | `feature/v4-p0-baseline` | 首轮证据已提交（协调 Agent 临时代执行） | `p0-baseline-evidence.md`，`9ea1dbbf1` | Git 基线、历史分支、旧源码和编译制品边界；P0-U001 未关闭 |
 

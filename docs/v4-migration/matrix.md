@@ -36,7 +36,7 @@
 - [x] 完成 V3/Wujie 静态依赖清单。
 - [x] 创建 Deployment 路由、API、Store、操作和缺口文档。
 - [x] 完成 `v3dist` 第一轮 REA 制品分析，并在 [REA 阶段分析总结](./rea-analysis-summary.md) 记录证据和限制；该结果为部分覆盖，不代表 P0-REA 通过。
-- [x] 在独立 Worktree 形成 [P0-Audit](./p0-audit-evidence.md)、[P0-REA](./p0-rea-evidence.md) 和 [P0-Baseline](./p0-baseline-evidence.md) 首轮证据；三份证据已汇入协调分支，等待统一门禁复核。
+- [x] 在独立 Worktree 形成 [P0-Audit](./p0-audit-evidence.md)、[V3 路由入口库存](./p0-route-inventory.md)、[P0-REA](./p0-rea-evidence.md) 和 [P0-Baseline](./p0-baseline-evidence.md) 首轮证据；证据已汇入协调分支，等待统一门禁复核。
 - [ ] 根据 131 部署版本映射所有启用路由和扩展。
 - [ ] 固定旧 V3 源码来源、tag/commit，并完成 P0-REA 门禁复核。
 
