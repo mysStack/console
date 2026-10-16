@@ -102,6 +102,21 @@ message: [master] chore(bot): update v3dist from kse-console-embed:kse-release-4
 
 这为当前目录中的 `v3dist` 提供了 Git 历史更新提交和外部镜像标签线索，但没有给出 `kse-console-embed:kse-release-4.1` 内部对应的 V3 源码 commit。制品与 `origin/release-3.4` 的源码对应关系仍需通过镜像构建元数据、制品清单或项目负责人确认。
 
+另外，历史分支 `feature/workload-envfrom-console` 的提交 `8fdfde044b4c7e9518bbe0edce794a2a75d87d65` 曾携带 `packages/bootstrap/assets/v3dist/.v3dist-source.json`：
+
+```json
+{
+  "schemaVersion": 1,
+  "repository": "mysStack/kse-console-v3",
+  "ref": "feature/v3-artifact-decouple",
+  "commit": "8843eadf1",
+  "builtAt": "2026-10-03T13:18:23+08:00",
+  "publicPath": "/dist/v3dist/"
+}
+```
+
+当前 `origin/feature/v4-migration` 的 `v3dist` 不包含这个元数据文件，且其最近目录更新提交是 2025 年的 `3f3064787`。因此不能把历史元数据直接套到当前 P0 制品；需要先确认本轮指定测试制品到底是 2025 年外部镜像输入，还是 2026 年带有该元数据的另一套制品。
+
 ## 3. 当前边界和风险
 
 - `release-4.1.5` 是稳定发布基线；P0 取证分支从 `feature/v4-migration` 当前远程提交创建，两者用途不同，不能混写成同一基线。
