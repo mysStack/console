@@ -33,7 +33,7 @@ interface Props {
 function ServiceAccounts({ workspace: workspaceProp }: Props = {}): JSX.Element {
   const { module, getDocsUrl, usePatchMutation, usePostMutation } = serviceAccountStore;
   const params: Record<string, any> = useParams();
-  const { cluster, workspace: routeWorkspace } = params;
+  const { cluster, namespace, workspace: routeWorkspace } = params;
   const workspace = workspaceProp ?? routeWorkspace;
   const projectPrefix = `${workspace ? `/${workspace}` : ''}/clusters/${cluster}/projects`;
   const tableRef = useRef<TableRef<FormattedServiceAccount>>(null);
@@ -260,7 +260,15 @@ function ServiceAccounts({ workspace: workspaceProp }: Props = {}): JSX.Element 
 
   return (
     <>
-      <ListPage banner={banner} table={table} store={serviceAccountStore} hasNamespaceSelector />
+      <ListPage
+        banner={banner}
+        table={table}
+        store={serviceAccountStore}
+        hasNamespaceSelector
+        getTableUrl={
+          namespace ? () => serviceAccountStore.getResourceUrl({ cluster, namespace }) : undefined
+        }
+      />
       {serviceAccountCreateModal.isOpen && (
         <ServiceAccountCreateModal
           visible={true}
