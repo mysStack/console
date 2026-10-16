@@ -3,11 +3,12 @@
  * https://github.com/kubesphere/console/blob/master/LICENSE
  */
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { Form, FormItem, Input, Modal, useForm } from '@kubed/components';
 
 import { NamespaceSelector } from '@ks-console/shared';
 import { ConfigMapSettings, SecretSettings } from '../../../clusters/components';
+import type { SecretSettingRef } from '../../../clusters/components/ConfigMapEditModal';
 
 type ResourceModule = 'configmaps' | 'secrets';
 
@@ -40,9 +41,21 @@ function ConfigResourceCreateModal({
   onCancel,
 }: Props): JSX.Element {
   const [form] = useForm();
+  const settingsRef = useRef<SecretSettingRef>(null);
   const initialValues = getInitialValues(module);
-  const handleSubmit = () => {
+
+  const validateAndSubmit = () => {
     form.validateFields().then(data => onOk(data));
+  };
+
+  const handleSubmit = () => {
+    const dataForm = settingsRef.current?.dataFormRef?.current;
+    if (dataForm) {
+      dataForm.handleSubmit(validateAndSubmit);
+      return;
+    }
+
+    validateAndSubmit();
   };
 
   return (
@@ -69,6 +82,7 @@ function ConfigResourceCreateModal({
         {module === 'secrets' ? (
           <SecretSettings
             form={form}
+            ref={settingsRef}
             formTemplate={initialValues as any}
             isFederated={false}
             mode="create"
@@ -77,6 +91,7 @@ function ConfigResourceCreateModal({
         ) : (
           <ConfigMapSettings
             form={form}
+            ref={settingsRef}
             formTemplate={initialValues as any}
             isFederated={false}
             onOk={() => undefined}

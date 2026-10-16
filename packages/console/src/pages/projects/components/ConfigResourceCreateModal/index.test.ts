@@ -15,3 +15,8 @@ test('Secret create modal starts with an opaque type and uses native settings', 
   assert.match(source, /SecretSettings/);
   assert.doesNotMatch(source, /safeAtob|decode|base64/);
 });
+
+test('create submission flushes an open data editor before validating the resource form', () => {
+  assert.match(source, /dataFormRef/);
+  assert.match(source, /handleSubmit/);
+});
