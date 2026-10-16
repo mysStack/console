@@ -80,7 +80,9 @@ function ConfigMapSettings({ form, formTemplate, isFederated }: Props, ref: Ref<
       delete originData[selectDataKey];
     }
 
-    set(fedFormTemplate, 'data', { ...originData, ...data });
+    const nextData = { ...originData, ...data };
+    set(fedFormTemplate, 'data', nextData);
+    form.setFieldsValue({ data: nextData });
 
     hideDataForm();
   };
