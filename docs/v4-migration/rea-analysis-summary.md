@@ -1,0 +1,118 @@
+# REA 阶段分析总结
+
+> 文档用途：作为 V4 迁移各阶段进入正式开发前的分析门禁记录。  
+> 统一顺序：`Pn-REA → Pn-DEV → Pn-VERIFY → Pn-PR`。  
+> 当前结论：P0-REA 未完成，P1-REA 未开始，P2-REA 未通过；不得据此进入新的正式模块开发。
+
+## 1. 门禁规则
+
+每个阶段必须先形成可复核的分析文档，再开始该阶段正式实现。分析文档至少要记录：
+
+- 分析对象的版本、分支、提交或制品摘要；
+- 旧 V3 源码、构建产物和实际运行时证据的来源；
+- 路由、页面、API、Action、Store、权限、缓存、作用域和异常行为；
+- 每条结论的证据类型：源码、REA 静态分析、运行时观察、Network、测试或推断；
+- 已确认行为、未确认行为、冲突证据和剩余未知项；
+- 对应的 V4 文件、可复用部分、需要改造部分和不能直接迁移的部分；
+- 进入开发的前置条件、复核人和门禁结论。
+
+只有“未解决的高风险未知项已关闭或明确隔离”，并且矩阵、证据和结论完成复核，阶段才可以从 `分析中` 进入 `开发中`。
+
+## 2. 阶段状态
+
+| 阶段      | 当前状态 | 进入下一阶段前必须完成                                                                                                           |
+| --------- | -------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| P0-REA    | 未完成   | 固定旧 V3 源码 tag/commit；完成 V3/Wujie、路由、动态 Action、扩展、构建入口盘点；补齐 REA 制品分析和运行时入口；记录高风险未知项 |
+| P1-REA    | 未开始   | 形成 cluster/workspace/project/federated 作用域、RBAC、缓存隔离、返回恢复和公共列表/详情行为矩阵                                 |
+| P2-REA    | 未通过   | 分别完成 ConfigMap、Secret、ServiceAccount 的旧源码、REA 静态/运行时、API/Action、RBAC、脱敏、批量操作和作用域矩阵               |
+| P2-DEV    | 未开始   | 仅在 P2-REA 复核通过后开始；此前代码属于先行探索证据                                                                             |
+| P2-VERIFY | 未开始   | 通过本地测试、构建、部署、rollout 和已部署制品上的 Playwright 验收                                                               |
+| P2-PR     | 未开始   | REA、实现、测试和部署验收证据齐全后，才提交正式 PR                                                                               |
+
+## 3. P0-REA 第一轮制品分析
+
+### 3.1 分析对象
+
+| 项目         | 值                                                                     |
+| ------------ | ---------------------------------------------------------------------- |
+| 制品路径     | `/home/bruce/code/ks-develop/console/packages/bootstrap/assets/v3dist` |
+| 制品类型     | 已构建 JavaScript/CSS 目录                                             |
+| 制品 SHA-256 | `0cfc6e64a2555f12b1ebca6d87ae8713bdae5dbad04c2ec2093d1d4de50b0bf4`     |
+| REA 操作     | `analyze_javascript_application`，`detail=summary`                     |
+| REA 摘要证据 | `ev_eca8e8bea648351f6cdfc9d4e3502e116199969c80ed69b21708891edc90e562`  |
+| 完整父证据   | `ev_a27c03718690a26273b7bb0acaca0ceccc71f16167bdda0f33530a59d70f9013`  |
+| 分析权限     | shipped-artifact                                                       |
+| 分析时间     | 2026-10-17（上海时间）                                                 |
+
+### 3.2 已观察结果
+
+- 目录中共有 1,451 个候选文件；REA 摘要检查了 563 个文件。
+- 识别到 440 个相关文件，解析了 434 个 JavaScript 文件。
+- 读取文本约 28,741,771 字节，未发现 UTF-8 解析失败。
+- 访问 AST 节点 5,134,695 个，记录 4,353 个静态发现。
+- REA 明确将 JavaScript/HTML 按静态文本解析，没有执行 Bundle 启动代码。
+- 当前结果可以证明该制品的身份和静态分析范围，不能单独证明页面运行时的完整路由、Network、Action 或权限行为。
+
+### 3.3 覆盖限制和未知项
+
+本轮结果的 application graph 和 semantic graph 均为 partial：
+
+- application unknowns：842；
+- semantic unknowns：98,907；
+- semantic graph 因结果容量限制被截断；
+- 许多大型 Chunk 只保留了静态文件事实，未完成语义图分析；
+- REA 返回 848 项限制，其中 839 项在摘要中省略，完整限制仍保留在父证据；
+- 本轮没有执行浏览器运行时观察，也没有把具体 ConfigMap、Secret、ServiceAccount 行为与制品中的 Chunk 建立完整对应关系。
+
+因此，本轮只能作为 P0-REA 的第一轮制品基线，不能作为 P0-REA 通过结论。
+
+## 4. 旧 V3 源码基线
+
+当前工作区和 `/home/bruce/code` 的有限目录扫描没有找到名为 `kse-console-v3` 的源码目录。现有计划中也没有可核验的旧 V3 tag/commit 记录。
+
+这不是“旧源码不存在”的结论，只表示当前分析环境还没有定位到可核验的源码路径。P0-REA 仍需：
+
+1. 定位旧 V3 源码目录或仓库；
+2. 固定来源、tag、commit 和许可证信息；
+3. 将旧源码路径与当前 `v3dist` 制品版本建立对应关系；
+4. 如果最终只有编译产物，必须在分析文档中明确“源码未知”，不能把 Chunk 反推成原始 TSX。
+
+## 5. P2 进入开发前的分析交付
+
+ConfigMap、Secret、ServiceAccount 进入正式 P2-DEV 前，必须分别完成以下记录：
+
+| 分析项      | 必须回答的问题                                                                            |
+| ----------- | ----------------------------------------------------------------------------------------- |
+| 路由和入口  | 项目、集群、workspace 入口分别是什么；直达、刷新、返回和 Tab 是否一致                     |
+| 页面行为    | 列表、详情、创建、编辑、删除、批量操作、历史、元数据、事件和错误态                        |
+| API/Network | list/detail/watch/create/update/patch/delete 的 method、path、query、body、响应和触发场景 |
+| Action      | 菜单项、弹窗、二次确认、批量 Action、V3 动态 Action 和替代路径                            |
+| Store/缓存  | query key、作用域、失效时机、切换 namespace/集群后的隔离和刷新                            |
+| RBAC        | 页面显示、按钮授权、API 返回、正向和反向权限，以及跨项目访问                              |
+| 数据安全    | Secret 脱敏、编辑回显、日志和错误信息是否泄露明文                                         |
+| V4 对照     | 已有 V4 文件是否可复用、需要改造还是需要新建                                              |
+| 未知项      | 每个未知项的影响、证据缺口、验证方法和关闭条件                                            |
+
+## 6. 当前门禁结论
+
+- P0-REA：**未通过**。已有静态依赖清单和第一轮 `v3dist` REA，但旧源码基线、完整 Chunk 语义分析、运行时入口和扩展/Action 盘点仍不完整。
+- P1-REA：**未开始**。公共作用域、权限、缓存和返回恢复矩阵尚未形成。
+- P2-REA：**未通过**。之前的 ConfigMap、Secret、ServiceAccount 实现和 131 验收记录保留为先行探索证据，不能倒推阶段门禁完成。
+- P2-DEV：**暂不开始新的正式开发**。
+- 后续短期分支：**暂不继续创建**，等待相应 REA 和验收门禁通过。
+
+## 7. 下一步
+
+1. 定位并固定旧 V3 源码来源和版本。
+2. 对 `v3dist` 做按模块的 focused REA，优先提取 ConfigMap、Secret、ServiceAccount 的入口、Chunk、字符串、API 和 Action 线索。
+3. 在不修改生产的前提下，补充 131 环境运行时页面和 Network 证据。
+4. 将每条证据回填到迁移矩阵和模块分析记录。
+5. P0、P1 和 P2-REA 复核通过后，再开始正式 P2-DEV。
+
+## 8. 相关文档
+
+- [迁移总计划](../../../console-v4-migration-plan.md)
+- [迁移矩阵](./matrix.md)
+- [V3/Wujie 依赖清单](./dependency-inventory.md)
+- [ConfigMap/Secret 131 验收记录](./config-secrets-131-acceptance.md)
+- [ServiceAccount 131 验收记录](./service-account-131-acceptance.md)
