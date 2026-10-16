@@ -1,5 +1,9 @@
 # Deployment V3 / V4 缺口矩阵
 
+> 事实基线：`release-4.1.5` / `fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`；文档复核：2026-10-17。本文是 P0/P3-REA 分析输入，P3-REA 未通过前，表中已有 V4 代码和先行测试不能视为正式开发或验收。
+
+> 第一轮 `v3dist` REA 的 Evidence ID、覆盖范围和限制见[REA 阶段分析总结](./rea-analysis-summary.md)；Deployment 的路由、API、Store 和操作链见[Deployment V3/V4 证据记录](./deployment-v3-evidence.md)。
+
 | V3 能力                | 当前 V3 证据                                                             | V4 候选实现                                                               | 缺口 / 决策                                 | 验收场景                                         | 状态   |
 | ---------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------- | ------------------------------------------- | ------------------------------------------------ | ------ |
 | 项目列表分页/搜索/排序 | `projects/containers/Deployments/index.tsx` 使用 `ConsoleV3ResourceList` | `ApplicationWorkloads/Workloads/index.tsx` + `ListPage` + `workloadStore` | 重接项目路由，同时保留 namespace 和查询状态 | 打开项目列表，搜索、排序、分页、刷新并返回       | 待开发 |
@@ -9,7 +13,7 @@
 | 元数据和事件           | V3 子路由                                                                | `Metadata`、`Events`                                                      | 对齐字段、事件顺序和分页                    | 刷新后打开两个 Tab，并支持直达                   | 待开发 |
 | 监控                   | 启用模块时使用 V3 `monitors`                                             | `Monitoring`                                                              | 确认模块/RBAC 可见性和查询结构              | 监控模块启用和关闭两种场景                       | 待开发 |
 | 环境变量               | V3 `env`                                                                 | `EnvVariables`                                                            | 保留容器范围和 Secret 脱敏                  | 查看 ConfigMap/Secret 环境变量，不暴露值         | 待开发 |
-| 配置引用               | 宿主已有原生路由                                                         | `ConfigReferencePage`、`ConfigReferencePanel`                             | 验证保存、预览、文件挂载和选择性重启        | 增删引用、预览 key、保存、重新打开详情           | 测试中 |
+| 配置引用               | 宿主已有原生路由                                                         | `ConfigReferencePage`、`ConfigReferencePanel`                             | 验证保存、预览、文件挂载和选择性重启        | 增删引用、预览 key、保存、重新打开详情           | 分析中 |
 | 编辑基础信息           | V3 宿主详情调用 `useCommonActions.editBaseInfo`                          | 现有共享 Action 和原生详情                                                | 验证字段和校验与 V3 一致                    | 编辑合法/非法元数据并验证请求和刷新              | 分析中 |
 | 编辑 YAML              | `useCommonActions.editYaml`                                              | 现有共享 Action 和原生详情                                                | 验证 resourceVersion、校验和错误显示        | 编辑 YAML，拒绝非法 YAML，保存合法 YAML          | 分析中 |
 | 容器/模板设置          | `useV3action`，参数为 `v3Module: workload`                               | 新建原生容器/模板弹窗                                                     | 先完成 V3 Action 清单；当前没有等价原生弹窗 | 打开每个设置区，编辑环境变量/端口/资源/卷并保存  | 未确认 |
@@ -21,4 +25,4 @@
 
 ## 晋级关卡
 
-完成 V3 Action 清单和 131 Network 采集，并补齐“待实测”或“未确认”行后，Deployment 才能从“分析中”进入“开发中”。通过路由、数据、操作、RBAC 和缓存场景的部署后验证，并附可复现证据后，才能标记为“已验收”。
+完成 P3-REA 所需的 V3 Action 清单、131 Network、RBAC、缓存和作用域矩阵，并补齐“待实测”或“未确认”行后，Deployment 才能从“分析中”进入正式“开发中”。通过路由、数据、操作、RBAC 和缓存场景的部署后验证，并附可回读的制品 tag/digest、Pod imageID 和可复现证据后，才能标记为“已验收”。
