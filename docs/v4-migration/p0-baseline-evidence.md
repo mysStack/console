@@ -83,6 +83,25 @@ REA 制品 SHA-256：0cfc6e64a2555f12b1ebca6d87ae8713bdae5dbad04c2ec2093d1d4de50
 
 这是构建和模板层面的静态对应关系，不等于已在 131 环境观察到该制品被实际加载。仍需在指定部署制品上核验 HTML、静态资源响应、浏览器 console 和 Network。
 
+## 2.2 当前制品的 Git 历史来源线索
+
+在当前 P0 取证基线执行：
+
+```bash
+git log -1 --format='%H%n%P%n%ad%n%s' --date=iso-strict -- packages/bootstrap/assets/v3dist
+```
+
+得到：
+
+```text
+commit:  3f3064787042a95792b591f4aea4231ea7988bb0
+parent:  ff2e7919ed36f388274f7718390289961e025d3c
+date:    2025-06-13T13:51:48+08:00
+message: [master] chore(bot): update v3dist from kse-console-embed:kse-release-4.1 to kubesphere/console:release-4.1 at 2025-06-13 10:50:13+0800 (#4616)
+```
+
+这为当前目录中的 `v3dist` 提供了 Git 历史更新提交和外部镜像标签线索，但没有给出 `kse-console-embed:kse-release-4.1` 内部对应的 V3 源码 commit。制品与 `origin/release-3.4` 的源码对应关系仍需通过镜像构建元数据、制品清单或项目负责人确认。
+
 ## 3. 当前边界和风险
 
 - `release-4.1.5` 是稳定发布基线；P0 取证分支从 `feature/v4-migration` 当前远程提交创建，两者用途不同，不能混写成同一基线。
