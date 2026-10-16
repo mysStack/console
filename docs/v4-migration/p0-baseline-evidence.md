@@ -63,6 +63,16 @@ REA 制品 SHA-256：0cfc6e64a2555f12b1ebca6d87ae8713bdae5dbad04c2ec2093d1d4de50
 
 该摘要只是本轮文件列表摘要，不能替代 REA 返回的制品 SHA-256，也不能推导制品对应的源码提交。
 
+## 2.1 制品到服务入口的静态对应关系
+
+源码中可以确认以下关系：
+
+- `server/views/consolev3.html` 将 `bundlePrefix` 固定为 `/dist/v3dist`，并从 manifest 加载 V3 CSS/JS；
+- `packages/bootstrap/webpack/webpack.base.conf.js` 使用 CopyWebpackPlugin 将 `assetsPath/v3dist` 复制到 `dist/v3dist`；
+- 因此当前 `packages/bootstrap/assets/v3dist` 是构建时输入，部署后对应的静态服务前缀是 `/dist/v3dist`。
+
+这是构建和模板层面的静态对应关系，不等于已在 131 环境观察到该制品被实际加载。仍需在指定部署制品上核验 HTML、静态资源响应、浏览器 console 和 Network。
+
 ## 3. 当前边界和风险
 
 - `release-4.1.5` 是稳定发布基线；P0 取证分支从 `feature/v4-migration` 当前远程提交创建，两者用途不同，不能混写成同一基线。
