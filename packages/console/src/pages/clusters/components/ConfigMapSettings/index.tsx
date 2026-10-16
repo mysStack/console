@@ -53,7 +53,9 @@ function ConfigMapSettings({ form, formTemplate, isFederated }: Props, ref: Ref<
   }, []);
 
   useEffect(() => {
-    form.resetFields(['data']);
+    if (secretChanged) {
+      form.resetFields(['data']);
+    }
   }, [secretChanged]);
 
   useEffect(() => {
