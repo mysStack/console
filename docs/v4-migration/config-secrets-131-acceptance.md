@@ -96,3 +96,13 @@
 - Secret 创建请求返回 `201 Created`，Kubernetes API 回读确认资源位于 `test-biz-config`、类型为 `Opaque`，数据键存在；随后通过“编辑设置”提交修改并以编码值比对确认，最后通过确认删除完成清理。验收记录不写入 Secret 明文或编码值。
 
 本轮测试资源已删除。编辑成功提交、批量删除、权限差异和完整作用域回归仍未完成，模块继续保持“测试中”。
+
+## 第五轮批量删除与最小 RBAC 复验（2026-10-16）
+
+在同一 131 制品上创建两组临时 ConfigMap 和 Secret，并通过原生列表批量操作完成清理：
+
+- ConfigMap 列表同时选中两个测试资源，确认批量删除弹窗后提交；Kubernetes API 回读均为 `NotFound`。
+- Secret 列表同时选中两个测试资源，确认批量删除弹窗后提交；Kubernetes API 回读均为 `NotFound`，验收记录不写入 Secret 明文或编码值。
+- 在 `test-biz-config` 创建临时 ServiceAccount 和项目角色，角色仅授予 ConfigMap/Secret 的 `get/list`；`kubectl auth can-i` 验证同 namespace 可读 ConfigMap 和 Secret、不可删除 Secret，跨到 `test-wes` namespace 不可读 ConfigMap。临时 ServiceAccount、项目角色和 RoleBinding 已清理。
+
+本轮完成批量删除和一组最小 RBAC/作用域正负校验；完整权限矩阵、不同用户权限差异和跨项目全量隔离回归仍待补，模块继续保持“测试中”。
