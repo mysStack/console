@@ -39,7 +39,7 @@
 | 计划项                | 当前结论       | 依据和未完成项                                                                                                                                                                     |
 | --------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 发布基线              | 已完成         | `v4.1.5` 与 `release-4.1.5` 均指向 `fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`；`feature/config-history` 末提交 `2656419bc` 已在基线历史中，分支引用已删除。                        |
-| 迁移集成分支          | 已完成         | `feature/v4-migration` 已在本地和 `origin` 存在，当前文档提交为 `45c682d81`。                                                                                                      |
+| 迁移集成分支          | 已完成         | `feature/v4-migration` 已在本地和 `origin` 存在，当前文档提交为 `3d5ee939d`。                                                                                                      |
 | 模块短期分支 / PR     | 未完成         | `feature/v4-resource-framework`、`feature/v4-configmaps-secrets`、`feature/v4-workloads`、`feature/v4-storage-network` 均未创建；当前没有以 `feature/v4-migration` 为源分支的 PR。 |
 | P0 静态盘点           | 部分完成       | 依赖清单、Deployment 证据和缺口矩阵已生成；WSL REA 验证、131 全启用路由/扩展映射、V3 Action 完整实测和每行 PR 证据仍未完成。                                                       |
 | P1 公共底座           | 未形成完成证据 | 复用了现有 `ListPage`、`DataTable` 和 Store，但 cluster/workspace/project 作用域、缓存隔离、权限和返回恢复的统一验收尚未完成。                                                     |
