@@ -25,6 +25,7 @@ import type { FormattedSecret } from '@ks-console/shared';
 
 import { NAME, SECRET_TYPES } from '../../../clusters/containers/Configuration/Secrets/constants';
 import { SecretEditModal as SecretSettingEditModal } from '../../../clusters/components';
+import ConfigResourceCreateModal from '../../components/ConfigResourceCreateModal';
 
 import {
   FedManagedIcon,
@@ -33,7 +34,7 @@ import {
 } from '../../../clusters/containers/Configuration/Secrets/styles';
 
 function Secrets(): JSX.Element {
-  const { module, getDocsUrl, usePutMutation } = secretStore;
+  const { module, getDocsUrl, usePostMutation, usePutMutation } = secretStore;
   const params = useParams<'cluster' | 'namespace' | 'workspace'>();
   const { cluster, workspace } = params;
   const projectPrefix = `${workspace ? `/${workspace}` : ''}/clusters/${cluster}/projects`;
@@ -42,6 +43,16 @@ function Secrets(): JSX.Element {
   const secretSettingEditModal = useDisclosure();
   const createSecretModal = useDisclosure();
   const [activeRecord, setActiveRecord] = useState<FormattedSecret>();
+  const { mutate: mutateSecretCreate, isLoading: isCreateSecretLoading } = usePostMutation(
+    {},
+    {
+      onSuccess: () => {
+        createSecretModal.close();
+        notify.success(t('CREATE_SUCCESSFUL'));
+        tableRef?.current?.refetch();
+      },
+    },
+  );
   const { mutate: mutateSecretSettingEdit, isLoading: isEditSecretLoading } = usePutMutation(
     {},
     {
@@ -252,9 +263,27 @@ function Secrets(): JSX.Element {
     setActiveRecord(undefined);
   };
 
+  const handleCreateSecret = (data: Record<string, any>) => {
+    mutateSecretCreate({
+      params: { cluster, namespace: data.metadata?.namespace },
+      data,
+    });
+  };
+
   return (
     <>
       <ListPage banner={banner} table={table} store={secretStore} hasNamespaceSelector />
+      {createSecretModal.isOpen && (
+        <ConfigResourceCreateModal
+          module="secrets"
+          visible={true}
+          cluster={cluster}
+          workspace={workspace}
+          confirmLoading={isCreateSecretLoading}
+          onOk={handleCreateSecret}
+          onCancel={createSecretModal.close}
+        />
+      )}
       {activeRecord && secretSettingEditModal.isOpen && (
         <SecretSettingEditModal
           visible={true}

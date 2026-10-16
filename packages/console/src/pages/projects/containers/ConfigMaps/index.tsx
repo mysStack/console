@@ -24,9 +24,10 @@ import type { FormattedConfigMap } from '@ks-console/shared';
 
 import { NAME } from '../../../clusters/containers/Configuration/Configmaps/constants';
 import { ConfigMapEditModal } from '../../../clusters/components';
+import ConfigResourceCreateModal from '../../components/ConfigResourceCreateModal';
 
 function ConfigMaps(): JSX.Element {
-  const { module, getDocsUrl, usePutMutation } = configMapStore;
+  const { module, getDocsUrl, usePostMutation, usePutMutation } = configMapStore;
   const params = useParams<'cluster' | 'namespace' | 'workspace'>();
   const { cluster = '', workspace } = params;
   const projectPrefix = `${workspace ? `/${workspace}` : ''}/clusters/${cluster}/projects`;
@@ -35,6 +36,16 @@ function ConfigMaps(): JSX.Element {
   const createConfigMapModal = useDisclosure();
   const configMapEditModal = useDisclosure();
   const [activeRecord, setActiveRecord] = useState<FormattedConfigMap>();
+  const { mutate: mutateConfigMapCreate, isLoading: isCreateConfigMapLoading } = usePostMutation(
+    {},
+    {
+      onSuccess: () => {
+        createConfigMapModal.close();
+        notify.success(t('CREATE_SUCCESSFUL'));
+        tableRef?.current?.refetch();
+      },
+    },
+  );
   const { mutate: mutateConfigMapSettingEdit, isLoading: isEditConfigMapLoading } = usePutMutation(
     {},
     {
@@ -223,9 +234,27 @@ function ConfigMaps(): JSX.Element {
     setActiveRecord(undefined);
   };
 
+  const handleCreateConfigMap = (data: Record<string, any>) => {
+    mutateConfigMapCreate({
+      params: { cluster, namespace: data.metadata?.namespace },
+      data,
+    });
+  };
+
   return (
     <>
       <ListPage banner={banner} table={table} store={configMapStore} hasNamespaceSelector />
+      {createConfigMapModal.isOpen && (
+        <ConfigResourceCreateModal
+          module="configmaps"
+          visible={true}
+          cluster={cluster}
+          workspace={workspace}
+          confirmLoading={isCreateConfigMapLoading}
+          onOk={handleCreateConfigMap}
+          onCancel={createConfigMapModal.close}
+        />
+      )}
       {configMapEditModal.isOpen && activeRecord && (
         <ConfigMapEditModal
           visible={true}

@@ -7,6 +7,8 @@ const source = readFileSync(__filename.replace(/[^/]+$/, 'index.tsx'), 'utf8');
 test('Secret list uses the native ListPage and shared store', () => {
   assert.match(source, /ListPage/);
   assert.match(source, /secretStore/);
+  assert.match(source, /ConfigResourceCreateModal/);
+  assert.match(source, /usePostMutation/);
   assert.doesNotMatch(source, /ConsoleV3ResourceList|wujieUrlPrefix|WujieReact|wujie-react/);
 });
 
