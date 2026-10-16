@@ -67,3 +67,17 @@
 - 尚未执行真实创建、编辑、删除、批量删除及权限差异流程，因此不能把本模块标记为“已验收”。
 - 浏览器控制台有扩展模块加载错误（扩展调用 `getExtensionConsoleV3Embed` 等）；这些错误来自已安装扩展，不影响本次列表和详情页面渲染，但需要单独处理。
 - 因此迁移矩阵中的 ConfigMap/Secret 状态继续保持“测试中”。
+
+## 第三轮原生创建复验（2026-10-16）
+
+针对前两轮只验证弹窗、未验证数据提交的问题，已在短期分支 `feature/v4-configmaps-secrets` 修正创建表单在数据编辑器返回时丢失 `metadata` 和 `data` 的问题，并重新构建部署：
+
+- GitHub Actions Run：`38871006795`
+- 提交：`bd21a5565293073c404c5160858903bf1e22991d`
+- 镜像 tag：`feature-v4-configmaps-secrets-20261016-160309-bd21a5565293`
+- 镜像 digest：`sha256:6426a3c6e51ad2a2530ad43a42b057f322069f33325d814bc978f7e3ce5d41e0`
+- Pod：`ks-console-8c484d5dc-85kck`
+- Pod imageID：`ghcr.io/mysstack/ks-console@sha256:6426a3c6e51ad2a2530ad43a42b057f322069f33325d814bc978f7e3ce5d41e0`
+- Playwright 创建请求返回 `201 Created`；随后通过 Kubernetes API 回读测试 ConfigMap，确认 namespace 为 `test-biz-config` 且 `data.test-key` 为 `test-value`。
+
+本轮创建后已删除测试资源。编辑、批量删除、权限差异和完整 Secret CRUD 仍未完成，模块继续保持“测试中”。
