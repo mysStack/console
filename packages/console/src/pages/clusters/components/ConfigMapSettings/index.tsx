@@ -11,7 +11,7 @@ import DataForm from '../DataForm';
 import DataList from '../DataList';
 import { useCacheStore as useStore } from '@ks-console/shared';
 import { StyledForm } from './styles';
-import { get, set } from 'lodash';
+import { get } from 'lodash';
 import { Constants } from '@ks-console/shared';
 
 import { SecretSettingRef } from '../SecretEditModal';
@@ -60,11 +60,12 @@ function ConfigMapSettings({ form, formTemplate, isFederated }: Props, ref: Ref<
 
   useEffect(() => {
     if (state !== 'data') {
-      form.setFieldsValue({ data: get(fedFormTemplate, 'data', {}) });
+      form.setFieldsValue(fedFormTemplate);
     }
   }, [state, fedFormTemplate, form]);
 
   const showDataForm = () => {
+    setFedFormTemplate(prev => ({ ...prev, ...form.getFieldsValue() }));
     setState('data');
     setSelectDataKey('');
   };

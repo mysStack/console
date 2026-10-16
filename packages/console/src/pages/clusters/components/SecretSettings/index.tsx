@@ -78,7 +78,7 @@ function SecretSettings(
 
   useEffect(() => {
     if (state !== 'data') {
-      form.setFieldsValue({ data: get(fedFormTemplate, 'data', {}) });
+      form.setFieldsValue(fedFormTemplate);
     }
   }, [state, fedFormTemplate, form]);
 
@@ -131,6 +131,7 @@ function SecretSettings(
   };
 
   const showDataForm = () => {
+    setFedFormTemplate(prev => ({ ...prev, ...form.getFieldsValue() }));
     setState('data');
     setSelectDataKey('');
   };
