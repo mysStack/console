@@ -24,16 +24,33 @@ import type { FormattedServiceAccount } from '@ks-console/shared';
 
 import { NAME } from './constants';
 import ModifyServiceAccountRole from './ModifyRole';
+import ServiceAccountCreateModal from './ServiceAccountCreateModal';
 
-function ServiceAccounts(): JSX.Element {
-  const { module, getDocsUrl, usePatchMutation } = serviceAccountStore;
+interface Props {
+  workspace?: string;
+}
+
+function ServiceAccounts({ workspace: workspaceProp }: Props = {}): JSX.Element {
+  const { module, getDocsUrl, usePatchMutation, usePostMutation } = serviceAccountStore;
   const params: Record<string, any> = useParams();
-  const { cluster } = params;
+  const { cluster, workspace: routeWorkspace } = params;
+  const workspace = workspaceProp ?? routeWorkspace;
+  const projectPrefix = `${workspace ? `/${workspace}` : ''}/clusters/${cluster}/projects`;
   const tableRef = useRef<TableRef<FormattedServiceAccount>>(null);
   const docUrl = getDocsUrl();
   const serviceAccountCreateModal = useDisclosure();
   const modifyServiceAccountRoleModal = useDisclosure();
   const [activeRecord, setActiveRecord] = useState<FormattedServiceAccount>();
+  const { mutate: mutateServiceAccountCreate, isLoading: isCreateLoading } = usePostMutation(
+    {},
+    {
+      onSuccess: () => {
+        serviceAccountCreateModal.close();
+        notify.success(t('CREATE_SUCCESSFUL'));
+        tableRef?.current?.refetch();
+      },
+    },
+  );
   const { mutate: mutateEditServiceAccountRole, isLoading: isEditRoleLoading } = usePatchMutation(
     {},
     {
@@ -157,7 +174,7 @@ function ServiceAccounts(): JSX.Element {
         return (
           <Field
             value={
-              <Link to={`/clusters/${cluster}/projects/${row.namespace}/${module}/${value}`}>
+              <Link to={`${projectPrefix}/${row.namespace}/${module}/${value}`}>
                 {getDisplayName(row)}
               </Link>
             }
@@ -172,7 +189,7 @@ function ServiceAccounts(): JSX.Element {
       field: 'namespace',
       canHide: true,
       width: '16%',
-      render: ns => <Link to={`/clusters/${cluster}/projects/${ns}`}>{ns}</Link>,
+      render: ns => <Link to={`${projectPrefix}/${ns}`}>{ns}</Link>,
     },
     {
       title: t('ROLE'),
@@ -188,7 +205,7 @@ function ServiceAccounts(): JSX.Element {
         secrets &&
         secrets.map((item: { name: string }) => (
           <div key={item.name}>
-            <Link to={`/clusters/${cluster}/projects/${record.namespace}/secrets/${item.name}`}>
+            <Link to={`${projectPrefix}/${record.namespace}/secrets/${item.name}`}>
               {item.name}
             </Link>
           </div>
@@ -221,9 +238,17 @@ function ServiceAccounts(): JSX.Element {
     const data = merge(activeRecord?._originData, info);
     mutateEditServiceAccountRole({
       params: {
+        cluster,
         name: activeRecord?.name,
         namespace: activeRecord?.namespace,
       },
+      data,
+    });
+  };
+
+  const handleCreate = (data: Record<string, any>) => {
+    mutateServiceAccountCreate({
+      params: { cluster, namespace: data.metadata?.namespace },
       data,
     });
   };
@@ -236,6 +261,16 @@ function ServiceAccounts(): JSX.Element {
   return (
     <>
       <ListPage banner={banner} table={table} store={serviceAccountStore} hasNamespaceSelector />
+      {serviceAccountCreateModal.isOpen && (
+        <ServiceAccountCreateModal
+          visible={true}
+          cluster={cluster}
+          workspace={workspace}
+          confirmLoading={isCreateLoading}
+          onOk={handleCreate}
+          onCancel={serviceAccountCreateModal.close}
+        />
+      )}
       {modifyServiceAccountRoleModal.isOpen && activeRecord && (
         <ModifyServiceAccountRole
           detail={activeRecord}

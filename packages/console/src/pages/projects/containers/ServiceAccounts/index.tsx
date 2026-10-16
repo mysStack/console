@@ -4,15 +4,11 @@
  */
 
 import React from 'react';
-import ConsoleV3ResourceList from '../../../../components/ConsoleV3ResourceList';
-import { useCacheStore as useStore } from '@ks-console/shared';
+
+import NativeServiceAccounts from '../../../clusters/containers/Configuration/ServiceAccounts';
 
 function ServiceAccounts(): JSX.Element {
-  const [wujieUrlPrefix] = useStore<string>('wujieUrlPrefix');
-
-  return (
-    <ConsoleV3ResourceList resource="serviceaccounts" url={`${wujieUrlPrefix}/serviceaccounts`} />
-  );
+  return <NativeServiceAccounts />;
 }
 
 export default ServiceAccounts;

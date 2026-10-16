@@ -8,7 +8,6 @@ import { Navigate } from 'react-router-dom';
 
 // import Secrets from './Secrets';
 // import ConfigMaps from './Configmaps';
-// import ServiceAccounts from './ServiceAccounts';
 import SecretDetail from './Secrets/Detail';
 import SecretsData from './Secrets/Detail/Data';
 import ConfigMapDetail from './Configmaps/Detail';
@@ -19,7 +18,7 @@ import ServiceAccountsData from './ServiceAccounts/Detail/Data';
 // embed
 import SecretsList from './Secrets/Embed';
 import ConfigMaps from './Configmaps/Embed';
-import ServiceAccounts from './ServiceAccounts/Embed';
+import ServiceAccounts from './ServiceAccounts';
 
 const PATH = '/clusters/:cluster';
 
