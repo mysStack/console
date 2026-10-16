@@ -33,7 +33,7 @@
 - 测试读取同目录的 `index.tsx` 源码，验证列表入口不再依赖 V3 包装器。
 - 测试只约束可观察的组件入口和关键数据安全约束，不绑定无关的 JSX 排版。
 
-- [ ] **步骤 1：将 ConfigMap 测试改成期望原生列表**
+- [x] **步骤 1：将 ConfigMap 测试改成期望原生列表**
 
 ```ts
 test('ConfigMap list uses the native ListPage and shared store', () => {
@@ -43,7 +43,7 @@ test('ConfigMap list uses the native ListPage and shared store', () => {
 });
 ```
 
-- [ ] **步骤 2：新增 Secret 原生列表测试**
+- [x] **步骤 2：新增 Secret 原生列表测试**
 
 ```ts
 import assert from 'node:assert';
@@ -63,7 +63,7 @@ test('Secret list source does not decode or render secret values', () => {
 });
 ```
 
-- [ ] **步骤 3：只运行这两个测试，确认它们因当前 V3 列表实现失败**
+- [x] **步骤 3：只运行这两个测试，确认它们因当前 V3 列表实现失败**
 
 运行：
 
@@ -90,11 +90,11 @@ test('Secret list source does not decode or render secret values', () => {
 - 详情链接使用 `/clusters/${cluster}/projects/${namespace}/configmaps/${name}`。
 - 创建、单行编辑、YAML 编辑、单行删除和批量删除沿用集群配置列表的共享 Action 与弹窗。
 
-- [ ] **步骤 1：复用集群 ConfigMap 列表的字段和操作模型**
+- [x] **步骤 1：复用集群 ConfigMap 列表的字段和操作模型**
 
 保留以下列和行为：名称/描述、项目、字段名、创建时间、行操作；保留创建按钮、批量删除和 namespace 过滤。编辑设置时将 `activeRecord` 的 `_originData` 去掉 `data` 后提交，避免把列表映射后的数据直接当作 Kubernetes 原对象提交。
 
-- [ ] **步骤 2：将列表 Store 绑定到 `configMapStore`**
+- [x] **步骤 2：将列表 Store 绑定到 `configMapStore`**
 
 列表主体使用：
 
@@ -104,7 +104,7 @@ test('Secret list source does not decode or render secret values', () => {
 
 所有成功回调都调用 `tableRef.current?.refetch()`，编辑弹窗关闭并清理 `activeRecord`。
 
-- [ ] **步骤 3：运行 ConfigMap 测试并确认通过**
+- [x] **步骤 3：运行 ConfigMap 测试并确认通过**
 
 运行：
 
@@ -130,11 +130,11 @@ test('Secret list source does not decode or render secret values', () => {
 - 列表显示 Secret 类型和字段数量，不显示任何 Secret value。
 - 编辑设置时提交去掉 `data` 的 `_originData`，保持现有 Secret 编辑弹窗的脱敏行为。
 
-- [ ] **步骤 1：从集群 Secret 列表复用字段、权限和操作**
+- [x] **步骤 1：从集群 Secret 列表复用字段、权限和操作**
 
 保留创建、编辑信息、编辑 YAML、编辑 Secret、单行删除、批量删除、`isFedManaged` 限制和 Secret 类型翻译；使用项目详情路由，不使用集群详情的 `/detail` 后缀。
 
-- [ ] **步骤 2：绑定 `secretStore` 和 `ListPage`**
+- [x] **步骤 2：绑定 `secretStore` 和 `ListPage`**
 
 列表主体使用：
 
@@ -144,7 +144,7 @@ test('Secret list source does not decode or render secret values', () => {
 
 Secret 的列只能读取 mapper 返回的类型、字段数量、名称、描述、namespace 和创建时间；不得添加值解码逻辑。
 
-- [ ] **步骤 3：运行 Secret 测试并确认通过**
+- [x] **步骤 3：运行 Secret 测试并确认通过**
 
 运行：
 
@@ -162,7 +162,7 @@ Secret 的列只能读取 mapper 返回的类型、字段数量、名称、描�
 
 - 修改：仅保留任务 1–3 的文件；不加入生成物。
 
-- [ ] **步骤 1：运行 ConfigMap/Secret 相关测试集合**
+- [x] **步骤 1：运行 ConfigMap/Secret 相关测试集合**
 
 ```bash
 ./node_modules/.bin/esno packages/console/src/pages/projects/containers/ConfigMaps/index.test.ts
@@ -173,7 +173,7 @@ Secret 的列只能读取 mapper 返回的类型、字段数量、名称、描�
 ./node_modules/.bin/esno packages/console/src/pages/projects/containers/Secrets/Detail/shell.test.ts
 ```
 
-- [ ] **步骤 2：运行格式和差异检查**
+- [x] **步骤 2：运行格式和差异检查**
 
 ```bash
 ./node_modules/.bin/prettier --check \
@@ -185,7 +185,7 @@ Secret 的列只能读取 mapper 返回的类型、字段数量、名称、描�
 git diff --check
 ```
 
-- [ ] **步骤 3：静态确认项目列表不再引用 V3 包装器**
+- [x] **步骤 3：静态确认项目列表不再引用 V3 包装器**
 
 ```bash
 rg -n 'ConsoleV3ResourceList|wujieUrlPrefix|WujieReact|wujie-react' \
