@@ -6,7 +6,7 @@
 
 状态值为：`未开始`、`分析中`、`开发中`、`测试中`、`阻塞`、`已验收`。`阻塞`表示缺少外部输入或环境条件，不能通过继续编码绕过。只有附带部署后制品的 Playwright 证据，模块才能标记为 `已验收`。
 
-> 阶段门禁（2026-10-16 修订）：每个阶段必须按 `Pn-REA → Pn-DEV → Pn-VERIFY → Pn-PR` 执行。ConfigMap、Secret、ServiceAccount 之前已经发生的实现和测试属于先行试验，保留证据但不代表 P2-REA 已通过；在旧 V3 源码、REA 运行时证据、API/Action、RBAC 和作用域矩阵完成前，矩阵状态按 `分析中` 处理，不继续扩展后续模块。
+> 阶段门禁（2026-10-17 重启）：每个阶段必须按 `Pn-REA → Pn-DEV → Pn-VERIFY → Pn-PR` 执行。ConfigMap、Secret、ServiceAccount 之前已经发生的实现和测试归档为历史先行证据，不代表 P2-REA 已通过；本轮从 P0-REA 重新开始，不沿用上一轮模块状态。完成旧 V3 源码、REA 运行时证据、API/Action、RBAC 和作用域矩阵后，才能按当前证据更新模块状态。
 
 本轮 REA 结果和限制统一记录在[REA 阶段分析总结](./rea-analysis-summary.md)，该文档的阶段门禁结论优先于单次测试或部署记录。
 
@@ -39,7 +39,7 @@
 - [ ] 根据 131 部署版本映射所有启用路由和扩展。
 - [ ] 固定旧 V3 源码来源、tag/commit，并完成 P0-REA 门禁复核。
 
-## 先行试验记录（不计入阶段门禁）
+## 历史先行证据（不计入阶段门禁）
 
 - [x] ConfigMap/Secret 项目列表、详情、创建、编辑、删除和批量操作已通过原生浏览器先行验收；该证据不替代 P2-REA 门禁。
 - [x] ServiceAccount 项目/集群列表、详情、创建、编辑、删除、角色修改和最小 RBAC 场景已通过先行验收；该证据不替代 P2-REA 门禁。
@@ -62,4 +62,4 @@
 | M2 ConfigMap + Secret + ServiceAccount | 未完成         | 真实操作和最小权限回归已有先行证据，但 P2-REA、完整权限矩阵、跨项目全量隔离和正式 P2-VERIFY 尚未完成，不能标记为 `已验收`。                                                                                                            |
 | P3-P8 / release-4.2.0                  | 未开始         | 后续资源迁移、V3/Wujie 清理和 `release-4.2.0` 创建均未达到前置条件。                                                                                                                                                                   |
 
-本次复核已统一试点顺序：先完成 P0-REA、P1-REA，再完成 P2-REA；ConfigMap、Secret、ServiceAccount 的已有实现只作为先行证据。Deployment 文档继续作为逆向输入，正式开发必须等待 P3-REA。
+本次复核已统一试点顺序：本轮从 P0-REA 重新开始，先完成 P0-REA、P1-REA，再完成 P2-REA；ConfigMap、Secret、ServiceAccount 的已有实现只作为历史先行证据。Deployment 文档继续作为逆向输入，正式开发必须等待 P3-REA。
