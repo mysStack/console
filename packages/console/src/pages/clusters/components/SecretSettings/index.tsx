@@ -74,6 +74,12 @@ function SecretSettings(
     form.resetFields();
   }, [secretChanged]);
 
+  useEffect(() => {
+    if (state !== 'data') {
+      form.setFieldsValue({ data: get(fedFormTemplate, 'data', {}) });
+    }
+  }, [state, fedFormTemplate, form]);
+
   const TypeOptions = [
     { label: t('DEFAULT'), value: 'Opaque' },
     { label: t('TLS_INFORMATION'), value: 'kubernetes.io/tls' },
@@ -147,7 +153,8 @@ function SecretSettings(
     }
 
     const nextData = { ...originData, ...data };
-    set(fedFormTemplate, 'data', nextData);
+    const nextTemplate = { ...fedFormTemplate, data: nextData };
+    setFedFormTemplate(nextTemplate);
     form.setFieldsValue({ data: nextData });
 
     hideDataForm();

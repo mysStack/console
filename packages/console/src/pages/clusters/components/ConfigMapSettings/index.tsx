@@ -56,6 +56,12 @@ function ConfigMapSettings({ form, formTemplate, isFederated }: Props, ref: Ref<
     form.resetFields();
   }, [secretChanged]);
 
+  useEffect(() => {
+    if (state !== 'data') {
+      form.setFieldsValue({ data: get(fedFormTemplate, 'data', {}) });
+    }
+  }, [state, fedFormTemplate, form]);
+
   const showDataForm = () => {
     setState('data');
     setSelectDataKey('');
@@ -81,7 +87,8 @@ function ConfigMapSettings({ form, formTemplate, isFederated }: Props, ref: Ref<
     }
 
     const nextData = { ...originData, ...data };
-    set(fedFormTemplate, 'data', nextData);
+    const nextTemplate = { ...fedFormTemplate, data: nextData };
+    setFedFormTemplate(nextTemplate);
     form.setFieldsValue({ data: nextData });
 
     hideDataForm();
