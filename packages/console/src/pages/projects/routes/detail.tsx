@@ -137,7 +137,7 @@ export default (PATH: string) => [
     children: [...configMapDetailRoutes],
   },
   {
-    path: `${PATH}/serviceAccounts/:name`,
+    path: `${PATH}/serviceaccounts/:name`,
     element: <ServiceAccountDetail />,
     children: [...serviceAccountDetailRoutes],
   },
