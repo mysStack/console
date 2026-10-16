@@ -47,6 +47,16 @@ find /home/bruce/code/ks-develop /home/bruce/code -maxdepth 3 \
 
 当前扫描没有找到可直接核验的 `kse-console-v3` 旧源码目录。这不是“旧源码不存在”的证明，只能确认本轮环境内尚未定位到固定路径、版本和许可证。
 
+进一步检查当前仓库的远程发布引用后，确认同一仓库保留了 V3 源码发布分支：
+
+| 远程引用 | 提交 | 日期 | 源码事实 |
+| --- | --- | --- | --- |
+| `origin/release-3.2` | `5e6b2d05361fc8bd70b04e900a914b399deae7a8` | 2022-10-09 | 根目录 `src/`，含 `src/actions/configmap.js`、`src/actions/serviceaccount.js` |
+| `origin/release-3.3` | `cd90e5b64326df76432a9cafb05c2a08aa40ecdf` | 2023-02-01 | 根目录 `src/`，含 ConfigMap、ServiceAccount 页面和 Action |
+| `origin/release-3.4` | `175710fefeeba6ff295c2c0967b4d45b83563d26` | 2024-01-18 | 根目录 `src/`，含 ConfigMap、ServiceAccount 页面和 Action |
+
+三个分支的 `package.json` 均声明版本 `3.0.0`、许可证 `AGPL-3.0`。这些引用提供了可核验的旧 V3 源码候选基线；本轮优先以 `origin/release-3.4` 作为最新 V3 源码参考，但不能把分支名直接等同于 `v3dist` 的构建来源。
+
 当前可核验的 V3 分析对象是构建制品：
 
 ```text
@@ -82,4 +92,4 @@ REA 制品 SHA-256：0cfc6e64a2555f12b1ebca6d87ae8713bdae5dbad04c2ec2093d1d4de50
 
 ## 4. 关闭条件与门禁结论
 
-P0-U001 仍未关闭。需要项目负责人提供或确认旧 V3 源码来源、版本和许可证；如果最终只有编译制品，必须明确“源码未知、仅做制品分析”的范围，并在总计划中保留这一限制。P0-Baseline 当前为“进行中/待统一复核”，不授权 P1/P2 正式开发。
+P0-U001 已从“未定位源码”推进到“已定位候选源码引用”，但仍未完全关闭。还需要证明 `v3dist` 制品与哪个 V3 源码提交、构建配置和依赖锁定文件对应；在对应关系未建立前，不能把 `origin/release-3.4` 直接当作制品的确定源码来源。P0-Baseline 当前为“进行中/待统一复核”，不授权 P1/P2 正式开发。
