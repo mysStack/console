@@ -87,6 +87,14 @@ Playwright 直达 Secret 详情页和刷新后，默认数据区域均显示固�
 
 状态：代码修复已提交并推送，候选制品部署失败后已回滚；浏览器尚未在修复制品上复验，因此 namespace 作用域修复待重新部署后验证。三个模块继续为“VERIFY 部分通过，待补齐”，全局 P0 继续为“分析中，待负责人复核”。
 
+## 2026-10-17 修复制品部署与浏览器验证完成
+
+同一候选镜像第二次部署成功：Deployment generation/observedGeneration `510/510`，Pod `ks-console-699dd9c46f-jstfd` Running/Ready，实际 Pod imageID 为 `ghcr.io/mysstack/ks-console@sha256:f9468e155d98b7872f35d5d2099f1d6e38f2093006ee77eddb85f20201f45a54`，rollout 成功。
+
+使用已登录的真实 Playwright 会话检查项目 ConfigMap、Secret、ServiceAccount 页面：三个页面均不显示“全部项目”；ConfigMap、Secret、ServiceAccount 的可见资源行分别为 1、2、1，项目列均为 `v4-migration-e2e`。Secret 额外完成直达、刷新和浏览器返回验证，路由和行数据保持稳定；三张截图保存在 `.playwright-cli/`，未提交。
+
+结论：namespace 作用域代码已完成部署后页面验证。模块状态仍为“VERIFY 部分通过，待补齐”，因为编辑、配置引用、低权限 RBAC、完整隔离和全部功能等价性未完成；全局 P0 仍为“分析中，待负责人复核”。
+
 ## 本轮顺序核验：Git 集成与风险关闭
 
 | 项目                            | 实际结果                                                                                                                                                                                               |

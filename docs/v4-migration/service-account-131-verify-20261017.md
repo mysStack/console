@@ -54,3 +54,11 @@ ServiceAccount：**部分通过，未验收**。列表、创建、详情、路�
 该提交对应候选镜像 `feature-v4-configmaps-secrets-20261017-200414-00310f5e5a31`，digest 为 `sha256:f9468e155d98b7872f35d5d2099f1d6e38f2093006ee77eddb85f20201f45a54`，GitHub Actions Run 为 `39031017563`。候选镜像在 131 上的部署尝试因新 Pod `ks-console-699dd9c46f-ldvtc` 长时间停留在 `ContainerCreating` 而超时，随后已回滚到上一版；没有形成候选 Pod imageID，也没有在候选制品上完成浏览器验收。
 
 因此本记录仍只能证明旧制品的登录和页面渲染，不能证明本次 namespace 选择器修复已经在 131 页面生效。ServiceAccount 继续保持“部分通过，未验收”。
+
+## 2026-10-17 修复制品重新部署与浏览器复验
+
+候选镜像第二次部署成功，`ks-console-699dd9c46f-jstfd` 为 Running/Ready，Pod imageID 为 `ghcr.io/mysstack/ks-console@sha256:f9468e155d98b7872f35d5d2099f1d6e38f2093006ee77eddb85f20201f45a54`，Deployment generation/observedGeneration 为 `510/510`。
+
+在已登录的 Playwright 会话中打开项目 ServiceAccount 页面，页面不再显示“全部项目”，表格仅有 `default` 一行，项目列为 `v4-migration-e2e`；截图为 `.playwright-cli/page-2026-10-17T12-25-41-225Z.png`。项目级请求范围和界面提示现已一致，集群级 ServiceAccount 页面仍保留全局范围。
+
+本轮只验证 namespace 作用域和页面渲染，不改变角色提交、可编辑字段、低权限 RBAC 和完整隔离仍未完成的结论；ServiceAccount 继续保持“部分通过，未验收”。

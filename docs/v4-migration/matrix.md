@@ -96,3 +96,9 @@
 本地定向测试和完整测试已通过，GitHub Actions Run `39031017563` 的单元测试及镜像构建也已通过。候选镜像为 `feature-v4-configmaps-secrets-20261017-200414-00310f5e5a31`，digest 为 `sha256:f9468e155d98b7872f35d5d2099f1d6e38f2093006ee77eddb85f20201f45a54`。
 
 131 部署未完成：generation/observedGeneration 为 `508/508`，新 Pod `ks-console-699dd9c46f-ldvtc` 被调度但超过 300 秒仍为 `ContainerCreating`，只有 `Pulling image` 事件，没有 Ready 或 imageID。已按授权回滚，当前恢复上一版镜像 `feature-v4-configmaps-secrets-20261017-191324-259b556eccd1`，其运行中 Pod imageID 为 `sha256:3b6748229935b3e6cf4d29a05793f59ef3b8e5136e922d6850eba28c6d9d5f89`。候选制品尚未完成 rollout，因此尚未进行该修复的浏览器登录、页面渲染和数据范围验证；三个模块状态不变，仍为“VERIFY 部分通过，待补齐”。
+
+随后按同一授权范围重新部署候选制品，第二次镜像拉取耗时约 `1m23.914s` 后成功。Deployment generation/observedGeneration 为 `510/510`，Pod `ks-console-699dd9c46f-jstfd` Running/Ready，imageID 为 `sha256:f9468e155d98b7872f35d5d2099f1d6e38f2093006ee77eddb85f20201f45a54`，rollout 成功。
+
+在已登录的真实 Playwright 会话中复验项目页面：ConfigMap 1 行、Secret 2 行、ServiceAccount 1 行，所有可见项目列均为 `v4-migration-e2e`；三个页面均不再出现“全部项目”选择器。Secret 直达、刷新和浏览器返回后仍保持当前项目路由、选择器隐藏和数据行稳定。截图保存在 `.playwright-cli/page-2026-10-17T12-25-30-293Z.png`、`.playwright-cli/page-2026-10-17T12-25-35-674Z.png` 和 `.playwright-cli/page-2026-10-17T12-25-41-225Z.png`，未提交 Git。
+
+该项 namespace 作用域修复已取得部署后浏览器证据；三个模块仍不能标记为“已验收”，因为编辑、配置引用、低权限 RBAC、完整隔离和全部功能等价性尚未完成。浏览器控制台仍有已知全局/扩展错误，继续单独跟踪。

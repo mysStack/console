@@ -107,3 +107,21 @@ ConfigMap：**部分通过，未验收**。Secret：**脱敏修复后部分通�
 131 部署尝试记录：`ks-console` generation/observedGeneration 达到 `508/508`，新 Pod `ks-console-699dd9c46f-ldvtc` 被调度到 `dev01`，但约 6 分钟仍停在 `ContainerCreating`，事件只有 `Pulling image`，没有形成 Pod imageID 或 Ready 状态。`rollout status --timeout=300s` 超时后按授权执行 `kubectl rollout undo deployment/ks-console -n kubesphere-system`，回滚成功；当前 Deployment 恢复使用上一版镜像 `feature-v4-configmaps-secrets-20261017-191324-259b556eccd1`，运行中 Pod imageID 为 `sha256:3b6748229935b3e6cf4d29a05793f59ef3b8e5136e922d6850eba28c6d9d5f89`。
 
 由于候选镜像没有完成 rollout 和 Ready，**本轮尚未在该修复制品上执行浏览器登录、页面渲染和 namespace 数据范围验收**。因此不能把项目 namespace 作用域修复标记为部署后通过；ConfigMap、Secret 仍为“VERIFY 部分通过，待补齐”。
+
+## 2026-10-17 修复制品重新部署与浏览器复验
+
+第二次部署继续使用同一候选镜像，确认第一次失败是拉取过程超过 rollout 超时后被回滚取消；本次镜像拉取完成并成功启动：
+
+- Deployment generation/observedGeneration：`510/510`
+- Pod：`ks-console-699dd9c46f-jstfd`，Running/Ready
+- Pod imageID：`ghcr.io/mysstack/ks-console@sha256:f9468e155d98b7872f35d5d2099f1d6e38f2093006ee77eddb85f20201f45a54`
+- 事件：镜像成功拉取，耗时约 `1m23.914s`；rollout 成功
+
+在已登录的 Playwright 会话中直接访问并检查：
+
+- Secret：项目页面不再显示“全部项目”，表格 2 行的项目列均为 `v4-migration-e2e`
+- ConfigMap：项目页面不再显示“全部项目”，表格 1 行的项目列为 `v4-migration-e2e`
+- 刷新和浏览器返回：Secret 页面仍回到原项目路由，选择器保持隐藏，表格行数保持 2
+- 截图：`.playwright-cli/page-2026-10-17T12-25-30-293Z.png`、`.playwright-cli/page-2026-10-17T12-25-35-674Z.png`
+
+本次证明项目 ConfigMap/Secret 页面已经按当前 namespace 渲染，且没有再显示跨项目选择器。浏览器控制台仍有既有的 8 个全局/扩展错误，未影响本轮列表渲染；编辑、配置引用、低权限 RBAC 和完整隔离仍未验收。
