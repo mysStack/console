@@ -19,13 +19,13 @@ kubectl -n kubesphere-system get pod ks-console-789d5765fd-dsp5v \
 
 结果：
 
-| 项目 | 实际值 |
-| --- | --- |
-| Deployment | `ks-console` |
-| Pod | `ks-console-789d5765fd-dsp5v` |
-| 镜像 tag | `feature-v4-configmaps-secrets-20261016-170820-277e50781a04` |
+| 项目        | 实际值                                                                                                |
+| ----------- | ----------------------------------------------------------------------------------------------------- |
+| Deployment  | `ks-console`                                                                                          |
+| Pod         | `ks-console-789d5765fd-dsp5v`                                                                         |
+| 镜像 tag    | `feature-v4-configmaps-secrets-20261016-170820-277e50781a04`                                          |
 | Pod imageID | `ghcr.io/mysstack/ks-console@sha256:04650b2ddbb79dcb19443fafa639cabbb62cb08d8c0087b7a8f850402bd3e018` |
-| 状态 | `Running/true` |
+| 状态        | `Running/true`                                                                                        |
 
 当前仓库的 `v3dist` 自 `277e50781a041274ce05473ed59b5ee117ccba75` 到当前协调提交没有变化，Git tree 仍为 `1e499d92e11374e26c76f5e13be45251602bd596`，因此本次浏览器取证使用的已部署制品包含与当前 P0 记录相同的 V3 文件树。该关系不能补齐外部镜像到旧 V3 源码 commit 的 provenance，P0-U001/P0-U004 仍保留。
 
@@ -104,5 +104,4 @@ http://192.168.2.131:30880/test-workspace/clusters/host/projects/test-wes/log-co
 3. 当前 `v3dist` 与外部镜像及旧 V3 源码 commit/tag 的可核验 provenance；
 4. 三个独立任务 Agent 的独立复核（启动请求连续受到协作服务 `429 Too Many Requests`）。
 
-因此 P0-REA 仍为“分析中/待门禁复核”，本轮不宣布 P0 通过，不进入 P1-REA、P2-REA 或任何正式功能开发。下一步应由项目负责人或指定复核人根据本文件、静态盘点、REA Evidence 和基线来源证据确认剩余未知项的关闭方式。
-
+因此 P0-REA 仍为“分析中，待负责人复核”，本轮不宣布 P0 通过，不进入 P1-REA、P2-REA 或任何正式功能开发。下一步应由项目负责人或指定复核人根据本文件、静态盘点、REA Evidence 和基线来源证据确认剩余未知项的关闭方式。

@@ -75,13 +75,13 @@
 
 当前只提出方案，没有修改 Hook、package.json 或业务代码。
 
-## 6. 当前 P0 结论
+## 6. 本轮运行时收尾后的 P0 结论
 
-| 状态     | 项目                                                                                                                                                 |
-| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 已验证   | 分支关系、Worktree 干净状态、PR #1 远程头、11 个业务 Action 调用点、3 个桥接文件、作用域权限代码路径、当前 `v3dist` 提交/tree、131 当前 Pod 镜像身份 |
-| 部分验证 | project 代表性运行时入口、Wujie frame、原生 Secret 详情、扩展状态、focused REA、ConfigMap/Secret/ServiceAccount 历史 CRUD 证据                       |
-| 未验证   | cluster/workspace/federated/platform 全量入口，低权限账号，全部 Action 的触发/Network/RBAC/错误态，逐扩展 V4 契约，当前制品到旧源码的 provenance     |
-| 阻塞     | P0-U001/P0-U004 缺少当前外部 V3 镜像的源码构建元数据；独立人工/其他复核未完成；PR #1 同时混入 P0 文档，尚未具备合并条件                              |
+| 状态     | 项目                                                                                                                                                                                                                      |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 已验证   | 分支关系、Worktree 干净状态、PR #1 远程头、11 个业务 Action 调用点、3 个桥接文件、作用域权限代码路径、当前 `v3dist` 提交/tree、131 当前 Pod 镜像身份；cluster、workspace DevOps、platform、extension 代表性入口和 Network |
+| 部分验证 | project 代表性运行时入口、Wujie frame、原生 Secret 详情、workspace DevOps 打开/取消 Action、扩展管理和一个已安装扩展详情、focused REA、ConfigMap/Secret/ServiceAccount 历史 CRUD 证据                                     |
+| 未验证   | federated project 有效 fixture、低权限账号，全部 Action 的触发/Network/RBAC/错误态，逐扩展 V4 契约，扩展初始化错误闭环，当前制品到旧源码的 provenance                                                                     |
+| 阻塞     | P0-U001/P0-U004 缺少当前外部 V3 镜像的源码构建元数据；独立人工/其他复核未完成；PR #1 同时混入 P0 文档，尚未具备合并条件                                                                                                   |
 
-本矩阵不改变 P0 门禁结论：P0-REA 仍为“分析中/待人工复核”，不进入 P1/P2 正式开发，不删除 V3/Wujie，不合并 Draft PR #1。
+本矩阵不改变 P0 门禁结论：P0-REA 仍为“分析中，待负责人复核”，不进入 P1/P2 正式开发，不删除 V3/Wujie，不合并 Draft PR #1。运行时细节见 [`p0-runtime-closure-20261017.md`](./p0-runtime-closure-20261017.md)。
