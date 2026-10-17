@@ -116,6 +116,13 @@ Playwright 直达 Secret 详情页和刷新后，默认数据区域均显示固�
 - 验证：`./scripts/test.sh` 通过（57 个文件、226 个用例）；ServiceAccount 相关 6 个文件、8 个用例通过；相关 ESLint、Prettier、`git diff --check` 和 `corepack yarn build:packages` 通过。
 - 未完成：新代码尚未构建镜像并部署到 131，尚未完成新制品浏览器角色弹窗验证、角色提交、低权限 RBAC 和完整 namespace 隔离。
 
+## 2026-10-17 ServiceAccount 角色修复制品部署
+
+- 代码 `05450c14f733a1c2e189270f2b257759dadacd8b` 已通过 GitHub Actions Run `39038790572` 构建并推送。
+- 镜像 `feature-v4-configmaps-secrets-20261017-215959-05450c14f733`，digest `sha256:27ef8f71b889c4ddb2a9f19ddf22ce09eb7b148a47bc02a2fa8f482bdfdbab65`。
+- 131 rollout 成功：generation/observedGeneration `511/511`，Pod `ks-console-56cbbb9df8-ptp5r` Ready，imageID 与 digest 一致。
+- 浏览器直达已执行，但已有会话已过期并被重定向到登录页；当前测试账号仍未恢复，未继续尝试凭据，因此新制品的页面、角色弹窗和角色提交尚未验收。
+
 ## 本轮顺序核验：Git 集成与风险关闭
 
 | 项目                            | 实际结果                                                                                                                                                                                               |

@@ -122,3 +122,5 @@
 当前不能继续执行新的浏览器登录和状态变更验证：现有会话已过期，独立测试账号被测试环境拒绝。该环境阻塞需要账号轮换或恢复后再补登录闭环；在此之前不继续尝试凭据，也不把本地测试或旧会话证据扩大解释为新的登录通过。ConfigMap/Secret 数据编辑、YAML 持久化、配置引用工作负载、ServiceAccount 角色提交、低权限 RBAC 和完整跨 namespace 正反路径仍未关闭，三个模块维持“VERIFY 部分通过，待补齐”。
 
 随后发现并修复 ServiceAccount 角色选项的缓存作用域缺口：角色弹窗原来使用固定 React Query 键 `['roles']`，虽然请求包含 cluster/namespace，跨作用域时仍可能复用缓存。当前改为按 cluster 和 namespace 组成查询键，并新增回归断言。`./scripts/test.sh` 已通过 57 个文件、226 个用例，`corepack yarn build:packages` 也已通过；该提交尚未部署到 131，不能标记角色缓存修复已完成浏览器验收。
+
+角色缓存修复随后已构建并部署到 131：代码提交 `05450c14f733a1c2e189270f2b257759dadacd8b`，GitHub Actions Run `39038790572`，镜像 tag `feature-v4-configmaps-secrets-20261017-215959-05450c14f733`，digest `sha256:27ef8f71b889c4ddb2a9f19ddf22ce09eb7b148a47bc02a2fa8f482bdfdbab65`。Deployment generation/observedGeneration 为 `511/511`，Pod `ks-console-56cbbb9df8-ptp5r` 为 Running/Ready，imageID 与 digest 一致。浏览器直达项目 ServiceAccount 页面已执行，但已有会话已过期并重定向 `/login`；新制品的登录、角色弹窗、角色提交和页面渲染仍未验证。

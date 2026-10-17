@@ -77,3 +77,14 @@ ServiceAccount：**部分通过，未验收**。列表、创建、详情、路�
 - 部署与浏览器：本轮尚未将新提交构建成镜像部署到 131，也未在新制品上执行浏览器登录和角色弹窗验证。现有 namespace 作用域浏览器证据仍对应 `00310f5e5` 制品，不能延伸到本修复。
 
 ServiceAccount 仍为“VERIFY 部分通过，待补齐”。新提交完成部署后，还需在至少两个 namespace/cluster 场景验证角色选项不串缓存，并补齐角色提交、低权限 RBAC 和完整隔离验证。
+
+## 2026-10-17 角色缓存修复制品部署
+
+- 代码提交：`05450c14f733a1c2e189270f2b257759dadacd8b`
+- GitHub Actions：Run `39038790572`；Unit tests 成功，Build and publish 成功
+- 镜像 tag：`feature-v4-configmaps-secrets-20261017-215959-05450c14f733`
+- 镜像 digest：`sha256:27ef8f71b889c4ddb2a9f19ddf22ce09eb7b148a47bc02a2fa8f482bdfdbab65`
+- 131 部署：`ks-console` generation/observedGeneration `511/511`，副本 `1/1`，rollout 成功
+- Pod：`ks-console-56cbbb9df8-ptp5r` Running/Ready，imageID 与上述 digest 一致；旧 Pod 已退出
+
+尝试使用已有 Playwright 会话直达项目 ServiceAccount 页面时已被重定向到 `/login`，说明原会话已过期。由于当前测试账号仍被环境拒绝，本轮没有输入或重试凭据，也没有把角色弹窗、角色提交或页面渲染记为通过。新制品的浏览器验收待测试账号轮换或恢复后继续。
