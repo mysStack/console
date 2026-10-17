@@ -117,6 +117,16 @@ message: [master] chore(bot): update v3dist from kse-console-embed:kse-release-4
 
 当前 `origin/feature/v4-migration` 的 `v3dist` 不包含这个元数据文件，且其最近目录更新提交是 2025 年的 `3f3064787`。因此不能把历史元数据直接套到当前 P0 制品；需要先确认本轮指定测试制品到底是 2025 年外部镜像输入，还是 2026 年带有该元数据的另一套制品。
 
+继续比较 Git tree 后发现，当前基线、`3f3064787` 和 `656d7fec5` 的 `packages/bootstrap/assets/v3dist` tree 均为：
+
+```text
+1e499d92e11374e26c76f5e13be45251602bd596
+```
+
+`656d7fec5^` 和 `8fdfde044` 的 tree 为 `e6c16ea260a8c32227149135f3f5fe3b5a2c5fc2`，与当前 tree 的差异只有 `.v3dist-source.json` 这 8 行元数据；V3 JS/CSS/locale 文件本身没有差异。由此可以确认当前 P0 制品文件内容与带历史来源元数据的那一代制品一致，但来源元数据已经在 `656d7fec5` 删除。
+
+远程 `mysStack/kse-console-v3` 当前公开的 `feature/v3-artifact-decouple` 引用为 `9c5d3049b9e0f5eb06f1dd95d374da74041287ce`，未直接公开历史元数据中的 `8843eadf1`。因此 P0-U004 已缩小为“制品内容一致、来源元数据缺失且历史 commit 尚未可核验”，仍需项目负责人或制品仓库补充 provenance 证据。
+
 ## 3. 当前边界和风险
 
 - `release-4.1.5` 是稳定发布基线；P0 取证分支从 `feature/v4-migration` 当前远程提交创建，两者用途不同，不能混写成同一基线。
