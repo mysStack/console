@@ -46,3 +46,11 @@ ServiceAccount：**部分通过，未验收**。列表、创建、详情、路�
 - 控制台错误：页面仍记录已知全局/扩展错误，不能据此宣称浏览器无错误；但本轮 ServiceAccount 列表入口可访问并完成渲染
 
 本补充只关闭了“登录和页面显示”证据，不改变 ServiceAccount 的“部分通过，未验收”结论；角色提交、可编辑字段、低权限 RBAC 和完整 namespace 隔离仍待完成。
+
+## 2026-10-17 项目 namespace 作用域修复
+
+项目级 ServiceAccount 路由同样带有 `:namespace`。旧实现虽然通过自定义 URL 请求了当前 namespace，但通用列表页仍显示“全部项目”，会造成页面范围与实际请求范围不一致。提交 `00310f5e5a3105f177e9e8d413db359f26bbd1d1` 已将项目路由下的跨项目选择器隐藏，并使创建弹窗锁定当前 namespace；集群级 ServiceAccount 页面继续保留全局范围。
+
+该提交对应候选镜像 `feature-v4-configmaps-secrets-20261017-200414-00310f5e5a31`，digest 为 `sha256:f9468e155d98b7872f35d5d2099f1d6e38f2093006ee77eddb85f20201f45a54`，GitHub Actions Run 为 `39031017563`。候选镜像在 131 上的部署尝试因新 Pod `ks-console-699dd9c46f-ldvtc` 长时间停留在 `ContainerCreating` 而超时，随后已回滚到上一版；没有形成候选 Pod imageID，也没有在候选制品上完成浏览器验收。
+
+因此本记录仍只能证明旧制品的登录和页面渲染，不能证明本次 namespace 选择器修复已经在 131 页面生效。ServiceAccount 继续保持“部分通过，未验收”。

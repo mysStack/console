@@ -79,6 +79,14 @@ Playwright 直达 Secret 详情页和刷新后，默认数据区域均显示固�
 
 本轮仅完成视觉渲染和登录闭环补证，ConfigMap、Secret、ServiceAccount 仍保持 `VERIFY 部分通过，待补齐`，未改变全局 P0 门禁，也未自动进入 Deployment。
 
+## 2026-10-17 namespace 作用域问题修复状态
+
+已定位项目资源页面显示全量 namespace 的根因：项目路由的 `namespace` 参数未传入通用 `ListPage` 的默认资源请求和选择器状态。当前分支已提交 `00310f5e5a3105f177e9e8d413db359f26bbd1d1`，修复 ConfigMap、Secret、ServiceAccount 的项目级选择器和 ConfigMap/Secret 请求 URL，并锁定项目创建弹窗的 namespace。
+
+本地 56 个测试文件、225 个测试，以及相关 lint、格式、构建检查通过；Actions Run `39031017563` 的构建和发布通过。候选镜像 `feature-v4-configmaps-secrets-20261017-200414-00310f5e5a31` / `sha256:f9468e155d98b7872f35d5d2099f1d6e38f2093006ee77eddb85f20201f45a54` 在 131 部署时超过 300 秒仍停在 `ContainerCreating`，未产生 imageID，rollout 超时后已回滚。当前 131 仍运行上一版 digest `sha256:3b6748229935b3e6cf4d29a05793f59ef3b8e5136e922d6850eba28c6d9d5f89`。
+
+状态：代码修复已提交并推送，候选制品部署失败后已回滚；浏览器尚未在修复制品上复验，因此 namespace 作用域修复待重新部署后验证。三个模块继续为“VERIFY 部分通过，待补齐”，全局 P0 继续为“分析中，待负责人复核”。
+
 ## 本轮顺序核验：Git 集成与风险关闭
 
 | 项目                            | 实际结果                                                                                                                                                                                               |

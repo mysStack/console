@@ -92,3 +92,18 @@
 ## 当前结论
 
 ConfigMap：**部分通过，未验收**。Secret：**脱敏修复后部分通过，仍待补齐**。本记录不改变全局 P0 状态，不授权进入 Deployment 模块，也不改变 PR #1 的 Draft 状态。
+
+## 2026-10-17 项目 namespace 作用域修复
+
+本轮针对浏览器页面显示“全部项目”以及项目级资源可能加载全量 namespace 数据的问题完成代码修复。项目路由本身包含 `:namespace`，但旧实现没有把该参数传给通用 `ListPage` 的资源 URL；因此 ConfigMap 和 Secret 使用了集群级请求，页面也显示了跨项目选择器。
+
+- 修复提交：`00310f5e5a3105f177e9e8d413db359f26bbd1d1`
+- 修复范围：项目 ConfigMap、Secret、ServiceAccount 列表隐藏跨项目选择器；ConfigMap/Secret 使用当前 namespace 的资源 URL；创建弹窗锁定当前 namespace
+- 本地验证：ConfigMap 定向测试 2/2、Secret 定向测试 4/4、ServiceAccount 定向测试 2/2；`./scripts/test.sh` 为 56 个文件、225 个测试通过；相关 ESLint、Prettier、`git diff --check` 和 `corepack yarn build:packages` 通过
+- GitHub Actions：Run `39031017563`；Unit tests 和 Build and publish 均通过
+- 候选镜像：`feature-v4-configmaps-secrets-20261017-200414-00310f5e5a31`
+- 候选镜像 digest：`sha256:f9468e155d98b7872f35d5d2099f1d6e38f2093006ee77eddb85f20201f45a54`
+
+131 部署尝试记录：`ks-console` generation/observedGeneration 达到 `508/508`，新 Pod `ks-console-699dd9c46f-ldvtc` 被调度到 `dev01`，但约 6 分钟仍停在 `ContainerCreating`，事件只有 `Pulling image`，没有形成 Pod imageID 或 Ready 状态。`rollout status --timeout=300s` 超时后按授权执行 `kubectl rollout undo deployment/ks-console -n kubesphere-system`，回滚成功；当前 Deployment 恢复使用上一版镜像 `feature-v4-configmaps-secrets-20261017-191324-259b556eccd1`，运行中 Pod imageID 为 `sha256:3b6748229935b3e6cf4d29a05793f59ef3b8e5136e922d6850eba28c6d9d5f89`。
+
+由于候选镜像没有完成 rollout 和 Ready，**本轮尚未在该修复制品上执行浏览器登录、页面渲染和 namespace 数据范围验收**。因此不能把项目 namespace 作用域修复标记为部署后通过；ConfigMap、Secret 仍为“VERIFY 部分通过，待补齐”。

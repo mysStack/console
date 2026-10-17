@@ -88,3 +88,11 @@
 负责人要求以真实浏览器登录和页面渲染为准。本轮新建 Playwright 会话从 `/login` 登录成功进入 `/dashboard`，并在已部署制品上实际检查 ConfigMap、Secret、ServiceAccount 三个原生列表页面：页面标题、侧边导航、工具栏、表格和数据行均正常显示。Secret 列表发现的名称列窄导致长名称逐字换行问题已在 `259b556eccd1` 修复，并通过截图复验；本地截图未提交 Git。
 
 浏览器控制台仍有 `common is not defined`、`getExtensionConsoleV3Embed is not a function`、`getStoreWithQueryHooks` 和 `ConfigConstants` 等全局/扩展错误。它们没有阻止三个目标列表页面显示，但仍未关闭。三个模块的编辑、配置引用、低权限 RBAC、完整 namespace 隔离和全部功能等价性仍未完成，因此模块状态继续为“VERIFY 部分通过，待补齐”，全局 P0 继续为“分析中，待负责人复核”。
+
+## 2026-10-17 项目 namespace 作用域修复与部署结果
+
+针对项目级 ConfigMap、Secret、ServiceAccount 页面显示“全部项目”的问题，提交 `00310f5e5a3105f177e9e8d413db359f26bbd1d1` 已完成最小代码修复：项目路由隐藏跨项目选择器，ConfigMap/Secret 请求改为当前 namespace 资源 URL，创建弹窗锁定路由 namespace。修复前项目路由中的 `:namespace` 没有传入通用 `ListPage`，ConfigMap/Secret 因而存在加载全量 namespace 数据的实际风险；ServiceAccount 存在请求范围与界面提示不一致的问题。
+
+本地定向测试和完整测试已通过，GitHub Actions Run `39031017563` 的单元测试及镜像构建也已通过。候选镜像为 `feature-v4-configmaps-secrets-20261017-200414-00310f5e5a31`，digest 为 `sha256:f9468e155d98b7872f35d5d2099f1d6e38f2093006ee77eddb85f20201f45a54`。
+
+131 部署未完成：generation/observedGeneration 为 `508/508`，新 Pod `ks-console-699dd9c46f-ldvtc` 被调度但超过 300 秒仍为 `ContainerCreating`，只有 `Pulling image` 事件，没有 Ready 或 imageID。已按授权回滚，当前恢复上一版镜像 `feature-v4-configmaps-secrets-20261017-191324-259b556eccd1`，其运行中 Pod imageID 为 `sha256:3b6748229935b3e6cf4d29a05793f59ef3b8e5136e922d6850eba28c6d9d5f89`。候选制品尚未完成 rollout，因此尚未进行该修复的浏览器登录、页面渲染和数据范围验证；三个模块状态不变，仍为“VERIFY 部分通过，待补齐”。
