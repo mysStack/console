@@ -90,4 +90,4 @@ rg -l 'WujieReact|ConsoleV3ResourceList|ExtensionConsoleV3Embed|useV3action|/con
 
 ## 5. 门禁结论
 
-P0-Audit 已形成第一轮静态证据，但仍处于“进行中/待统一复核”，不能宣布 P0 通过。下一步应将引用文件按路由、扩展、Action、构建链路和模块分组，和 P0-REA 及 131 脱敏运行时证据逐项合并；在协调 Agent 汇总并由指定复核人确认前，不进入 P1/P2 正式开发。
+P0-Audit 已形成第一轮静态证据，并由协调 Agent 在 [P0 131 运行时证据](./p0-runtime-evidence.md) 中补充了代表性菜单、Wujie frame、直达/刷新/返回、Network 和扩展状态。任务仍处于“进行中/待统一复核”，不能宣布 P0 通过；全量启用入口、权限和动态 Action 逐项映射仍需继续，且在指定复核人确认前不进入 P1/P2 正式开发。
