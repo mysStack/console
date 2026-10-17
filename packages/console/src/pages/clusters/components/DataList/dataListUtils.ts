@@ -1,5 +1,5 @@
-export const getDataDescription = (value: string, module?: string) =>
-  module === 'configmaps' ? value || '-' : value ? '******' : '-';
+export const getDataDescription = (value: unknown, module?: string) =>
+  module === 'configmaps' ? String(value || '-') : value ? '******' : '-';
 
 export const getEditableDataValue = (value: string, module?: string) =>
   module === 'configmaps' ? value || '' : '';
