@@ -3,7 +3,7 @@
 > 任务启动日期：2026-10-17（上海时间）  
 > 协调工作区：`/home/bruce/code/ks-develop/console`  
 > 项目计划基准：[KubeSphere Console V3 → V4 全量原生化迁移计划](../../../console-v4-migration-plan.md)  
-> 本轮范围：只执行 P0 取证和分析，不进行未经门禁批准的功能开发。
+> 本轮范围：继续维护 P0 全局风险，同时按模块门禁推进已具备依据的 V4 收尾工作；不把模块开发结果写成 P0 全局通过。
 
 当前执行模式：**单 Codex 会话 + Git Worktree + 顺序执行**。项目已停止使用 Multi-Agent 和子 Agent；已有三个 P0 Worktree、分支、提交和历史证据继续保留。需要独立完成的人工或其他复核仍保持未完成，不因当前会话的静态核验自动关闭。
 
@@ -13,7 +13,7 @@
 - 当前只由协调 Codex 会话顺序处理一个独立任务；每项先在对应 Worktree 完成、验证并提交，再进入下一项。
 - 任务 Agent 必须区分事实、推断和未知项，记录命令、Git SHA、制品摘要和 Evidence ID。
 - 协调 Agent 负责维护本文件、汇总证据和提交 P0 门禁复核；任务 Agent 不得自行宣布 P0 通过。
-- P0 未完成前，不创建 P1/P2 正式开发分支，不修改 `release-4.1.5`，不部署 131 或生产环境。
+- 全局 P0 未完成前，不宣布全量迁移完成、不删除 V3/Wujie、不创建最终发布分支；模块开发仍须先通过自身 REA 门禁，不修改 `release-4.1.5`，不未经授权部署 131 或生产环境。
 
 ## 任务看板
 
@@ -34,7 +34,7 @@
 | 原有开发工作区       | `feature/v4-configmaps-secrets`                                              |
 | 原有 Draft PR        | [PR #1](https://github.com/mysStack/console/pull/1)                          |
 | 当前顺序取证文档汇总 | `feature/v4-configmaps-secrets` / `74022b89d54a345e77b4fd38ee2895336854fe8a` |
-| 本轮正式开发         | 未开始                                                                       |
+| 本轮正式开发         | 按 ConfigMap、Secret、ServiceAccount 模块级 REA → DEV → VERIFY → PR 顺序恢复 |
 | P0 门禁              | 分析中，待负责人复核                                                         |
 
 本轮针对性运行时收尾已形成 [`p0-runtime-closure-20261017.md`](./p0-runtime-closure-20261017.md)：cluster、workspace、platform、extension 代表性入口和 workspace DevOps 打开/取消 Action 已取证；联邦项目、低权限 RBAC、全量 Action 和扩展错误闭环仍未完成。
