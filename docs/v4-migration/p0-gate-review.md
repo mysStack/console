@@ -1,7 +1,7 @@
 # P0-REA 门禁复核包
 
 > 复核材料生成日期：2026-10-17（上海时间）  
-> 复核对象：`feature/v4-configmaps-secrets` 当前文档提交 `1121f9bd7`  
+> 复核对象：`feature/v4-configmaps-secrets` 当前文档提交 `2eacd83f9`  
 > 迁移基线：`origin/feature/v4-migration` / `3e09afd6a051d4091b3c887462c880eff2ba6754`  
 > 门禁状态：**待项目负责人或指定复核人确认，不能进入下一阶段**
 
