@@ -97,3 +97,39 @@ rg -il 'secret' packages/bootstrap/assets/v3dist --glob '*.js' | wc -l
 ## 5. 门禁结论
 
 P0-REA 仍为“分析中”。本轮结果已形成可复核的 focused REA 证据，但覆盖存在明确边界，不能写成“全量 REA 已完成”，也不能自动进入 P1/P2 正式开发。后续必须把 REA Evidence、P0-Audit 静态盘点、P0-Baseline 来源核验和 131 脱敏运行时证据统一回填到 `rea-analysis-summary.md` 与迁移矩阵，提交项目负责人或指定复核人进行门禁验收。
+
+## 6. 2026-10-17 Action 重点顺序复核
+
+为补齐 P0-Audit 中的动态 Action 与制品字符串对应关系，本轮在同一 `v3dist` 制品上重新执行了一个更窄的 focused REA。分析没有执行 Bundle，也没有修改源文件或部署环境。
+
+调用参数：
+
+```text
+工具：analyze_javascript_application
+format：directory
+detail：summary
+analysis_timeout：300000
+max_heap：1024
+max_semantic_nodes：30000
+max_semantic_nodes_per_file：12000
+指定文件：1.9ca3a76d71946712055c.js、3.bb6cbee4309e765b70c1.js、
+6.8bcf3ff261066d30352e.js、7.e17520c994653ce8d2f4.js、
+8.efefc7072f02199ebc47.js、14.87db00577a502c52dfc5.js、
+16.c38048441fc60c1f26b2.js
+```
+
+证据：
+
+| 项目 | 值 |
+| --- | --- |
+| 视图 Evidence ID | `ev_1499abcad9683e664b746ef8c97b96092158e1ab805d6c75f60f17b23c9da037` |
+| 父 Evidence ID | `ev_aabde5d443c3576511b4d159d889edc1f14faeb1a6ec3f02569b0dd5a3c5f268` |
+| 模块分页 Evidence ID | `ev_3083b25b2745fe59e2e60fc1a76588981bde4e612879f2423511488efa1d87e7` |
+| 制品 SHA-256 | `0cfc6e64a2555f12b1ebca6d87ae8713bdae5dbad04c2ec2093d1d4de50b0bf4` |
+| 检查范围 | 441 / 957 个制品文件；433 个清单文件未进入本次源文件分析 |
+| 解析文件 | 7 个 JavaScript 文件；0 个解析失败 |
+| 静态发现 | 109 |
+| application unknowns | 439 |
+| semantic unknowns | 114,852 |
+
+结果表明，7 个指定 Chunk 均被纳入同一制品身份下的静态分析，REA 对大型 Chunk 的语义图仍受到结果预算限制；构建引导代码未执行，不能从该证据推出 Action 的实际触发入口、权限结果、Network 请求或错误态。该证据补强了静态制品与当前 Action 字符串的关联，但 P0-U002 和 P0-U003 仍未关闭。
