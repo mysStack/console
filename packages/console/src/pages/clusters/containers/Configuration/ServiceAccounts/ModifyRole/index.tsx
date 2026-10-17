@@ -54,16 +54,19 @@ function ModifyServiceAccountRole({
   const handleOk = () => form.submit();
   const { fetchList } = roleStore('roles');
 
-  const { data: roles = [] } = useQuery<FormattedRole[]>(['roles'], async () => {
-    const res = await fetchList({
-      cluster: detail?.cluster,
-      namespace: detail?.namespace,
-      limit: -1,
-      annotation: 'kubesphere.io/creator',
-    } as any);
+  const { data: roles = [] } = useQuery<FormattedRole[]>(
+    ['roles', detail?.cluster, detail?.namespace],
+    async () => {
+      const res = await fetchList({
+        cluster: detail?.cluster,
+        namespace: detail?.namespace,
+        limit: -1,
+        annotation: 'kubesphere.io/creator',
+      } as any);
 
-    return res.data;
-  });
+      return res.data;
+    },
+  );
 
   return (
     <Modal

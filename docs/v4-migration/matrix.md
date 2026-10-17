@@ -120,3 +120,5 @@
 131 当前仍运行 namespace 作用域修复制品：Deployment generation/observedGeneration 为 `510/510`，Pod `ks-console-699dd9c46f-jstfd` 为 Running/Ready，镜像 tag 为 `feature-v4-configmaps-secrets-20261017-200414-00310f5e5a31`，Pod imageID 对应 digest 为 `sha256:f9468e155d98b7872f35d5d2099f1d6e38f2093006ee77eddb85f20201f45a54`。此前已在该制品上完成项目 ConfigMap、Secret、ServiceAccount 的 namespace 列表渲染、Secret 刷新和浏览器返回证据。
 
 当前不能继续执行新的浏览器登录和状态变更验证：现有会话已过期，独立测试账号被测试环境拒绝。该环境阻塞需要账号轮换或恢复后再补登录闭环；在此之前不继续尝试凭据，也不把本地测试或旧会话证据扩大解释为新的登录通过。ConfigMap/Secret 数据编辑、YAML 持久化、配置引用工作负载、ServiceAccount 角色提交、低权限 RBAC 和完整跨 namespace 正反路径仍未关闭，三个模块维持“VERIFY 部分通过，待补齐”。
+
+随后发现并修复 ServiceAccount 角色选项的缓存作用域缺口：角色弹窗原来使用固定 React Query 键 `['roles']`，虽然请求包含 cluster/namespace，跨作用域时仍可能复用缓存。当前改为按 cluster 和 namespace 组成查询键，并新增回归断言。`./scripts/test.sh` 已通过 57 个文件、226 个用例，`corepack yarn build:packages` 也已通过；该提交尚未部署到 131，不能标记角色缓存修复已完成浏览器验收。

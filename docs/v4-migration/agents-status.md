@@ -109,6 +109,13 @@ Playwright 直达 Secret 详情页和刷新后，默认数据区域均显示固�
 - 未关闭项：ConfigMap/Secret 数据编辑、YAML 持久化、配置引用工作负载、ServiceAccount 角色提交、低权限 RBAC、完整跨 namespace 正反路径和全局浏览器运行时错误。
 - 门禁：三个模块仍为“VERIFY 部分通过，待补齐”；全局 P0 仍为“分析中，待负责人复核”；PR #1 保持 Draft，未进入 Deployment 模块。
 
+## 2026-10-17 ServiceAccount 角色缓存修复
+
+- 定位：角色修改弹窗的 React Query 键固定为 `['roles']`，与实际 cluster/namespace 请求参数不一致，存在跨作用域复用角色选项的风险。
+- 修复：查询键改为包含 `detail?.cluster` 和 `detail?.namespace`，新增 `ModifyRole` 回归测试；没有改变角色 API 或提交权限。
+- 验证：`./scripts/test.sh` 通过（57 个文件、226 个用例）；ServiceAccount 相关 6 个文件、8 个用例通过；相关 ESLint、Prettier、`git diff --check` 和 `corepack yarn build:packages` 通过。
+- 未完成：新代码尚未构建镜像并部署到 131，尚未完成新制品浏览器角色弹窗验证、角色提交、低权限 RBAC 和完整 namespace 隔离。
+
 ## 本轮顺序核验：Git 集成与风险关闭
 
 | 项目                            | 实际结果                                                                                                                                                                                               |
