@@ -89,9 +89,9 @@ http://192.168.2.131:30880/test-workspace/clusters/host/projects/test-wes/log-co
 
 - `Installed`：`cert-manager`、`frontend-forge`、`gateway`、`ingress-utils`、`ks-autoscaling`、`kubesphere-copilot`、`metrics-server`、`openkruise`、`openpitrix`、`vertical-pod-autoscaler`、`whizard-alerting`、`whizard-monitoring`、`whizard-monitoring-pro`、`whizard-telemetry`、`wiztelemetry-tracing`；
 - `InstallFailed`：`kubeeye`；
-- 其余已发现扩展对象未处于 `Installed`。
+- 其余已发现扩展对象未处于已安装或失败状态。
 
-控制台工作台显示“16 已安装组件”，而 CRD 只读结果有 15 个 `Installed` 对象，二者计数不一致，需要继续核对控制台统计口径和扩展实际加载清单。
+浏览器请求 `/kapis/kubesphere.io/v1alpha1/extensions?limit=100&available=true` 返回 `200`，15 个 `Installed` 加 1 个 `InstallFailed`，共有 16 个带状态的扩展对象，与工作台显示“16 已安装组件”一致。计数差异已经解释；但 `kubeeye` 虽为 `InstallFailed`，仍有 `kubeeye-frontend-js-bundle`，且控制台记录了该扩展初始化错误，仍需作为失败扩展风险处理。
 
 ## 3. 证据边界和门禁结论
 

@@ -1,7 +1,7 @@
 # P0-REA 门禁复核包
 
 > 复核材料生成日期：2026-10-17（上海时间）  
-> 复核对象：`feature/v4-configmaps-secrets` 当前文档提交 `2eacd83f9`  
+> 复核对象：`feature/v4-configmaps-secrets`（复核时以 `git rev-parse HEAD` 回读文档提交）  
 > 迁移基线：`origin/feature/v4-migration` / `3e09afd6a051d4091b3c887462c880eff2ba6754`  
 > 门禁状态：**待项目负责人或指定复核人确认，不能进入下一阶段**
 
@@ -18,7 +18,7 @@
 | `v3dist` focused REA | 已完成首轮 | `p0-rea-evidence.md`；Evidence ID、制品 SHA 和覆盖限制已记录；语义/application coverage 仍是 partial |
 | 当前测试制品身份可回读 | 已完成当前 Pod 回读 | `p0-runtime-evidence.md`；Pod imageID 为 `sha256:04650b...`，rollout read-only 检查成功；外部镜像与旧源码 provenance 仍缺 |
 | 131 菜单、直达、刷新、返回、Tab、Network 和错误态 | 代表性完成 | `p0-runtime-evidence.md`；覆盖项目入口、原生 Secret 详情和日志收集 Wujie frame；未覆盖全部作用域、所有启用路由和低权限账号 |
-| 当前启用扩展清单 | 部分完成 | 只读 CRD 列出 15 个 `Installed`、1 个 `InstallFailed`；工作台显示 16 个，统计口径不一致；扩展初始化错误已记录 |
+| 当前启用扩展清单 | 状态已核对，行为仍待覆盖 | 只读 API 列出 15 个 `Installed`、1 个 `InstallFailed`，16 个带状态对象与工作台显示一致；`kubeeye` 失败但仍有 JSBundle，扩展初始化错误已记录 |
 | 独立 Agent 复核 | 未完成 | 三次启动请求均返回协作服务 `429 Too Many Requests`；首轮证据由协调 Agent 在对应 Worktree 完成 |
 | 门禁签署 | 未完成 | 复核人、日期和结论待项目负责人或指定复核人填写 |
 
