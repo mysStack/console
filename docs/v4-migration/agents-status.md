@@ -57,6 +57,19 @@
 
 已确认三个 P0 Worktree 缺少被 `.gitignore` 忽略的 `.husky/_/husky.sh`，而主工作区存在；因此 P0 Worktree 的提交会报 Hook 引用失效。当前没有修改 Hook 或业务代码。最小修复是为每个 Worktree 执行既有 `yarn prepare`/依赖初始化并增加文件存在性检查；此前用 `git -c core.hooksPath=/dev/null` 提交文档，只能说明 Git 提交成功，不能说明 lint-staged、测试、类型检查或构建通过。
 
+## 模块 DEV 本轮提交与验证
+
+本轮在 `feature/v4-configmaps-secrets` 上完成 ServiceAccount Secret 引用脱敏，并修复 Node 22 下 `build:packages` 的脚本模块兼容问题。相关提交为 `ec21875c1`（业务代码）、`5c0162517`（构建脚本）；当前本地 HEAD 为 `5c0162517`，相对远程分支领先 3 个提交，未 push。
+
+| 检查                           | 命令                                                                                                                                                                              | 结果                                                               |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| 回归测试                       | `./scripts/test.sh`                                                                                                                                                               | 55 个文件、220 个测试通过                                          |
+| ServiceAccount/相关代码 ESLint | `./node_modules/.bin/eslint packages/shared/src/stores/serviceAccounts.ts packages/shared/src/stores/serviceAccountsMapper.ts packages/shared/src/stores/serviceAccounts.test.ts` | 通过                                                               |
+| 包构建                         | `corepack yarn build:packages`                                                                                                                                                    | Node `v22.22.1` 下通过；appstore、console、core、shared 均完成构建 |
+| 格式与差异检查                 | `prettier --check scripts/build-packages.js`、`git diff --check`                                                                                                                  | 通过                                                               |
+
+该结果只完成本地 DEV 验证，不代表模块 VERIFY 或正式 PR 已完成。尚未部署新制品到 131，未执行 rollout、Playwright、真实环境权限正反路径、namespace 隔离和 Secret 运行时关联验证；因此 ConfigMap、Secret、ServiceAccount 仍保持“分析中/收尾中”。
+
 ## 完成条件
 
 - [x] P0-Audit 形成首轮静态依赖、路由、扩展、动态 Action 和构建入口盘点；待统一复核。
