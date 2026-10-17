@@ -115,7 +115,7 @@ REA 不要求对整个大型 Bundle 取得无截断的语义图；门禁要求�
 | 任务 | 证据文档 | 分支提交 | 当前结论 |
 | --- | --- | --- | --- |
 | P0-Audit | [静态盘点证据](./p0-audit-evidence.md)、[V3 路由入口库存](./p0-route-inventory.md)、[V3 Action 桥接库存](./p0-action-inventory.md) | `feature/v4-p0-audit` / `ec26ca27e`（首轮证据已汇入当前协调分支） | 已形成首轮 Wujie、V3 ResourceList、V3 Action 桥接、扩展、路由字符串、V4 路由注册和构建入口清单；启用入口仍需运行时核对 |
-| P0-REA | [制品分析证据](./p0-rea-evidence.md) | `feature/v4-p0-rea` / `5a0874d2e`（已汇入当前协调分支为 `4d93b4f81`） | focused REA 视图完成，但 semantic/application coverage 仍为 partial，432 个文件在视图外 |
+| P0-REA | [制品分析证据](./p0-rea-evidence.md) | `feature/v4-p0-rea` / `833773b16`（首轮证据已汇入当前协调分支） | focused REA 视图和 ConfigMap/Secret/ServiceAccount 字符串库存已完成，但 semantic/application coverage 仍为 partial，432 个文件在视图外 |
 | P0-Baseline | [基线边界证据](./p0-baseline-evidence.md)、[V3 模块源码行为证据](./p0-v3-module-source-evidence.md) | `feature/v4-p0-baseline` / `86b041dce`（首轮证据已汇入当前协调分支） | Git refs、V3 源码候选、模块 Action 行为、制品 tree 身份、历史来源和源码到静态服务入口已固定；来源元数据与源码 commit 仍未完全核验 |
 
 本轮 focused REA 的视图 Evidence ID 为 `ev_ffb7b2d8944f03db1f81697faa230110d1bcf3d4ebd203d3cc8695662f29fd0c`，父 Evidence ID 为 `ev_9ec76fca5d3ded4e263413f967715411463f8c622250d84abcb1c724065fcd8b`。该视图检查 441 个文件、解析 8 个指定 JavaScript 文件、记录 151 项静态发现；application unknowns 为 437，semantic unknowns 为 57,457，不能替代运行时证据。
