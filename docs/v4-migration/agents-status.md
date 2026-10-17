@@ -17,25 +17,43 @@
 
 ## 任务看板
 
-| 任务        | 负责人             | Worktree                                      | 分支                  | 当前进度 | 证据交付                               | 阻塞项/下一步                                      |
-| ----------- | ------------------ | --------------------------------------------- | --------------------- | -------- | -------------------------------------- | -------------------------------------------------- |
-| P0-Audit    | 协调 Codex | `/home/bruce/code/ks-develop/console-p0-audit`   | `feature/v4-p0-audit`   | 首轮证据后完成 V3 Action 调用点、参数、Wujie 实例和制品字符串映射 | `p0-audit-evidence.md`，`p0-route-inventory.md`，`p0-action-inventory.md`，`p0-runtime-evidence.md`，`5fc90ebf5` | 已确认 11 个业务调用文件；全量启用入口、权限、131 触发、Network、错误态和 V4 替代行为仍待补齐 |
-| P0-REA      | 协调 Codex | `/home/bruce/code/ks-develop/console-p0-rea`     | `feature/v4-p0-rea`     | 已完成 Action 重点 Chunk 的第二次 focused REA | `p0-rea-evidence.md`，`8c6f59e69`，Evidence `ev_1499abcad9683e664b746ef8c97b96092158e1ab805d6c75f60f17b23c9da037` | 7 个指定 Chunk 纳入同一制品分析；application/semantic coverage 仍 partial，运行时入口仍待补齐 |
-| P0-Baseline | 协调 Codex | `/home/bruce/code/ks-develop/console-p0-baseline` | `feature/v4-p0-baseline` | 已顺序核验 release-3.4 版本、commit、许可证和当前制品更新提交 | `p0-baseline-evidence.md`，`p0-v3-module-source-evidence.md`，`be20bc7a3` | 候选源码身份已固定；当前 2025 外部 `v3dist` 与旧源码的构建 provenance 仍未关闭 |
+| 任务        | 负责人     | Worktree                                          | 分支                     | 当前进度                                                                                                  | 证据交付                                                                                                                                      | 阻塞项/下一步                                                                                                |
+| ----------- | ---------- | ------------------------------------------------- | ------------------------ | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| P0-Audit    | 协调 Codex | `/home/bruce/code/ks-develop/console-p0-audit`    | `feature/v4-p0-audit`    | 首轮证据后完成 V3 Action 调用点、参数、Wujie 实例和制品字符串映射；已顺序补充六类作用域和静态权限路径矩阵 | `p0-audit-evidence.md`，`p0-route-inventory.md`，`p0-action-inventory.md`，`p0-risk-closure-matrix.md`，`p0-runtime-evidence.md`，`5fc90ebf5` | 已确认 11 个业务调用文件和 3 个桥接文件；全量启用入口、权限、131 触发、Network、错误态和 V4 替代行为仍待补齐 |
+| P0-REA      | 协调 Codex | `/home/bruce/code/ks-develop/console-p0-rea`      | `feature/v4-p0-rea`      | 已完成 Action 重点 Chunk 的第二次 focused REA                                                             | `p0-rea-evidence.md`，`8c6f59e69`，Evidence `ev_1499abcad9683e664b746ef8c97b96092158e1ab805d6c75f60f17b23c9da037`                             | 7 个指定 Chunk 纳入同一制品分析；application/semantic coverage 仍 partial，运行时入口仍待补齐                |
+| P0-Baseline | 协调 Codex | `/home/bruce/code/ks-develop/console-p0-baseline` | `feature/v4-p0-baseline` | 已顺序核验 release-3.4 版本、commit、许可证和当前制品更新提交                                             | `p0-baseline-evidence.md`，`p0-v3-module-source-evidence.md`，`be20bc7a3`                                                                     | 候选源码身份已固定；当前 2025 外部 `v3dist` 与旧源码的构建 provenance 仍未关闭                               |
 
 > 历史记录：此前的 Multi-Agent 启动请求曾返回协作服务 `429`，没有产生 Agent 提交。该记录保留用于解释历史证据来源；当前已按项目负责人指令停止使用 Multi-Agent，不再重试或追加子 Agent。
 
 ## 当前基线
 
-| 项目                         | 实际值                                      |
-| ---------------------------- | ------------------------------------------- |
-| 稳定基线                     | `release-4.1.5` / `fc1253cbe`               |
-| P0 取证基线                  | `origin/feature/v4-migration` / `3e09afd6a` |
-| 原有开发工作区               | `feature/v4-configmaps-secrets`             |
-| 原有 Draft PR                | [PR #1](https://github.com/mysStack/console/pull/1) |
-| 当前顺序取证文档汇总          | `feature/v4-configmaps-secrets` / `5d5678883` |
-| 本轮正式开发                 | 未开始                                      |
-| P0 门禁                     | 未完成，等待三项证据和统一复核               |
+| 项目                 | 实际值                                              |
+| -------------------- | --------------------------------------------------- |
+| 稳定基线             | `release-4.1.5` / `fc1253cbe`                       |
+| P0 取证基线          | `origin/feature/v4-migration` / `3e09afd6a`         |
+| 原有开发工作区       | `feature/v4-configmaps-secrets`                     |
+| 原有 Draft PR        | [PR #1](https://github.com/mysStack/console/pull/1) |
+| 当前顺序取证文档汇总 | `feature/v4-configmaps-secrets` / `5d5678883`       |
+| 本轮正式开发         | 未开始                                              |
+| P0 门禁              | 未完成，等待三项证据和统一复核                      |
+
+## 本轮顺序核验：Git 集成与风险关闭
+
+| 项目                            | 实际结果                                                                                                                                          |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `feature/v4-migration`          | `3e09afd6a051d4091b3c887462c880eff2ba6754`，作为 P0 取证基线；未修改                                                                              |
+| `feature/v4-configmaps-secrets` | 本地 `3f19924fc665dcfdb1a1fdee840bcef1d73f9d97`，相对迁移基线领先 63 个提交；相对远程分支领先 38 个提交；未 push                                  |
+| `feature/v4-p0-audit`           | `5fc90ebf5`，相对迁移基线领先 5 个提交，Worktree clean                                                                                            |
+| `feature/v4-p0-rea`             | `8c6f59e69`，相对迁移基线领先 3 个提交，Worktree clean                                                                                            |
+| `feature/v4-p0-baseline`        | `be20bc7a3`，相对迁移基线领先 8 个提交，Worktree clean                                                                                            |
+| Draft PR #1                     | 远程 head `e5a137271`，base `feature/v4-migration`；14 个文件，包含 ConfigMap/Secret 代码测试以及 ServiceAccount、P0 审计等文档；当前没有合并条件 |
+| 安全整理建议                    | 保留三个 P0 分支和现有提交；保留 Draft PR #1；先拆分或明确 PR 范围，再由人工决定 push/合并；不强推、不改写历史、不自动合并                        |
+
+详细路由、Action、作用域、RBAC、API 和 V4 替代行为矩阵见[针对性风险关闭矩阵](./p0-risk-closure-matrix.md)。
+
+## 本轮质量检查问题
+
+已确认三个 P0 Worktree 缺少被 `.gitignore` 忽略的 `.husky/_/husky.sh`，而主工作区存在；因此 P0 Worktree 的提交会报 Hook 引用失效。当前没有修改 Hook 或业务代码。最小修复是为每个 Worktree 执行既有 `yarn prepare`/依赖初始化并增加文件存在性检查；此前用 `git -c core.hooksPath=/dev/null` 提交文档，只能说明 Git 提交成功，不能说明 lint-staged、测试、类型检查或构建通过。
 
 ## 完成条件
 
@@ -53,9 +71,9 @@
 
 本批遵循“最多两个子 Agent、同批并行、批次完成后再调度”的规则，未创建下级 Agent，也没有修改代码、分支、Worktree 或配置。
 
-| Explorer | 任务 | 结果 | 状态/错误 |
-| --- | --- | --- | --- |
-| `/root/p0_audit_route_action` | 只读核对 P0-U002 的 V3 Action 调用点、模块参数和运行时映射缺口 | 初始摘要写成 10 个业务调用文件；后续单会话复核确认实际为 11 个业务调用文件，另有 3 个实现/导出文件；确认当前仍缺少 131 触发入口、权限、Network、错误态、V4 替代实现和回滚证据 | 已完成；未修改文件；P0-U002-B 仍未关闭 |
-| `/root/p0_baseline_provenance` | 只读核对 P0-U001/P0-U004 的旧源码与 `v3dist` 制品 provenance | 未形成可用结果 | 协作服务返回原始 `429 Too Many Requests`：`c9980dfe-945b-4033-a789-63ec10b87ba0`；按规则停止追加任务和重试 |
+| Explorer                       | 任务                                                           | 结果                                                                                                                                                                          | 状态/错误                                                                                                  |
+| ------------------------------ | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `/root/p0_audit_route_action`  | 只读核对 P0-U002 的 V3 Action 调用点、模块参数和运行时映射缺口 | 初始摘要写成 10 个业务调用文件；后续单会话复核确认实际为 11 个业务调用文件，另有 3 个实现/导出文件；确认当前仍缺少 131 触发入口、权限、Network、错误态、V4 替代实现和回滚证据 | 已完成；未修改文件；P0-U002-B 仍未关闭                                                                     |
+| `/root/p0_baseline_provenance` | 只读核对 P0-U001/P0-U004 的旧源码与 `v3dist` 制品 provenance   | 未形成可用结果                                                                                                                                                                | 协作服务返回原始 `429 Too Many Requests`：`c9980dfe-945b-4033-a789-63ec10b87ba0`；按规则停止追加任务和重试 |
 
 本批没有产生新的提交。该批次属于历史执行记录，不能作为当前执行模式。P0-Baseline 的 P0-U001/P0-U004 和 P0-Audit 的 P0-U002-B 仍保持“分析中”；独立复核未完成前，P0 门禁不通过，不进入 P1/P2 正式开发。
