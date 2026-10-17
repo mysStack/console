@@ -33,6 +33,7 @@
 | P0 取证基线                  | `origin/feature/v4-migration` / `3e09afd6a` |
 | 原有开发工作区               | `feature/v4-configmaps-secrets`             |
 | 原有 Draft PR                | [PR #1](https://github.com/mysStack/console/pull/1) |
+| 当前顺序取证文档汇总          | `feature/v4-configmaps-secrets` / `5d5678883` |
 | 本轮正式开发                 | 未开始                                      |
 | P0 门禁                     | 未完成，等待三项证据和统一复核               |
 
