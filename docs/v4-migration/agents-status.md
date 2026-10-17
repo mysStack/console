@@ -48,7 +48,7 @@
 | `feature/v4-p0-audit`           | `5fc90ebf5`，相对迁移基线领先 5 个提交，Worktree clean                                                                                                                   |
 | `feature/v4-p0-rea`             | `8c6f59e69`，相对迁移基线领先 3 个提交，Worktree clean                                                                                                                   |
 | `feature/v4-p0-baseline`        | `be20bc7a3`，相对迁移基线领先 8 个提交，Worktree clean                                                                                                                   |
-| Draft PR #1                     | 远程 head `ca11dce5f`，base `feature/v4-migration`；65 个提交、24 个文件，包含 ConfigMap/Secret 代码测试以及 ServiceAccount、P0 审计等文档；当前保持 Draft，待负责人复核 |
+| Draft PR #1                     | 远程 head `aea9806eb`，base `feature/v4-migration`；67 个提交、25 个文件，包含 ConfigMap/Secret 代码测试以及 ServiceAccount、P0 审计等文档；当前保持 Draft，待负责人复核 |
 | 安全整理建议                    | 保留三个 P0 分支和现有提交；保留 Draft PR #1；先拆分或明确 PR 范围，再由人工决定 push/合并；不强推、不改写历史、不自动合并                                               |
 
 详细路由、Action、作用域、RBAC、API 和 V4 替代行为矩阵见[针对性风险关闭矩阵](./p0-risk-closure-matrix.md)。
