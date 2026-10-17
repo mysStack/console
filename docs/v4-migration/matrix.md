@@ -24,6 +24,26 @@
 
 模块级门禁通过不改变全局 P0 状态，也不授权删除 V3/Wujie、创建最终发布分支或宣布全量迁移完成。
 
+## 2026-10-17 最新部署后浏览器证据
+
+当前 131 实际运行的是代码提交 `05450c14f733a1c2e189270f2b257759dadacd8b` 对应的镜像：
+`feature-v4-configmaps-secrets-20261017-215959-05450c14f733`，digest 为
+`sha256:27ef8f71b889c4ddb2a9f19ddf22ce09eb7b148a47bc02a2fa8f482bdfdbab65`。
+Deployment `kubesphere-system/ks-console` generation/observedGeneration 为 `511/511`，Pod
+`ks-console-56cbbb9df8-ptp5r` 为 Running/Ready，Pod imageID 与 digest 一致。
+
+本轮通过真实 Playwright 登录并验收了三个项目级页面：
+
+| 模块           | 本轮新增部署后证据                                                                           | 清理结果                                             | 当前状态                |
+| -------------- | -------------------------------------------------------------------------------------------- | ---------------------------------------------------- | ----------------------- |
+| ConfigMap      | 当前 namespace 列表、创建、详情、元数据编辑、YAML 编辑器打开、历史、元数据、事件、删除、刷新 | 本轮 ConfigMap 及其配置历史对象已清理                | VERIFY 部分通过，待补齐 |
+| Secret         | 当前 namespace 列表、创建、详情默认掩码、元数据编辑、历史、元数据、事件、删除、刷新          | 本轮 Secret 及其配置历史对象已清理，测试值未写入证据 | VERIFY 部分通过，待补齐 |
+| ServiceAccount | 当前 namespace 列表、角色选项缓存切换、专用账号创建、`viewer` 角色提交、列表刷新、删除       | 本轮 ServiceAccount 已清理，既有 `default` 保留      | VERIFY 部分通过，待补齐 |
+
+跨项目核验还实际打开了 `test-wes` 的 ServiceAccount 角色弹窗：请求 namespace 随路由切换，前一项目的角色选项没有串入当前项目；切回 `v4-migration-e2e` 后角色选项恢复。该证据支持角色查询键的 namespace 作用域修复，但不替代低权限 RBAC 和全量权限矩阵。
+
+本轮仍未关闭：ConfigMap/Secret 数据和 YAML 持久化、配置引用工作负载、低权限正反路径、完整跨 namespace 正反隔离、ServiceAccount 可编辑字段，以及全局/扩展运行时错误。三个模块不能标记为“已验收”，全局 P0 继续保持“分析中，待负责人复核”。
+
 本次全量文档复核见[文档与流程复核记录](./document-review-2026-10-17.md)。
 
 本轮 P0 针对性风险关闭结果见[P0-U002/U003 风险关闭矩阵](./p0-risk-closure-matrix.md)。该矩阵逐项记录 cluster、workspace、project、federated、platform、extension 的路由、V3/Wujie 入口、静态 RBAC、API/Store、131 证据和 V4 替代边界，并单列 11 个业务 `useV3action` 调用和 3 个桥接文件。静态权限路径和代表性运行时证据均不能替代全量 API RBAC、低权限和错误态验证。

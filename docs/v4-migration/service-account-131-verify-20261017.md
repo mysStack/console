@@ -90,3 +90,31 @@ ServiceAccount 仍为“VERIFY 部分通过，待补齐”。新提交完成部�
 尝试使用已有 Playwright 会话直达项目 ServiceAccount 页面时已被重定向到 `/login`，说明原会话已过期。由于当前测试账号仍被环境拒绝，本轮没有输入或重试凭据，也没有把角色弹窗、角色提交或页面渲染记为通过。新制品的浏览器验收待测试账号轮换或恢复后继续。
 
 后续登录尝试发现当前 Playwright CLI 会回显传入的表单值，因此已立即停止继续使用该方式，未将任何凭据写入仓库或验证文档。测试账号需要再次轮换；轮换完成后必须使用不把变量值拼入 CLI 输出的浏览器执行方式重新完成登录，之前的浏览器阻塞状态保持不变。
+
+## 2026-10-17 当前修复制品浏览器闭环补充
+
+本轮已在当前 131 角色缓存修复制品上完成真实浏览器登录，实际验证项目 ServiceAccount 页面和角色操作：
+
+- 代码基线：`05450c14f733a1c2e189270f2b257759dadacd8b`
+- GitHub Actions：Run `39038790572`
+- 镜像 tag：`feature-v4-configmaps-secrets-20261017-215959-05450c14f733`
+- 镜像 digest：`sha256:27ef8f71b889c4ddb2a9f19ddf22ce09eb7b148a47bc02a2fa8f482bdfdbab65`
+- Deployment：`ks-console` generation/observedGeneration `511/511`，rollout 成功
+- Pod：`ks-console-56cbbb9df8-ptp5r` Running/Ready，imageID 与 digest 一致
+- 页面：`/test-workspace/clusters/host/projects/v4-migration-e2e/serviceaccounts`
+
+### 角色缓存和角色提交
+
+1. 项目页面只显示当前项目 `v4-migration-e2e`，没有“全部项目”选择器。
+2. 打开专用 ServiceAccount 的“修改角色”弹窗时，角色请求使用当前 namespace，返回 HTTP 200；页面显示 `viewer`、`operator` 等选项。
+3. 切换到只读核验的 `test-wes` 项目后，角色请求切换到 `test-wes` namespace，页面没有复用前一项目的角色选项；切回 `v4-migration-e2e` 后正确恢复该项目角色选项。该结果验证了查询键加入 cluster/namespace 后的缓存隔离。
+4. 使用本轮专用 ServiceAccount 提交 `viewer` 角色，列表随后显示 `viewer`，证明角色提交和列表刷新路径可用。
+5. 删除本轮专用 ServiceAccount 后，页面只剩既有 `default`，API 查询确认专用对象为 NotFound。
+
+本轮没有修改既有 `default` ServiceAccount，也没有创建长期 Token Secret；专用 ServiceAccount 删除后的 Secret 关联仍为 0。项目列表、创建、角色弹窗、角色提交和删除已获得部署后浏览器证据。
+
+### 尚未关闭
+
+可编辑字段、低权限账号的拒绝路径、完整跨 namespace 正反权限验证、集群级与项目级全部行为等价性仍未完成。浏览器控制台仍有已知全局/扩展错误，页面能够完成目标流程，但不能宣称控制台无错误。
+
+因此 ServiceAccount 状态更新为：**角色缓存、项目页面和专用角色提交部分通过，模块仍未验收**。

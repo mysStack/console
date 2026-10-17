@@ -137,3 +137,35 @@ ConfigMap：**部分通过，未验收**。Secret：**脱敏修复后部分通�
 当前 131 运行状态仍为：Deployment generation/observedGeneration `510/510`，Pod `ks-console-699dd9c46f-jstfd` 为 Running/Ready，部署镜像 tag 为 `feature-v4-configmaps-secrets-20261017-200414-00310f5e5a31`，Pod imageID 对应 digest 为 `sha256:f9468e155d98b7872f35d5d2099f1d6e38f2093006ee77eddb85f20201f45a54`。此前已在该制品上完成项目 namespace 列表渲染、刷新和返回路径验证；当前浏览器会话已失效，新的独立登录被测试环境拒绝，因此本轮不能补记新的登录闭环。
 
 独立登录阻塞项只记录为环境问题：测试账号需要由负责人轮换或恢复，轮换前不继续尝试，也不在日志、截图、文档或测试配置中记录凭据。ConfigMap/Secret 的数据编辑、YAML 持久化、配置引用工作负载、低权限 RBAC 和完整跨 namespace 正反路径仍未完成，三个模块继续保持“VERIFY 部分通过，待补齐”。
+
+## 2026-10-17 当前修复制品浏览器闭环补充
+
+本轮使用当前 131 已部署的角色缓存修复制品完成真实浏览器登录和页面验收：
+
+- 代码基线：`05450c14f733a1c2e189270f2b257759dadacd8b`
+- GitHub Actions：Run `39038790572`，Unit tests 和 Build and publish 均成功
+- 镜像 tag：`feature-v4-configmaps-secrets-20261017-215959-05450c14f733`
+- 镜像 digest：`sha256:27ef8f71b889c4ddb2a9f19ddf22ce09eb7b148a47bc02a2fa8f482bdfdbab65`
+- Deployment：`kubesphere-system/ks-console` generation/observedGeneration `511/511`，rollout 成功
+- Pod：`ks-console-56cbbb9df8-ptp5r` Running/Ready，Pod imageID 与上述 digest 一致
+- 登录：真实 Playwright 会话从登录页进入项目页面，当前用户页面显示为 `admin / platform-admin`
+
+### ConfigMap
+
+在 `v4-migration-e2e` 项目中通过浏览器完成了专用 ConfigMap 的创建、列表显示、详情直达、元数据描述编辑、YAML 编辑器打开、修改记录、元数据和事件页面访问，以及单项删除。删除后通过 API 和页面刷新确认专用对象及本轮生成的配置历史对象均已清理；没有触碰 `kube-root-ca.crt` 等既有对象。
+
+YAML 编辑器能够正确显示当前对象的 `kind`、`apiVersion`、namespace、描述注解和数据键；本轮没有提交 YAML 数据变更，因此 YAML 持久化仍未验收。配置引用、低权限 RBAC 和完整跨 namespace 正反路径仍未完成。
+
+### Secret
+
+在同一专用项目中通过浏览器完成了专用 Secret 的创建、列表显示、详情直达、元数据描述编辑、修改记录、元数据、事件页面访问和单项删除。详情页的数据值显示为固定掩码 `******`，没有在页面快照、命令输出、文档或测试报告中记录测试值。删除后通过 API 和页面刷新确认专用 Secret 及本轮生成的配置历史对象均已清理。
+
+Secret 的 YAML 编辑入口和数据持久化本轮未提交，配置引用、低权限 RBAC 和完整跨 namespace 正反路径仍未完成。既有历史测试对象仍保留在专用 namespace，本轮未删除这些非本轮创建的对象。
+
+### 页面和运行时限制
+
+三个项目级页面均只显示当前路由项目 `v4-migration-e2e`，没有“全部项目”选择器；ConfigMap、Secret 的列表、详情和返回路由正常。浏览器控制台仍记录已知全局/扩展错误，当前页面错误计数约为 8 个错误和 2 个警告；页面仍能完成本轮目标流程，因此不能把本轮结论表述为“浏览器无错误”。
+
+本轮只清理了本轮创建的 ConfigMap、Secret、ServiceAccount 及其配置历史对象，没有删除测试 namespace，也没有修改稳定分支或生产资源。
+
+当前结论仍为：ConfigMap **部分通过，未验收**；Secret **脱敏和基础 CRUD 部分通过，未验收**。未完成项为数据/YAML 持久化、配置引用、低权限 RBAC 和完整 namespace 正反隔离。
