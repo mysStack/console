@@ -112,3 +112,11 @@
 - 后续项目级资源页面的 VERIFY 必须同时检查：直接访问、刷新、浏览器返回；页面不存在“全部项目”；所有可见资源的项目列等于路由 namespace；ConfigMap/Secret 请求使用 namespaced URL；创建弹窗锁定当前 namespace。集群级页面则必须明确保留全局选择器。
 
 登录测试环境还存在独立问题：`/home/bruce/.bashrc` 的非交互 shell 提前返回，普通 `source` 不会加载测试变量；改用交互 shell 后当前测试账号登录被拒绝。该问题属于测试账号/环境阻塞，不能把未成功登录写成浏览器登录通过。
+
+## 2026-10-17 主流程收尾复核
+
+当前分支最新文档提交为 `e1632f8a0`。本轮未修改业务代码，也未在 131 执行新的状态变更。针对 ConfigMap、Secret 和配置引用相关实现，逐个执行 19 个测试文件，共 119 个用例全部通过；`git diff --check` 和提交钩子的 Prettier 检查通过。
+
+131 当前仍运行 namespace 作用域修复制品：Deployment generation/observedGeneration 为 `510/510`，Pod `ks-console-699dd9c46f-jstfd` 为 Running/Ready，镜像 tag 为 `feature-v4-configmaps-secrets-20261017-200414-00310f5e5a31`，Pod imageID 对应 digest 为 `sha256:f9468e155d98b7872f35d5d2099f1d6e38f2093006ee77eddb85f20201f45a54`。此前已在该制品上完成项目 ConfigMap、Secret、ServiceAccount 的 namespace 列表渲染、Secret 刷新和浏览器返回证据。
+
+当前不能继续执行新的浏览器登录和状态变更验证：现有会话已过期，独立测试账号被测试环境拒绝。该环境阻塞需要账号轮换或恢复后再补登录闭环；在此之前不继续尝试凭据，也不把本地测试或旧会话证据扩大解释为新的登录通过。ConfigMap/Secret 数据编辑、YAML 持久化、配置引用工作负载、ServiceAccount 角色提交、低权限 RBAC 和完整跨 namespace 正反路径仍未关闭，三个模块维持“VERIFY 部分通过，待补齐”。
