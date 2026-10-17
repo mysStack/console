@@ -27,15 +27,15 @@
 
 ## 当前基线
 
-| 项目                 | 实际值                                                           |
-| -------------------- | ---------------------------------------------------------------- |
-| 稳定基线             | `release-4.1.5` / `fc1253cbe`                                    |
-| P0 取证基线          | `origin/feature/v4-migration` / `3e09afd6a`                      |
-| 原有开发工作区       | `feature/v4-configmaps-secrets`                                  |
-| 原有 Draft PR        | [PR #1](https://github.com/mysStack/console/pull/1)              |
-| 当前顺序取证文档汇总 | `feature/v4-configmaps-secrets` / 本轮运行时收尾提交见 `git log` |
-| 本轮正式开发         | 未开始                                                           |
-| P0 门禁              | 分析中，待负责人复核                                             |
+| 项目                 | 实际值                                                                       |
+| -------------------- | ---------------------------------------------------------------------------- |
+| 稳定基线             | `release-4.1.5` / `fc1253cbe`                                                |
+| P0 取证基线          | `origin/feature/v4-migration` / `3e09afd6a`                                  |
+| 原有开发工作区       | `feature/v4-configmaps-secrets`                                              |
+| 原有 Draft PR        | [PR #1](https://github.com/mysStack/console/pull/1)                          |
+| 当前顺序取证文档汇总 | `feature/v4-configmaps-secrets` / `74022b89d54a345e77b4fd38ee2895336854fe8a` |
+| 本轮正式开发         | 未开始                                                                       |
+| P0 门禁              | 分析中，待负责人复核                                                         |
 
 本轮针对性运行时收尾已形成 [`p0-runtime-closure-20261017.md`](./p0-runtime-closure-20261017.md)：cluster、workspace、platform、extension 代表性入口和 workspace DevOps 打开/取消 Action 已取证；联邦项目、低权限 RBAC、全量 Action 和扩展错误闭环仍未完成。
 
