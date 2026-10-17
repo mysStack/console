@@ -146,4 +146,52 @@ curl -sS -L https://raw.githubusercontent.com/mysStack/kse-console-v3/8843eadf16
 
 ## 4. 关闭条件与门禁结论
 
-P0-U001 已从“未定位源码”推进到“已定位候选源码引用和一个可查询的历史 commit”，但当前制品对应关系仍未关闭。P0-U004 明确存在两代制品：当前 2025 外部镜像输入的 tree 为 `1e499d92`，历史 2026 元数据指向的 tree 为 `e6c16ea2`；在对应关系未建立前，不能把 `origin/release-3.4` 或 `8843eadf1` 直接当作当前制品的确定源码来源。P0-Baseline 当前为“进行中/待统一复核”，不授权 P1/P2 正式开发。
+P0-U001 已从“未定位源码”推进到“已定位候选源码引用、版本、commit 和许可证”，但当前制品对应关系仍未关闭。P0-U004 明确存在两代制品：当前 2025 外部镜像输入的 tree 为 `1e499d92`，历史 2026 元数据指向的 tree 为 `e6c16ea2`；在对应关系未建立前，不能把 `origin/release-3.4` 或 `8843eadf1` 直接当作当前制品的确定源码来源。P0-Baseline 当前为“进行中/待统一复核”，不授权 P1/P2 正式开发。
+
+## 5. 2026-10-17 顺序复核补充
+
+在停止 Multi-Agent 后，本轮由协调 Codex 会话在干净的 `feature/v4-p0-baseline` Worktree 中顺序执行只读核验，未修改稳定分支、当前 `v3dist` 文件或任何部署环境。
+
+### 5.1 `origin/release-3.4` 源码候选
+
+执行：
+
+```bash
+git show origin/release-3.4:package.json
+git show origin/release-3.4:LICENSE
+git ls-tree -r --name-only origin/release-3.4
+git log -1 --format='%H%n%P%n%aI%n%s' origin/release-3.4
+```
+
+结果：
+
+- commit：`175710fefeeba6ff295c2c0967b4d45b83563d26`，时间 `2024-01-18T12:58:47+08:00`；
+- 根 `package.json`：版本 `3.0.0`，许可证 `AGPL-3.0`；
+- 根 `LICENSE` 为 GNU Affero General Public License Version 3；
+- `yarn.lock`、`scripts/webpack.prod.js`、`src/actions/configmap.js`、`src/actions/secret.js` 和 `src/actions/serviceaccount.js` 均存在。
+
+这进一步固定了 `release-3.4` 的版本、许可证、构建入口和三个目标资源 Action，但仍不能证明它生成了当前 `v3dist`。
+
+### 5.2 当前 `v3dist` 更新提交
+
+执行：
+
+```bash
+git log -1 --format='%H%n%P%n%aI%n%s' -- packages/bootstrap/assets/v3dist
+git show 3f3064787042a95792b591f4aea4231ea7988bb0:packages/bootstrap/assets/v3dist/.v3dist-source.json
+```
+
+结果：当前目录最近一次更新为 `3f3064787042a95792b591f4aea4231ea7988bb0`，时间 `2025-06-13T13:51:48+08:00`，提交消息明确写入外部镜像输入 `kse-console-embed:kse-release-4.1`；当前 tree 不包含 `.v3dist-source.json`，因此没有可从当前 Git tree 直接读取的 V3 源码 commit。
+
+### 5.3 历史源码 commit 的独立身份
+
+通过 GitHub API 和 raw 文件只读核验：
+
+```bash
+curl -fsSL https://api.github.com/repos/mysStack/kse-console-v3/commits/8843eadf162919f60c823192ea8ef30572aa9408
+curl -fsSL https://raw.githubusercontent.com/mysStack/kse-console-v3/8843eadf162919f60c823192ea8ef30572aa9408/package.json
+```
+
+结果：`8843eadf162919f60c823192ea8ef30572aa9408` 存在，提交时间为 `2026-10-03T05:15:49Z`，提交树为 `b2894e93cbc27bee6245ff699ddd6d06e364ffb4`；其 `package.json` 为版本 `3.0.0`、许可证 `AGPL-3.0`。这只能证明该历史源码 commit 的身份和许可证，不能把它归因到当前 `1e499d92` 制品 tree；查询 `v3.4.0` tag 未发现对应 tag。
+
+本次补充将 P0-U001 的“源码候选版本、commit 和许可证”证据补齐到可复核状态，但 P0-U001/P0-U004 的“当前制品 ↔ 源码构建对应关系”仍未关闭。关闭仍需要 `kse-console-embed:kse-release-4.1` 的构建元数据、制品清单或项目负责人对“仅编译制品分析边界”的明确确认。
