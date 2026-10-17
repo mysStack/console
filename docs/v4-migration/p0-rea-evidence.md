@@ -60,6 +60,20 @@ REA 证据标识：
 
 结果说明：本轮视图在其选择范围内完成了静态解析，未发生解析失败；但这不是整个 44M 制品的完整语义覆盖。
 
+## 2.1 资源模块字符串库存
+
+在同一制品目录上补做不执行 Bundle 的字符串定位：
+
+```bash
+rg -il 'configmap' packages/bootstrap/assets/v3dist --glob '*.js' | wc -l
+rg -il 'serviceaccount' packages/bootstrap/assets/v3dist --glob '*.js' | wc -l
+rg -il 'secret' packages/bootstrap/assets/v3dist --glob '*.js' | wc -l
+```
+
+结果：`configmap` 出现在 7 个 JavaScript 文件，`serviceaccount` 出现在 6 个文件，`secret` 出现在 15 个文件。8 个 focused REA 指定 Chunk 中均能定位到至少一个相关资源字符串；`18.4e47b566cbbe39ac49d2.js` 只定位到 `secrets`，没有定位到 ConfigMap 或 ServiceAccount 字符串。
+
+这只能证明制品中存在资源名和相关静态文本，不能证明对应页面已启用、Action 已触发、API 已调用或权限行为正确。具体 Chunk 与当前 V4 路由的映射仍需 REA 结构结果和 131 Network 证据共同确认。
+
 ## 3. 覆盖限制
 
 - application coverage 为 partial，application unknowns 为 437；
