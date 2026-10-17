@@ -264,7 +264,7 @@ function ServiceAccounts({ workspace: workspaceProp }: Props = {}): JSX.Element 
         banner={banner}
         table={table}
         store={serviceAccountStore}
-        hasNamespaceSelector
+        hasNamespaceSelector={!namespace}
         getTableUrl={
           namespace ? () => serviceAccountStore.getResourceUrl({ cluster, namespace }) : undefined
         }
@@ -274,6 +274,7 @@ function ServiceAccounts({ workspace: workspaceProp }: Props = {}): JSX.Element 
           visible={true}
           cluster={cluster}
           workspace={workspace}
+          namespace={namespace}
           confirmLoading={isCreateLoading}
           onOk={handleCreate}
           onCancel={serviceAccountCreateModal.close}

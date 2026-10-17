@@ -36,7 +36,7 @@ import {
 function Secrets(): JSX.Element {
   const { module, getDocsUrl, usePostMutation, usePutMutation } = secretStore;
   const params = useParams<'cluster' | 'namespace' | 'workspace'>();
-  const { cluster, workspace } = params;
+  const { cluster, namespace, workspace } = params;
   const projectPrefix = `${workspace ? `/${workspace}` : ''}/clusters/${cluster}/projects`;
   const docUrl = getDocsUrl();
   const tableRef = useRef<TableRef<FormattedSecret>>(null);
@@ -265,20 +265,29 @@ function Secrets(): JSX.Element {
 
   const handleCreateSecret = (data: Record<string, any>) => {
     mutateSecretCreate({
-      params: { cluster, namespace: data.metadata?.namespace },
+      params: { cluster, namespace: namespace || data.metadata?.namespace },
       data,
     });
   };
 
   return (
     <>
-      <ListPage banner={banner} table={table} store={secretStore} hasNamespaceSelector />
+      <ListPage
+        banner={banner}
+        table={table}
+        store={secretStore}
+        hasNamespaceSelector={!namespace}
+        getTableUrl={
+          namespace ? () => secretStore.getResourceUrl({ cluster, namespace }) : undefined
+        }
+      />
       {createSecretModal.isOpen && (
         <ConfigResourceCreateModal
           module="secrets"
           visible={true}
           cluster={cluster}
           workspace={workspace}
+          namespace={namespace}
           confirmLoading={isCreateSecretLoading}
           onOk={handleCreateSecret}
           onCancel={createSecretModal.close}

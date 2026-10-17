@@ -17,15 +17,16 @@ interface Props {
   visible: boolean;
   cluster?: string;
   workspace?: string;
+  namespace?: string;
   confirmLoading?: boolean;
   onOk: (data: Record<string, any>) => void;
   onCancel: () => void;
 }
 
-const getInitialValues = (module: ResourceModule) => ({
+const getInitialValues = (module: ResourceModule, namespace = '') => ({
   metadata: {
     name: '',
-    namespace: '',
+    namespace,
   },
   ...(module === 'secrets' ? { type: 'Opaque' } : {}),
   data: {},
@@ -36,13 +37,14 @@ function ConfigResourceCreateModal({
   visible,
   cluster = '',
   workspace,
+  namespace,
   confirmLoading,
   onOk,
   onCancel,
 }: Props): JSX.Element {
   const [form] = useForm();
   const settingsRef = useRef<SecretSettingRef>(null);
-  const initialValues = getInitialValues(module);
+  const initialValues = getInitialValues(module, namespace);
 
   const validateAndSubmit = () => {
     form.validateFields().then(data => onOk(data));
@@ -77,7 +79,11 @@ function ConfigResourceCreateModal({
           label={t('PROJECT')}
           rules={[{ required: true, message: t('PROJECT_EMPTY_DESC') }]}
         >
-          <NamespaceSelector cluster={cluster} workspace={workspace} style={{ width: '100%' }} />
+          {namespace ? (
+            <Input disabled />
+          ) : (
+            <NamespaceSelector cluster={cluster} workspace={workspace} style={{ width: '100%' }} />
+          )}
         </FormItem>
         {module === 'secrets' ? (
           <SecretSettings

@@ -21,6 +21,13 @@ test('Secret list source does not decode or render secret values', () => {
   assert.doesNotMatch(source, /safeAtob|decode|base64|value\s*:/);
 });
 
+test('project Secret list is scoped to the route namespace', () => {
+  assert.match(source, /hasNamespaceSelector=\{!namespace\}/);
+  assert.match(source, /getTableUrl/);
+  assert.match(source, /secretStore\.getResourceUrl\(\{ cluster, namespace \}\)/);
+  assert.match(source, /namespace=\{namespace\}/);
+});
+
 test('Secret list keeps enough width for resource names', () => {
   for (const listSource of [source, clusterSource]) {
     assert.match(listSource, /field: 'type',[\s\S]{0,180}width: '15%'/);
