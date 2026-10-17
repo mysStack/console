@@ -80,3 +80,11 @@
 | P3-P8 / release-4.2.0                  | 未开始         | 后续资源迁移、V3/Wujie 清理和 `release-4.2.0` 创建均未达到前置条件。                                                                                                                                                                   |
 
 本次策略已调整为：全局 P0 风险持续跟踪；ConfigMap、Secret、ServiceAccount 分别完成模块级 REA 后，按模块进入 DEV、VERIFY、PR。已有实现和 131 记录作为先行证据继续复核，不自动标记模块已验收。Deployment 文档继续作为逆向输入，正式开发前必须完成 Deployment 自身模块级 REA。
+
+## 2026-10-17 当前制品浏览器验收补充
+
+当前分支 `feature/v4-configmaps-secrets` 的最新代码提交为 `259b556eccd19fbbbade8392db4954f195672114`。通过 GitHub Actions Run `39027793096` 构建的镜像为 `feature-v4-configmaps-secrets-20261017-191324-259b556eccd1`，digest 为 `sha256:3b6748229935b3e6cf4d29a05793f59ef3b8e5136e922d6850eba28c6d9d5f89`，131 Pod `ks-console-69fc77bb7b-gbb2j` 的 imageID 与该 digest 一致，rollout 已成功。
+
+负责人要求以真实浏览器登录和页面渲染为准。本轮新建 Playwright 会话从 `/login` 登录成功进入 `/dashboard`，并在已部署制品上实际检查 ConfigMap、Secret、ServiceAccount 三个原生列表页面：页面标题、侧边导航、工具栏、表格和数据行均正常显示。Secret 列表发现的名称列窄导致长名称逐字换行问题已在 `259b556eccd1` 修复，并通过截图复验；本地截图未提交 Git。
+
+浏览器控制台仍有 `common is not defined`、`getExtensionConsoleV3Embed is not a function`、`getStoreWithQueryHooks` 和 `ConfigConstants` 等全局/扩展错误。它们没有阻止三个目标列表页面显示，但仍未关闭。三个模块的编辑、配置引用、低权限 RBAC、完整 namespace 隔离和全部功能等价性仍未完成，因此模块状态继续为“VERIFY 部分通过，待补齐”，全局 P0 继续为“分析中，待负责人复核”。

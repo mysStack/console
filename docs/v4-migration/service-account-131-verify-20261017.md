@@ -32,3 +32,17 @@
 ## 当前结论
 
 ServiceAccount：**部分通过，未验收**。列表、创建、详情、路由、删除和当前 Kubernetes Token Secret 行为已取得部署后证据；角色提交、可编辑字段、低权限 RBAC 和完整 namespace 隔离仍未闭环。
+
+## 当前制品登录与页面渲染复验
+
+- 代码提交：`259b556eccd19fbbbade8392db4954f195672114`
+- 镜像 tag：`feature-v4-configmaps-secrets-20261017-191324-259b556eccd1`
+- 镜像 digest：`sha256:3b6748229935b3e6cf4d29a05793f59ef3b8e5136e922d6850eba28c6d9d5f89`
+- GitHub Actions：Run `39027793096`，Unit tests 和 Build and publish 均通过
+- Deployment：`kubesphere-system/ks-console` generation/observedGeneration `507/507`，副本、Ready、Updated、Available 均为 `1`
+- Pod：`ks-console-69fc77bb7b-gbb2j` Running/Ready，imageID 与镜像 digest 一致
+- 浏览器登录：新建 Playwright 会话从 `/login` 登录成功进入 `/dashboard`
+- 浏览器页面：已部署制品上实际打开 `/test-workspace/clusters/host/projects/v4-migration-e2e/serviceaccounts`，标题“服务帐户”、项目选择器、搜索/刷新/定制内容/创建工具栏、表头、`default` 行和分页均正常渲染；本地截图 `.playwright-cli/page-2026-10-17T11-20-57-218Z.png` 未提交 Git
+- 控制台错误：页面仍记录已知全局/扩展错误，不能据此宣称浏览器无错误；但本轮 ServiceAccount 列表入口可访问并完成渲染
+
+本补充只关闭了“登录和页面显示”证据，不改变 ServiceAccount 的“部分通过，未验收”结论；角色提交、可编辑字段、低权限 RBAC 和完整 namespace 隔离仍待完成。

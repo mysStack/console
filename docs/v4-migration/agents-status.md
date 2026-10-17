@@ -33,7 +33,7 @@
 | P0 取证基线          | `origin/feature/v4-migration` / `3e09afd6a`                                  |
 | 原有开发工作区       | `feature/v4-configmaps-secrets`                                              |
 | 原有 Draft PR        | [PR #1](https://github.com/mysStack/console/pull/1)                          |
-| 当前顺序取证文档汇总 | `feature/v4-configmaps-secrets` / `5e12c0ec3f4cfe295cb57859a19ae8b913661f5f` |
+| 当前顺序取证文档汇总 | `feature/v4-configmaps-secrets` / `259b556eccd19fbbbade8392db4954f195672114` |
 | 本轮正式开发         | 按 ConfigMap、Secret、ServiceAccount 模块级 REA → DEV → VERIFY → PR 顺序恢复 |
 | P0 门禁              | 分析中，待负责人复核                                                         |
 
@@ -41,11 +41,11 @@
 
 本轮在 131 测试环境完成新制品构建、发布、部署、rollout 和 Playwright 取证。制品为 `feature-v4-configmaps-secrets-20261017-164719-5e12c0ec3f4c`，digest 为 `sha256:a2600930a7f5e199e4a2f8db49669b4dd16bf26c4330fdf7cb82ab5be32b30ac`，Pod imageID 与该 digest 一致。GitHub Actions Run 为 `39018611070`。本轮部署制品对应的 Git HEAD 为 `5e12c0ec3f4cfe295cb57859a19ae8b913661f5f`；本记录提交后，PR #1 的 Head 和变更文件数以 GitHub 实际状态为准，PR 继续保持 Draft。
 
-| 模块           | 当前状态 | 本轮实际结果                                                                                               | 阻塞/未完成                                                             |
-| -------------- | -------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| ConfigMap      | 测试中   | 原生项目筛选、创建、详情、元数据编辑、历史、元数据、事件、批量删除、单项删除和缓存刷新已验证               | 数据编辑提交、配置引用、低权限 RBAC 和完整跨项目正反隔离未完成          |
-| Secret         | 阻塞     | 原生列表、项目筛选、创建、详情、历史、元数据、事件和删除路径已验证                                         | 详情页默认直接显示 Secret Base64 数据；已停止后续写操作，必须先修复脱敏 |
-| ServiceAccount | 测试中   | 原生项目/集群列表、创建、详情、删除、角色入口和项目路由已验证；API 确认新 SA 没有自动生成长期 Token Secret | 角色提交、可编辑字段、低权限 RBAC 和完整 namespace 隔离未完成           |
+| 模块           | 当前状态                | 本轮实际结果                                                                                                               | 阻塞/未完成                                                    |
+| -------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| ConfigMap      | VERIFY 部分通过，待补齐 | 原生项目筛选、创建、详情、元数据编辑、历史、元数据、事件、批量删除、单项删除、缓存刷新及部署后页面渲染已验证               | 数据编辑提交、配置引用、低权限 RBAC 和完整跨项目正反隔离未完成 |
+| Secret         | VERIFY 部分通过，待补齐 | 默认脱敏修复、部署后列表渲染、真实登录、页面截图和刷新路径已验证；名称列布局问题已修复                                     | 编辑、YAML、配置引用、低权限 RBAC 和完整 namespace 隔离未完成  |
+| ServiceAccount | VERIFY 部分通过，待补齐 | 原生项目/集群列表、创建、详情、删除、角色入口、项目路由及部署后页面渲染已验证；API 确认新 SA 没有自动生成长期 Token Secret | 角色提交、可编辑字段、低权限 RBAC 和完整 namespace 隔离未完成  |
 
 当前只有 `admin` 测试凭据，未找到可用于低权限拒绝路径的专用账号；本轮没有创建额外权限，也没有用 admin 模拟低权限通过。三个模块均不能标记为“已验收”。详细证据见 [ConfigMap/Secret VERIFY](./config-secrets-131-verify-20261017.md) 和 [ServiceAccount VERIFY](./service-account-131-verify-20261017.md)。
 
@@ -58,6 +58,26 @@
 Playwright 直达 Secret 详情页和刷新后，默认数据区域均显示固定掩码 `******`，不再显示 Base64 数据；专用复验 Secret 已清理。Secret 的模块门禁由“脱敏失败阻塞”调整为“VERIFY 部分通过，待补齐”，编辑、YAML、配置引用、低权限 RBAC 和完整 namespace 隔离仍未完成，不能标记为“已验收”。
 
 本轮浏览器日志同时记录到全局运行时错误：登录页出现 `ReferenceError: common is not defined`，登录后扩展初始化出现 `getExtensionConsoleV3Embed is not a function`、`getStoreWithQueryHooks` 和 `ConfigConstants` 未定义。它们未阻止 Secret 详情页加载，但浏览器验收结论应表述为“目标功能可访问，存在未关闭的全局运行时错误”；这些问题不归因于 Secret 脱敏修复，需单独追踪。
+
+## 2026-10-17 当前制品登录与页面渲染复验
+
+本轮针对浏览器实际显示又发现并修复了 Secret 列表的列宽问题。旧布局中名称列实测约 `95px`，长名称在截图中几乎逐字换行；提交 `259b556eccd19fbbbade8392db4954f195672114` 将类型、字段数量和创建时间列收窄，名称列实测约 `253px`。项目级和集群级 Secret 列表均同步调整，并补充了列宽回归断言。
+
+当前 131 制品和浏览器证据如下：
+
+- 镜像：`feature-v4-configmaps-secrets-20261017-191324-259b556eccd1`
+- 镜像 digest：`sha256:3b6748229935b3e6cf4d29a05793f59ef3b8e5136e922d6850eba28c6d9d5f89`
+- GitHub Actions：Run `39027793096`，Unit tests 和 Build and publish 均通过
+- Deployment：`ks-console` generation/observedGeneration `507/507`，副本、Ready、Updated、Available 均为 `1`
+- Pod：`ks-console-69fc77bb7b-gbb2j` Running/Ready，imageID 与上述 digest 一致
+- 登录：新建 Playwright 会话从 `/login` 登录后进入 `/dashboard`，未输出账号密码
+- 页面：登录后实际截图检查 Secret、ConfigMap、ServiceAccount 三个原生列表页面，标题、侧边栏、工具栏、表格和数据行均渲染成功。截图仅保留在本地 `.playwright-cli/`，没有提交到 Git：
+  - `.playwright-cli/page-2026-10-17T11-19-45-106Z.png`
+  - `.playwright-cli/page-2026-10-17T11-20-25-903Z.png`
+  - `.playwright-cli/page-2026-10-17T11-20-57-218Z.png`
+- 页面仍有全局控制台错误：`common is not defined`、`getExtensionConsoleV3Embed is not a function`、`getStoreWithQueryHooks`、`ConfigConstants`；因此结论是“登录成功、目标页面可渲染、存在未关闭的全局运行时错误”，不能写成浏览器无错误
+
+本轮仅完成视觉渲染和登录闭环补证，ConfigMap、Secret、ServiceAccount 仍保持 `VERIFY 部分通过，待补齐`，未改变全局 P0 门禁，也未自动进入 Deployment。
 
 ## 本轮顺序核验：Git 集成与风险关闭
 

@@ -30,6 +30,23 @@
 - Playwright：登录后直达 Secret 详情页，默认数据区域显示 `******`；浏览器刷新后仍显示 `******`，没有在快照或报告中输出测试值
 - 清理：`v4-secret-mask-20261017` 已删除，API 复核为 NotFound；namespace 保留
 
+## 当前制品的登录与页面渲染复验
+
+- 修复提交：`259b556eccd19fbbbade8392db4954f195672114`
+- 修复内容：收窄 Secret 类型、字段数量和创建时间列，给名称列保留可用空间；项目级和集群级 Secret 列表同时调整
+- 本轮镜像：`feature-v4-configmaps-secrets-20261017-191324-259b556eccd1`
+- 镜像 digest：`sha256:3b6748229935b3e6cf4d29a05793f59ef3b8e5136e922d6850eba28c6d9d5f89`
+- GitHub Actions：Run `39027793096`；Unit tests 和 Build and publish 均通过
+- Deployment：`kubesphere-system/ks-console` generation/observedGeneration 为 `507/507`，副本、Ready、Updated、Available 均为 `1`
+- Pod：`ks-console-69fc77bb7b-gbb2j` 为 Running/Ready；imageID 为 `ghcr.io/mysstack/ks-console@sha256:3b6748229935b3e6cf4d29a05793f59ef3b8e5136e922d6850eba28c6d9d5f89`
+- 登录：使用新建 Playwright 会话从 `/login` 登录，成功进入 `/dashboard`；账号密码来自 `/home/bruce/.bashrc`，没有写入日志或文档
+- 页面渲染：登录后实际打开并截图检查以下页面，标题、侧边导航、工具栏、表格和数据行均完成渲染：
+  - Secret：`/test-workspace/clusters/host/projects/v4-migration-e2e/secrets`；名称列实测约 `253px`，长名称不再逐字挤压；本地截图 `.playwright-cli/page-2026-10-17T11-19-45-106Z.png`
+  - ConfigMap：`/test-workspace/clusters/host/projects/v4-migration-e2e/configmaps`；显示 10 行数据；本地截图 `.playwright-cli/page-2026-10-17T11-20-25-903Z.png`
+  - ServiceAccount：`/test-workspace/clusters/host/projects/v4-migration-e2e/serviceaccounts`；显示 `default` 数据行；本地截图 `.playwright-cli/page-2026-10-17T11-20-57-218Z.png`
+- 页面功能结论：上述页面在真实登录会话中可访问并完成渲染；这只证明当前入口可用，不代表三个模块的编辑、引用、低权限 RBAC 和完整隔离已验收
+- 浏览器控制台：登录后仍记录 `common is not defined`、`getExtensionConsoleV3Embed is not a function`、`getStoreWithQueryHooks` 和 `ConfigConstants` 等全局/扩展错误；这些错误没有阻止本轮三个列表页面显示，但仍是未关闭问题
+
 ## ConfigMap
 
 | 检查项             | 结果     | 证据                                                                                                                                         |
