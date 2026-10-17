@@ -1,7 +1,7 @@
 # P0-U002/U003 针对性风险关闭矩阵
 
 > 取证日期：2026-10-17（上海时间）
-> 当前工作区：`feature/v4-configmaps-secrets` / `3f19924fc665dcfdb1a1fdee840bcef1d73f9d97`
+> 风险核验起点：`feature/v4-configmaps-secrets` / `3f19924fc665dcfdb1a1fdee840bcef1d73f9d97`
 > 迁移基线：`feature/v4-migration` / `3e09afd6a051d4091b3c887462c880eff2ba6754`
 > 证据对象：当前源码、`v3dist` 静态证据、已存在的 131 只读运行时证据
 

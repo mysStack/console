@@ -37,7 +37,7 @@
 
 当前结论为 **P0-REA 待复核/未通过**。证据包已经可以交给复核人，但高风险未知项和独立复核没有完成，不能创建或启动 P1/P2 正式开发任务，不能把 ConfigMap、Secret、ServiceAccount 的历史实现当作本轮 P2-REA 完成。
 
-本轮还核对了 Git 集成状态：`feature/v4-configmaps-secrets` 当前为 `3f19924fc`，相对 `feature/v4-migration` `3e09afd6a` 有 63 个本地提交；Draft PR #1 的远端 head 仍为 `e5a137271`，包含 14 个文件，其中 6 个是 ConfigMap/Secret 代码或测试，文档中同时包含 ServiceAccount 和 P0 审计内容。因此建议继续保持 Draft、暂不合并；如需提交，应先拆分资源实现与 P0 证据，或由负责人明确接受混合 PR，且不强推、不改写历史。
+本轮风险核验起点为 `feature/v4-configmaps-secrets` / `3f19924fc`，相对 `feature/v4-migration` / `3e09afd6a` 有 63 个本地提交；本轮文档提交后本地 HEAD 已产生新的文档 SHA。Draft PR #1 的远端 head 仍为 `e5a137271`，包含 14 个文件，其中 6 个是 ConfigMap/Secret 代码或测试，文档中同时包含 ServiceAccount 和 P0 审计内容。因此建议继续保持 Draft、暂不合并；如需提交，应先拆分资源实现与 P0 证据，或由负责人明确接受混合 PR，且不强推、不改写历史。
 
 复核人确认栏：
 
