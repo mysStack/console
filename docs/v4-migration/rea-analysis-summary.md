@@ -50,7 +50,7 @@ REA 不要求对整个大型 Bundle 取得无截断的语义图；门禁要求�
 
 | 阶段   | 分析文档                                  | 复核人           | 复核日期 | 结论                   | 阻塞项                                                              |
 | ------ | ----------------------------------------- | ---------------- | -------- | ---------------------- | ------------------------------------------------------------------- |
-| P0-REA | 本文第 3～4 节、`dependency-inventory.md` | 待项目负责人确认 | 待复核   | 分析中                 | 旧 V3 源码基线、启用路由/扩展/Action、运行时入口和 REA 覆盖仍不完整 |
+| P0-REA | 本文第 3～4 节、`dependency-inventory.md`、[131 运行时证据](./p0-runtime-evidence.md) | 待项目负责人确认 | 待复核   | 分析中                 | 已补充代表性 131 路由、Wujie frame、刷新/返回、原生 Tab、Network 和扩展状态；旧 V3 provenance、全量入口和独立复核仍不完整 |
 | P1-REA | 待补                                      | 待项目负责人确认 | 待复核   | 未开始                 | 公共作用域、RBAC、缓存和返回恢复矩阵未形成                          |
 | P2-REA | 待补                                      | 待项目负责人确认 | 待复核   | 未开始（历史先行证据） | 三个模块的旧源码、运行时、API/Action、权限和作用域矩阵未完成        |
 
@@ -63,8 +63,8 @@ REA 不要求对整个大型 Bundle 取得无截断的语义图；门禁要求�
 | ID      | 范围                        | 影响 | 证据缺口                                       | 关闭条件                                                                                                                                   | 状态   |
 | ------- | --------------------------- | ---- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------ |
 | P0-U001 | 旧 V3 源码基线              | 高   | 已定位远程 release-3.2/3.3/3.4 候选，但尚未证明与 `v3dist` 制品的构建对应关系 | 固定来源、版本、许可证，并与 `v3dist` 制品建立对应关系；若最终只有编译制品，记录来源、版本、许可证和仅做制品分析的边界，并由项目负责人确认 | 分析中 |
-| P0-U002 | 启用路由、扩展和动态 Action | 高   | 静态制品与当前启用入口尚未完成逐项映射         | 完成路由/扩展/Action 清单、focused REA 和运行时入口核对                                                                                    | 分析中 |
-| P0-U003 | 运行时 Network、菜单和路由  | 高   | 尚未在指定制品上完成脱敏采集和行为对照         | 在 131 部署制品上完成路由、菜单、Network 和错误态记录                                                                                      | 未开始 |
+| P0-U002 | 启用路由、扩展和动态 Action | 高   | 已有静态清单和代表性运行时入口，但还没有逐项映射所有启用入口；扩展计数和控制台错误存在待核对项 | 完成路由/扩展/Action 清单、focused REA 和运行时入口核对；对计数不一致和错误态给出复核结论 | 分析中 |
+| P0-U003 | 运行时 Network、菜单和路由  | 高   | 已在同一 131 制品上采集代表性菜单、直达、刷新、返回、Wujie frame、原生 Tab、Network 和错误态；尚未覆盖全量入口及低权限账号 | 在 131 部署制品上完成全量路由、菜单、Network、权限和错误态记录 | 分析中 |
 | P0-U004 | P0 指定 `v3dist` 制品代次   | 高   | 当前基线与历史 2026 制品的文件 tree 已确认一致，但当前缺少 `.v3dist-source.json`，历史 `8843eadf1` 尚未从 V3 仓库核验 | 固定本轮测试制品的 Git 提交、制品 SHA、外部镜像 tag/digest 和源码元数据；分析、部署、运行时证据必须使用同一制品身份 | 分析中 |
 | P1-U001 | 公共作用域、RBAC 和缓存     | 高   | cluster/workspace/project/federated 矩阵未形成 | 完成正反权限、缓存隔离、返回恢复和跨作用域矩阵并通过复核                                                                                   | 未开始 |
 | P2-U001 | 三个资源模块的旧行为和权限  | 高   | 旧源码、Action/API、脱敏和作用域对照未完成     | ConfigMap、Secret、ServiceAccount 分别完成 REA 与模块矩阵复核                                                                              | 未开始 |
@@ -122,6 +122,10 @@ REA 不要求对整个大型 Bundle 取得无截断的语义图；门禁要求�
 
 三次独立任务 Agent 启动请求均因协作服务 `429 Too Many Requests` 失败，因此上述首轮文档由协调 Agent 在对应 Worktree 中完成，并已在任务状态记录中标明；服务恢复后仍需独立复核，不能把首轮取证当作多 Agent 复核完成。
 
+### 3.5 131 运行时补充证据
+
+已在当前 131 测试环境对已部署镜像 `feature-v4-configmaps-secrets-20261016-170820-277e50781a04`（Pod imageID `sha256:04650b2ddbb79dcb19443fafa639cabbb62cb08d8c0087b7a8f850402bd3e018`）执行只读浏览器取证，详见[《P0 131 运行时与制品身份证据》](./p0-runtime-evidence.md)，本地 Evidence ID 为 `ev_local_p0_runtime_20261017_131_01`。证据证明代表性外层 V4 菜单、内嵌 V3/Wujie 入口、直达/刷新/返回、原生资源详情 Tab 以及 Network 请求确实存在；同时记录了独立直达 `/consolev3/dashboard` 时 body 为空、扩展初始化错误和 CRD Installed 计数与工作台显示不一致等限制。该证据只把 P0-U003 从“未开始”推进到“分析中”，不能替代全量入口映射、旧源码 provenance 或门禁复核。
+
 ## 4. 旧 V3 源码基线
 
 当前工作区和 `/home/bruce/code` 的有限目录扫描没有找到名为 `kse-console-v3` 的独立源码目录，但同一 Git 仓库的远程发布引用中保留了 V3 源码候选：`origin/release-3.2`（`5e6b2d05361fc8bd70b04e900a914b399deae7a8`）、`origin/release-3.3`（`cd90e5b64326df76432a9cafb05c2a08aa40ecdf`）和 `origin/release-3.4`（`175710fefeeba6ff295c2c0967b4d45b83563d26`）。三个分支的 `package.json` 均声明版本 `3.0.0`、许可证 `AGPL-3.0`，并含 `src/actions/configmap.js`、`src/actions/serviceaccount.js` 等旧实现。
@@ -161,7 +165,7 @@ ConfigMap、Secret、ServiceAccount 进入正式 P2-DEV 前，必须分别完成
 
 1. 定位并固定旧 V3 源码来源和版本。
 2. 对 `v3dist` 做按模块的 focused REA，优先提取 ConfigMap、Secret、ServiceAccount 的入口、Chunk、字符串、API 和 Action 线索。
-3. 在不修改生产的前提下，补充 131 环境运行时页面和 Network 证据。
+3. 在不修改生产的前提下，继续补充 131 环境其余作用域、权限和扩展入口的运行时页面与 Network 证据。
 4. 将每条证据回填到迁移矩阵和模块分析记录。
 5. P0、P1 和 P2-REA 复核通过后，再开始正式 P2-DEV。
 
@@ -173,5 +177,6 @@ ConfigMap、Secret、ServiceAccount 进入正式 P2-DEV 前，必须分别完成
 - [V3 路由入口库存](./p0-route-inventory.md)
 - [V3 Action 桥接库存](./p0-action-inventory.md)
 - [V3 模块源码行为证据](./p0-v3-module-source-evidence.md)
+- [P0 131 运行时与制品身份证据](./p0-runtime-evidence.md)
 - [ConfigMap/Secret 131 验收记录](./config-secrets-131-acceptance.md)
 - [ServiceAccount 131 验收记录](./service-account-131-acceptance.md)
