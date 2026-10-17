@@ -51,6 +51,12 @@
 
 本轮针对性运行时收尾已形成 [`p0-runtime-closure-20261017.md`](./p0-runtime-closure-20261017.md)：cluster、workspace、platform、extension 代表性入口和 workspace DevOps 打开/取消 Action 已取证；联邦项目、低权限 RBAC、全量 Action 和扩展错误闭环仍未完成。
 
+## 2026-10-17 Secret 脱敏修复复验
+
+修复提交为 `8275096ab220b2eb813c1b27e043efa4ea4f2da0`。本轮通过 GitHub Actions Run `39023050476` 构建并发布 `feature-v4-configmaps-secrets-20261017-175822-8275096ab220`，镜像 digest 为 `sha256:9ca9d048bd767512929ef01a743e6bfe0bf73954e6ac46f13170a655364ac5cd`。131 上的 `ks-console-6d59c9fb67-8td2j` 已 Running/Ready，Pod imageID 与该 digest 一致。
+
+Playwright 直达 Secret 详情页和刷新后，默认数据区域均显示固定掩码 `******`，不再显示 Base64 数据；专用复验 Secret 已清理。Secret 的模块门禁由“脱敏失败阻塞”调整为“VERIFY 部分通过，待补齐”，编辑、YAML、配置引用、低权限 RBAC 和完整 namespace 隔离仍未完成，不能标记为“已验收”。
+
 ## 本轮顺序核验：Git 集成与风险关闭
 
 | 项目                            | 实际结果                                                                                                                                                                                               |

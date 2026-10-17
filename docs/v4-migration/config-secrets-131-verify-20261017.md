@@ -18,6 +18,18 @@
 
 部署检查：Deployment generation/observedGeneration 为 `505/505`，副本、Ready、Updated、Available 均为 `1`；rollout 成功。登录使用 `/home/bruce/.bashrc` 中的专用测试账号，未将账号密码写入本记录。
 
+## 脱敏修复后的补充复验
+
+- 修复提交：`8275096ab220b2eb813c1b27e043efa4ea4f2da0`
+- 修复内容：Secret 原生详情页默认使用固定掩码 `******`，不再回显 `_originData.data` 中的 Base64 数据；主动切换显示的行为保留
+- 本轮镜像：`feature-v4-configmaps-secrets-20261017-175822-8275096ab220`
+- 镜像 digest：`sha256:9ca9d048bd767512929ef01a743e6bfe0bf73954e6ac46f13170a655364ac5cd`
+- GitHub Actions：Run `39023050476`；Unit tests 和 Build and publish 均通过
+- Deployment：generation/observedGeneration 为 `506/506`，`ks-console-6d59c9fb67-8td2j` 为 Running/Ready
+- Pod imageID：`ghcr.io/mysstack/ks-console@sha256:9ca9d048bd767512929ef01a743e6bfe0bf73954e6ac46f13170a655364ac5cd`
+- Playwright：登录后直达 Secret 详情页，默认数据区域显示 `******`；浏览器刷新后仍显示 `******`，没有在快照或报告中输出测试值
+- 清理：`v4-secret-mask-20261017` 已删除，API 复核为 NotFound；namespace 保留
+
 ## ConfigMap
 
 | 检查项             | 结果     | 证据                                                                                                                                         |
@@ -40,17 +52,17 @@
 
 ## Secret
 
-| 检查项                         | 结果                   | 证据                                                                                                         |
-| ------------------------------ | ---------------------- | ------------------------------------------------------------------------------------------------------------ |
-| 原生列表和项目筛选             | 通过                   | 原生 `/test-workspace/clusters/host/projects/v4-migration-e2e/secrets` 可访问并按项目筛选                    |
-| 创建                           | 通过                   | 原生创建弹窗创建 `v4-secret-20261017-0902`；API 仅复核 type、namespace 和 data key，未输出 Secret 值         |
-| 数据脱敏                       | **失败，阻塞模块验收** | 原生详情页初始状态直接显示 Secret 数据的 Base64 文本，未达到“默认脱敏”的要求；该值未写入文档、测试报告或提交 |
-| 详情、历史、元数据、事件       | 部分通过               | 详情、`revision-control`、`metadata`、`events` 路由均可打开；详情页暴露数据导致后续编辑验证停止              |
-| 编辑、YAML、批量删除、配置引用 | 未完成                 | 发现数据暴露后停止继续写操作，避免扩大敏感数据暴露                                                           |
-| namespace 隔离                 | 部分通过               | 列表支持项目筛选；缺少低权限账号和跨 namespace 的完整正反权限验证                                            |
-| RBAC 正反路径                  | 阻塞                   | 没有低权限测试账号，不能用 admin 模拟拒绝路径                                                                |
+| 检查项                         | 结果                 | 证据                                                                                                                              |
+| ------------------------------ | -------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| 原生列表和项目筛选             | 通过                 | 原生 `/test-workspace/clusters/host/projects/v4-migration-e2e/secrets` 可访问并按项目筛选                                         |
+| 创建                           | 通过                 | 原生创建弹窗创建 `v4-secret-20261017-0902`；API 仅复核 type、namespace 和 data key，未输出 Secret 值                              |
+| 数据脱敏                       | 初次失败，修复后通过 | 初始制品曾直接显示 Base64；`8275096ab` 修复后，在 131 直达详情页和刷新后均显示固定掩码 `******`，测试值未写入文档、测试报告或提交 |
+| 详情、历史、元数据、事件       | 部分通过             | 详情、`revision-control`、`metadata`、`events` 路由均可打开；详情页暴露数据导致后续编辑验证停止                                   |
+| 编辑、YAML、批量删除、配置引用 | 未完成               | 发现数据暴露后停止继续写操作，避免扩大敏感数据暴露                                                                                |
+| namespace 隔离                 | 部分通过             | 列表支持项目筛选；缺少低权限账号和跨 namespace 的完整正反权限验证                                                                 |
+| RBAC 正反路径                  | 阻塞                 | 没有低权限测试账号，不能用 admin 模拟拒绝路径                                                                                     |
 
-发现数据暴露后，立即通过原生删除流程删除 `v4-secret-20261017-0902`，API 复核为 NotFound；测试 namespace 保留。该问题必须先修复并重新执行 Secret 的脱敏、编辑和错误路径验证，Secret 不能标记为已验收。
+初次验证发现数据暴露后，立即删除了 `v4-secret-20261017-0902`。修复后重新创建的 `v4-secret-mask-20261017` 已完成默认脱敏和刷新复验，并在复验结束后删除。Secret 仍不能标记为已验收，原因转为编辑、YAML、配置引用、低权限 RBAC 和完整 namespace 隔离尚未完成。
 
 ## 共同限制
 
@@ -60,4 +72,4 @@
 
 ## 当前结论
 
-ConfigMap：**部分通过，未验收**。Secret：**失败，阻塞模块验收**。本记录不改变全局 P0 状态，不授权进入 Deployment 模块，也不改变 PR #1 的 Draft 状态。
+ConfigMap：**部分通过，未验收**。Secret：**脱敏修复后部分通过，仍待补齐**。本记录不改变全局 P0 状态，不授权进入 Deployment 模块，也不改变 PR #1 的 Draft 状态。
