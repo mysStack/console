@@ -200,3 +200,13 @@ Playwright 直达 Secret 详情页和刷新后，默认数据区域均显示固�
 | 低权限 RBAC           | 没有低权限测试账号，未使用 admin 模拟拒绝路径                                                        | 阻塞           |
 
 本轮新增测试对象及配置历史对象已清理，测试 namespace、既有对象和稳定分支均保留。三个模块仍不能标记为“已验收”；全局 P0 风险和 PR #1 Draft 状态不变。
+
+## 2026-10-17 当前测试批次：ConfigMap 数据编辑
+
+| 任务                       | 负责人          | 分支                            | 实际结果                                                                                                                                     | 状态                              |
+| -------------------------- | --------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| ConfigMap 数据编辑和持久化 | 当前 Codex 会话 | `feature/v4-configmaps-secrets` | 在 131 已部署制品 `05450c14f733` 上用 Playwright 从“编辑设置”新增数据键；详情页、API、刷新和修改记录均一致；专用对象及配置历史 Secret 已清理 | 数据编辑已验证，YAML 持久化未验证 |
+| ConfigMap YAML 提交        | 当前 Codex 会话 | `feature/v4-configmaps-secrets` | 编辑器可打开；一次自动化输入造成缩进叠加，提交收到 HTTP 400，未改变 Kubernetes 对象，不能计为成功或产品缺陷                                  | 待重新设计有效粘贴验证            |
+| 低权限 RBAC                | 当前 Codex 会话 | `feature/v4-configmaps-secrets` | 当前只有 admin 测试账号，未模拟拒绝路径                                                                                                      | 阻塞                              |
+
+本批未修改业务代码，未启动子 Agent，未部署新制品。当前仍运行 `feature-v4-configmaps-secrets-20261017-215959-05450c14f733`，Pod `ks-console-56cbbb9df8-ptp5r` 为 Ready，实际 imageID 对应 digest `sha256:27ef8f71b889c4ddb2a9f19ddf22ce09eb7b148a47bc02a2fa8f482bdfdbab65`。ConfigMap、Secret、ServiceAccount 均继续保持“VERIFY 部分通过，待补齐”，全局 P0 保持“分析中，待负责人复核”。
