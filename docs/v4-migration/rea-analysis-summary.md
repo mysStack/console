@@ -161,7 +161,7 @@ ConfigMap、Secret、ServiceAccount 进入正式 P2-DEV 前，必须分别完成
 
 - P0-REA：**分析中（本轮重新开始）**。已有静态依赖清单、旧 V3 源码候选和两轮 `v3dist` focused REA；制品代次、完整 Chunk 语义分析、运行时入口和扩展/Action 盘点仍不完整，对应未知项见 `P0-U001`～`P0-U004`。旧源码定位是分析交付项，不把上一轮实现当作当前风险结论。
 - P1-REA：**未开始**。公共作用域、权限、缓存和返回恢复矩阵尚未形成。
-- P2-REA：**未开始（历史先行证据）**。之前的 ConfigMap、Secret、ServiceAccount 实现和 131 验收记录保留为历史参考，不能倒推阶段门禁完成；对应未知项见 `P2-U001`。
+- P2-REA：**按模块分析中**。ConfigMap、Secret、ServiceAccount 分别补齐旧源码、运行时、API/Action、RBAC、脱敏和作用域证据；此前实现和 131 验收记录保留为先行参考，不能倒推三个模块全部通过；对应未知项见 `P2-U001`。
 - P2-DEV：**按模块门禁推进**。ConfigMap、Secret、ServiceAccount 可以在各自模块 REA 依据充分后继续处理已识别缺口；这不改变全局 P0 的“分析中，待负责人复核”状态。
 - 后续短期分支：**按模块创建或整理**，每个模块必须独立完成 REA、DEV、VERIFY 后再提交 PR；不得以一个模块的结果替代其他模块的证据。
 
