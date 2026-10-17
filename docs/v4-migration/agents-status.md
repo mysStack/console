@@ -33,9 +33,21 @@
 | P0 取证基线          | `origin/feature/v4-migration` / `3e09afd6a`                                  |
 | 原有开发工作区       | `feature/v4-configmaps-secrets`                                              |
 | 原有 Draft PR        | [PR #1](https://github.com/mysStack/console/pull/1)                          |
-| 当前顺序取证文档汇总 | `feature/v4-configmaps-secrets` / `74022b89d54a345e77b4fd38ee2895336854fe8a` |
+| 当前顺序取证文档汇总 | `feature/v4-configmaps-secrets` / `5e12c0ec3f4cfe295cb57859a19ae8b913661f5f` |
 | 本轮正式开发         | 按 ConfigMap、Secret、ServiceAccount 模块级 REA → DEV → VERIFY → PR 顺序恢复 |
 | P0 门禁              | 分析中，待负责人复核                                                         |
+
+## 2026-10-17 模块级 VERIFY 结果
+
+本轮在 131 测试环境完成新制品构建、发布、部署、rollout 和 Playwright 取证。制品为 `feature-v4-configmaps-secrets-20261017-164719-5e12c0ec3f4c`，digest 为 `sha256:a2600930a7f5e199e4a2f8db49669b4dd16bf26c4330fdf7cb82ab5be32b30ac`，Pod imageID 与该 digest 一致。GitHub Actions Run 为 `39018611070`。本轮部署制品对应的 Git HEAD 为 `5e12c0ec3f4cfe295cb57859a19ae8b913661f5f`；本记录提交后，PR #1 的 Head 和变更文件数以 GitHub 实际状态为准，PR 继续保持 Draft。
+
+| 模块           | 当前状态 | 本轮实际结果                                                                                               | 阻塞/未完成                                                             |
+| -------------- | -------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| ConfigMap      | 测试中   | 原生项目筛选、创建、详情、元数据编辑、历史、元数据、事件、批量删除、单项删除和缓存刷新已验证               | 数据编辑提交、配置引用、低权限 RBAC 和完整跨项目正反隔离未完成          |
+| Secret         | 阻塞     | 原生列表、项目筛选、创建、详情、历史、元数据、事件和删除路径已验证                                         | 详情页默认直接显示 Secret Base64 数据；已停止后续写操作，必须先修复脱敏 |
+| ServiceAccount | 测试中   | 原生项目/集群列表、创建、详情、删除、角色入口和项目路由已验证；API 确认新 SA 没有自动生成长期 Token Secret | 角色提交、可编辑字段、低权限 RBAC 和完整 namespace 隔离未完成           |
+
+当前只有 `admin` 测试凭据，未找到可用于低权限拒绝路径的专用账号；本轮没有创建额外权限，也没有用 admin 模拟低权限通过。三个模块均不能标记为“已验收”。详细证据见 [ConfigMap/Secret VERIFY](./config-secrets-131-verify-20261017.md) 和 [ServiceAccount VERIFY](./service-account-131-verify-20261017.md)。
 
 本轮针对性运行时收尾已形成 [`p0-runtime-closure-20261017.md`](./p0-runtime-closure-20261017.md)：cluster、workspace、platform、extension 代表性入口和 workspace DevOps 打开/取消 Action 已取证；联邦项目、低权限 RBAC、全量 Action 和扩展错误闭环仍未完成。
 
