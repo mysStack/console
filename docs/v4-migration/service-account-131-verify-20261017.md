@@ -62,3 +62,5 @@ ServiceAccount：**部分通过，未验收**。列表、创建、详情、路�
 在已登录的 Playwright 会话中打开项目 ServiceAccount 页面，页面不再显示“全部项目”，表格仅有 `default` 一行，项目列为 `v4-migration-e2e`；截图为 `.playwright-cli/page-2026-10-17T12-25-41-225Z.png`。项目级请求范围和界面提示现已一致，集群级 ServiceAccount 页面仍保留全局范围。
 
 本轮只验证 namespace 作用域和页面渲染，不改变角色提交、可编辑字段、低权限 RBAC 和完整隔离仍未完成的结论；ServiceAccount 继续保持“部分通过，未验收”。
+
+本次漏测复盘：ServiceAccount 旧实现的请求已经使用项目 namespace，但页面仍显示“全部项目”；原有测试没有验证界面提示与请求作用域一致。当前回归要求同时检查项目选择器隐藏、可见行项目列、刷新和浏览器返回，并单独保留集群级页面的全局选择器行为。
