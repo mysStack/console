@@ -4,10 +4,11 @@
  */
 
 import React from 'react';
-import { ListAdd, ListItem, safeAtob } from '@ks-console/shared';
+import { ListAdd, ListItem } from '@ks-console/shared';
 
 import { Wrapper, List } from './styles';
 import { omit } from 'lodash';
+import { getDataDescription } from './dataListUtils';
 
 interface Props {
   onEdit: Function;
@@ -36,7 +37,7 @@ function DataList({ value, onChange, onEdit, onAdd, icon, module }: Props) {
               key={key}
               icon={icon || 'key'}
               title={key}
-              description={module === 'configmaps' ? _value || '-' : safeAtob(_value) || '-'}
+              description={getDataDescription(_value, module)}
               onDelete={() => handleDelete(key)}
               onEdit={() => handleEdit(key)}
             />

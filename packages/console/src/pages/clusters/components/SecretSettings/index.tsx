@@ -52,7 +52,7 @@ function SecretSettings(
   { form, formTemplate, isFederated, cluster, disableSelect }: Props,
   ref: Ref<SecretSettingRef>,
 ) {
-  const [secretChanged, setSecretChanged] = useStore<boolean>('secretChanged');
+  const [, setSecretChanged] = useStore<boolean>('secretChanged');
   const [formData] = useState<OriginalSecret>(
     get(formTemplate, MODULE_KIND_MAP[module], formTemplate),
   );
@@ -174,6 +174,7 @@ function SecretSettings(
         selectKey={selectDataKey}
         onOk={handleData}
         onCancel={hideDataForm}
+        module={module}
       />
     );
   };
@@ -185,7 +186,7 @@ function SecretSettings(
         name="data"
         rules={[{ required: true, message: t('ENTER_DATA_DESC') }, { validator: dataValidator }]}
       >
-        <DataList onEdit={handleDataItemEdit} onAdd={showDataForm} />
+        <DataList onEdit={handleDataItemEdit} onAdd={showDataForm} module={module} />
       </FormItem>
     );
   };

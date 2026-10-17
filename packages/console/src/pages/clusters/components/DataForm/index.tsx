@@ -6,13 +6,14 @@
 import React, { forwardRef, useEffect, useRef, useState, Ref, useImperativeHandle } from 'react';
 import { trim } from 'lodash';
 
-import { Form, Input, FormItem, useForm } from '@kubed/components';
+import { Form, FormItem, Input, InputPassword, useForm } from '@kubed/components';
 import AutoSizeTextarea from 'react-textarea-autosize';
 
-import { Icon, safeAtob, safeBtoa } from '@ks-console/shared';
+import { Icon, safeBtoa } from '@ks-console/shared';
 import { useCacheStore as useStore } from '@ks-console/shared';
 import { DefaultWrapper, FormWrapper } from './styles';
 import { DataFormRef } from '../SecretSettings';
+import { getEditableDataValue, getSubmittedDataValue } from '../DataList/dataListUtils';
 
 interface Props {
   selectKey: string;
@@ -37,7 +38,7 @@ function SecretDataForm(
   const getFormData = () => {
     return {
       key: selectKey || '',
-      value: module === 'configmaps' ? detail[selectKey] || '' : safeAtob(detail[selectKey] || ''),
+      value: getEditableDataValue(detail[selectKey], module),
     };
   };
   const [formData] = useState(getFormData());
@@ -54,7 +55,10 @@ function SecretDataForm(
     form.validateFields().then((data: any) => {
       const { key, value } = data;
 
-      onOk({ [trim(key)]: module === 'configmaps' ? value : safeBtoa(value) });
+      const nextValue = getSubmittedDataValue(detail[selectKey], value, module);
+      onOk({
+        [trim(key)]: module === 'configmaps' ? nextValue : value ? safeBtoa(value) : nextValue,
+      });
       if (callback) {
         callback();
       }
@@ -81,7 +85,11 @@ function SecretDataForm(
             <Input />
           </FormItem>
           <FormItem label={t('DATA_VALUE')} name={'value'}>
-            <AutoSizeTextarea rows={4} style={{ width: '100%' }} />
+            {module === 'configmaps' ? (
+              <AutoSizeTextarea rows={4} style={{ width: '100%' }} />
+            ) : (
+              <InputPassword autoComplete="new-password" />
+            )}
           </FormItem>
         </Form>
       </FormWrapper>
