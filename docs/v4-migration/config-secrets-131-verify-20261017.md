@@ -201,3 +201,28 @@ Secret 的 YAML 编辑入口和数据持久化本轮未提交，配置引用、�
 在该新制品上使用真实登录浏览器，在专用 namespace 创建 `v4-secret-mask-20261017-1548`，详情页数据仍显示固定掩码 `******`。进入“更多操作 → 编辑设置”后，已有键显示为未填充状态，没有回显原 Secret 值；随后关闭弹窗并通过原生详情页删除对象。API 复核该 Secret 及本轮生成的历史 Secret 均为 NotFound。测试值没有写入文档、快照或报告。
 
 该项修复已完成“代码 → CI 制品 → 131 rollout → 浏览器页面复验”闭环，Secret 的数据脱敏和编辑表单明文暴露问题可标记为**已验证修复**。Secret 模块仍不能标记为“已验收”，因为 YAML 持久化、配置引用、低权限 RBAC、完整 namespace 正反隔离和全部 V3 功能等价性仍未完成。浏览器控制台继续存在 `common is not defined`、`getExtensionConsoleV3Embed is not a function`、`getStoreWithQueryHooks` 和 `ConfigConstants` 等既有全局/扩展错误；它们未阻止本轮 Secret 页面流程，但不应从模块验收中省略。
+
+## 2026-10-18 ConfigMap YAML 与配置引用补充验收
+
+本轮继续使用 131 当前部署制品 `feature-v4-configmaps-secrets-20261017-234040-d6b4135fc497`，代码基线为 `d6b4135fc`（当前分支随后仅新增文档提交 `b433e45ac`），镜像 digest 为 `sha256:ab81aca98c7c5e659bff196d90f53d531ab6f5b451d5daf1018fd0159b04263e`。Deployment `kubesphere-system/ks-console` 为 `512/512`，Pod `ks-console-7766585f4-7lz6x` 为 Running/Ready，Pod imageID 与该 digest 一致。
+
+### ConfigMap YAML
+
+- 在 `v4-migration-e2e` 中通过真实浏览器创建专用对象 `v4-cm-yaml-fix-20261018`。
+- 从详情页进入“编辑 YAML”，通过 Ace 编辑器模型提交新增键 `yaml_key`；请求成功，Kubernetes API 返回对象同时包含原键和新增键。
+- 浏览器刷新后详情页仍显示新增键；API 复核的 resourceVersion 已变化，证明结果已持久化，不是前端缓存。
+- 上一轮 HTTP 400 的原因是自动化对 Ace 隐藏 textarea 使用 `fill`，导致旧 YAML 与新 YAML 拼接；此次改用编辑器实际模型复验成功，不能把前一次自动化输入失败当作产品缺陷。
+
+### ConfigMap/Secret 配置引用
+
+- 创建本轮专用 ConfigMap、Secret 和 Deployment `v4-ref-workload-20261018`；Deployment 同时包含 `envFrom`、ConfigMap volume 和只读 Secret volume 引用，并成功 rollout。
+- 真实浏览器打开原生配置引用路由：`/test-workspace/clusters/host/projects/v4-migration-e2e/deployments/v4-ref-workload-20261018/config-reference`。
+- 页面正确显示当前容器、ConfigMap/Secret 资源名称和各自产生的环境变量数量；点击 Secret“查看”只显示 `APP_TOKEN` 键名，不显示 Secret 值。
+- 通过页面给 Secret 引用添加前缀 `REF_` 并点击“应用引用”，API 复核 Deployment 的 `secretRef` 保持正确资源名且写入 `prefix: REF_`；刷新配置引用页面后前缀仍保留，证明缓存刷新和持久化路径有效。
+- 本轮没有在日志、快照、文档或命令输出中输出 Secret 值。
+
+### 清理和未完成项
+
+本轮创建的 ConfigMap、Secret、Deployment 及配置历史 Secret 均已按名称删除，并分别复核为 NotFound；`v4-migration-e2e` namespace 及既有资源未删除。
+
+ConfigMap 的有效 YAML 和配置引用已取得部署后浏览器/API 证据；Secret 的配置引用已取得部署后浏览器/API 证据。三个模块仍不能标记为“已验收”，剩余缺口为低权限账号的正反 RBAC、完整跨 namespace 正反隔离、ServiceAccount 剩余可编辑字段和全部 V3 功能等价性。扩展运行时错误本轮按负责人指令暂不处理，继续单独登记，不影响本轮资源引用证据结论。

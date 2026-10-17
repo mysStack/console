@@ -16,11 +16,11 @@
 
 ## 模块级门禁
 
-| 模块           | 当前门禁                | 本轮允许动作                                | 必须补齐的证据                                                                | 当前结论                                               |
-| -------------- | ----------------------- | ------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------ |
-| ConfigMap      | VERIFY 部分通过，待补齐 | 继续处理 YAML 持久化、配置引用和低权限 RBAC | 旧行为对照、API/Action、配置历史、跨项目隔离、部署后 Playwright               | 数据编辑已验证；其余证据未完成，不能标记为已验收       |
-| Secret         | VERIFY 部分通过，待补齐 | 继续编辑、YAML、引用和 RBAC 验证            | 数据不泄露、编辑回显、配置引用、RBAC、跨项目隔离、部署后 Playwright           | 默认脱敏已在修复制品和刷新路径复验通过；其余证据未完成 |
-| ServiceAccount | VERIFY 部分通过，待补齐 | 继续处理角色提交、可编辑字段和低权限 RBAC   | Secret 关联、列表/详情/API、角色修改、RBAC、namespace 隔离、部署后 Playwright | 已完成部署后部分验证；不能标记为已验收                 |
+| 模块           | 当前门禁                | 本轮允许动作                                               | 必须补齐的证据                                                                | 当前结论                                                       |
+| -------------- | ----------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| ConfigMap      | VERIFY 部分通过，待补齐 | 继续处理低权限 RBAC、完整跨 namespace 正反路径和功能等价性 | 旧行为对照、API/Action、配置历史、跨项目隔离、部署后 Playwright               | 数据编辑、有效 YAML 持久化和配置引用已验证；仍不能标记为已验收 |
+| Secret         | VERIFY 部分通过，待补齐 | 继续编辑、YAML、低权限 RBAC 和完整隔离验证                 | 数据不泄露、编辑回显、配置引用、RBAC、跨项目隔离、部署后 Playwright           | 默认脱敏、引用键名和前缀写入已验证；仍不能标记为已验收         |
+| ServiceAccount | VERIFY 部分通过，待补齐 | 继续处理角色提交、可编辑字段和低权限 RBAC                  | Secret 关联、列表/详情/API、角色修改、RBAC、namespace 隔离、部署后 Playwright | 已完成部署后部分验证；不能标记为已验收                         |
 
 模块级门禁通过不改变全局 P0 状态，也不授权删除 V3/Wujie、创建最终发布分支或宣布全量迁移完成。
 
@@ -86,18 +86,18 @@ Deployment `kubesphere-system/ks-console` generation/observedGeneration 为 `511
 
 本次按 `console-v4-migration-plan.md` 逐项核对后的结论如下：
 
-| 计划项                                 | 当前结论       | 依据和未完成项                                                                                                                                                                                                                         |
-| -------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 发布基线                               | 已完成         | `v4.1.5` 与 `release-4.1.5` 均指向 `fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`；`feature/config-history` 末提交 `2656419bc` 已在基线历史中，分支引用已删除。                                                                            |
-| 迁移集成分支                           | 已完成         | `feature/v4-migration` 已在本地和 `origin` 存在；文档提交以该分支当前 HEAD 和 Git 历史为准。                                                                                                                                           |
-| 模块短期分支 / PR                      | 部分完成       | `feature/v4-configmaps-secrets` 已创建并推送，草稿 PR [#1](https://github.com/mysStack/console/pull/1) 已指向 `feature/v4-migration`；`feature/v4-resource-framework`、`feature/v4-workloads`、`feature/v4-storage-network` 尚未创建。 |
-| P0 静态盘点                            | 部分完成       | 依赖清单、Deployment 证据和缺口矩阵已生成；WSL REA 验证、旧 V3 源码基线、131 全启用路由/扩展映射、V3 Action 完整实测和每行 PR 证据仍未完成。                                                                                           |
-| P1 公共底座                            | 未形成完成证据 | 复用了现有 `ListPage`、`DataTable` 和 Store，但 cluster/workspace/project 作用域、缓存隔离、权限和返回恢复的统一验收尚未完成。                                                                                                         |
-| P2 ConfigMap / Secret                  | 分析中         | 已有先行实现和 131 列表、详情、创建、编辑、删除、批量删除及最小 RBAC 证据；旧 V3 源码与完整 REA/API/Action/权限/作用域矩阵未完成，尚未通过 P2-REA。                                                                                    |
-| P2 ServiceAccount                      | 分析中         | 已有先行实现和 131 列表、详情、创建、编辑、删除、角色修改及最小 RBAC 证据；旧 V3 源码与完整 REA/API/Action/权限/作用域矩阵未完成，尚未通过 P2-REA。                                                                                    |
-| M1 Deployment                          | 未完成         | 证据文档已生成，但 V3 Action、131 Network、RBAC、缓存隔离和完整操作矩阵仍未验证。                                                                                                                                                      |
-| M2 ConfigMap + Secret + ServiceAccount | 未完成         | 真实操作和最小权限回归已有先行证据，但 P2-REA、完整权限矩阵、跨项目全量隔离和正式 P2-VERIFY 尚未完成，不能标记为 `已验收`。                                                                                                            |
-| P3-P8 / release-4.2.0                  | 未开始         | 后续资源迁移、V3/Wujie 清理和 `release-4.2.0` 创建均未达到前置条件。                                                                                                                                                                   |
+| 计划项                                 | 当前结论                | 依据和未完成项                                                                                                                                                                                                                         |
+| -------------------------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 发布基线                               | 已完成                  | `v4.1.5` 与 `release-4.1.5` 均指向 `fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`；`feature/config-history` 末提交 `2656419bc` 已在基线历史中，分支引用已删除。                                                                            |
+| 迁移集成分支                           | 已完成                  | `feature/v4-migration` 已在本地和 `origin` 存在；文档提交以该分支当前 HEAD 和 Git 历史为准。                                                                                                                                           |
+| 模块短期分支 / PR                      | 部分完成                | `feature/v4-configmaps-secrets` 已创建并推送，草稿 PR [#1](https://github.com/mysStack/console/pull/1) 已指向 `feature/v4-migration`；`feature/v4-resource-framework`、`feature/v4-workloads`、`feature/v4-storage-network` 尚未创建。 |
+| P0 静态盘点                            | 部分完成                | 依赖清单、Deployment 证据和缺口矩阵已生成；WSL REA 验证、旧 V3 源码基线、131 全启用路由/扩展映射、V3 Action 完整实测和每行 PR 证据仍未完成。                                                                                           |
+| P1 公共底座                            | 未形成完成证据          | 复用了现有 `ListPage`、`DataTable` 和 Store，但 cluster/workspace/project 作用域、缓存隔离、权限和返回恢复的统一验收尚未完成。                                                                                                         |
+| P2 ConfigMap / Secret                  | VERIFY 部分通过，待补齐 | 已有先行实现和 131 列表、详情、创建、编辑、删除、批量删除、有效 YAML 持久化及配置引用证据；低权限 RBAC、完整跨 namespace 正反路径和完整功能等价性未完成，尚未通过 P2-REA。                                                             |
+| P2 ServiceAccount                      | 分析中                  | 已有先行实现和 131 列表、详情、创建、编辑、删除、角色修改及最小 RBAC 证据；旧 V3 源码与完整 REA/API/Action/权限/作用域矩阵未完成，尚未通过 P2-REA。                                                                                    |
+| M1 Deployment                          | 未完成                  | 证据文档已生成，但 V3 Action、131 Network、RBAC、缓存隔离和完整操作矩阵仍未验证。                                                                                                                                                      |
+| M2 ConfigMap + Secret + ServiceAccount | 未完成                  | 真实操作、有效 YAML 持久化和配置引用已有部署后证据，但低权限 RBAC、完整权限矩阵、跨项目正反隔离、ServiceAccount 剩余字段及正式 P2-VERIFY 尚未完成，不能标记为 `已验收`。                                                               |
+| P3-P8 / release-4.2.0                  | 未开始                  | 后续资源迁移、V3/Wujie 清理和 `release-4.2.0` 创建均未达到前置条件。                                                                                                                                                                   |
 
 本次策略已调整为：全局 P0 风险持续跟踪；ConfigMap、Secret、ServiceAccount 分别完成模块级 REA 后，按模块进入 DEV、VERIFY、PR。已有实现和 131 记录作为先行证据继续复核，不自动标记模块已验收。Deployment 文档继续作为逆向输入，正式开发前必须完成 Deployment 自身模块级 REA。
 

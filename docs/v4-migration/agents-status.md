@@ -229,3 +229,22 @@ Playwright 直达 Secret 详情页和刷新后，默认数据区域均显示固�
 Secret 的明文暴露缺陷已完成“代码 → CI → 131 rollout → 真实浏览器复验”闭环，可以标记为**已验证修复**。Secret 模块总体仍不能标记为“已验收”：YAML 持久化、配置引用、低权限 RBAC、完整 namespace 正反隔离和全部 V3 功能等价性仍未完成。浏览器控制台仍有 `common is not defined`、`getExtensionConsoleV3Embed is not a function`、`getStoreWithQueryHooks` 和 `ConfigConstants` 等既有全局/扩展错误，未作为本轮 Secret 修复的回归通过条件。
 
 本轮浏览器页面仍使用真实登录会话，测试值没有写入日志、快照、文档或提交。PR #1 继续保持 Draft，全局 P0 继续保持“分析中，待负责人复核”，不自动进入 P1/P2。
+
+## 2026-10-18 模块级 VERIFY 收尾补充（单 Codex 会话）
+
+| 任务                      | 分支 / 制品                                                                                                                                                                                   | 实际结果                                                                                                      | 状态   |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------ |
+| ConfigMap YAML 持久化     | `feature/v4-configmaps-secrets`；131 镜像 `feature-v4-configmaps-secrets-20261017-234040-d6b4135fc497`；Pod imageID `sha256:ab81aca98c7c5e659bff196d90f53d531ab6f5b451d5daf1018fd0159b04263e` | 通过真实浏览器编辑 Ace 模型，提交成功；刷新页面和 Kubernetes API 均保留新增键；专用对象已清理                 | 已验证 |
+| ConfigMap/Secret 配置引用 | 同上；专用 Deployment `v4-ref-workload-20261018` rollout 成功                                                                                                                                 | 浏览器显示 ConfigMap/Secret 引用和键数量；Secret 只显示键名；前缀写入 Deployment 后刷新仍保留；专用资源已清理 | 已验证 |
+| 低权限 RBAC               | 当前仅有 admin 浏览器会话                                                                                                                                                                     | 没有低权限测试账号，未使用 admin 模拟拒绝路径                                                                 | 阻塞   |
+| 完整跨 namespace 正反隔离 | `v4-migration-e2e`                                                                                                                                                                            | 当前 namespace 列表范围已验证；本轮没有低权限账号和第二个专用 namespace，未宣称完整正反隔离                   | 未完成 |
+| 扩展运行时错误            | 不纳入本轮                                                                                                                                                                                    | 按负责人指令暂不处理 `getExtensionConsoleV3Embed` 等既有扩展错误                                              | 延后   |
+
+### 本轮实际验证命令
+
+- `kubectl -n v4-migration-e2e rollout status deployment/v4-ref-workload-20261018 --timeout=180s`
+- `kubectl -n v4-migration-e2e get deployment/v4-ref-workload-20261018 -o json | jq ...`（只输出引用名称、前缀、挂载关系和状态，不输出 Secret 值）
+- Playwright 会话 `v4-verify-20261017b`：ConfigMap YAML 编辑、刷新、配置引用页面、Secret 键名查看、前缀应用和刷新
+- 清理后逐项执行 `kubectl -n v4-migration-e2e get ...`，五个本轮对象均为 NotFound
+
+本轮没有修改业务代码，没有新建镜像或重新部署；复用的部署制品、Pod 身份和浏览器证据均已在 `config-secrets-131-verify-20261017.md` 记录。当前分支只新增本轮文档提交，模块仍为“VERIFY 部分通过，待补齐”，不进入 Deployment 正式开发。
