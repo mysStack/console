@@ -36,9 +36,11 @@
 - [x] 完成 V3/Wujie 静态依赖清单。
 - [x] 创建 Deployment 路由、API、Store、操作和缺口文档。
 - [x] 完成 `v3dist` 第一轮 REA 制品分析，并在 [REA 阶段分析总结](./rea-analysis-summary.md) 记录证据和限制；该结果为部分覆盖，不代表 P0-REA 通过。
-- [x] 在独立 Worktree 形成 [P0-Audit](./p0-audit-evidence.md)、[V3 路由入口库存](./p0-route-inventory.md)、[P0-REA](./p0-rea-evidence.md) 和 [P0-Baseline](./p0-baseline-evidence.md) 首轮证据；证据已汇入协调分支，等待统一门禁复核。
+- [x] 在独立 Worktree 形成 [P0-Audit](./p0-audit-evidence.md)、[V3 路由入口库存](./p0-route-inventory.md)、[P0-REA](./p0-rea-evidence.md) 和 [P0-Baseline](./p0-baseline-evidence.md) 首轮证据，并由单 Codex 会话顺序补充 Action 映射、重点 Chunk REA 和源码 provenance；证据已汇入协调分支，等待统一门禁复核。
 - [ ] 根据 131 部署版本映射所有启用路由和扩展；已完成代表性项目菜单、Wujie frame、直达/刷新/返回、原生详情 Tab、Network 和扩展状态取证，详见 [P0 131 运行时与制品身份证据](./p0-runtime-evidence.md)。
-- [ ] 固定旧 V3 源码来源、tag/commit，并完成 P0-REA 门禁复核。
+- [ ] 固定旧 V3 源码来源、tag/commit 与当前 `v3dist` 构建 provenance，并完成 P0-REA 门禁复核；候选源码版本、commit 和许可证已固定，但当前制品对应关系仍未关闭。
+
+本轮顺序取证提交：P0-Baseline `be20bc7a3`、P0-Audit `5fc90ebf5`、P0-REA `8c6f59e69`。这些提交只补充证据文档，没有修改功能代码、`release-4.1.5` 或部署环境；独立人工/其他复核和 131 全量运行时映射仍未完成，因此 P0 门禁保持未通过。
 
 ## 历史先行证据（不计入阶段门禁）
 

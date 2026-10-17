@@ -62,10 +62,10 @@ REA 不要求对整个大型 Bundle 取得无截断的语义图；门禁要求�
 
 | ID      | 范围                        | 影响 | 证据缺口                                       | 关闭条件                                                                                                                                   | 状态   |
 | ------- | --------------------------- | ---- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------ |
-| P0-U001 | 旧 V3 源码基线              | 高   | 已定位远程 release-3.2/3.3/3.4 候选，但尚未证明与 `v3dist` 制品的构建对应关系 | 固定来源、版本、许可证，并与 `v3dist` 制品建立对应关系；若最终只有编译制品，记录来源、版本、许可证和仅做制品分析的边界，并由项目负责人确认 | 分析中 |
-| P0-U002 | 启用路由、扩展和动态 Action | 高   | 已有静态清单和代表性运行时入口，但还没有逐项映射所有启用入口；`kubeeye` 失败状态与 JSBundle 仍需处理 | 完成路由/扩展/Action 清单、focused REA 和运行时入口核对；对失败扩展和错误态给出复核结论 | 分析中 |
+| P0-U001 | 旧 V3 源码基线              | 高   | 已固定 `origin/release-3.4` / `175710fefeeba6ff295c2c0967b4d45b83563d26`、版本 `3.0.0`、许可证 `AGPL-3.0`，并独立核验历史 `8843eadf162919f60c823192ea8ef30572aa9408`；仍未证明候选源码与当前 `v3dist` 制品的构建对应关系 | 固定来源、版本、许可证，并与当前 `v3dist` 制品建立对应关系；若最终只有编译制品，记录来源、版本、许可证和仅做制品分析的边界，并由项目负责人确认 | 分析中 |
+| P0-U002 | 启用路由、扩展和动态 Action | 高   | 已补齐 11 个业务 `useV3action` 调用点、参数、作用域、Wujie 实例差异和重点 Chunk 字符串；仍没有逐项映射所有启用入口，`kubeeye` 失败状态与 JSBundle 仍需运行时复核 | 完成路由/扩展/Action 清单、focused REA 和运行时入口核对；对失败扩展和错误态给出复核结论 | 分析中 |
 | P0-U003 | 运行时 Network、菜单和路由  | 高   | 已在同一 131 制品上采集代表性菜单、直达、刷新、返回、Wujie frame、原生 Tab、Network 和错误态；尚未覆盖全量入口及低权限账号 | 在 131 部署制品上完成全量路由、菜单、Network、权限和错误态记录 | 分析中 |
-| P0-U004 | P0 指定 `v3dist` 制品代次   | 高   | 当前基线与历史 2026 制品的文件 tree 已确认一致，但当前缺少 `.v3dist-source.json`，历史 `8843eadf1` 尚未从 V3 仓库核验 | 固定本轮测试制品的 Git 提交、制品 SHA、外部镜像 tag/digest 和源码元数据；分析、部署、运行时证据必须使用同一制品身份 | 分析中 |
+| P0-U004 | P0 指定 `v3dist` 制品代次   | 高   | 当前 tree `1e499d92` 属于 2025 外部镜像输入；历史 `.v3dist-source.json` 指向的 2026 tree `e6c16ea2` 与当前 tree 有 750 个文件变化，不能直接复用历史 provenance | 固定本轮测试制品的 Git 提交、制品 SHA、外部镜像 tag/digest 和源码元数据；分析、部署、运行时证据必须使用同一制品身份 | 分析中 |
 | P1-U001 | 公共作用域、RBAC 和缓存     | 高   | cluster/workspace/project/federated 矩阵未形成 | 完成正反权限、缓存隔离、返回恢复和跨作用域矩阵并通过复核                                                                                   | 未开始 |
 | P2-U001 | 三个资源模块的旧行为和权限  | 高   | 旧源码、Action/API、脱敏和作用域对照未完成     | ConfigMap、Secret、ServiceAccount 分别完成 REA 与模块矩阵复核                                                                              | 未开始 |
 
@@ -114,13 +114,13 @@ REA 不要求对整个大型 Bundle 取得无截断的语义图；门禁要求�
 
 | 任务 | 证据文档 | 分支提交 | 当前结论 |
 | --- | --- | --- | --- |
-| P0-Audit | [静态盘点证据](./p0-audit-evidence.md)、[V3 路由入口库存](./p0-route-inventory.md)、[V3 Action 桥接库存](./p0-action-inventory.md) | `feature/v4-p0-audit` / `ec26ca27e`（首轮证据已汇入当前协调分支） | 已形成首轮 Wujie、V3 ResourceList、V3 Action 桥接、扩展、路由字符串、V4 路由注册和构建入口清单；启用入口仍需运行时核对 |
-| P0-REA | [制品分析证据](./p0-rea-evidence.md) | `feature/v4-p0-rea` / `833773b16`（首轮证据已汇入当前协调分支） | focused REA 视图和 ConfigMap/Secret/ServiceAccount 字符串库存已完成，但 semantic/application coverage 仍为 partial，432 个文件在视图外 |
-| P0-Baseline | [基线边界证据](./p0-baseline-evidence.md)、[V3 模块源码行为证据](./p0-v3-module-source-evidence.md) | `feature/v4-p0-baseline` / `86b041dce`（首轮证据已汇入当前协调分支） | Git refs、V3 源码候选、模块 Action 行为、制品 tree 身份、历史来源和源码到静态服务入口已固定；来源元数据与源码 commit 仍未完全核验 |
+| P0-Audit | [静态盘点证据](./p0-audit-evidence.md)、[V3 路由入口库存](./p0-route-inventory.md)、[V3 Action 桥接库存](./p0-action-inventory.md) | `feature/v4-p0-audit` / `5fc90ebf5`（首轮 `ec26ca27e` 后的顺序补充） | 已补齐 11 个业务 `useV3action` 调用点、Action 参数、作用域、Wujie 双实例差异和当前制品字符串对照；启用入口仍需运行时核对 |
+| P0-REA | [制品分析证据](./p0-rea-evidence.md) | `feature/v4-p0-rea` / `8c6f59e69`（首轮 `833773b16` 后的顺序补充） | 以同一制品 SHA 对 7 个重点 Chunk 完成第二轮 focused REA；Evidence `ev_1499abcad9683e664b746ef8c97b96092158e1ab805d6c75f60f17b23c9da037`，application/semantic coverage 仍为 partial，433 个清单文件在本轮选择范围外 |
+| P0-Baseline | [基线边界证据](./p0-baseline-evidence.md)、[V3 模块源码行为证据](./p0-v3-module-source-evidence.md) | `feature/v4-p0-baseline` / `be20bc7a3`（首轮 `86b041dce` 后的顺序补充） | 已固定 `release-3.4` 的 commit、版本 `3.0.0`、许可证 `AGPL-3.0`、构建入口和当前 `v3dist` 更新提交；当前 2025 外部镜像与旧源码 commit 的 provenance 仍未建立 |
 
-本轮 focused REA 的视图 Evidence ID 为 `ev_ffb7b2d8944f03db1f81697faa230110d1bcf3d4ebd203d3cc8695662f29fd0c`，父 Evidence ID 为 `ev_9ec76fca5d3ded4e263413f967715411463f8c622250d84abcb1c724065fcd8b`。该视图检查 441 个文件、解析 8 个指定 JavaScript 文件、记录 151 项静态发现；application unknowns 为 437，semantic unknowns 为 57,457，不能替代运行时证据。
+首轮 focused REA 的视图 Evidence ID 为 `ev_ffb7b2d8944f03db1f81697faa230110d1bcf3d4ebd203d3cc8695662f29fd0c`，第二轮 Action 重点视图 Evidence ID 为 `ev_1499abcad9683e664b746ef8c97b96092158e1ab805d6c75f60f17b23c9da037`，父 Evidence ID 为 `ev_aabde5d443c3576511b4d159d889edc1f14faeb1a6ec3f02569b0dd5a3c5f268`。第二轮在同一制品 SHA 上检查 441/957 个文件、解析 7 个指定 JavaScript 文件、记录 109 项静态发现；application unknowns 为 439，semantic unknowns 为 114,852。两轮均为 partial focused REA，不能替代运行时证据。
 
-三次独立任务 Agent 启动请求均因协作服务 `429 Too Many Requests` 失败，因此上述首轮文档由协调 Agent 在对应 Worktree 中完成，并已在任务状态记录中标明；服务恢复后仍需独立复核，不能把首轮取证当作多 Agent 复核完成。
+此前三次独立任务 Agent 启动请求曾因协作服务 `429 Too Many Requests` 失败；当前项目已停止使用 Multi-Agent，后续由单 Codex 会话顺序取证。原本需要独立完成的人工或其他复核仍未完成，不能把本轮顺序取证当作独立复核。
 
 ### 3.5 131 运行时补充证据
 
@@ -128,9 +128,9 @@ REA 不要求对整个大型 Bundle 取得无截断的语义图；门禁要求�
 
 ## 4. 旧 V3 源码基线
 
-当前工作区和 `/home/bruce/code` 的有限目录扫描没有找到名为 `kse-console-v3` 的独立源码目录，但同一 Git 仓库的远程发布引用中保留了 V3 源码候选：`origin/release-3.2`（`5e6b2d05361fc8bd70b04e900a914b399deae7a8`）、`origin/release-3.3`（`cd90e5b64326df76432a9cafb05c2a08aa40ecdf`）和 `origin/release-3.4`（`175710fefeeba6ff295c2c0967b4d45b83563d26`）。三个分支的 `package.json` 均声明版本 `3.0.0`、许可证 `AGPL-3.0`，并含 `src/actions/configmap.js`、`src/actions/serviceaccount.js` 等旧实现。
+当前工作区和 `/home/bruce/code` 的有限目录扫描没有找到名为 `kse-console-v3` 的独立源码目录，但同一 Git 仓库的远程发布引用中保留了 V3 源码候选：`origin/release-3.2`（`5e6b2d05361fc8bd70b04e900a914b399deae7a8`）、`origin/release-3.3`（`cd90e5b64326df76432a9cafb05c2a08aa40ecdf`）和 `origin/release-3.4`（`175710fefeeba6ff295c2c0967b4d45b83563d26`）。另外，历史 `.v3dist-source.json` 指向的 `mysStack/kse-console-v3` commit `8843eadf162919f60c823192ea8ef30572aa9408` 已通过 GitHub API 核验存在。候选分支和该历史 commit 的 `package.json` 均声明版本 `3.0.0`、许可证 `AGPL-3.0`，并含 `src/actions/configmap.js`、`src/actions/serviceaccount.js` 等旧实现。
 
-这不是“旧源码不存在”的结论。当前可以把 `origin/release-3.4` 作为最新 V3 源码参考，但还没有把它与 `v3dist` 的构建产物建立可核验的对应关系。P0-REA 仍需：
+这不是“旧源码不存在”的结论。当前可以把 `origin/release-3.4` 和历史 `8843eadf1` 作为 V3 源码参考，但还没有把它们与当前 `v3dist` 的构建产物建立可核验的对应关系。P0-REA 仍需：
 
 1. 固定采用的旧 V3 源码引用和对应 commit；
 2. 核对旧源码的构建配置、依赖锁定文件和制品生成时间；

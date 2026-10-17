@@ -117,23 +117,33 @@ message: [master] chore(bot): update v3dist from kse-console-embed:kse-release-4
 
 当前 `origin/feature/v4-migration` 的 `v3dist` 不包含这个元数据文件，且其最近目录更新提交是 2025 年的 `3f3064787`。因此不能把历史元数据直接套到当前 P0 制品；需要先确认本轮指定测试制品到底是 2025 年外部镜像输入，还是 2026 年带有该元数据的另一套制品。
 
-继续比较 Git tree 后发现，当前基线、`3f3064787` 和 `656d7fec5` 的 `packages/bootstrap/assets/v3dist` tree 均为：
+继续比较 Git tree 后确认，当前基线、`3f3064787` 和 `656d7fec5` 的 `packages/bootstrap/assets/v3dist` tree 均为：
 
 ```text
 1e499d92e11374e26c76f5e13be45251602bd596
 ```
 
-`656d7fec5^` 和 `8fdfde044` 的 tree 为 `e6c16ea260a8c32227149135f3f5fe3b5a2c5fc2`，与当前 tree 的差异只有 `.v3dist-source.json` 这 8 行元数据；V3 JS/CSS/locale 文件本身没有差异。由此可以确认当前 P0 制品文件内容与带历史来源元数据的那一代制品一致，但来源元数据已经在 `656d7fec5` 删除。
+`656d7fec5^` 和 `8fdfde044` 的 tree 为 `e6c16ea260a8c32227149135f3f5fe3b5a2c5fc2`，属于 2026-10-03 的另一代实验制品；它与当前 tree 并非只有元数据差异。`git diff --shortstat 8fdfde044 656d7fec5 -- packages/bootstrap/assets/v3dist` 显示 750 个文件变化（574 个新增、167 个删除、5 个修改和 4 个重命名/相似重命名）。因此不能把历史 `.v3dist-source.json` 中的 `8843eadf1` 直接归因到当前 1e499d92 tree。
 
-远程 `mysStack/kse-console-v3` 当前公开的 `feature/v3-artifact-decouple` 引用为 `9c5d3049b9e0f5eb06f1dd95d374da74041287ce`，未直接公开历史元数据中的 `8843eadf1`。因此 P0-U004 已缩小为“制品内容一致、来源元数据缺失且历史 commit 尚未可核验”，仍需项目负责人或制品仓库补充 provenance 证据。
+使用以下只读命令核验历史 commit（未修改当前仓库）：
+
+```bash
+curl -sS -L https://api.github.com/repos/mysStack/kse-console-v3/commits/8843eadf1
+curl -sS -L https://api.github.com/repos/mysStack/kse-console-v3/git/trees/8843eadf162919f60c823192ea8ef30572aa9408?recursive=1
+curl -sS -L https://raw.githubusercontent.com/mysStack/kse-console-v3/8843eadf162919f60c823192ea8ef30572aa9408/package.json
+```
+
+结果确认：完整 SHA 为 `8843eadf162919f60c823192ea8ef30572aa9408`，提交时间为 `2026-10-03T05:15:49Z`，提交树为 `b2894e93cbc27bee6245ff699ddd6d06e364ffb4`，根 `package.json` 为版本 `3.0.0`、许可证 `AGPL-3.0`，并包含 `yarn.lock`、`scripts/webpack.prod.js` 和三个资源 Action 文件。这只能证明 2026 实验制品的来源 commit 可查询，不能证明当前 2025 外部镜像输入由该 commit 构建。
+
+因此 P0-U004 的准确状态是“当前制品身份已固定，但与旧 V3 源码的 provenance 未建立；历史 2026 provenance 已核验为另一代 tree”。当前仍需项目负责人或制品仓库提供 `kse-console-embed:kse-release-4.1` 内部构建来源，或者明确接受仅有当前编译制品的分析边界。
 
 ## 3. 当前边界和风险
 
 - `release-4.1.5` 是稳定发布基线；P0 取证分支从 `feature/v4-migration` 当前远程提交创建，两者用途不同，不能混写成同一基线。
-- 当前可以确认 Git 引用和 `v3dist` 制品身份，但尚未建立“旧 V3 源码 commit/tag ↔ v3dist 制品”的可核验对应关系。
+- 当前可以确认 Git 引用、当前 `v3dist` tree 和历史 2026 源码 commit 的独立身份，但尚未建立“当前 2025 外部镜像输入 ↔ 旧 V3 源码 commit/tag”的可核验对应关系。
 - 没有执行生产部署、没有修改稳定分支、没有删除制品或历史引用。
 - 没有找到 `feature/config-history` 引用不等于可以直接删除所有相关代码；删除动作必须由独立分支、历史和引用审计支持。
 
 ## 4. 关闭条件与门禁结论
 
-P0-U001 已从“未定位源码”推进到“已定位候选源码引用”，但仍未完全关闭。还需要证明 `v3dist` 制品与哪个 V3 源码提交、构建配置和依赖锁定文件对应；在对应关系未建立前，不能把 `origin/release-3.4` 直接当作制品的确定源码来源。P0-Baseline 当前为“进行中/待统一复核”，不授权 P1/P2 正式开发。
+P0-U001 已从“未定位源码”推进到“已定位候选源码引用和一个可查询的历史 commit”，但当前制品对应关系仍未关闭。P0-U004 明确存在两代制品：当前 2025 外部镜像输入的 tree 为 `1e499d92`，历史 2026 元数据指向的 tree 为 `e6c16ea2`；在对应关系未建立前，不能把 `origin/release-3.4` 或 `8843eadf1` 直接当作当前制品的确定源码来源。P0-Baseline 当前为“进行中/待统一复核”，不授权 P1/P2 正式开发。
