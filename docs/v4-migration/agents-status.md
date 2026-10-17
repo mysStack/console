@@ -39,7 +39,7 @@
 - [x] P0-Audit 形成首轮静态依赖、路由、扩展、动态 Action 和构建入口盘点；待统一复核。
 - [x] P0-REA 形成首轮可复核的 REA Evidence、覆盖范围、限制和未知项记录；待统一复核。
 - [ ] P0-Baseline 已固定 Git 基线、V3 源码候选和当前编译制品边界，但制品代次及源码对应关系仍未核验（P0-U001/P0-U004）。
-- [x] 协调 Agent 已汇总首轮三项证据，并补充 [131 运行时与制品身份证据](./p0-runtime-evidence.md)；[REA 阶段分析总结](./rea-analysis-summary.md) 已更新，仍待门禁复核。
+- [x] 协调 Agent 已汇总首轮三项证据，并补充 [131 运行时与制品身份证据](./p0-runtime-evidence.md) 和 [P0-REA 门禁复核包](./p0-gate-review.md)；[REA 阶段分析总结](./rea-analysis-summary.md) 已更新，仍待门禁复核。
 - [ ] 项目负责人或指定复核人确认 P0-REA 门禁结论。
 
 ## 状态更新规则

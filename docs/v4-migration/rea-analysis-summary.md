@@ -50,7 +50,7 @@ REA 不要求对整个大型 Bundle 取得无截断的语义图；门禁要求�
 
 | 阶段   | 分析文档                                  | 复核人           | 复核日期 | 结论                   | 阻塞项                                                              |
 | ------ | ----------------------------------------- | ---------------- | -------- | ---------------------- | ------------------------------------------------------------------- |
-| P0-REA | 本文第 3～4 节、`dependency-inventory.md`、[131 运行时证据](./p0-runtime-evidence.md) | 待项目负责人确认 | 待复核   | 分析中                 | 已补充代表性 131 路由、Wujie frame、刷新/返回、原生 Tab、Network 和扩展状态；旧 V3 provenance、全量入口和独立复核仍不完整 |
+| P0-REA | 本文第 3～4 节、`dependency-inventory.md`、[131 运行时证据](./p0-runtime-evidence.md)、[门禁复核包](./p0-gate-review.md) | 待项目负责人确认 | 待复核   | 分析中                 | 已补充代表性 131 路由、Wujie frame、刷新/返回、原生 Tab、Network 和扩展状态；旧 V3 provenance、全量入口和独立复核仍不完整 |
 | P1-REA | 待补                                      | 待项目负责人确认 | 待复核   | 未开始                 | 公共作用域、RBAC、缓存和返回恢复矩阵未形成                          |
 | P2-REA | 待补                                      | 待项目负责人确认 | 待复核   | 未开始（历史先行证据） | 三个模块的旧源码、运行时、API/Action、权限和作用域矩阵未完成        |
 
@@ -178,5 +178,6 @@ ConfigMap、Secret、ServiceAccount 进入正式 P2-DEV 前，必须分别完成
 - [V3 Action 桥接库存](./p0-action-inventory.md)
 - [V3 模块源码行为证据](./p0-v3-module-source-evidence.md)
 - [P0 131 运行时与制品身份证据](./p0-runtime-evidence.md)
+- [P0-REA 门禁复核包](./p0-gate-review.md)
 - [ConfigMap/Secret 131 验收记录](./config-secrets-131-acceptance.md)
 - [ServiceAccount 131 验收记录](./service-account-131-acceptance.md)
