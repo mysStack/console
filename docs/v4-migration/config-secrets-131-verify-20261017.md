@@ -66,6 +66,8 @@
 
 ## 共同限制
 
+- 登录页及详情页 Playwright Console 日志出现 `ReferenceError: common is not defined`；登录后还持续出现 `getExtensionConsoleV3Embed is not a function`、`getStoreWithQueryHooks` 和 `ConfigConstants` 未定义。页面仍能完成登录并加载本轮原生 Secret 详情，但不能据此宣称浏览器无运行时错误。
+- `common is not defined` 在当前修复制品以及历史 Playwright 日志中均出现，暂不能归因于本次 Secret 脱敏修改；应作为全局 DLL/主 Bundle 或扩展初始化问题单独定位和关闭。
 - 页面控制台仍有已知扩展错误：`getExtensionConsoleV3Embed is not a function`、`ConfigConstants` 未定义以及 `getStoreWithQueryHooks`。这些错误在部署前页面已存在，未阻止本轮 ConfigMap/Secret 原生页面加载，但仍需单独跟踪。
 - 项目概览仍能看到指向 `/consolev3` 的历史链接；本轮资源原生页面没有依赖 V3 弹窗，但这说明全局 V3 清理仍未完成。
 - 低权限账号、跨 namespace 正反权限和配置引用工作负载均未具备完整测试条件。

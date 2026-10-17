@@ -57,6 +57,8 @@
 
 Playwright 直达 Secret 详情页和刷新后，默认数据区域均显示固定掩码 `******`，不再显示 Base64 数据；专用复验 Secret 已清理。Secret 的模块门禁由“脱敏失败阻塞”调整为“VERIFY 部分通过，待补齐”，编辑、YAML、配置引用、低权限 RBAC 和完整 namespace 隔离仍未完成，不能标记为“已验收”。
 
+本轮浏览器日志同时记录到全局运行时错误：登录页出现 `ReferenceError: common is not defined`，登录后扩展初始化出现 `getExtensionConsoleV3Embed is not a function`、`getStoreWithQueryHooks` 和 `ConfigConstants` 未定义。它们未阻止 Secret 详情页加载，但浏览器验收结论应表述为“目标功能可访问，存在未关闭的全局运行时错误”；这些问题不归因于 Secret 脱敏修复，需单独追踪。
+
 ## 本轮顺序核验：Git 集成与风险关闭
 
 | 项目                            | 实际结果                                                                                                                                                                                               |
