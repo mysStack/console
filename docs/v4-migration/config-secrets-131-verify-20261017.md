@@ -132,7 +132,7 @@ ConfigMap：**部分通过，未验收**。Secret：**脱敏修复后部分通�
 
 ## 2026-10-17 主流程收尾复核
 
-本轮没有修改业务代码，也没有在 131 执行新的创建、编辑、删除或其他状态变更。针对当前模块的本地回归重新核对完成：ConfigMap、Secret、ServiceAccount 列表与详情相关测试，以及 ConfigReference、ConfigHistory、Secret 脱敏测试共 19 个测试文件、114 个用例通过。该结果只证明本地代码级回归通过，不能替代已部署制品上的浏览器和 RBAC 验证。
+本轮没有修改业务代码，也没有在 131 执行新的创建、编辑、删除或其他状态变更。针对当前模块的本地回归重新核对完成：ConfigMap、Secret、ConfigReference、ConfigHistory 和配置编辑相关测试共 19 个测试文件、119 个用例通过。该结果只证明本地代码级回归通过，不能替代已部署制品上的浏览器和 RBAC 验证。
 
 当前 131 运行状态仍为：Deployment generation/observedGeneration `510/510`，Pod `ks-console-699dd9c46f-jstfd` 为 Running/Ready，部署镜像 tag 为 `feature-v4-configmaps-secrets-20261017-200414-00310f5e5a31`，Pod imageID 对应 digest 为 `sha256:f9468e155d98b7872f35d5d2099f1d6e38f2093006ee77eddb85f20201f45a54`。此前已在该制品上完成项目 namespace 列表渲染、刷新和返回路径验证；当前浏览器会话已失效，新的独立登录被测试环境拒绝，因此本轮不能补记新的登录闭环。
 

@@ -103,7 +103,7 @@ Playwright 直达 Secret 详情页和刷新后，默认数据区域均显示固�
 
 ## 2026-10-17 主流程收尾复核
 
-- 本地回归：ConfigMap、Secret、ServiceAccount、ConfigReference、ConfigHistory 和 Secret 脱敏相关测试共 19 个文件、114 个用例通过。
+- 本地回归：ConfigMap、Secret、ConfigReference、ConfigHistory 和配置编辑相关测试共 19 个文件、119 个用例通过。
 - 131 制品：继续确认 `ks-console` generation/observedGeneration 为 `510/510`，Pod `ks-console-699dd9c46f-jstfd` 为 Ready，Pod imageID 为 `sha256:f9468e155d98b7872f35d5d2099f1d6e38f2093006ee77eddb85f20201f45a54`。
 - 浏览器状态：修复制品上既有的项目 namespace 列表、刷新和返回证据仍有效；当前会话已过期，新的独立登录被测试环境拒绝，未将其记为通过，也未继续尝试凭据。
 - 未关闭项：ConfigMap/Secret 数据编辑、YAML 持久化、配置引用工作负载、ServiceAccount 角色提交、低权限 RBAC、完整跨 namespace 正反路径和全局浏览器运行时错误。
