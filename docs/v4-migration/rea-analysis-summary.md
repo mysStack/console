@@ -65,7 +65,7 @@ REA 不要求对整个大型 Bundle 取得无截断的语义图；门禁要求�
 | P0-U001 | 旧 V3 源码基线              | 高   | 已定位远程 release-3.2/3.3/3.4 候选，但尚未证明与 `v3dist` 制品的构建对应关系 | 固定来源、版本、许可证，并与 `v3dist` 制品建立对应关系；若最终只有编译制品，记录来源、版本、许可证和仅做制品分析的边界，并由项目负责人确认 | 分析中 |
 | P0-U002 | 启用路由、扩展和动态 Action | 高   | 静态制品与当前启用入口尚未完成逐项映射         | 完成路由/扩展/Action 清单、focused REA 和运行时入口核对                                                                                    | 分析中 |
 | P0-U003 | 运行时 Network、菜单和路由  | 高   | 尚未在指定制品上完成脱敏采集和行为对照         | 在 131 部署制品上完成路由、菜单、Network 和错误态记录                                                                                      | 未开始 |
-| P0-U004 | P0 指定 `v3dist` 制品代次   | 高   | 当前基线制品来自 2025 年 Git 更新；历史 2026 制品另有 `.v3dist-source.json`，两者未完成选择和对应关系确认 | 固定本轮测试制品的 Git 提交、制品 SHA、外部镜像 tag/digest 和源码元数据；分析、部署、运行时证据必须使用同一制品身份 | 分析中 |
+| P0-U004 | P0 指定 `v3dist` 制品代次   | 高   | 当前基线与历史 2026 制品的文件 tree 已确认一致，但当前缺少 `.v3dist-source.json`，历史 `8843eadf1` 尚未从 V3 仓库核验 | 固定本轮测试制品的 Git 提交、制品 SHA、外部镜像 tag/digest 和源码元数据；分析、部署、运行时证据必须使用同一制品身份 | 分析中 |
 | P1-U001 | 公共作用域、RBAC 和缓存     | 高   | cluster/workspace/project/federated 矩阵未形成 | 完成正反权限、缓存隔离、返回恢复和跨作用域矩阵并通过复核                                                                                   | 未开始 |
 | P2-U001 | 三个资源模块的旧行为和权限  | 高   | 旧源码、Action/API、脱敏和作用域对照未完成     | ConfigMap、Secret、ServiceAccount 分别完成 REA 与模块矩阵复核                                                                              | 未开始 |
 
@@ -116,7 +116,7 @@ REA 不要求对整个大型 Bundle 取得无截断的语义图；门禁要求�
 | --- | --- | --- | --- |
 | P0-Audit | [静态盘点证据](./p0-audit-evidence.md)、[V3 路由入口库存](./p0-route-inventory.md)、[V3 Action 桥接库存](./p0-action-inventory.md) | `feature/v4-p0-audit` / `ec26ca27e`（首轮证据已汇入当前协调分支） | 已形成首轮 Wujie、V3 ResourceList、V3 Action 桥接、扩展、路由字符串、V4 路由注册和构建入口清单；启用入口仍需运行时核对 |
 | P0-REA | [制品分析证据](./p0-rea-evidence.md) | `feature/v4-p0-rea` / `5a0874d2e`（已汇入当前协调分支为 `4d93b4f81`） | focused REA 视图完成，但 semantic/application coverage 仍为 partial，432 个文件在视图外 |
-| P0-Baseline | [基线边界证据](./p0-baseline-evidence.md)、[V3 模块源码行为证据](./p0-v3-module-source-evidence.md) | `feature/v4-p0-baseline` / `bb4520715`（首轮证据已汇入当前协调分支） | Git refs、V3 源码候选、模块 Action 行为、制品历史来源和源码到静态服务入口已固定；外部制品代次及其源码对应关系仍未关闭 |
+| P0-Baseline | [基线边界证据](./p0-baseline-evidence.md)、[V3 模块源码行为证据](./p0-v3-module-source-evidence.md) | `feature/v4-p0-baseline` / `86b041dce`（首轮证据已汇入当前协调分支） | Git refs、V3 源码候选、模块 Action 行为、制品 tree 身份、历史来源和源码到静态服务入口已固定；来源元数据与源码 commit 仍未完全核验 |
 
 本轮 focused REA 的视图 Evidence ID 为 `ev_ffb7b2d8944f03db1f81697faa230110d1bcf3d4ebd203d3cc8695662f29fd0c`，父 Evidence ID 为 `ev_9ec76fca5d3ded4e263413f967715411463f8c622250d84abcb1c724065fcd8b`。该视图检查 441 个文件、解析 8 个指定 JavaScript 文件、记录 151 项静态发现；application unknowns 为 437，semantic unknowns 为 57,457，不能替代运行时证据。
 
