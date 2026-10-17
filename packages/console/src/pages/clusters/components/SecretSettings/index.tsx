@@ -52,7 +52,7 @@ function SecretSettings(
   { form, formTemplate, isFederated, cluster, disableSelect }: Props,
   ref: Ref<SecretSettingRef>,
 ) {
-  const [secretChanged, setSecretChanged] = useStore<boolean>('secretChanged');
+  const [, setSecretChanged] = useStore<boolean>('secretChanged');
   const [formData] = useState<OriginalSecret>(
     get(formTemplate, MODULE_KIND_MAP[module], formTemplate),
   );
@@ -71,8 +71,10 @@ function SecretSettings(
   }, []);
 
   useEffect(() => {
-    form.resetFields();
-  }, [secretChanged]);
+    if (state !== 'data') {
+      form.setFieldsValue(fedFormTemplate);
+    }
+  }, [state, fedFormTemplate, form]);
 
   const TypeOptions = [
     { label: t('DEFAULT'), value: 'Opaque' },
@@ -100,6 +102,7 @@ function SecretSettings(
     if (!type || SECRET_TYPES.includes(type)) {
       set(fedFormTemplate, 'data', {});
     }
+    form.resetFields(['data']);
     setSecretChanged(true);
     setType(value);
   };
@@ -123,6 +126,7 @@ function SecretSettings(
   };
 
   const showDataForm = () => {
+    setFedFormTemplate(prev => ({ ...prev, ...form.getFieldsValue() }));
     setState('data');
     setSelectDataKey('');
   };
@@ -146,7 +150,10 @@ function SecretSettings(
       delete originData[selectDataKey];
     }
 
-    set(fedFormTemplate, 'data', { ...originData, ...data });
+    const nextData = { ...originData, ...data };
+    const nextTemplate = { ...fedFormTemplate, data: nextData };
+    setFedFormTemplate(nextTemplate);
+    form.setFieldsValue({ data: nextData });
 
     hideDataForm();
   };
@@ -167,6 +174,7 @@ function SecretSettings(
         selectKey={selectDataKey}
         onOk={handleData}
         onCancel={hideDataForm}
+        module={module}
       />
     );
   };
@@ -178,7 +186,7 @@ function SecretSettings(
         name="data"
         rules={[{ required: true, message: t('ENTER_DATA_DESC') }, { validator: dataValidator }]}
       >
-        <DataList onEdit={handleDataItemEdit} onAdd={showDataForm} />
+        <DataList onEdit={handleDataItemEdit} onAdd={showDataForm} module={module} />
       </FormItem>
     );
   };

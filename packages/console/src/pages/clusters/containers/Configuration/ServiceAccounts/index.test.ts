@@ -14,4 +14,6 @@ test('ServiceAccount list uses native ListPage and shared store', () => {
 test('project-scoped ServiceAccount list filters by the route namespace', () => {
   assert.match(source, /getTableUrl/);
   assert.match(source, /namespace/);
+  assert.match(source, /hasNamespaceSelector=\{!namespace\}/);
+  assert.match(source, /namespace=\{namespace\}/);
 });

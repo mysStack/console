@@ -29,7 +29,7 @@ import ConfigResourceCreateModal from '../../components/ConfigResourceCreateModa
 function ConfigMaps(): JSX.Element {
   const { module, getDocsUrl, usePostMutation, usePutMutation } = configMapStore;
   const params = useParams<'cluster' | 'namespace' | 'workspace'>();
-  const { cluster = '', workspace } = params;
+  const { cluster = '', namespace, workspace } = params;
   const projectPrefix = `${workspace ? `/${workspace}` : ''}/clusters/${cluster}/projects`;
   const tableRef = useRef<TableRef<FormattedConfigMap>>(null);
   const docUrl = getDocsUrl();
@@ -236,20 +236,29 @@ function ConfigMaps(): JSX.Element {
 
   const handleCreateConfigMap = (data: Record<string, any>) => {
     mutateConfigMapCreate({
-      params: { cluster, namespace: data.metadata?.namespace },
+      params: { cluster, namespace: namespace || data.metadata?.namespace },
       data,
     });
   };
 
   return (
     <>
-      <ListPage banner={banner} table={table} store={configMapStore} hasNamespaceSelector />
+      <ListPage
+        banner={banner}
+        table={table}
+        store={configMapStore}
+        hasNamespaceSelector={!namespace}
+        getTableUrl={
+          namespace ? () => configMapStore.getResourceUrl({ cluster, namespace }) : undefined
+        }
+      />
       {createConfigMapModal.isOpen && (
         <ConfigResourceCreateModal
           module="configmaps"
           visible={true}
           cluster={cluster}
           workspace={workspace}
+          namespace={namespace}
           confirmLoading={isCreateConfigMapLoading}
           onOk={handleCreateConfigMap}
           onCancel={createConfigMapModal.close}

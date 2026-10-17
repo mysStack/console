@@ -8,6 +8,7 @@ import { get } from 'lodash';
 import baseStore from './store';
 import { getOriginData, getBaseInfo } from '../utils';
 import type { FormattedServiceAccount, OriginalServiceAccount } from '../types';
+import { mapServiceAccountSecrets } from './serviceAccountsMapper';
 
 const module = 'serviceaccounts';
 
@@ -18,7 +19,7 @@ const mapper = (item: OriginalServiceAccount): FormattedServiceAccount => {
     labels: get(item, 'metadata.labels', {}) as FormattedServiceAccount['labels'],
     annotations: get(item, 'metadata.annotations', {}) as FormattedServiceAccount['annotations'],
     role: get(item, 'metadata.annotations["iam.kubesphere.io/role"]', ''),
-    secrets: get(item, 'secrets', []),
+    secrets: mapServiceAccountSecrets(get(item, 'secrets', [])),
     _originData: getOriginData<OriginalServiceAccount>(item),
   };
 };
