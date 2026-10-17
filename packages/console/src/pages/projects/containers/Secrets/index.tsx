@@ -213,14 +213,14 @@ function Secrets(): JSX.Element {
       title: t('TYPE'),
       field: 'type',
       canHide: true,
-      width: '20%',
+      width: '15%',
       render: type => (type ? (SECRET_TYPES[type] ? t(SECRET_TYPES[type]) : type) : ''),
     },
     {
       title: t('SECRET_FIELD_COUNT'),
       field: 'data',
       canHide: true,
-      width: '16%',
+      width: '12%',
       render: data => (data && Object.keys(data)?.length) ?? 0,
     },
     {
@@ -228,7 +228,7 @@ function Secrets(): JSX.Element {
       field: 'createTime',
       sortable: true,
       canHide: true,
-      width: 250,
+      width: 180,
       render: time => formatTime(time),
     },
     {
