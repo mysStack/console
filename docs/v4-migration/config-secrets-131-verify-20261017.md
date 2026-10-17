@@ -183,3 +183,21 @@ Secret 的 YAML 编辑入口和数据持久化本轮未提交，配置引用、�
 本轮同时打开了“编辑 YAML”入口并确认编辑器可以显示当前对象。一次自动化键盘输入将编辑器自动缩进与输入文本中的缩进叠加，提交请求收到 HTTP 400；随后页面刷新恢复，Kubernetes 对象未被错误内容修改。这个过程不能作为 YAML 编辑器产品缺陷结论，也不能作为 YAML 持久化通过证据。YAML 编辑的有效粘贴、成功提交、刷新后持久化和错误提示仍需单独补测。
 
 因此 ConfigMap 的“编辑设置”数据持久化调整为**通过**；“YAML 持久化”仍为**未验证**。配置引用、低权限 RBAC、跨 namespace 正反隔离和完整功能等价性仍未关闭，模块继续保持“VERIFY 部分通过，待补齐”。
+
+## 2026-10-17 Secret 编辑设置脱敏修复复验
+
+本轮针对上一轮发现的真实问题继续执行：Secret 详情页默认显示掩码，但旧实现打开“编辑设置”时会把已有 Secret 数据解码后回填到表单，导致明文暴露。该问题已停止继续扩大写操作，并按测试流程完成最小修复。
+
+- 修复提交：`ba5a4518d`、`d6b4135fc`
+- 修复范围：Secret 数据列表不再解码并展示原值；编辑设置表单以空值/掩码状态加载，使用密码输入控件；未修改字段提交时保留原有编码值，新输入值才进行编码；ConfigMap 原有明文编辑行为保持不变
+- 单元测试：`./scripts/test.sh packages/console/src/pages/clusters/components/DataList/dataListUtils.test.ts`，58 个文件、230 个测试通过
+- 相关 ESLint、`git diff --check`：通过；Node 22 下本地生产构建曾直接遇到 OpenSSL 环境错误，CI 构建作为制品构建依据
+- GitHub Actions：Run `39046026262`；Unit tests 和 Build and publish 均成功
+- 镜像 tag：`feature-v4-configmaps-secrets-20261017-234040-d6b4135fc497`
+- 镜像 digest：`sha256:ab81aca98c7c5e659bff196d90f53d531ab6f5b451d5daf1018fd0159b04263e`
+- Deployment：`kubesphere-system/ks-console` generation/observedGeneration `512/512`，rollout 成功，副本、Ready、Available 均为 `1`
+- Pod：`ks-console-7766585f4-7lz6x` Running/Ready；imageID 为 `ghcr.io/mysstack/ks-console@sha256:ab81aca98c7c5e659bff196d90f53d531ab6f5b451d5daf1018fd0159b04263e`
+
+在该新制品上使用真实登录浏览器，在专用 namespace 创建 `v4-secret-mask-20261017-1548`，详情页数据仍显示固定掩码 `******`。进入“更多操作 → 编辑设置”后，已有键显示为未填充状态，没有回显原 Secret 值；随后关闭弹窗并通过原生详情页删除对象。API 复核该 Secret 及本轮生成的历史 Secret 均为 NotFound。测试值没有写入文档、快照或报告。
+
+该项修复已完成“代码 → CI 制品 → 131 rollout → 浏览器页面复验”闭环，Secret 的数据脱敏和编辑表单明文暴露问题可标记为**已验证修复**。Secret 模块仍不能标记为“已验收”，因为 YAML 持久化、配置引用、低权限 RBAC、完整 namespace 正反隔离和全部 V3 功能等价性仍未完成。浏览器控制台继续存在 `common is not defined`、`getExtensionConsoleV3Embed is not a function`、`getStoreWithQueryHooks` 和 `ConfigConstants` 等既有全局/扩展错误；它们未阻止本轮 Secret 页面流程，但不应从模块验收中省略。

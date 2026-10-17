@@ -145,6 +145,14 @@ Deployment `kubesphere-system/ks-console` generation/observedGeneration 为 `511
 
 角色缓存修复随后已构建并部署到 131：代码提交 `05450c14f733a1c2e189270f2b257759dadacd8b`，GitHub Actions Run `39038790572`，镜像 tag `feature-v4-configmaps-secrets-20261017-215959-05450c14f733`，digest `sha256:27ef8f71b889c4ddb2a9f19ddf22ce09eb7b148a47bc02a2fa8f482bdfdbab65`。Deployment generation/observedGeneration 为 `511/511`，Pod `ks-console-56cbbb9df8-ptp5r` 为 Running/Ready，imageID 与 digest 一致。浏览器直达项目 ServiceAccount 页面已执行，但已有会话已过期并重定向 `/login`；新制品的登录、角色弹窗、角色提交和页面渲染仍未验证。
 
+## 2026-10-17 Secret 编辑设置脱敏修复
+
+Secret 编辑设置曾在表单初始化时解码并回填已有数据，造成浏览器中出现明文。提交 `ba5a4518d`、`d6b4135fc` 已修复数据列表和编辑表单的处理：已有值保持掩码/空值，新值才编码提交，ConfigMap 明文编辑行为不变。
+
+本轮单元测试 `./scripts/test.sh packages/console/src/pages/clusters/components/DataList/dataListUtils.test.ts` 通过（58 个文件、230 个测试）；GitHub Actions Run `39046026262` 的 Unit tests 和 Build and publish 均成功。131 使用镜像 `feature-v4-configmaps-secrets-20261017-234040-d6b4135fc497`，digest `sha256:ab81aca98c7c5e659bff196d90f53d531ab6f5b451d5daf1018fd0159b04263e`，Deployment generation/observedGeneration `512/512`，Pod `ks-console-7766585f4-7lz6x` Running/Ready，imageID 与 digest 一致。
+
+真实登录浏览器在 `v4-migration-e2e` 创建专用 Secret 后，详情页显示 `******`；打开“编辑设置”时已有键为空值状态，未回显原 Secret 值。随后通过原生页面删除，API 复核对象和本轮历史对象均为 NotFound。该项标记为“已验证修复”，Secret 模块总体仍为“VERIFY 部分通过，待补齐”，YAML、配置引用、低权限 RBAC、完整 namespace 正反隔离和全部功能等价性未完成。
+
 ## 2026-10-17 ConfigMap 数据编辑补充验证
 
 在同一已部署制品和已登录浏览器会话中，ConfigMap 专用对象 `v4-cm-yaml-20261017-1457` 通过“编辑设置”新增数据键后，详情页、Kubernetes API 和刷新后的详情页均显示一致；“修改记录”显示 `#1`。对象随后经原生详情页删除，API 返回 NotFound，生成的配置历史 Secret 已清理。

@@ -210,3 +210,22 @@ Playwright 直达 Secret 详情页和刷新后，默认数据区域均显示固�
 | 低权限 RBAC                | 当前 Codex 会话 | `feature/v4-configmaps-secrets` | 当前只有 admin 测试账号，未模拟拒绝路径                                                                                                      | 阻塞                              |
 
 本批未修改业务代码，未启动子 Agent，未部署新制品。当前仍运行 `feature-v4-configmaps-secrets-20261017-215959-05450c14f733`，Pod `ks-console-56cbbb9df8-ptp5r` 为 Ready，实际 imageID 对应 digest `sha256:27ef8f71b889c4ddb2a9f19ddf22ce09eb7b148a47bc02a2fa8f482bdfdbab65`。ConfigMap、Secret、ServiceAccount 均继续保持“VERIFY 部分通过，待补齐”，全局 P0 保持“分析中，待负责人复核”。
+
+## 2026-10-17 Secret 编辑设置脱敏修复复验
+
+本轮继续按单 Codex 会话顺序执行，没有启动子 Agent。上一轮浏览器检查发现：Secret 详情页默认掩码正常，但“编辑设置”会把已有数据解码后回填，造成明文暴露。该问题已通过最小代码修复并完成新制品闭环验证。
+
+| 检查项         | 实际结果                                                                                                                                           | 状态       |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| 修复提交       | `ba5a4518d`、`d6b4135fc`；Secret 编辑表单保持已有值为空/掩码，新值才编码提交                                                                       | 已完成     |
+| 本地回归       | `./scripts/test.sh packages/console/src/pages/clusters/components/DataList/dataListUtils.test.ts`；58 个文件、230 个测试通过                       | 已完成     |
+| GitHub Actions | Run `39046026262`；Unit tests、Build and publish 均成功                                                                                            | 已完成     |
+| 131 制品       | tag `feature-v4-configmaps-secrets-20261017-234040-d6b4135fc497`；digest `sha256:ab81aca98c7c5e659bff196d90f53d531ab6f5b451d5daf1018fd0159b04263e` | 已部署     |
+| Pod 身份       | `ks-console-7766585f4-7lz6x` Running/Ready；imageID 与上述 digest 一致；Deployment generation/observedGeneration `512/512`                         | 已完成     |
+| 浏览器详情页   | 专用 Secret 数据显示 `******`                                                                                                                      | 已验证     |
+| 浏览器编辑设置 | 已有键显示为空值状态，没有回显原 Secret 值                                                                                                         | 已验证修复 |
+| 清理           | 专用 Secret 和本轮生成的历史 Secret 均经 API 复核为 NotFound；namespace 保留                                                                       | 已完成     |
+
+Secret 的明文暴露缺陷已完成“代码 → CI → 131 rollout → 真实浏览器复验”闭环，可以标记为**已验证修复**。Secret 模块总体仍不能标记为“已验收”：YAML 持久化、配置引用、低权限 RBAC、完整 namespace 正反隔离和全部 V3 功能等价性仍未完成。浏览器控制台仍有 `common is not defined`、`getExtensionConsoleV3Embed is not a function`、`getStoreWithQueryHooks` 和 `ConfigConstants` 等既有全局/扩展错误，未作为本轮 Secret 修复的回归通过条件。
+
+本轮浏览器页面仍使用真实登录会话，测试值没有写入日志、快照、文档或提交。PR #1 继续保持 Draft，全局 P0 继续保持“分析中，待负责人复核”，不自动进入 P1/P2。
