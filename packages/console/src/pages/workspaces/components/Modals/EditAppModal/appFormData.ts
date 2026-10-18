@@ -15,7 +15,7 @@ export type AppEditFormValues = {
   workspace: string;
 };
 
-export type AppPatchData = {
+export type AppPatchData = Partial<AppDetail> & {
   aliasName: string;
   description: string;
   abstraction: string;
