@@ -190,3 +190,18 @@ ConfigMap、Secret、ServiceAccount 的基础 CRUD、元数据、YAML、脱敏�
 ## 2026-10-18 全部业务 V3 Action 等价性跟踪
 
 已把 11 个业务调用文件拆成 12 个业务 Action 行，逐项记录旧源码、当前 V4 替代边界和运行时状态，见[全部业务 V3 Action 等价性矩阵](./v3-action-equivalence-matrix-20261018.md)。当前仅 ConfigMap、Secret、ServiceAccount 资源自身的基础 Action 已取得模块级证据；工作负载详情、DevOps、通知设置、应用模板、边缘批量操作等调用仍依赖 V3/Wujie 或缺少运行时证据，不能标记为全量等价。
+
+## 2026-10-18 应用模板详情路由和版本列表补测
+
+本轮继续执行未闭环的 V3 业务入口验证，没有重新进行全量 REA。旧制品真实浏览器直达 `/workspaces/test-workspace/apps/stakater-configmap` 时返回原生 `Not Found`；源码核对发现工作区路由未挂载 `appTemplateDetailRoutes`，且路由参数 `appId` 与组件和实际链接使用的 `appName` 不一致。提交 `b3e7571b4bddd812dd65fa67ea3741a48c14ef9c` 已完成这两个路由修复。
+
+部署后又发现版本子页面 `VersionListDetail` 仍返回空 Fragment。提交 `57f297f90f40136f57ba1fdd40c1417b17839abd` 恢复原生 `VersionList` 和上传版本入口，并增加回归测试。该提交本地 `./scripts/test.sh` 为 61 个文件、236 个测试通过，变更文件 ESLint、Prettier、`git diff --check` 和 `corepack yarn build:packages` 通过；GitHub Actions Run `39132471323` 的 Unit tests 和 Build and publish 均成功。
+
+131 部署及浏览器证据：
+
+- 镜像 tag：`feature-v4-configmaps-secrets-20261018-214008-57f297f90f40`。
+- 多架构 index digest：`sha256:24a0b0ed8d1b51afdaac381df715fc82529b342fb621b22a844aef2af0865041`。
+- Deployment `ks-console` generation/observedGeneration `517/517`，副本 `1/1` Ready；Pod `ks-console-58975f9479-vpx2b` 为 `Running/Ready`，实际 imageID 为 `sha256:3e299d0217e60ab90258830bc21cce12e61fbafc2f075792cbb3658c0e28bc62`。
+- 真实浏览器登录后，直达应用模板详情自动进入 `versions`；应用详情 API、版本列表 API 和 3 个版本详情 API 均为 `200`。页面渲染 1.0.5、1.0.2、1.0.1 三个版本，总数为 3；展开版本可见 Chart Files、Version Information、Deployment 和 View in Store；Upload Version 弹窗可以打开，Cancel 可以关闭，未产生写操作。
+
+本轮只关闭了应用模板详情路由和版本列表的渲染缺口，不能把 A09/A12 标记为完整等价：A09 的项目“从应用模板创建”仍缺少可用模板 fixture；A12 的编辑保存、删除、上传成功、失败/取消完整路径和 V3 Action 移除仍未闭环。此前真实浏览器点击详情页 Edit 曾出现页面空白，该缺陷继续保留。`/consolev3/dashboard` 预加载和扩展初始化错误仍按负责人指令延期，不能作为迁移通过证据。

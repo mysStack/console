@@ -249,6 +249,26 @@ Secret 的明文暴露缺陷已完成“代码 → CI → 131 rollout → 真实
 
 本轮没有修改业务代码，没有新建镜像或重新部署；复用的部署制品、Pod 身份和浏览器证据均已在 `config-secrets-131-verify-20261017.md` 记录。当前分支只新增本轮文档提交，模块仍为“VERIFY 部分通过，待补齐”，不进入 Deployment 正式开发。
 
+## 2026-10-18 应用模板详情补测（单 Codex 会话）
+
+| 负责人          | 分支                            | 提交 / CI                                                                    | 实际结果                                                                                                            | 状态         |
+| --------------- | ------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ------------ |
+| 当前 Codex 会话 | `feature/v4-configmaps-secrets` | `b3e7571b4bddd812dd65fa67ea3741a48c14ef9c`                                   | 修复工作区应用模板详情路由未挂载和 `appId`/`appName` 参数不一致；部署后直达详情路由返回 200 并进入版本页            | 已验证       |
+| 当前 Codex 会话 | `feature/v4-configmaps-secrets` | `57f297f90f40136f57ba1fdd40c1417b17839abd`；GitHub Actions Run `39132471323` | 恢复 `VersionListDetail` 的原生 `VersionList`，补充版本列表回归测试；本地 61 个文件、236 个测试通过，构建和 CI 通过 | 已提交并部署 |
+
+### 131 部署证据
+
+- 镜像 tag：`feature-v4-configmaps-secrets-20261018-214008-57f297f90f40`。
+- 多架构 index digest：`sha256:24a0b0ed8d1b51afdaac381df715fc82529b342fb621b22a844aef2af0865041`。
+- Deployment `ks-console` generation/observedGeneration：`517/517`，副本 `1/1` Ready。
+- Pod：`ks-console-58975f9479-vpx2b`，`Running/Ready`，实际 imageID：`sha256:3e299d0217e60ab90258830bc21cce12e61fbafc2f075792cbb3658c0e28bc62`。
+
+### 浏览器验证
+
+真实浏览器登录后直达 `/workspaces/test-workspace/apps/stakater-configmap`，详情 API、版本列表 API 和 3 个版本详情 API 均为 200；页面渲染 1.0.5、1.0.2、1.0.1 三个版本，总数为 3。版本项可展开查看 Chart Files、Version Information、Deployment 和 View in Store；Upload Version 弹窗可打开，Cancel 可关闭且未产生写操作。
+
+本轮只关闭详情路由和版本列表渲染缺口。A09 的应用模板创建仍缺少可用 fixture；A12 的编辑保存、删除、上传成功、失败/取消完整路径及 V3 Action 移除仍未闭环。此前点击详情页 Edit 出现页面空白，继续登记为未解决缺陷。扩展初始化错误按负责人指令延期，PR #1 继续保持 Draft，全局 P0 仍为“分析中，待负责人复核”。
+
 ## 2026-10-18 低权限 RBAC 验证补充（单 Codex 会话）
 
 | 任务                | 实际结果                                                                                                                                     | 状态           |

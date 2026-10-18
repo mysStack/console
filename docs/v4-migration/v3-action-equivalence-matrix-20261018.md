@@ -49,3 +49,18 @@ A02～A04 和 A01 共涉及三类工作负载详情与配置引用；A05～A12 �
 - 真实浏览器用户菜单没有出现通知设置入口，当前启用模块未提供 `notification.user.setting` 的可触发入口；该 Action 保持未验证。
 
 上述结果是环境/fixture 证据缺口，不是等价通过。需要相应的 DevOps、应用模板和通知模块测试数据或负责人确认功能未启用后，才能继续关闭这些 Action。
+
+## 2026-10-18 应用模板详情和版本列表补测
+
+本轮先在已部署的旧制品上直接访问 `/workspaces/test-workspace/apps/stakater-configmap`，发现路由返回原生 `Not Found`。源码核对确认两个问题：工作区路由没有挂载 `appTemplateDetailRoutes`，详情路由参数定义为 `appId`，而详情组件和实际链接使用 `appName`。已在提交 `b3e7571b4bddd812dd65fa67ea3741a48c14ef9c` 修复并部署验证。
+
+随后发现详情页的 `VersionListDetail` 仍返回空 Fragment，导致版本区域没有任何列表、上传入口或版本操作。已在提交 `57f297f90f40136f57ba1fdd40c1417b17839abd` 恢复原生 `VersionList`，并增加回归测试；该提交已通过 GitHub Actions Run `39132471323`，镜像 tag 为 `feature-v4-configmaps-secrets-20261018-214008-57f297f90f40`。
+
+在 131 的该制品上完成真实浏览器验证：
+
+- Deployment rollout 成功，Pod `ks-console-58975f9479-vpx2b` 为 `Running/Ready`；部署 tag 与分支、上海时间和短 SHA 一致，Pod imageID 为 `sha256:3e299d0217e60ab90258830bc21cce12e61fbafc2f075792cbb3658c0e28bc62`，镜像多架构 index digest 为 `sha256:24a0b0ed8d1b51afdaac381df715fc82529b342fb621b22a844aef2af0865041`。
+- 直达 `/workspaces/test-workspace/apps/stakater-configmap` 自动进入 `versions`，详情 API 返回 200；版本 API 返回 200，页面渲染 3 个版本（1.0.5、1.0.2、1.0.1），总数显示为 3。
+- 点击版本项可以展开 Chart Files、Version Information、Deployment 和 View in Store 操作；点击 Upload Version 可以打开原生上传弹窗，点击 Cancel 后弹窗关闭且未产生写操作。
+- 同一浏览器会话仍观测到 `/consolev3/dashboard` 预加载和已登记的扩展初始化错误；这些错误按负责人指令延期处理，不能据此把全局 V4 迁移标记为完成。
+
+本轮只关闭了 A12 的“详情路由和版本列表不可渲染”子缺口。A12 的编辑保存、删除、上传成功、错误/取消完整路径及 V3 Action 移除仍未闭环；点击详情页 Edit 在此前真实浏览器会话中会导致页面空白，当前保留为缺陷证据。A09 的项目“从应用模板创建”仍因抽屉没有可用模板数据而未验证。A01～A11 和 A12 均不能标记为全量等价通过。
