@@ -20,6 +20,8 @@ import {
   useActionMenu,
   getDisplayName,
   useCommonActions,
+  getSecretYamlEditorValue,
+  mergeSecretYaml,
 } from '@ks-console/shared';
 import type { FormattedSecret } from '@ks-console/shared';
 
@@ -91,6 +93,13 @@ function Secrets(): JSX.Element {
     callback,
   });
 
+  const editSecretYaml = (record: FormattedSecret) =>
+    editYaml({
+      initialValues: record,
+      yamlValue: getSecretYamlEditorValue(record._originData),
+      transformYaml: (data, initialValues) => mergeSecretYaml(initialValues._originData, data),
+    });
+
   const renderItemAction = useActionMenu<FormattedSecret>({
     authKey: module,
     params,
@@ -109,7 +118,7 @@ function Secrets(): JSX.Element {
         text: t('EDIT_YAML'),
         action: 'edit',
         show: row => !row.isFedManaged,
-        onClick: editYaml,
+        onClick: editSecretYaml,
       },
       {
         key: 'editSecret',
