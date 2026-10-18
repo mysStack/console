@@ -41,3 +41,11 @@ A02～A04 和 A01 共涉及三类工作负载详情与配置引用；A05～A12 �
 在 `v4-migration-e2e` 创建唯一临时 Deployment `v4-v3-workload-20261018`（副本数为 0，不启动业务 Pod），使用临时项目 admin 账号从真实浏览器登录并打开项目 Deployment 详情。页面实际请求了当前 V4 Deployment API，同时观测到 `/consolev3/dashboard` 请求；浏览器页面仍有已知运行时错误，未把该入口当作 V4 等价通过。
 
 该证据确认 A02 的项目 Deployment 详情仍与 V3/Wujie 兼容路径耦合，不能关闭 `workload.template.edit` 等价性。临时 Deployment、账号和 IAM 绑定已经清理。
+
+## 2026-10-18 DevOps、通知和应用入口补充
+
+- 真实浏览器打开 `/workspaces/test-workspace/devops`，页面请求了企业空间集群列表，但当前 `test-workspace` 没有可供 DevOps 页面选择的集群，页面停留在“请选择集群”，没有创建入口。因此 `devops.create`、`devops.edit` 不能伪造为已验证；当前环境缺少 DevOps fixture。
+- 真实浏览器打开项目 `/applications/template` 和 `/applications/edge`，原生应用列表、创建入口和“从应用模板创建”抽屉均可渲染；当前测试项目没有应用模板数据，无法触发 `app.template.create.v2`、`openpitrix.template.edit.v2` 或边缘应用部署链路。该范围保持未验证。
+- 真实浏览器用户菜单没有出现通知设置入口，当前启用模块未提供 `notification.user.setting` 的可触发入口；该 Action 保持未验证。
+
+上述结果是环境/fixture 证据缺口，不是等价通过。需要相应的 DevOps、应用模板和通知模块测试数据或负责人确认功能未启用后，才能继续关闭这些 Action。

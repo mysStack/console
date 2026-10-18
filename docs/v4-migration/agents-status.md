@@ -334,3 +334,7 @@ ConfigMap、Secret、ServiceAccount 的创建弹窗取消路径也已验证：�
 ## 2026-10-18 Deployment V3 入口运行时补充
 
 创建并清理了专用 Deployment 后，使用临时项目 admin 账号真实登录 131 并打开项目 Deployment 详情。Network 证据同时出现当前 Deployment API 和 `/consolev3/dashboard`，确认项目工作负载详情仍存在 V3/Wujie 兼容入口；该项没有标记为 V4 等价通过。临时 Deployment、账号和 IAM 绑定均已清理。
+
+## 2026-10-18 DevOps、通知、应用 V3 Action 取证
+
+真实浏览器已打开 DevOps、应用模板和用户菜单入口。当前 `test-workspace` 没有 DevOps 页面可选集群，测试项目没有应用模板数据，用户菜单未启用通知设置入口，因此 `devops.create/edit`、`app.template.create.v2`、`openpitrix.template.edit.v2`、`notification.user.setting` 均保持“未验证”，没有用静态页面渲染冒充运行时等价。后续需要对应 fixture 或负责人确认模块未启用。
