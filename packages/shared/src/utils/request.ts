@@ -40,6 +40,18 @@ function formatError(response: AxiosResponse): GlobalMessage {
   };
 }
 
+export function getGlobalMessage(error: any): GlobalMessage {
+  if (!error?.response) {
+    return {
+      status: 0,
+      reason: 'Network Error',
+      message: error?.message || 'Network request failed',
+    };
+  }
+
+  return formatError(error.response);
+}
+
 axios.interceptors.request.use((config: AxiosRequestConfig) => {
   config.url = getRequestUrl(config.url);
 
@@ -86,8 +98,8 @@ axios.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    if (!error.response.config.headers['x-ignore-error-notify']) {
-      const msg = formatError(error.response);
+    if (!error.response?.config?.headers?.['x-ignore-error-notify']) {
+      const msg = getGlobalMessage(error);
       const { $emit } = useEventEmitter();
       $emit('globalMsg', msg);
     }
