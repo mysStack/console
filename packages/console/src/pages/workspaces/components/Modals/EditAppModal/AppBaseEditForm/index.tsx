@@ -19,9 +19,10 @@ const { useCategoryList } = openpitrixStore;
 type Props = {
   form: any;
   detail: AppDetail;
+  initialValues: Record<string, unknown>;
 };
 
-function AppBaseEditForm({ form, detail }: Props): JSX.Element {
+function AppBaseEditForm({ form, detail, initialValues }: Props): JSX.Element {
   const { data: categories, isLoading } = useCategoryList();
   const categoryOptions = useMemo(() => {
     if (isLoading || isEmpty(categories)) {
@@ -44,7 +45,7 @@ function AppBaseEditForm({ form, detail }: Props): JSX.Element {
   }, [categories, isLoading]);
 
   return (
-    <Form form={form} initialValues={detail}>
+    <Form form={form} initialValues={initialValues}>
       <FormItem
         name={['name']}
         label={t('NAME')}

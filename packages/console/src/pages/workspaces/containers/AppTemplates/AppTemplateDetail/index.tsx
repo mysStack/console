@@ -6,7 +6,7 @@
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
 import { useCacheStore as useStore } from '@ks-console/shared';
-import { isEmpty, omit, pick } from 'lodash';
+import { isEmpty } from 'lodash';
 import { Loading, notify } from '@kubed/components';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -25,10 +25,11 @@ import {
   getVersionTypesName,
   getAnnotationsDescription,
 } from '@ks-console/shared';
-import type { AppDeployFormData, AppDetail } from '@ks-console/shared';
+import type { AppDeployFormData } from '@ks-console/shared';
 
 import { getAvatar } from '../../../utils';
 import { HelmUploadModal, EditAppModal } from '../../../components/Modals';
+import type { AppPatchData } from '../../../components/Modals/EditAppModal/appFormData';
 
 const PATH_PREFIX = '/workspaces/:workspace/apps/:appName';
 
@@ -154,11 +155,8 @@ function AppTemplateDetail(): JSX.Element {
     setModalType('');
   }
 
-  async function handleEditOk(data: Partial<AppDetail>): Promise<void> {
-    const pathParam = pick(data, ['app_id', 'workspace']);
-    const patchData = omit(data, ['app_id', 'workspace']);
-
-    await updateApp(pathParam, patchData);
+  async function handleEditOk(data: AppPatchData): Promise<void> {
+    await updateApp({ workspace, appName }, data);
     closeModal();
     notify.success(t('MODIFY_SUCCESSFUL'));
     appDetail.refetchAppDetails?.();
