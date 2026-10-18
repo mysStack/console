@@ -330,3 +330,7 @@ ConfigMap、Secret、ServiceAccount 的创建弹窗取消路径也已验证：�
 ## 2026-10-18 全部业务 V3 Action 逐项跟踪
 
 已将 11 个业务调用文件拆分为 12 个业务 Action 行，写入[全部业务 V3 Action 等价性矩阵](./v3-action-equivalence-matrix-20261018.md)。ConfigMap、Secret、ServiceAccount 资源自身的基础功能已完成模块级证据；工作负载模板编辑、DevOps、通知设置、应用模板和边缘操作仍有 V3/Wujie 依赖或运行时证据缺口，不能标记为全量等价。
+
+## 2026-10-18 Deployment V3 入口运行时补充
+
+创建并清理了专用 Deployment 后，使用临时项目 admin 账号真实登录 131 并打开项目 Deployment 详情。Network 证据同时出现当前 Deployment API 和 `/consolev3/dashboard`，确认项目工作负载详情仍存在 V3/Wujie 兼容入口；该项没有标记为 V4 等价通过。临时 Deployment、账号和 IAM 绑定均已清理。
