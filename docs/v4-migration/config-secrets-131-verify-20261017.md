@@ -306,6 +306,10 @@ Secret 的 YAML 数据暴露阻塞已完成“代码 → 单元测试 → CI 制
 
 该项关闭 ConfigMap、Secret 的原生批量删除路径证据；批量操作的低权限拒绝、网络失败和全部 V3 行为逐项对照仍按剩余矩阵继续验证。
 
+### 创建取消路径补充
+
+通过真实浏览器分别打开 ConfigMap、Secret、ServiceAccount 原生“创建”弹窗，未填写数据直接按 `Escape` 取消。三个弹窗均正常关闭并回到原列表路由，没有创建对象或改变 Kubernetes API 状态。
+
 ## 2026-10-18 网络失败错误反馈修复与部署后复验
 
 本轮在 namespace 路径验证中进一步注入资源列表 API 的网络失败，发现通用请求拦截器在没有 HTTP response 的情况下直接访问 `error.response.config.headers`，导致页面只显示空列表，用户看不到失败原因。

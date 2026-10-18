@@ -302,6 +302,8 @@ Secret 的明文暴露缺陷已完成“代码 → CI → 131 rollout → 真实
 
 本轮另通过真实浏览器验证 ConfigMap、Secret 的原生批量删除：各创建两个唯一临时对象，逐行勾选后提交确认，页面返回列表且两个对象均从页面消失，Kubernetes API 均为 `NotFound`；临时对象已清理，未输出 Secret 值。
 
+ConfigMap、Secret、ServiceAccount 的创建弹窗取消路径也已验证：打开弹窗后直接按 `Escape`，弹窗关闭、路由保持列表页，未产生 Kubernetes 对象。
+
 ## 2026-10-18 网络失败错误反馈修复
 
 | 项目       | 实际结果                                                                                                                                 | 状态         |
