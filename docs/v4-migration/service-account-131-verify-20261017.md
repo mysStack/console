@@ -118,3 +118,15 @@ ServiceAccount 仍为“VERIFY 部分通过，待补齐”。新提交完成部�
 可编辑字段、低权限账号的拒绝路径、完整跨 namespace 正反权限验证、集群级与项目级全部行为等价性仍未完成。浏览器控制台仍有已知全局/扩展错误，页面能够完成目标流程，但不能宣称控制台无错误。
 
 因此 ServiceAccount 状态更新为：**角色缓存、项目页面和专用角色提交部分通过，模块仍未验收**。
+
+## 2026-10-18 ServiceAccount 角色与可编辑字段部署后复验
+
+本轮继续使用 131 最终制品 `feature-v4-configmaps-secrets-20261018-113604-cc8e9fc7e47b`，manifest digest 为 `sha256:79392342480fce277e0243ca5eef25f8c9b1983e1c7c9412e29ddcb3286bf3ce`；Deployment `kubesphere-system/ks-console` 为 `514/514`，Pod `ks-console-5cd7f8cdcd-4r5tv` Running/Ready，imageID 与 digest 一致。测试使用真实 Playwright 登录，专用 namespace 为 `v4-migration-e2e`。
+
+- 通过项目原生“创建”弹窗创建 `v4-sa-verify-20261018`，创建弹窗中的项目字段锁定为当前 `v4-migration-e2e`；API 复核 namespace 正确，未自动生成长期 Token Secret。
+- 通过详情页“更多操作 → 修改角色”选择并提交 `viewer`，随后再次修改为 `operator`；页面刷新后仍显示 `operator`，API 复核对应 RoleBinding 的 `roleRef` 为 `iam:operator`。这同时覆盖了角色选项、提交、状态刷新和缓存作用域。
+- 通过“编辑信息”提交允许修改的别名和描述字段，详情页和 API 均复核写入；名称字段保持禁用，未修改 namespace、owner 或其他受保护字段。
+- 通过详情页删除确认框输入专用 ServiceAccount 名称并完成删除；页面回到项目列表，API 复核 ServiceAccount 为 NotFound，相关 RoleBinding 也已消失，既有 `default` 未受影响。
+- 当前浏览器仍记录既有全局/扩展错误；目标页面、创建、角色修改、字段编辑和删除流程均完成，不能据此宣称浏览器控制台无错误。扩展运行时错误按负责人指令暂不处理。
+
+本轮关闭了 ServiceAccount 的项目角色提交和允许编辑字段证据，专用资源已清理，namespace 保留。ServiceAccount 仍为**部分通过，未验收**；剩余项目为低权限正反路径的完整矩阵、跨 namespace 正反隔离、集群级与项目级全部行为等价性和错误态组合。

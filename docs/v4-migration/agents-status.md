@@ -276,3 +276,11 @@ Secret 的明文暴露缺陷已完成“代码 → CI → 131 rollout → 真实
 本轮先在实际项目路由发现第一次修复遗漏：只改集群配置入口不足以覆盖 `/test-workspace/clusters/host/projects/.../secrets/...`，项目详情仍调用通用 YAML 编辑器。该遗漏已由 `cc8e9fc7e` 补齐并重新完成构建、部署和浏览器验收，已记录到 [ConfigMap/Secret VERIFY 记录](./config-secrets-131-verify-20261017.md)。
 
 当前未解决项：Secret 模块完整 namespace 正反隔离、全量错误态组合、全部 V3 功能等价性；扩展运行时错误按负责人指令延后。全局 P0 仍为“分析中，待负责人复核”，PR #1 保持 Draft，不自动进入下一个模块。
+
+## 2026-10-18 当前任务状态：ServiceAccount 角色与可编辑字段已复验
+
+| 负责人          | 分支/制品                                                                                      | 任务                                                          | 实际结果                                                                                                                                                                                                 | 状态           |
+| --------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
+| 当前 Codex 会话 | `feature/v4-configmaps-secrets` / `feature-v4-configmaps-secrets-20261018-113604-cc8e9fc7e47b` | ServiceAccount 项目级创建、角色提交、允许字段编辑、刷新和删除 | 真实浏览器创建专用 ServiceAccount；`viewer` → `operator` 角色提交后 API RoleBinding 与页面刷新一致；别名和描述写入后 API/页面一致；删除后 ServiceAccount 和 RoleBinding 为 NotFound，既有 `default` 保留 | 已完成本轮证据 |
+
+本轮使用的 Pod 为 `ks-console-5cd7f8cdcd-4r5tv`，imageID 对应 manifest digest `sha256:79392342480fce277e0243ca5eef25f8c9b1983e1c7c9412e29ddcb3286bf3ce`，Deployment generation/observedGeneration 为 `514/514`。ServiceAccount 模块仍未验收，剩余完整低权限矩阵、跨 namespace 正反隔离、集群/项目全部行为等价性和错误态组合；扩展运行时错误延后。
