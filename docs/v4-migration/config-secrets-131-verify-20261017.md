@@ -226,3 +226,22 @@ Secret 的 YAML 编辑入口和数据持久化本轮未提交，配置引用、�
 本轮创建的 ConfigMap、Secret、Deployment 及配置历史 Secret 均已按名称删除，并分别复核为 NotFound；`v4-migration-e2e` namespace 及既有资源未删除。
 
 ConfigMap 的有效 YAML 和配置引用已取得部署后浏览器/API 证据；Secret 的配置引用已取得部署后浏览器/API 证据。三个模块仍不能标记为“已验收”，剩余缺口为低权限账号的正反 RBAC、完整跨 namespace 正反隔离、ServiceAccount 剩余可编辑字段和全部 V3 功能等价性。扩展运行时错误本轮按负责人指令暂不处理，继续单独登记，不影响本轮资源引用证据结论。
+
+## 2026-10-18 低权限 RBAC 浏览器验收
+
+本轮按负责人授权，在 131 测试集群创建临时 KubeSphere 用户 `v4-rbac-viewer-20261018`，只授予 `test-workspace` 查看企业空间角色和 `v4-migration-e2e` 项目 `viewer` 角色。密码通过受限临时文件传递，未写入仓库、日志、截图或文档；测试结束后用户、WorkspaceRoleBinding、项目 RoleBinding 和临时凭据文件均已删除。
+
+在真实 Playwright 浏览器会话中完成登录，页面显示当前用户为该临时查看账号，未使用 admin 模拟低权限行为：
+
+- ConfigMap 项目列表可读，只显示 `v4-migration-e2e` 当前 namespace 的对象；详情页可访问，页面没有创建、编辑或删除操作入口。
+- Secret 项目列表可读，详情页数据值显示固定掩码 `******`，没有输出测试 Secret 值；页面没有创建、编辑或删除操作入口。
+- ServiceAccount 项目列表可读，页面没有创建、角色修改或删除操作入口。
+- 通过浏览器会话实际调用当前 namespace API：
+  - ConfigMap：GET `200`；POST、PUT、DELETE 均为 `403`。
+  - Secret：GET `200`；POST、PUT、DELETE 均为 `403`。
+  - ServiceAccount：GET `200`；POST、PUT、DELETE 均为 `403`。
+- 直接访问同一企业空间下的 `test-wes` 项目时，页面只加载 `test-wes` 的当前 namespace 数据，没有混入 `v4-migration-e2e` 数据；本轮没有修改 `test-wes` 或其他既有项目。
+
+本轮专用 ConfigMap `v4-rbac-config-20261018` 和 Secret `v4-rbac-secret-20261018`、用户及绑定均已清理并复核；`v4-migration-e2e` namespace 保留。
+
+该结果关闭了 ConfigMap、Secret、ServiceAccount 的低权限读写边界验证缺口，但不等于完整 RBAC 矩阵或模块验收完成。剩余项为完整跨 namespace 正反路径、ServiceAccount 剩余可编辑字段和全部 V3 功能等价性。扩展运行时错误继续按负责人指令暂不处理。
