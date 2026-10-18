@@ -130,3 +130,11 @@ ServiceAccount 仍为“VERIFY 部分通过，待补齐”。新提交完成部�
 - 当前浏览器仍记录既有全局/扩展错误；目标页面、创建、角色修改、字段编辑和删除流程均完成，不能据此宣称浏览器控制台无错误。扩展运行时错误按负责人指令暂不处理。
 
 本轮关闭了 ServiceAccount 的项目角色提交和允许编辑字段证据，专用资源已清理，namespace 保留。ServiceAccount 仍为**部分通过，未验收**；剩余项目为低权限正反路径的完整矩阵、跨 namespace 正反隔离、集群级与项目级全部行为等价性和错误态组合。
+
+## 2026-10-18 项目 namespace 隔离和 NotFound 验证补充
+
+在 131 当前最终制品 `feature-v4-configmaps-secrets-20261018-113604-cc8e9fc7e47b` 上，使用真实 Playwright 登录创建唯一临时 ServiceAccount，执行项目列表、详情、刷新、浏览器返回和切换 `test-wes` 项目列表验证。当前项目对象在 `v4-migration-e2e` 页面可见，详情和刷新后的列表均可见，浏览器返回后仍可见；直达 `test-wes` 页面时不显示该对象。测试结束后专用 ServiceAccount 已删除，未修改 `test-wes` 或既有 ServiceAccount。
+
+同时直达一个不存在的 ServiceAccount 详情 URL，页面显示 Kubernetes `NotFound ... not found`，没有渲染错误对象。
+
+本轮关闭 ServiceAccount 的项目级 namespace 正向展示、跨项目对象排除、刷新、浏览器返回和不存在对象错误反馈证据。集群级与项目级全部行为等价性、全量错误态组合和完整 RBAC 矩阵仍未完成；扩展运行时错误继续延期。

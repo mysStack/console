@@ -284,3 +284,18 @@ Secret 的明文暴露缺陷已完成“代码 → CI → 131 rollout → 真实
 | 当前 Codex 会话 | `feature/v4-configmaps-secrets` / `feature-v4-configmaps-secrets-20261018-113604-cc8e9fc7e47b` | ServiceAccount 项目级创建、角色提交、允许字段编辑、刷新和删除 | 真实浏览器创建专用 ServiceAccount；`viewer` → `operator` 角色提交后 API RoleBinding 与页面刷新一致；别名和描述写入后 API/页面一致；删除后 ServiceAccount 和 RoleBinding 为 NotFound，既有 `default` 保留 | 已完成本轮证据 |
 
 本轮使用的 Pod 为 `ks-console-5cd7f8cdcd-4r5tv`，imageID 对应 manifest digest `sha256:79392342480fce277e0243ca5eef25f8c9b1983e1c7c9412e29ddcb3286bf3ce`，Deployment generation/observedGeneration 为 `514/514`。ServiceAccount 模块仍未验收，剩余完整低权限矩阵、跨 namespace 正反隔离、集群/项目全部行为等价性和错误态组合；扩展运行时错误延后。
+
+## 2026-10-18 项目 namespace 隔离和错误反馈继续验证
+
+本轮在 131 最终制品 `feature-v4-configmaps-secrets-20261018-113604-cc8e9fc7e47b` / manifest digest `sha256:79392342480fce277e0243ca5eef25f8c9b1983e1c7c9412e29ddcb3286bf3ce` 上，使用真实浏览器登录，分别为 ConfigMap、Secret、ServiceAccount 创建并清理唯一临时对象。
+
+| 验证项                                 | ConfigMap | Secret | ServiceAccount |
+| -------------------------------------- | --------- | ------ | -------------- |
+| 当前 namespace 列表显示对象            | 通过      | 通过   | 通过           |
+| 详情页显示对象                         | 通过      | 通过   | 通过           |
+| 刷新后保持                             | 通过      | 通过   | 通过           |
+| 浏览器返回后保持                       | 通过      | 通过   | 通过           |
+| 切换 `test-wes` 后排除当前对象         | 通过      | 通过   | 通过           |
+| 不存在对象详情显示 Kubernetes NotFound | 通过      | 通过   | 通过           |
+
+本轮关闭三个模块的项目级 namespace 展示/排除、刷新、浏览器返回和 NotFound 证据。模块仍为“VERIFY 部分通过，待补齐”，剩余完整 RBAC 组合、全部 V3 功能等价性和全部错误态组合；扩展运行时错误按负责人指令延期。测试对象均已清理，`v4-migration-e2e` namespace 保留。
