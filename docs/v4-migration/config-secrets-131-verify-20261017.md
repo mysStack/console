@@ -251,3 +251,35 @@ ConfigMap 的有效 YAML 和配置引用已取得部署后浏览器/API 证据�
 为区分“企业空间查看权限”和“项目查看权限”，又创建了临时账号 `v4-project-viewer-20261018`，只绑定 `v4-migration-e2e` 的项目 `viewer` RoleBinding，不绑定 `test-workspace` WorkspaceRoleBinding。该账号可以登录，但直接访问项目 ConfigMap 路由被前端返回 `/errors/403`；这说明当前 KubeSphere UI 要求账号先具备企业空间成员权限，单独的项目 RoleBinding 不能完成浏览器项目入口授权。
 
 该账号及绑定已经清理。前一个带 `test-workspace` 查看角色的临时账号能够访问 `v4-migration-e2e` 和 `test-wes`，但每个项目页面只加载自身 namespace 的资源；因此本轮已验证页面请求的当前 namespace 范围和低权限读写边界，完整“仅授权项目可见”的企业空间成员模型仍需按项目负责人定义继续确认。
+
+## 2026-10-18 Secret YAML 脱敏阻塞修复与部署后复验
+
+本轮按“发现阻塞先统一处理，再继续测试”执行。上一轮在 131 浏览器打开 Secret 的“编辑 YAML”时发现真实缺陷：编辑器直接渲染 `_originData`，既显示 `data` 中的 Base64 值，也可能通过 `kubectl.kubernetes.io/last-applied-configuration` 注解间接显示同一数据。该问题属于产品数据暴露风险，立即停止继续写入并清理专用 Secret；不把它归为测试脚本问题。
+
+### 修复范围
+
+- `packages/shared/src/utils/secretYaml.ts` 新增 Secret YAML 编辑器的脱敏和提交合并逻辑：已有 `data` 值在编辑器中统一显示固定占位标记，移除可能包含原始数据的 `last-applied-configuration` 注解；用户明确替换的值仍按 Kubernetes Secret YAML 的 Base64 语义提交，未修改的占位标记会合并回原值。
+- `useCommonActions.editYaml` 增加可选的 YAML 展示值和提交转换钩子，普通资源继续使用原行为。
+- 同时修复集群配置入口和实际项目入口：`clusters/containers/Configuration/Secrets` 与 `projects/containers/Secrets` 的列表、详情“编辑 YAML”均使用脱敏路径。第一次修复只覆盖了集群配置入口，部署后复验发现项目路由仍使用旧实现，已由第二个提交补齐；这次漏测已记录为路由覆盖问题。
+
+### 代码、制品和部署证据
+
+- 修复提交：`cc36e3535`（通用脱敏逻辑、单元测试、集群入口）和 `cc8e9fc7e`（项目列表和详情入口）。远程分支已更新到 `cc8e9fc7e47bc08ea4e92d261fa21695d29a6226`。
+- 本地回归：`./scripts/test.sh`，59 个文件、233 个测试通过；`git diff --check` 通过；变更文件 ESLint 无错误；`corepack yarn build:packages` 通过。
+- GitHub Actions：Run `39094132849`，Unit tests 和 Build and publish 均成功。第一次使用短 SHA 作为 workflow `source_ref` 的构建因 checkout 无法解析短 SHA 失败，未部署该制品；随后使用分支触发，得到正确 tag。
+- 最终镜像 tag：`feature-v4-configmaps-secrets-20261018-113604-cc8e9fc7e47b`。
+- 最终镜像 manifest digest：`sha256:79392342480fce277e0243ca5eef25f8c9b1983e1c7c9412e29ddcb3286bf3ce`。
+- 131 部署：`kubesphere-system/ks-console` generation/observedGeneration 为 `514/514`，rollout 成功；最终 Pod `ks-console-5cd7f8cdcd-4r5tv` 为 Running/Ready，Pod imageID 与上述 manifest digest 一致。旧 Pod 已退出，Deployment 保持 1 个副本。
+
+### 真实浏览器复验
+
+在已部署最终制品上用 Playwright 真实登录并直达项目 Secret 详情页，创建专用对象 `v4-secret-yaml-redact-20261018`，其 `data` 通过 `kubectl apply` 生成 `last-applied-configuration` 注解，以覆盖真实风险路径。复验结果如下：
+
+- “编辑 YAML”编辑器只显示固定脱敏占位标记；原有两个测试值和 `last-applied-configuration` 均不出现在页面文本中。
+- 在编辑器内明确替换两个键并增加一个键，点击“确定”后 Kubernetes API 的键集合为 `initial_key, updated_key, yaml_key`，三个值均按预期持久化；结果只用键名和布尔断言记录，没有输出值。
+- 浏览器重新加载详情页后，新增键仍显示，Secret 数据区域仍显示 `******`；页面不显示 Base64 值。
+- 专用 Secret 及本轮生成的历史 Secret 已删除，主对象 API 复核为 NotFound；`v4-migration-e2e` namespace 保留。
+
+### 当前模块状态修正
+
+Secret 的 YAML 数据暴露阻塞已完成“代码 → 单元测试 → CI 制品 → 131 rollout → 真实浏览器渲染、写入、刷新 → 清理”闭环，可标记为**已验证修复**；Secret 模块总体仍为“VERIFY 部分通过，待补齐”。尚未关闭的模块级项目包括完整配置引用回归、完整 namespace 正反隔离、全部 V3 功能等价性和其他错误态组合。浏览器仍记录既有全局/扩展错误；扩展运行时错误按负责人指令暂不处理，不能表述为浏览器无错误。
