@@ -138,3 +138,5 @@ ServiceAccount 仍为“VERIFY 部分通过，待补齐”。新提交完成部�
 同时直达一个不存在的 ServiceAccount 详情 URL，页面显示 Kubernetes `NotFound ... not found`，没有渲染错误对象。
 
 本轮关闭 ServiceAccount 的项目级 namespace 正向展示、跨项目对象排除、刷新、浏览器返回和不存在对象错误反馈证据。集群级与项目级全部行为等价性、全量错误态组合和完整 RBAC 矩阵仍未完成；扩展运行时错误继续延期。
+
+后续完整 RBAC 组合矩阵已在当前 131 制品上执行，见[RBAC 组合验证记录](./rbac-matrix-131-verify-20261018.md)。`viewer`、`workspaceonly`、`projectonly`、`clusterviewer` 的 ServiceAccount 创建、更新、角色 PATCH 和删除均按权限返回 `403`；`operator`、`admin` 的创建、更新、角色 PATCH 和删除均成功；集群 viewer 的集群级 ServiceAccount 列表 GET 成功。ServiceAccount 仍未完成全部 V3 行为逐项等价性和真实 API Server 故障验证。

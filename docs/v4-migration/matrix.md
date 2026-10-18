@@ -172,3 +172,13 @@ Secret 编辑设置曾在表单初始化时解码并回填已有数据，造成�
 在同一已部署制品和已登录浏览器会话中，ConfigMap 专用对象 `v4-cm-yaml-20261017-1457` 通过“编辑设置”新增数据键后，详情页、Kubernetes API 和刷新后的详情页均显示一致；“修改记录”显示 `#1`。对象随后经原生详情页删除，API 返回 NotFound，生成的配置历史 Secret 已清理。
 
 “编辑 YAML”入口可以打开并显示对象内容，但本轮一次自动化输入因编辑器自动缩进与输入缩进叠加，向 API 提交了 HTTP 400；对象没有被错误更新。由于没有形成有效 YAML 粘贴和成功提交的独立证据，矩阵只将 ConfigMap 的数据编辑标记为“已验证”，YAML 持久化继续标记为“未验证”，不能据此扩大为模块验收通过。配置引用、低权限 RBAC、跨 namespace 正反隔离和完整功能等价性仍未关闭。
+
+## 2026-10-18 完整 RBAC 组合矩阵
+
+本轮在当前 131 制品上使用真实 Playwright 登录，建立 `viewer`、`operator`、`admin`、仅企业空间、仅项目和集群只读六种临时账号组合，逐项验证项目 ConfigMap、Secret、ServiceAccount 的 GET/POST/PUT/PATCH/DELETE，以及项目和集群路由。完整状态码、账号绑定、截图和清理结果见[完整 RBAC 组合验证记录](./rbac-matrix-131-verify-20261018.md)。
+
+本轮结果：项目 viewer 和仅企业空间组合为项目读 `200`、项目写 `403`；operator/admin 的项目创建、更新、删除和 ServiceAccount 角色 PATCH 均通过；仅项目账号的 Console 项目入口为 `/errors/403`；集群 viewer 的集群级三个资源列表 GET 为 `200`，项目写入仍为 `403`。临时业务资源已清理，三个模块保持“VERIFY 部分通过，待补齐”。
+
+## 2026-10-18 V3 功能逐项等价性核对结果
+
+ConfigMap、Secret、ServiceAccount 的基础 CRUD、元数据、YAML、脱敏、ServiceAccount 角色和通用删除已按 V3 Action 逐项对照，并把旧源码位置、V4 替代入口和 131 证据写入[V3 等价性核对记录](./v3-equivalence-config-secrets-131-20261018.md)。其中旧 `secret.default` 的默认 Secret 语义在当前 V4 中未找到对应入口或 Store 实现，联邦 ConfigMap/Secret 仍使用 `consolev3` Embed；这两项不能标记为等价，三个模块保持“VERIFY 部分通过，待补齐”。

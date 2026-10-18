@@ -316,3 +316,13 @@ ConfigMap、Secret、ServiceAccount 的创建弹窗取消路径也已验证：�
 | 浏览器验证 | 正常列表可渲染；拦截 ConfigMap 列表 API 后页面显示 `Network Error`，未再抛出无 response 异常                                             | 已验证       |
 
 本轮网络失败验证使用 Playwright 只拦截目标列表 API，没有修改集群资源。真实 API Server 故障未执行；错误提示已补齐，页面同时保留空数据区域。扩展运行时错误继续延期。
+
+## 2026-10-18 完整 RBAC 组合矩阵已执行
+
+当前 Codex 会话在 131 已部署制品上完成六种临时账号组合的真实浏览器登录和浏览器内 API 验证：企业空间 viewer、项目 viewer、operator、admin、仅企业空间、仅项目和集群 viewer 边界均已记录。项目 ConfigMap、Secret、ServiceAccount 的读写状态码、ServiceAccount 角色 PATCH、项目/集群路由结果已写入[RBAC 组合验证记录](./rbac-matrix-131-verify-20261018.md)。
+
+本轮没有使用 admin 代替低权限账号；所有临时业务资源已删除，`v4-migration-e2e` namespace 保留。该项关闭了低权限组合矩阵的实际 API 和路由证据缺口，但不关闭全部 V3 行为等价性，也不代表三个模块已经验收。真实 API Server 故障仍未执行，原因是需要对共享 131 集群实施可回滚故障注入。
+
+## 2026-10-18 V3 功能逐项等价性核对
+
+已完成 ConfigMap、Secret、ServiceAccount 模块范围内的 V3 Action 对照：基础创建、编辑、元数据、YAML、删除、批量删除和 ServiceAccount 角色均有旧源码、V4 入口及 131 运行时证据。核对同时发现旧 `secret.default` 默认 Secret 语义在当前 V4 中没有对应入口或 Store 实现，联邦 ConfigMap/Secret 仍保留 `consolev3` Embed；两项已登记为未等价，未冒充通过。全仓库其余 V3/Wujie Action 仍未完成逐项等价验收。

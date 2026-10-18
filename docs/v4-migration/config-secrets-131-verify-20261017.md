@@ -327,3 +327,5 @@ Secret 的 YAML 数据暴露阻塞已完成“代码 → 单元测试 → CI 制
 - 在该新制品上用真实 Playwright 登录，正常 ConfigMap 页面可渲染；随后只拦截当前 ConfigMap 列表 API，浏览器页面保持项目路由并显示 `Network Error`，没有再因为无 HTTP response 抛出前端异常。
 
 该修复关闭了资源列表网络失败的错误提示缺口。API 失败时页面仍会显示空数据区域，同时显示错误提示；扩展初始化错误继续按负责人指令延期。真实集群断网或 API Server 故障未执行，本轮使用 Playwright 网络拦截进行确定性验证。
+
+本轮后续完整 RBAC 组合矩阵见[RBAC 组合验证记录](./rbac-matrix-131-verify-20261018.md)：六种临时账号组合已经在当前部署制品上完成真实浏览器登录、项目/集群路由和 ConfigMap、Secret 的 GET/POST/PUT/DELETE 验证。ConfigMap 和 Secret 的项目读写边界已由 `viewer`、`workspaceonly`、`operator`、`admin`、`projectonly`、`clusterviewer` 分别取得状态码证据；该结果不能替代全部 V3 功能逐项等价性和真实 API Server 故障验证。
