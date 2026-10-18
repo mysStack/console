@@ -262,3 +262,7 @@ Secret 的明文暴露缺陷已完成“代码 → CI → 131 rollout → 真实
 | 扩展运行时错误      | 按负责人指令暂不处理                                                                                                                         | 延后           |
 
 本轮使用的已部署制品仍为 `feature-v4-configmaps-secrets-20261017-234040-d6b4135fc497`，digest `sha256:ab81aca98c7c5e659bff196d90f53d531ab6f5b451d5daf1018fd0159b04263e`，Pod `ks-console-7766585f4-7lz6x` 为 Running/Ready；没有修改业务代码、没有重新构建镜像、没有部署新制品。
+
+### 项目级权限模型补充
+
+另创建临时账号 `v4-project-viewer-20261018`，只绑定 `v4-migration-e2e` 项目 `viewer` RoleBinding，不绑定企业空间角色。该账号登录成功，但直达项目 ConfigMap 路由得到 `/errors/403`；验证了当前浏览器入口还要求 WorkspaceRoleBinding。该账号和绑定已清理。前一个带 `test-workspace` 查看角色的低权限账号能访问多个项目，但各项目页面只返回当前 namespace 数据；因此低权限读写边界已关闭，企业空间成员与项目可见范围的最终策略仍需单独确认。

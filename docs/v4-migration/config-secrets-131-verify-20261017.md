@@ -245,3 +245,9 @@ ConfigMap 的有效 YAML 和配置引用已取得部署后浏览器/API 证据�
 本轮专用 ConfigMap `v4-rbac-config-20261018` 和 Secret `v4-rbac-secret-20261018`、用户及绑定均已清理并复核；`v4-migration-e2e` namespace 保留。
 
 该结果关闭了 ConfigMap、Secret、ServiceAccount 的低权限读写边界验证缺口，但不等于完整 RBAC 矩阵或模块验收完成。剩余项为完整跨 namespace 正反路径、ServiceAccount 剩余可编辑字段和全部 V3 功能等价性。扩展运行时错误继续按负责人指令暂不处理。
+
+### 项目级账号补充结果
+
+为区分“企业空间查看权限”和“项目查看权限”，又创建了临时账号 `v4-project-viewer-20261018`，只绑定 `v4-migration-e2e` 的项目 `viewer` RoleBinding，不绑定 `test-workspace` WorkspaceRoleBinding。该账号可以登录，但直接访问项目 ConfigMap 路由被前端返回 `/errors/403`；这说明当前 KubeSphere UI 要求账号先具备企业空间成员权限，单独的项目 RoleBinding 不能完成浏览器项目入口授权。
+
+该账号及绑定已经清理。前一个带 `test-workspace` 查看角色的临时账号能够访问 `v4-migration-e2e` 和 `test-wes`，但每个项目页面只加载自身 namespace 的资源；因此本轮已验证页面请求的当前 namespace 范围和低权限读写边界，完整“仅授权项目可见”的企业空间成员模型仍需按项目负责人定义继续确认。
