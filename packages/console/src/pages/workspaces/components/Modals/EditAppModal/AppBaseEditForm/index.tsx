@@ -10,6 +10,7 @@ import { Form, FormItem, Input, Select } from '@kubed/components';
 import { Pattern, openpitrixStore, AppDetail } from '@ks-console/shared';
 
 import IconUploadField from './IconUploadField';
+import { getCategoryDisplayName } from './categoryOptions';
 
 import { TextArea } from '../styles';
 
@@ -27,12 +28,19 @@ function AppBaseEditForm({ form, detail }: Props): JSX.Element {
       return [];
     }
 
-    return categories?.map(({ name, category_id }: any) => ({
-      label: t(`APP_CATE_${name.toUpperCase().replace(/[^A-Z]+/g, '_')}`, {
-        defaultValue: name,
-      }),
-      value: category_id,
-    }));
+    return categories?.map(({ name, category_id }: any) => {
+      const displayName = getCategoryDisplayName(name, category_id);
+
+      return {
+        label:
+          displayName === '-'
+            ? displayName
+            : t(`APP_CATE_${displayName.toUpperCase().replace(/[^A-Z]+/g, '_')}`, {
+                defaultValue: displayName,
+              }),
+        value: category_id,
+      };
+    });
   }, [categories, isLoading]);
 
   return (
