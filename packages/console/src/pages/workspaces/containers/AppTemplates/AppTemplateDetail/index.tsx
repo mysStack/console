@@ -30,7 +30,7 @@ import type { AppDeployFormData, AppDetail } from '@ks-console/shared';
 import { getAvatar } from '../../../utils';
 import { HelmUploadModal, EditAppModal } from '../../../components/Modals';
 
-const PATH_PREFIX = '/workspaces/:workspace/apps/:appId';
+const PATH_PREFIX = '/workspaces/:workspace/apps/:appName';
 
 const { useAppDetail, deleteApp, updateApp, deployApp, createVersion } = openpitrixStore;
 

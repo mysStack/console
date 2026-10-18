@@ -12,7 +12,7 @@ import VersionListDetail from './VersionListDetail';
 
 import AppTemplateDetail from './index';
 
-const PATH = '/workspaces/:workspace/apps/:appId';
+const PATH = '/workspaces/:workspace/apps/:appName';
 
 export default [
   {
