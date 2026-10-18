@@ -1,7 +1,7 @@
 # API Server 实际故障环境验证记录
 
-> 核对日期：2026-10-18（上海时间）  
-> 目标环境：`192.168.2.131:30880` / Kubernetes context `default`  
+> 核对日期：2026-10-18（上海时间）
+> 目标环境：`192.168.2.131:30880` / Kubernetes context `default`
 > 当前制品：`8c6262d97`，manifest digest `sha256:bf6577ccdaddd314e478b4ba7235865e695a705c1f50cc7ec132152566b3652c`
 
 ## 当前健康证据
