@@ -386,3 +386,14 @@ RBAC 六种账号组合已经取得部署后真实浏览器/API 证据；全部 
 - 页面和证据没有输出 Secret 值；专用 Deployment、ConfigMap、Secret 已删除并逐项确认 NotFound，`v4-migration-e2e` namespace 保留。
 
 A01 的 ConfigReference 入口、引用展示、前缀写入/清除和 API 持久化子路径已验证。主工作负载模板编辑的 V3/Wujie 兼容入口、低权限拒绝、错误反馈和所有工作负载类型组合仍未闭环；A01 不能标记为完整等价。
+
+## 2026-10-19 A03/A04 StatefulSet、DaemonSet 运行时补测
+
+本轮在当前 131 制品上使用真实浏览器访问两个专用工作负载的 ConfigReference 路由：
+
+- StatefulSet `v4-statefulset-20261019`：页面渲染 ConfigMap/Secret 引用、键名和“应用引用”，详情及引用 API 均为 `200`。
+- DaemonSet `v4-daemonset-20261019`：页面渲染 ConfigMap/Secret 引用、键名和“应用引用”，详情及引用 API 均为 `200`。
+- 两个页面均实际请求 `/consolev3/dashboard`，继续证明工作负载详情仍依赖 V3/Wujie 兼容壳；没有把 ConfigReference 页面可访问误判为工作负载详情 V4 等价。
+- 专用 StatefulSet、DaemonSet、ConfigMap、Secret 已清理并逐项确认 NotFound。
+
+A03/A04 的 ConfigReference 入口子路径已补充运行时证据，但主详情、模板编辑、错误态、低权限路径和 V3 Action 移除仍未完成，A03/A04 继续保持“未等价”。

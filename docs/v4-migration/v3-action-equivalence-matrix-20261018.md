@@ -78,3 +78,9 @@ A02～A04 和 A01 共涉及三类工作负载详情与配置引用；A05～A12 �
 浏览器为两个临时引用分别写入前缀 `CM_` 和 `SEC_`，点击“应用引用”后通过 Kubernetes API 复核两个 `envFrom` 引用的前缀已持久化；随后清空前缀再次应用，API 复核前缀已移除。专用 Deployment、ConfigMap 和 Secret 已清理。该证据关闭 A01 的入口、引用展示、前缀写入、清除和 API 持久化子路径。
 
 A01 仍不能标记为完整 V3 等价：主工作负载模板编辑仍保留 V3/Wujie 兼容入口，低权限拒绝、网络失败、错误反馈和所有工作负载类型的逐项组合尚未全部完成。
+
+## 2026-10-19 A03/A04 StatefulSet、DaemonSet ConfigReference 补测
+
+使用当前 131 制品和真实浏览器，在 `v4-migration-e2e` 分别创建副本数为 0 的专用 StatefulSet、不会调度 Pod 的专用 DaemonSet，以及临时 ConfigMap/Secret。直达两个工作负载的 ConfigReference 路由后，页面均正确显示工作负载名称、容器、ConfigMap/Secret 引用、键名和“应用引用”入口；两个工作负载详情 API、引用资源 API 均返回 `200`。
+
+两个页面均观测到 `/consolev3/dashboard` 请求，说明当前工作负载详情仍加载 V3/Wujie 兼容壳；因此 A03、A04 的 ConfigReference 子路径可以确认可访问，但工作负载详情的 V4 原生等价性不能关闭。专用 StatefulSet、DaemonSet、ConfigMap 和 Secret 已清理。
