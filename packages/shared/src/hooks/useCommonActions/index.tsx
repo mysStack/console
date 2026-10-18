@@ -34,6 +34,8 @@ interface EditYamlProps extends Record<string, any> {
   initialValues?: any;
   onOk?: (data?: any, initialValues?: any) => Promise<any>;
   readOnly?: boolean;
+  yamlValue?: string;
+  transformYaml?: (data: any, initialValues: any) => any;
 }
 
 interface DelProps extends DeleteConfirmContentProps, Record<string, any> {}
@@ -125,14 +127,18 @@ const useCommonActions = ({ store, callback = () => {}, params = {} }: CommonAct
     if (!initialValues) initialValues = props;
     if (!onOk) {
       onOk = async (data: any) => {
-        await store.put({ ...initialValues, ...params }, yaml.load(data), false, k8sVersion);
+        const parsedData = yaml.load(data);
+        const transformedData = props.transformYaml
+          ? props.transformYaml(parsedData, initialValues)
+          : parsedData;
+        await store.put({ ...initialValues, ...params }, transformedData, false, k8sVersion);
         notify.success(t('UPDATE_SUCCESSFUL'));
         invalidateResourceList(store?.module);
         callback('editYaml');
       };
     }
 
-    const yamlValue = yaml.getValue(initialValues._originData);
+    const yamlValue = props.yamlValue || yaml.getValue(initialValues._originData);
 
     modal.open({
       title,

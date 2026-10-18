@@ -16,6 +16,8 @@ import {
   secretStore,
   DetailPageRef,
   useCommonActions,
+  getSecretYamlEditorValue,
+  mergeSecretYaml,
 } from '@ks-console/shared';
 import type { FormattedSecret } from '@ks-console/shared';
 
@@ -57,6 +59,13 @@ export default function SecretDetail(): JSX.Element {
     },
   });
 
+  const editSecretYaml = (record: FormattedSecret) =>
+    editYaml({
+      initialValues: record,
+      yamlValue: getSecretYamlEditorValue(record._originData),
+      transformYaml: (data, initialValues) => mergeSecretYaml(initialValues._originData, data),
+    });
+
   const tabs = [{ path: `${PATH}/detail`, title: t('DATA') }];
 
   const attrs = (data: FormattedSecret) => [
@@ -88,7 +97,7 @@ export default function SecretDetail(): JSX.Element {
       text: t('EDIT_YAML'),
       action: 'edit',
       show: true,
-      onClick: editYaml,
+      onClick: editSecretYaml,
     },
     {
       key: 'editSecret',
