@@ -204,4 +204,12 @@ ConfigMap、Secret、ServiceAccount 的基础 CRUD、元数据、YAML、脱敏�
 - Deployment `ks-console` generation/observedGeneration `517/517`，副本 `1/1` Ready；Pod `ks-console-58975f9479-vpx2b` 为 `Running/Ready`，实际 imageID 为 `sha256:3e299d0217e60ab90258830bc21cce12e61fbafc2f075792cbb3658c0e28bc62`。
 - 真实浏览器登录后，直达应用模板详情自动进入 `versions`；应用详情 API、版本列表 API 和 3 个版本详情 API 均为 `200`。页面渲染 1.0.5、1.0.2、1.0.1 三个版本，总数为 3；展开版本可见 Chart Files、Version Information、Deployment 和 View in Store；Upload Version 弹窗可以打开，Cancel 可以关闭，未产生写操作。
 
-本轮只关闭了应用模板详情路由和版本列表的渲染缺口，不能把 A09/A12 标记为完整等价：A09 的项目“从应用模板创建”仍缺少可用模板 fixture；A12 的编辑保存、删除、上传成功、失败/取消完整路径和 V3 Action 移除仍未闭环。此前真实浏览器点击详情页 Edit 曾出现页面空白，该缺陷继续保留。`/consolev3/dashboard` 预加载和扩展初始化错误仍按负责人指令延期，不能作为迁移通过证据。
+本轮只关闭了应用模板详情路由和版本列表的渲染缺口，不能把 A09/A12 标记为完整等价：A09 的项目“从应用模板创建”仍缺少可用模板 fixture；A12 的编辑保存、删除、上传成功、失败/取消完整路径和 V3 Action 移除仍未闭环。此前真实浏览器点击详情页 Edit 出现的页面空白已由后续制品修复并完成表单渲染复验，不能再作为当前制品缺陷，但也不能扩大为编辑写入等价通过。`/consolev3/dashboard` 预加载和扩展初始化错误仍按负责人指令延期，不能作为迁移通过证据。
+
+## 2026-10-18 应用模板编辑表单补测
+
+在最新部署制品 `feature-v4-configmaps-secrets-20261018-225142-1f711bb66b3b` 上，使用真实浏览器登录后直达 `/workspaces/test-workspace/apps/stakater-configmap/versions`，打开“编辑”弹窗并完成页面截图核对。此前页面空白的两个问题分别由 `5371d69470e4`（分类名称缺失时的显示回退）和 `7ba63676c`、`1f711bb66b3b`（V2 应用对象到编辑表单及 PATCH 数据的映射）修复。
+
+本次实际看到名称 `configmap`、描述、分类 `kubesphere-app-uncategorized`、图标和服务商网站均正确回填；弹窗未再出现 `toUpperCase` 导致的空白页。点击“取消”后弹窗关闭，仍停留在版本列表页，没有产生写请求。Deployment generation/observedGeneration 为 `519/519`，Pod `ks-console-797469cf84-mgndq` 为 `Running/Ready`，实际 imageID 对应 manifest digest `sha256:5fc81a366fc59ebd9c3d19e57eb6c8d0a1d70453748c622324a0a8c16b8afc02`。
+
+本次只关闭 A12 的“编辑表单渲染、字段回填和取消”子缺口。应用模板编辑保存、删除、上传成功、上传失败/取消完整路径、项目从模板创建，以及 V3 Action 移除仍未验证；扩展初始化错误继续按负责人指令延期。

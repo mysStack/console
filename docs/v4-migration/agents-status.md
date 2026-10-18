@@ -267,7 +267,19 @@ Secret 的明文暴露缺陷已完成“代码 → CI → 131 rollout → 真实
 
 真实浏览器登录后直达 `/workspaces/test-workspace/apps/stakater-configmap`，详情 API、版本列表 API 和 3 个版本详情 API 均为 200；页面渲染 1.0.5、1.0.2、1.0.1 三个版本，总数为 3。版本项可展开查看 Chart Files、Version Information、Deployment 和 View in Store；Upload Version 弹窗可打开，Cancel 可关闭且未产生写操作。
 
-本轮只关闭详情路由和版本列表渲染缺口。A09 的应用模板创建仍缺少可用 fixture；A12 的编辑保存、删除、上传成功、失败/取消完整路径及 V3 Action 移除仍未闭环。此前点击详情页 Edit 出现页面空白，继续登记为未解决缺陷。扩展初始化错误按负责人指令延期，PR #1 继续保持 Draft，全局 P0 仍为“分析中，待负责人复核”。
+本轮只关闭详情路由和版本列表渲染缺口。A09 的应用模板创建仍缺少可用 fixture；A12 的编辑保存、删除、上传成功、失败/取消完整路径及 V3 Action 移除仍未闭环。此前点击详情页 Edit 出现的页面空白已由后续制品修复并完成表单渲染复验，不能再作为当前制品缺陷，但仍不能扩大为编辑写入等价通过。扩展初始化错误按负责人指令延期，PR #1 继续保持 Draft，全局 P0 仍为“分析中，待负责人复核”。
+
+## 2026-10-18 应用模板编辑表单补测（最新制品）
+
+本轮继续执行未闭环的 V3 入口验证，没有启动子 Agent，也没有重新进行全量 REA。针对上一轮应用模板详情页点击“编辑”出现空白的问题，在提交 `5371d69470e4`、`7ba63676c` 和 `1f711bb66b3b` 的最新制品上完成真实浏览器复验：
+
+- 镜像 tag：`feature-v4-configmaps-secrets-20261018-225142-1f711bb66b3b`；CI Run `39137798758` 已成功。
+- 131 Deployment `ks-console` generation/observedGeneration 为 `519/519`，副本 `1/1` Ready。
+- Pod `ks-console-797469cf84-mgndq` 为 `Running/Ready`，实际 imageID 为 `ghcr.io/mysstack/ks-console@sha256:5fc81a366fc59ebd9c3d19e57eb6c8d0a1d70453748c622324a0a8c16b8afc02`。
+- 真实浏览器直达 `/workspaces/test-workspace/apps/stakater-configmap/versions`，编辑弹窗正常显示；名称、描述、分类、图标、服务商网站均正确回填。点击“取消”后弹窗关闭并保持版本列表路由，未产生写请求。
+- 本轮截图为 `.playwright-cli/page-2026-10-18T15-01-35-559Z.png`，仅保留在本地未跟踪生成物中；临时账号、IAM 绑定和凭据文件已清理，`v4-migration-e2e` 未删除。
+
+本轮关闭 A12 的编辑表单渲染、字段回填和取消子路径。编辑保存、删除、上传成功、上传失败/取消完整路径、项目从应用模板创建和 V3 Action 移除仍未验证；扩展初始化错误按负责人指令延期。三个 ConfigMap、Secret、ServiceAccount 模块仍不能标记为完整验收，全局 P0 和 PR #1 状态不变。
 
 ## 2026-10-18 低权限 RBAC 验证补充（单 Codex 会话）
 
