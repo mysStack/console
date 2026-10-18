@@ -338,3 +338,9 @@ ConfigMap、Secret、ServiceAccount 的创建弹窗取消路径也已验证：�
 ## 2026-10-18 DevOps、通知、应用 V3 Action 取证
 
 真实浏览器已打开 DevOps、应用模板和用户菜单入口。当前 `test-workspace` 没有 DevOps 页面可选集群，测试项目没有应用模板数据，用户菜单未启用通知设置入口，因此 `devops.create/edit`、`app.template.create.v2`、`openpitrix.template.edit.v2`、`notification.user.setting` 均保持“未验证”，没有用静态页面渲染冒充运行时等价。后续需要对应 fixture 或负责人确认模块未启用。
+
+## 2026-10-18 静态依赖范围与 API Server 故障验证状态
+
+当前工作树重新执行依赖清单扫描后，文件级命中数为：`wujie-react/WujieReact` 133、`ConsoleV3ResourceList` 28、`ExtensionConsoleV3Embed` 17、`useV3action/useV3Actions` 14、`consolev3` 路径 101。结果包含构建配置、测试和现有 `packages/shared/lib` 编译输出，并存在交集；这次只更新静态取证范围，不把命中数当作启用页面或 V3 等价通过。
+
+RBAC 六种账号组合已经取得部署后真实浏览器/API 证据；全部 V3 Action 逐项等价性仍未完成，当前已确认项目 Deployment 详情保留 V3/Wujie 耦合，Secret 默认对象语义和联邦 ConfigMap/Secret 仍未等价，DevOps、应用模板、通知和边缘入口缺少可触发 fixture。真实 API Server 故障验证也未执行：131 为单节点 K3s 共享控制平面，当前授权不包含停止或重启远程 API Server。已有 Playwright 请求拦截只证明前端 `Network Error` 处理，不能替代集群故障证据。详见 [`api-server-fault-verify-20261018.md`](./api-server-fault-verify-20261018.md)。

@@ -34,6 +34,21 @@ rg -l --hidden --glob '!.git/**' --glob '!node_modules/**' \
 
 这些数字存在交集。例如一个 Deployment 详情文件可以同时包含 Wujie 组件和 V3 路由地址。
 
+## 2026-10-18 当前分支复核
+
+在 `feature/v4-configmaps-secrets` 当前工作树重新执行上面的扫描命令，仍排除
+`node_modules` 和 `packages/bootstrap/assets/v3dist`。本次结果如下：
+
+| 引用类型                       | 当前文件数 | 说明                                                                                     |
+| ------------------------------ | ---------: | ---------------------------------------------------------------------------------------- |
+| `wujie-react` / `WujieReact`   |        133 | 包含构建配置、测试文件和现有 `packages/shared/lib` 编译输出；不能直接视为 133 个启用页面 |
+| `ConsoleV3ResourceList`        |         28 | 与首轮结果一致                                                                           |
+| `ExtensionConsoleV3Embed`      |         17 | 包含源码、导出、类型和现有编译输出；当前启用扩展数量仍需运行时清单确认                   |
+| `useV3action` / `useV3Actions` |         14 | 与业务调用文件和桥接文件的静态盘点一致                                                   |
+| `/consolev3` 或 `consolev3/`   |        101 | 路由、测试、工具和编译输出均可能命中                                                     |
+
+复核命令仍是文件级统计，结果存在交集，不能替代菜单启用状态、Network、API RBAC 或浏览器功能等价性证据。当前只更新静态取证范围，未因数字变化关闭任何 V3/Wujie 迁移项。
+
 ## 运行时入口
 
 | 入口                                                                | 源码证据                                                     | 当前作用                             | 迁移状态                     |
