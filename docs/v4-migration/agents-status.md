@@ -299,3 +299,16 @@ Secret 的明文暴露缺陷已完成“代码 → CI → 131 rollout → 真实
 | 不存在对象详情显示 Kubernetes NotFound | 通过      | 通过   | 通过           |
 
 本轮关闭三个模块的项目级 namespace 展示/排除、刷新、浏览器返回和 NotFound 证据。模块仍为“VERIFY 部分通过，待补齐”，剩余完整 RBAC 组合、全部 V3 功能等价性和全部错误态组合；扩展运行时错误按负责人指令延期。测试对象均已清理，`v4-migration-e2e` namespace 保留。
+
+## 2026-10-18 网络失败错误反馈修复
+
+| 项目       | 实际结果                                                                                                                                 | 状态         |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| 问题       | 无 HTTP response 的网络失败触发 `error.response.config.headers` 访问异常，资源列表只显示空列表                                           | 已定位       |
+| 修复       | `8c6262d97` 增加网络错误消息格式化和可选 response/config/headers 保护                                                                    | 已提交并推送 |
+| 本地测试   | `./scripts/test.sh`：60 个文件、235 个测试通过                                                                                           | 通过         |
+| 构建和 CI  | `corepack yarn build:packages`、变更文件 ESLint、`git diff --check` 通过；Run `39125068845` 成功                                         | 通过         |
+| 131 制品   | `feature-v4-configmaps-secrets-20261018-195453-8c6262d97d13` / `sha256:bf6577ccdaddd314e478b4ba7235865e695a705c1f50cc7ec132152566b3652c` | 已部署       |
+| 浏览器验证 | 正常列表可渲染；拦截 ConfigMap 列表 API 后页面显示 `Network Error`，未再抛出无 response 异常                                             | 已验证       |
+
+本轮网络失败验证使用 Playwright 只拦截目标列表 API，没有修改集群资源。真实 API Server 故障未执行；错误提示已补齐，页面同时保留空数据区域。扩展运行时错误继续延期。

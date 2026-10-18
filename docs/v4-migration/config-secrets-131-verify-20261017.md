@@ -299,3 +299,21 @@ Secret 的 YAML 数据暴露阻塞已完成“代码 → 单元测试 → CI 制
 另外对三个模块分别直达随机不存在对象的详情 URL，页面均显示 Kubernetes `NotFound ... not found`，没有把不存在对象渲染成已有对象或静默显示错误数据。
 
 本轮关闭了三个模块的**项目级 namespace 正向展示、跨项目对象排除、刷新和浏览器返回路径**。这不等同于全部功能验收：完整 RBAC 组合、所有 V3 行为逐项对照、全部错误态组合仍需继续验证；扩展运行时错误按负责人指令暂不处理。
+
+## 2026-10-18 网络失败错误反馈修复与部署后复验
+
+本轮在 namespace 路径验证中进一步注入资源列表 API 的网络失败，发现通用请求拦截器在没有 HTTP response 的情况下直接访问 `error.response.config.headers`，导致页面只显示空列表，用户看不到失败原因。
+
+修复提交为 `8c6262d97`：请求错误处理增加无 response 的网络错误分支，生成 `Network Error` 全局提示，并保护可选的 response/config/headers 访问；新增 `request.test.ts` 覆盖网络错误和 HTTP 403 错误格式化。
+
+验证链路：
+
+- 本地 `./scripts/test.sh`：60 个测试文件、235 个测试通过。
+- `corepack yarn build:packages`：通过；变更文件 ESLint 和 `git diff --check`：通过。
+- GitHub Actions Run `39125068845`：Unit tests、Build and publish 均成功。
+- 镜像 tag：`feature-v4-configmaps-secrets-20261018-195453-8c6262d97d13`。
+- manifest digest：`sha256:bf6577ccdaddd314e478b4ba7235865e695a705c1f50cc7ec132152566b3652c`。
+- 131 `ks-console` rollout 成功，Deployment generation/observedGeneration 为 `515/515`；Pod `ks-console-959cd4457-vxk5m` Running/Ready，imageID 与上述 digest 一致。
+- 在该新制品上用真实 Playwright 登录，正常 ConfigMap 页面可渲染；随后只拦截当前 ConfigMap 列表 API，浏览器页面保持项目路由并显示 `Network Error`，没有再因为无 HTTP response 抛出前端异常。
+
+该修复关闭了资源列表网络失败的错误提示缺口。API 失败时页面仍会显示空数据区域，同时显示错误提示；扩展初始化错误继续按负责人指令延期。真实集群断网或 API Server 故障未执行，本轮使用 Playwright 网络拦截进行确定性验证。

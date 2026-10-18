@@ -151,6 +151,10 @@ Secret YAML 编辑器曾在实际浏览器中暴露已有 `data` 和 `last-appli
 
 在最终部署制品上，ConfigMap、Secret、ServiceAccount 分别完成项目级列表、详情、刷新、浏览器返回和跨项目对象排除验证。三个模块直达不存在对象的详情 URL 均显示 Kubernetes `NotFound ... not found`。本轮关闭项目级 namespace 展示/排除、刷新返回和 NotFound 证据；完整 RBAC 组合、全部 V3 功能等价性和全部错误态组合仍未关闭，扩展运行时错误按负责人指令延期。
 
+### 2026-10-18 网络失败错误反馈
+
+资源列表 API 在没有 HTTP response 的网络失败场景下，已补充 `Network Error` 全局提示并完成 `8c6262d97` 的本地测试、CI、131 部署和 Playwright 拦截验证。该项关闭“无 response 导致前端异常且没有错误提示”的缺口；真实 API Server 故障未执行，扩展初始化错误继续延期。
+
 角色缓存修复随后已构建并部署到 131：代码提交 `05450c14f733a1c2e189270f2b257759dadacd8b`，GitHub Actions Run `39038790572`，镜像 tag `feature-v4-configmaps-secrets-20261017-215959-05450c14f733`，digest `sha256:27ef8f71b889c4ddb2a9f19ddf22ce09eb7b148a47bc02a2fa8f482bdfdbab65`。Deployment generation/observedGeneration 为 `511/511`，Pod `ks-console-56cbbb9df8-ptp5r` 为 Running/Ready，imageID 与 digest 一致。浏览器直达项目 ServiceAccount 页面已执行，但已有会话已过期并重定向 `/login`；新制品的登录、角色弹窗、角色提交和页面渲染仍未验证。
 
 ## 2026-10-17 Secret 编辑设置脱敏修复
