@@ -70,3 +70,11 @@ A02～A04 和 A01 共涉及三类工作负载详情与配置引用；A05～A12 �
 在 `feature-v4-configmaps-secrets-20261018-225142-1f711bb66b3b` 制品上，真实浏览器直达应用模板版本页并打开编辑弹窗。名称、描述、分类、图标和服务商网站均从 V2 应用详情正确回填；点击“取消”后弹窗关闭且未产生写请求。该证据关闭 A12 的表单渲染、字段回填和取消子路径。
 
 本次没有提交编辑保存、删除或上传成功操作，因此 A12 的写入成功、失败反馈、刷新一致性及 V3 Action 移除仍为未验证；A09、A10、A11 以及 A06～A08 仍分别受 fixture 或 V3/Wujie 边界影响，保持未验证。
+
+## 2026-10-19 A01 ConfigReference 运行时补测
+
+在当前 131 制品 `feature-v4-configmaps-secrets-20261018-225142-1f711bb66b3b` 上，创建专用 Deployment `v4-config-reference-20261019`、ConfigMap 和 Secret 后，使用真实浏览器访问项目工作负载 ConfigReference 路由。页面正确渲染容器、ConfigMap/Secret 引用、键数量和“应用引用”入口；请求取得工作负载、ConfigMap 和 Secret 的 `200` 响应，页面只显示 Secret 资源名、前缀和键名，不显示 Secret 值。
+
+浏览器为两个临时引用分别写入前缀 `CM_` 和 `SEC_`，点击“应用引用”后通过 Kubernetes API 复核两个 `envFrom` 引用的前缀已持久化；随后清空前缀再次应用，API 复核前缀已移除。专用 Deployment、ConfigMap 和 Secret 已清理。该证据关闭 A01 的入口、引用展示、前缀写入、清除和 API 持久化子路径。
+
+A01 仍不能标记为完整 V3 等价：主工作负载模板编辑仍保留 V3/Wujie 兼容入口，低权限拒绝、网络失败、错误反馈和所有工作负载类型的逐项组合尚未全部完成。

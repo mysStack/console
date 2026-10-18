@@ -376,3 +376,13 @@ ConfigMap、Secret、ServiceAccount 的创建弹窗取消路径也已验证：�
 当前工作树重新执行依赖清单扫描后，文件级命中数为：`wujie-react/WujieReact` 133、`ConsoleV3ResourceList` 28、`ExtensionConsoleV3Embed` 17、`useV3action/useV3Actions` 14、`consolev3` 路径 101。结果包含构建配置、测试和现有 `packages/shared/lib` 编译输出，并存在交集；这次只更新静态取证范围，不把命中数当作启用页面或 V3 等价通过。
 
 RBAC 六种账号组合已经取得部署后真实浏览器/API 证据；全部 V3 Action 逐项等价性仍未完成，当前已确认项目 Deployment 详情保留 V3/Wujie 耦合，Secret 默认对象语义和联邦 ConfigMap/Secret 仍未等价，DevOps、应用模板、通知和边缘入口缺少可触发 fixture。真实 API Server 故障验证也未执行：131 为单节点 K3s 共享控制平面，当前授权不包含停止或重启远程 API Server。已有 Playwright 请求拦截只证明前端 `Network Error` 处理，不能替代集群故障证据。详见 [`api-server-fault-verify-20261018.md`](./api-server-fault-verify-20261018.md)。
+
+## 2026-10-19 A01 ConfigReference 运行时补测
+
+本轮继续补齐全部业务 V3 Action 的运行时证据，未启动子 Agent。使用当前 131 制品 `feature-v4-configmaps-secrets-20261018-225142-1f711bb66b3b` 和真实浏览器，在 `v4-migration-e2e` 创建专用 Deployment `v4-config-reference-20261019`、ConfigMap 和 Secret。
+
+- 访问 `/test-workspace/clusters/host/projects/v4-migration-e2e/deployments/v4-config-reference-20261019/config-reference` 后，页面显示容器、ConfigMap/Secret 引用、键数量和“应用引用”入口；工作负载、引用资源请求均为 `200`。
+- 通过浏览器分别写入 `CM_`、`SEC_` 前缀，Kubernetes API 复核 `envFrom` 持久化；清空前缀再次应用后 API 复核前缀移除。
+- 页面和证据没有输出 Secret 值；专用 Deployment、ConfigMap、Secret 已删除并逐项确认 NotFound，`v4-migration-e2e` namespace 保留。
+
+A01 的 ConfigReference 入口、引用展示、前缀写入/清除和 API 持久化子路径已验证。主工作负载模板编辑的 V3/Wujie 兼容入口、低权限拒绝、错误反馈和所有工作负载类型组合仍未闭环；A01 不能标记为完整等价。
