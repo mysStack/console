@@ -326,3 +326,7 @@ ConfigMap、Secret、ServiceAccount 的创建弹窗取消路径也已验证：�
 ## 2026-10-18 V3 功能逐项等价性核对
 
 已完成 ConfigMap、Secret、ServiceAccount 模块范围内的 V3 Action 对照：基础创建、编辑、元数据、YAML、删除、批量删除和 ServiceAccount 角色均有旧源码、V4 入口及 131 运行时证据。核对同时发现旧 `secret.default` 默认 Secret 语义在当前 V4 中没有对应入口或 Store 实现，联邦 ConfigMap/Secret 仍保留 `consolev3` Embed；两项已登记为未等价，未冒充通过。全仓库其余 V3/Wujie Action 仍未完成逐项等价验收。
+
+## 2026-10-18 全部业务 V3 Action 逐项跟踪
+
+已将 11 个业务调用文件拆分为 12 个业务 Action 行，写入[全部业务 V3 Action 等价性矩阵](./v3-action-equivalence-matrix-20261018.md)。ConfigMap、Secret、ServiceAccount 资源自身的基础功能已完成模块级证据；工作负载模板编辑、DevOps、通知设置、应用模板和边缘操作仍有 V3/Wujie 依赖或运行时证据缺口，不能标记为全量等价。

@@ -182,3 +182,7 @@ Secret 编辑设置曾在表单初始化时解码并回填已有数据，造成�
 ## 2026-10-18 V3 功能逐项等价性核对结果
 
 ConfigMap、Secret、ServiceAccount 的基础 CRUD、元数据、YAML、脱敏、ServiceAccount 角色和通用删除已按 V3 Action 逐项对照，并把旧源码位置、V4 替代入口和 131 证据写入[V3 等价性核对记录](./v3-equivalence-config-secrets-131-20261018.md)。其中旧 `secret.default` 的默认 Secret 语义在当前 V4 中未找到对应入口或 Store 实现，联邦 ConfigMap/Secret 仍使用 `consolev3` Embed；这两项不能标记为等价，三个模块保持“VERIFY 部分通过，待补齐”。
+
+## 2026-10-18 全部业务 V3 Action 等价性跟踪
+
+已把 11 个业务调用文件拆成 12 个业务 Action 行，逐项记录旧源码、当前 V4 替代边界和运行时状态，见[全部业务 V3 Action 等价性矩阵](./v3-action-equivalence-matrix-20261018.md)。当前仅 ConfigMap、Secret、ServiceAccount 资源自身的基础 Action 已取得模块级证据；工作负载详情、DevOps、通知设置、应用模板、边缘批量操作等调用仍依赖 V3/Wujie 或缺少运行时证据，不能标记为全量等价。
