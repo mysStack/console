@@ -441,6 +441,6 @@ A02 的页面入口和取消子路径已取证，但模板编辑成功/失败、
 
 ## 2026-10-19 当前 GitHub/部署状态复核
 
-- 当前分支 `feature/v4-configmaps-secrets` 已推送到 `22eb38cecf0714b026d82eaf9fd8a6c13b9effb5`；Draft PR #1 的目标分支为 `feature/v4-migration`，GitHub 回读变更文件数为 71，PR 未合并。
+- 当前分支 `feature/v4-configmaps-secrets` 的本轮文档提交已推送；Draft PR #1 的目标分支为 `feature/v4-migration`，GitHub 回读变更文件数为 71，PR 未合并。最新 SHA 以本次提交后的本地和远程回读为准。
 - 131 的 `ks-console` Deployment generation/observedGeneration 为 `519/519`，副本 `1/1` Ready；当前仍部署镜像 `feature-v4-configmaps-secrets-20261018-225142-1f711bb66b3b`，Pod `ks-console-797469cf84-mgndq` 为 `Running/Ready`，实际 imageID 为 `sha256:5fc81a366fc59ebd9c3d19e57eb6c8d0a1d70453748c622324a0a8c16b8afc02`。
 - Kubernetes `/readyz?verbose` 通过；本次只提交文档，没有重新构建或部署业务制品。未执行真实 API Server 停止/恢复，仍需维护窗口、远程控制方式和最长中断时间明确后才能进行。
