@@ -193,3 +193,9 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 使用仅绑定 `v4-migration-e2e` 项目 `viewer` Role、没有企业空间成员绑定的临时账号，通过真实 Playwright 访问临时 Deployment 详情和 API：项目详情页本轮实际正常渲染，GET 为 `200`，POST 为 `403`，DELETE 为 `403`。临时用户、项目 RoleBinding 和 Workload 已删除。
 
 本轮结果与早期 ConfigMap 入口记录的 `/errors/403` 不同，说明项目入口行为不能跨资源类型或跨制品直接推断；当前 Workload 的 projectonly API 读写边界已取得真实证据，页面权限差异继续保留在矩阵中待统一解释。A02～A04 的 admin 独立组合和其他平台作用域仍未完成。
+
+## 2026-10-20 应用模板版本上传 RBAC 补测
+
+在当前部署制品上，真实浏览器使用临时 workspace viewer 账号访问 `stakater-configmap` 版本页面：版本列表 GET 返回 `200`，版本创建 POST 返回 `403`，页面正常渲染版本列表且未产生测试版本。临时用户和 WorkspaceRoleBinding 已删除。
+
+该结果补齐 A12 workspace viewer 的读取/创建拒绝边界；应用模板完整的项目、平台和扩展作用域矩阵仍未完成。

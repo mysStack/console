@@ -372,3 +372,9 @@ GitHub Actions Run `39209219839` 成功，镜像 tag 为 `feature-v4-configmaps-
 仅项目 viewer、没有企业空间绑定的临时账号通过真实浏览器访问 Deployment 详情时页面正常渲染；同一浏览器会话中 GET 为 `200`，POST/DELETE 为 `403`。临时账号、RoleBinding 和 Workload 已清理。
 
 该结果与早期 ConfigMap 项目入口记录存在差异，已作为资源类型差异保留，不能跨模块推断统一页面权限。A02～A04 的 Workload projectonly API 边界已验证，admin 独立组合和全量 RBAC 仍未完成。
+
+## 2026-10-20 A12 当前制品上传和 RBAC 补测
+
+在 Run `39315775014` 对应的 131 制品上，真实浏览器上传合法 Chart 版本 `9.9.21`：校验和版本创建请求均为 `200`，页面显示上传成功；API 回读为 `200`，删除测试版本后回读为 `404`。缺少 `Chart.yaml` 的非法 Chart 校验返回 `500`，页面显示“出现错误，请重试”且弹窗保持打开。临时 workspace viewer 的版本列表 GET 为 `200`、创建 POST 为 `403`，没有留下对象。
+
+该补测增加了 A12 当前制品的成功、失败反馈和低权限证据，但冲突、删除失败、完整 V3 Action 移除和全量应用模板 RBAC 仍未完成。
