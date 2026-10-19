@@ -117,3 +117,17 @@
 平台只读角色由 `global-view-workspaces`、`global-view-clusters`、`global-view-users` 和 `global-view-roles` 的实际规则展开组成；创建临时 GlobalRole 时最初遗漏必填 `rules` 导致对象被拒绝，随后按 RoleTemplate 规则展开后重新验证。该过程没有修改内置角色或已有用户。
 
 临时 GlobalRole、GlobalRoleBinding、WorkspaceRoleBinding、项目 RoleBinding 和用户均已删除，并复核资源不存在。该补测关闭了平台只读的读/写拒绝和项目独立账号的页面/API边界证据，但联邦、DevOps、扩展 Action 以及全部 V3 Action 等价性仍未完成，不能把 RBAC 总体标记为完整通过。
+
+## 2026-10-20 DevOps 作用域与扩展安装状态补测
+
+本轮使用临时 `dev-workspace` viewer 账号和平台管理员账号分别打开 `/workspaces/dev-workspace/devops`，并通过真实浏览器检查 DevOps API 和创建弹窗。
+
+| 检查项           | viewer                                                                                    | platform-admin                          | 结论                                  |
+| ---------------- | ----------------------------------------------------------------------------------------- | --------------------------------------- | ------------------------------------- |
+| DevOps 页面      | 页面可渲染，显示“暂无数据 / 请选择集群”                                                   | 页面可渲染，显示“暂无数据 / 请选择集群” | 入口已验证                            |
+| 集群选择         | `host` 显示“未安装 DevOps”                                                                | `host` 显示“未安装 DevOps”              | 集群存在但缺少 DevOps 扩展            |
+| DevOps 列表 GET  | `GET /kapis/devops.kubesphere.io/v1alpha3/workspaces/dev-workspace/namespaces` 返回 `404` | 同一 GET 返回 `404`                     | 不是账号权限差异，是后端入口不可用    |
+| DevOps 创建 POST | 返回 `403`                                                                                | 返回 `404`                              | viewer 受到权限拒绝，管理员也无法创建 |
+| 创建弹窗取消     | 弹窗打开后未提交，点击取消关闭                                                            | 弹窗打开后未提交，点击取消关闭          | 已验证无状态变更                      |
+
+该结果确认 DevOps 的成功、失败、取消和资源刷新无法在当前集群闭环，因为 `host` 未安装 DevOps 扩展且对应 API 返回 `404`。不能把空列表或创建弹窗渲染标记为 V3 等价通过；该项记录为“环境阻塞，未通过”，不修改集群扩展安装状态。

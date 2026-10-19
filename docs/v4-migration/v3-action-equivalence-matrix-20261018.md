@@ -203,3 +203,12 @@ A01 仍不能标记为完整 V3 等价：主工作负载模板编辑仍保留 V3
 | 浏览器页面   | 版本页正常渲染，刷新后原有版本总数恢复为 3                                                                                                              | 已验证 |
 
 本轮关闭 A12 的无效 Chart 错误反馈和有效上传提交子路径。A12 仍只能标记为“部分验证”：冲突边界、低权限拒绝、完整返回路径和 `openpitrix.template.edit.v2` 的 V3 Action 移除仍未完成。页面仍有已登记的扩展运行时错误，按负责人指令暂不处理；该错误不能作为本轮上传修复已解决的证据。
+
+## 2026-10-20 DevOps Action 作用域补测
+
+本轮使用真实浏览器分别以 `dev-workspace` viewer 和平台管理员访问 `/workspaces/dev-workspace/devops`。两种账号均看到 DevOps 页面和“创建”入口，但集群选择器中的 `host` 明确显示“未安装 DevOps”。
+
+- viewer：`GET /kapis/devops.kubesphere.io/v1alpha3/workspaces/dev-workspace/namespaces` 返回 `404`，创建请求返回 `403`；创建弹窗可以打开，取消后没有写入。
+- platform-admin：同一 DevOps 列表 GET 返回 `404`，创建请求也返回 `404`；创建弹窗可以打开，集群选项显示“未安装 DevOps”，取消后没有写入。
+
+这组结果区分了权限拒绝和后端能力缺失：viewer 的 `403` 是权限边界，管理员的 `404` 证明当前环境没有可用 DevOps API/扩展。A06 `devops.edit` 和 A07 `devops.create` 仍为“未验证/环境阻塞”，不能把入口渲染或空列表当作 V4 等价完成。
