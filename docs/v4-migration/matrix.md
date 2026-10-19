@@ -382,3 +382,7 @@ GitHub Actions Run `39209219839` 成功，镜像 tag 为 `feature-v4-configmaps-
 2026-10-20 A02～A04 独立 admin 正向 RBAC 补测：Deployment、StatefulSet、DaemonSet 详情页均渲染原生操作入口，浏览器会话内 GET/PUT/PATCH/POST/DELETE 均为 `200/200/200/201/200`，临时对象已清理。该结果补齐 Workload admin 组合，但不关闭 `projectonly` 结果不一致、其他平台作用域或全部 V3 功能等价性。
 
 A11 边界修正：本轮应用模板安装实际走原生 `deployApp`，没有触发 `batch.deploy.app.create.v2`；该 V3 Action 仅在 Edge 应用分支中打开，而当前集群没有 Edge fixture。因此原生 Helm 安装提交不能写成 A11 的 V3 Action 等价通过，A11 继续保持部分验证。
+
+## 2026-10-20 API Server 实际故障扩展复测
+
+在 131 测试环境按授权停止并恢复 K3s，真实浏览器连续采样 103 组请求。ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet 六类 Kubernetes 资源列表在故障期间均出现 `502/503`，恢复后全部回到 `200`；应用列表 API 本轮 103 组均为 `200`，不扩大解释为应用模块故障恢复已验证。恢复后 `readyz`、节点、Console Deployment、Pod 和浏览器登录均正常，实际 Pod imageID 与当前部署 digest 一致。该证据扩展了 API Server 故障环境覆盖范围，但仍不关闭全部 V3 功能等价性、全量写操作和全局 RBAC 门禁。

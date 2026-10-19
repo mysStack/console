@@ -683,3 +683,17 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 该结果补齐 A02～A04 的独立 admin 正向组合。结合已有 viewer、operator、workspaceonly、clusterviewer 证据，Workload 的主要项目/集群组合已有实际记录；`projectonly` 当前制品仍与历史记录不一致，平台/联邦/DevOps/Extension 作用域和全部 V3 Action 等价性仍未闭环。
 
 本轮同时复核 A11 的 Action 边界：从 `stakater` 系统仓库安装 Helm 模板时，实际请求走原生 `deployApp`，没有触发 `batch.deploy.app.create.v2`；该 Action 仅在 Edge 应用分支中打开。由于当前集群没有 Edge fixture，A11 的 V3 Action 成功、失败、取消和低权限路径仍未验证，原生安装提交证据不扩大解释为 A11 等价通过。
+
+## 2026-10-20 当前会话：API Server 实际故障扩展复测
+
+| 项目       | 结果                                                                                                                                                                     |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 故障注入   | 按已授权范围使用 `kubectl debug node/dev01`，通过宿主机 systemd timer 在 45 秒后恢复 K3s；未修改业务资源                                                                 |
+| 浏览器采样 | 真实登录后连续采样 103 组，监控 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet 列表及应用列表 API                                                 |
+| 故障结果   | 六类 Kubernetes 资源列表均出现 `502/503`，各自恢复为 `200`；应用列表 API 103 组均为 `200`，未产生故障响应                                                                |
+| 恢复结果   | `readyz=ok`、`dev01 Ready`、`ks-console` rollout 完成、单 Pod Ready，恢复后浏览器资源接口均为 `200`                                                                      |
+| 制品身份   | 镜像 tag `feature-v4-configmaps-secrets-20261020-040218-4042f9570a8e`；Pod imageID 对应 digest `sha256:1c59602033e75e14d60e769e1de25bf16db20e962a9d504ee40f991e5f879878` |
+| 环境备注   | 单节点 CPU 不足导致恢复期间新 Pod 短暂 Pending；删除旧的同镜像 Pod 后完成 rollout，测试 namespace 无残留测试资源                                                         |
+| 当前结论   | API Server 实际故障证据扩大到六类 Kubernetes 资源列表；全部页面、写操作、V3 Action 和全量 RBAC 仍未完成                                                                  |
+
+详细采样和恢复证据见 [`api-server-fault-verify-20261018.md`](./api-server-fault-verify-20261018.md)。
