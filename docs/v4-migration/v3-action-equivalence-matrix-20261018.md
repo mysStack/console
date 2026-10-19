@@ -337,3 +337,9 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 在 131 使用临时项目 operator 用户和真实 Playwright，对 Deployment、StatefulSet、DaemonSet 详情页及 API 进行正向验证。三类详情页均能渲染；同一浏览器会话中的 GET、PUT、PATCH、POST、DELETE 状态均分别为 `200/200/200/201/200`，并完成测试对象清理。
 
 该证据补齐三类 Workload 当前项目 operator 的正向读写子路径，与已有 viewer 的 `GET 200、POST/PUT/PATCH/DELETE 403` 形成一组真实权限边界。A02～A04 的完整字段、错误态、所有作用域和 V3/Wujie 去依赖仍未闭环。
+
+## 2026-10-20 A02 Workload 作用域边界补测
+
+真实浏览器验证了两个作用域组合的 Deployment 详情和 API 边界：仅企业空间 viewer 的 `workspaceonly` 账号访问项目详情进入 `/errors/403`，GET/POST/PUT/PATCH/DELETE 均为 `403`；带企业空间 viewer 与集群 `cluster-viewer` 的 `clusterviewer` 账号页面正常渲染，GET 为 `200`、POST/PUT/PATCH/DELETE 均为 `403`。
+
+该结果说明 Workload 的项目读取权限不能从其他资源模块矩阵直接推断。A02～A04 的 viewer/operator/workspaceonly/clusterviewer 作用域已有证据，但 projectonly、admin 独立组合以及全部 V3 Action 等价仍未闭环。

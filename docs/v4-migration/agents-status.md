@@ -643,3 +643,12 @@ A12 上传成功子路径已关闭；冲突/失败反馈、低权限、完整返
 | 浏览器/API 结果 | 三类详情页均渲染；GET/PUT/PATCH/POST/DELETE 均为 `200/200/200/201/200`                                     |
 | 清理            | 临时用户、WorkspaceRoleBinding、RoleBinding 和 Workload 已删除，namespace 无残留                           |
 | 当前结论        | A02/A03/A04 当前项目 operator 正向边界已验证，与 viewer 拒绝证据形成正反组合；完整 RBAC 和 V3 等价仍未完成 |
+
+## 2026-10-20 当前会话：Workload 作用域 RBAC 补测
+
+| 组合            | 浏览器/API 结果                                              | 清理                                                              | 当前结论                          |
+| --------------- | ------------------------------------------------------------ | ----------------------------------------------------------------- | --------------------------------- |
+| `workspaceonly` | 项目详情 `/errors/403`；GET/POST/PUT/PATCH/DELETE 均为 `403` | 用户和 WorkspaceRoleBinding 已删除                                | Workload 没有项目读取权           |
+| `clusterviewer` | 项目详情正常；GET `200`，POST/PUT/PATCH/DELETE `403`         | 用户、WorkspaceRoleBinding、ClusterRoleBinding 和 Workload 已删除 | 集群只读可读取 Workload，不能写入 |
+
+A02～A04 当前已补齐 viewer、operator、workspaceonly、clusterviewer 作用域证据；projectonly、独立 admin、平台/联邦/DevOps/Extension 作用域及全量 V3 等价仍未完成。

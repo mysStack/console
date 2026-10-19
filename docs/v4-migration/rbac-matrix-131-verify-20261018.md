@@ -174,3 +174,16 @@
 POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完成并清理。临时用户、WorkspaceRoleBinding、项目 RoleBinding 和三类测试 Workload 已删除，namespace 复核只剩系统 ConfigMap 和默认 ServiceAccount。
 
 该证据补齐 A02～A04 当前项目 operator 的正向读写 API 边界；viewer 拒绝证据已在本记录前文，其他作用域、admin 独立组合、完整错误态和全部 V3 等价仍未完成。
+
+## 2026-10-20 Workload workspaceonly 与 clusterviewer 作用域补测
+
+为核对 A02～A04 的作用域边界，在 `test-workspace` 创建两个临时账号，均通过真实 Playwright 登录并访问同一临时 Deployment 详情路由：
+
+| 组合            | 绑定                                       | 项目详情路由  | GET | POST | PUT | PATCH | DELETE |
+| --------------- | ------------------------------------------ | ------------- | --: | ---: | --: | ----: | -----: |
+| `workspaceonly` | 仅 `test-workspace-viewer`                 | `/errors/403` | 403 |  403 | 403 |   403 |    403 |
+| `clusterviewer` | `test-workspace-viewer` + `cluster-viewer` | 正常渲染      | 200 |  403 | 403 |   403 |    403 |
+
+`workspaceonly` 没有项目资源读取权，不能沿用 ConfigMap/Secret/ServiceAccount 旧矩阵中的读取结果推断 Workload 读取权；`clusterviewer` 可读取项目 Workload，但不能写入。两组临时用户、绑定和 Workload 均已删除，namespace 无测试残留。
+
+结合此前 viewer、operator 结果，A02～A04 当前项目的 viewer/operator/workspaceonly/clusterviewer 作用域边界已有真实证据；`admin` 独立 Workload 组合、projectonly 的 Workload API 边界和平台/联邦/DevOps/Extension 作用域仍未完成。

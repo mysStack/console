@@ -360,3 +360,9 @@ GitHub Actions Run `39209219839` 成功，镜像 tag 为 `feature-v4-configmaps-
 使用临时项目 operator 用户和真实浏览器访问临时 Deployment、StatefulSet、DaemonSet 详情页，三类页面均正常渲染。浏览器会话内三类 Workload 的 GET、PUT、PATCH、POST、DELETE 状态均为 `200/200/200/201/200`；所有临时用户、绑定和 Workload 已清理。
 
 结合已有项目 viewer 的 `GET 200、POST/PUT/PATCH/DELETE 403` 证据，A02～A04 当前项目 operator/viewer 正反读写边界已验证。其他作用域、完整错误态、全量 RBAC 组合和 V3 等价性仍未完成。
+
+## 2026-10-20 Workload 作用域 RBAC 补测
+
+真实浏览器核对 A02 Deployment 的两个作用域组合：仅企业空间 viewer (`workspaceonly`) 访问项目详情进入 `/errors/403`，API 的 GET/POST/PUT/PATCH/DELETE 均为 `403`；企业空间 viewer 加集群 viewer (`clusterviewer`) 可以渲染项目详情，GET 为 `200`，所有写操作为 `403`。临时用户、绑定和 Workload 已删除。
+
+该结果补齐了 Workload 作用域边界，且明确不能沿用 ConfigMap/Secret/ServiceAccount 的旧读取结果。A02～A04 当前已有 viewer、operator、workspaceonly、clusterviewer 证据，projectonly、admin 独立组合、平台/联邦/DevOps/Extension 作用域和全量 V3 等价仍未完成。
