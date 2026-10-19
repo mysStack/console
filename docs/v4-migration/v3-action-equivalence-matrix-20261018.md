@@ -321,3 +321,13 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 - 两个编辑对话框在冲突后均保持打开，页面未把旧 YAML 写回集群；临时对象已删除。
 
 至此 A02～A04 三类 Workload 的 resourceVersion 并发冲突保护均有真实浏览器和 Kubernetes API 证据。该证据只关闭冲突保护子路径，完整字段、全部成功/失败/取消操作、其他作用域 RBAC、V3 Action 移除和兼容残留清理仍未闭环。
+
+## 2026-10-20 A03/A04 原生 YAML 非法内容错误态补测
+
+在当前 131 制品上，分别对临时 StatefulSet `v4-invalid-sts-20261020` 和 DaemonSet `v4-invalid-ds-20261020` 的原生 YAML 编辑器导入缺少 `apiVersion`、`kind` 和资源名称的非法 YAML。
+
+- StatefulSet：浏览器 `PUT` 返回 `400 Bad Request`，编辑对话框保持打开，API 回读 `resourceVersion` 和 generation 均未改变。
+- DaemonSet：浏览器 `PUT` 返回 `400 Bad Request`，编辑对话框保持打开，API 回读 `resourceVersion` 和 generation 均未改变。
+- 两个临时 Workload 已删除，测试 namespace 复核只剩系统 ConfigMap 和默认 ServiceAccount。
+
+该证据关闭 A03/A04 的非法 YAML 错误反馈和失败写入保护子路径；全部操作组合、其他作用域 RBAC、V3 Action 移除和兼容残留清理仍未闭环。

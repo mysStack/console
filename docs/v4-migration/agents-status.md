@@ -624,3 +624,12 @@ A12 上传成功子路径已关闭；冲突/失败反馈、低权限、完整返
 | API 结果   | 外部描述分别保持为 `conflict-external-sts`、`conflict-external-ds`，generation 均保持 `1`             |
 | 清理       | 两个临时 Workload 已删除，测试 namespace 保留                                                         |
 | 当前结论   | A02/A03/A04 的 resourceVersion 冲突保护子路径均已验证；完整 V3 等价、全量 RBAC 和兼容残留清理仍未完成 |
+
+## 2026-10-20 当前会话：StatefulSet/DaemonSet 非法 YAML 错误态补测
+
+| 项目            | 结果                                                                                                     |
+| --------------- | -------------------------------------------------------------------------------------------------------- |
+| 验证对象        | `v4-invalid-sts-20261020`、`v4-invalid-ds-20261020`                                                      |
+| 浏览器/API 结果 | 两类原生 YAML 提交均返回 `PUT 400 Bad Request`；编辑弹窗保持打开，`resourceVersion` 与 generation 未变化 |
+| 清理            | 两个临时 Workload 已删除，namespace 只剩系统 ConfigMap 和默认 ServiceAccount                             |
+| 当前结论        | A03/A04 非法 YAML 错误反馈和不写入保护已验证；完整 V3 等价、全量 RBAC 和兼容残留清理仍未完成             |

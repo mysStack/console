@@ -348,3 +348,9 @@ GitHub Actions Run `39209219839` 成功，镜像 tag 为 `feature-v4-configmaps-
 两类资源的浏览器 `PUT` 均返回 `409 Conflict`，编辑对话框保持打开；Kubernetes API 中的外部描述分别保持为 `conflict-external-sts`、`conflict-external-ds`，generation 均未因失败提交继续变化。临时对象已删除。
 
 该补测与 A02 的同类证据合并后，A02/A03/A04 三类 Workload 的 resourceVersion 冲突保护子路径已验证。完整字段、所有操作成功/失败/取消、全量 RBAC 组合、V3/Wujie 清理和其他 V3 Action 仍未完成。
+
+## 2026-10-20 A03/A04 非法 YAML 错误态补测
+
+在 131 当前制品上，StatefulSet `v4-invalid-sts-20261020` 和 DaemonSet `v4-invalid-ds-20261020` 分别导入缺少 `apiVersion`、`kind` 和资源名称的非法 YAML。两类资源的浏览器 `PUT` 均返回 `400 Bad Request`，编辑对话框保持打开；API 回读确认 `resourceVersion` 与 generation 未改变。临时资源已删除，namespace 无测试残留。
+
+该补测关闭 A03/A04 非法 YAML 错误反馈和不写入保护子路径；A02～A04 的完整字段、全部操作组合、全量 RBAC 和 V3 等价仍未完成。
