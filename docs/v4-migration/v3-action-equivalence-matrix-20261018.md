@@ -20,7 +20,7 @@
 | A09  | `shared/components/Apps/AppCreate/index.tsx`            | `app.template.create.v2`      | 当前 `v3dist` 有字符串，旧源码未直接匹配         | 已在项目应用页打开“从应用模板”并完成远程模板选择；完整 V4 替代、失败/取消和低权限仍待验证                           | 部分验证   |
 | A10  | `shared/.../EdgeWorkloads/index.tsx`                    | `workload.batch.delete.v2`    | 当前 `v3dist` 有字符串，旧源码未直接匹配         | 当前仍由 V3 Action 执行边缘工作负载批量删除                                                                         | 未验证     |
 | A11  | `shared/components/Apps/AppsDeploySpaceModal/index.tsx` | `batch.deploy.app.create.v2`  | 当前 `v3dist` 有字符串，旧源码未直接匹配         | 已完成远程 Helm 模板选择、项目安装和 Application 创建；完整部署等价、失败/取消和低权限仍待验证                      | 部分验证   |
-| A12  | `shared/components/Modals/AppTemplateEdit/index.tsx`    | `openpitrix.template.edit.v2` | 当前 `v3dist` 有字符串，旧源码未直接匹配         | 编辑表单、字段回填、保存和删除已有运行时证据；上传、低权限和 V3 Action 移除仍未闭环                                 | 部分验证   |
+| A12  | `shared/components/Modals/AppTemplateEdit/index.tsx`    | `openpitrix.template.edit.v2` | 当前 `v3dist` 有字符串，旧源码未直接匹配         | 编辑表单、字段回填、保存、删除和上传成功子路径已有运行时证据；冲突/失败、低权限和 V3 Action 移除仍未闭环            | 部分验证   |
 
 A02～A04 和 A01 共涉及三类工作负载详情与配置引用；A05～A12 是独立业务入口。桥接实现和导出文件不重复计数，但删除桥接前必须关闭所有业务调用点。
 
@@ -172,3 +172,14 @@ A01 仍不能标记为完整 V3 等价：主工作负载模板编辑仍保留 V3
 - A05：当前环境仍没有 Edge/EdgeWorkload API、CRD 或可用边缘应用 fixture，无法触发批量删除入口。
 
 本轮只补充了入口渲染、空数据态和取消路径证据，没有把缺少 fixture、隐藏入口或弹窗打开当作 V3 功能等价通过。临时 Application `v4-app-template-20261019`、对应 ApplicationVersion 和 Helm 安装 Job 已按测试名称清理并复核不存在；`v4-migration-e2e` namespace 保留。
+
+## 2026-10-19 A12 Helm 版本上传成功补测
+
+在当前 131 制品 `feature-v4-configmaps-secrets-20261019-142018-58de31e58395`（manifest digest `sha256:772adef318c923e4452b9b1b5fcc8e654006b6439938d2815cc138dae36e8d17`）上，使用真实浏览器向现有 `stakater-configmap` 应用模板上传专用 Chart `v4-action-upload-20261019.tgz`，Chart 版本为 `9.9.19`。
+
+- 浏览器上传并完成 Chart 校验，校验请求 `POST .../versions?validate=true` 返回 `200`。
+- 点击“确定”后，版本创建请求 `POST .../apps/stakater-configmap/versions` 返回 `200`；响应中的应用名为 `stakater-configmap`、版本名为 `9.9.19`。
+- 刷新版本列表后页面显示 `9.9.19`，状态为“未提交”，总版本数从 3 变为 4。
+- 通过 Kubernetes API 删除专用 `ApplicationVersion` `stakater-configmap-9.9.19`；刷新后页面恢复总数 3，并确认资源不存在。临时 Chart 文件和浏览器产物已清理。
+
+该证据关闭 A12 的上传成功子路径。A12 仍为“部分验证”：冲突/失败反馈、低权限拒绝、完整刷新/返回边界和 `openpitrix.template.edit.v2` 的 V3 Action 移除仍未完成。
