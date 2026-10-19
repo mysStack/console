@@ -495,3 +495,19 @@ A02 的页面入口和取消子路径已取证，但模板编辑成功/失败、
 | 清理         | 临时 Application、ApplicationVersion、账号、绑定和上传文件均已清理；`v4-migration-e2e` 保留                                                             | 已完成   |
 
 A12 仍为“部分验证”。不能把本地测试、CI 或正确请求形态替代最终浏览器成功证据；上传成功、冲突/失败反馈、低权限、V3 Action 移除仍未闭环。全局 P0 继续跟踪，PR #1 保持 Draft，未进入下一模块。
+
+## 2026-10-19 当前制品入口复核与临时资源清理
+
+当前 131 制品为 `feature-v4-configmaps-secrets-20261019-142018-58de31e58395`，manifest digest 为 `sha256:772adef318c923e4452b9b1b5fcc8e654006b6439938d2815cc138dae36e8d17`，`ks-console` Deployment `523/523`，Pod `ks-console-6dcf5456c4-7tvhx` 为 `Running/Ready`，实际 imageID 与 manifest digest 一致。
+
+本轮使用真实 Playwright 浏览器完成以下只读或可逆入口核对：
+
+| Action                                       | 结果                                                                                    | 状态         |
+| -------------------------------------------- | --------------------------------------------------------------------------------------- | ------------ |
+| A06/A07 `devops.create/edit`                 | DevOps 页面显示“请选择集群”、总数 0；点击“创建”未形成可用弹窗，缺少企业空间集群 fixture | 未闭环       |
+| A09 `app.template.create.v2`                 | “创建 → 从应用模板”抽屉可以打开，但显示“未发现资源”                                     | 部分入口验证 |
+| A12 `openpitrix.template.edit.v2` 上传子路径 | “上传版本”弹窗可以打开；点击取消后未产生上传写请求                                      | 部分入口验证 |
+| A08 `notification.user.setting`              | 用户菜单没有“通知设置”入口，只有用户设置、登出、关于、技术支持                          | 未验证       |
+| A05/A10 边缘应用路径                         | 当前集群没有 Edge/EdgeWorkload API 或 CRD，无法建立选择和批量删除 fixture               | 未验证       |
+
+本轮没有把空数据态、隐藏入口或弹窗打开标记为功能等价通过。检查过程中发现此前安装测试遗留的临时 Application `v4-app-template-20261019`、对应 ApplicationVersion 和 Helm 安装 Job，已按唯一测试名称删除并复核不存在；`v4-migration-e2e` namespace 保留。全部 V3 功能逐项等价性、完整 RBAC 作用域覆盖和扩展运行时错误仍未闭环；扩展错误按负责人指令暂缓。

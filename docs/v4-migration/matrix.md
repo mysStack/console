@@ -241,6 +241,12 @@ A10：只读检查确认当前集群没有 Edge/EdgeWorkload 相关 CRD 或 API 
 
 本轮部署制品为 `feature-v4-configmaps-secrets-20261019-115905-3a14e96f10b5`，manifest digest 为 `sha256:e61af451d3425e60445cd097549cb6a1e53e4fc511f4a14fad3388c3e03155fd`；Pod `ks-console-57fcd4d59f-sn5cp` 为 `Running/Ready`，实际 imageID 与该 digest 一致。
 
+## 2026-10-19 当前制品未闭环入口复核
+
+在当前部署制品 `feature-v4-configmaps-secrets-20261019-142018-58de31e58395`（manifest digest `sha256:772adef318c923e4452b9b1b5fcc8e654006b6439938d2815cc138dae36e8d17`）上，真实浏览器重新复核了 A05～A12 的可触发入口边界：DevOps 页面没有可选集群，应用模板抽屉没有资源，上传版本弹窗可打开并取消，用户菜单没有通知设置，当前集群没有 Edge/EdgeWorkload 资源。以上结果只证明当前环境的入口与空数据/取消行为，不能替代成功、失败、权限、刷新返回和 V4 原生替代验证。
+
+本轮发现此前安装测试遗留的唯一临时 Application `v4-app-template-20261019`、对应版本和 Helm 安装 Job；已按测试名称删除并复核不存在，`v4-migration-e2e` namespace 未删除。ConfigMap、Secret、ServiceAccount 的模块级验收状态不变，全部 V3 功能等价性仍未完成。
+
 ## 2026-10-19 应用模板版本上传缺口修复与部署复验
 
 真实浏览器发现版本上传校验成功后，提交数据没有保留应用名和版本名，随后又确认版本接口要求 `appType: helm`。已补充上传数据回归测试并提交 `0fff169bd`、`58de31e58` 修复；本地目标测试、ESLint、Prettier、`git diff --check`、完整测试（67 个测试文件、246 个测试）和 `corepack yarn build:packages` 均通过。

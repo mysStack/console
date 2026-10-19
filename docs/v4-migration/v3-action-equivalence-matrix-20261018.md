@@ -160,3 +160,15 @@ A01 仍不能标记为完整 V3 等价：主工作负载模板编辑仍保留 V3
 - 三个页面均可打开原生“编辑设置”入口，未提交写操作。
 
 浏览器请求仍观测到应用启动层的 `/consolev3/dashboard` 全局预加载，因此本轮只能关闭“这三个项目详情组件直接嵌入 V3/Wujie”的代码路径，不能宣称完整 V3 等价或全局 V3/Wujie 已移除。完整模板字段、编辑成功/失败/取消、低权限、刷新/返回和启动层预加载仍未闭环。临时 Deployment、StatefulSet、DaemonSet 已清理。
+
+## 2026-10-19 当前制品业务入口复核
+
+在当前 131 制品 `feature-v4-configmaps-secrets-20261019-142018-58de31e58395`（manifest digest `sha256:772adef318c923e4452b9b1b5fcc8e654006b6439938d2815cc138dae36e8d17`）上，用真实浏览器重新核对尚未闭环的入口：
+
+- A06/A07：`/workspaces/test-workspace/devops` 页面正常渲染，页面显示“请选择集群”、总数为 0，并有“创建”按钮；点击后没有形成可用创建弹窗，当前企业空间没有可供 DevOps 选择的集群。`devops.create`、`devops.edit` 的成功、失败、取消、刷新和权限路径仍未验证。
+- A09：项目应用页的“创建 → 从应用模板”弹窗及应用模板抽屉均可打开；抽屉返回“未发现资源”，没有可选择模板，未执行创建写操作。
+- A12：应用模板版本页的“上传版本”弹窗可以打开；本轮点击“取消”关闭弹窗，未产生上传写请求。上传成功、冲突/失败反馈和低权限路径仍未闭环。
+- A08：打开用户菜单后实际菜单只有“用户设置、登出、关于、技术支持”，没有“通知设置”入口；`notification.user.setting` 当前无可触发 fixture。
+- A05：当前环境仍没有 Edge/EdgeWorkload API、CRD 或可用边缘应用 fixture，无法触发批量删除入口。
+
+本轮只补充了入口渲染、空数据态和取消路径证据，没有把缺少 fixture、隐藏入口或弹窗打开当作 V3 功能等价通过。临时 Application `v4-app-template-20261019`、对应 ApplicationVersion 和 Helm 安装 Job 已按测试名称清理并复核不存在；`v4-migration-e2e` namespace 保留。
