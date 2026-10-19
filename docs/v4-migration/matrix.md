@@ -80,7 +80,7 @@ Deployment `kubesphere-system/ks-console` generation/observedGeneration 为 `511
 
 本轮顺序取证提交：P0-Baseline `be20bc7a3`、P0-Audit `5fc90ebf5`、P0-REA `8c6f59e69`。本轮针对性运行时收尾见 [`p0-runtime-closure-20261017.md`](./p0-runtime-closure-20261017.md)。这些提交和本轮文档只补充证据，没有修改功能代码、`release-4.1.5` 或部署环境；独立人工/其他复核、联邦 fixture、低权限验证和 131 全量运行时映射仍未完成，因此全局 P0 保持“分析中，待负责人复核”。该结论不阻塞已经完成模块级 REA 的 ConfigMap、Secret、ServiceAccount 收尾工作。
 
-2026-10-18 API Server 实际故障验证仍未执行。当前 131 是单节点 K3s 共享控制平面，现有授权不包含停止或重启远程 API Server；Playwright 网络拦截只能作为前端错误处理证据。预检查和后续授权门槛见 [`api-server-fault-verify-20261018.md`](./api-server-fault-verify-20261018.md)。
+2026-10-19 已完成一次 131 API Server 实际故障注入和恢复验证。通过 `kubectl debug node/dev01` 在宿主机停止 K3s，并用 systemd timer 自动恢复；真实浏览器监控的 ConfigMap、Secret、ServiceAccount 列表请求在故障期间由 `200` 变为 `502`，恢复后 readyz、节点、Console rollout、Pod imageID 和三个页面均恢复。35 组样本和验证边界见 [`api-server-fault-verify-20261018.md`](./api-server-fault-verify-20261018.md)。该项只关闭 API Server 故障环境证据缺口，不代表全部 V3 Action 或模块级 VERIFY 已完成。
 
 ### 2026-10-18 Secret YAML 脱敏阻塞收尾
 

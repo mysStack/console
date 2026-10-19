@@ -444,4 +444,15 @@ A02 的页面入口和取消子路径已取证，但模板编辑成功/失败、
 
 - 当前分支 `feature/v4-configmaps-secrets` 的本轮文档提交已推送；Draft PR #1 的目标分支为 `feature/v4-migration`，GitHub 回读变更文件数为 71，PR 未合并。最新 SHA 以本次提交后的本地和远程回读为准。
 - 131 的 `ks-console` Deployment generation/observedGeneration 为 `519/519`，副本 `1/1` Ready；当前仍部署镜像 `feature-v4-configmaps-secrets-20261018-225142-1f711bb66b3b`，Pod `ks-console-797469cf84-mgndq` 为 `Running/Ready`，实际 imageID 为 `sha256:5fc81a366fc59ebd9c3d19e57eb6c8d0a1d70453748c622324a0a8c16b8afc02`。
-- Kubernetes `/readyz?verbose` 通过；本次只提交文档，没有重新构建或部署业务制品。未执行真实 API Server 停止/恢复，仍需维护窗口、远程控制方式和最长中断时间明确后才能进行。
+- Kubernetes `/readyz?verbose` 通过；截至本段记录时只提交文档，真实 API Server 停止/恢复尚未获授权。本段状态已由下方 2026-10-19 实际故障注入记录 supersede。
+
+## 2026-10-19 API Server 实际故障注入与恢复
+
+项目负责人已授权在 131 维护窗口通过 `kubectl debug node/dev01` 停止和恢复宿主机 K3s，最长中断时间为 5 分钟。本轮使用 systemd timer 延迟 45 秒恢复 K3s，未修改业务代码、稳定分支或测试 namespace。
+
+- 故障前：`readyz` 通过，`dev01` Ready，`ks-console` Deployment `519/519`，Pod `ks-console-797469cf84-mgndq` Ready，镜像 tag 为 `feature-v4-configmaps-secrets-20261018-225142-1f711bb66b3b`。
+- 故障期间：浏览器监控 35 组请求；样本 0–10 的 ConfigMap、Secret、ServiceAccount 列表均为 `200`，样本 11 开始出现 `502`，样本 12–34 三类请求持续为 `502`。
+- 恢复后：`readyz` 通过，`dev01` Ready，Deployment `520/520` 且 desired/ready/updated/available 为 `1/1/1/1`，Pod `ks-console-7796c9d77f-zq5f7` Ready，实际 imageID 为 `ghcr.io/mysstack/ks-console@sha256:5fc81a366fc59ebd9c3d19e57eb6c8d0a1d70453748c622324a0a8c16b8afc02`。三个页面重新加载后分别显示 ConfigMap 1、Secret 4、ServiceAccount 1，未输出 Secret 明文。
+- 清理：临时 debug Pod `node-debugger-dev01-s4grv` 已删除；`v4-migration-e2e` namespace 保留。
+
+该证据关闭真实 API Server 故障环境验证项，但只覆盖三个目标资源列表的故障和恢复行为；全部 V3 功能等价性、全局扩展运行时错误和其他模块级 VERIFY 条件仍按各自记录处理。全局 P0 仍为“分析中，待负责人复核”，PR #1 继续保持 Draft。完整命令、样本和边界见 [`api-server-fault-verify-20261018.md`](./api-server-fault-verify-20261018.md)。
