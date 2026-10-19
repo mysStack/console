@@ -205,3 +205,15 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 为核对前文 Workload `projectonly` 的 `GET 200` 记录，本轮在当前 131 制品上重新创建独立临时用户，只绑定 `v4-migration-e2e` 项目 viewer RoleBinding，不绑定 `test-workspace` WorkspaceRoleBinding。真实浏览器登录成功，但直达 Deployment 详情进入 `/errors/403`；浏览器会话内通过集群代理对同一临时 Deployment 执行 GET、POST、PUT、PATCH、DELETE，结果均为 `403`。
 
 临时用户、项目 RoleBinding 和 Deployment 已清理。该结果与前一条历史记录不一致，原因和制品/账号绑定上下文尚未证明，不能将两次结果合并或推断为稳定的 `projectonly` 读取权限。当前 Workload `projectonly` 组合应标记为“结果不一致，待独立复核”，不作为通过证据。
+
+## 2026-10-20 Workload admin 独立正向补测
+
+使用现有平台管理员真实浏览器会话，分别访问临时 Deployment、StatefulSet、DaemonSet 详情页。三类页面均渲染原生“编辑信息”和“更多操作”入口；浏览器会话内通过集群代理执行资源操作，结果如下：
+
+| 资源        | GET | PUT | PATCH | POST | DELETE |
+| ----------- | --: | --: | ----: | ---: | -----: |
+| Deployment  | 200 | 200 |   200 |  201 |    200 |
+| StatefulSet | 200 | 200 |   200 |  201 |    200 |
+| DaemonSet   | 200 | 200 |   200 |  201 |    200 |
+
+每类资源均完成更新、创建、删除和清理；测试 namespace 最终只剩系统 `kube-root-ca.crt` ConfigMap 和默认 ServiceAccount。该结果补齐 A02～A04 的独立 admin 正向组合。`projectonly` 当前制品结果不一致、平台/联邦/DevOps/Extension 作用域和全部 V3 Action 等价仍未完成。

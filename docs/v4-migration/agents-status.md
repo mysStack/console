@@ -675,3 +675,9 @@ A02～A04 当前已补齐 viewer、operator、workspaceonly、clusterviewer 作�
 2. Workload `projectonly` 使用新建的仅项目 viewer 账号在当前制品重新验证，项目路由为 `/errors/403`，Deployment 的 GET/POST/PUT/PATCH/DELETE 均为 `403`。该结果与此前记录的 `GET 200` 不一致，保留两次原始记录，不把旧结果继续当作当前通过证据。
 
 A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一致，待独立复核”。全量 RBAC 组合、全部 V3 Action 等价性和扩展运行时问题仍未闭环。
+
+## 2026-10-20 Workload admin 独立正向 RBAC 补测
+
+使用当前 131 制品的真实平台管理员浏览器会话，分别访问临时 Deployment、StatefulSet、DaemonSet 详情页，三类页面均渲染原生编辑和操作入口。浏览器会话内三类 Workload 的 GET、PUT、PATCH、POST、DELETE 均为 `200/200/200/201/200`，更新、创建、删除和清理均完成；测试 namespace 最终只剩系统 ConfigMap 和默认 ServiceAccount。
+
+该结果补齐 A02～A04 的独立 admin 正向组合。结合已有 viewer、operator、workspaceonly、clusterviewer 证据，Workload 的主要项目/集群组合已有实际记录；`projectonly` 当前制品仍与历史记录不一致，平台/联邦/DevOps/Extension 作用域和全部 V3 Action 等价性仍未闭环。

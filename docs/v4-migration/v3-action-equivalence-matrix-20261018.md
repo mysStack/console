@@ -371,3 +371,9 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 - 已删除 ApplicationRelease、Job、安装 ConfigMap，并复核测试 namespace 只剩系统 `kube-root-ca.crt` 和默认 ServiceAccount。
 
 > 该结果只关闭 A09 的原生模板选择、表单提交和 API `200` 子路径；应用部署成功、失败/取消、刷新/返回、低权限和完整 V4/Wujie 替代仍未闭环。A09 继续标记为“部分验证”，不能把集群资源不足时的创建中状态写成安装通过。
+
+## 2026-10-20 A02/A03/A04 admin 正向 RBAC 补测
+
+使用当前 131 制品的真实平台管理员浏览器会话，分别访问临时 Deployment、StatefulSet、DaemonSet 详情页，三类页面均显示原生编辑和操作入口。浏览器会话内对三类 Workload 执行 GET、PUT、PATCH、POST、DELETE，状态均为 `200/200/200/201/200`，并删除所有临时对象。
+
+该证据补齐 A02～A04 的独立 admin 正向 API 和页面入口子路径，与 viewer、operator、workspaceonly、clusterviewer 证据合并后，当前已有五类 Workload 作用域组合的实际记录；`projectonly` 当前制品结果与历史记录不一致，平台/联邦/DevOps/Extension 作用域和完整 V3/Wujie 去依赖仍未闭环。
