@@ -511,3 +511,5 @@ A12 仍为“部分验证”。不能把本地测试、CI 或正确请求形态�
 | A05/A10 边缘应用路径                         | 当前集群没有 Edge/EdgeWorkload API 或 CRD，无法建立选择和批量删除 fixture               | 未验证       |
 
 本轮没有把空数据态、隐藏入口或弹窗打开标记为功能等价通过。检查过程中发现此前安装测试遗留的临时 Application `v4-app-template-20261019`、对应 ApplicationVersion 和 Helm 安装 Job，已按唯一测试名称删除并复核不存在；`v4-migration-e2e` namespace 保留。全部 V3 功能逐项等价性、完整 RBAC 作用域覆盖和扩展运行时错误仍未闭环；扩展错误按负责人指令暂缓。
+
+补充的平台作用域只读核验使用临时用户、GlobalRole 和 GlobalRoleBinding 打开了 `/access/workspaces`、`/clusters`、`/access/accounts`、`/extensions/management` 和 `/settings/base-info`，页面均能渲染。由于 KubeSphere 聚合控制器把全局模板规则展开到了临时角色，本次结果只记为平台入口证据，未执行写操作，也未把它当作最小权限拒绝证据；三个临时 IAM 对象已删除并复核不存在。

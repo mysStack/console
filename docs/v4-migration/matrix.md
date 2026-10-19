@@ -247,6 +247,8 @@ A10：只读检查确认当前集群没有 Edge/EdgeWorkload 相关 CRD 或 API 
 
 本轮发现此前安装测试遗留的唯一临时 Application `v4-app-template-20261019`、对应版本和 Helm 安装 Job；已按测试名称删除并复核不存在，`v4-migration-e2e` namespace 未删除。ConfigMap、Secret、ServiceAccount 的模块级验收状态不变，全部 V3 功能等价性仍未完成。
 
+平台作用域补测使用临时用户和临时聚合 GlobalRole 只读打开了工作空间、集群、用户、扩展中心和平台设置页面；临时 IAM 对象已经删除并复核不存在。由于聚合控制器展开了全局模板规则，本次只作为路由渲染证据，不能证明平台最小权限写拒绝或扩展 Action 等价。
+
 ## 2026-10-19 应用模板版本上传缺口修复与部署复验
 
 真实浏览器发现版本上传校验成功后，提交数据没有保留应用名和版本名，随后又确认版本接口要求 `appType: helm`。已补充上传数据回归测试并提交 `0fff169bd`、`58de31e58` 修复；本地目标测试、ESLint、Prettier、`git diff --check`、完整测试（67 个测试文件、246 个测试）和 `corepack yarn build:packages` 均通过。

@@ -96,3 +96,11 @@
 | 扩展中心/扩展 Action 作用域                       | 扩展运行时错误按负责人指令延期                                                 | 暂缓，未通过         |
 
 因此，“完整”仅表示本记录覆盖的 ConfigMap、Secret、ServiceAccount 项目/集群六种权限组合已取得实际证据；平台、联邦、DevOps、扩展作用域不能沿用这些结果推断通过。三类资源模块的 RBAC 组合证据已完成，但全量 V3 功能等价性和跨功能作用域门禁仍未完成。
+
+## 2026-10-19 平台/扩展路由只读补测
+
+为补齐平台作用域的入口证据，本轮创建了临时用户、临时 GlobalRole 和 GlobalRoleBinding，并使用当前测试账号密码通过真实浏览器登录。临时角色引用了 `global-view-workspaces`、`global-view-clusters`、`global-view-users`、`global-view-roles` 模板；KubeSphere 的聚合控制器实际把全局模板规则展开到该临时角色，因此本轮只把它作为平台路由渲染证据，不能作为最小权限拒绝证据。
+
+该临时账号实际打开并渲染了以下路由：`/access/workspaces`、`/clusters`、`/access/accounts`、`/extensions/management` 和 `/settings/base-info`；没有执行任何写操作。临时用户、GlobalRole 和 GlobalRoleBinding 已删除，并分别用 Kubernetes API 复核为不存在。
+
+这次补测只证明平台/扩展入口在该临时聚合角色下可以渲染，不能关闭平台写权限、扩展 Action、联邦资源或完整 V3 等价性。扩展初始化运行时错误仍按负责人指令暂缓。
