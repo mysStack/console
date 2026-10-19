@@ -438,3 +438,9 @@ A02 的页面入口和取消子路径已取证，但模板编辑成功/失败、
 | 清理         | Application 删除后 ApplicationVersion 未自动清理，随后单独删除 ApplicationVersion，两个对象均确认 `NotFound` | 已完成     |
 
 本轮关闭 A12 的编辑保存、刷新一致性和删除成功子路径，不能把应用模板编辑标记为完整 V4 等价。删除失败/取消、版本上传成功/失败、低权限路径和 V3 Action 移除仍未完成；临时测试对象已清理，`v4-migration-e2e` namespace 未删除。应用模板创建 A09、部署弹窗 A11 仍缺少可用 fixture，保持未验证。
+
+## 2026-10-19 当前 GitHub/部署状态复核
+
+- 当前分支 `feature/v4-configmaps-secrets` 已推送到 `22eb38cecf0714b026d82eaf9fd8a6c13b9effb5`；Draft PR #1 的目标分支为 `feature/v4-migration`，GitHub 回读变更文件数为 71，PR 未合并。
+- 131 的 `ks-console` Deployment generation/observedGeneration 为 `519/519`，副本 `1/1` Ready；当前仍部署镜像 `feature-v4-configmaps-secrets-20261018-225142-1f711bb66b3b`，Pod `ks-console-797469cf84-mgndq` 为 `Running/Ready`，实际 imageID 为 `sha256:5fc81a366fc59ebd9c3d19e57eb6c8d0a1d70453748c622324a0a8c16b8afc02`。
+- Kubernetes `/readyz?verbose` 通过；本次只提交文档，没有重新构建或部署业务制品。未执行真实 API Server 停止/恢复，仍需维护窗口、远程控制方式和最长中断时间明确后才能进行。
