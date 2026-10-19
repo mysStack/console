@@ -602,3 +602,15 @@ A12 上传成功子路径已关闭；冲突/失败反馈、低权限、完整返
 ## 2026-10-20 A02 非法 YAML 错误态补测
 
 使用真实 Playwright 在临时 Deployment `v4-invalid-yaml-20261020` 的原生 YAML 编辑器中导入非法对象。提交收到 `400 BadRequest`，页面展示错误信息并保持编辑对话框，API 回读确认 generation 未变化；临时对象已删除，namespace 无测试残留。A02 非法 YAML 错误反馈和不写入保护已取得部署后证据，A03/A04 与冲突、低权限和完整 V3 等价仍未完成。
+
+## 2026-10-20 当前会话：Workload YAML 并发冲突保护
+
+| 项目        | 结果                                                                                                                                                              |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 负责人/模式 | 主 Codex 会话，单会话顺序执行，未启动子 Agent                                                                                                                     |
+| 分支/提交   | `feature/v4-configmaps-secrets` / `4042f9570a8edf85e20ce43717c1cdf3b3a4f1bd`                                                                                      |
+| CI/制品     | Run `39315775014`；`feature-v4-configmaps-secrets-20261020-040218-4042f9570a8e`；digest `sha256:1c59602033e75e14d60e769e1de25bf16db20e962a9d504ee40f991e5f879878` |
+| 131 部署    | `ks-console-6f98cccdf7-jd5kz` 为 `Running/Ready`，Pod imageID 与 digest 一致，rollout 成功                                                                        |
+| 浏览器验证  | A02 Deployment YAML 并发修改返回 `409 Conflict`；页面错误提示和编辑弹窗保留，外部 API 变更未被覆盖                                                                |
+| 清理        | 临时 Deployment `v4-conflict-fix-20261020` 已删除，未删除测试 namespace                                                                                           |
+| 当前结论    | A02 resourceVersion 冲突保护子路径已验证；A03/A04 同路径和全部模块等价性仍未完成                                                                                  |

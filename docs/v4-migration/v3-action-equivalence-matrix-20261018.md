@@ -301,3 +301,13 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 - 临时 Deployment 已删除，namespace 复核只剩系统 ConfigMap 和默认 ServiceAccount。
 
 该证据关闭 A02 的非法 YAML 错误反馈和不写入保护子路径。A03/A04 非法 YAML、resourceVersion 冲突、低权限错误态、完整操作组合和 V3/Wujie 清理仍未闭环。
+
+## 2026-10-20 A02 原生 YAML resourceVersion 冲突保护补测
+
+针对前一轮发现的资源版本保护缺口，已在提交 `4042f9570a8edf85e20ce43717c1cdf3b3a4f1bd` 中让 YAML 编辑提交保留编辑器打开时的 `metadata.resourceVersion`，避免提交前重新 GET 最新对象后静默覆盖并发变更。该变更新增 `preserveResourceVersion` 回归测试，并通过本地完整测试和构建。
+
+本轮使用 GitHub Actions Run `39315775014` 构建并部署到 131：镜像 tag 为 `feature-v4-configmaps-secrets-20261020-040218-4042f9570a8e`，manifest digest 为 `sha256:1c59602033e75e14d60e769e1de25bf16db20e962a9d504ee40f991e5f879878`，Pod `ks-console-6f98cccdf7-jd5kz` 为 `Running/Ready`，实际 imageID 与该 digest 一致。
+
+真实 Playwright 证据：打开临时 Deployment `v4-conflict-fix-20261020` 的原生 YAML 编辑器，外部将描述改为 `conflict-external-fix` 后，导入保存旧 `resourceVersion` 的 YAML 并提交；浏览器请求返回 `PUT 409 Conflict`，页面显示 Conflict 错误并保持编辑对话框，Kubernetes API 回读仍为 `conflict-external-fix`、generation 为 `2`，没有被旧内容覆盖。临时 Deployment 已删除。
+
+该证据关闭 A02 的 resourceVersion 并发冲突保护子路径。A03/A04 尚未分别取得冲突证据，所有资源的完整操作组合、其他作用域 RBAC、V3 Action 移除和兼容残留清理仍未闭环；A02～A04 继续标记为“部分验证”。

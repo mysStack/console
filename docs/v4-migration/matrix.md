@@ -330,3 +330,13 @@ GitHub Actions Run `39209219839` 成功，镜像 tag 为 `feature-v4-configmaps-
 ## 2026-10-20 A02 非法 YAML 错误态补测
 
 真实浏览器在临时 Deployment 的原生“编辑 YAML”中导入缺少 `apiVersion`、`kind` 和 `metadata.name` 的非法文件；提交返回 `400 BadRequest`，页面显示错误信息且编辑对话框保持打开，Kubernetes 对象 generation 未变化。临时对象已删除。该项关闭 A02 非法 YAML 错误反馈和不写入保护；A03/A04 及冲突、低权限和完整 V3 等价条件仍未完成。
+
+## 2026-10-20 模块级 VERIFY：YAML 并发冲突保护
+
+提交 `4042f9570a8edf85e20ce43717c1cdf3b3a4f1bd` 修复原生 Workload YAML 编辑提交的 resourceVersion 处理：提交使用编辑器打开时的版本，服务端发现对象已被外部修改时返回冲突，避免先 GET 最新对象再静默覆盖并发变更。
+
+部署证据：GitHub Actions Run `39315775014`；镜像 `feature-v4-configmaps-secrets-20261020-040218-4042f9570a8e`；manifest digest `sha256:1c59602033e75e14d60e769e1de25bf16db20e962a9d504ee40f991e5f879878`；Pod `ks-console-6f98cccdf7-jd5kz` 已 Ready，imageID 与 digest 一致。
+
+真实浏览器验证 Deployment `v4-conflict-fix-20261020`：外部先修改描述，浏览器随后提交旧 resourceVersion 的 YAML，收到 `409 Conflict`，页面保留错误和编辑弹窗；API 中外部描述仍保留、generation 未因失败提交继续变化。临时资源已清理。
+
+状态：A02 的并发冲突保护已验证；A03/A04 尚未分别验证该冲突路径，三类 Workload 的完整 V3 等价、全部 RBAC 组合和兼容残留清理仍未完成。
