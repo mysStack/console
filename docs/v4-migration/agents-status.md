@@ -594,3 +594,7 @@ A12 上传成功子路径已关闭；冲突/失败反馈、低权限、完整返
 ## 2026-10-20 A03/A04 YAML 文件导入持久化补测
 
 在 131 当前制品上使用真实浏览器分别对临时 StatefulSet `v4-yaml-statefulset-20261020` 和 DaemonSet `v4-yaml-daemonset-20261020` 的原生“编辑 YAML”入口执行文件导入，将描述更新为 `yaml-after-sts`、`yaml-after-ds`。两个页面提交后显示新值，刷新后仍保持，Kubernetes API 回读注解一致；测试对象已经删除，namespace 复核只剩系统 ConfigMap 和默认 ServiceAccount。A03/A04 合法 YAML 文件导入、提交、刷新和 API 持久化子路径已取得证据，非法 YAML、冲突、低权限和完整 V3 等价仍未完成。
+
+## 2026-10-20 A02/A03/A04 Workload 低权限拒绝补测
+
+创建临时 `v4-workload-viewer-20261020`，绑定 `test-workspace-viewer` 与项目 `viewer` 角色后，使用真实 Playwright 登录 131，分别访问临时 Deployment、StatefulSet、DaemonSet 详情页。三类页面均可读取，且没有显示编辑或更多操作入口；浏览器会话内 API 结果均为 GET `200`、POST/PUT/PATCH/DELETE `403`。临时资源、用户、WorkspaceRoleBinding 和项目 RoleBinding 已删除，namespace 清理后只剩系统 ConfigMap 和默认 ServiceAccount。该项补齐 A02～A04 当前项目 viewer 组合的低权限拒绝证据，其他作用域和完整 V3 等价仍未完成。

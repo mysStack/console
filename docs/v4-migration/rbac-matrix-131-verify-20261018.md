@@ -144,3 +144,17 @@
 | V3 兼容加载  | 联邦项目页面                                   | 页面请求 `/consolev3/dashboard` 及 `dist/v3dist/*` 资源均返回 `200`                                                                            | 未完成原生化 |
 
 集群 API 资源盘点此前已确认当前集群没有 KubeSphere FederatedProject/FederatedResource、EdgeWorkload 等可用于建立真实 fixture 的 API/CRD。本轮没有创建联邦项目、Edge 节点或其他测试资源，也没有将空数据态、禁用按钮或入口渲染写成 RBAC/功能等价通过。联邦和 Edge 的成功、失败、取消、刷新、低权限及 V4 替代行为仍未验证。
+
+## 2026-10-20 Workload 低权限组合补测
+
+为补齐原生 Workload 详情与权限边界，本轮在 131 当前制品上创建临时账号 `v4-workload-viewer-20261020`，绑定 `test-workspace-viewer` 和 `v4-migration-e2e` 项目 `viewer` 角色。使用真实 Playwright 登录后，分别直达 Deployment、StatefulSet、DaemonSet 详情页：三类页面均能渲染资源状态、修改记录、元数据、环境变量、配置引用和事件入口；页面没有显示“编辑信息”或“更多操作”等写入口。
+
+在同一浏览器会话中对三个临时 Workload 对象执行 Kubernetes API 请求，状态码如下：
+
+| 资源        | GET 详情 | POST 创建 | PUT 更新 | PATCH 更新 | DELETE 删除 |
+| ----------- | -------: | --------: | -------: | ---------: | ----------: |
+| Deployment  |      200 |       403 |      403 |        403 |         403 |
+| StatefulSet |      200 |       403 |      403 |        403 |         403 |
+| DaemonSet   |      200 |       403 |      403 |        403 |         403 |
+
+该结果补齐 A02～A04 的低权限读写拒绝证据，但只覆盖当前项目 viewer 组合；不代表全部 RBAC 作用域、所有错误态或全部 V3 行为等价性已完成。临时 Workload、用户、WorkspaceRoleBinding 和项目 RoleBinding 均已删除，`v4-migration-e2e` 清理后只剩系统 `kube-root-ca.crt` ConfigMap 和默认 ServiceAccount。

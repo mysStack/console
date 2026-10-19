@@ -276,3 +276,17 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 - 清理后 `v4-migration-e2e` 只剩系统 `kube-root-ca.crt` ConfigMap 和默认 ServiceAccount。
 
 该证据关闭 A03/A04 的合法 YAML 文件导入、提交、刷新和 API 持久化子路径。非法 YAML、resourceVersion 冲突、所有操作成功/失败/取消、低权限、回滚/重新创建/删除、V3 Action 移除和 `/consolev3/dashboard` 全局预加载仍未闭环，A02～A04 继续标记为“部分验证”。
+
+## 2026-10-20 A02/A03/A04 Workload 低权限拒绝补测
+
+使用当前 131 制品和真实 Playwright，以临时 `test-workspace-viewer` + 项目 `viewer` 账号分别访问 Deployment、StatefulSet、DaemonSet 原生详情页。三类页面均可读取并渲染资源状态、修改记录、元数据、环境变量、配置引用和事件入口，未显示编辑或更多操作入口。
+
+同一浏览器会话中的 API 状态码为：
+
+| 资源        | GET 详情 | POST 创建 | PUT 更新 | PATCH 更新 | DELETE 删除 |
+| ----------- | -------: | --------: | -------: | ---------: | ----------: |
+| Deployment  |      200 |       403 |      403 |        403 |         403 |
+| StatefulSet |      200 |       403 |      403 |        403 |         403 |
+| DaemonSet   |      200 |       403 |      403 |        403 |         403 |
+
+临时 Workload 和账号绑定已清理。该证据关闭 A02～A04 当前项目 viewer 组合的读写拒绝子路径；operator/admin 正向操作的完整字段和错误态、低权限其他作用域、回滚/重新创建/删除、V3 Action 移除以及 `/consolev3/dashboard` 全局预加载仍未闭环。
