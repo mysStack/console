@@ -306,3 +306,9 @@ GitHub Actions Run `39209219839` 成功，镜像 tag 为 `feature-v4-configmaps-
 在真实浏览器访问原生 Deployment、StatefulSet、DaemonSet 详情页时，发现 HPA 请求重复拼接 `/apis/`，实际地址为 `/apis/apis/autoscaling/v2beta2/...`。同一错误请求在控制台日志中重复出现 282 次，并伴随 `Network Error` 和 `ERR_INSUFFICIENT_RESOURCES`。根因、修复和本地验证记录见[原生 Workload HPA API 路径修复记录](./hpa-native-workload-api-fix-20261020.md)。
 
 第一版路径修复部署后，浏览器确认重复 `/apis/apis/` 已消失，但正确 HPA URL 仍被重复请求并触发资源耗尽。根因进一步定位为 `useCacheStore` setter 身份不稳定导致详情同步 effect 循环。第二版 `useCallback` 修复已提交为 `3ee15af9ad2b`，CI Run `39302192970` 成功，并已部署到 131：镜像 tag 为 `feature-v4-configmaps-secrets-20261020-022516-3ee15af9ad2b`，manifest digest 为 `sha256:27d44f7e001a6c5593ce39a5fbde2cb53dcdcb75959ab3a2f57114ee5b3f25b9`，Pod `ks-console-7c875999cf-6zw2g` 为 `Running/Ready`，实际 imageID 一致。Deployment、StatefulSet、DaemonSet 页面复验中重复请求和资源耗尽均为 0，DaemonSet 操作菜单、YAML 弹窗和取消路径可用；A02～A04 的其他功能等价条件仍未完成。
+
+## 2026-10-20 原生 Workload 详情操作补测
+
+在同一第二版制品上，真实浏览器访问 `v4-migration-e2e` 中临时 Deployment、StatefulSet、DaemonSet 的原生详情页。三类页面的资源状态、修改记录、元数据、环境变量、配置引用和事件入口均能渲染；三类“编辑信息”弹窗均可打开，StatefulSet/DaemonSet 取消路径通过，Deployment 提交描述 `v4-a02-verify` 后页面和 Kubernetes API 均一致。Deployment 刷新、浏览器返回以及 DaemonSet 的“更多操作”菜单、原生 YAML 弹窗和取消路径通过。临时资源已清理，namespace 复核无残留测试资源。
+
+该补测只增加 A02～A04 的详情渲染、部分信息编辑、取消、刷新/返回和 HPA 稳定性证据；完整 YAML 持久化、所有操作成功/失败/取消、低权限和 V3/Wujie 兼容残留清理仍未完成，模块不能标记为完整 V3 等价。

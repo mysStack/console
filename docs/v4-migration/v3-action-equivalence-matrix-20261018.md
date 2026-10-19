@@ -241,3 +241,14 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 第一版路径修复部署后，浏览器确认重复 `/apis/apis/` 已消失，但正确 HPA URL 仍被重复请求并触发资源耗尽。进一步定位到 `useCacheStore` setter 身份不稳定导致详情同步 effect 循环；第二版 `useCallback` 修复已提交为 `3ee15af9ad2b`，CI Run `39302192970` 成功并部署到 131。真实浏览器复验 Deployment、StatefulSet、DaemonSet 页面时，重复 HPA 请求和 `ERR_INSUFFICIENT_RESOURCES` 均为 0，DaemonSet 的操作菜单、原生 YAML 弹窗和取消路径可用。
 
 该证据关闭 A02～A04 的 HPA 请求路径和详情同步循环缺陷，但 A02～A04 的完整字段、成功/失败/取消、低权限、刷新返回、V3 Action 移除和全局兼容残留清理仍未闭环。
+
+## 2026-10-20 A02～A04 原生详情操作补测
+
+在第二版制品 `feature-v4-configmaps-secrets-20261020-022516-3ee15af9ad2b` 上，使用真实浏览器和 `v4-migration-e2e` 内的临时 Deployment、StatefulSet、DaemonSet 复核原生详情页：
+
+- 三类详情页均能直达并渲染资源状态、修改记录、元数据、环境变量、配置引用和事件路由，页面显示项目和工作负载名称，副本为 `0/0` 或不可调度的 `0/0`。
+- 三类页面均能打开“编辑信息”弹窗；StatefulSet、DaemonSet 完成取消路径，Deployment 完成描述 `v4-a02-verify` 的提交，页面和 Kubernetes API 均显示该描述。
+- Deployment 完成刷新和浏览器返回后路由、描述和页面数据保持一致；DaemonSet 的“更多操作”菜单、原生“编辑 YAML”弹窗及取消路径已在同一制品上复核。
+- 三类页面的 HPA 重复请求为 0，`ERR_INSUFFICIENT_RESOURCES` 为 0；测试资源已删除，namespace 清理后只剩系统 ConfigMap 和默认 ServiceAccount。
+
+本轮只关闭了 A02～A04 的原生详情渲染、部分信息编辑、取消、刷新/返回和 HPA 请求稳定性子路径。完整 YAML 持久化、所有可编辑字段、成功/失败/取消组合、低权限、回滚/重新创建/删除、V3 Action 移除和 `/consolev3/dashboard` 全局预加载仍未闭环，因此 A02～A04 继续为“部分验证”。

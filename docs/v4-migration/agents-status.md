@@ -578,3 +578,9 @@ A12 上传成功子路径已关闭；冲突/失败反馈、低权限、完整返
 第一版路径修复部署后，浏览器确认重复 `/apis/apis/` 已消失，但正确的 HPA URL 仍被重复请求并触发 `ERR_INSUFFICIENT_RESOURCES`。根因进一步定位为 `useCacheStore` 每次创建新 setter，详情同步 effect 因依赖变化形成循环；第二版 `useCallback` 修复已提交为 `3ee15af9ad2b`，本地 69 个测试文件、249 个测试通过，`build:packages`、CI Run `39302192970` 均成功。
 
 第二版已部署到 131：镜像 tag `feature-v4-configmaps-secrets-20261020-022516-3ee15af9ad2b`，manifest digest `sha256:27d44f7e001a6c5593ce39a5fbde2cb53dcdcb75959ab3a2f57114ee5b3f25b9`，Deployment `538/538`，Pod `ks-console-7c875999cf-6zw2g` 为 `Running/Ready`，imageID 与 digest 一致。真实浏览器复验 Deployment、StatefulSet、DaemonSet 页面均正常，重复 HPA 请求和 `ERR_INSUFFICIENT_RESOURCES` 均为 0；DaemonSet 的操作菜单、YAML 弹窗和取消路径可用。测试工作负载已清理，namespace 只剩系统 ConfigMap 和默认 ServiceAccount。该修复只关闭 HPA 请求循环缺陷，不改变 A02～A04 的完整等价性、RBAC 或全局 V3/Wujie 状态。
+
+## 2026-10-20 原生 Workload 详情操作补测
+
+在第二版制品上使用真实 Playwright 复核临时 Deployment、StatefulSet、DaemonSet：三类详情页及主要子路由均能渲染；三类“编辑信息”弹窗可打开，StatefulSet/DaemonSet 取消通过，Deployment 提交描述 `v4-a02-verify` 后页面和 Kubernetes API 一致；Deployment 刷新和浏览器返回保持路由与描述；DaemonSet 的“更多操作”、原生 YAML 弹窗和取消通过。临时资源已经删除并复核 namespace 无测试残留。
+
+该补测仍只关闭 A02～A04 的部分原生详情行为，完整 YAML 持久化、所有操作错误态、低权限、回滚/重新创建/删除和 V3/Wujie 残留清理未完成。
