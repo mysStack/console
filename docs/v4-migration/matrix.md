@@ -314,3 +314,9 @@ GitHub Actions Run `39209219839` 成功，镜像 tag 为 `feature-v4-configmaps-
 该补测只增加 A02～A04 的详情渲染、部分信息编辑、取消、刷新/返回和 HPA 稳定性证据；完整 YAML 持久化、所有操作成功/失败/取消、低权限和 V3/Wujie 兼容残留清理仍未完成，模块不能标记为完整 V3 等价。
 
 同一轮尝试用浏览器编辑器提交 Deployment YAML 描述变更，提交返回 HTTP `400` 且弹窗保持打开。由于自动化输入没有形成完整可引用的编辑器内容，不能将该结果判定为原生 YAML 功能失败；YAML 持久化仍为未验证，测试对象已清理。
+
+## 2026-10-20 A02 YAML 文件导入持久化补测
+
+使用同一 131 制品和真实浏览器对临时 Deployment `v4-yaml-verify-20261020-2` 进行原生 YAML 文件导入补测：从“编辑 YAML”入口导入合法 Deployment YAML，将描述从 `yaml-before` 更新为 `yaml-after`；提交后详情页显示新值，浏览器刷新后仍保持，Kubernetes API 回读注解一致且 generation 由 `1` 变为 `2`。临时 Deployment 已删除，namespace 复核只剩系统 ConfigMap 和默认 ServiceAccount。
+
+该证据仅关闭 A02 的合法 YAML 导入、提交、刷新和 API 持久化子路径；StatefulSet/DaemonSet YAML、非法 YAML、resourceVersion 冲突、低权限及全部 V3 等价条件仍未完成。

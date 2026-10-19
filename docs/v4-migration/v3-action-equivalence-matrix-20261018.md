@@ -254,3 +254,14 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 本轮只关闭了 A02～A04 的原生详情渲染、部分信息编辑、取消、刷新/返回和 HPA 请求稳定性子路径。完整 YAML 持久化、所有可编辑字段、成功/失败/取消组合、低权限、回滚/重新创建/删除、V3 Action 移除和 `/consolev3/dashboard` 全局预加载仍未闭环，因此 A02～A04 继续为“部分验证”。
 
 本轮另建临时 Deployment 尝试通过原生“编辑 YAML”提交描述变更。浏览器编辑器自动化输入后提交返回 HTTP `400`，弹窗保持打开；由于当前输入方式只更新了编辑器活动文本区域，未形成可独立引用的有效 YAML 提交证据，不能把这次失败归因于原生 API 或代码缺陷。该临时 Deployment 已删除，YAML 持久化继续标记为未验证，后续需要使用编辑器支持的逐键输入或文件导入方式重新验证。
+
+## 2026-10-20 A02 Deployment 原生 YAML 持久化补测
+
+在当前 131 制品 `feature-v4-configmaps-secrets-20261020-022516-3ee15af9ad2b` 上，使用真实 Playwright 登录并访问 `v4-migration-e2e` 中的临时 Deployment `v4-yaml-verify-20261020-2`。本轮通过“编辑 YAML”对话框的文件导入入口提交合法 `Deployment` YAML，将 `kubesphere.io/description` 从 `yaml-before` 修改为 `yaml-after`。
+
+- 点击确定后对话框关闭，详情页立即显示 `yaml-after`。
+- 浏览器刷新后仍显示 `yaml-after`，资源详情路由和页面数据正常渲染。
+- Kubernetes API 回读对象注解为 `yaml-after`，generation 从 `1` 变为 `2`。
+- 本轮临时 Deployment 已删除，复核 `v4-migration-e2e` 只剩系统 `kube-root-ca.crt` ConfigMap 和默认 ServiceAccount。
+
+该证据关闭 A02 的合法 YAML 文件导入、提交、页面刷新和 API 持久化子路径。A03/A04 尚未分别取得 YAML 持久化证据；非法 YAML、resourceVersion 冲突、成功/失败/取消完整组合、低权限、回滚/重新创建/删除、V3 Action 移除和 `/consolev3/dashboard` 全局预加载仍未闭环，A02～A04 继续标记为“部分验证”。

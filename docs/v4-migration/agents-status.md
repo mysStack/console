@@ -586,3 +586,7 @@ A12 上传成功子路径已关闭；冲突/失败反馈、低权限、完整返
 该补测仍只关闭 A02～A04 的部分原生详情行为，完整 YAML 持久化、所有操作错误态、低权限、回滚/重新创建/删除和 V3/Wujie 残留清理未完成。
 
 补测中的 YAML 自动化输入提交返回 HTTP `400`，但编辑器只更新了活动文本区域，缺少完整 YAML 输入证据，因此不把它记为代码失败或通过；YAML 持久化保持未验证，临时 Deployment 已删除。
+
+## 2026-10-20 A02 YAML 文件导入持久化补测
+
+真实浏览器在临时 Deployment `v4-yaml-verify-20261020-2` 的“编辑 YAML”对话框使用文件导入方式提交合法 YAML，将 `kubesphere.io/description` 从 `yaml-before` 改为 `yaml-after`。提交后详情页显示新值，刷新后仍保持；Kubernetes API 回读注解一致，generation 从 `1` 变为 `2`。测试 Deployment 已删除，namespace 复核只剩系统 `kube-root-ca.crt` ConfigMap 和默认 ServiceAccount。A02 的合法 YAML 文件导入、提交、刷新和 API 持久化子路径已取得部署后证据；A03/A04 YAML、非法 YAML、冲突、低权限和完整 V3 等价仍未完成。
