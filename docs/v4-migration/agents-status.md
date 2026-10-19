@@ -681,3 +681,5 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 使用当前 131 制品的真实平台管理员浏览器会话，分别访问临时 Deployment、StatefulSet、DaemonSet 详情页，三类页面均渲染原生编辑和操作入口。浏览器会话内三类 Workload 的 GET、PUT、PATCH、POST、DELETE 均为 `200/200/200/201/200`，更新、创建、删除和清理均完成；测试 namespace 最终只剩系统 ConfigMap 和默认 ServiceAccount。
 
 该结果补齐 A02～A04 的独立 admin 正向组合。结合已有 viewer、operator、workspaceonly、clusterviewer 证据，Workload 的主要项目/集群组合已有实际记录；`projectonly` 当前制品仍与历史记录不一致，平台/联邦/DevOps/Extension 作用域和全部 V3 Action 等价性仍未闭环。
+
+本轮同时复核 A11 的 Action 边界：从 `stakater` 系统仓库安装 Helm 模板时，实际请求走原生 `deployApp`，没有触发 `batch.deploy.app.create.v2`；该 Action 仅在 Edge 应用分支中打开。由于当前集群没有 Edge fixture，A11 的 V3 Action 成功、失败、取消和低权限路径仍未验证，原生安装提交证据不扩大解释为 A11 等价通过。

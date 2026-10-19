@@ -372,6 +372,8 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 
 > 该结果只关闭 A09 的原生模板选择、表单提交和 API `200` 子路径；应用部署成功、失败/取消、刷新/返回、低权限和完整 V4/Wujie 替代仍未闭环。A09 继续标记为“部分验证”，不能把集群资源不足时的创建中状态写成安装通过。
 
+补充边界：本轮从 `stakater` 系统仓库安装 `helm` 模板时，实际走的是 `AppsDeploySpaceModal` 的原生 `deployApp` 路径，浏览器没有触发 `batch.deploy.app.create.v2`。该 V3 Action 只在 `detail.spec.appType === 'edge'` 的分支中打开；当前测试集群没有可用 Edge fixture，因此 A11 的 V3 Action 触发、成功/失败/取消和低权限仍未验证。此前“远程 Helm 模板选择和项目安装”只能作为原生安装提交证据，不能扩大为 A11 的 V3 Action 等价通过。
+
 ## 2026-10-20 A02/A03/A04 admin 正向 RBAC 补测
 
 使用当前 131 制品的真实平台管理员浏览器会话，分别访问临时 Deployment、StatefulSet、DaemonSet 详情页，三类页面均显示原生编辑和操作入口。浏览器会话内对三类 Workload 执行 GET、PUT、PATCH、POST、DELETE，状态均为 `200/200/200/201/200`，并删除所有临时对象。

@@ -380,3 +380,5 @@ GitHub Actions Run `39209219839` 成功，镜像 tag 为 `feature-v4-configmaps-
 该补测增加了 A12 当前制品的成功、失败反馈和低权限证据，但冲突、删除失败、完整 V3 Action 移除和全量应用模板 RBAC 仍未完成。
 2026-10-20 A09 补测通过 `stakater` 系统仓库的真实应用模板选择和原生安装提交，浏览器 POST 返回 `200`；但 131 单节点 CPU 不足，Helm 安装 Job Pending，未取得部署成功证据。测试 ApplicationRelease、Job 和安装 ConfigMap 已清理，A09 继续为“部分验证”。同轮重新核对 Workload `projectonly` 组合时，当前制品的页面和 GET/POST/PUT/PATCH/DELETE 均返回 `403`，与历史 `GET 200` 记录不一致，已标记为结果不一致，不能作为全量 RBAC 通过证据。
 2026-10-20 A02～A04 独立 admin 正向 RBAC 补测：Deployment、StatefulSet、DaemonSet 详情页均渲染原生操作入口，浏览器会话内 GET/PUT/PATCH/POST/DELETE 均为 `200/200/200/201/200`，临时对象已清理。该结果补齐 Workload admin 组合，但不关闭 `projectonly` 结果不一致、其他平台作用域或全部 V3 功能等价性。
+
+A11 边界修正：本轮应用模板安装实际走原生 `deployApp`，没有触发 `batch.deploy.app.create.v2`；该 V3 Action 仅在 Edge 应用分支中打开，而当前集群没有 Edge fixture。因此原生 Helm 安装提交不能写成 A11 的 V3 Action 等价通过，A11 继续保持部分验证。
