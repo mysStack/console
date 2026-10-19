@@ -260,3 +260,13 @@ GitHub Actions Run `39209219839` 成功，镜像 tag 为 `feature-v4-configmaps-
 部署后浏览器重新检查了上传入口、Chart 校验 `200`、版本元数据和刷新路径；本轮没有取得可独立引用的最终上传 HTTP `200` 及完整成功截图，因此 A12 上传成功仍为“未闭环”，不能只凭本地测试、CI 或 API 请求形态标记通过。冲突/失败反馈、低权限和 V3 Action 移除仍未完成。临时 Application、ApplicationVersion、测试账号、绑定和上传文件均已清理，`v4-migration-e2e` namespace 保留。
 
 首次访问详情页时，后台系统网关请求返回 `403`，全局错误处理跳转到 `/errors/403`；补充临时集群管理员绑定后详情页恢复。该绑定仅用于定位测试环境权限条件，已与临时 Application、版本、账号及其他绑定一并清理。A09/A11 现在有真实成功子路径证据，但失败/取消、低权限和完整 V4 替代仍未闭环，不能标记为已验收。
+
+## 2026-10-19 A12 上传失败反馈修复与模块级验证更新
+
+本轮继续推进全部 V3 Action 等价性中的 A12。真实浏览器确认应用模板版本页实际加载远程 `/pstatic/dist/openpitrix/index.js`，此前本地 `PackageUpload` 组件修复未覆盖该入口；无效 Chart 校验接口返回 `500` 后页面会停留在“正在上传”。
+
+提交 `6acdc3b2fc52a3264ee58a2bb9270cd630e7dc44` 在共享请求层仅针对 `application.kubesphere.io/v2/.../versions?validate=true` 归一化校验失败响应，并新增回归测试。`./scripts/test.sh` 通过（68 个测试文件、248 个测试），`corepack yarn build:packages` 通过，GitHub Actions Run `39267930049` 成功。
+
+131 当前部署制品：`feature-v4-configmaps-secrets-20261019-222044-6acdc3b2fc52`，manifest digest `sha256:99ca60b78572916ad45342fcc752e7966a8bd6fb57e4db5108acfc6a6e996b20`，Pod `ks-console-7f96d678f-7k64b` 为 `Running/Ready`，实际 imageID 与 digest 一致。真实浏览器验证无效 Chart 已从“正在上传”进入“出现错误，请重试”，有效 Chart `9.9.20` 完成校验和版本创建，专用 ApplicationVersion 已删除并确认不存在。
+
+该修复关闭 A12 的上传失败反馈和有效提交子路径，但 A12 仍为“部分验证”。完整 RBAC 作用域矩阵、全部 V3 Action 等价性和扩展运行时错误仍未闭环；扩展错误按负责人要求暂缓。

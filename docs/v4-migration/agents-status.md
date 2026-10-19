@@ -526,3 +526,13 @@ A12 仍为“部分验证”。不能把本地测试、CI 或正确请求形态�
 | 清理       | 删除 `stakater-configmap-9.9.19` 后页面恢复总数 3，API 复核资源不存在       | 已完成 |
 
 A12 上传成功子路径已关闭；冲突/失败反馈、低权限、完整返回边界和 V3 Action 移除仍未完成，A12 继续保持“部分验证”。
+
+## 2026-10-19 A12 上传失败反馈修复与最新制品验证
+
+本轮没有启动子 Agent，继续使用单 Codex 会话完成 A12 的真实浏览器复验。根因定位为应用模板版本页实际由远程 `openpitrix` 扩展包提供，之前只修改本地 `PackageUpload` 组件不能覆盖该入口；共享请求层把 `versions?validate=true` 的预期校验失败继续作为 rejected Promise 返回，导致远程入口长期显示“正在上传”。
+
+提交 `6acdc3b2fc52a3264ee58a2bb9270cd630e7dc44` 增加受限的校验错误归一化和请求工具回归测试。`./scripts/test.sh` 通过（68 个测试文件、248 个测试），`corepack yarn build:packages` 通过；GitHub Actions Run `39267930049` 成功。镜像 tag 为 `feature-v4-configmaps-secrets-20261019-222044-6acdc3b2fc52`，manifest digest 为 `sha256:99ca60b78572916ad45342fcc752e7966a8bd6fb57e4db5108acfc6a6e996b20`。
+
+131 部署后曾因 Deployment 原有 `maxSurge=1` 且单节点 CPU 请求达到约 99%，新 Pod 无法调度；已回滚到旧制品确认服务恢复，再在维护窗口使用 `maxUnavailable=1/maxSurge=0` 完成新制品 rollout，最后恢复原 `maxUnavailable=0/maxSurge=1` 策略。最终 Pod `ks-console-7f96d678f-7k64b` 为 `Running/Ready`，实际 imageID 与新制品 digest 一致。
+
+真实浏览器证据：无效 Chart 的校验请求返回 `500`，页面进入“出现错误，请重试”，不再卡在“正在上传”；有效 Chart `v4-action-upload-20261019.tgz`（版本 `9.9.20`）显示上传成功、应用信息并完成版本创建，随后删除专用 `ApplicationVersion` 并确认不存在，版本列表恢复 3 条。该记录只关闭 A12 的上传失败反馈和有效提交子路径，不代表 A12 全量等价，也不关闭全部 V3/Wujie、完整 RBAC 或扩展运行时风险。

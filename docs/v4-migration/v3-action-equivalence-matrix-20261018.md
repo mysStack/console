@@ -183,3 +183,23 @@ A01 仍不能标记为完整 V3 等价：主工作负载模板编辑仍保留 V3
 - 通过 Kubernetes API 删除专用 `ApplicationVersion` `stakater-configmap-9.9.19`；刷新后页面恢复总数 3，并确认资源不存在。临时 Chart 文件和浏览器产物已清理。
 
 该证据关闭 A12 的上传成功子路径。A12 仍为“部分验证”：冲突/失败反馈、低权限拒绝、完整刷新/返回边界和 `openpitrix.template.edit.v2` 的 V3 Action 移除仍未完成。
+
+## 2026-10-19 A12 上传失败反馈修复与部署后复验
+
+本轮继续验证 A12 的失败反馈子路径。前一轮只修改本地 `PackageUpload` 组件后，真实浏览器仍由远程 `openpitrix` 扩展包承载版本页，因此无效 Chart 的校验请求返回 `500` 后页面会长期停留在“正在上传”。通过浏览器请求和已部署资源核对确认，实际入口加载的是 `/pstatic/dist/openpitrix/index.js`，不在当前仓库内；问题根因是共享请求层把该预期的 Chart 校验失败继续作为 rejected Promise 返回，远程扩展没有进入错误态。
+
+本轮在 `packages/shared/src/utils/request.ts` 增加了仅匹配 `application.kubesphere.io/v2/.../versions?validate=true` 的错误响应归一化，将校验错误转换为 `{ error: 'UPLOAD_AGAIN_TIP' }`，并补充请求工具回归测试。该修复不改变未授权响应的跳转逻辑，也不把其他接口的 `500` 当作校验失败处理。
+
+| 检查项       | 实际结果                                                                                                                                                | 状态   |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| Git 提交     | `6acdc3b2fc52a3264ee58a2bb9270cd630e7dc44`，已推送到 `feature/v4-configmaps-secrets`                                                                    | 已验证 |
+| 本地单元测试 | `./scripts/test.sh`：68 个测试文件、248 个测试通过                                                                                                      | 已验证 |
+| 本地构建     | `corepack yarn build:packages` 成功                                                                                                                     | 已验证 |
+| CI           | Run `39267930049`，Unit tests 与镜像构建均成功                                                                                                          | 已验证 |
+| 镜像         | `feature-v4-configmaps-secrets-20261019-222044-6acdc3b2fc52`；manifest digest `sha256:99ca60b78572916ad45342fcc752e7966a8bd6fb57e4db5108acfc6a6e996b20` | 已验证 |
+| 131 部署     | Pod `ks-console-7f96d678f-7k64b` 为 `Running/Ready`，实际 imageID 与上述 digest 一致                                                                    | 已验证 |
+| 无效 Chart   | 校验请求仍返回 `500`，页面从“正在上传”进入“出现错误，请重试”，确定按钮保持禁用                                                                          | 已验证 |
+| 有效 Chart   | Chart `v4-action-upload-20261019.tgz`、版本 `9.9.20` 校验成功，页面显示应用信息并完成版本创建；专用 `ApplicationVersion` 已删除并复核不存在             | 已验证 |
+| 浏览器页面   | 版本页正常渲染，刷新后原有版本总数恢复为 3                                                                                                              | 已验证 |
+
+本轮关闭 A12 的无效 Chart 错误反馈和有效上传提交子路径。A12 仍只能标记为“部分验证”：冲突边界、低权限拒绝、完整返回路径和 `openpitrix.template.edit.v2` 的 V3 Action 移除仍未完成。页面仍有已登记的扩展运行时错误，按负责人指令暂不处理；该错误不能作为本轮上传修复已解决的证据。
