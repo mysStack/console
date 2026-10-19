@@ -108,6 +108,18 @@ A01 仍不能标记为完整 V3 等价：主工作负载模板编辑仍保留 V3
 
 本轮为 A09 的入口、模板选择和 A11 的项目安装/创建增加了真实成功证据，因此二者调整为“部分验证”。失败、取消、删除、刷新返回、低权限正反路径、完整 V4 原生替代以及 V3/Wujie 启动层预加载仍未闭环；A05 边缘应用仍因缺少 Edge fixture 保持未验证。
 
+## 2026-10-19 A12 Helm 版本上传缺口修复与部署复验
+
+在真实浏览器验证应用模板版本上传时，先发现验证接口能够返回应用名和版本号，但提交请求没有保留验证结果中的 `name`/`versionName`，页面信息显示为 `-`，提交链路因此无法形成有效的 ApplicationVersion 请求。随后补充回归测试并修复上传数据组装：
+
+- 提交 `0fff169bd`：按 `CREATE_APP`/`ADD_VERSION` 分支保留验证返回的应用名、版本名，并让上传信息页显示 `appName`/`versionName`。
+- 提交 `58de31e58`：版本上传请求补充后端要求的 `appType: helm`。
+- 本地验证：上传数据回归测试 2/2、目标文件 ESLint、Prettier 和 `git diff --check` 通过；此前完整本地测试为 67 个测试文件、246 个测试通过，`corepack yarn build:packages` 通过。
+- CI：Run `39209219839` 成功；镜像 tag 为 `feature-v4-configmaps-secrets-20261019-142018-58de31e58395`，manifest digest 为 `sha256:772adef318c923e4452b9b1b5fcc8e654006b6439938d2815cc138dae36e8d17`。
+- 131：Deployment `ks-console` rollout 成功，generation/observedGeneration 为 `523/523`，Pod `ks-console-6dcf5456c4-7tvhx` 为 `Running/Ready`，实际 imageID 为 `ghcr.io/mysstack/ks-console@sha256:772adef318c923e4452b9b1b5fcc8e654006b6439938d2815cc138dae36e8d17`，`/readyz` 通过。
+
+部署后浏览器已重新验证版本上传入口、Chart 校验请求 `200`、版本元数据显示路径以及页面刷新路径；同时用同一部署制品复核了版本创建 API 的正确请求形态。由于本轮自动化提交结果未取得可独立引用的最终 HTTP `200` 响应和完整成功截图，A12 不能因代码和 CI 通过而标记上传成功；上传成功、冲突/失败反馈、低权限和 V3 Action 移除继续保持未闭环。临时 Application、ApplicationVersion、账号、绑定和上传文件已清理，`v4-migration-e2e` namespace 保留。
+
 ## 2026-10-19 A06/A07/A08 DevOps 与通知入口补测
 
 真实浏览器访问 `/workspaces/test-workspace/devops` 返回 `200`，企业空间集群列表请求成功但没有可选集群；页面显示“请选择集群”、空列表和“创建”入口，无法触发 `devops.create` 或 `devops.edit`。打开用户菜单后实际显示用户设置、登出、关于和技术支持，没有“通知设置”入口，因此 `notification.user.setting` 没有可触发 fixture。

@@ -241,4 +241,12 @@ A10：只读检查确认当前集群没有 Edge/EdgeWorkload 相关 CRD 或 API 
 
 本轮部署制品为 `feature-v4-configmaps-secrets-20261019-115905-3a14e96f10b5`，manifest digest 为 `sha256:e61af451d3425e60445cd097549cb6a1e53e4fc511f4a14fad3388c3e03155fd`；Pod `ks-console-57fcd4d59f-sn5cp` 为 `Running/Ready`，实际 imageID 与该 digest 一致。
 
+## 2026-10-19 应用模板版本上传缺口修复与部署复验
+
+真实浏览器发现版本上传校验成功后，提交数据没有保留应用名和版本名，随后又确认版本接口要求 `appType: helm`。已补充上传数据回归测试并提交 `0fff169bd`、`58de31e58` 修复；本地目标测试、ESLint、Prettier、`git diff --check`、完整测试（67 个测试文件、246 个测试）和 `corepack yarn build:packages` 均通过。
+
+GitHub Actions Run `39209219839` 成功，镜像 tag 为 `feature-v4-configmaps-secrets-20261019-142018-58de31e58395`，manifest digest 为 `sha256:772adef318c923e4452b9b1b5fcc8e654006b6439938d2815cc138dae36e8d17`。131 rollout 成功，Deployment generation/observedGeneration 为 `523/523`，Pod `ks-console-6dcf5456c4-7tvhx` Ready，实际 imageID 与该 digest 一致，`/readyz` 通过。
+
+部署后浏览器重新检查了上传入口、Chart 校验 `200`、版本元数据和刷新路径；本轮没有取得可独立引用的最终上传 HTTP `200` 及完整成功截图，因此 A12 上传成功仍为“未闭环”，不能只凭本地测试、CI 或 API 请求形态标记通过。冲突/失败反馈、低权限和 V3 Action 移除仍未完成。临时 Application、ApplicationVersion、测试账号、绑定和上传文件均已清理，`v4-migration-e2e` namespace 保留。
+
 首次访问详情页时，后台系统网关请求返回 `403`，全局错误处理跳转到 `/errors/403`；补充临时集群管理员绑定后详情页恢复。该绑定仅用于定位测试环境权限条件，已与临时 Application、版本、账号及其他绑定一并清理。A09/A11 现在有真实成功子路径证据，但失败/取消、低权限和完整 V4 替代仍未闭环，不能标记为已验收。
