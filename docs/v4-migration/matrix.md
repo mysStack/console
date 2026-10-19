@@ -354,3 +354,9 @@ GitHub Actions Run `39209219839` 成功，镜像 tag 为 `feature-v4-configmaps-
 在 131 当前制品上，StatefulSet `v4-invalid-sts-20261020` 和 DaemonSet `v4-invalid-ds-20261020` 分别导入缺少 `apiVersion`、`kind` 和资源名称的非法 YAML。两类资源的浏览器 `PUT` 均返回 `400 Bad Request`，编辑对话框保持打开；API 回读确认 `resourceVersion` 与 generation 未改变。临时资源已删除，namespace 无测试残留。
 
 该补测关闭 A03/A04 非法 YAML 错误反馈和不写入保护子路径；A02～A04 的完整字段、全部操作组合、全量 RBAC 和 V3 等价仍未完成。
+
+## 2026-10-20 A02/A03/A04 operator RBAC 正向补测
+
+使用临时项目 operator 用户和真实浏览器访问临时 Deployment、StatefulSet、DaemonSet 详情页，三类页面均正常渲染。浏览器会话内三类 Workload 的 GET、PUT、PATCH、POST、DELETE 状态均为 `200/200/200/201/200`；所有临时用户、绑定和 Workload 已清理。
+
+结合已有项目 viewer 的 `GET 200、POST/PUT/PATCH/DELETE 403` 证据，A02～A04 当前项目 operator/viewer 正反读写边界已验证。其他作用域、完整错误态、全量 RBAC 组合和 V3 等价性仍未完成。

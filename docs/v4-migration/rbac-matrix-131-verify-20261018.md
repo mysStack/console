@@ -158,3 +158,19 @@
 | DaemonSet   |      200 |       403 |      403 |        403 |         403 |
 
 该结果补齐 A02～A04 的低权限读写拒绝证据，但只覆盖当前项目 viewer 组合；不代表全部 RBAC 作用域、所有错误态或全部 V3 行为等价性已完成。临时 Workload、用户、WorkspaceRoleBinding 和项目 RoleBinding 均已删除，`v4-migration-e2e` 清理后只剩系统 `kube-root-ca.crt` ConfigMap 和默认 ServiceAccount。
+
+## 2026-10-20 Workload operator 正向 RBAC 补测
+
+为补齐 A02～A04 当前项目 operator 组合，在 `test-workspace` 创建临时 operator 用户并绑定 `v4-migration-e2e` 项目 `operator` Role。使用真实浏览器登录后分别直达临时 Deployment、StatefulSet、DaemonSet 详情页，三类页面均正常渲染资源状态、修改记录、元数据、环境变量、配置引用和事件入口。
+
+同一浏览器会话内对三类 Workload 执行 GET、PUT、PATCH、POST、DELETE，状态码均为：
+
+| 资源        | GET | PUT | PATCH | POST | DELETE |
+| ----------- | --: | --: | ----: | ---: | -----: |
+| Deployment  | 200 | 200 |   200 |  201 |    200 |
+| StatefulSet | 200 | 200 |   200 |  201 |    200 |
+| DaemonSet   | 200 | 200 |   200 |  201 |    200 |
+
+POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完成并清理。临时用户、WorkspaceRoleBinding、项目 RoleBinding 和三类测试 Workload 已删除，namespace 复核只剩系统 ConfigMap 和默认 ServiceAccount。
+
+该证据补齐 A02～A04 当前项目 operator 的正向读写 API 边界；viewer 拒绝证据已在本记录前文，其他作用域、admin 独立组合、完整错误态和全部 V3 等价仍未完成。

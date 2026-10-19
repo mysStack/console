@@ -633,3 +633,13 @@ A12 上传成功子路径已关闭；冲突/失败反馈、低权限、完整返
 | 浏览器/API 结果 | 两类原生 YAML 提交均返回 `PUT 400 Bad Request`；编辑弹窗保持打开，`resourceVersion` 与 generation 未变化 |
 | 清理            | 两个临时 Workload 已删除，namespace 只剩系统 ConfigMap 和默认 ServiceAccount                             |
 | 当前结论        | A03/A04 非法 YAML 错误反馈和不写入保护已验证；完整 V3 等价、全量 RBAC 和兼容残留清理仍未完成             |
+
+## 2026-10-20 当前会话：Workload operator 正向 RBAC 补测
+
+| 项目            | 结果                                                                                                       |
+| --------------- | ---------------------------------------------------------------------------------------------------------- |
+| 验证对象        | 临时 Deployment、StatefulSet、DaemonSet                                                                    |
+| 账号/作用域     | 临时 `test-workspace` 成员 + `v4-migration-e2e` 项目 `operator`                                            |
+| 浏览器/API 结果 | 三类详情页均渲染；GET/PUT/PATCH/POST/DELETE 均为 `200/200/200/201/200`                                     |
+| 清理            | 临时用户、WorkspaceRoleBinding、RoleBinding 和 Workload 已删除，namespace 无残留                           |
+| 当前结论        | A02/A03/A04 当前项目 operator 正向边界已验证，与 viewer 拒绝证据形成正反组合；完整 RBAC 和 V3 等价仍未完成 |

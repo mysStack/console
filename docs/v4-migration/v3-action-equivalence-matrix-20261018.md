@@ -331,3 +331,9 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 - 两个临时 Workload 已删除，测试 namespace 复核只剩系统 ConfigMap 和默认 ServiceAccount。
 
 该证据关闭 A03/A04 的非法 YAML 错误反馈和失败写入保护子路径；全部操作组合、其他作用域 RBAC、V3 Action 移除和兼容残留清理仍未闭环。
+
+## 2026-10-20 A02/A03/A04 operator 正向 RBAC 补测
+
+在 131 使用临时项目 operator 用户和真实 Playwright，对 Deployment、StatefulSet、DaemonSet 详情页及 API 进行正向验证。三类详情页均能渲染；同一浏览器会话中的 GET、PUT、PATCH、POST、DELETE 状态均分别为 `200/200/200/201/200`，并完成测试对象清理。
+
+该证据补齐三类 Workload 当前项目 operator 的正向读写子路径，与已有 viewer 的 `GET 200、POST/PUT/PATCH/DELETE 403` 形成一组真实权限边界。A02～A04 的完整字段、错误态、所有作用域和 V3/Wujie 去依赖仍未闭环。
