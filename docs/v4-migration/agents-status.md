@@ -413,3 +413,9 @@ A05、A09、A11 的成功、失败、取消、刷新、RBAC 和完整 V4 原生�
 真实浏览器访问 `/workspaces/test-workspace/devops`：企业空间集群列表请求成功，但当前没有可选集群，页面显示“请选择集群”、空列表和“创建”入口，无法触发 `devops.create/edit`。打开用户菜单实际没有“通知设置”入口，只显示用户设置、登出、关于和技术支持，因此 `notification.user.setting` 没有可触发入口。
 
 A06/A07/A08 当前仅取得入口和环境条件证据，成功、失败、取消、刷新、RBAC 和 V4 原生替代仍未验证；不把空列表或隐藏入口视为功能通过。
+
+## 2026-10-19 A02 Deployment 详情补测
+
+在 `v4-migration-e2e` 创建副本数为 0 的专用 Deployment `v4-deployment-20261019`，真实浏览器直达项目详情。页面进入 `resource-status`，编辑信息弹窗可以打开并取消，详情 API 返回 `200`；同时观测到 `/consolev3/dashboard` 请求，确认项目 Deployment 详情仍存在 V3/Wujie 兼容耦合。专用 Deployment 已删除并确认清理。
+
+A02 的页面入口和取消子路径已取证，但模板编辑成功/失败、低权限、刷新/返回、完整 RBAC 和 V4 原生替代仍未完成，A02 继续保持“未等价”。

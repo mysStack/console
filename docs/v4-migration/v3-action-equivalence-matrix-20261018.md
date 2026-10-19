@@ -96,3 +96,7 @@ A01 仍不能标记为完整 V3 等价：主工作负载模板编辑仍保留 V3
 真实浏览器访问 `/workspaces/test-workspace/devops` 返回 `200`，企业空间集群列表请求成功但没有可选集群；页面显示“请选择集群”、空列表和“创建”入口，无法触发 `devops.create` 或 `devops.edit`。打开用户菜单后实际显示用户设置、登出、关于和技术支持，没有“通知设置”入口，因此 `notification.user.setting` 没有可触发 fixture。
 
 本轮只确认了 A06/A07 的环境条件缺口和 A08 当前入口未启用，没有把空列表或隐藏入口标记为等价通过。三个 Action 的成功、失败、取消、刷新、RBAC 和 V4 原生替代仍未验证。
+
+## 2026-10-19 A02 Deployment 详情补测
+
+在 `v4-migration-e2e` 创建副本数为 0 的专用 Deployment `v4-deployment-20261019`，真实浏览器直达项目 Deployment 详情。页面进入 `resource-status`，显示编辑信息、更多操作、编辑设置和编辑 YAML；详情 API 返回 `200`，点击“编辑信息”可打开原生信息弹窗，未提交写操作。页面同时实际请求 `/consolev3/dashboard`，并加载 V3 资源桥接，因此 A02 的工作负载模板编辑仍不是完整 V4 原生等价。专用 Deployment 已清理。

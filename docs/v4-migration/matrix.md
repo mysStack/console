@@ -222,3 +222,5 @@ ConfigMap、Secret、ServiceAccount 的基础 CRUD、元数据、YAML、脱敏�
 本轮没有修改 `release-4.1.5`，没有删除 V3/Wujie 桥接，也没有把空数据态或兼容壳页面标记为等价通过。A02、A06～A08、A10、A12 的完整成功/失败/取消、RBAC 和 V4 替代证据仍未闭环。
 
 本轮进一步检查 A06～A08：DevOps 页面请求企业空间集群列表但当前 `test-workspace` 没有可选集群，页面显示“请选择集群”和空列表，无法触发 `devops.create/edit`；用户菜单实际没有“通知设置”入口，`notification.user.setting` 当前没有可触发入口。以上保持未验证，不能以空页面或隐藏入口推断功能等价。
+
+A02：在 `v4-migration-e2e` 创建副本数为 0 的专用 Deployment，真实浏览器直达项目详情后页面进入 `resource-status`，显示编辑信息、编辑设置、编辑 YAML 等入口；详情请求为 `200`，点击“编辑信息”可打开原生信息弹窗并取消。页面同时实际请求 `/consolev3/dashboard`，因此项目 Deployment 详情仍保留 V3/Wujie 兼容耦合，A02 不得标记为 V4 等价。
