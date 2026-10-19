@@ -18,7 +18,6 @@ import {
   getDisplayName,
   formatTime,
   useCommonActions,
-  useV3action,
   hasClusterModule,
   hpaStore,
   ClusterAliasName,
@@ -46,14 +45,16 @@ const { usePatchHpaMutation } = hpaStore;
 const StatefulSetsDetail = () => {
   const authKey = module;
   const params = useParams();
-  const { cluster, namespace, name } = params;
+  const { workspace, cluster, namespace, name } = params;
   const navigate = useNavigate();
 
   const k8sVersion = globals.clusterConfig?.[cluster!]?.k8sVersion;
 
   const listUrl = useMemo(() => {
-    return `/clusters/${cluster}/statefulsets`;
-  }, []);
+    return workspace
+      ? `/${workspace}/clusters/${cluster}/projects/${namespace}/statefulsets`
+      : `/clusters/${cluster}/statefulsets`;
+  }, [workspace, cluster, namespace]);
 
   const {
     data: detail,
@@ -138,7 +139,7 @@ const StatefulSetsDetail = () => {
 
   useEffect(() => {
     setDetailProps({ module, detail, isLoading, isError });
-  }, [detail]);
+  }, [detail, isLoading, isError, setDetailProps]);
 
   const { renderAutoScalingModal, setScaleVisible } = useAutoScalingModal<
     FormattedWorkload['_originData']
@@ -174,7 +175,10 @@ const StatefulSetsDetail = () => {
     ),
   });
   const tabs = useMemo(() => {
-    const path = `/clusters/${cluster}/projects/${namespace}/statefulsets/${name}`;
+    const prefix = workspace
+      ? `/${workspace}/clusters/${cluster}/projects/${namespace}`
+      : `/clusters/${cluster}/projects/${namespace}`;
+    const path = `${prefix}/statefulsets/${name}`;
 
     return cluster && hasClusterModule(cluster, 'whizard-monitoring')
       ? [
@@ -194,7 +198,7 @@ const StatefulSetsDetail = () => {
           { title: t('CONFIG_REFERENCE'), path: `${path}/config-reference` },
           { title: t('EVENT_PL'), path: `${path}/events` },
         ];
-  }, []);
+  }, [workspace, cluster, namespace, name]);
 
   const attrs = useMemo(() => {
     if (isEmpty(detail)) {
@@ -229,9 +233,7 @@ const StatefulSetsDetail = () => {
         value: creator ? creator : '',
       },
     ];
-  }, [detail]);
-
-  const { open, render: renderV3Modal } = useV3action();
+  }, [detail, cluster, namespace]);
 
   const isExtensionEnabledInCluster = hasClusterModule(cluster!, 'metrics-server');
   const actions = () => {
@@ -276,20 +278,7 @@ const StatefulSetsDetail = () => {
         icon: <Icon name="storage" />,
         text: t('EDIT_SETTINGS'),
         action: 'edit',
-        onClick: () => {
-          open({
-            module,
-            ...params,
-            detail,
-            v3Module: 'workload',
-            v3StoreParams: module,
-            hasRootStore: true,
-            success: () => {
-              notify.success(t('UPDATE_SUCCESSFUL'));
-              refetch();
-            },
-          });
-        },
+        onClick: () => editYaml(detail),
       },
       {
         key: 'editYaml',
@@ -385,7 +374,6 @@ const StatefulSetsDetail = () => {
           onCancel={() => closeDeleteModal()}
         ></DeleteConfirmModal>
       )}
-      {renderV3Modal()}
       {renderAutoScalingModal()}
     </>
   );

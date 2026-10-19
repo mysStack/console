@@ -14,9 +14,6 @@ import SecretDetail from '../containers/Secrets/Detail';
 import CronJobDetail from '../containers/CronJobs/Detail';
 import ServiceDetail from '../containers/Services/Detail';
 import ConfigMapDetail from '../containers/ConfigMaps/Detail';
-import DaemonSetDetail from '../containers/DaemonSets/Detail';
-import DeploymentDetail from '../containers/Deployments/Detail';
-import StatefulSetDetail from '../containers/StatefulSets/Detail';
 import ImageBuilderDetail from '../containers/ImageBuilder/Detail';
 import PodContainerDetail from '../containers/Pods/ContainerDetail';
 import VolumeSnapshotDetail from '../containers/VolumeSnapshots/Detail';
@@ -39,9 +36,9 @@ import volumeDetailRoutes from '../containers/Volumes/Detail/routes';
 import cronJobDetailRoutes from '../containers/CronJobs/Detail/routes';
 import serviceDetailRoutes from '../containers/Services/Detail/routes';
 import configMapDetailRoutes from '../containers/ConfigMaps/Detail/routes';
-import daemonSetDetailRoutes from '../containers/DaemonSets/Detail/routes';
-import deploymentDetailRoutes from '../containers/Deployments/Detail/routes';
-import statefulSetDetailRoutes from '../containers/StatefulSets/Detail/routes';
+import nativeDaemonSetDetailRoutes from '../containers/ApplicationWorkloads/Workloads/DaemonSets/Detail/routes';
+import nativeDeploymentDetailRoutes from '../containers/ApplicationWorkloads/Workloads/Deployments/Detail/routes';
+import nativeStatefulSetDetailRoutes from '../containers/ApplicationWorkloads/Workloads/StatefulSets/Detail/routes';
 import imageBuilderDetailRoutes from '../containers/ImageBuilder/Detail/routes';
 import podContainerDetailRoutes from '../containers/Pods/ContainerDetail/routes';
 import volumeSnapshotDetailRoute from '../containers/VolumeSnapshots/Detail/routes';
@@ -55,37 +52,12 @@ import serviceroutingRoutes from '../containers/SpringCloud/servicerouting/Detai
 import MicroserviceInstancesRoutes from '../containers/SpringCloud/microserviceInstances/Detail/routes';
 import composingDetailRoutes from '../containers/ApplicationComposing/Detail/routes';
 import GatewaysDetailRoutes from '../containers/Gateway/Detail/routes';
-import ConfigReferencePage from '../components/ConfigReference/ConfigReferencePage';
 
 export default (PATH: string) => [
   ...applicationsDetailRoutes(PATH),
-  {
-    path: `${PATH}/deployments/:name/config-reference`,
-    element: <ConfigReferencePage module="deployments" />,
-  },
-  {
-    path: `${PATH}/statefulsets/:name/config-reference`,
-    element: <ConfigReferencePage module="statefulsets" />,
-  },
-  {
-    path: `${PATH}/daemonsets/:name/config-reference`,
-    element: <ConfigReferencePage module="daemonsets" />,
-  },
-  {
-    path: `${PATH}/deployments/:name`,
-    element: <DeploymentDetail />,
-    children: [...deploymentDetailRoutes],
-  },
-  {
-    path: `${PATH}/statefulsets/:name`,
-    element: <StatefulSetDetail />,
-    children: [...statefulSetDetailRoutes],
-  },
-  {
-    path: `${PATH}/daemonsets/:name`,
-    element: <DaemonSetDetail />,
-    children: [...daemonSetDetailRoutes],
-  },
+  ...nativeDeploymentDetailRoutes('/:workspace/clusters/:cluster'),
+  ...nativeStatefulSetDetailRoutes('/:workspace/clusters/:cluster'),
+  ...nativeDaemonSetDetailRoutes('/:workspace/clusters/:cluster'),
   {
     path: `${PATH}/jobs/:name`,
     element: <JobDetail />,
