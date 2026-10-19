@@ -36,6 +36,10 @@ A02～A04 和 A01 共涉及三类工作负载详情与配置引用；A05～A12 �
 
 按 A01～A12 顺序逐项补齐：当前路由和入口、旧 V3 Store/API/权限、131 触发后的 Network、成功/取消/失败反馈、刷新/返回、V4 原生替代和低权限拒绝路径。每个 Action 关闭前不得删除对应 V3/Wujie 桥接代码。
 
+## 2026-10-19 静态调用覆盖复核
+
+重新扫描当前源码（排除 `packages/**/lib` 编译输出和 `node_modules`）后，`useV3action/useV3Actions` 命中 14 个文件：11 个业务调用文件，以及 `v3actions.tsx`、`hooks/index.ts`、`hooks/useV3Actions/index.tsx` 3 个桥接/导出文件。11 个业务文件对应 A01～A12 共 12 行，只有 DevOps 文件拆成 `devops.edit` 和 `devops.create` 两个独立 Action。当前矩阵没有发现未登记的业务 `useV3action` 调用点；静态覆盖完整不等于运行时等价通过。
+
 ## 2026-10-18 Deployment 详情运行时补充
 
 在 `v4-migration-e2e` 创建唯一临时 Deployment `v4-v3-workload-20261018`（副本数为 0，不启动业务 Pod），使用临时项目 admin 账号从真实浏览器登录并打开项目 Deployment 详情。页面实际请求了当前 V4 Deployment API，同时观测到 `/consolev3/dashboard` 请求；浏览器页面仍有已知运行时错误，未把该入口当作 V4 等价通过。
