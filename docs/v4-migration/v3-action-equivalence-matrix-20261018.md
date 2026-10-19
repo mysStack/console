@@ -379,3 +379,11 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 使用当前 131 制品的真实平台管理员浏览器会话，分别访问临时 Deployment、StatefulSet、DaemonSet 详情页，三类页面均显示原生编辑和操作入口。浏览器会话内对三类 Workload 执行 GET、PUT、PATCH、POST、DELETE，状态均为 `200/200/200/201/200`，并删除所有临时对象。
 
 该证据补齐 A02～A04 的独立 admin 正向 API 和页面入口子路径，与 viewer、operator、workspaceonly、clusterviewer 证据合并后，当前已有五类 Workload 作用域组合的实际记录；`projectonly` 当前制品结果与历史记录不一致，平台/联邦/DevOps/Extension 作用域和完整 V3/Wujie 去依赖仍未闭环。
+
+## 2026-10-20 当前 HEAD 静态残留复核
+
+在提交 `831bae689f221a80f3d88dded2431b056ba54212` 上重新执行源码扫描，排除 `node_modules`、编译输出和测试文件：
+
+- `useV3action/useV3Actions` 仍命中 11 个源码文件，其中 8 个业务调用文件、2 个桥接实现/入口文件和 1 个导出文件；8 个业务文件对应矩阵中的 12 个 Action 行，DevOps 文件拆分为 `devops.edit` 和 `devops.create`。
+- `WujieReact`、`wujie-react` 或 `/consolev3` 仍命中 120 个源码文件。活动 Workload 原生详情不再直接引用这些符号，但旧详情、平台页面、联邦页面、DevOps 页面和共享布局仍保留兼容实现。
+- 因此当前静态结果只能证明调用点已登记，不能证明 V3/Wujie 已移除；A01～A12 的运行时等价、替代行为和桥接删除条件仍未全部满足。
