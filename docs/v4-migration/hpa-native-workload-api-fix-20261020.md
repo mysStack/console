@@ -38,6 +38,10 @@
 
 第一版修复已部署到 131，tag 为 `feature-v4-configmaps-secrets-20261020-015729-c9a311a56c5d`，Pod imageID 对应 manifest digest `sha256:cd54b3ef13605197416d18833740d8ef280eea009c04b03242d8fe2c0e5f5a7d`。真实浏览器复验确认重复 `/apis/apis/` 已消失，但正确的 HPA URL 在单次页面加载中仍出现 194 次，并继续伴随 `ERR_INSUFFICIENT_RESOURCES`。
 
-进一步定位发现 `useCacheStore` 每次渲染都会创建新的 setter 函数，而原生 Workload 详情父组件把该 setter 放在同步详情的 `useEffect` 依赖中，导致缓存写入、父组件重渲染和 HPA 检查请求形成循环。当前已将 setter 改为 `useCallback`，本地测试和构建已通过；该第二版修复尚未提交、构建镜像或部署到 131。
+进一步定位发现 `useCacheStore` 每次渲染都会创建新的 setter 函数，而原生 Workload 详情父组件把该 setter 放在同步详情的 `useEffect` 依赖中，导致缓存写入、父组件重渲染和 HPA 检查请求形成循环。已将 setter 改为 `useCallback`。
 
-因此，本记录目前只证明了第一版路径修复和第二版循环修复的本地证据，A02～A04 仍需在第二版制品上完成 rollout、Pod imageID 核对和 Playwright 复验。扩展运行时错误按负责人指令暂缓处理。
+第二版修复已提交为 `3ee15af9ad2b85d2b9e83aea9db978a6104f93a0`，GitHub Actions Run `39302192970` 的 Unit tests 和 Build and publish 均成功。131 使用镜像 tag `feature-v4-configmaps-secrets-20261020-022516-3ee15af9ad2b`，manifest digest 为 `sha256:27d44f7e001a6c5593ce39a5fbde2cb53dcdcb75959ab3a2f57114ee5b3f25b9`；Deployment `538/538`，Pod `ks-console-7c875999cf-6zw2g` 为 `Running/Ready`，实际 imageID 与该 digest 一致，rollout 后策略已恢复为 `maxUnavailable=0/maxSurge=1`。
+
+部署后重新登录真实浏览器并访问 Deployment、StatefulSet、DaemonSet 原生详情页：三个页面均正常渲染，重复 `/apis/apis/` 请求为 0，`ERR_INSUFFICIENT_RESOURCES` 为 0；DaemonSet 的“更多操作”菜单、原生“编辑 YAML”弹窗及取消路径均可用。页面仍有已登记的扩展初始化错误和 WebSocket 403，这些不属于本次 HPA 修复范围，扩展运行时错误按负责人指令暂缓处理。测试创建的 DaemonSet、Deployment、StatefulSet 已删除，namespace 复核只剩系统 `kube-root-ca.crt` ConfigMap 和默认 ServiceAccount。
+
+该记录关闭了当前三个原生 Workload 详情页的 HPA URL 重复和请求循环缺陷，但不代表 A02～A04 的完整 V3 功能等价、字段、权限、成功/失败/取消、刷新返回和 V3/Wujie 全局清理已经完成。

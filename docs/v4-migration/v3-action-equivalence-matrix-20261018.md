@@ -238,4 +238,6 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 
 在 A02～A04 的原生详情页浏览器复验中发现，集群版本信息未加载时 HPA 默认版本带有 `apis/` 前缀，调用方再次拼接后形成 `/apis/apis/autoscaling/v2beta2/...`。该错误在控制台日志中重复出现并造成网络资源耗尽，已由 `getHpaApiVersion` 统一规范，新增回归测试并通过本地完整测试和构建。
 
-第一版路径修复已部署到 131，浏览器确认重复 `/apis/apis/` 已消失，但正确 HPA URL 仍被重复请求并触发资源耗尽。进一步定位到 `useCacheStore` setter 身份不稳定导致详情同步 effect 循环，第二版 `useCallback` 修复已通过本地测试和构建，尚未部署。A02～A04 的请求稳定性、操作菜单、完整字段、成功/失败/取消、低权限、刷新返回和 V3 功能等价性仍未闭环。
+第一版路径修复部署后，浏览器确认重复 `/apis/apis/` 已消失，但正确 HPA URL 仍被重复请求并触发资源耗尽。进一步定位到 `useCacheStore` setter 身份不稳定导致详情同步 effect 循环；第二版 `useCallback` 修复已提交为 `3ee15af9ad2b`，CI Run `39302192970` 成功并部署到 131。真实浏览器复验 Deployment、StatefulSet、DaemonSet 页面时，重复 HPA 请求和 `ERR_INSUFFICIENT_RESOURCES` 均为 0，DaemonSet 的操作菜单、原生 YAML 弹窗和取消路径可用。
+
+该证据关闭 A02～A04 的 HPA 请求路径和详情同步循环缺陷，但 A02～A04 的完整字段、成功/失败/取消、低权限、刷新返回、V3 Action 移除和全局兼容残留清理仍未闭环。

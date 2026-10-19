@@ -575,4 +575,6 @@ A12 上传成功子路径已关闭；冲突/失败反馈、低权限、完整返
 
 原生 Deployment、StatefulSet、DaemonSet 详情页的浏览器取证发现 HPA 请求地址重复包含 `/apis/`，导致 `/apis/apis/autoscaling/v2beta2/...` 请求持续失败。已在 `getHpaApiVersion` 中统一规范版本路径，并将 HPA Store、资源状态和自动伸缩弹窗切换到该辅助函数；新增回归测试覆盖集群版本未知和已知两种情况。
 
-第一版路径修复已部署到 131，浏览器确认重复 `/apis/apis/` 已消失，但正确的 HPA URL 仍被重复请求并触发 `ERR_INSUFFICIENT_RESOURCES`。根因进一步定位为 `useCacheStore` 每次创建新 setter，详情同步 effect 因依赖变化形成循环；当前已增加 `useCallback` 修复，已通过本地测试和构建，尚未提交、构建镜像或部署。A02～A04、完整 V3 等价性和全局 RBAC 门禁状态不因第一版修复自动改变。
+第一版路径修复部署后，浏览器确认重复 `/apis/apis/` 已消失，但正确的 HPA URL 仍被重复请求并触发 `ERR_INSUFFICIENT_RESOURCES`。根因进一步定位为 `useCacheStore` 每次创建新 setter，详情同步 effect 因依赖变化形成循环；第二版 `useCallback` 修复已提交为 `3ee15af9ad2b`，本地 69 个测试文件、249 个测试通过，`build:packages`、CI Run `39302192970` 均成功。
+
+第二版已部署到 131：镜像 tag `feature-v4-configmaps-secrets-20261020-022516-3ee15af9ad2b`，manifest digest `sha256:27d44f7e001a6c5593ce39a5fbde2cb53dcdcb75959ab3a2f57114ee5b3f25b9`，Deployment `538/538`，Pod `ks-console-7c875999cf-6zw2g` 为 `Running/Ready`，imageID 与 digest 一致。真实浏览器复验 Deployment、StatefulSet、DaemonSet 页面均正常，重复 HPA 请求和 `ERR_INSUFFICIENT_RESOURCES` 均为 0；DaemonSet 的操作菜单、YAML 弹窗和取消路径可用。测试工作负载已清理，namespace 只剩系统 ConfigMap 和默认 ServiceAccount。该修复只关闭 HPA 请求循环缺陷，不改变 A02～A04 的完整等价性、RBAC 或全局 V3/Wujie 状态。
