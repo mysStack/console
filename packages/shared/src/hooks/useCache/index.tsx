@@ -3,7 +3,15 @@
  * https://github.com/kubesphere/console/blob/master/LICENSE
  */
 
-import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { StoreApi, createStore, useStore } from 'zustand';
 import mitt from 'mitt';
 
@@ -97,7 +105,10 @@ export function useCacheStore<T = any>(
     }
   });
   const value = useStore(store, state => state.storage[key]);
-  const setValue = (v: T | ((v: T) => T)) => store.getState().setStorage(key, v);
+  const setValue = useCallback(
+    (v: T | ((v: T) => T)) => store.getState().setStorage(key, v),
+    [key, store],
+  );
 
   const v = id === undefined ? initialValue : value;
   return [v, setValue];

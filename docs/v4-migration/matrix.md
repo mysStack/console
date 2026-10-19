@@ -300,8 +300,9 @@ GitHub Actions Run `39209219839` 成功，镜像 tag 为 `feature-v4-configmaps-
 重新以当前分支源码和活动路由树核对后，项目 Deployment、StatefulSet、DaemonSet 详情由 `projects/routes/detail.tsx` 导入 `ApplicationWorkloads/Workloads/*/Detail/routes.tsx`，当前活动详情实现使用原生 Workload Detail；旧 `projects/containers/*/Detail` 文件仍保留 Wujie 代码，但没有被该活动路由文件导入，暂列为兼容残留，不能直接删除。
 
 当前非测试源码统计为：`useV3action/useV3Actions` 11 个文件（8 个业务调用文件、2 个桥接实现/Hook 文件、1 个导出文件），`WujieReact` 117 个文件，`consolev3` 121 个文件。历史 P0 统计中的 14 个动态 Action 文件和 11 个业务文件保留为历史基线；当前数字只用于活动源码复核，不代表全仓库 V3/Wujie 已移除。A02～A04 的完整字段、错误态、低权限、刷新返回和兼容残留清理仍未完成。
+
 ## 2026-10-20 原生 Workload HPA API 路径缺陷
 
 在真实浏览器访问原生 Deployment、StatefulSet、DaemonSet 详情页时，发现 HPA 请求重复拼接 `/apis/`，实际地址为 `/apis/apis/autoscaling/v2beta2/...`。同一错误请求在控制台日志中重复出现 282 次，并伴随 `Network Error` 和 `ERR_INSUFFICIENT_RESOURCES`。根因、修复和本地验证记录见[原生 Workload HPA API 路径修复记录](./hpa-native-workload-api-fix-20261020.md)。
 
-当前修复已通过本地定向测试、完整测试、ESLint、Prettier 和 `build:packages`，但尚未部署到 131；A02～A04 不能据此标记为已验证，必须完成新制品 rollout、Pod imageID 核对和部署后浏览器复验。
+第一版路径修复已部署到 131（tag `feature-v4-configmaps-secrets-20261020-015729-c9a311a56c5d`，Pod imageID 对应 digest `sha256:cd54b3ef13605197416d18833740d8ef280eea009c04b03242d8fe2c0e5f5a7d`），浏览器确认重复 `/apis/apis/` 已消失，但正确 HPA URL 仍在单次加载中重复请求并触发资源耗尽。根因进一步定位为 `useCacheStore` setter 身份不稳定导致详情同步 effect 循环；第二版 `useCallback` 修复已通过本地测试和构建，尚未部署。A02～A04 仍不能标记为已验证。
