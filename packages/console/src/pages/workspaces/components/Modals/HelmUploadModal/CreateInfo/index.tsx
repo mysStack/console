@@ -24,7 +24,9 @@ type Props = {
 
 function CreateInfo({ createInfo, onIconChange }: Props): JSX.Element {
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { name, version_name, home, description, icon } = createInfo;
+  const { name, appName, version_name, versionName, home, description, icon } = createInfo;
+  const displayName = name || appName;
+  const displayVersion = version_name || versionName;
   const [errorInfo, setErrorInfo] = useState<string>('');
   const [imgSrc, setImgSrc] = useState<string>(icon);
 
@@ -38,13 +40,18 @@ function CreateInfo({ createInfo, onIconChange }: Props): JSX.Element {
       <Title>{t('APP_INFORMATION')}</Title>
       <AppContentWrapper>
         <StyledDropzone onError={setErrorInfo} onFinish={handleIconUploadFinished}>
-          <Image isBase64Str={Boolean(imgSrc)} src={imgSrc} iconSize={100} iconLetter={name} />
+          <Image
+            isBase64Str={Boolean(imgSrc)}
+            src={imgSrc}
+            iconSize={100}
+            iconLetter={displayName}
+          />
           <Label className="mt12">{t('UPLOAD_ICON')}</Label>
           <Note>{t('APP_ICON_NOTE')}</Note>
         </StyledDropzone>
         <div>
-          <StyledField value={name || '-'} label={t('NAME')} />
-          <StyledField value={version_name || '-'} label={t('VERSION')} />
+          <StyledField value={displayName || '-'} label={t('NAME')} />
+          <StyledField value={displayVersion || '-'} label={t('VERSION')} />
           <StyledField value={home || '-'} label={t('HOMEPAGE')} />
           <StyledField value={description || '-'} label={t('DESCRIPTION')} />
         </div>
