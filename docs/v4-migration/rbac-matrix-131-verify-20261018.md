@@ -187,3 +187,9 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 `workspaceonly` 没有项目资源读取权，不能沿用 ConfigMap/Secret/ServiceAccount 旧矩阵中的读取结果推断 Workload 读取权；`clusterviewer` 可读取项目 Workload，但不能写入。两组临时用户、绑定和 Workload 均已删除，namespace 无测试残留。
 
 结合此前 viewer、operator 结果，A02～A04 当前项目的 viewer/operator/workspaceonly/clusterviewer 作用域边界已有真实证据；`admin` 独立 Workload 组合、projectonly 的 Workload API 边界和平台/联邦/DevOps/Extension 作用域仍未完成。
+
+## 2026-10-20 Workload projectonly 作用域补测
+
+使用仅绑定 `v4-migration-e2e` 项目 `viewer` Role、没有企业空间成员绑定的临时账号，通过真实 Playwright 访问临时 Deployment 详情和 API：项目详情页本轮实际正常渲染，GET 为 `200`，POST 为 `403`，DELETE 为 `403`。临时用户、项目 RoleBinding 和 Workload 已删除。
+
+本轮结果与早期 ConfigMap 入口记录的 `/errors/403` 不同，说明项目入口行为不能跨资源类型或跨制品直接推断；当前 Workload 的 projectonly API 读写边界已取得真实证据，页面权限差异继续保留在矩阵中待统一解释。A02～A04 的 admin 独立组合和其他平台作用域仍未完成。

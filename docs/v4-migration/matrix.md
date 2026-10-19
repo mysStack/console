@@ -366,3 +366,9 @@ GitHub Actions Run `39209219839` 成功，镜像 tag 为 `feature-v4-configmaps-
 真实浏览器核对 A02 Deployment 的两个作用域组合：仅企业空间 viewer (`workspaceonly`) 访问项目详情进入 `/errors/403`，API 的 GET/POST/PUT/PATCH/DELETE 均为 `403`；企业空间 viewer 加集群 viewer (`clusterviewer`) 可以渲染项目详情，GET 为 `200`，所有写操作为 `403`。临时用户、绑定和 Workload 已删除。
 
 该结果补齐了 Workload 作用域边界，且明确不能沿用 ConfigMap/Secret/ServiceAccount 的旧读取结果。A02～A04 当前已有 viewer、operator、workspaceonly、clusterviewer 证据，projectonly、admin 独立组合、平台/联邦/DevOps/Extension 作用域和全量 V3 等价仍未完成。
+
+## 2026-10-20 Workload projectonly RBAC 补测
+
+仅项目 viewer、没有企业空间绑定的临时账号通过真实浏览器访问 Deployment 详情时页面正常渲染；同一浏览器会话中 GET 为 `200`，POST/DELETE 为 `403`。临时账号、RoleBinding 和 Workload 已清理。
+
+该结果与早期 ConfigMap 项目入口记录存在差异，已作为资源类型差异保留，不能跨模块推断统一页面权限。A02～A04 的 Workload projectonly API 边界已验证，admin 独立组合和全量 RBAC 仍未完成。

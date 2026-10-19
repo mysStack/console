@@ -652,3 +652,7 @@ A12 上传成功子路径已关闭；冲突/失败反馈、低权限、完整返
 | `clusterviewer` | 项目详情正常；GET `200`，POST/PUT/PATCH/DELETE `403`         | 用户、WorkspaceRoleBinding、ClusterRoleBinding 和 Workload 已删除 | 集群只读可读取 Workload，不能写入 |
 
 A02～A04 当前已补齐 viewer、operator、workspaceonly、clusterviewer 作用域证据；projectonly、独立 admin、平台/联邦/DevOps/Extension 作用域及全量 V3 等价仍未完成。
+
+## 2026-10-20 当前会话：Workload projectonly RBAC 补测
+
+仅项目 viewer 临时账号（无企业空间绑定）访问 Deployment 详情时页面正常渲染；浏览器 API GET `200`、POST `403`、DELETE `403`。临时用户、项目 RoleBinding 和 Workload 已删除。该结果与早期 ConfigMap 页面权限记录不同，已登记为资源类型差异，不能相互推断；A02～A04 的 admin 独立组合和全量 RBAC 仍未完成。

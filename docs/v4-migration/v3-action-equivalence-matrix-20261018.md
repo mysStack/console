@@ -343,3 +343,9 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 真实浏览器验证了两个作用域组合的 Deployment 详情和 API 边界：仅企业空间 viewer 的 `workspaceonly` 账号访问项目详情进入 `/errors/403`，GET/POST/PUT/PATCH/DELETE 均为 `403`；带企业空间 viewer 与集群 `cluster-viewer` 的 `clusterviewer` 账号页面正常渲染，GET 为 `200`、POST/PUT/PATCH/DELETE 均为 `403`。
 
 该结果说明 Workload 的项目读取权限不能从其他资源模块矩阵直接推断。A02～A04 的 viewer/operator/workspaceonly/clusterviewer 作用域已有证据，但 projectonly、admin 独立组合以及全部 V3 Action 等价仍未闭环。
+
+## 2026-10-20 A02 Workload projectonly 作用域补测
+
+真实浏览器使用仅项目 `viewer` 绑定、没有企业空间成员绑定的临时账号访问 Deployment 详情：本轮页面正常渲染，项目 Deployment GET 为 `200`，POST 和 DELETE 均为 `403`。测试对象和账号已清理。
+
+该结果补齐 A02 的 projectonly API 读写边界，同时记录页面结果与早期其他资源记录不同，不能将不同资源的 Console 路由权限行为互相推断。A02～A04 全部作用域统一矩阵、完整错误态和 V3 等价仍未完成。
