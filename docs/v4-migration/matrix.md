@@ -282,3 +282,9 @@ GitHub Actions Run `39209219839` 成功，镜像 tag 为 `feature-v4-configmaps-
 真实浏览器分别使用 `dev-workspace` viewer 和平台管理员检查 DevOps 页面。两类账号均能打开页面和创建弹窗，但集群选择器显示 `host：未安装 DevOps`。viewer 的 DevOps 列表 GET 为 `404`、创建为 `403`；平台管理员的列表 GET 和创建均为 `404`。创建弹窗取消路径没有写入。
 
 该证据确认当前环境缺少 DevOps 扩展/API，A06/A07 继续保持未验证，不能用空数据态或弹窗渲染替代成功、失败、权限和刷新等价性证据。
+
+## 2026-10-20 联邦项目与 Edge 入口运行时补测
+
+本轮使用真实 Playwright 对联邦项目和 Edge 节点入口进行只读核验。联邦项目页面可以渲染列表和创建弹窗，但当前没有联邦项目，`host` 仅显示为主集群且添加集群按钮禁用；Edge 节点页面可以渲染空数据态，带 Edge 标签选择器的节点列表请求返回 `200`。当前集群没有可用的 FederatedProject/FederatedResource、EdgeWorkload 等 API/CRD，未创建任何资源，也没有提交联邦项目表单。
+
+本轮补充了 A05/A10 的入口、空数据态和环境边界证据，但没有关闭成功、失败、取消、RBAC、刷新返回或 V4 原生替代验证；联邦页面仍加载 `/consolev3/dashboard` 与 `v3dist` 资源。A05/A10 继续标记为“环境不可执行/未验证”，三个目标资源模块的状态不变，全部 V3 功能等价性仍未完成。

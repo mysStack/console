@@ -548,3 +548,13 @@ A12 上传成功子路径已关闭；冲突/失败反馈、低权限、完整返
 本轮未启动子 Agent。使用临时 `dev-workspace` viewer 和平台管理员通过真实 Playwright 检查 DevOps 页面：页面都能渲染，但集群选择器显示 `host：未安装 DevOps`。viewer 的 DevOps 列表 GET 为 `404`、创建 POST 为 `403`；管理员的列表 GET 和创建 POST 均为 `404`；两种账号均可打开创建弹窗并取消，未产生状态变更。
 
 该证据区分了账号权限和环境缺失：viewer 的 `403` 是 RBAC 拒绝，管理员的 `404` 说明当前集群没有可用 DevOps API/扩展。A06/A07 的成功、失败、刷新、低权限和 V4 原生替代仍未闭环，临时用户和绑定已清理。
+
+## 2026-10-20 联邦项目与 Edge 入口只读补测
+
+本轮保持单 Codex 会话，未启动子 Agent，使用当前 131 部署制品和真实 Playwright 进行只读核验：
+
+- 联邦项目 `/workspaces/test-workspace/federatedprojects` 正常渲染；页面显示没有联邦项目，创建弹窗可打开，`host` 显示为主集群但添加集群按钮禁用；没有提交创建操作。
+- Edge 节点 `/clusters/host/edgenodes` 正常渲染空数据态；带 `node-role.kubernetes.io/edge` 选择器的节点请求返回 `200`，当前没有边缘节点。
+- 联邦页面实际请求 `/consolev3/dashboard` 和 `dist/v3dist/*`，说明该入口仍存在 V3 兼容加载；现有 API/CRD 盘点没有发现可用于联邦或 Edge 真实 CRUD 的 KubeSphere 资源。
+
+本轮只补齐了入口、空数据态和环境能力证据。A05/A10 的成功、失败、取消、RBAC、刷新返回和 V4 原生替代仍未验证；不把空数据态或入口渲染标记为等价通过。全量 V3 功能等价性和完整 RBAC 作用域矩阵继续未闭环。
