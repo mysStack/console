@@ -294,3 +294,9 @@ GitHub Actions Run `39209219839` 成功，镜像 tag 为 `feature-v4-configmaps-
 在继续运行时核验前，对 `v4-migration-e2e` 做了只针对测试命名和测试标签的资源复核，发现此前应用模板安装与配置历史测试遗留的 Helm ConfigMap、Helm release Secret、应用生成的 `configmapname` 及配置历史 Secret 链。已删除这些明确属于本轮测试的对象，并复核 namespace 当前只剩系统 `kube-root-ca.crt` ConfigMap 和默认 ServiceAccount；没有删除 namespace，也没有修改其他 namespace 或业务资源。
 
 该清理结果修正了此前“测试对象已清理”的记录缺口。后续模块验收必须在测试结束时按唯一名称、标签和 Helm release 关联对象进行二次清理核验。
+
+## 2026-10-20 活动路由与 V3 依赖口径复核
+
+重新以当前分支源码和活动路由树核对后，项目 Deployment、StatefulSet、DaemonSet 详情由 `projects/routes/detail.tsx` 导入 `ApplicationWorkloads/Workloads/*/Detail/routes.tsx`，当前活动详情实现使用原生 Workload Detail；旧 `projects/containers/*/Detail` 文件仍保留 Wujie 代码，但没有被该活动路由文件导入，暂列为兼容残留，不能直接删除。
+
+当前非测试源码统计为：`useV3action/useV3Actions` 11 个文件（8 个业务调用文件、2 个桥接实现/Hook 文件、1 个导出文件），`WujieReact` 117 个文件，`consolev3` 121 个文件。历史 P0 统计中的 14 个动态 Action 文件和 11 个业务文件保留为历史基线；当前数字只用于活动源码复核，不代表全仓库 V3/Wujie 已移除。A02～A04 的完整字段、错误态、低权限、刷新返回和兼容残留清理仍未完成。

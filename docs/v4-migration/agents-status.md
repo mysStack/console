@@ -559,6 +559,12 @@ A12 上传成功子路径已关闭；冲突/失败反馈、低权限、完整返
 
 本轮只补齐了入口、空数据态和环境能力证据。A05/A10 的成功、失败、取消、RBAC、刷新返回和 V4 原生替代仍未验证；不把空数据态或入口渲染标记为等价通过。全量 V3 功能等价性和完整 RBAC 作用域矩阵继续未闭环。
 
+## 2026-10-20 活动路由与 Action 统计口径修正
+
+重新核对当前分支后确认，项目 Deployment、StatefulSet、DaemonSet 的活动详情路由由 `packages/console/src/pages/projects/routes/detail.tsx` 导入 `ApplicationWorkloads/Workloads/*/Detail/routes.tsx`，活动实现使用原生 Workload Detail；此前记录中引用的 `projects/containers/*/Detail` 文件仍有 Wujie 代码，但当前不在该活动路由导入链上，暂按兼容残留保留。
+
+当前非测试源码的 `useV3action/useV3Actions` 统计为 11 个文件、8 个业务调用文件和 9 个业务 Action 行。历史 P0 记录中的 14 个文件和 11 个业务文件作为当时基线保留，不再用于描述当前活动调用数量。A02～A04 的完整字段、错误态、权限、刷新返回和残留文件清理仍未闭环。
+
 ## 2026-10-20 测试 namespace 残留清理
 
 继续运行时复核时发现 `v4-migration-e2e` 仍残留此前应用模板安装和配置历史测试对象，包括测试 Helm release 的 ConfigMap/Secret、应用生成的 `configmapname` 以及配置历史 Secret 链。已按明确测试名称、标签和测试 namespace 删除这些对象，并复核 `kubectl get all,configmap,secret,serviceaccount -n v4-migration-e2e` 只剩系统 `kube-root-ca.crt` 和默认 ServiceAccount。

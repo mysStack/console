@@ -65,3 +65,9 @@ P0-Baseline Explorer 未能完成取证，协作服务返回原始错误：`429 
 | 3    | `console-p0-rea` / `feature/v4-p0-rea`           | `8c6f59e697f2c0219a8e87afa75e2c47cfc8f89f` | 以同一制品 SHA 执行 7 个重点 Chunk 的 focused REA；Evidence `ev_1499...`，coverage 仍 partial  |
 
 三项补充均为证据和文档变更，没有修改功能代码、稳定分支或部署环境。它们不能替代指定复核人对 P0 门禁的确认。
+
+## 2026-10-20 当前活动路由统计修正
+
+以当前 `feature/v4-configmaps-secrets` 源码重新核对后，项目 Deployment、StatefulSet、DaemonSet 的活动详情路由已经导入 `ApplicationWorkloads/Workloads/*/Detail/routes.tsx` 原生实现；旧 `projects/containers/*/Detail` 文件仍包含 Wujie 兼容代码，但不在当前项目详情活动路由导入链上。
+
+当前非测试源码中的 `useV3action/useV3Actions` 为 11 个文件（8 个业务调用、2 个桥接实现/Hook、1 个导出），与本文件历史的 11 个业务调用文件口径不同。历史口径保留为取证快照；本轮修正只影响当前活动统计，不关闭全量 Action、路由、扩展、RBAC 或 V3 等价性门禁。

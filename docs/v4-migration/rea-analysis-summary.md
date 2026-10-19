@@ -184,3 +184,9 @@ ConfigMap、Secret、ServiceAccount 进入正式 P2-DEV 前，必须分别完成
 - [P0-REA 门禁复核包](./p0-gate-review.md)
 - [ConfigMap/Secret 131 验收记录](./config-secrets-131-acceptance.md)
 - [ServiceAccount 131 验收记录](./service-account-131-acceptance.md)
+
+## 2026-10-20 当前活动源码口径修正
+
+当前分支重新扫描非测试源码后，`useV3action/useV3Actions` 为 11 个文件，其中 8 个是业务调用文件，2 个是桥接实现/Hook，1 个是导出文件；当前活动项目 Workload 详情路由已经导入原生 `ApplicationWorkloads/Workloads/*/Detail/routes.tsx`。历史记录中的 11 个业务调用文件属于早期取证口径，保留用于追溯，不再用于描述当前活动调用数量。旧 `projects/containers/*/Detail` 文件仍有 Wujie 代码，完整清理前必须完成消费者复核。
+
+同一口径下，当前源码仍有 117 个 `WujieReact` 文件和 121 个 `consolev3` 命中文件。该结果进一步确认 P0-U002 只能标记为“分析中”，不能因为 A02～A04 活动路由切换而宣布全量 V3 等价。
