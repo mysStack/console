@@ -311,3 +311,13 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 真实 Playwright 证据：打开临时 Deployment `v4-conflict-fix-20261020` 的原生 YAML 编辑器，外部将描述改为 `conflict-external-fix` 后，导入保存旧 `resourceVersion` 的 YAML 并提交；浏览器请求返回 `PUT 409 Conflict`，页面显示 Conflict 错误并保持编辑对话框，Kubernetes API 回读仍为 `conflict-external-fix`、generation 为 `2`，没有被旧内容覆盖。临时 Deployment 已删除。
 
 该证据关闭 A02 的 resourceVersion 并发冲突保护子路径。A03/A04 尚未分别取得冲突证据，所有资源的完整操作组合、其他作用域 RBAC、V3 Action 移除和兼容残留清理仍未闭环；A02～A04 继续标记为“部分验证”。
+
+## 2026-10-20 A03/A04 原生 YAML resourceVersion 冲突补测
+
+在同一部署制品上，分别对临时 StatefulSet `v4-conflict-sts-20261020` 和 DaemonSet `v4-conflict-ds-20261020` 打开原生 YAML 编辑器。浏览器保持旧 YAML 后，外部 Kubernetes API 先修改描述，再通过文件导入提交旧 `resourceVersion`。
+
+- StatefulSet：浏览器 `PUT` 返回 `409 Conflict`，API 回读外部描述 `conflict-external-sts`，generation 保持 `1`。
+- DaemonSet：浏览器 `PUT` 返回 `409 Conflict`，API 回读外部描述 `conflict-external-ds`，generation 保持 `1`。
+- 两个编辑对话框在冲突后均保持打开，页面未把旧 YAML 写回集群；临时对象已删除。
+
+至此 A02～A04 三类 Workload 的 resourceVersion 并发冲突保护均有真实浏览器和 Kubernetes API 证据。该证据只关闭冲突保护子路径，完整字段、全部成功/失败/取消操作、其他作用域 RBAC、V3 Action 移除和兼容残留清理仍未闭环。

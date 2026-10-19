@@ -340,3 +340,11 @@ GitHub Actions Run `39209219839` 成功，镜像 tag 为 `feature-v4-configmaps-
 真实浏览器验证 Deployment `v4-conflict-fix-20261020`：外部先修改描述，浏览器随后提交旧 resourceVersion 的 YAML，收到 `409 Conflict`，页面保留错误和编辑弹窗；API 中外部描述仍保留、generation 未因失败提交继续变化。临时资源已清理。
 
 状态：A02 的并发冲突保护已验证；A03/A04 尚未分别验证该冲突路径，三类 Workload 的完整 V3 等价、全部 RBAC 组合和兼容残留清理仍未完成。
+
+## 2026-10-20 A03/A04 YAML 并发冲突补测
+
+在当前 131 部署制品上，分别对临时 StatefulSet `v4-conflict-sts-20261020` 和 DaemonSet `v4-conflict-ds-20261020` 使用真实 Playwright 执行 YAML 并发修改：浏览器保存旧 `resourceVersion`，外部 API 先修改描述，再提交旧 YAML。
+
+两类资源的浏览器 `PUT` 均返回 `409 Conflict`，编辑对话框保持打开；Kubernetes API 中的外部描述分别保持为 `conflict-external-sts`、`conflict-external-ds`，generation 均未因失败提交继续变化。临时对象已删除。
+
+该补测与 A02 的同类证据合并后，A02/A03/A04 三类 Workload 的 resourceVersion 冲突保护子路径已验证。完整字段、所有操作成功/失败/取消、全量 RBAC 组合、V3/Wujie 清理和其他 V3 Action 仍未完成。

@@ -614,3 +614,13 @@ A12 上传成功子路径已关闭；冲突/失败反馈、低权限、完整返
 | 浏览器验证  | A02 Deployment YAML 并发修改返回 `409 Conflict`；页面错误提示和编辑弹窗保留，外部 API 变更未被覆盖                                                                |
 | 清理        | 临时 Deployment `v4-conflict-fix-20261020` 已删除，未删除测试 namespace                                                                                           |
 | 当前结论    | A02 resourceVersion 冲突保护子路径已验证；A03/A04 同路径和全部模块等价性仍未完成                                                                                  |
+
+## 2026-10-20 当前会话：StatefulSet/DaemonSet YAML 并发冲突补测
+
+| 项目       | 结果                                                                                                  |
+| ---------- | ----------------------------------------------------------------------------------------------------- |
+| 验证对象   | `v4-conflict-sts-20261020`、`v4-conflict-ds-20261020`                                                 |
+| 浏览器结果 | 两类原生 YAML 提交均收到 `PUT 409 Conflict`，编辑对话框保持打开                                       |
+| API 结果   | 外部描述分别保持为 `conflict-external-sts`、`conflict-external-ds`，generation 均保持 `1`             |
+| 清理       | 两个临时 Workload 已删除，测试 namespace 保留                                                         |
+| 当前结论   | A02/A03/A04 的 resourceVersion 冲突保护子路径均已验证；完整 V3 等价、全量 RBAC 和兼容残留清理仍未完成 |
