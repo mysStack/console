@@ -288,3 +288,9 @@ GitHub Actions Run `39209219839` 成功，镜像 tag 为 `feature-v4-configmaps-
 本轮使用真实 Playwright 对联邦项目和 Edge 节点入口进行只读核验。联邦项目页面可以渲染列表和创建弹窗，但当前没有联邦项目，`host` 仅显示为主集群且添加集群按钮禁用；Edge 节点页面可以渲染空数据态，带 Edge 标签选择器的节点列表请求返回 `200`。当前集群没有可用的 FederatedProject/FederatedResource、EdgeWorkload 等 API/CRD，未创建任何资源，也没有提交联邦项目表单。
 
 本轮补充了 A05/A10 的入口、空数据态和环境边界证据，但没有关闭成功、失败、取消、RBAC、刷新返回或 V4 原生替代验证；联邦页面仍加载 `/consolev3/dashboard` 与 `v3dist` 资源。A05/A10 继续标记为“环境不可执行/未验证”，三个目标资源模块的状态不变，全部 V3 功能等价性仍未完成。
+
+## 2026-10-20 测试 namespace 残留复核与清理
+
+在继续运行时核验前，对 `v4-migration-e2e` 做了只针对测试命名和测试标签的资源复核，发现此前应用模板安装与配置历史测试遗留的 Helm ConfigMap、Helm release Secret、应用生成的 `configmapname` 及配置历史 Secret 链。已删除这些明确属于本轮测试的对象，并复核 namespace 当前只剩系统 `kube-root-ca.crt` ConfigMap 和默认 ServiceAccount；没有删除 namespace，也没有修改其他 namespace 或业务资源。
+
+该清理结果修正了此前“测试对象已清理”的记录缺口。后续模块验收必须在测试结束时按唯一名称、标签和 Helm release 关联对象进行二次清理核验。

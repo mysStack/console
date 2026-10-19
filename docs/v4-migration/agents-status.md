@@ -558,3 +558,9 @@ A12 上传成功子路径已关闭；冲突/失败反馈、低权限、完整返
 - 联邦页面实际请求 `/consolev3/dashboard` 和 `dist/v3dist/*`，说明该入口仍存在 V3 兼容加载；现有 API/CRD 盘点没有发现可用于联邦或 Edge 真实 CRUD 的 KubeSphere 资源。
 
 本轮只补齐了入口、空数据态和环境能力证据。A05/A10 的成功、失败、取消、RBAC、刷新返回和 V4 原生替代仍未验证；不把空数据态或入口渲染标记为等价通过。全量 V3 功能等价性和完整 RBAC 作用域矩阵继续未闭环。
+
+## 2026-10-20 测试 namespace 残留清理
+
+继续运行时复核时发现 `v4-migration-e2e` 仍残留此前应用模板安装和配置历史测试对象，包括测试 Helm release 的 ConfigMap/Secret、应用生成的 `configmapname` 以及配置历史 Secret 链。已按明确测试名称、标签和测试 namespace 删除这些对象，并复核 `kubectl get all,configmap,secret,serviceaccount -n v4-migration-e2e` 只剩系统 `kube-root-ca.crt` 和默认 ServiceAccount。
+
+该项说明此前部分清理记录不完整，已修正为本轮实际状态。后续每轮测试必须同时核对 Helm release、Job、ConfigMap、Secret、历史对象和临时账号绑定；本次没有删除 namespace，也没有修改其他 namespace 或业务资源。
