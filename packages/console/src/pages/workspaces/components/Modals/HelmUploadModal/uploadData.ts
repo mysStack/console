@@ -9,6 +9,7 @@ export type ValidatedHelmInfo = {
 export function getHelmUploadData(type: string, info: ValidatedHelmInfo) {
   if (type === 'ADD_VERSION') {
     return {
+      appType: 'helm',
       package: info.base64Str,
       name: info.versionName || info.name,
       ...(info.icon ? { icon: info.icon } : {}),

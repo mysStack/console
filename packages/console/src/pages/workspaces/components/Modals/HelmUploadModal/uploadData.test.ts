@@ -12,6 +12,7 @@ test('builds version upload data from validated chart metadata', () => {
       icon: 'icon-data',
     }),
     {
+      appType: 'helm',
       package: 'chart-bytes',
       name: '0.2.0',
       icon: 'icon-data',
