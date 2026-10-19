@@ -22,6 +22,7 @@ import type { DeleteConfirmContentProps } from '../../components/Modals/DeleteCo
 import { DeleteConfirmContent } from '../../components/Modals/DeleteConfirm/DeleteConfirm';
 import type { PathParams } from '../../types';
 import { invalidateResourceList } from '../../utils/resourceListInvalidation';
+import { preserveResourceVersion } from '../../utils/resourceVersion';
 
 interface BaseInfoProps extends Record<string, any> {
   initialValues?: any;
@@ -131,7 +132,8 @@ const useCommonActions = ({ store, callback = () => {}, params = {} }: CommonAct
         const transformedData = props.transformYaml
           ? props.transformYaml(parsedData, initialValues)
           : parsedData;
-        await store.put({ ...initialValues, ...params }, transformedData, false, k8sVersion);
+        const dataWithResourceVersion = preserveResourceVersion(transformedData, initialValues);
+        await store.put({ ...initialValues, ...params }, dataWithResourceVersion, true, k8sVersion);
         notify.success(t('UPDATE_SUCCESSFUL'));
         invalidateResourceList(store?.module);
         callback('editYaml');
