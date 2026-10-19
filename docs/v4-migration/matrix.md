@@ -48,6 +48,8 @@ Deployment `kubesphere-system/ks-console` generation/observedGeneration 为 `511
 
 本轮 P0 针对性风险关闭结果见[P0-U002/U003 风险关闭矩阵](./p0-risk-closure-matrix.md)。该矩阵逐项记录 cluster、workspace、project、federated、platform、extension 的路由、V3/Wujie 入口、静态 RBAC、API/Store、131 证据和 V4 替代边界，并单列 11 个业务 `useV3action` 调用和 3 个桥接文件。静态权限路径和代表性运行时证据均不能替代全量 API RBAC、低权限和错误态验证。
 
+2026-10-19 继续补测应用模板编辑：临时 Application/ApplicationVersion 的编辑描述通过浏览器提交 `PATCH 200`，刷新后数据保持；删除确认框输入名称后提交，捕获 `DELETE 200` 并返回应用模板列表。ApplicationVersion 未随 Application 自动清理，随后单独删除并确认两个对象均为 `NotFound`。A12 的删除成功子路径已验证，但删除失败/取消、上传和 A09/A11 的完整创建部署链路仍未闭环，不能据此标记应用模块验收。
+
 2026-10-18 在当前工作树复核静态依赖扫描：`wujie-react/WujieReact` 命中 133 个文件、`ConsoleV3ResourceList` 命中 28 个文件、`ExtensionConsoleV3Embed` 命中 17 个文件、`useV3action/useV3Actions` 命中 14 个文件、`consolev3` 路径字符串命中 101 个文件。统计包含构建配置、测试和现有 `packages/shared/lib` 编译输出，存在交集，只用于更新取证范围，不等于启用入口或功能等价通过。详见 [`dependency-inventory.md`](./dependency-inventory.md)。
 
 | 模块                             | V3 路由/入口                                                                                 | V3 操作                                                  | V4 对应代码                                                                                                                                        | 缺口                                                                                                                                                                 | 证据                                                                                                                                                                                                                | 负责人/执行器 | 状态   | 测试链接                              | PR  |
