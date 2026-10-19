@@ -104,3 +104,16 @@
 该临时账号实际打开并渲染了以下路由：`/access/workspaces`、`/clusters`、`/access/accounts`、`/extensions/management` 和 `/settings/base-info`；没有执行任何写操作。临时用户、GlobalRole 和 GlobalRoleBinding 已删除，并分别用 Kubernetes API 复核为不存在。
 
 这次补测只证明平台/扩展入口在该临时聚合角色下可以渲染，不能关闭平台写权限、扩展 Action、联邦资源或完整 V3 等价性。扩展初始化运行时错误仍按负责人指令暂缓。
+
+## 2026-10-20 平台只读与项目隔离组合补测
+
+本轮在当前 131 部署制品上新增两个作用域组合，使用一次性用户和临时绑定，测试密码只保存在权限为 `600` 的临时文件中，未写入日志或文档。
+
+| 组合          | 入口与读取                                                                                       | 写入拒绝                                                              | 实际结果 |
+| ------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------- | -------- |
+| 平台只读      | `/access/workspaces`、`/clusters` 正常渲染；工作空间列表和集群列表为 `200`；平台用户列表为 `200` | 创建用户、创建工作空间、创建集群均为 `403`                            | 已验证   |
+| 仅项目 viewer | 直接项目 ConfigMap GET 为 `200`；工作空间详情 GET 为 `200`                                       | 项目 ConfigMap POST 为 `403`；直达项目 Console 路由进入 `/errors/403` | 已验证   |
+
+平台只读角色由 `global-view-workspaces`、`global-view-clusters`、`global-view-users` 和 `global-view-roles` 的实际规则展开组成；创建临时 GlobalRole 时最初遗漏必填 `rules` 导致对象被拒绝，随后按 RoleTemplate 规则展开后重新验证。该过程没有修改内置角色或已有用户。
+
+临时 GlobalRole、GlobalRoleBinding、WorkspaceRoleBinding、项目 RoleBinding 和用户均已删除，并复核资源不存在。该补测关闭了平台只读的读/写拒绝和项目独立账号的页面/API边界证据，但联邦、DevOps、扩展 Action 以及全部 V3 Action 等价性仍未完成，不能把 RBAC 总体标记为完整通过。
