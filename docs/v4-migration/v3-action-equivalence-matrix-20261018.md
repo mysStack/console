@@ -212,3 +212,14 @@ A01 仍不能标记为完整 V3 等价：主工作负载模板编辑仍保留 V3
 - platform-admin：同一 DevOps 列表 GET 返回 `404`，创建请求也返回 `404`；创建弹窗可以打开，集群选项显示“未安装 DevOps”，取消后没有写入。
 
 这组结果区分了权限拒绝和后端能力缺失：viewer 的 `403` 是权限边界，管理员的 `404` 证明当前环境没有可用 DevOps API/扩展。A06 `devops.edit` 和 A07 `devops.create` 仍为“未验证/环境阻塞”，不能把入口渲染或空列表当作 V4 等价完成。
+
+## 2026-10-20 联邦项目与 Edge 入口运行时补测
+
+本轮使用真实 Playwright 以平台管理员访问当前 131 环境，补充 A05/A10 相关入口的运行时边界证据：
+
+- 联邦项目路由 `/workspaces/test-workspace/federatedprojects` 正常渲染，列表为空；创建弹窗能够打开，`host` 显示为主集群，但添加集群按钮为禁用状态。本轮未提交表单，因此没有形成 FederatedProject fixture。
+- 联邦页面请求工作空间 namespace 列表并返回 `200`，同时实际请求 `/consolev3/dashboard` 和 `dist/v3dist/*` 资源；这证明当前入口仍处于兼容加载边界，不能作为 V4 原生等价证据。
+- Edge 节点路由 `/clusters/host/edgenodes` 正常渲染空数据态；边缘节点列表请求带 `node-role.kubernetes.io/edge` 标签选择器并返回 `200`，当前没有 Edge 节点。
+- 当前集群 API/CRD 盘点没有发现可用于 A05/A10 的 KubeSphere Edge 或 FederatedProject/FederatedResource 资源，因此无法触发边缘应用创建、边缘批量删除或联邦资源 CRUD。
+
+A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达、空列表、禁用按钮或兼容资源加载替代成功、失败、取消、权限、刷新和 V4 替代行为验证。
