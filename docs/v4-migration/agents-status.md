@@ -419,3 +419,7 @@ A06/A07/A08 当前仅取得入口和环境条件证据，成功、失败、取�
 在 `v4-migration-e2e` 创建副本数为 0 的专用 Deployment `v4-deployment-20261019`，真实浏览器直达项目详情。页面进入 `resource-status`，编辑信息弹窗可以打开并取消，详情 API 返回 `200`；同时观测到 `/consolev3/dashboard` 请求，确认项目 Deployment 详情仍存在 V3/Wujie 兼容耦合。专用 Deployment 已删除并确认清理。
 
 A02 的页面入口和取消子路径已取证，但模板编辑成功/失败、低权限、刷新/返回、完整 RBAC 和 V4 原生替代仍未完成，A02 继续保持“未等价”。
+
+## 2026-10-19 A10 边缘工作负载入口核对
+
+只读检查当前集群的 CRD 和 API Resource，没有发现 Edge/EdgeWorkload 相关资源；项目应用入口也没有可用边缘应用 fixture，无法触发 `workload.batch.delete.v2`。A10 的选择、确认、成功、失败、取消、刷新和 RBAC 路径保持未验证，不把缺少资源写成测试通过。

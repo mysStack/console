@@ -224,3 +224,5 @@ ConfigMap、Secret、ServiceAccount 的基础 CRUD、元数据、YAML、脱敏�
 本轮进一步检查 A06～A08：DevOps 页面请求企业空间集群列表但当前 `test-workspace` 没有可选集群，页面显示“请选择集群”和空列表，无法触发 `devops.create/edit`；用户菜单实际没有“通知设置”入口，`notification.user.setting` 当前没有可触发入口。以上保持未验证，不能以空页面或隐藏入口推断功能等价。
 
 A02：在 `v4-migration-e2e` 创建副本数为 0 的专用 Deployment，真实浏览器直达项目详情后页面进入 `resource-status`，显示编辑信息、编辑设置、编辑 YAML 等入口；详情请求为 `200`，点击“编辑信息”可打开原生信息弹窗并取消。页面同时实际请求 `/consolev3/dashboard`，因此项目 Deployment 详情仍保留 V3/Wujie 兼容耦合，A02 不得标记为 V4 等价。
+
+A10：只读检查确认当前集群没有 Edge/EdgeWorkload 相关 CRD 或 API Resource；现有项目也没有可触发边缘工作负载列表的应用模板 fixture。因此边缘工作负载批量删除没有执行，保持未验证。
