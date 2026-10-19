@@ -270,3 +270,9 @@ GitHub Actions Run `39209219839` 成功，镜像 tag 为 `feature-v4-configmaps-
 131 当前部署制品：`feature-v4-configmaps-secrets-20261019-222044-6acdc3b2fc52`，manifest digest `sha256:99ca60b78572916ad45342fcc752e7966a8bd6fb57e4db5108acfc6a6e996b20`，Pod `ks-console-7f96d678f-7k64b` 为 `Running/Ready`，实际 imageID 与 digest 一致。真实浏览器验证无效 Chart 已从“正在上传”进入“出现错误，请重试”，有效 Chart `9.9.20` 完成校验和版本创建，专用 ApplicationVersion 已删除并确认不存在。
 
 该修复关闭 A12 的上传失败反馈和有效提交子路径，但 A12 仍为“部分验证”。完整 RBAC 作用域矩阵、全部 V3 Action 等价性和扩展运行时错误仍未闭环；扩展错误按负责人要求暂缓。
+
+## 2026-10-20 RBAC 平台与项目隔离补测
+
+在 131 使用真实浏览器补充了平台只读和仅项目 viewer 两个作用域组合：平台只读账号可打开工作空间、集群和用户列表，读取请求为 `200`，创建用户、工作空间和集群均被拒绝为 `403`；仅项目账号直接访问项目资源时 ConfigMap GET 为 `200`、POST 为 `403`，直达项目路由进入 `/errors/403`。全部临时 IAM 对象均已删除并复核不存在。
+
+该证据补齐了平台只读和项目隔离的实际边界，但不代表联邦、DevOps、扩展 Action 或全部 V3 Action 已完成验证。

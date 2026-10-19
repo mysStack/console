@@ -536,3 +536,9 @@ A12 上传成功子路径已关闭；冲突/失败反馈、低权限、完整返
 131 部署后曾因 Deployment 原有 `maxSurge=1` 且单节点 CPU 请求达到约 99%，新 Pod 无法调度；已回滚到旧制品确认服务恢复，再在维护窗口使用 `maxUnavailable=1/maxSurge=0` 完成新制品 rollout，最后恢复原 `maxUnavailable=0/maxSurge=1` 策略。最终 Pod `ks-console-7f96d678f-7k64b` 为 `Running/Ready`，实际 imageID 与新制品 digest 一致。
 
 真实浏览器证据：无效 Chart 的校验请求返回 `500`，页面进入“出现错误，请重试”，不再卡在“正在上传”；有效 Chart `v4-action-upload-20261019.tgz`（版本 `9.9.20`）显示上传成功、应用信息并完成版本创建，随后删除专用 `ApplicationVersion` 并确认不存在，版本列表恢复 3 条。该记录只关闭 A12 的上传失败反馈和有效提交子路径，不代表 A12 全量等价，也不关闭全部 V3/Wujie、完整 RBAC 或扩展运行时风险。
+
+## 2026-10-20 平台只读与项目隔离 RBAC 补测
+
+本轮继续使用单 Codex 会话和真实 Playwright，不启动子 Agent。新增平台只读账号和仅项目 viewer 账号两个作用域组合：平台只读账号的工作空间/集群/用户读取页面正常渲染并返回 `200`，创建用户、工作空间、集群均返回 `403`；仅项目账号的项目 ConfigMap GET 返回 `200`、POST 返回 `403`，直达项目路由进入 `/errors/403`。
+
+临时用户、GlobalRole、GlobalRoleBinding、WorkspaceRoleBinding、RoleBinding 和临时凭据已删除并复核不存在。RBAC 矩阵新增了平台只读读写边界和项目独立账号边界，但联邦、DevOps、扩展 Action 和全部 V3 功能逐项等价性仍未闭环。
