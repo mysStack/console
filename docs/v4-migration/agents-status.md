@@ -570,7 +570,6 @@ A12 上传成功子路径已关闭；冲突/失败反馈、低权限、完整返
 继续运行时复核时发现 `v4-migration-e2e` 仍残留此前应用模板安装和配置历史测试对象，包括测试 Helm release 的 ConfigMap/Secret、应用生成的 `configmapname` 以及配置历史 Secret 链。已按明确测试名称、标签和测试 namespace 删除这些对象，并复核 `kubectl get all,configmap,secret,serviceaccount -n v4-migration-e2e` 只剩系统 `kube-root-ca.crt` 和默认 ServiceAccount。
 
 该项说明此前部分清理记录不完整，已修正为本轮实际状态。后续每轮测试必须同时核对 Helm release、Job、ConfigMap、Secret、历史对象和临时账号绑定；本次没有删除 namespace，也没有修改其他 namespace 或业务资源。
-
 ## 2026-10-20 原生 Workload HPA 请求修复
 
 原生 Deployment、StatefulSet、DaemonSet 详情页的浏览器取证发现 HPA 请求地址重复包含 `/apis/`，导致 `/apis/apis/autoscaling/v2beta2/...` 请求持续失败。已在 `getHpaApiVersion` 中统一规范版本路径，并将 HPA Store、资源状态和自动伸缩弹窗切换到该辅助函数；新增回归测试覆盖集群版本未知和已知两种情况。
