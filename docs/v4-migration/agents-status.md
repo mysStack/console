@@ -666,3 +666,12 @@ A02～A04 当前已补齐 viewer、operator、workspaceonly、clusterviewer 作�
 | 非法上传 | 缺少 `Chart.yaml`，校验 `500`，页面显示“出现错误，请重试”，弹窗保持打开                                                                                           |
 | 低权限   | workspace viewer 版本列表 GET `200`、创建 POST `403`，未产生对象                                                                                                  |
 | 当前结论 | A12 增加了当前制品成功/失败和低权限证据，冲突、删除失败、完整 V3 等价仍未完成                                                                                     |
+
+## 2026-10-20 A09 原生应用模板安装和 Workload projectonly 复核
+
+本轮继续使用当前 131 制品和真实 Playwright，完成两项针对性验证：
+
+1. A09 从项目应用模板抽屉切换到 `stakater` 系统仓库，选择 `configmap:1.0.5`，提交唯一测试应用 `v4-a09-install-20261020`。安装 API 返回 `200`，项目列表显示“创建中”，但 Helm 安装 Job 因单节点 CPU 不足处于 Pending，未取得安装成功或资源 Ready 证据。ApplicationRelease、Job、安装 ConfigMap 已删除并复核。
+2. Workload `projectonly` 使用新建的仅项目 viewer 账号在当前制品重新验证，项目路由为 `/errors/403`，Deployment 的 GET/POST/PUT/PATCH/DELETE 均为 `403`。该结果与此前记录的 `GET 200` 不一致，保留两次原始记录，不把旧结果继续当作当前通过证据。
+
+A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一致，待独立复核”。全量 RBAC 组合、全部 V3 Action 等价性和扩展运行时问题仍未闭环。

@@ -360,3 +360,14 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 - 临时 workspace viewer 账号访问同一版本页面时列表 GET 为 `200`，版本创建 POST 为 `403`，没有产生版本对象。
 
 该证据关闭 A12 当前制品的版本上传成功、非法包错误反馈、取消/不写入和 workspace viewer 创建拒绝子路径。A12 的冲突路径、删除失败、完整页面操作和 V3 Action/Wujie 移除仍未闭环，A12 继续标记为“部分验证”。
+
+## 2026-10-20 A09 原生应用模板安装补测
+
+为避免“当前企业空间没有模板”阻断原生应用模板验证，本轮从真实浏览器的应用模板抽屉切换到 `stakater` 系统仓库，选择 `configmap` 的 `1.0.5` 版本，在项目 `v4-migration-e2e` 中输入唯一应用名 `v4-a09-install-20261020` 并提交安装。
+
+- 安装向导的基本信息、版本选择、应用设置和最终确认均正常渲染。
+- 浏览器提交 `POST /kapis/application.kubesphere.io/v2/namespaces/v4-migration-e2e/applications` 返回 `200`，项目应用列表新增状态为“创建中”的应用，说明原生安装提交路径可达。
+- 后端创建 `ApplicationRelease` 和 Helm 安装 Job；由于 131 单节点当时 CPU 不足，Job Pod 处于 `Pending`，未能取得 Helm 安装成功和应用资源就绪证据。
+- 已删除 ApplicationRelease、Job、安装 ConfigMap，并复核测试 namespace 只剩系统 `kube-root-ca.crt` 和默认 ServiceAccount。
+
+> 该结果只关闭 A09 的原生模板选择、表单提交和 API `200` 子路径；应用部署成功、失败/取消、刷新/返回、低权限和完整 V4/Wujie 替代仍未闭环。A09 继续标记为“部分验证”，不能把集群资源不足时的创建中状态写成安装通过。

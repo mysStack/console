@@ -378,3 +378,4 @@ GitHub Actions Run `39209219839` 成功，镜像 tag 为 `feature-v4-configmaps-
 在 Run `39315775014` 对应的 131 制品上，真实浏览器上传合法 Chart 版本 `9.9.21`：校验和版本创建请求均为 `200`，页面显示上传成功；API 回读为 `200`，删除测试版本后回读为 `404`。缺少 `Chart.yaml` 的非法 Chart 校验返回 `500`，页面显示“出现错误，请重试”且弹窗保持打开。临时 workspace viewer 的版本列表 GET 为 `200`、创建 POST 为 `403`，没有留下对象。
 
 该补测增加了 A12 当前制品的成功、失败反馈和低权限证据，但冲突、删除失败、完整 V3 Action 移除和全量应用模板 RBAC 仍未完成。
+2026-10-20 A09 补测通过 `stakater` 系统仓库的真实应用模板选择和原生安装提交，浏览器 POST 返回 `200`；但 131 单节点 CPU 不足，Helm 安装 Job Pending，未取得部署成功证据。测试 ApplicationRelease、Job 和安装 ConfigMap 已清理，A09 继续为“部分验证”。同轮重新核对 Workload `projectonly` 组合时，当前制品的页面和 GET/POST/PUT/PATCH/DELETE 均返回 `403`，与历史 `GET 200` 记录不一致，已标记为结果不一致，不能作为全量 RBAC 通过证据。

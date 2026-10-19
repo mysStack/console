@@ -199,3 +199,9 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 在当前部署制品上，真实浏览器使用临时 workspace viewer 账号访问 `stakater-configmap` 版本页面：版本列表 GET 返回 `200`，版本创建 POST 返回 `403`，页面正常渲染版本列表且未产生测试版本。临时用户和 WorkspaceRoleBinding 已删除。
 
 该结果补齐 A12 workspace viewer 的读取/创建拒绝边界；应用模板完整的项目、平台和扩展作用域矩阵仍未完成。
+
+## 2026-10-20 Workload projectonly 当前制品复核修正
+
+为核对前文 Workload `projectonly` 的 `GET 200` 记录，本轮在当前 131 制品上重新创建独立临时用户，只绑定 `v4-migration-e2e` 项目 viewer RoleBinding，不绑定 `test-workspace` WorkspaceRoleBinding。真实浏览器登录成功，但直达 Deployment 详情进入 `/errors/403`；浏览器会话内通过集群代理对同一临时 Deployment 执行 GET、POST、PUT、PATCH、DELETE，结果均为 `403`。
+
+临时用户、项目 RoleBinding 和 Deployment 已清理。该结果与前一条历史记录不一致，原因和制品/账号绑定上下文尚未证明，不能将两次结果合并或推断为稳定的 `projectonly` 读取权限。当前 Workload `projectonly` 组合应标记为“结果不一致，待独立复核”，不作为通过证据。
