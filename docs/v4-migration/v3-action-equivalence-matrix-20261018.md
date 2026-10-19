@@ -265,3 +265,14 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 - 本轮临时 Deployment 已删除，复核 `v4-migration-e2e` 只剩系统 `kube-root-ca.crt` ConfigMap 和默认 ServiceAccount。
 
 该证据关闭 A02 的合法 YAML 文件导入、提交、页面刷新和 API 持久化子路径。A03/A04 尚未分别取得 YAML 持久化证据；非法 YAML、resourceVersion 冲突、成功/失败/取消完整组合、低权限、回滚/重新创建/删除、V3 Action 移除和 `/consolev3/dashboard` 全局预加载仍未闭环，A02～A04 继续标记为“部分验证”。
+
+## 2026-10-20 A03/A04 StatefulSet、DaemonSet 原生 YAML 持久化补测
+
+在同一 131 制品上，使用真实 Playwright 对 `v4-migration-e2e` 中临时 StatefulSet `v4-yaml-statefulset-20261020` 和 DaemonSet `v4-yaml-daemonset-20261020` 的原生详情页执行 YAML 文件导入：分别将 `kubesphere.io/description` 从 `yaml-before` 更新为 `yaml-after-sts`、`yaml-after-ds`。
+
+- 两个“编辑 YAML”入口均可打开，合法 YAML 文件导入后点击确定，详情页分别显示新的描述。
+- 两个页面刷新后仍显示对应的新描述，路由和详情数据正常渲染。
+- Kubernetes API 回读两个对象的描述注解均与页面一致；两个测试对象均已清理。
+- 清理后 `v4-migration-e2e` 只剩系统 `kube-root-ca.crt` ConfigMap 和默认 ServiceAccount。
+
+该证据关闭 A03/A04 的合法 YAML 文件导入、提交、刷新和 API 持久化子路径。非法 YAML、resourceVersion 冲突、所有操作成功/失败/取消、低权限、回滚/重新创建/删除、V3 Action 移除和 `/consolev3/dashboard` 全局预加载仍未闭环，A02～A04 继续标记为“部分验证”。

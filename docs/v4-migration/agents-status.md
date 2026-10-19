@@ -590,3 +590,7 @@ A12 上传成功子路径已关闭；冲突/失败反馈、低权限、完整返
 ## 2026-10-20 A02 YAML 文件导入持久化补测
 
 真实浏览器在临时 Deployment `v4-yaml-verify-20261020-2` 的“编辑 YAML”对话框使用文件导入方式提交合法 YAML，将 `kubesphere.io/description` 从 `yaml-before` 改为 `yaml-after`。提交后详情页显示新值，刷新后仍保持；Kubernetes API 回读注解一致，generation 从 `1` 变为 `2`。测试 Deployment 已删除，namespace 复核只剩系统 `kube-root-ca.crt` ConfigMap 和默认 ServiceAccount。A02 的合法 YAML 文件导入、提交、刷新和 API 持久化子路径已取得部署后证据；A03/A04 YAML、非法 YAML、冲突、低权限和完整 V3 等价仍未完成。
+
+## 2026-10-20 A03/A04 YAML 文件导入持久化补测
+
+在 131 当前制品上使用真实浏览器分别对临时 StatefulSet `v4-yaml-statefulset-20261020` 和 DaemonSet `v4-yaml-daemonset-20261020` 的原生“编辑 YAML”入口执行文件导入，将描述更新为 `yaml-after-sts`、`yaml-after-ds`。两个页面提交后显示新值，刷新后仍保持，Kubernetes API 回读注解一致；测试对象已经删除，namespace 复核只剩系统 ConfigMap 和默认 ServiceAccount。A03/A04 合法 YAML 文件导入、提交、刷新和 API 持久化子路径已取得证据，非法 YAML、冲突、低权限和完整 V3 等价仍未完成。

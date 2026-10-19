@@ -320,3 +320,9 @@ GitHub Actions Run `39209219839` 成功，镜像 tag 为 `feature-v4-configmaps-
 使用同一 131 制品和真实浏览器对临时 Deployment `v4-yaml-verify-20261020-2` 进行原生 YAML 文件导入补测：从“编辑 YAML”入口导入合法 Deployment YAML，将描述从 `yaml-before` 更新为 `yaml-after`；提交后详情页显示新值，浏览器刷新后仍保持，Kubernetes API 回读注解一致且 generation 由 `1` 变为 `2`。临时 Deployment 已删除，namespace 复核只剩系统 ConfigMap 和默认 ServiceAccount。
 
 该证据仅关闭 A02 的合法 YAML 导入、提交、刷新和 API 持久化子路径；StatefulSet/DaemonSet YAML、非法 YAML、resourceVersion 冲突、低权限及全部 V3 等价条件仍未完成。
+
+## 2026-10-20 A03/A04 YAML 文件导入持久化补测
+
+使用真实浏览器在 StatefulSet、DaemonSet 原生详情页分别导入合法 YAML，将描述更新为 `yaml-after-sts`、`yaml-after-ds`；提交后页面显示新值，刷新后仍保持，Kubernetes API 回读注解一致。两个临时对象已删除，namespace 复核只剩系统 ConfigMap 和默认 ServiceAccount。
+
+该证据关闭 A03/A04 的合法 YAML 导入、提交、刷新和 API 持久化子路径；非法 YAML、冲突、低权限、全部操作错误态和 V3 等价条件仍未完成。
