@@ -84,3 +84,9 @@ A01 仍不能标记为完整 V3 等价：主工作负载模板编辑仍保留 V3
 使用当前 131 制品和真实浏览器，在 `v4-migration-e2e` 分别创建副本数为 0 的专用 StatefulSet、不会调度 Pod 的专用 DaemonSet，以及临时 ConfigMap/Secret。直达两个工作负载的 ConfigReference 路由后，页面均正确显示工作负载名称、容器、ConfigMap/Secret 引用、键名和“应用引用”入口；两个工作负载详情 API、引用资源 API 均返回 `200`。
 
 两个页面均观测到 `/consolev3/dashboard` 请求，说明当前工作负载详情仍加载 V3/Wujie 兼容壳；因此 A03、A04 的 ConfigReference 子路径可以确认可访问，但工作负载详情的 V4 原生等价性不能关闭。专用 StatefulSet、DaemonSet、ConfigMap 和 Secret 已清理。
+
+## 2026-10-19 A05/A09/A11 应用入口补测
+
+使用当前 131 制品和真实浏览器访问项目 `/applications/template`、`/applications/edge`。两条入口均返回 `200`，原生应用列表和“创建应用”弹窗正常渲染；从“从应用模板”进入后，应用模板弹窗正常打开，但当前企业空间显示“未发现资源”，应用列表总数为 `0`，没有可触发模板选择、边缘应用创建或部署空间提交的 fixture。
+
+本轮确认了 A09 的入口、弹窗和空数据态，并确认 A05/A11 的业务入口仍由 `useV3action`/`consolev3` 兼容路径承载；没有把空数据态当成成功等价，也没有执行创建或部署写操作。A05、A09、A11 的成功、失败、取消、刷新、RBAC 和完整 V4 原生替代仍未闭环。

@@ -397,3 +397,13 @@ A01 的 ConfigReference 入口、引用展示、前缀写入/清除和 API 持�
 - 专用 StatefulSet、DaemonSet、ConfigMap、Secret 已清理并逐项确认 NotFound。
 
 A03/A04 的 ConfigReference 入口子路径已补充运行时证据，但主详情、模板编辑、错误态、低权限路径和 V3 Action 移除仍未完成，A03/A04 继续保持“未等价”。
+
+## 2026-10-19 A05/A09/A11 应用入口补测
+
+在当前 131 制品上使用真实浏览器访问项目应用模板和边缘应用入口：
+
+- `/test-workspace/clusters/host/projects/v4-migration-e2e/applications/template`、`/applications/edge` 均返回 `200`，列表页面和“创建应用”弹窗正常渲染。
+- 点击“从应用模板”后，应用模板弹窗正常打开，当前企业空间显示“未发现资源”；项目应用列表总数为 `0`。
+- 本轮确认 A09 的入口和空数据态；A05、A11 仍没有可触发的边缘应用/应用模板 fixture，未执行创建、部署或删除写操作。页面同时观测到 `/consolev3/dashboard` 兼容请求。
+
+A05、A09、A11 的成功、失败、取消、刷新、RBAC 和完整 V4 原生替代仍未验证，保持未完成；缺少 fixture 是当前环境条件，不得把空数据态写成等价通过。
