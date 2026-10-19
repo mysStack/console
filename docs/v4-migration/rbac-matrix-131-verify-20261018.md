@@ -217,3 +217,18 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 | DaemonSet   | 200 | 200 |   200 |  201 |    200 |
 
 每类资源均完成更新、创建、删除和清理；测试 namespace 最终只剩系统 `kube-root-ca.crt` ConfigMap 和默认 ServiceAccount。该结果补齐 A02～A04 的独立 admin 正向组合。`projectonly` 当前制品结果不一致、平台/联邦/DevOps/Extension 作用域和全部 V3 Action 等价仍未完成。
+
+## A02～A04 Workload 作用域组合汇总
+
+以下汇总只统计当前已取得真实浏览器/API 证据的组合；`projectonly` 采用当前制品复核结果，历史 `GET 200` 记录单独保留，不混入通过结论。
+
+| 组合                    | 企业空间绑定 | 项目绑定 | 集群绑定       | 页面/API 结论                                                         |
+| ----------------------- | ------------ | -------- | -------------- | --------------------------------------------------------------------- |
+| viewer                  | viewer       | viewer   | 无             | 页面正常；GET `200`，POST/PUT/PATCH/DELETE `403`                      |
+| operator                | viewer       | operator | 无             | 页面正常；GET/PUT/PATCH/DELETE `200`，POST `201`                      |
+| admin                   | viewer       | admin    | 无             | 页面正常；GET/PUT/PATCH/DELETE `200`，POST `201`                      |
+| workspaceonly           | viewer       | 无       | 无             | 页面 `/errors/403`；全部请求 `403`                                    |
+| projectonly（当前复核） | 无           | viewer   | 无             | 页面 `/errors/403`；GET/POST/PUT/PATCH/DELETE `403`，与历史记录不一致 |
+| clusterviewer           | viewer       | 无       | cluster-viewer | 页面正常；GET `200`，POST/PUT/PATCH/DELETE `403`                      |
+
+该表闭合了 A02～A04 当前制品的六种账号组合记录，但不等同于联邦、DevOps、Extension 或其他 V3 Action 的全局 RBAC 验收。
