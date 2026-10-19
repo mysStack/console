@@ -542,3 +542,9 @@ A12 上传成功子路径已关闭；冲突/失败反馈、低权限、完整返
 本轮继续使用单 Codex 会话和真实 Playwright，不启动子 Agent。新增平台只读账号和仅项目 viewer 账号两个作用域组合：平台只读账号的工作空间/集群/用户读取页面正常渲染并返回 `200`，创建用户、工作空间、集群均返回 `403`；仅项目账号的项目 ConfigMap GET 返回 `200`、POST 返回 `403`，直达项目路由进入 `/errors/403`。
 
 临时用户、GlobalRole、GlobalRoleBinding、WorkspaceRoleBinding、RoleBinding 和临时凭据已删除并复核不存在。RBAC 矩阵新增了平台只读读写边界和项目独立账号边界，但联邦、DevOps、扩展 Action 和全部 V3 功能逐项等价性仍未闭环。
+
+## 2026-10-20 DevOps RBAC 与环境能力补测
+
+本轮未启动子 Agent。使用临时 `dev-workspace` viewer 和平台管理员通过真实 Playwright 检查 DevOps 页面：页面都能渲染，但集群选择器显示 `host：未安装 DevOps`。viewer 的 DevOps 列表 GET 为 `404`、创建 POST 为 `403`；管理员的列表 GET 和创建 POST 均为 `404`；两种账号均可打开创建弹窗并取消，未产生状态变更。
+
+该证据区分了账号权限和环境缺失：viewer 的 `403` 是 RBAC 拒绝，管理员的 `404` 说明当前集群没有可用 DevOps API/扩展。A06/A07 的成功、失败、刷新、低权限和 V4 原生替代仍未闭环，临时用户和绑定已清理。
