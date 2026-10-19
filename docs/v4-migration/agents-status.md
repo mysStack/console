@@ -584,3 +584,5 @@ A12 上传成功子路径已关闭；冲突/失败反馈、低权限、完整返
 在第二版制品上使用真实 Playwright 复核临时 Deployment、StatefulSet、DaemonSet：三类详情页及主要子路由均能渲染；三类“编辑信息”弹窗可打开，StatefulSet/DaemonSet 取消通过，Deployment 提交描述 `v4-a02-verify` 后页面和 Kubernetes API 一致；Deployment 刷新和浏览器返回保持路由与描述；DaemonSet 的“更多操作”、原生 YAML 弹窗和取消通过。临时资源已经删除并复核 namespace 无测试残留。
 
 该补测仍只关闭 A02～A04 的部分原生详情行为，完整 YAML 持久化、所有操作错误态、低权限、回滚/重新创建/删除和 V3/Wujie 残留清理未完成。
+
+补测中的 YAML 自动化输入提交返回 HTTP `400`，但编辑器只更新了活动文本区域，缺少完整 YAML 输入证据，因此不把它记为代码失败或通过；YAML 持久化保持未验证，临时 Deployment 已删除。

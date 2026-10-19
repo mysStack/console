@@ -312,3 +312,5 @@ GitHub Actions Run `39209219839` 成功，镜像 tag 为 `feature-v4-configmaps-
 在同一第二版制品上，真实浏览器访问 `v4-migration-e2e` 中临时 Deployment、StatefulSet、DaemonSet 的原生详情页。三类页面的资源状态、修改记录、元数据、环境变量、配置引用和事件入口均能渲染；三类“编辑信息”弹窗均可打开，StatefulSet/DaemonSet 取消路径通过，Deployment 提交描述 `v4-a02-verify` 后页面和 Kubernetes API 均一致。Deployment 刷新、浏览器返回以及 DaemonSet 的“更多操作”菜单、原生 YAML 弹窗和取消路径通过。临时资源已清理，namespace 复核无残留测试资源。
 
 该补测只增加 A02～A04 的详情渲染、部分信息编辑、取消、刷新/返回和 HPA 稳定性证据；完整 YAML 持久化、所有操作成功/失败/取消、低权限和 V3/Wujie 兼容残留清理仍未完成，模块不能标记为完整 V3 等价。
+
+同一轮尝试用浏览器编辑器提交 Deployment YAML 描述变更，提交返回 HTTP `400` 且弹窗保持打开。由于自动化输入没有形成完整可引用的编辑器内容，不能将该结果判定为原生 YAML 功能失败；YAML 持久化仍为未验证，测试对象已清理。
