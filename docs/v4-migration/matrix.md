@@ -326,3 +326,7 @@ GitHub Actions Run `39209219839` 成功，镜像 tag 为 `feature-v4-configmaps-
 使用真实浏览器在 StatefulSet、DaemonSet 原生详情页分别导入合法 YAML，将描述更新为 `yaml-after-sts`、`yaml-after-ds`；提交后页面显示新值，刷新后仍保持，Kubernetes API 回读注解一致。两个临时对象已删除，namespace 复核只剩系统 ConfigMap 和默认 ServiceAccount。
 
 该证据关闭 A03/A04 的合法 YAML 导入、提交、刷新和 API 持久化子路径；非法 YAML、冲突、低权限、全部操作错误态和 V3 等价条件仍未完成。
+
+## 2026-10-20 A02 非法 YAML 错误态补测
+
+真实浏览器在临时 Deployment 的原生“编辑 YAML”中导入缺少 `apiVersion`、`kind` 和 `metadata.name` 的非法文件；提交返回 `400 BadRequest`，页面显示错误信息且编辑对话框保持打开，Kubernetes 对象 generation 未变化。临时对象已删除。该项关闭 A02 非法 YAML 错误反馈和不写入保护；A03/A04 及冲突、低权限和完整 V3 等价条件仍未完成。

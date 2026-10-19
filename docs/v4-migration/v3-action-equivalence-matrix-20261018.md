@@ -290,3 +290,14 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 | DaemonSet   |      200 |       403 |      403 |        403 |         403 |
 
 临时 Workload 和账号绑定已清理。该证据关闭 A02～A04 当前项目 viewer 组合的读写拒绝子路径；operator/admin 正向操作的完整字段和错误态、低权限其他作用域、回滚/重新创建/删除、V3 Action 移除以及 `/consolev3/dashboard` 全局预加载仍未闭环。
+
+## 2026-10-20 A02 原生 YAML 非法内容错误态补测
+
+在 131 当前制品上创建临时 Deployment `v4-invalid-yaml-20261020`，通过真实浏览器打开原生“编辑 YAML”，使用文件导入提交缺少 `apiVersion`、`kind` 和 `metadata.name` 的非法 YAML。
+
+- 点击确定后 Kubernetes API 返回 `400 BadRequest`。
+- 页面显示 `BadRequest` 及“name must be provided”错误信息，编辑对话框保持打开，用户可以继续修正或取消。
+- Kubernetes API 回读对象 generation 未变化，原对象没有被错误内容覆盖。
+- 临时 Deployment 已删除，namespace 复核只剩系统 ConfigMap 和默认 ServiceAccount。
+
+该证据关闭 A02 的非法 YAML 错误反馈和不写入保护子路径。A03/A04 非法 YAML、resourceVersion 冲突、低权限错误态、完整操作组合和 V3/Wujie 清理仍未闭环。
