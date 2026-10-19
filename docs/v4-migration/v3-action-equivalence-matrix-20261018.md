@@ -7,27 +7,27 @@
 
 ## 业务调用点
 
-| 编号 | 当前调用文件                                            | Action                        | 旧源码证据                                       | V4 替代/当前状态                                                                                                    | 运行时状态 |
-| ---- | ------------------------------------------------------- | ----------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- | ---------- |
-| A01  | `projects/components/ConfigReference/entry.tsx`         | `workload.template.edit`      | `src/actions/workload.js`                        | 已有原生 ConfigReference 编辑逻辑，但仍保留 V3 Action 兼容入口                                                      | 未闭环     |
-| A02  | `projects/.../Deployments/Detail/index.tsx`             | 默认 `workload.template.edit` | `src/actions/workload.js`                        | 项目 Deployment 详情已切换到原生 Workload Detail；“编辑设置”改走原生 YAML 编辑器，完整字段等价和全局预加载仍待验证  | 部分验证   |
-| A03  | `projects/.../StatefulSets/Detail/index.tsx`            | 默认 `workload.template.edit` | `src/actions/workload.js`                        | 项目 StatefulSet 详情已切换到原生 Workload Detail；“编辑设置”改走原生 YAML 编辑器，完整字段等价和全局预加载仍待验证 | 部分验证   |
-| A04  | `projects/.../DaemonSets/Detail/index.tsx`              | 默认 `workload.template.edit` | `src/actions/workload.js`                        | 项目 DaemonSet 详情已切换到原生 Workload Detail；“编辑设置”改走原生 YAML 编辑器，完整字段等价和全局预加载仍待验证   | 部分验证   |
-| A05  | `projects/.../Applications/.../OPAppTable/index.tsx`    | `batch.deploy.app.create.v2`  | 当前 `v3dist` 有字符串，`release-3.4` 未直接匹配 | 当前仍由 V3 Action 打开边缘应用模板创建                                                                             | 未验证     |
-| A06  | `pages/workspaces/containers/Devops/index.tsx`          | `devops.edit`                 | `src/actions/devops.js`                          | 当前仍由 V3 Action 打开 DevOps 编辑流程                                                                             | 未验证     |
-| A07  | `pages/workspaces/containers/Devops/index.tsx`          | `devops.create`               | `src/actions/devops.js`                          | 当前仍由 V3 Action 打开 DevOps 创建流程                                                                             | 未验证     |
-| A08  | `core/.../ProfileMenu/index.tsx`                        | `notification.user.setting`   | `release-3.4` 未直接匹配                         | 当前仍由 V3 Action 打开用户通知设置                                                                                 | 未验证     |
-| A09  | `shared/components/Apps/AppCreate/index.tsx`            | `app.template.create.v2`      | 当前 `v3dist` 有字符串，旧源码未直接匹配         | 已在项目应用页打开“从应用模板”并完成远程模板选择；完整 V4 替代、失败/取消和低权限仍待验证                           | 部分验证   |
-| A10  | `shared/.../EdgeWorkloads/index.tsx`                    | `workload.batch.delete.v2`    | 当前 `v3dist` 有字符串，旧源码未直接匹配         | 当前仍由 V3 Action 执行边缘工作负载批量删除                                                                         | 未验证     |
-| A11  | `shared/components/Apps/AppsDeploySpaceModal/index.tsx` | `batch.deploy.app.create.v2`  | 当前 `v3dist` 有字符串，旧源码未直接匹配         | 已完成远程 Helm 模板选择、项目安装和 Application 创建；完整部署等价、失败/取消和低权限仍待验证                      | 部分验证   |
-| A12  | `shared/components/Modals/AppTemplateEdit/index.tsx`    | `openpitrix.template.edit.v2` | 当前 `v3dist` 有字符串，旧源码未直接匹配         | 编辑表单、字段回填、保存、删除和上传成功子路径已有运行时证据；冲突/失败、低权限和 V3 Action 移除仍未闭环            | 部分验证   |
+| 编号 | 当前调用文件                                                                                                 | Action                        | 旧源码证据                                       | V4 替代/当前状态                                                                                                                                                        | 运行时状态 |
+| ---- | ------------------------------------------------------------------------------------------------------------ | ----------------------------- | ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| A01  | `projects/components/ConfigReference/entry.tsx`                                                              | `workload.template.edit`      | `src/actions/workload.js`                        | 已有原生 ConfigReference 编辑逻辑，但仍保留 V3 Action 兼容入口                                                                                                          | 未闭环     |
+| A02  | 活动路由由 `projects/routes/detail.tsx` 导入 `ApplicationWorkloads/Workloads/Deployments/Detail/routes.tsx`  | 历史 `workload.template.edit` | `src/actions/workload.js`                        | 当前活动详情使用原生 Workload Detail；旧 `projects/containers/Deployments/Detail/index.tsx` 仍是未从活动路由导入的兼容残留。原生字段、错误态、权限和全局预加载仍待验证  | 部分验证   |
+| A03  | 活动路由由 `projects/routes/detail.tsx` 导入 `ApplicationWorkloads/Workloads/StatefulSets/Detail/routes.tsx` | 历史 `workload.template.edit` | `src/actions/workload.js`                        | 当前活动详情使用原生 Workload Detail；旧 `projects/containers/StatefulSets/Detail/index.tsx` 仍是未从活动路由导入的兼容残留。原生字段、错误态、权限和全局预加载仍待验证 | 部分验证   |
+| A04  | 活动路由由 `projects/routes/detail.tsx` 导入 `ApplicationWorkloads/Workloads/DaemonSets/Detail/routes.tsx`   | 历史 `workload.template.edit` | `src/actions/workload.js`                        | 当前活动详情使用原生 Workload Detail；旧 `projects/containers/DaemonSets/Detail/index.tsx` 仍是未从活动路由导入的兼容残留。原生字段、错误态、权限和全局预加载仍待验证   | 部分验证   |
+| A05  | `projects/.../Applications/.../OPAppTable/index.tsx`                                                         | `batch.deploy.app.create.v2`  | 当前 `v3dist` 有字符串，`release-3.4` 未直接匹配 | 当前仍由 V3 Action 打开边缘应用模板创建                                                                                                                                 | 未验证     |
+| A06  | `pages/workspaces/containers/Devops/index.tsx`                                                               | `devops.edit`                 | `src/actions/devops.js`                          | 当前仍由 V3 Action 打开 DevOps 编辑流程                                                                                                                                 | 未验证     |
+| A07  | `pages/workspaces/containers/Devops/index.tsx`                                                               | `devops.create`               | `src/actions/devops.js`                          | 当前仍由 V3 Action 打开 DevOps 创建流程                                                                                                                                 | 未验证     |
+| A08  | `core/.../ProfileMenu/index.tsx`                                                                             | `notification.user.setting`   | `release-3.4` 未直接匹配                         | 当前仍由 V3 Action 打开用户通知设置                                                                                                                                     | 未验证     |
+| A09  | `shared/components/Apps/AppCreate/index.tsx`                                                                 | `app.template.create.v2`      | 当前 `v3dist` 有字符串，旧源码未直接匹配         | 已在项目应用页打开“从应用模板”并完成远程模板选择；完整 V4 替代、失败/取消和低权限仍待验证                                                                               | 部分验证   |
+| A10  | `shared/.../EdgeWorkloads/index.tsx`                                                                         | `workload.batch.delete.v2`    | 当前 `v3dist` 有字符串，旧源码未直接匹配         | 当前仍由 V3 Action 执行边缘工作负载批量删除                                                                                                                             | 未验证     |
+| A11  | `shared/components/Apps/AppsDeploySpaceModal/index.tsx`                                                      | `batch.deploy.app.create.v2`  | 当前 `v3dist` 有字符串，旧源码未直接匹配         | 已完成远程 Helm 模板选择、项目安装和 Application 创建；完整部署等价、失败/取消和低权限仍待验证                                                                          | 部分验证   |
+| A12  | `shared/components/Modals/AppTemplateEdit/index.tsx`                                                         | `openpitrix.template.edit.v2` | 当前 `v3dist` 有字符串，旧源码未直接匹配         | 编辑表单、字段回填、保存、删除和上传成功子路径已有运行时证据；冲突/失败、低权限和 V3 Action 移除仍未闭环                                                                | 部分验证   |
 
 A02～A04 和 A01 共涉及三类工作负载详情与配置引用；A05～A12 是独立业务入口。桥接实现和导出文件不重复计数，但删除桥接前必须关闭所有业务调用点。
 
 ## 已完成和未完成的边界
 
 - ConfigMap、Secret、ServiceAccount 资源本身的 V3 Action 等价性已单独记录在[资源模块等价性记录](./v3-equivalence-config-secrets-131-20261018.md)。
-- A02～A04 的项目详情入口已切换到原生 Workload Detail，源文件不再依赖 `useV3action`/`WujieReact`；“编辑设置”当前复用原生 YAML 编辑器。完整字段、成功/失败/取消和权限等价仍未关闭，应用启动层仍会预加载 `/consolev3/dashboard`。
+- A02～A04 的活动项目详情路由已切换到 `ApplicationWorkloads/Workloads/*/Detail` 原生实现，当前活动路由文件不再依赖 `useV3action`/`WujieReact`；“编辑设置”复用原生 YAML 编辑器。旧 `projects/containers/{Deployments,StatefulSets,DaemonSets}/Detail` 文件仍存在，但当前 `routes/detail.tsx` 没有导入它们，删除前仍需完成全仓库路由和联邦引用复核。完整字段、成功/失败/取消和权限等价仍未关闭，应用启动层仍会预加载 `/consolev3/dashboard`。
 - A05～A12 目前只有静态调用、旧制品字符串或部分 V4 Store 证据，没有完整的 131 触发入口、Network、RBAC、失败和取消路径证据。
 - 扩展初始化错误按负责人指令延期；延期不等同于这些 Action 已等价。
 - 真实 API Server 故障验证另行记录，不能用 Playwright 路由拦截冒充集群故障。
@@ -223,3 +223,13 @@ A01 仍不能标记为完整 V3 等价：主工作负载模板编辑仍保留 V3
 - 当前集群 API/CRD 盘点没有发现可用于 A05/A10 的 KubeSphere Edge 或 FederatedProject/FederatedResource 资源，因此无法触发边缘应用创建、边缘批量删除或联邦资源 CRUD。
 
 A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达、空列表、禁用按钮或兼容资源加载替代成功、失败、取消、权限、刷新和 V4 替代行为验证。
+
+## 2026-10-20 活动路由与动态 Action 重新核对
+
+重新以当前分支源码为准核对 `packages/console/src/pages/projects/routes/detail.tsx` 和非测试源码中的 `useV3action/useV3Actions`：
+
+- 活动路由明确导入 `ApplicationWorkloads/Workloads/Deployments/Detail/routes.tsx`、`StatefulSets/Detail/routes.tsx` 和 `DaemonSets/Detail/routes.tsx`，对应活动详情实现使用原生 Store、原生详情页和原生编辑操作。
+- 当前非测试源码中 `useV3action/useV3Actions` 命中 11 个文件：8 个业务调用文件、2 个桥接实现/Hook 文件和 1 个导出文件；对应 9 个活动业务 Action 行（DevOps 拆成 create/edit）。A02～A04 不再属于当前活动动态 Action 调用点。
+- 旧 `projects/containers/{Deployments,StatefulSets,DaemonSets}/Detail/index.tsx` 仍包含 `WujieReact`，但没有被当前项目详情路由导入；它们属于待清理的兼容残留，不能直接删除，必须先完成其他路由、测试和联邦消费者复核。
+
+该核对修正了“历史调用点数量”和“当前活动调用点数量”的混用。它只关闭了 A02～A04 的活动路由归属证据，不代表完整 Workload 功能等价、全局 V3/Wujie 移除或兼容残留清理已经完成。

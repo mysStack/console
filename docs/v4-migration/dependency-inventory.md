@@ -49,6 +49,18 @@ rg -l --hidden --glob '!.git/**' --glob '!node_modules/**' \
 
 复核命令仍是文件级统计，结果存在交集，不能替代菜单启用状态、Network、API RBAC 或浏览器功能等价性证据。当前只更新静态取证范围，未因数字变化关闭任何 V3/Wujie 迁移项。
 
+## 2026-10-20 活动源码口径复核
+
+为区分历史编译输出、旧兼容文件和当前活动路由，本轮在 `packages/console/src`、`packages/core/src`、`packages/shared/src` 中排除测试文件后重新统计：
+
+| 引用类型                       | 当前源码文件数 | 说明                                                                    |
+| ------------------------------ | -------------: | ----------------------------------------------------------------------- |
+| `useV3action` / `useV3Actions` |             11 | 8 个业务调用文件、2 个桥接实现/Hook 文件、1 个导出文件                  |
+| `WujieReact`                   |            117 | 当前源码仍有活动 Embed、兼容残留和扩展入口，不能直接视为 117 个启用页面 |
+| `consolev3`                    |            121 | URL、Wujie 工具、路由转换和桥接实现的文件级命中                         |
+
+当前项目 Deployment、StatefulSet、DaemonSet 活动详情路由已由 `projects/routes/detail.tsx` 导入 `ApplicationWorkloads/Workloads/*/Detail/routes.tsx`；旧 `projects/containers/*/Detail` 文件仍被静态扫描命中，但不在该活动导入链上。历史 P0 统计保留作为历史证据，本节数字用于当前分支的活动源码复核，不代表全仓库 V3/Wujie 已移除。
+
 ## 运行时入口
 
 | 入口                                                                | 源码证据                                                     | 当前作用                             | 迁移状态                     |

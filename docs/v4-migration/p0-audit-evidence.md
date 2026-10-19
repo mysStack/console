@@ -28,14 +28,14 @@ rg -l --glob '!packages/bootstrap/assets/v3dist/**' --glob '!**/*.map' \
 
 结果如下。计数单位是“包含匹配文本的文件数”，不是运行时路由数，不能直接当作迁移模块数量：
 
-| 关键词 | 文件数 | 解释 |
-| --- | ---: | --- |
-| `WujieReact` | 124 | V3 微前端挂载或嵌入入口候选 |
-| `ConsoleV3ResourceList` | 28 | 复用 V3 资源列表的页面候选 |
-| `ExtensionConsoleV3Embed` | 5 | 扩展嵌入组件引用 |
-| `useV3action` | 14 | V3 动态 Action 调用候选 |
-| `/consolev3` | 98 | V3 路由字符串或路由转换逻辑 |
-| `v3dist` | 3 | 编译制品复制、删除或目录引用 |
+| 关键词                    | 文件数 | 解释                         |
+| ------------------------- | -----: | ---------------------------- |
+| `WujieReact`              |    124 | V3 微前端挂载或嵌入入口候选  |
+| `ConsoleV3ResourceList`   |     28 | 复用 V3 资源列表的页面候选   |
+| `ExtensionConsoleV3Embed` |      5 | 扩展嵌入组件引用             |
+| `useV3action`             |     14 | V3 动态 Action 调用候选      |
+| `/consolev3`              |     98 | V3 路由字符串或路由转换逻辑  |
+| `v3dist`                  |      3 | 编译制品复制、删除或目录引用 |
 
 在 `packages/console/src/pages` 下使用以下命令得到 429 个包含相关匹配的页面文件：
 
@@ -81,12 +81,18 @@ rg -l 'WujieReact|ConsoleV3ResourceList|ExtensionConsoleV3Embed|useV3action|/con
 
 ### 未知项和关闭条件
 
-| ID | 未知项 | 影响 | 关闭条件 |
-| --- | --- | --- | --- |
-| P0-U002-A | 429 个页面引用中哪些是当前启用入口 | 高 | 从路由注册、菜单/权限和 131 运行时入口建立去重清单 |
-| P0-U002-B | 各 V3 Action 的触发菜单、参数和替代 V4 行为 | 高 | 逐项建立 Action、API、权限、错误态和替代实现矩阵 |
-| P0-U002-C | 扩展嵌入是否仍被已启用扩展消费 | 中高 | 枚举扩展清单并在目标制品和运行时核对加载结果 |
-| P0-U002-D | 删除 `v3dist` 对构建、部署和回滚的影响 | 高 | 完成构建制品对照、部署 rollout 和已部署制品验收 |
+| ID        | 未知项                                      | 影响 | 关闭条件                                           |
+| --------- | ------------------------------------------- | ---- | -------------------------------------------------- |
+| P0-U002-A | 429 个页面引用中哪些是当前启用入口          | 高   | 从路由注册、菜单/权限和 131 运行时入口建立去重清单 |
+| P0-U002-B | 各 V3 Action 的触发菜单、参数和替代 V4 行为 | 高   | 逐项建立 Action、API、权限、错误态和替代实现矩阵   |
+| P0-U002-C | 扩展嵌入是否仍被已启用扩展消费              | 中高 | 枚举扩展清单并在目标制品和运行时核对加载结果       |
+| P0-U002-D | 删除 `v3dist` 对构建、部署和回滚的影响      | 高   | 完成构建制品对照、部署 rollout 和已部署制品验收    |
+
+## 5. 2026-10-20 当前活动路由复核补充
+
+本文件首轮统计基于 P0 取证分支，不能覆盖后续模块提交。当前 `feature/v4-configmaps-secrets` 重新核对发现，项目 Deployment、StatefulSet、DaemonSet 详情的活动路由已由 `packages/console/src/pages/projects/routes/detail.tsx` 导入 `ApplicationWorkloads/Workloads/*/Detail/routes.tsx`；旧 `projects/containers/*/Detail` 文件仍保留 Wujie 代码，但未被该活动路由文件导入。
+
+因此，历史 `useV3action` 文件数和业务调用数只能作为基线快照；当前分支非测试源码的活动动态 Action 统计为 11 个文件、8 个业务调用文件和 9 个业务 Action 行。该补充只修正统计和活动路由归属，不关闭 P0-U002/P0-U003，也不授权删除兼容残留。
 
 ## 5. 门禁结论
 

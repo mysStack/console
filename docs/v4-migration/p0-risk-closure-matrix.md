@@ -85,3 +85,9 @@
 | 阻塞     | P0-U001/P0-U004 缺少当前外部 V3 镜像的源码构建元数据；独立人工/其他复核未完成；PR #1 同时混入 P0 文档，尚未具备合并条件                                                                                                   |
 
 本矩阵不改变 P0 门禁结论：P0-REA 仍为“分析中，待负责人复核”，不进入 P1/P2 正式开发，不删除 V3/Wujie，不合并 Draft PR #1。运行时细节见 [`p0-runtime-closure-20261017.md`](./p0-runtime-closure-20261017.md)。
+
+## 2026-10-20 当前活动调用口径修正
+
+当前分支非测试源码重新扫描得到 11 个 `useV3action/useV3Actions` 文件：8 个业务调用文件、2 个桥接实现/Hook 文件和 1 个导出文件。A02～A04 的活动项目详情路由已切换到原生 `ApplicationWorkloads/Workloads/*/Detail/routes.tsx`，因此历史矩阵中的 11 个业务调用文件属于早期基线，不能直接套用于当前活动调用统计。
+
+旧 `projects/containers/{Deployments,StatefulSets,DaemonSets}/Detail` 文件仍包含 Wujie 代码，当前仅确认它们不在活动项目详情路由导入链上；其他消费者、联邦入口和测试引用仍需继续复核。该修正不关闭 P0-U002/P0-U003。
