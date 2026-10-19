@@ -14,7 +14,7 @@ import {
   hpaStore,
   ReplicaCard,
   getActions,
-  getApiVersion,
+  getHpaApiVersion,
 } from '@ks-console/shared';
 import HpaCard from '../Cards/HpaCard';
 
@@ -113,7 +113,7 @@ const ResourceStatus = ({ detailPropsName }: IProps) => {
 
   const fetchHpaDetail = async () => {
     const k8sVersion = globals.clusterConfig?.[params.cluster!]?.k8sVersion;
-    const version = getApiVersion('horizontalpodautoscalers', k8sVersion);
+    const version = getHpaApiVersion(k8sVersion);
     const url = `/clusters/${params.cluster}/apis/${version}/namespaces/${params.namespace}/horizontalpodautoscalers/${params.name}`;
     checkName(detail, {}, url).then(async (resp: any) => {
       if (resp.exist) {
