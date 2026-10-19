@@ -697,3 +697,7 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 | 当前结论   | API Server 实际故障证据扩大到六类 Kubernetes 资源列表；全部页面、写操作、V3 Action 和全量 RBAC 仍未完成                                                                  |
 
 详细采样和恢复证据见 [`api-server-fault-verify-20261018.md`](./api-server-fault-verify-20261018.md)。
+
+## 2026-10-20 当前环境 fixture 复核
+
+只读复核 131 集群发现：当前没有 EdgeWorkload、FederatedProject 或 FederatedResource API/CRD；`devops` 扩展版本对象存在，但扩展状态不是 `Installed`，没有可用 DevOps API。A05、A06、A07、A10 仍属于环境不可执行项，未擅自安装扩展或创建伪造 fixture；A08 的通知扩展同样未启用。该结果继续作为 V3 Action 逐项矩阵的未验证边界。
