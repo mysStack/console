@@ -15,6 +15,8 @@
 - 当前 Pod 为 `ks-console-959cd4457-vxk5m`，Pod imageID 与上述制品 digest 一致；
 - `v4-migration-e2e` 保留，未发现本轮 RBAC 矩阵使用的临时用户、绑定或测试资源残留。
 
+2026-10-19 复核时，当前制品已更新为 `1f711bb66b3b`：Deployment `generation/observedGeneration=519/519`，镜像 tag 为 `feature-v4-configmaps-secrets-20261018-225142-1f711bb66b3b`，Pod `ks-console-797469cf84-mgndq` 为 `Running/Ready`，实际 imageID 对应 manifest digest `sha256:5fc81a366fc59ebd9c3d19e57eb6c8d0a1d70453748c622324a0a8c16b8afc02`。测试 namespace 只保留既有历史对象和默认 ServiceAccount，本轮临时工作负载、ConfigMap、Secret 均已清理。
+
 ## 已完成的替代性错误态验证
 
 此前已在真实 Playwright 浏览器中对 ConfigMap 列表 API 做请求路由拦截，页面显示 `Network Error`，并确认没有再抛出无 response 异常。该验证只证明前端网络错误处理，不等价于 API Server 实际不可用。

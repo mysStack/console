@@ -213,3 +213,10 @@ ConfigMap、Secret、ServiceAccount 的基础 CRUD、元数据、YAML、脱敏�
 本次实际看到名称 `configmap`、描述、分类 `kubesphere-app-uncategorized`、图标和服务商网站均正确回填；弹窗未再出现 `toUpperCase` 导致的空白页。点击“取消”后弹窗关闭，仍停留在版本列表页，没有产生写请求。Deployment generation/observedGeneration 为 `519/519`，Pod `ks-console-797469cf84-mgndq` 为 `Running/Ready`，实际 imageID 对应 manifest digest `sha256:5fc81a366fc59ebd9c3d19e57eb6c8d0a1d70453748c622324a0a8c16b8afc02`。
 
 本次只关闭 A12 的“编辑表单渲染、字段回填和取消”子缺口。应用模板编辑保存、删除、上传成功、上传失败/取消完整路径、项目从模板创建，以及 V3 Action 移除仍未验证；扩展初始化错误继续按负责人指令延期。
+
+## 2026-10-19 全部业务 Action 针对性补测
+
+- A01：在当前 131 制品上，ConfigReference 的 Deployment 入口完成引用展示、前缀写入、清除和 API 持久化验证；StatefulSet、DaemonSet 入口完成页面、引用和 API `200` 验证。三个入口均仍观测到 `/consolev3/dashboard` 兼容请求，主工作负载编辑仍未完成 V4 原生等价。
+- A05/A09/A11：项目应用模板、边缘应用创建入口和“从应用模板”抽屉均能渲染；当前企业空间模板列表为空，未执行创建或部署写操作，成功/失败/取消和 V4 替代仍未验证。
+
+本轮没有修改 `release-4.1.5`，没有删除 V3/Wujie 桥接，也没有把空数据态或兼容壳页面标记为等价通过。A02、A06～A08、A10、A12 的完整成功/失败/取消、RBAC 和 V4 替代证据仍未闭环。
