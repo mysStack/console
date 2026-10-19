@@ -234,3 +234,11 @@ A10：只读检查确认当前集群没有 Edge/EdgeWorkload 相关 CRD 或 API 
 提交 `3a14e96f1` 已将项目 Deployment、StatefulSet、DaemonSet 详情路由切换到已有原生 Workload Detail，并在 131 完成构建制品、rollout 和真实浏览器复验。三个详情页请求工作负载 API 并渲染原生资源状态页，没有 `wujie-app` 元素；镜像 tag 为 `feature-v4-configmaps-secrets-20261019-115905-3a14e96f10b5`，Pod imageID 对应 manifest digest `sha256:e61af451d3425e60445cd097549cb6a1e53e4fc511f4a14fad3388c3e03155fd`。
 
 该增量仍不是完整 V3 等价：应用启动层继续预加载 `/consolev3/dashboard`，原生 YAML 编辑器尚未完成与旧模板编辑表单的全部字段、失败/取消、低权限和刷新返回逐项对照。A02～A04 状态更新为“部分验证”，全局 P0 和全部 V3 功能验收状态不变。
+
+## 2026-10-19 应用模板远程选择和项目安装补测
+
+在当前 131 部署制品上，使用专用临时账号通过真实浏览器进入 `v4-migration-e2e` 项目应用页面，选择 `stakater/configmap` 远程模板，输入唯一名称并完成安装。浏览器捕获 Application `POST 200`，应用列表刷新后显示测试应用，详情、资源状态、应用模板和应用设置页面均可渲染，相关详情和版本 API 返回 `200`。
+
+本轮部署制品为 `feature-v4-configmaps-secrets-20261019-115905-3a14e96f10b5`，manifest digest 为 `sha256:e61af451d3425e60445cd097549cb6a1e53e4fc511f4a14fad3388c3e03155fd`；Pod `ks-console-57fcd4d59f-sn5cp` 为 `Running/Ready`，实际 imageID 与该 digest 一致。
+
+首次访问详情页时，后台系统网关请求返回 `403`，全局错误处理跳转到 `/errors/403`；补充临时集群管理员绑定后详情页恢复。该绑定仅用于定位测试环境权限条件，已与临时 Application、版本、账号及其他绑定一并清理。A09/A11 现在有真实成功子路径证据，但失败/取消、低权限和完整 V4 替代仍未闭环，不能标记为已验收。

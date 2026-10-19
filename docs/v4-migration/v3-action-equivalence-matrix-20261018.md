@@ -17,9 +17,9 @@
 | A06  | `pages/workspaces/containers/Devops/index.tsx`          | `devops.edit`                 | `src/actions/devops.js`                          | 当前仍由 V3 Action 打开 DevOps 编辑流程                                                                             | 未验证     |
 | A07  | `pages/workspaces/containers/Devops/index.tsx`          | `devops.create`               | `src/actions/devops.js`                          | 当前仍由 V3 Action 打开 DevOps 创建流程                                                                             | 未验证     |
 | A08  | `core/.../ProfileMenu/index.tsx`                        | `notification.user.setting`   | `release-3.4` 未直接匹配                         | 当前仍由 V3 Action 打开用户通知设置                                                                                 | 未验证     |
-| A09  | `shared/components/Apps/AppCreate/index.tsx`            | `app.template.create.v2`      | 当前 `v3dist` 有字符串，旧源码未直接匹配         | 当前仍由 V3 Action 打开应用模板创建                                                                                 | 未验证     |
+| A09  | `shared/components/Apps/AppCreate/index.tsx`            | `app.template.create.v2`      | 当前 `v3dist` 有字符串，旧源码未直接匹配         | 已在项目应用页打开“从应用模板”并完成远程模板选择；完整 V4 替代、失败/取消和低权限仍待验证                           | 部分验证   |
 | A10  | `shared/.../EdgeWorkloads/index.tsx`                    | `workload.batch.delete.v2`    | 当前 `v3dist` 有字符串，旧源码未直接匹配         | 当前仍由 V3 Action 执行边缘工作负载批量删除                                                                         | 未验证     |
-| A11  | `shared/components/Apps/AppsDeploySpaceModal/index.tsx` | `batch.deploy.app.create.v2`  | 当前 `v3dist` 有字符串，旧源码未直接匹配         | 当前仍由 V3 Action 调起部署弹窗，之后才调用 V4 `deployApp`                                                          | 未验证     |
+| A11  | `shared/components/Apps/AppsDeploySpaceModal/index.tsx` | `batch.deploy.app.create.v2`  | 当前 `v3dist` 有字符串，旧源码未直接匹配         | 已完成远程 Helm 模板选择、项目安装和 Application 创建；完整部署等价、失败/取消和低权限仍待验证                      | 部分验证   |
 | A12  | `shared/components/Modals/AppTemplateEdit/index.tsx`    | `openpitrix.template.edit.v2` | 当前 `v3dist` 有字符串，旧源码未直接匹配         | 编辑表单、字段回填、保存和删除已有运行时证据；上传、低权限和 V3 Action 移除仍未闭环                                 | 部分验证   |
 
 A02～A04 和 A01 共涉及三类工作负载详情与配置引用；A05～A12 是独立业务入口。桥接实现和导出文件不重复计数，但删除桥接前必须关闭所有业务调用点。
@@ -93,7 +93,20 @@ A01 仍不能标记为完整 V3 等价：主工作负载模板编辑仍保留 V3
 
 使用当前 131 制品和真实浏览器访问项目 `/applications/template`、`/applications/edge`。两条入口均返回 `200`，原生应用列表和“创建应用”弹窗正常渲染；从“从应用模板”进入后，应用模板弹窗正常打开，但当前企业空间显示“未发现资源”，应用列表总数为 `0`，没有可触发模板选择、边缘应用创建或部署空间提交的 fixture。
 
-本轮确认了 A09 的入口、弹窗和空数据态，并确认 A05/A11 的业务入口仍由 `useV3action`/`consolev3` 兼容路径承载；没有把空数据态当成成功等价，也没有执行创建或部署写操作。A05、A09、A11 的成功、失败、取消、刷新、RBAC 和完整 V4 原生替代仍未闭环。
+本轮确认了 A09 的入口、弹窗和空数据态，并确认 A05/A11 的业务入口仍由 `useV3action`/`consolev3` 兼容路径承载；没有把空数据态当成成功等价。此前的空数据态记录由下方远程模板补测更新，A05 仍未验证，A09/A11 转为部分验证。
+
+## 2026-10-19 A09/A11 远程模板创建和项目安装补测
+
+为关闭此前“项目没有可用模板 fixture”的环境缺口，在 `test-workspace` 使用专用临时账号登录 131，进入项目 `v4-migration-e2e` 的应用页面，实际选择远程仓库 `stakater` 的 `configmap` 模板并打开原生安装流程。
+
+- 本轮使用部署制品 `feature-v4-configmaps-secrets-20261019-115905-3a14e96f10b5`，manifest digest 为 `sha256:e61af451d3425e60445cd097549cb6a1e53e4fc511f4a14fad3388c3e03155fd`；Pod `ks-console-57fcd4d59f-sn5cp` 为 `Running/Ready`，实际 imageID 与该 digest 一致。
+- “从应用模板”弹窗、远程仓库选择、模板详情和版本选择均正常渲染。
+- 输入唯一测试名称 `v4-app-template-20261019` 后完成应用设置并点击“安装”；浏览器捕获 Application 创建 `POST 200`，应用列表随后显示该对象为“已创建”，刷新后显示为“运行中”。
+- 创建后的项目应用详情、资源状态、应用模板和应用设置三个原生子页面均可渲染；详情 API、版本 API 和应用设置页面请求均返回 `200`。
+- 首次打开详情页时，测试账号对系统网关 API 的 `403` 被全局错误处理跳转到 `/errors/403`。临时补充集群管理员绑定后重新登录，详情页才可访问。该权限只用于定位页面验收条件，已在测试后删除；因此本轮不能作为低权限通过。
+- 本轮临时 Application、相关版本、测试用户、WorkspaceRoleBinding、项目 RoleBinding 和临时集群绑定均已删除；`v4-migration-e2e` namespace 保留。
+
+本轮为 A09 的入口、模板选择和 A11 的项目安装/创建增加了真实成功证据，因此二者调整为“部分验证”。失败、取消、删除、刷新返回、低权限正反路径、完整 V4 原生替代以及 V3/Wujie 启动层预加载仍未闭环；A05 边缘应用仍因缺少 Edge fixture 保持未验证。
 
 ## 2026-10-19 A06/A07/A08 DevOps 与通知入口补测
 
