@@ -456,3 +456,15 @@ A02 的页面入口和取消子路径已取证，但模板编辑成功/失败、
 - 清理：临时 debug Pod `node-debugger-dev01-s4grv` 已删除；`v4-migration-e2e` namespace 保留。
 
 该证据关闭真实 API Server 故障环境验证项，但只覆盖三个目标资源列表的故障和恢复行为；全部 V3 功能等价性、全局扩展运行时错误和其他模块级 VERIFY 条件仍按各自记录处理。全局 P0 仍为“分析中，待负责人复核”，PR #1 继续保持 Draft。完整命令、样本和边界见 [`api-server-fault-verify-20261018.md`](./api-server-fault-verify-20261018.md)。
+
+## 2026-10-19 A02/A03/A04 原生详情切换与部署后复验
+
+本轮完成项目 Deployment、StatefulSet、DaemonSet 详情路由切换。提交 `3a14e96f1` 使用已有原生 Workload Detail，移除三个项目详情组件中的 `useV3action`/`WujieReact` 直接依赖；“编辑设置”入口改为原生 YAML 编辑器，保留编辑、回滚、伸缩、重启、删除和配置引用入口。
+
+- 本地：`corepack yarn build:packages` 通过；`./scripts/test.sh` 通过，66 个测试文件、243 个测试通过；新增的原生详情和路由测试通过。
+- CI：Run `39197149133` 成功，Unit tests 和镜像构建均通过。
+- 131：镜像 tag `feature-v4-configmaps-secrets-20261019-115905-3a14e96f10b5`，manifest digest `sha256:e61af451d3425e60445cd097549cb6a1e53e4fc511f4a14fad3388c3e03155fd`；Deployment `521/521`；Pod `ks-console-57fcd4d59f-sn5cp` Ready，实际 imageID 与 manifest digest 一致。
+- 浏览器：三个原生详情路由均渲染，工作负载 API 为 `200`，没有 `wujie-app` 元素；“编辑设置”可打开原生编辑器，未提交写操作。
+- 边界：应用启动仍有全局 `/consolev3/dashboard` 预加载请求；完整模板字段、写入成功/失败/取消、低权限、刷新/返回和全局 V3/Wujie 清理仍未完成。
+
+本轮关闭的是三个项目详情组件的直接 V3 Action 桥接，不是全部 V3 Action 等价。临时测试工作负载已清理，`v4-migration-e2e` namespace 保留。
