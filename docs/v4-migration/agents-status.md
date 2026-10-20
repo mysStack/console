@@ -862,3 +862,11 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 ## 2026-10-21 131 部署状态修正
 
 本轮复核发现单节点 CPU 不足导致 `ks-console` 在 `maxUnavailable=0/maxSurge=1` 下残留一个 Pending 旧 ReplicaSet Pod，Deployment 曾报告超过 progress deadline；这不是代码测试结果。按已授权测试环境操作，将策略临时调整为 `maxUnavailable=1/maxSurge=0`，rollout 已成功，当前 Deployment 状态为 `replicas=1/updated=1/ready=1/available=1`，仅保留一个 Running/Ready Pod，Pod imageID 与 `sha256:ffe166aa35e105d463e3b1d37e14fca3595088706e1eecfe5daf7c97518fb3ac` 一致。该环境限制仍需在后续部署记录中保留，不能把单节点上的默认滚动策略容量不足写成应用故障。
+
+## 2026-10-21 API Server 六类资源写故障补测
+
+- 状态：已完成本轮故障注入和恢复核验；API Server 故障证据覆盖范围扩大，仍不等于所有页面错误和重试路径已验收。
+- 实际操作：在 `v4-migration-e2e` 创建临时 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet，使用真实浏览器会话对六类资源分别执行 PATCH 和 POST。
+- 结果：六类 PATCH 均返回 `502`，六类 POST 均返回 `502`；恢复后已有对象未出现临时标签，所有新对象均不存在。六类 DELETE 在故障窗口内均为连接级失败，没有 HTTP 状态码，恢复后对象仍存在。
+- 恢复：K3s 自动恢复，`/readyz=ok`、`dev01 Ready`；全部临时资源已清理，namespace 无本轮残留。
+- 未覆盖：页面级错误提示、自动重试、恢复后的 UI 缓存刷新，以及 API Server 故障下的全部 V3 Action。

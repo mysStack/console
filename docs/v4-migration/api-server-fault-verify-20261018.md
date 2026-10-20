@@ -175,3 +175,19 @@ K3s 按计划恢复后，`/readyz` 返回 `ok`，`dev01` 恢复为 Ready；测�
 故障注入使用已授权的 `kubectl debug node/dev01 --profile=sysadmin`，通过宿主机 systemd 在 45 秒后恢复 K3s；没有修改业务资源。恢复后 `/readyz=ok`、`dev01=True`，`ks-console` Deployment `550/550` 且副本为 `1/1/1/1`，最终 Pod `ks-console-74899889df-gp9lq` 为 Running/Ready，实际 imageID 与上述 digest 一致。4 个临时 debug Pod 已删除。
 
 单节点资源不足使恢复期间出现同镜像 Pending 副本；删除 Pending/旧副本后 Deployment 完成 rollout，未改变制品或业务资源。该现象作为环境资源约束记录，不作为 API Server 故障功能结果。该次复测将 API Server 实际故障证据更新到当前 Workload 原生制品，但仍只覆盖上述列表接口和恢复链路。
+
+## 2026-10-21 六类资源写入与删除故障补测
+
+为扩大 API Server 实际故障验证范围，本轮在 `v4-migration-e2e` 创建了带唯一标签的临时 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet 和 DaemonSet。Secret 仅使用非敏感测试值，未写入日志或报告。
+
+按授权使用 `kubectl debug node/dev01 --profile=sysadmin` 停止 K3s，并在真实已登录浏览器会话内通过 Console API 代理执行六类资源的 PATCH 和 POST：
+
+| 操作            |            ConfigMap |               Secret |       ServiceAccount |           Deployment |          StatefulSet |            DaemonSet |
+| --------------- | -------------------: | -------------------: | -------------------: | -------------------: | -------------------: | -------------------: |
+| PATCH 已有对象  |                  502 |                  502 |                  502 |                  502 |                  502 |                  502 |
+| POST 新对象     |                  502 |                  502 |                  502 |                  502 |                  502 |                  502 |
+| DELETE 已有对象 | 浏览器请求未建立响应 | 浏览器请求未建立响应 | 浏览器请求未建立响应 | 浏览器请求未建立响应 | 浏览器请求未建立响应 | 浏览器请求未建立响应 |
+
+K3s 按预定维护窗口自动恢复。恢复后 `/readyz=ok`、`dev01` 为 Ready；六个已有对象仍然存在，均没有写入故障期间的临时标签；六个浏览器 POST 对应的新对象均不存在。随后删除本轮所有临时资源，namespace 复核只剩系统 `kube-root-ca.crt` ConfigMap 和 `default` ServiceAccount。
+
+该补测把真实浏览器/API Server 故障期间的写请求覆盖扩展到六类资源，并确认没有观察到部分写入。DELETE 操作在故障窗口内是连接级失败，未取得 HTTP 状态码；已有对象在恢复后仍存在，因此不能把它写成六类资源均返回 `502`。页面级错误提示、自动重试和恢复后的 UI 状态仍未单独验证。
