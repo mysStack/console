@@ -359,3 +359,7 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 点击已安装的 `frontend-forge` 详情后，页面进入 `/errors/403`。浏览器记录扩展、版本、InstallPlan 和分类读取请求为 `200`，扩展文件请求 `/kapis/package.kubesphere.io/v1alpha1/extensionversions/frontend-forge-1.0.0/files` 返回 `403`。该结果补齐“扩展列表可读、扩展制品文件读取被拒绝”的实际边界，不代表扩展详情或运行时初始化通过。
 
 临时用户、GlobalRole、GlobalRoleBinding 和凭据均已删除并复核不存在；本轮没有修改扩展、安装计划或业务资源。扩展运行时错误按负责人要求延期。
+
+## 2026-10-21 扩展管理员对照补测
+
+使用现有测试管理员真实浏览器直达 `/extensions/management/frontend-forge`。详情页面正常渲染“已安装”“已启用”、版本、扩展仓库和安装/卸载说明；扩展、版本、InstallPlan、分类和扩展制品文件读取均返回 `200`。与上一条全局只读结果对照，当前证据区分了管理员完整读取与只读用户制品文件 `403` 的边界；本轮没有执行安装、卸载或配置修改，扩展初始化运行时错误仍按负责人要求延期。
