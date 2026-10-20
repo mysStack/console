@@ -199,3 +199,15 @@ K3s 按预定维护窗口自动恢复。恢复后 `/readyz=ok`、`dev01` 为 Rea
 浏览器在故障窗口内重新加载 ConfigMap 路由时，页面保留了此前已经渲染的 `kube-root-ca.crt` 行和总数 `1`，没有显示显式错误页、错误提示或“重试”状态。这个结果记录为“缓存/旧数据仍留在页面上，故障态可见反馈不足”，不能把页面继续显示旧数据当成 API 请求成功。故障恢复后点击页面“刷新”，页面仍显示同一 namespace 的列表；此前多轮真实故障采样已经记录该资源列表请求在故障期间返回 `502/503`，本轮补充了浏览器层面的故障态视觉观察。
 
 恢复核验：`/readyz=ok`、`dev01 Ready`、`ks-console` Deployment `1/1/1/1`，当前 Pod imageID 与部署 manifest digest `sha256:ffe166aa35e105d463e3b1d37e14fca3595088706e1eecfe5daf7c97518fb3ac` 一致；专用 namespace 无本轮资源残留。页面故障提示、自动重试和恢复后的缓存策略仍属于产品行为缺口，不能标记为完整错误体验通过。扩展初始化错误仍按负责人要求延期。
+
+## 2026-10-21 Secret 与 ServiceAccount 浏览器故障态补测
+
+在当前 131 制品上，真实管理员浏览器先打开项目 Secret 页面（故障前列表总数为 `0`），再按已授权维护窗口停止 `dev01` 上的 K3s/API Server；随后重新加载 Secret 页面，并在同一故障窗口切换、重新加载 ServiceAccount 页面。
+
+- Secret 页面在 API Server 不可用期间仍保留已渲染的项目路由和旧列表状态（总数 `0`），没有显示显式错误页或重试提示；
+- ServiceAccount 页面在故障期间仍保留已渲染的列表状态（总数 `1`，包含 `default`），没有显示显式错误页或重试提示；
+- 故障窗口内 `readyz` 先返回 API Server 未就绪及 informer/controller 检查失败，节点和资源查询不可用；
+- 恢复后 `readyz=ok`、`dev01 Ready`、`ks-console` `1/1/1/1`，ServiceAccount 页面刷新后仍能正常渲染；
+- debug Pod 和本轮临时资源均已清理，namespace 仅保留系统 ConfigMap 和默认 ServiceAccount。
+
+该补测扩大了浏览器视觉层覆盖到 Secret 和 ServiceAccount，同时确认故障时旧数据保留、错误提示不明显的共同行为。它不能把页面旧数据当作 API 请求成功，也不能标记自动重试或错误反馈为通过。

@@ -542,3 +542,7 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 ## 2026-10-21 当前制品 A05～A08、A10 入口复核
 
 真实管理员浏览器顺序访问项目 Edge 应用、工作空间 DevOps、通知静默策略和工作空间应用模板入口。Edge 列表可渲染但没有 EdgeWorkload fixture；DevOps 页面显示创建入口但提示“请选择集群”，目标扩展未安装；通知页面为空列表但仍加载 `/consolev3`、`v3dist`，silences API 返回 `400`；应用模板原生入口可渲染但空列表。上述结果只关闭入口可达性复核，不关闭对应 Action 的成功、失败、取消、RBAC 或 V4 等价。
+
+## 2026-10-21 Secret/ServiceAccount API Server 故障页面补测
+
+真实管理员浏览器在 API Server 故障窗口重新加载 Secret 和 ServiceAccount 页面：Secret 保留故障前总数 `0`，ServiceAccount 保留 `default` 和总数 `1`，均没有显式错误页或重试提示。故障恢复后 `readyz`、节点、Console rollout 和页面刷新恢复正常。该证据补充了两个页面的故障视觉表现，仍把页面旧数据保留和缺少错误反馈记录为待改进项。

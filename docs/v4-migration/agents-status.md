@@ -939,3 +939,10 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - `/settings/silent-policy` 可渲染空列表，但 Network 仍请求 `/consolev3/settings/silent-policy`、`/consolev3/dashboard` 和 `v3dist`，silences API 返回 `400`。
 - 应用模板工作空间入口可渲染，空列表和“添加”入口已见；该结果不改变 A09/A12 仅部分验证的结论。
 - 结论：A05、A06、A07、A08、A10 的入口复核完成，成功、失败、取消、RBAC 和 V4 替代行为仍未完成。
+
+## 2026-10-21 Secret/ServiceAccount API Server 故障页面补测
+
+- 使用真实管理员浏览器在 API Server 故障窗口重新加载 Secret 和 ServiceAccount 页面。
+- Secret 页面保留故障前空列表状态（总数 `0`）；ServiceAccount 页面保留 `default` 列表状态（总数 `1`）；两页均没有显式错误页或重试提示。
+- 故障期间 `readyz` 返回未就绪及 informer/controller 检查失败；恢复后 `readyz=ok`、节点 Ready、Console `1/1/1/1`，页面刷新恢复。
+- 所有 debug Pod 和测试资源已清理；该结果补充浏览器视觉层证据，但错误反馈、自动重试和缓存策略仍未验收。

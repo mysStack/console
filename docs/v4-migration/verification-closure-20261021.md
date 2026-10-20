@@ -64,3 +64,5 @@
 2026-10-21 的只读就绪性复核显示，`devops`、`kubefed`、`kubeedge`、`whizard-notification` 均没有 `Installed` 状态，`FederatedProject`、`FederatedResource`、`EdgeWorkload` 目标 CRD 不存在；当前扩展 APIService 列表也没有这些目标 API。当前有效 `projectonly` 账号的 GET `200`、写入 `403` 已重复复核，早期无法复现的全 `403` 只保留为历史异常。
 
 当前制品入口复核进一步确认：项目 Edge 页面只是普通应用列表，没有 EdgeWorkload fixture；DevOps 页面因扩展未安装停留在集群选择；通知静默策略页面仍加载 `/consolev3`/`v3dist` 且 silences API 为 `400`。这些入口可达性结果不能替代 A05～A08、A10 的逐项等价测试。
+
+API Server 故障浏览器层覆盖已扩大到 Secret 和 ServiceAccount：两页在故障期间均保留旧列表数据且没有显式错误/重试提示，恢复后页面刷新正常。该结果强化了实际故障链路证据，同时确认页面错误反馈和缓存策略尚未通过验收。
