@@ -114,6 +114,18 @@ K3s 恢复过程中 Console Pod 由 ReplicaSet 重建，但最终运行镜像 di
 
 本轮扩大了 Kubernetes 资源列表的真实故障证据，但仍未覆盖全部页面、全部写操作、全部 V3 Action、全部 RBAC 组合和扩展初始化错误；应用列表接口未出现故障响应，也不能扩大解释为应用模块故障恢复已验证。
 
+## 2026-10-21 写操作故障补测
+
+为补齐此前只覆盖列表读取的缺口，本轮在专用 namespace 创建 ConfigMap `v4-api-fault-write-20261021`，先通过 Kubernetes API 确认 `data.state=before-fault`。随后按已授权方式停止 131 节点上的 K3s/API Server，在真实已登录浏览器会话内对同一资源依次执行 PATCH、DELETE，并对专用新资源执行 POST：
+
+| 浏览器操作         | 请求                                                                                | 故障期间结果 | 恢复后核对                       |
+| ------------------ | ----------------------------------------------------------------------------------- | ------------ | -------------------------------- |
+| 修改已有 ConfigMap | `PATCH /api/v1/namespaces/v4-migration-e2e/configmaps/v4-api-fault-write-20261021`  | `502`        | `data.state` 仍为 `before-fault` |
+| 删除已有 ConfigMap | `DELETE /api/v1/namespaces/v4-migration-e2e/configmaps/v4-api-fault-write-20261021` | `502`        | 资源仍存在，未被删除             |
+| 创建新 ConfigMap   | `POST /api/v1/namespaces/v4-migration-e2e/configmaps`                               | `502`        | 新资源不存在                     |
+
+K3s 按计划恢复后，`/readyz` 返回 `ok`，`dev01` 恢复为 Ready；测试 ConfigMap 已删除，namespace 最终只保留系统 ConfigMap 和默认 ServiceAccount。该补测证明当前 Console 在 API Server 故障期间对写请求收到失败状态，未形成部分写入；它不覆盖所有资源类型的写操作，也不替代浏览器页面级错误提示和重试体验验证。
+
 ## 2026-10-20 当前制品第三次实际故障验证
 
 本轮在当前分支 `b2bd7bf639ae0e42cbd92e4787d93dbf666a902a` 对应的 131 部署制品上重新执行了已授权的 API Server 故障验证。执行前确认 Kubernetes context 为 `default`、`dev01` 为 `Ready`、`/readyz` 为 `ok`，`ks-console` rollout 已完成；故障前部署镜像为

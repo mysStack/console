@@ -843,3 +843,9 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - 同一制品的 Deployment 回退复验请求为 `PATCH 200`，JSON Patch 包含历史 `busybox:1.35` 模板；API 回读镜像为 `busybox:1.35`，generation 由 `2` 变为 `3`。
 
 本轮测试资源已清理，`v4-migration-e2e` 没有本轮 Workload 残留，仅保留系统 ConfigMap 和默认 ServiceAccount。浏览器仍记录已登记的扩展初始化错误（包括 `getExtensionConsoleV3Embed is not a function`、Ingress/监控扩展初始化错误），按负责人要求暂不处理；这些错误不影响本轮回退请求和 Kubernetes API 回读，但也不作为全局 V3/Wujie 等价通过依据。A02～A04 的管理员回退成功子路径已验证，完整操作组合、低权限 RBAC、全部 V3 等价性仍未完成。
+
+## 2026-10-21 API Server 故障写操作补测
+
+在当前 131 环境按授权停止并恢复 K3s/API Server。真实浏览器会话对专用 ConfigMap 执行 PATCH、DELETE，并对另一个专用名称执行 POST；三类请求在故障期间均返回 `502`。恢复后 Kubernetes API 确认已有 ConfigMap 仍为故障前的 `before-fault`，删除没有生效，新建对象不存在。恢复后 `/readyz` 返回 `ok`、节点 `dev01` Ready；两个专用对象均已清理，namespace 无测试资源残留。
+
+本轮把 API Server 故障证据从只读列表扩展到 ConfigMap 写操作失败和不产生部分写入，但仍不代表所有资源类型、所有页面错误提示/重试路径或全量 V3 等价已经验证。

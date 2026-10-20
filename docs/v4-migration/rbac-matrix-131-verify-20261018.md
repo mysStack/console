@@ -317,3 +317,5 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 | 联邦/DevOps/Extension 专用组合 | 不适用                                                           | 不适用                                                      | 不适用                               | DevOps 扩展未 `Installed`             | FederatedProject/FederatedResource/EdgeWorkload fixture 不存在 | `whizard-notification` 未 `Installed`，扩展错误按要求延期 |
 
 该表已经覆盖当前 131 能执行的项目、集群和平台主要组合，并明确记录未建立的组合和环境边界；它仍不能被解释为“全平台 RBAC 已通过”。完整 RBAC 的剩余条件是：补齐可用的联邦、DevOps、Edge、Extension fixture 后，对每个入口执行正向、拒绝、错误、取消和刷新路径，并解释 `projectonly` 历史结果差异。
+
+2026-10-21 复核后，表中已验证项仍以真实浏览器/API 状态码为准；API Server 故障期间对 ConfigMap 的 PATCH、DELETE、POST 返回 `502` 属于基础设施故障证据，不计入任何 RBAC 组合的成功或拒绝结果。联邦、DevOps、Edge、Extension 专用组合仍未建立，不能用平台管理员或其他资源的权限结果推断通过。

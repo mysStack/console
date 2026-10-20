@@ -475,6 +475,10 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 
 该轮关闭 A02～A04 的管理员回退成功子路径，不能扩大为全部操作、低权限 RBAC 或全部 V3/Wujie 等价通过。浏览器控制台仍有已登记的扩展初始化错误，本轮按负责人要求暂不处理。
 
+## 2026-10-21 API Server 故障写操作补测
+
+在专用 namespace 创建临时 ConfigMap 后，按授权停止并恢复 131 的 K3s/API Server。真实已登录浏览器对已有资源执行 PATCH、DELETE，对新资源执行 POST，三类请求在故障期间均返回 `502`；恢复后已有资源仍保持故障前数据，新资源不存在，未出现部分写入。恢复后 `/readyz=ok`、`dev01` 为 Ready，临时资源已清理。该结果补齐 API Server 故障期间的 ConfigMap 写请求失败保护，但不扩大为所有资源类型、页面错误提示、重试和全量功能等价通过。
+
 ## 2026-10-20 当前项目 Workload V3 兼容桥清理
 
 已确认项目 Deployment、StatefulSet、DaemonSet 的旧 V3 详情包装器没有活动路由或源码消费者，当前活动路由使用原生 Workload Detail 和原生 ConfigReferencePage。本轮删除无消费者的旧项目详情包装器、ConfigReference V3 DOM 注入桥及其专用测试/辅助文件，并新增回归断言防止旧项目包装器重新出现。
