@@ -562,3 +562,13 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 当前 131 制品上，临时工作空间级用户通过真实浏览器完成应用模板 Chart 校验、上传、列表刷新和删除：校验 `POST`、创建 `POST` 和删除 `DELETE` 均返回 `200`，页面显示创建入口、临时模板，删除后回到空数据态。该结果证明当前原生入口存在一条工作空间管理员成功路径，但不证明 A09/A12 的全部 V3 行为等价。
 
 仍未验证工作空间级拒绝、冲突/网络失败、返回与直达 URL、全部动态 Action、旧 V3/Wujie 去依赖以及其他业务入口；临时测试身份和应用模板已清理。
+
+## 2026-10-21 A02～A04 合法 YAML 成功持久化补测
+
+在当前 131 制品上创建临时 Deployment、StatefulSet 和 DaemonSet，并使用真实管理员浏览器分别打开三个原生详情页的“编辑 YAML”。通过文件导入提交单一合法 YAML 文档：
+
+- Deployment `v4-yaml-success-deploy-20261021`：副本数由 `0` 改为 `1`，提交请求返回 `200`，Kubernetes API 回读 `spec.replicas=1`、generation `1→2`，页面出现对应 Pod；
+- StatefulSet `v4-yaml-success-sts-20261021`：副本数由 `0` 改为 `1`，提交后 API 回读 `spec.replicas=1`、generation `1→2`、updated/ready 副本为 `1`；
+- DaemonSet `v4-yaml-success-ds-20261021`：镜像由 `busybox:1.35` 改为 `busybox:1.36`，提交后 API 回读镜像已更新、generation `1→2`；由于专用 nodeSelector 无匹配节点，期望和就绪副本为 `0`，没有把调度缺失误判为 YAML 提交失败。
+
+该轮关闭 A02～A04 的合法单文档 YAML 成功持久化子路径，并与此前非法 YAML、resourceVersion 冲突和取消证据合并。临时 Workload 已删除，namespace 无本轮残留。完整字段覆盖、所有操作组合、低权限拒绝、故障恢复体验和 V3/Wujie 运行时移除仍未完成。

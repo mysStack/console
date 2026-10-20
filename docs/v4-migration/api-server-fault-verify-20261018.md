@@ -191,3 +191,11 @@ K3s 按计划恢复后，`/readyz` 返回 `ok`，`dev01` 恢复为 Ready；测�
 K3s 按预定维护窗口自动恢复。恢复后 `/readyz=ok`、`dev01` 为 Ready；六个已有对象仍然存在，均没有写入故障期间的临时标签；六个浏览器 POST 对应的新对象均不存在。随后删除本轮所有临时资源，namespace 复核只剩系统 `kube-root-ca.crt` ConfigMap 和 `default` ServiceAccount。
 
 该补测把真实浏览器/API Server 故障期间的写请求覆盖扩展到六类资源，并确认没有观察到部分写入。DELETE 操作在故障窗口内是连接级失败，未取得 HTTP 状态码；已有对象在恢复后仍存在，因此不能把它写成六类资源均返回 `502`。页面级错误提示、自动重试和恢复后的 UI 状态仍未单独验证。
+
+## 2026-10-21 当前制品浏览器故障态与恢复后刷新复核
+
+本轮在当前 131 已部署制品上使用真实登录浏览器打开项目 ConfigMap 页面，故障前页面显示 `v4-migration-e2e` namespace 的 ConfigMap 列表。随后按已授权维护窗口停止 `dev01` 上的 K3s/API Server；故障期间 `kubectl get --raw='/readyz'` 返回 `ServiceUnavailable: apiserver not ready`，节点和 Pod 查询同样不可用。
+
+浏览器在故障窗口内重新加载 ConfigMap 路由时，页面保留了此前已经渲染的 `kube-root-ca.crt` 行和总数 `1`，没有显示显式错误页、错误提示或“重试”状态。这个结果记录为“缓存/旧数据仍留在页面上，故障态可见反馈不足”，不能把页面继续显示旧数据当成 API 请求成功。故障恢复后点击页面“刷新”，页面仍显示同一 namespace 的列表；此前多轮真实故障采样已经记录该资源列表请求在故障期间返回 `502/503`，本轮补充了浏览器层面的故障态视觉观察。
+
+恢复核验：`/readyz=ok`、`dev01 Ready`、`ks-console` Deployment `1/1/1/1`，当前 Pod imageID 与部署 manifest digest `sha256:ffe166aa35e105d463e3b1d37e14fca3595088706e1eecfe5daf7c97518fb3ac` 一致；专用 namespace 无本轮资源残留。页面故障提示、自动重试和恢复后的缓存策略仍属于产品行为缺口，不能标记为完整错误体验通过。扩展初始化错误仍按负责人要求延期。

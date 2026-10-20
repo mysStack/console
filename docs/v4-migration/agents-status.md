@@ -903,3 +903,17 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - 权限范围：临时用户只绑定工作空间应用模板管理规则，没有借用项目管理员权限；本轮未把成功结果外推到 viewer、projectonly、clusterviewer 或平台只读组合。
 - 清理与复核：临时用户、WorkspaceRole、WorkspaceRoleBinding 和应用模板已删除并复核不存在；测试 namespace 保留且无本轮资源残留。
 - 未闭环：工作空间级拒绝路径、冲突/网络失败、DevOps、联邦、Edge、通知、扩展及全部动态 Action 的正反权限和 V3 等价性。
+
+## 2026-10-21 A02～A04 合法 YAML 成功持久化补测
+
+- 状态：已完成三类原生 Workload 的合法单文档 YAML 提交成功子路径；A02～A04 全量等价仍未完成。
+- 浏览器：真实管理员登录当前 131 制品，分别打开 Deployment、StatefulSet、DaemonSet 原生详情页，使用“编辑 YAML”文件导入单一合法文档并确认提交。
+- API 回读：Deployment 副本数 `0→1`、StatefulSet 副本数 `0→1`、DaemonSet 镜像 `busybox:1.35→busybox:1.36`；三个对象 generation 均 `1→2`。Deployment 请求明确返回 `PUT 200`；三类对象的最终 Kubernetes API 状态均与提交内容一致。
+- 清理：三类临时 Workload 均已删除，`v4-migration-e2e` namespace 仅保留系统 ConfigMap 和默认 ServiceAccount。
+- 未闭环：完整字段、全部操作组合、低权限拒绝、API 故障下的全部 Workload 写路径和 V3/Wujie 运行时移除。
+
+## 2026-10-21 API Server 故障窗口浏览器态补测
+
+- 故障期间 `readyz` 返回 API Server 未就绪；ConfigMap 页面保留先前列表数据，没有出现显式错误或重试提示。
+- 恢复后 `readyz=ok`、节点 Ready、Console `1/1/1/1`，页面刷新恢复正常；该结果补充了视觉层证据，但把故障态旧数据保留视为待改进的错误反馈行为。
+- 本轮没有留下 debug Pod 或测试资源；扩展初始化错误按负责人要求延期。

@@ -522,3 +522,13 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 当前 131 制品上，临时工作空间级用户仅绑定应用模板管理规则。使用真实浏览器访问 `test-workspace` 应用模板页面，页面显示“添加/创建”入口；临时 Chart 的校验 `POST`、创建 `POST` 均返回 `200`，列表刷新后出现唯一模板；页面删除确认后的 `DELETE` 返回 `200`，删除后回到空数据态。
 
 临时用户、WorkspaceRole、WorkspaceRoleBinding 和应用模板均已删除并复核不存在，`v4-migration-e2e` namespace 保留且无本轮资源残留。本证据只关闭 A09/A12 工作空间管理员的成功子路径；工作空间级拒绝、冲突/网络失败、完整路由返回与刷新、DevOps、联邦、Edge、通知、扩展和全部 V3 Action 等价仍未完成。
+
+## 2026-10-21 A02～A04 合法 YAML 成功持久化补测
+
+当前 131 制品上，真实管理员浏览器分别对临时 Deployment、StatefulSet、DaemonSet 的原生“编辑 YAML”导入单一合法 YAML 文档并提交。Deployment 副本数 `0→1`，StatefulSet 副本数 `0→1`，DaemonSet 镜像 `busybox:1.35→busybox:1.36`；三个对象的 Kubernetes API 回读均与提交内容一致，generation 均由 `1` 变为 `2`。Deployment 的提交请求明确为 `PUT 200`，DaemonSet 因专用 nodeSelector 无匹配节点保持 `0` 个就绪副本，但 YAML 修改已持久化。
+
+该证据关闭 A02～A04 合法单文档 YAML 成功子路径；非法 YAML、冲突和取消已有记录。三类临时 Workload 已清理，namespace 无本轮残留。完整字段、全部操作组合、低权限拒绝、故障恢复体验和全量 V3/Wujie 等价仍未完成。
+
+## 2026-10-21 API Server 故障期间浏览器页面观察
+
+授权故障窗口内，ConfigMap 页面在 API Server 不可用时保留故障前已经渲染的旧列表数据，未出现显式错误页或重试提示；恢复后 `readyz`、节点、Console rollout 和页面刷新均恢复正常。该观察补充了浏览器视觉层证据，同时记录了“故障态旧数据仍显示、错误反馈不明显”的待改进项，不能把旧数据展示解释为请求成功。
