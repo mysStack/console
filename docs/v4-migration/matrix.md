@@ -386,3 +386,7 @@ A11 边界修正：本轮应用模板安装实际走原生 `deployApp`，没有�
 ## 2026-10-20 API Server 实际故障扩展复测
 
 在 131 测试环境按授权停止并恢复 K3s，真实浏览器连续采样 103 组请求。ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet 六类 Kubernetes 资源列表在故障期间均出现 `502/503`，恢复后全部回到 `200`；应用列表 API 本轮 103 组均为 `200`，不扩大解释为应用模块故障恢复已验证。恢复后 `readyz`、节点、Console Deployment、Pod 和浏览器登录均正常，实际 Pod imageID 与当前部署 digest 一致。该证据扩展了 API Server 故障环境覆盖范围，但仍不关闭全部 V3 功能等价性、全量写操作和全局 RBAC 门禁。
+
+## 2026-10-20 Workload projectonly 有效账号复核
+
+使用只绑定项目 `viewer`、带有效邮箱且 Active 的临时账号，真实浏览器打开 Deployment、StatefulSet、DaemonSet 详情页，三类页面均正常渲染；三类资源 API 均为 GET `200`、POST/PUT/PATCH/DELETE `403`。该结果复现此前有效账号的读写边界，但与另一个账号上下文的全部 `403` 结果仍不一致，因此保留为待解释差异，不把 Workload `projectonly` 标记为全量 RBAC 通过。

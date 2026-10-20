@@ -698,6 +698,12 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 
 详细采样和恢复证据见 [`api-server-fault-verify-20261018.md`](./api-server-fault-verify-20261018.md)。
 
+## 2026-10-20 当前会话：Workload projectonly 有效账号复核
+
+使用带有效邮箱且状态为 Active 的临时用户，只绑定 `v4-migration-e2e` 项目 `viewer` RoleBinding，不绑定企业空间权限。真实浏览器登录成功，Deployment、StatefulSet、DaemonSet 三类原生详情页均正常渲染；浏览器会话内 API 均为 GET `200`、POST/PUT/PATCH/DELETE `403`。
+
+该结果复现了此前有效 `projectonly` 账号的读写边界。与另一账号上下文中的全部 `403` 结果相比仍存在差异，账号元数据和登录上下文原因尚未完全证明；临时账号、绑定和 Workload 已清理，namespace 无测试残留。
+
 ## 2026-10-20 当前环境 fixture 复核
 
 只读复核 131 集群发现：当前没有 EdgeWorkload、FederatedProject 或 FederatedResource API/CRD；`devops` 扩展版本对象存在，但扩展状态不是 `Installed`，没有可用 DevOps API。A05、A06、A07、A10 仍属于环境不可执行项，未擅自安装扩展或创建伪造 fixture；A08 的通知扩展同样未启用。该结果继续作为 V3 Action 逐项矩阵的未验证边界。

@@ -232,3 +232,17 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 | clusterviewer           | viewer       | 无       | cluster-viewer | 页面正常；GET `200`，POST/PUT/PATCH/DELETE `403`                      |
 
 该表闭合了 A02～A04 当前制品的六种账号组合记录，但不等同于联邦、DevOps、Extension 或其他 V3 Action 的全局 RBAC 验收。
+
+## 2026-10-20 Workload projectonly 有效账号复核
+
+为复核前一次 `projectonly` 全部 `403` 结果，本轮重新创建带有效邮箱、状态为 Active 的临时用户，只绑定 `v4-migration-e2e` 项目 `viewer` RoleBinding，不绑定企业空间权限。真实浏览器登录成功后，分别访问 Deployment、StatefulSet、DaemonSet 原生详情路由，页面均渲染资源详情和资源状态。
+
+同一浏览器会话通过集群代理对三类临时 Workload 执行 API 验证：
+
+| 资源        | GET | POST | PUT | PATCH | DELETE |
+| ----------- | --: | ---: | --: | ----: | -----: |
+| Deployment  | 200 |  403 | 403 |   403 |    403 |
+| StatefulSet | 200 |  403 | 403 |   403 |    403 |
+| DaemonSet   | 200 |  403 | 403 |   403 |    403 |
+
+临时用户、RoleBinding 和三类 Workload 均已删除，namespace 复核只剩系统 ConfigMap 和默认 ServiceAccount。该结果与此前有效账号的 `GET 200、写入 403` 记录一致，但仍与另一账号上下文中的全部 `403` 结果不一致；账号元数据和登录上下文差异尚未完全证明原因，因此 `projectonly` 仍保留为“结果不一致，待独立解释”，不能扩大为全量 RBAC 通过。
