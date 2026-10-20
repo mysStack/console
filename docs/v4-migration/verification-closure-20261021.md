@@ -41,7 +41,7 @@
 | A11 应用部署              | 部分验证；普通 Helm 安装成功，Edge 分支未触发                                                                        |
 | A12 应用模板编辑/制品     | 部分验证；原生编辑、上传、刷新、删除和错误子路径已有证据，完整等价和运行时清理未完成                                 |
 
-当前 HEAD `017179af0` 重新扫描后，仍有 6 个业务文件直接调用 `useV3action`，另有 3 个桥接/导出文件；排除 `lib`、`node_modules` 和测试文件后，源码匹配 `WujieReact`、`wujie-react`、`ConsoleV3ResourceList`、`consolev3` 或 `v3dist` 的文件数为 141。当前制品浏览器仍可观测 `/consolev3/dashboard` 和 `/dist/v3dist/*`。
+当前源码 HEAD `adee14078` 重新扫描后，仍有 6 个业务文件直接调用 `useV3action`，另有 3 个桥接/导出文件；排除 `lib`、`node_modules` 和测试文件后，源码匹配 `WujieReact`、`wujie-react`、`ConsoleV3ResourceList`、`consolev3` 或 `v3dist` 的文件数为 141。当前制品浏览器仍可观测 `/consolev3/dashboard` 和 `/dist/v3dist/*`。
 
 结论：**全部 V3 功能逐项等价性未完成**。环境缺失 fixture 的 Action 不能以空列表、入口可达或页面渲染代替成功等价。
 

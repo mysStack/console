@@ -990,3 +990,12 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - 浏览器/API：管理员连续上传同一 Chart 两次，校验和创建请求均为 `200`；系统生成不同模板名 `v4-a12-chart-orx26`、`v4-a12-chart-zl34w`，列表总数由 `1` 变为 `2`，没有 `409`。
 - 清理：两个临时模板通过浏览器会话 API 删除，`DELETE` 均为 `200`；页面刷新后回到空数据态。
 - 未闭环：V3 冲突语义对照、低权限、网络失败、返回/直达 URL 和制品内 V3 Action/Wujie 清理。
+
+## 2026-10-21 A01～A12 RBAC 台账与当前源码快照
+
+- 当前分支 HEAD：`adee14078ee0d57e03c82aa30d9ef701de31e284`，已推送到 `origin/feature/v4-configmaps-secrets`；Draft PR #1 当前 Head 与该 SHA 一致，目标分支仍为 `feature/v4-migration`。
+- 新增 `rbac-matrix-131-verify-20261018.md` 的 A01～A12 组合覆盖台账，明确已验证、部分验证、环境阻塞和未验证项；没有把资源级 CRUD 结果外推为全量 RBAC 通过。
+- 当前源码同口径扫描仍为 9 个 `useV3action/useV3Actions` 文件、141 个 V3/Wujie 兼容关键字源码文件；该结果支持“全部 V3 功能逐项等价性未完成”。
+- 文档校验：两个修改文档通过 Prettier `--check` 和 `git diff --check`；提交钩子成功执行 lint-staged/Prettier。
+- 131 当前状态：`ks-console` `1/1/1/1`，部署镜像 tag `feature-v4-configmaps-secrets-20261021-013709-4b5c7f5670c4`，Pod imageID 对应 `sha256:ffe166aa35e105d463e3b1d37e14fca3595088706e1eecfe5daf7c97518fb3ac`，`/readyz=ok`。
+- 结论不变：API Server 实际故障验证已完成限定范围；完整 RBAC 组合和全部 V3 等价仍未完成。A05～A07、A10 受目标扩展/CRD/fixture 缺失阻塞，A08 仍有 V3/Wujie 兼容加载和 `400`；扩展运行时错误按负责人要求延期。
