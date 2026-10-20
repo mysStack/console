@@ -564,3 +564,5 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 2026-10-21 又在当前 131 制品上补测了 A02 Deployment 的管理员自动扩缩成功路径。真实浏览器在专用 namespace 创建临时 Deployment，从原生详情页设置 CPU 目标 `50%`、内存目标 `128Mi`、最小副本 `1`、最大副本 `2`；HPA 创建请求返回 `201`，Deployment 更新返回 `200`。Kubernetes API 回读确认 HPA 同时保存 CPU/内存目标，`AbleToScale=True`、`ScalingActive=True`；浏览器刷新后页面继续显示 `1/2` 副本范围和两个目标值。HPA 与临时 Deployment 已删除并复核无残留。
 
 该证据只关闭 A02 管理员自动扩缩的一条成功子路径，未覆盖 StatefulSet/DaemonSet、低权限拒绝、失败/取消、网络故障和全部 V3 Action 等价性；A02～A04 仍不能标记为完整等价。
+
+同一轮在 StatefulSet 临时对象上重复执行自动扩缩成功路径：HPA 创建返回 `201`，`scaleTargetRef` 正确指向 StatefulSet，API 回读确认 CPU/内存目标、`minReplicas=1`、`maxReplicas=2`，StatefulSet 保持 `1` 个就绪副本；浏览器刷新后设置仍显示。测试对象和 HPA 已删除。该证据仅关闭 A03 管理员自动扩缩成功子路径，DaemonSet及其他失败、取消、低权限和 V3/Wujie 条件仍未完成。

@@ -979,3 +979,5 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - API：HPA 创建 `POST` 返回 `201`，Deployment `PATCH` 返回 `200`；回读确认两个资源目标、HPA `AbleToScale=True` 和 `ScalingActive=True`；浏览器刷新后目标值和副本范围保持一致。
 - 清理：HPA 和临时 Deployment 已删除；`v4-migration-e2e` 只保留系统 ConfigMap 和默认 ServiceAccount。
 - 未闭环：StatefulSet/DaemonSet 自动扩缩、低权限拒绝、失败/取消、网络故障和全部 V3/Wujie 运行时清理。
+
+同一轮又完成 StatefulSet 管理员自动扩缩成功路径：HPA 创建返回 `201`，`scaleTargetRef` 指向 StatefulSet，API 回读确认 CPU/内存目标及 `1～2` 副本范围，刷新后页面保持一致。临时 HPA、StatefulSet 和 Pod 已清理。DaemonSet 自动扩缩、低权限拒绝、失败/取消、网络故障和全部 V3/Wujie 运行时清理仍未闭环。

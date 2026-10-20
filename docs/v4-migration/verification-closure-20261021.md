@@ -76,3 +76,5 @@ API Server 故障浏览器层覆盖已扩大到 Secret 和 ServiceAccount：两�
 仓库标准回归 `./scripts/test.sh` 已通过：66 个文件、210 个测试，0 个失败。由于测试集合包含当前仍保留的 `ConsoleV3ResourceList`、`consolev3` 和扩展兼容边界，该结果不能替代全量 V3/Wujie 运行时等价验证。
 
 2026-10-21 在当前部署制品上补测 A02 Deployment 管理员自动扩缩：真实浏览器提交 CPU `50%`、内存 `128Mi`、副本范围 `1～2`，HPA 创建返回 `201`、Deployment 更新返回 `200`；API 回读确认 HPA 目标和状态，刷新后页面数据保持一致。临时 HPA 与 Deployment 已清理。该结果只增加 A02 的成功子路径，不改变 A02～A04、完整 RBAC 和全量 V3 等价性的未完成结论。
+
+同一轮在 StatefulSet 上完成管理员自动扩缩成功路径复核：HPA 创建返回 `201`，`scaleTargetRef` 指向 StatefulSet，API 回读确认 CPU/内存目标和 `1～2` 副本范围，页面刷新后设置保持一致；临时 HPA、StatefulSet 和 Pod 已清理。该结果只增加 A03 成功子路径，DaemonSet及其他权限、错误和 V3 等价条件仍未完成。

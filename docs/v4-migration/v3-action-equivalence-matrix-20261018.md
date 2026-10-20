@@ -614,3 +614,7 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 - 测试完成后删除 HPA 和临时 Deployment，并复核专用 namespace 只剩系统 `kube-root-ca.crt` ConfigMap 与默认 ServiceAccount。
 
 该证据关闭 A02 管理员自动扩缩的一条成功路径；没有外推到 StatefulSet、DaemonSet、低权限拒绝、失败/取消、网络故障和全部动态 Action 等价性。当前 A02～A04 仍保持“部分验证”。
+
+同一轮又在 StatefulSet `v4-sts-ops-verify-20261021` 上执行相同的管理员自动扩缩流程。页面成功提交，HPA `POST` 返回 `201`，HPA 的 `scaleTargetRef` 为 `StatefulSet/v4-sts-ops-verify-20261021`，API 回读确认 `minReplicas=1`、`maxReplicas=2`、CPU/内存两个目标以及 StatefulSet `readyReplicas=1`；刷新后页面仍显示自动扩缩设置。临时 HPA、StatefulSet 和 Pod 已删除。
+
+该结果关闭 A03 管理员自动扩缩成功子路径；DaemonSet、低权限拒绝、失败/取消、网络故障和全部 V3/Wujie 运行时清理仍未验证。
