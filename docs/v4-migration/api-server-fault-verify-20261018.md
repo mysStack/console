@@ -143,3 +143,23 @@ K3s 恢复过程中 Console Pod 由 ReplicaSet 重建，但最终运行镜像 di
 恢复过程中单节点 CPU 不足使同一镜像旧 ReplicaSet 短暂保留 Pending 副本；删除该 Pending 测试副本并让旧 ReplicaSet 退出后，新的同镜像 Pod `ks-console-58794bfdc6-dc5j2` 达到 `Running/Ready`，Deployment 状态恢复为 `1/1/1/1`，实际 imageID 仍为上述 digest。该调度现象已单独记录，不能误判为 API Server 故障导致的 Console 功能失败。
 
 本轮将“API Server 实际故障环境验证”标记为**已完成（限定上述列表接口和恢复链路）**。它仍不代表所有页面、所有写操作、所有动态 Action 或全部 V3 功能在 API Server 故障期间均已验证。
+
+## 2026-10-20 当前 Workload 原生制品第四次实际故障验证
+
+为确认项目 Workload V3 兼容桥清理后的实际制品仍能完成故障恢复链路，本轮在提交 `d091cb1cdc3d271e1632ed569decc9aeac75fb31` 对应的 131 部署上重新执行真实 K3s/API Server 故障验证。故障前部署镜像为 `feature-v4-configmaps-secrets-20261020-171341-d091cb1cdc3d`，manifest digest 为 `sha256:1b82acae4539989150585dfd3e68376ad9bbb957302d82adb98bb19b4d58ce6e`；故障前 `/readyz` 为 `ok`、`dev01` 为 Ready、`ks-console` 为 `1/1` Ready。
+
+真实登录浏览器每 2 秒并行采样 7 个接口，共 60 组样本。Kubernetes 资源列表接口的结果如下：
+
+| 接口范围            | 200 | 502 | 503 | 其他 | 结论                         |
+| ------------------- | --: | --: | --: | ---: | ---------------------------- |
+| ConfigMap 列表      |  24 |  24 |  12 |    0 | 故障期间失败，恢复后回到 200 |
+| Secret 列表         |  24 |  25 |  11 |    0 | 故障期间失败，恢复后回到 200 |
+| ServiceAccount 列表 |  24 |  25 |  11 |    0 | 故障期间失败，恢复后回到 200 |
+| Deployment 列表     |  24 |  25 |  11 |    0 | 故障期间失败，恢复后回到 200 |
+| StatefulSet 列表    |  24 |  25 |  11 |    0 | 故障期间失败，恢复后回到 200 |
+| DaemonSet 列表      |  24 |  25 |  11 |    0 | 故障期间失败，恢复后回到 200 |
+| Application 列表    |  60 |   0 |   0 |    0 | 对照接口全程保持 200         |
+
+故障注入使用已授权的 `kubectl debug node/dev01 --profile=sysadmin`，通过宿主机 systemd 在 45 秒后恢复 K3s；没有修改业务资源。恢复后 `/readyz=ok`、`dev01=True`，`ks-console` Deployment `550/550` 且副本为 `1/1/1/1`，最终 Pod `ks-console-74899889df-gp9lq` 为 Running/Ready，实际 imageID 与上述 digest 一致。4 个临时 debug Pod 已删除。
+
+单节点资源不足使恢复期间出现同镜像 Pending 副本；删除 Pending/旧副本后 Deployment 完成 rollout，未改变制品或业务资源。该现象作为环境资源约束记录，不作为 API Server 故障功能结果。该次复测将 API Server 实际故障证据更新到当前 Workload 原生制品，但仍只覆盖上述列表接口和恢复链路。

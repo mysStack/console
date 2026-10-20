@@ -417,6 +417,8 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 
 本节的“已完成（限定范围）”只表示 API Server 故障注入、恢复和上述列表接口的浏览器/API链路已验证；不能扩展为全平台故障兼容或全部 V3 等价通过。
 
+本轮又在项目 Workload 原生桥清理对应的制品 `d091cb1cdc3d271e1632ed569decc9aeac75fb31` 上复测 API Server 实际故障：7 个接口各采样 60 次，ConfigMap 为 `200=24/502=24/503=12`，Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet 均为 `200=24/502=25/503=11`，Application 对照接口为 `200=60`。K3s 恢复后 `readyz`、节点、Console rollout 和 Pod imageID 均恢复正常。该结果更新了当前制品的故障证据，范围仍限于列表接口和恢复链路。
+
 ## 2026-10-20 当前项目 Workload V3 兼容桥清理
 
 已确认项目 Deployment、StatefulSet、DaemonSet 的旧 V3 详情包装器没有活动路由或源码消费者，当前活动路由使用原生 Workload Detail 和原生 ConfigReferencePage。本轮删除无消费者的旧项目详情包装器、ConfigReference V3 DOM 注入桥及其专用测试/辅助文件，并新增回归断言防止旧项目包装器重新出现。
@@ -430,3 +432,5 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 使用真实浏览器登录后，在专用 namespace 创建临时 Deployment、StatefulSet 和 DaemonSet，并分别直达三个项目详情 URL。三页均进入原生详情页并渲染资源状态、属性、修改记录、元数据、环境变量、配置引用和事件入口，容器组列表均显示 `1/1`。验证完成后只删除本轮资源，`v4-migration-e2e` 最终只保留系统 `kube-root-ca.crt` 和 `default` ServiceAccount。
 
 本轮浏览器控制台仍记录已知扩展初始化错误（包括 `getExtensionConsoleV3Embed is not a function`）；该问题属于已登记的扩展运行时范围，本轮不处理，也不把它写成 Workload 原生详情路由通过。新制品上的项目 Deployment、StatefulSet、DaemonSet 原生入口已完成部署后浏览器验收，但全部操作等价、全部 V3 功能逐项等价和完整 RBAC 组合矩阵仍未完成。
+
+本轮继续用真实浏览器检查当前制品的 A02～A04 操作入口。Deployment 的回退、自动扩缩、编辑 YAML、删除确认均能打开并取消；重新创建提交后 generation 从 `1` 变为 `2`，新 Pod 恢复 `Ready`。StatefulSet 的回退、自动扩缩、编辑服务、编辑设置、编辑 YAML、重新创建和删除入口均渲染；DaemonSet 的回退、编辑设置、编辑 YAML、重新创建和删除入口均渲染。本轮没有对 StatefulSet、DaemonSet 提交写操作，三类临时 Workload 已清理。该补测只扩大 A02～A04 的入口和取消/重新创建证据，不改变全量 V3 等价性为未完成的结论。

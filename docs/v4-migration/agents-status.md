@@ -747,6 +747,8 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 
 本轮提交前复核：Git HEAD 为 `b2bd7bf639ae0e42cbd92e4787d93dbf666a902a`；部署镜像为 `feature-v4-configmaps-secrets-20261020-105412-1c54df98d124`；最终运行 Pod 为 `ks-console-58794bfdc6-dc5j2`，imageID 对应 digest `sha256:49febd89201b7a887d30928ae31a3b296d459ed18dc7811b550a14719556fab2`。测试 namespace 复核无本轮临时资源残留，PR #1 仍保持 Draft。
 
+本轮又在项目 Workload 原生桥清理制品 `d091cb1cdc3d271e1632ed569decc9aeac75fb31` 上完成 API Server 实际故障复测。镜像 tag 为 `feature-v4-configmaps-secrets-20261020-171341-d091cb1cdc3d`，digest 为 `sha256:1b82acae4539989150585dfd3e68376ad9bbb957302d82adb98bb19b4d58ce6e`；7 个浏览器接口各采样 60 次，六类 Kubernetes 列表均出现 502/503，Application 对照接口 60/60 为 200。恢复后 `readyz=ok`、节点 Ready、Deployment `550/550` 且 `1/1/1/1`，Pod `ks-console-74899889df-gp9lq` Running/Ready，debug Pod 已清理。该证据仍只覆盖 Kubernetes 列表接口和恢复链路，不扩大为全部页面或写操作故障验证。
+
 ## 2026-10-20 当前会话：项目 Workload V3 兼容桥清理
 
 重新扫描确认当前项目活动路由使用原生 Deployment、StatefulSet、DaemonSet Detail，不再导入旧 `projects/containers/*/Detail` 包装器。删除无消费者的三个旧项目详情包装器、ConfigReference V3 DOM 注入桥及其专用测试/辅助文件；联邦项目下仍被 `fedprojects/routes/details.tsx` 导入的 V3 包装器没有删除。
@@ -760,3 +762,5 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 使用真实浏览器登录后，分别打开专用 Deployment、StatefulSet、DaemonSet 的项目详情 URL。三页都显示原生详情头部、资源状态、属性、修改记录、元数据、环境变量、配置引用、事件和 `1/1` 容器组列表，证明当前项目活动路由没有回退到已删除的旧详情包装器。临时资源已全部清理，namespace 最终没有本轮资源残留。
 
 浏览器控制台仍有已知扩展初始化错误，错误范围与既有 `getExtensionConsoleV3Embed is not a function` 记录一致，按负责人要求暂不处理。该错误不作为本轮 Workload 原生详情路由的成功依据；全部操作等价、全部 V3 功能逐项等价和完整 RBAC 组合矩阵仍保持未完成。
+
+本轮进一步核对 A02～A04 操作入口：Deployment 的回退、自动扩缩、编辑 YAML、删除确认打开后均取消；重新创建提交成功，generation 从 `1` 变为 `2`，Pod 替换后恢复 Ready。StatefulSet 的回退、自动扩缩、编辑服务、编辑设置、编辑 YAML、重新创建、删除，以及 DaemonSet 的回退、编辑设置、编辑 YAML、重新创建、删除入口均在浏览器中渲染；StatefulSet、DaemonSet 本轮未提交写操作。三类临时 Workload 已删除，测试 namespace 无本轮资源残留。该结果只补充当前制品的原生操作入口和部分成功/取消路径，不能关闭全部 V3 等价条件。
