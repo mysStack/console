@@ -746,3 +746,9 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 | API Server 实际故障环境 | 在当前制品上使用已授权 `kubectl debug node/dev01` 停止并恢复 K3s；浏览器登录会话每 2 秒采样 7 个接口，共 185 组。六类 Kubernetes 列表均在故障期间出现 502/503，恢复后 200；Application 对照接口 185/185 为 200；`readyz`、节点和 `ks-console` rollout 恢复成功，debug Pod 已清理。恢复期间单节点 CPU 不足导致旧 ReplicaSet 短暂 Pending，清理旧副本后最终 `1/1/1/1`。 | 已完成（限定范围） |
 
 本轮提交前复核：Git HEAD 为 `b2bd7bf639ae0e42cbd92e4787d93dbf666a902a`；部署镜像为 `feature-v4-configmaps-secrets-20261020-105412-1c54df98d124`；最终运行 Pod 为 `ks-console-58794bfdc6-dc5j2`，imageID 对应 digest `sha256:49febd89201b7a887d30928ae31a3b296d459ed18dc7811b550a14719556fab2`。测试 namespace 复核无本轮临时资源残留，PR #1 仍保持 Draft。
+
+## 2026-10-20 当前会话：项目 Workload V3 兼容桥清理
+
+重新扫描确认当前项目活动路由使用原生 Deployment、StatefulSet、DaemonSet Detail，不再导入旧 `projects/containers/*/Detail` 包装器。删除无消费者的三个旧项目详情包装器、ConfigReference V3 DOM 注入桥及其专用测试/辅助文件；联邦项目下仍被 `fedprojects/routes/details.tsx` 导入的 V3 包装器没有删除。
+
+新增回归断言检查三个旧项目详情文件不存在。执行结果：`./scripts/test.sh` 为 65 个测试文件、206 个测试通过；`corepack yarn build:packages` 成功。当前变更尚未部署到 131，需完成新制品 rollout 和真实浏览器回归后，才能关闭部署后验证。

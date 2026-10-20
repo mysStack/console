@@ -242,7 +242,7 @@ A01 仍不能标记为完整 V3 等价：主工作负载模板编辑仍保留 V3
 ## 2026-10-20 A12 清理后的当前静态计数
 
 重新排除测试文件、`packages/bootstrap/assets/v3dist`、编译输出和 `node_modules` 后，当前源码中的
-`useV3action/useV3Actions` 命中 10 个文件：7 个业务调用文件、2 个桥接实现/Hook 文件和 1 个导出文件；对应 8 个当前活动 Action 行。
+`useV3action/useV3Actions` 命中 9 个文件：6 个业务调用文件、2 个桥接实现/Hook 文件和 1 个导出文件；对应 7 个当前活动 Action 行。
 历史 14/11 个文件的数字保留为取证时点记录，不再作为当前分支计数。
 
 ## 2026-10-20 联邦项目与 Edge 入口运行时补测
@@ -426,7 +426,20 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 
 同一制品上的应用模板详情页打开原生 `EditAppModal`，名称、描述、分类和服务商网站等字段能够回填，点击取消后没有产生写请求。该证据关闭 A12 的原生编辑表单渲染和取消子路径；保存失败、冲突、低权限、边缘模板分支和 `v3dist` 内 Action 字符串清理仍未完成。
 
-当前源码重新扫描后，`useV3action/useV3Actions` 命中 10 个源码文件，其中 7 个业务调用文件、2 个桥接实现/Hook 文件和 1 个导出文件；`AppTemplateEdit` 与 `openpitx.template.edit.v2` 已没有当前源码调用点。该静态结果不能替代 A01～A12 的逐项运行时成功、失败、取消、刷新、权限和替代行为证据。
+当前源码重新扫描后，`useV3action/useV3Actions` 命中 9 个源码文件，其中 6 个业务调用文件、2 个桥接实现/Hook 文件和 1 个导出文件；`AppTemplateEdit` 与 `openpitx.template.edit.v2` 已没有当前源码调用点。该静态结果不能替代 A01～A12 的逐项运行时成功、失败、取消、刷新、权限和替代行为证据。
+
+## 2026-10-20 当前项目 Workload 兼容桥清理
+
+重新核对当前活动路由和全仓库消费者后，确认以下旧文件没有活动项目路由、动态导入或其他源码消费者：
+
+- `projects/containers/Deployments/Detail/index.tsx`；
+- `projects/containers/StatefulSets/Detail/index.tsx`；
+- `projects/containers/DaemonSets/Detail/index.tsx`；
+- `components/ConfigReference/entry.tsx` 及其仅供该桥接使用的 V3 DOM、草稿和编辑回调文件。
+
+当前 `projects/routes/detail.tsx` 继续导入 `ApplicationWorkloads/Workloads/{Deployments,StatefulSets,DaemonSets}/Detail/routes.tsx`，这三类活动项目详情使用原生 Store、原生详情页和原生 `ConfigReferencePage`。本次删除只清理已无消费者的项目 V3 兼容桥；`fedprojects/` 下仍被联邦路由直接导入的 V3 包装器保留，不能将其误记为已迁移。
+
+新增回归断言确认三个旧项目详情文件不存在，原有的 Services/Volumes V3 包装器检查继续保留。该变更关闭了 A02～A04 的“当前项目活动路由仍直接使用旧详情包装器”静态缺口，但不关闭联邦资源、全局 `consolev3` 预加载、全部操作等价和其他 A 行的运行时缺口。
 
 ## 2026-10-20 三项目标复核后的 V3 等价结论
 

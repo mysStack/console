@@ -210,7 +210,7 @@ export const linkButtonStyle: CSSProperties = {
 };
 
 // ---------------------------------------------------------------------------
-// Inline editor (ConfigReferenceInline)
+// Native reference editor
 // ---------------------------------------------------------------------------
 
 export const sectionStyle: CSSProperties = {
@@ -316,7 +316,7 @@ export const reloaderKnobEnabledStyle: CSSProperties = {
 };
 
 // ---------------------------------------------------------------------------
-// Read-only summary (ConfigReferenceSummary)
+// Native reference preview
 // ---------------------------------------------------------------------------
 
 export const summaryStyle: CSSProperties = {

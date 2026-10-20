@@ -416,3 +416,9 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 | API Server 实际故障环境 | 已完成（限定范围） | 本轮真实停止/恢复 K3s，185 组浏览器样本中六类 Kubernetes 列表在故障期间出现 502/503，恢复后回到 200；Application 对照接口保持 200；readyz、节点和 Console rollout 均恢复                                                        |
 
 本节的“已完成（限定范围）”只表示 API Server 故障注入、恢复和上述列表接口的浏览器/API链路已验证；不能扩展为全平台故障兼容或全部 V3 等价通过。
+
+## 2026-10-20 当前项目 Workload V3 兼容桥清理
+
+已确认项目 Deployment、StatefulSet、DaemonSet 的旧 V3 详情包装器没有活动路由或源码消费者，当前活动路由使用原生 Workload Detail 和原生 ConfigReferencePage。本轮删除无消费者的旧项目详情包装器、ConfigReference V3 DOM 注入桥及其专用测试/辅助文件，并新增回归断言防止旧项目包装器重新出现。
+
+联邦项目路由仍直接使用 `fedprojects/containers/*` 的 V3 包装器，因此本轮只关闭当前项目活动详情的静态桥接缺口；联邦资源的 V4 原生替代和运行时等价仍未完成。删除后本地 `./scripts/test.sh` 为 65 个测试文件、206 个测试通过，`corepack yarn build:packages` 成功；部署后浏览器复验仍需在新制品上完成。

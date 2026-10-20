@@ -123,8 +123,8 @@ P0-U002 的 Action 部分仍未关闭。每个当前调用点必须补充：
 
 删除无调用的 `packages/shared/src/components/Modals/AppTemplateEdit/index.tsx` 后，重新排除测试文件、`v3dist`、编译输出和 `node_modules` 扫描：
 
-- `useV3action/useV3Actions` 命中 10 个源码文件：7 个业务调用文件、2 个桥接实现/Hook 文件和 1 个导出文件。
-- 7 个业务文件对应 8 个当前活动 Action 行；DevOps 的 `create/edit` 仍拆成两个 Action。
+- `useV3action/useV3Actions` 命中 9 个源码文件：6 个业务调用文件、2 个桥接实现/Hook 文件和 1 个导出文件。
+- 6 个业务文件对应 7 个当前活动 Action 行；DevOps 的 `create/edit` 仍拆成两个 Action。
 - 当前源码中已找不到 `AppTemplateEdit` 或 `openpitrix.template.edit.v2` 调用点。
 
 该结果只关闭当前源码中的无调用 A12 编辑桥，不代表 `v3dist` 中的同名字符串或其他边缘应用模板路径已经完成 V4 等价验证。
