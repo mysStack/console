@@ -437,6 +437,20 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 
 该结果补充了 A08 的部署后运行时证据：当前入口依赖 V3/Wujie 兼容加载边界，且通知 API 查询请求存在错误响应。A08 不能标记为 V4 原生等价通过；完整 V3/Wujie 清理和通知功能成功、失败、取消、权限、刷新/返回路径仍未完成。扩展初始化错误按负责人要求暂不处理。
 
+## 2026-10-21 当前制品全入口浏览器复核
+
+当前 131 制品的真实管理员浏览器复核结果如下：
+
+| 入口      | 实际结果                                                                                                       | 当前判定                                                    |
+| --------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| DevOps    | `/workspaces/test-workspace/devops` 正常渲染；企业空间集群列表为 `200`，页面显示“请选择集群”、创建入口和空列表 | 入口已验证；DevOps 成功、失败、取消和低权限仍未验证         |
+| 联邦项目  | `/workspaces/test-workspace/federatedprojects` 正常渲染，但没有联邦项目 fixture                                | 入口部分验证；FederatedProject/FederatedResource 等价未验证 |
+| Edge 节点 | `/clusters/host/edgenodes` 正常渲染，Edge 节点列表请求 `200` 但为空                                            | 入口部分验证；EdgeWorkload 和批量 Action 未验证             |
+| 通知设置  | 访问 `/settings/notification-configuration` 后进入 `/settings/silent-policy`；通知 silences 请求 `400`         | A08 未验证；仍加载 `/consolev3` 和 `/dist/v3dist`           |
+| 应用模板  | `/workspaces/test-workspace/apps/stakater-configmap` 原生版本页渲染，详情/版本读取 `200`                       | A09/A12 继续部分验证；仍有 V3 预加载                        |
+
+本轮为当前制品补充了逐入口浏览器证据，但没有把空数据态、页面可达或只读接口成功当作全部 V3 等价通过；A01～A12、完整 RBAC 组合和 V3/Wujie 清理结论保持原状态。
+
 ## 2026-10-20 当前项目 Workload V3 兼容桥清理
 
 已确认项目 Deployment、StatefulSet、DaemonSet 的旧 V3 详情包装器没有活动路由或源码消费者，当前活动路由使用原生 Workload Detail 和原生 ConfigReferencePage。本轮删除无消费者的旧项目详情包装器、ConfigReference V3 DOM 注入桥及其专用测试/辅助文件，并新增回归断言防止旧项目包装器重新出现。

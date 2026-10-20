@@ -759,6 +759,20 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 
 本次验证未输出账号信息、密码、Token 或 Secret 内容；页面与请求记录只保留路径、状态码和功能结论。
 
+## 2026-10-21 当前制品全入口浏览器复核
+
+使用当前已部署制品和真实管理员浏览器会话，顺序访问 DevOps、联邦项目、Edge 节点、通知设置和应用模板版本页面：
+
+| 入口                                                 | 页面结果                                         | 网络/运行时边界                                                                                                                  | 结论                                        |
+| ---------------------------------------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| `/workspaces/test-workspace/devops`                  | 页面正常渲染，显示“请选择集群”、创建入口和空列表 | 企业空间集群列表请求为 `200`；当前没有可用 DevOps 项目数据                                                                       | 入口可达，DevOps 成功/失败/权限等价仍未验证 |
+| `/workspaces/test-workspace/federatedprojects`       | 联邦项目页面正常渲染，无项目数据                 | 当前没有可执行的 FederatedProject/FederatedResource fixture                                                                      | 入口部分验证，完整联邦行为未验证            |
+| `/clusters/host/edgenodes`                           | Edge 节点页面正常渲染，列表为空                  | Edge 节点读取请求为 `200`，没有 EdgeWorkload fixture                                                                             | 入口部分验证，边缘 Action 未验证            |
+| `/settings/notification-configuration`               | 实际跳转到 `/settings/silent-policy`，页面可渲染 | 请求 `/consolev3/settings/silent-policy`、`/consolev3/dashboard`、多个 `/dist/v3dist/*` 均为 `200`；通知 silences API 返回 `400` | A08 未验证，仍存在 V3/Wujie 兼容加载边界    |
+| `/workspaces/test-workspace/apps/stakater-configmap` | 原生版本页渲染，3 个版本可读取                   | 应用详情、版本列表接口均为 `200`，同时存在 `/consolev3/dashboard` 和 `v3dist` 加载                                               | A09/A12 仍为部分验证                        |
+
+本轮没有执行创建、修改、删除、扩缩或扩展安装；没有产生测试资源残留。浏览器控制台仍有已登记的扩展初始化错误，按负责人要求暂不处理。
+
 本轮提交前复核：Git HEAD 为 `b2bd7bf639ae0e42cbd92e4787d93dbf666a902a`；部署镜像为 `feature-v4-configmaps-secrets-20261020-105412-1c54df98d124`；最终运行 Pod 为 `ks-console-58794bfdc6-dc5j2`，imageID 对应 digest `sha256:49febd89201b7a887d30928ae31a3b296d459ed18dc7811b550a14719556fab2`。测试 namespace 复核无本轮临时资源残留，PR #1 仍保持 Draft。
 
 本轮又在项目 Workload 原生桥清理制品 `d091cb1cdc3d271e1632ed569decc9aeac75fb31` 上完成 API Server 实际故障复测。镜像 tag 为 `feature-v4-configmaps-secrets-20261020-171341-d091cb1cdc3d`，digest 为 `sha256:1b82acae4539989150585dfd3e68376ad9bbb957302d82adb98bb19b4d58ce6e`；7 个浏览器接口各采样 60 次，六类 Kubernetes 列表均出现 502/503，Application 对照接口 60/60 为 200。恢复后 `readyz=ok`、节点 Ready、Deployment `550/550` 且 `1/1/1/1`，Pod `ks-console-74899889df-gp9lq` Running/Ready，debug Pod 已清理。该证据仍只覆盖 Kubernetes 列表接口和恢复链路，不扩大为全部页面或写操作故障验证。
