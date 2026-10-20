@@ -730,3 +730,9 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 真实 Playwright 登录后，Deployment 原生详情页能够渲染资源状态、修改记录、元数据、环境变量、配置引用和事件入口；“更多操作”菜单显示回退、编辑自动扩缩、编辑设置、编辑 YAML、重新创建和删除入口。StatefulSet、DaemonSet 临时对象已创建并清理，namespace 无测试资源残留。应用模板详情页的原生“编辑信息”弹窗能够渲染并回填名称、描述、分类和服务商网站等字段，点击取消没有产生写请求。
 
 这轮只增加了原生入口和页面渲染证据，没有把菜单存在或弹窗可打开写成全部 V3 等价通过。A02～A04 的全量操作成功/失败/取消、全部作用域 RBAC 和 V3/Wujie 兼容残留仍未闭环；A12 的保存、冲突、低权限和制品运行时 Action 移除仍未完成。
+
+## 2026-10-20 平台只读三类配置资源 RBAC 补测
+
+在当前 131 制品上创建临时平台只读用户和 GlobalRole，真实 Playwright 登录后访问 ConfigMap、Secret、ServiceAccount 项目页面。三类资源列表 GET 均为 `200`，创建 POST 均为 `403`，页面均正常渲染；临时用户、GlobalRole、GlobalRoleBinding 已删除，`v4-migration-e2e` 无测试资源残留。
+
+该证据补齐平台只读作用域对三个目标资源的读/写边界，但不覆盖平台更新/删除、联邦、DevOps、Extension 或全部 V3 Action 等价。

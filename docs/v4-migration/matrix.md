@@ -398,3 +398,9 @@ A11 边界修正：本轮应用模板安装实际走原生 `deployApp`，没有�
 本轮只验证页面渲染和操作入口存在，没有逐项提交所有操作，也没有把入口存在当作 V3 功能等价通过。临时 Workload 已删除，`v4-migration-e2e` 最终只保留系统 `kube-root-ca.crt` ConfigMap 和默认 ServiceAccount；当前镜像 tag 为 `feature-v4-configmaps-secrets-20261020-105412-1c54df98d124`，Pod imageID 对应 manifest digest `sha256:49febd89201b7a887d30928ae31a3b296d459ed18dc7811b550a14719556fab2`。
 
 A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域和 `/consolev3/dashboard` 兼容预加载仍未关闭；A12 的原生编辑表单渲染和取消子路径已确认，但完整保存失败、冲突、低权限和制品内 V3 Action 移除仍未完成。
+
+## 2026-10-20 平台只读作用域覆盖三类配置资源
+
+真实 Playwright 使用临时平台只读用户访问 `v4-migration-e2e` 的 ConfigMap、Secret、ServiceAccount 页面。三类资源列表 GET 均返回 `200`，创建 POST 均返回 `403`；页面均能渲染，ConfigMap 只显示当前 namespace 对象。临时用户、GlobalRole 和 GlobalRoleBinding 已删除，namespace 无拒绝请求对象残留。
+
+该补测关闭平台只读角色对三个目标资源的读取/创建拒绝缺口。它不扩大为平台全部写操作、联邦/DevOps/Extension 作用域或全部 V3 功能等价性通过；Workload `projectonly` 的历史结果差异仍需独立解释。

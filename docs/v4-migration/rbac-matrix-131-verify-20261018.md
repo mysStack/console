@@ -246,3 +246,19 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 | DaemonSet   | 200 |  403 | 403 |   403 |    403 |
 
 临时用户、RoleBinding 和三类 Workload 均已删除，namespace 复核只剩系统 ConfigMap 和默认 ServiceAccount。该结果与此前有效账号的 `GET 200、写入 403` 记录一致，但仍与另一账号上下文中的全部 `403` 结果不一致；账号元数据和登录上下文差异尚未完全证明原因，因此 `projectonly` 仍保留为“结果不一致，待独立解释”，不能扩大为全量 RBAC 通过。
+
+## 2026-10-20 平台只读角色三类目标资源补测
+
+在当前 131 制品上创建临时平台只读用户、GlobalRole 和 GlobalRoleBinding。GlobalRole 规则由已安装的 `global-view-workspaces`、`global-view-clusters`、`global-view-users` 和 `global-view-roles` RoleTemplate 规则合并生成，未授予创建、更新或删除权限。真实 Playwright 登录后，ConfigMap、Secret、ServiceAccount 项目页面均能渲染；ConfigMap 列表显示当前 namespace 的系统对象，Secret 和 ServiceAccount 页面也能正常访问。
+
+浏览器会话内对 `v4-migration-e2e` 三类资源执行列表读取和创建拒绝验证：
+
+| 资源           | GET | POST | 页面结果                         |
+| -------------- | --: | ---: | -------------------------------- |
+| ConfigMap      | 200 |  403 | 项目 ConfigMap 页面正常渲染      |
+| Secret         | 200 |  403 | 项目 Secret 页面正常渲染         |
+| ServiceAccount | 200 |  403 | 项目 ServiceAccount 页面正常访问 |
+
+平台只读用户还实际访问了 `/access/workspaces`、`/clusters`、`/access/accounts`、`/extensions/management`、`/settings/base-info`，路由均保持可访问。本轮临时用户、GlobalRole 和 GlobalRoleBinding 已删除并复核不存在；测试 namespace 没有留下拒绝请求对象。
+
+该证据补齐了平台只读作用域对 ConfigMap、Secret、ServiceAccount 的读/写边界，但不代表平台角色具有全部页面或全部 V3 Action 等价权限，也不关闭联邦、DevOps、Extension 和 project-only 结果差异。
