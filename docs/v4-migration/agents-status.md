@@ -849,3 +849,12 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 在当前 131 环境按授权停止并恢复 K3s/API Server。真实浏览器会话对专用 ConfigMap 执行 PATCH、DELETE，并对另一个专用名称执行 POST；三类请求在故障期间均返回 `502`。恢复后 Kubernetes API 确认已有 ConfigMap 仍为故障前的 `before-fault`，删除没有生效，新建对象不存在。恢复后 `/readyz` 返回 `ok`、节点 `dev01` Ready；两个专用对象均已清理，namespace 无测试资源残留。
 
 本轮把 API Server 故障证据从只读列表扩展到 ConfigMap 写操作失败和不产生部分写入，但仍不代表所有资源类型、所有页面错误提示/重试路径或全量 V3 等价已经验证。
+
+## 2026-10-21 当前批次：A02～A04 重新创建复核
+
+- 状态：已完成本批次的管理员重新创建验证；模块级全量验收仍未完成。
+- 范围：`v4-migration-e2e` 中临时 Deployment、StatefulSet、DaemonSet，真实浏览器登录后分别执行原生“更多操作 → 重新创建”。
+- 证据：三类资源提交成功，API 回读 generation 均为 `1 → 2`，并写入 `kubesphere.io/restartedAt`；临时资源已清理。
+- 未闭环：伸缩、YAML 成功持久化、失败/取消组合、低权限拒绝、所有动态 Action 和完整 V3/Wujie 等价仍未验证。
+- 测试边界：本轮 YAML 自动化输入未替换 Ace 编辑器全文，形成重复 YAML 文档并收到 `PUT 400`，副本数保持不变；该结果不作为业务失败结论，后续需要用单一合法文档重新验证。
+- 当前制品：`4bbea8b022` 及其已部署镜像 `feature-v4-configmaps-secrets-20261021-013709-4b5c7f5670c4`；manifest digest 为 `sha256:ffe166aa35e105d463e3b1d37e14fca3595088706e1eecfe5daf7c97518fb3ac`，Pod imageID 已在此前部署复核中与该 digest 一致。

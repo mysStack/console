@@ -528,3 +528,11 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 提交 `4b5c7f5670c46314690e259535ad000cad85a014` 修复回退弹窗的目标版本匹配和空模板保护。Run `39466765863` 通过单元测试及镜像构建；131 制品为 `feature-v4-configmaps-secrets-20261021-013709-4b5c7f5670c4`，manifest digest 为 `sha256:ffe166aa35e105d463e3b1d37e14fca3595088706e1eecfe5daf7c97518fb3ac`，部署 rollout `553/553` 成功，Pod Ready 且 imageID 与 digest 一致。
 
 真实浏览器在当前制品上对 Deployment、StatefulSet、DaemonSet 分别选择历史修改记录 `#1` 执行回退。三类请求均为 `PATCH 200`；StatefulSet、DaemonSet 的请求体带有历史 Pod 模板，Deployment 的 JSON Patch 带有历史 Pod 模板；三类 Kubernetes API 回读均确认镜像恢复为 `busybox:1.35`，generation 均由 `2` 变为 `3`。该结果把 A02～A04 的管理员回退成功子路径从失败/未验证推进为已验证，但不代表全部 V3 Action、全部失败/取消组合、低权限 RBAC 或 V3/Wujie 去依赖已闭环。
+
+## 2026-10-21 A02～A04 重新创建操作复核
+
+在当前 131 制品 `feature-v4-configmaps-secrets-20261021-013709-4b5c7f5670c4` 上，使用真实管理员浏览器访问专用 `v4-migration-e2e` namespace 中的临时 Deployment、StatefulSet 和 DaemonSet，分别执行原生“更多操作 → 重新创建 → 确定”。三类页面都显示确认对话框，提交后对应 API 请求成功，三个对象的 `metadata.generation` 均由 `1` 变为 `2`，`spec.template.metadata.annotations.kubesphere.io/restartedAt` 均写入本次时间戳。临时对象随后全部删除，namespace 无本轮 Workload 残留。
+
+该结果关闭 A02～A04 管理员“重新创建”成功子路径；没有扩大为伸缩、YAML 成功持久化、失败/取消组合、低权限拒绝或全部 V3 Action 等价通过。
+
+本轮尝试通过浏览器原生“编辑 YAML”修改 Deployment 副本数时，自动化编辑器输入未替换 Ace 编辑器原有全文，提交请求体包含两个 YAML 文档，Console API 返回 `PUT 400`，副本数保持 `0`。该次失败属于测试输入未形成单一合法资源文档，不能作为业务功能失败证据；由于没有得到干净的单文档提交，伸缩/YAML 成功路径仍保持未验证。另观察到 Deployment 的“编辑设置”和“编辑 YAML”都调用同一 YAML 编辑回调，当前只记录为待产品确认的交互差异，不据此自行修改功能代码。

@@ -494,3 +494,11 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 本轮浏览器控制台仍记录已知扩展初始化错误（包括 `getExtensionConsoleV3Embed is not a function`）；该问题属于已登记的扩展运行时范围，本轮不处理，也不把它写成 Workload 原生详情路由通过。新制品上的项目 Deployment、StatefulSet、DaemonSet 原生入口已完成部署后浏览器验收，但全部操作等价、全部 V3 功能逐项等价和完整 RBAC 组合矩阵仍未完成。
 
 本轮继续用真实浏览器检查当前制品的 A02～A04 操作入口。Deployment 的回退、自动扩缩、编辑 YAML、删除确认均能打开并取消；重新创建提交后 generation 从 `1` 变为 `2`，新 Pod 恢复 `Ready`。StatefulSet 的回退、自动扩缩、编辑服务、编辑设置、编辑 YAML、重新创建和删除入口均渲染；DaemonSet 的回退、编辑设置、编辑 YAML、重新创建和删除入口均渲染。本轮没有对 StatefulSet、DaemonSet 提交写操作，三类临时 Workload 已清理。该补测只扩大 A02～A04 的入口和取消/重新创建证据，不改变全量 V3 等价性为未完成的结论。
+
+## 2026-10-21 当前制品 A02～A04 重新创建与 YAML 输入边界
+
+真实管理员浏览器在专用 namespace 对临时 Deployment、StatefulSet、DaemonSet 分别执行“重新创建”。三类操作均提交成功，Kubernetes API 回读 `metadata.generation` 从 `1` 变为 `2`，并写入 `kubesphere.io/restartedAt`；测试对象已清理。
+
+本轮通过浏览器 YAML 编辑器修改副本数的自动化输入产生了重复 YAML 文档，Console API 返回 `PUT 400`，副本数未改变。该结果只能说明本次编辑输入没有形成合法单文档，不能作为业务代码失败；伸缩/YAML 成功持久化仍未验证。页面中“编辑设置”和“编辑 YAML”当前都打开同一 YAML 编辑回调，作为待确认交互差异记录，不自动改代码。
+
+因此 A02～A04 的重新创建管理员成功子路径已验证，完整操作组合、YAML 成功写入、失败/取消、低权限及全量 V3 等价仍未完成。
