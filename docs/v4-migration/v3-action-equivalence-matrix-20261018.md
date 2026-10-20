@@ -618,3 +618,5 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 同一轮又在 StatefulSet `v4-sts-ops-verify-20261021` 上执行相同的管理员自动扩缩流程。页面成功提交，HPA `POST` 返回 `201`，HPA 的 `scaleTargetRef` 为 `StatefulSet/v4-sts-ops-verify-20261021`，API 回读确认 `minReplicas=1`、`maxReplicas=2`、CPU/内存两个目标以及 StatefulSet `readyReplicas=1`；刷新后页面仍显示自动扩缩设置。临时 HPA、StatefulSet 和 Pod 已删除。
 
 该结果关闭 A03 管理员自动扩缩成功子路径；DaemonSet、低权限拒绝、失败/取消、网络故障和全部 V3/Wujie 运行时清理仍未验证。
+
+在同一制品上打开 DaemonSet `v4-ds-ops-verify-20261021` 的“更多操作”菜单，真实浏览器显示回退、编辑设置、编辑 YAML、重新创建和删除；菜单没有“编辑自动扩缩”，因此没有对 DaemonSet 创建 HPA。该行为边界已记录，但尚未证明它与 V3 的原有操作集合等价；临时 DaemonSet 和 Pod 已清理。

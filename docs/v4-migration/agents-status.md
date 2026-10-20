@@ -981,3 +981,5 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - 未闭环：StatefulSet/DaemonSet 自动扩缩、低权限拒绝、失败/取消、网络故障和全部 V3/Wujie 运行时清理。
 
 同一轮又完成 StatefulSet 管理员自动扩缩成功路径：HPA 创建返回 `201`，`scaleTargetRef` 指向 StatefulSet，API 回读确认 CPU/内存目标及 `1～2` 副本范围，刷新后页面保持一致。临时 HPA、StatefulSet 和 Pod 已清理。DaemonSet 自动扩缩、低权限拒绝、失败/取消、网络故障和全部 V3/Wujie 运行时清理仍未闭环。
+
+对临时 DaemonSet 原生详情菜单复核：真实浏览器显示回退、编辑设置、编辑 YAML、重新创建和删除，没有“编辑自动扩缩”；本轮没有创建 DaemonSet HPA。该结果只记录当前操作边界，仍需与 V3 行为逐项核对，A04 未标记为等价通过。

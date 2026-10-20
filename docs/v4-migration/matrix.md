@@ -566,3 +566,5 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 该证据只关闭 A02 管理员自动扩缩的一条成功子路径，未覆盖 StatefulSet/DaemonSet、低权限拒绝、失败/取消、网络故障和全部 V3 Action 等价性；A02～A04 仍不能标记为完整等价。
 
 同一轮在 StatefulSet 临时对象上重复执行自动扩缩成功路径：HPA 创建返回 `201`，`scaleTargetRef` 正确指向 StatefulSet，API 回读确认 CPU/内存目标、`minReplicas=1`、`maxReplicas=2`，StatefulSet 保持 `1` 个就绪副本；浏览器刷新后设置仍显示。测试对象和 HPA 已删除。该证据仅关闭 A03 管理员自动扩缩成功子路径，DaemonSet及其他失败、取消、低权限和 V3/Wujie 条件仍未完成。
+
+对临时 DaemonSet 的真实详情页菜单进行了对照：显示回退、编辑设置、编辑 YAML、重新创建和删除，没有“编辑自动扩缩”入口。本轮没有创建 DaemonSet HPA；该菜单差异已作为 A04 的待等价核对项记录，不能根据入口缺失推断 V3 功能等价。
