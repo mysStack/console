@@ -113,3 +113,33 @@ K3s 恢复过程中 Console Pod 由 ReplicaSet 重建，但最终运行镜像 di
 恢复期间单节点资源不足导致 Console 新 Pod 短暂 Pending；删除旧的同镜像 Pod 后 Deployment 完成 rollout，最终只保留一个 Ready Pod。该现象记录为单节点资源约束，不能当作 API Server 故障本身的功能失败。
 
 本轮扩大了 Kubernetes 资源列表的真实故障证据，但仍未覆盖全部页面、全部写操作、全部 V3 Action、全部 RBAC 组合和扩展初始化错误；应用列表接口未出现故障响应，也不能扩大解释为应用模块故障恢复已验证。
+
+## 2026-10-20 当前制品第三次实际故障验证
+
+本轮在当前分支 `b2bd7bf639ae0e42cbd92e4787d93dbf666a902a` 对应的 131 部署制品上重新执行了已授权的 API Server 故障验证。执行前确认 Kubernetes context 为 `default`、`dev01` 为 `Ready`、`/readyz` 为 `ok`，`ks-console` rollout 已完成；故障前部署镜像为
+`feature-v4-configmaps-secrets-20261020-105412-1c54df98d124`，Pod 实际 imageID 为
+`ghcr.io/mysstack/ks-console@sha256:49febd89201b7a887d30928ae31a3b296d459ed18dc7811b550a14719556fab2`。
+
+使用真实登录后的浏览器会话，每 2 秒对以下接口采样一次，共取得 185 组样本：
+
+- `ConfigMap`、`Secret`、`ServiceAccount` 的 namespace 列表接口；
+- Deployment、StatefulSet、DaemonSet 的 namespace 列表接口；
+- Application 列表接口作为不依赖 Kubernetes API Server 的对照组。
+
+故障注入仍使用负责人已授权的 `kubectl debug node/dev01 --profile=sysadmin`，通过宿主机 `systemd` 停止 K3s，并预先安排 45 秒后启动恢复；故障结束后删除 debug Pod。采样结果如下：
+
+| 接口范围            | 200 | 403 | 502 | 503 | 恢复后 |
+| ------------------- | --: | --: | --: | --: | ------ |
+| ConfigMap 列表      |  63 |   1 |  81 |  40 | 200    |
+| Secret 列表         |  63 |   1 |  81 |  40 | 200    |
+| ServiceAccount 列表 |  63 |   1 |  81 |  40 | 200    |
+| Deployment 列表     |  63 |   1 |  81 |  40 | 200    |
+| StatefulSet 列表    |  63 |   1 |  81 |  40 | 200    |
+| DaemonSet 列表      |  63 |   1 |  80 |  41 | 200    |
+| Application 列表    | 185 |   0 |   0 |   0 | 200    |
+
+其中每个 Kubernetes 资源接口均出现了故障期间的 502/503，并在 K3s 恢复后返回 200；单次 403 是故障切换边界的瞬态授权结果，没有被当作 API Server 故障响应。恢复核验结果：`/readyz` 返回 `ok`，`dev01` 恢复为 `Ready`，`ks-console` rollout 成功，运行 Pod 为 `Running/Ready`，镜像 digest 未发生变化。故障注入没有创建、修改或删除业务资源。
+
+恢复过程中单节点 CPU 不足使同一镜像旧 ReplicaSet 短暂保留 Pending 副本；删除该 Pending 测试副本并让旧 ReplicaSet 退出后，新的同镜像 Pod `ks-console-58794bfdc6-dc5j2` 达到 `Running/Ready`，Deployment 状态恢复为 `1/1/1/1`，实际 imageID 仍为上述 digest。该调度现象已单独记录，不能误判为 API Server 故障导致的 Console 功能失败。
+
+本轮将“API Server 实际故障环境验证”标记为**已完成（限定上述列表接口和恢复链路）**。它仍不代表所有页面、所有写操作、所有动态 Action 或全部 V3 功能在 API Server 故障期间均已验证。
