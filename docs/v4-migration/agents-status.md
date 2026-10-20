@@ -1007,3 +1007,10 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - 访问 `/workspaces/test-workspace/app-templates` 页面正常渲染；应用模板列表 GET 返回 `200`。该结果证明工作空间资源权限不能外推为项目资源权限。
 - 临时用户、WorkspaceRoleBinding、ConfigMap、Secret、ServiceAccount、Deployment 和凭据均已清理并复核不存在；测试 namespace 保留。
 - 结论：补强 `workspaceonly` 负向项目资源边界和 A09/A12 读取边界；完整 RBAC 矩阵仍未完成。
+
+## 2026-10-21 集群管理员项目资源正向 CRUD 复核
+
+- 临时账号绑定 `test-workspace` workspace viewer 和集群 `cluster-admin`，未绑定项目 RoleBinding。
+- 真实浏览器打开项目 ConfigMap 页面正常；ConfigMap、Secret、ServiceAccount、Deployment 的列表/详情/POST/PATCH/PUT/DELETE 均为 `200/200/201/200/200/200`。
+- 所有写入对象均使用唯一名称并在同一浏览器会话内删除；初始临时对象、账号、workspace/cluster 绑定和凭据均已清理并复核不存在。
+- 该证据补齐当前四类核心项目资源的集群管理员正向组合；DevOps、联邦、Edge、通知、扩展和全部动态 Action 仍未完成。

@@ -400,3 +400,18 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 | 工作空间应用模板    | `/workspaces/test-workspace/app-templates` 正常渲染空列表 | 应用模板列表 GET `200`      | 工作空间管理员权限只覆盖工作空间资源     |
 
 本轮没有创建、编辑或删除业务对象；只创建了带唯一标签的临时测试对象用于确认环境，已全部删除。临时用户和 `WorkspaceRoleBinding` 已删除并复核不存在，`v4-migration-e2e` namespace 仍保留且无本轮对象残留。该结果补强 `workspaceonly` 的负向项目资源边界和 A09/A12 工作空间读取边界，但不关闭完整 RBAC 组合矩阵。
+
+## 2026-10-21 集群管理员项目资源正向 CRUD 复核
+
+使用当前 131 已部署制品创建临时账号，仅绑定 `test-workspace` 的 workspace viewer 和集群级 `cluster-admin`，未绑定项目 RoleBinding。真实浏览器登录后打开项目 ConfigMap 页面，页面正常渲染并显示当前 namespace 对象。随后在同一浏览器会话中对 ConfigMap、Secret、ServiceAccount、Deployment 分别执行列表、详情、创建、PATCH、PUT 和删除：
+
+| 资源           | 列表 | 详情 | POST | PATCH | PUT | DELETE |
+| -------------- | ---: | ---: | ---: | ----: | --: | -----: |
+| ConfigMap      |  200 |  200 |  201 |   200 | 200 |    200 |
+| Secret         |  200 |  200 |  201 |   200 | 200 |    200 |
+| ServiceAccount |  200 |  200 |  201 |   200 | 200 |    200 |
+| Deployment     |  200 |  200 |  201 |   200 | 200 |    200 |
+
+所有 POST 对象使用唯一名称，PUT/PATCH 仅修改本轮临时对象；删除响应为 `200`，之后通过 Kubernetes API 清理原始临时对象。临时用户、workspace/cluster 绑定、四类资源和凭据均已删除并复核不存在，测试 namespace 保留且无本轮对象残留。
+
+该结果补齐当前制品“workspace viewer + cluster admin”对四类项目资源的正向 CRUD 证据，与平台只读、workspaceonly、projectonly 和项目角色的拒绝/正向边界形成更完整的当前资源矩阵；它仍不能外推到 DevOps、Federation、Edge、Notification、Extension 或全部动态 Action。
