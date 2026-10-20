@@ -887,3 +887,11 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - API：列表 GET `200`；创建 POST `403`；不存在对象的 PUT、PATCH、DELETE 均 `403`；不存在对象 GET 为 `404`。
 - 清理：临时用户、GlobalRole、GlobalRoleBinding 和测试应用模板已删除并复核不存在；`v4-migration-e2e` namespace 未删除且无本轮资源残留。
 - 未闭环：应用模板冲突/网络失败、DevOps、联邦、Edge、通知、扩展和全部动态 Action 的完整正反权限与 V3 等价性。
+
+## 2026-10-21 当前源码 V3 Action 残留复核
+
+- 当前 HEAD：`fa8f2b3a4`。
+- 排除 `lib`、`node_modules` 和测试文件后，仍有 6 个业务文件直接调用 `useV3action`，涉及 Edge 应用模板创建、Edge 模板部署、EdgeWorkload 批量删除、DevOps 创建/编辑和通知设置；DevOps 文件包含两个 Action。
+- 仍有 3 个桥接/导出文件：`packages/console/src/actions/v3actions.tsx`、`packages/shared/src/hooks/useV3Actions/index.tsx`、`packages/shared/src/hooks/index.ts`。
+- 当前源码匹配 `WujieReact`、`wujie-react`、`ConsoleV3ResourceList`、`consolev3` 或 `v3dist` 的文件数为 157；部署后浏览器仍请求 `/consolev3/dashboard` 和 `/dist/v3dist/*`。
+- 结论：A05～A08、A10 和 A12 的制品级 V3/Wujie 清理条件仍未满足；该结果是当前状态复核，不把空数据态或部分原生成功路径写成全量等价通过。

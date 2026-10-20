@@ -546,3 +546,13 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 - 通过列表“更多操作 → 删除”打开确认框，输入系统生成的临时应用模板名称后，删除请求 `DELETE /kapis/application.kubesphere.io/v2/workspaces/test-workspace/apps/<临时名称>/` 返回 `200`；删除完成后列表回到空数据态，API 查询未发现该临时对象。
 
 该轮关闭 A12 当前制品管理员上传成功、列表刷新和删除成功子路径，并复核了删除后的空数据态。它不代表 A12 的完整等价性：低权限上传/删除、名称或版本冲突、网络失败、返回/直达 URL、全部 V3 Action/Wujie 移除仍未闭环；扩展初始化错误按负责人要求暂不处理。临时 Chart 和应用模板均已清理，`v4-migration-e2e` namespace 未删除。
+
+## 2026-10-21 当前源码 V3 Action 与兼容残留复核
+
+在当前 HEAD `fa8f2b3a4` 上重新扫描 `packages/console/src`、`packages/core/src` 和 `packages/shared/src`，排除 `lib`、`node_modules` 和测试文件：
+
+- 仍有 6 个业务文件直接调用 `useV3action`：应用模板创建的 Edge 分支、应用列表的 Edge 模板创建、Edge 应用部署、EdgeWorkload 批量删除、DevOps 页面以及用户通知设置；DevOps 文件包含 `devops.edit` 和 `devops.create` 两个 Action。
+- 仍有 3 个桥接/导出文件：`packages/console/src/actions/v3actions.tsx`、`packages/shared/src/hooks/useV3Actions/index.tsx` 和 `packages/shared/src/hooks/index.ts`。
+- 当前源码中匹配 `WujieReact`、`wujie-react`、`ConsoleV3ResourceList`、`consolev3` 或 `v3dist` 的文件数为 157；当前制品的浏览器请求仍可观测到 `/consolev3/dashboard` 和 `/dist/v3dist/*`。
+
+该复核证明 A05～A08、A10 仍有活动 V3 Action 或兼容加载边界，不能仅凭 A09/A12 的部分原生成功路径宣称全部 V3 功能逐项等价。当前环境仍缺少 Edge/Federated 和 DevOps 业务 fixture，通知页面仍有已记录的 V3 资源加载及 API `400`；这些项必须补齐 V4 替代行为或明确作为未通过项，不能用空数据态豁免。

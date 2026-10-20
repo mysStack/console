@@ -514,3 +514,5 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 使用真实管理员浏览器在 `test-workspace` 应用模板列表上传临时 Helm Chart `v4-a12-chart-20261021-0.0.1.tgz`。Chart 校验和创建请求均返回 `200`，列表刷新后显示唯一临时模板；通过“更多操作 → 删除”确认删除，删除请求返回 `200`，删除后页面回到空数据态，API 查询未发现临时对象。该证据补齐 A12 当前制品管理员上传、刷新和删除成功子路径；低权限、冲突/失败、返回/直达 URL、全部 V3/Wujie 清理和其他资源的完整 RBAC 组合仍未完成。临时对象已清理。
 
 同一部署制品上又补测了平台全局只读应用模板组合：临时用户只绑定包含 `global-view-workspaces` 和 `workspace-view-app-templates` 只读规则的 GlobalRole。真实浏览器访问工作空间应用模板页面能够渲染空列表且没有“添加/创建”入口；列表 GET 为 `200`，创建 POST、更新 PUT/PATCH、删除 DELETE 均为 `403`。不存在对象的 GET 为 `404`，与权限拒绝区分记录。临时用户、GlobalRole、GlobalRoleBinding 和测试模板均已清理；该证据补齐 A09/A12 的全局只读边界，但 DevOps、联邦、Edge、通知、扩展和全部动态 Action 的完整 RBAC 仍未完成。
+
+当前源码复核显示，排除编译输出、依赖和测试文件后仍有 6 个业务文件直接调用 `useV3action`，另有 3 个 V3 桥接/导出文件；匹配 `WujieReact`、`wujie-react`、`ConsoleV3ResourceList`、`consolev3` 或 `v3dist` 的源码文件数为 157。部署后浏览器仍请求 `/consolev3/dashboard` 和 `/dist/v3dist/*`。因此“全部 V3 功能逐项等价性”仍为未完成，不能因 A09/A12 的部分浏览器成功证据而放行全量迁移。
