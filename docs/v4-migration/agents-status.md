@@ -878,3 +878,12 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - 删除证据：列表“更多操作 → 删除”要求输入系统生成的临时名称；确认后的 `DELETE` 返回 `200`，删除后列表回到空数据态，API 查询未发现临时对象。
 - 清理：临时应用模板已通过页面删除，测试 namespace 未删除且无本轮资源残留。
 - 未闭环：低权限上传/删除、冲突、网络失败、完整返回/直达 URL、全部 V3 Action/Wujie 移除；扩展初始化错误按负责人要求延期。
+
+## 2026-10-21 A09/A12 平台全局只读 RBAC 补测
+
+- 状态：已完成应用模板全局只读组合的读取与写入拒绝验证；全量 RBAC 仍未完成。
+- 组合：临时用户只绑定包含 `global-view-workspaces` 与 `workspace-view-app-templates` 规则的 GlobalRole，没有项目 RoleBinding，也没有写权限。
+- 浏览器：真实登录后访问 `test-workspace` 应用模板页面，空列表正常渲染，页面不显示“添加/创建”入口。
+- API：列表 GET `200`；创建 POST `403`；不存在对象的 PUT、PATCH、DELETE 均 `403`；不存在对象 GET 为 `404`。
+- 清理：临时用户、GlobalRole、GlobalRoleBinding 和测试应用模板已删除并复核不存在；`v4-migration-e2e` namespace 未删除且无本轮资源残留。
+- 未闭环：应用模板冲突/网络失败、DevOps、联邦、Edge、通知、扩展和全部动态 Action 的完整正反权限与 V3 等价性。
