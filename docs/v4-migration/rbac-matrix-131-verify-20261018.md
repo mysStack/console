@@ -220,16 +220,16 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 
 ## A02～A04 Workload 作用域组合汇总
 
-以下汇总只统计当前已取得真实浏览器/API 证据的组合；`projectonly` 采用当前制品复核结果，历史 `GET 200` 记录单独保留，不混入通过结论。
+以下汇总只统计当前已取得真实浏览器/API 证据的组合；`projectonly` 采用带有效邮箱且 Active 的当前复核结果，另一账号上下文的全部 `403` 记录单独保留，不混入通过结论。
 
-| 组合                    | 企业空间绑定 | 项目绑定 | 集群绑定       | 页面/API 结论                                                         |
-| ----------------------- | ------------ | -------- | -------------- | --------------------------------------------------------------------- |
-| viewer                  | viewer       | viewer   | 无             | 页面正常；GET `200`，POST/PUT/PATCH/DELETE `403`                      |
-| operator                | viewer       | operator | 无             | 页面正常；GET/PUT/PATCH/DELETE `200`，POST `201`                      |
-| admin                   | viewer       | admin    | 无             | 页面正常；GET/PUT/PATCH/DELETE `200`，POST `201`                      |
-| workspaceonly           | viewer       | 无       | 无             | 页面 `/errors/403`；全部请求 `403`                                    |
-| projectonly（当前复核） | 无           | viewer   | 无             | 页面 `/errors/403`；GET/POST/PUT/PATCH/DELETE `403`，与历史记录不一致 |
-| clusterviewer           | viewer       | 无       | cluster-viewer | 页面正常；GET `200`，POST/PUT/PATCH/DELETE `403`                      |
+| 组合                        | 企业空间绑定 | 项目绑定 | 集群绑定       | 页面/API 结论                                                                |
+| --------------------------- | ------------ | -------- | -------------- | ---------------------------------------------------------------------------- |
+| viewer                      | viewer       | viewer   | 无             | 页面正常；GET `200`，POST/PUT/PATCH/DELETE `403`                             |
+| operator                    | viewer       | operator | 无             | 页面正常；GET/PUT/PATCH/DELETE `200`，POST `201`                             |
+| admin                       | viewer       | admin    | 无             | 页面正常；GET/PUT/PATCH/DELETE `200`，POST `201`                             |
+| workspaceonly               | viewer       | 无       | 无             | 页面 `/errors/403`；全部请求 `403`                                           |
+| projectonly（有效账号复核） | 无           | viewer   | 无             | 页面正常；GET `200`，POST/PUT/PATCH/DELETE `403`；另一账号上下文为全部 `403` |
+| clusterviewer               | viewer       | 无       | cluster-viewer | 页面正常；GET `200`，POST/PUT/PATCH/DELETE `403`                             |
 
 该表闭合了 A02～A04 当前制品的六种账号组合记录，但不等同于联邦、DevOps、Extension 或其他 V3 Action 的全局 RBAC 验收。
 
