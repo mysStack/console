@@ -425,11 +425,17 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 | ----------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 完整 RBAC 组合矩阵      | 未完成             | ConfigMap、Secret、ServiceAccount 已覆盖项目/集群六种组合及平台只读读写边界；Workload 和四类目标资源的有效 `projectonly`/平台只读 CRUD 边界已补测；联邦、DevOps、Extension 和全部动态 Action 的全量组合仍无完整 fixture/后端能力 |
 | 全部 V3 功能逐项等价性  | 未完成             | A01～A12 仍有部分验证、未验证和环境不可执行项；源码仍有 `useV3action/useV3Actions`、Wujie 和 `consolev3/v3dist` 运行时残留，不能宣称全部 V4 原生化完成                                                                           |
-| API Server 实际故障环境 | 已完成（限定范围） | 本轮真实停止/恢复 K3s，185 组浏览器样本中六类 Kubernetes 列表在故障期间出现 502/503，恢复后回到 200；Application 对照接口保持 200；readyz、节点和 Console rollout 均恢复                                                         |
+| API Server 实际故障环境 | 已完成（限定范围） | 本轮真实停止/恢复 K3s，7 个接口各采样 60 次，共 420 组浏览器样本；六类 Kubernetes 列表在故障期间出现 502/503，恢复后回到 200；Application 对照接口 60/60 为 200；readyz、节点和 Console rollout 均恢复                           |
 
 本节的“已完成（限定范围）”只表示 API Server 故障注入、恢复和上述列表接口的浏览器/API链路已验证；不能扩展为全平台故障兼容或全部 V3 等价通过。
 
 本轮又在项目 Workload 原生桥清理对应的制品 `d091cb1cdc3d271e1632ed569decc9aeac75fb31` 上复测 API Server 实际故障：7 个接口各采样 60 次，ConfigMap 为 `200=24/502=24/503=12`，Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet 均为 `200=24/502=25/503=11`，Application 对照接口为 `200=60`。K3s 恢复后 `readyz`、节点、Console rollout 和 Pod imageID 均恢复正常。该结果更新了当前制品的故障证据，范围仍限于列表接口和恢复链路。
+
+## 2026-10-21 通知配置与 V3 资源加载复核
+
+真实浏览器登录当前 131 制品后访问 `/settings/notification-configuration`：V4 外层路由、平台设置页面、静默策略、通知语言、创建按钮和空列表均能渲染；但网络证据显示页面仍请求 `/consolev3/settings/silent-policy`、`/consolev3/dashboard` 以及多个 `/dist/v3dist/*` 资源，通知列表 API `GET /kapis/notification.kubesphere.io/v2beta2/silences?sortBy=createTime&limit=10` 返回 `400`。
+
+该结果补充了 A08 的部署后运行时证据：当前入口依赖 V3/Wujie 兼容加载边界，且通知 API 查询请求存在错误响应。A08 不能标记为 V4 原生等价通过；完整 V3/Wujie 清理和通知功能成功、失败、取消、权限、刷新/返回路径仍未完成。扩展初始化错误按负责人要求暂不处理。
 
 ## 2026-10-20 当前项目 Workload V3 兼容桥清理
 

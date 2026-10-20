@@ -473,3 +473,14 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 ## 2026-10-20 扩展环境证据口径修正
 
 当前集群确实存在 `APIService` 和 `JSBundle` 扩展资源，并有 `copilot`、`whizard-telemetry`、`kubeeye`、`gateway` 等可用 APIService；这只能证明扩展基础设施存在。`devops` 没有 `Installed` 状态，FederatedProject/FederatedResource 和 EdgeWorkload 资源仍不存在，`whizard-notification` 也没有 `Installed` 状态。故 A05～A08 的未验证状态不应表述为“所有扩展 API 不存在”，而应表述为“目标扩展或业务 Fixture 不可执行”。该修正不改变 A01～A12 全量等价性仍未完成的结论。
+
+## 2026-10-21 A08 与平台通知页面实际加载复核
+
+在当前 131 制品上使用真实浏览器登录并访问 `/settings/notification-configuration`。页面外层路由和平台设置内容能够渲染，包含静默策略、通知语言、创建按钮和空列表；但请求记录同时出现：
+
+- `GET /consolev3/settings/silent-policy`，状态 `200`；
+- `GET /consolev3/dashboard`，状态 `200`；
+- 多个 `/dist/v3dist/*` 静态资源请求，状态 `200`；
+- `GET /kapis/notification.kubesphere.io/v2beta2/silences?sortBy=createTime&limit=10`，状态 `400`。
+
+因此，当前页面是 V4 外层路由与 V3/Wujie 兼容资源共同加载，通知列表查询还存在错误响应。该结果不能证明 `notification.user.setting` 已有 V4 原生替代，也不能把空列表或页面渲染写成等价通过。A08 仍为未验证；完整成功、失败、取消、权限、刷新/返回和 V3/Wujie 运行时移除证据仍缺失。扩展初始化错误按负责人要求暂不处理。
