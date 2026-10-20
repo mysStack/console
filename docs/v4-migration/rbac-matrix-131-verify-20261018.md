@@ -429,3 +429,16 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 | 删除 DELETE |  403 |
 
 不存在对象的写请求使用唯一名称，未产生业务对象。临时用户、WorkspaceRoleBinding 和凭据已删除并复核不存在，测试 namespace 无本轮残留。该结果补齐 A09/A12 工作空间 viewer 的读取/写入拒绝组合，但不覆盖项目、集群、平台、DevOps、联邦、Edge、通知、扩展和完整动态 Action 矩阵。
+
+## 2026-10-21 应用模板 projectonly 与 clusterviewer 组合复核
+
+为补齐 A09/A12 尚未独立记录的作用域，分别创建两个临时账号：`projectonly` 仅绑定 `v4-migration-e2e` 项目 `viewer` RoleBinding，不绑定工作空间角色；`clusterviewer` 绑定 `test-workspace` workspace viewer 和集群 `cluster-viewer`，不绑定项目 RoleBinding。
+
+真实浏览器分别访问 `/workspaces/test-workspace/app-templates`，两组页面均能渲染当前空列表；同一会话对应用模板 API 的结果一致：
+
+| 组合            | 列表 GET | 创建 POST | 更新 PUT | Patch | 删除 DELETE |
+| --------------- | -------: | --------: | -------: | ----: | ----------: |
+| `projectonly`   |      200 |       403 |      403 |   403 |         403 |
+| `clusterviewer` |      200 |       403 |      403 |   403 |         403 |
+
+该结果说明应用模板列表读取由工作空间应用 API 单独授权，不能从项目页面权限直接推断；两组组合均没有写权限。临时用户、项目/工作空间/集群绑定和凭据已删除并复核不存在，测试 namespace 无本轮残留。A09/A12 的这两组读取/写入边界已补入矩阵，但应用模板完整成功、失败、冲突、取消、刷新和 V3 等价仍未完成。

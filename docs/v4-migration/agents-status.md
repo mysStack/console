@@ -1027,3 +1027,10 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - 命令：`./scripts/test.sh`
 - 结果：66 个测试文件通过，210 个测试通过，0 个失败。
 - 说明：当前回归包含 V3/Wujie 保留边界的断言；它证明本轮文档和已有业务源码没有引入回归，不代表全部 V3 功能等价性完成。
+
+## 2026-10-21 应用模板 projectonly 与 clusterviewer 权限复核
+
+- `projectonly` 仅绑定项目 `viewer`；`clusterviewer` 绑定 workspace viewer 和 cluster viewer，均未绑定项目写权限。
+- 真实浏览器访问工作空间应用模板页面，两组均可读取空列表；API GET 均为 `200`，POST/PUT/PATCH/DELETE 均为 `403`。
+- 临时用户、项目/工作空间/集群绑定和凭据已清理并复核不存在，测试 namespace 无本轮残留。
+- 结论：补齐 A09/A12 两组作用域的读取/写入边界；应用模板成功、失败、冲突、取消和 V3 等价仍未完成。
