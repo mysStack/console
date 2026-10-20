@@ -629,6 +629,6 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 
 ## 2026-10-21 当前源码 V3/Wujie 扫描快照
 
-在文档提交后的当前源码 HEAD `5fbe9cc6a75a1a43503f70aca6e84b00729da872` 重新执行同一过滤口径的静态扫描：排除 `lib`、`node_modules` 和测试文件后，`useV3action/useV3Actions` 仍命中 9 个文件，其中 6 个为业务调用文件、2 个为桥接实现文件、1 个为导出文件；`WujieReact`、`wujie-react`、`ConsoleV3ResourceList`、`consolev3` 或 `v3dist` 仍命中 141 个源码文件。
+在业务源码未再变更的当前快照 `99ec26932e11927ae33fa8dd054ca24d4d75c0b4` 上重新执行同一过滤口径的静态扫描：排除 `lib`、`node_modules` 和测试文件后，`useV3action/useV3Actions` 仍命中 9 个文件，其中 6 个为业务调用文件、2 个为桥接实现文件、1 个为导出文件；`WujieReact`、`wujie-react`、`ConsoleV3ResourceList`、`consolev3` 或 `v3dist` 仍命中 141 个源码文件。
 
 该快照只更新当前源码证据的 SHA 和扫描结果，不把文档提交误写成业务迁移。当前 131 部署制品的浏览器证据仍记录 `/consolev3/dashboard` 和 `/dist/v3dist/*` 请求；A01～A12 的全部运行时成功、失败、取消、权限和 V4 替代行为仍未全部闭环。

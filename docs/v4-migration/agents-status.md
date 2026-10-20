@@ -993,7 +993,7 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 
 ## 2026-10-21 A01～A12 RBAC 台账与当前源码快照
 
-- 当前分支 HEAD：`5fbe9cc6a75a1a43503f70aca6e84b00729da872`，已推送到 `origin/feature/v4-configmaps-secrets`；Draft PR #1 当前 Head 与该 SHA 一致，目标分支仍为 `feature/v4-migration`。
+- 本轮业务源码快照：`99ec26932e11927ae33fa8dd054ca24d4d75c0b4`；之后仅追加文档提交并已推送到 `origin/feature/v4-configmaps-secrets`，Draft PR #1 目标分支仍为 `feature/v4-migration`。
 - 新增 `rbac-matrix-131-verify-20261018.md` 的 A01～A12 组合覆盖台账，明确已验证、部分验证、环境阻塞和未验证项；没有把资源级 CRUD 结果外推为全量 RBAC 通过。
 - 当前源码同口径扫描仍为 9 个 `useV3action/useV3Actions` 文件、141 个 V3/Wujie 兼容关键字源码文件；该结果支持“全部 V3 功能逐项等价性未完成”。
 - 文档校验：两个修改文档通过 Prettier `--check` 和 `git diff --check`；提交钩子成功执行 lint-staged/Prettier。

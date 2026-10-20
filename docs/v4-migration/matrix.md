@@ -573,7 +573,7 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 
 ## 2026-10-21 三项专项验证当前快照
 
-- 当前分支 HEAD 为 `5fbe9cc6a75a1a43503f70aca6e84b00729da872`，Draft PR #1 已同步该 SHA，未合并。
+- 本轮业务源码快照为 `99ec26932e11927ae33fa8dd054ca24d4d75c0b4`；后续仅有文档提交，Draft PR #1 未合并。
 - A01～A12 RBAC 组合覆盖台账已补入 `rbac-matrix-131-verify-20261018.md`。当前已验证的是部分资源、角色和操作边界；A05～A07、A10 因目标扩展/CRD/fixture 缺失不能执行，完整矩阵保持未完成。
 - 当前源码精确扫描仍命中 9 个 `useV3action/useV3Actions` 文件和 141 个 V3/Wujie 兼容关键字源码文件；因此全部 V3 功能逐项等价性保持未完成。
 - API Server 实际故障验证在授权维护窗口内已覆盖六类资源的列表、PATCH、POST、DELETE 结果及 ConfigMap/Secret/ServiceAccount 页面故障态和恢复链路；限定范围结论为已完成。页面显式错误、自动重试和缓存策略未标记为通过。
