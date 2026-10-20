@@ -858,3 +858,7 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - 未闭环：伸缩、YAML 成功持久化、失败/取消组合、低权限拒绝、所有动态 Action 和完整 V3/Wujie 等价仍未验证。
 - 测试边界：本轮 YAML 自动化输入未替换 Ace 编辑器全文，形成重复 YAML 文档并收到 `PUT 400`，副本数保持不变；该结果不作为业务失败结论，后续需要用单一合法文档重新验证。
 - 当前制品：`4bbea8b022` 及其已部署镜像 `feature-v4-configmaps-secrets-20261021-013709-4b5c7f5670c4`；manifest digest 为 `sha256:ffe166aa35e105d463e3b1d37e14fca3595088706e1eecfe5daf7c97518fb3ac`，Pod imageID 已在此前部署复核中与该 digest 一致。
+
+## 2026-10-21 131 部署状态修正
+
+本轮复核发现单节点 CPU 不足导致 `ks-console` 在 `maxUnavailable=0/maxSurge=1` 下残留一个 Pending 旧 ReplicaSet Pod，Deployment 曾报告超过 progress deadline；这不是代码测试结果。按已授权测试环境操作，将策略临时调整为 `maxUnavailable=1/maxSurge=0`，rollout 已成功，当前 Deployment 状态为 `replicas=1/updated=1/ready=1/available=1`，仅保留一个 Running/Ready Pod，Pod imageID 与 `sha256:ffe166aa35e105d463e3b1d37e14fca3595088706e1eecfe5daf7c97518fb3ac` 一致。该环境限制仍需在后续部署记录中保留，不能把单节点上的默认滚动策略容量不足写成应用故障。

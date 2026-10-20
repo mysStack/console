@@ -502,3 +502,7 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 本轮通过浏览器 YAML 编辑器修改副本数的自动化输入产生了重复 YAML 文档，Console API 返回 `PUT 400`，副本数未改变。该结果只能说明本次编辑输入没有形成合法单文档，不能作为业务代码失败；伸缩/YAML 成功持久化仍未验证。页面中“编辑设置”和“编辑 YAML”当前都打开同一 YAML 编辑回调，作为待确认交互差异记录，不自动改代码。
 
 因此 A02～A04 的重新创建管理员成功子路径已验证，完整操作组合、YAML 成功写入、失败/取消、低权限及全量 V3 等价仍未完成。
+
+## 2026-10-21 131 单节点部署状态修正
+
+复核发现 `ks-console` 在单节点 CPU 资源不足时采用 `maxUnavailable=0/maxSurge=1` 会保留 Pending 旧 ReplicaSet Pod，并导致 Deployment 超过 progress deadline。按授权将测试环境策略调整为 `maxUnavailable=1/maxSurge=0` 后 rollout 成功，当前 `replicas/updated/ready/available=1/1/1/1`，仅有一个 Running/Ready Pod，实际 imageID 与当前制品 digest 一致。该记录属于测试环境容量与 rollout 策略证据，不改变功能测试结论。
