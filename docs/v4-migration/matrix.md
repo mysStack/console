@@ -465,6 +465,8 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 
 本轮还在临时 Deployment 上生成两条修改记录，真实浏览器执行“回退”并选择目标记录 `#1`；确认后 Kubernetes API 回读镜像由 `busybox:1.36` 恢复为 `busybox:1.35`，generation 由 `2` 变为 `3`，随后清理临时对象。该证据补充 A02 的管理员回滚成功子路径，A03/A04 回滚和全部操作等价仍未完成。
 
+补测 A03/A04 回滚时，StatefulSet 和 DaemonSet 的浏览器请求均返回 `PATCH 200`，但请求体只有空的 `template` replace patch，API 回读镜像仍为修改后的 `busybox:1.36`，没有恢复到历史记录 `busybox:1.35`。因此 A03/A04 回滚判定为**测试失败**，不是环境阻塞；临时对象已清理，后续需要修复回滚数据组装并重新部署验收。
+
 ## 2026-10-20 当前项目 Workload V3 兼容桥清理
 
 已确认项目 Deployment、StatefulSet、DaemonSet 的旧 V3 详情包装器没有活动路由或源码消费者，当前活动路由使用原生 Workload Detail 和原生 ConfigReferencePage。本轮删除无消费者的旧项目详情包装器、ConfigReference V3 DOM 注入桥及其专用测试/辅助文件，并新增回归断言防止旧项目包装器重新出现。
