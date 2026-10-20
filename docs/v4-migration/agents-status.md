@@ -814,3 +814,9 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 验证完成后只删除本轮创建的四个测试资源；`v4-migration-e2e` 最终仍只保留系统 ConfigMap 和默认 ServiceAccount。浏览器控制台仍有已登记的扩展初始化错误，本轮按负责人要求暂不处理。
 
 本轮补充了 A02～A04 当前制品的编辑成功、YAML 取消和操作菜单证据，但没有执行 StatefulSet/DaemonSet 的 YAML 成功写入、回滚、伸缩、重新创建和删除，也没有关闭低权限、全部失败/取消组合、`/consolev3/dashboard` 预加载或全量 V3 等价性。
+
+## 2026-10-21 A02～A04 删除成功和取消复核
+
+在同一 131 制品上创建副本数为零或不可调度的临时 Deployment、StatefulSet、DaemonSet，真实浏览器分别打开删除确认框：三个确认框都要求输入资源名称，点击取消没有产生删除请求。随后仅对本轮临时资源输入准确名称并确认删除，三个页面均返回对应列表并显示“删除成功”；Kubernetes API 复核三类资源均为 `NotFound`，测试 namespace 无标签为 `workload-delete-20261021` 的资源。
+
+本轮补充了 A02～A04 当前制品的删除确认、取消和管理员成功删除路径。删除失败、低权限拒绝、回滚、伸缩、重启、StatefulSet/DaemonSet YAML 成功写入及全部 V3 等价条件仍未闭环。

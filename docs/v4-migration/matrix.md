@@ -457,6 +457,12 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 
 本轮临时资源已删除，namespace 无测试残留。该证据补充 A02～A04 当前制品的编辑成功、菜单渲染和 YAML 取消子路径；StatefulSet/DaemonSet YAML 成功写入、全部操作成功/失败/取消、低权限和 V3/Wujie 兼容残留仍未闭环。
 
+## 2026-10-21 A02～A04 删除路径复核
+
+当前 131 制品上，Deployment、StatefulSet、DaemonSet 的删除确认框均要求输入准确资源名称；三个确认框点击取消均未发送删除请求。随后对本轮临时对象执行管理员删除，三类页面均显示删除成功并返回对应列表，Kubernetes API 复核资源均为 `NotFound`。
+
+该证据补充 A02～A04 的删除成功和取消子路径；删除失败、低权限删除拒绝、回滚、伸缩、重启和全量 V3 等价仍未完成。
+
 ## 2026-10-20 当前项目 Workload V3 兼容桥清理
 
 已确认项目 Deployment、StatefulSet、DaemonSet 的旧 V3 详情包装器没有活动路由或源码消费者，当前活动路由使用原生 Workload Detail 和原生 ConfigReferencePage。本轮删除无消费者的旧项目详情包装器、ConfigReference V3 DOM 注入桥及其专用测试/辅助文件，并新增回归断言防止旧项目包装器重新出现。
