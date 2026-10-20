@@ -532,3 +532,7 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 ## 2026-10-21 API Server 故障期间浏览器页面观察
 
 授权故障窗口内，ConfigMap 页面在 API Server 不可用时保留故障前已经渲染的旧列表数据，未出现显式错误页或重试提示；恢复后 `readyz`、节点、Console rollout 和页面刷新均恢复正常。该观察补充了浏览器视觉层证据，同时记录了“故障态旧数据仍显示、错误反馈不明显”的待改进项，不能把旧数据展示解释为请求成功。
+
+## 2026-10-21 目标业务 Fixture 就绪性复核
+
+只读核对当前 131 集群后确认：`devops`、`kubefed`、`kubeedge`、`whizard-notification` 扩展对象均没有 `Installed` 状态；`FederatedProject`、`FederatedResource`、`EdgeWorkload` 目标 CRD 均不存在；当前扩展 APIService 列表没有 DevOps、联邦或 Edge 目标 API。因此 A05～A08、A10 的真实成功、失败、取消和 RBAC 组合仍不能执行，不能用普通 Kubernetes 资源、空列表或模拟状态码代替真实 fixture。

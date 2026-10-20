@@ -917,3 +917,10 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - 故障期间 `readyz` 返回 API Server 未就绪；ConfigMap 页面保留先前列表数据，没有出现显式错误或重试提示。
 - 恢复后 `readyz=ok`、节点 Ready、Console `1/1/1/1`，页面刷新恢复正常；该结果补充了视觉层证据，但把故障态旧数据保留视为待改进的错误反馈行为。
 - 本轮没有留下 debug Pod 或测试资源；扩展初始化错误按负责人要求延期。
+
+## 2026-10-21 目标业务 Fixture 就绪性复核
+
+- 只读核对结果：`devops`、`kubefed`、`kubeedge`、`whizard-notification` 扩展对象均没有 `Installed` 状态。
+- `FederatedProject`、`FederatedResource`、`EdgeWorkload` 目标 CRD 均不存在；可用 `extensions.kubesphere.io` APIService 列表没有 DevOps、联邦或 Edge 目标 API。
+- 结论：A05～A08、A10 的成功、失败、取消和 RBAC 组合不能在当前环境执行；不能用普通 Kubernetes 资源、空列表或模拟状态码代替真实 fixture。
+- `projectonly` 当前有效账号的 GET `200`、写入 `403` 已复核；早期无法复现的全 `403` 保留为历史异常，不纳入当前通过矩阵。
