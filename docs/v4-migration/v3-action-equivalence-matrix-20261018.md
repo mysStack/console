@@ -576,3 +576,16 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 - DaemonSet `v4-yaml-success-ds-20261021`：镜像由 `busybox:1.35` 改为 `busybox:1.36`，提交后 API 回读镜像已更新、generation `1→2`；由于专用 nodeSelector 无匹配节点，期望和就绪副本为 `0`，没有把调度缺失误判为 YAML 提交失败。
 
 该轮关闭 A02～A04 的合法单文档 YAML 成功持久化子路径，并与此前非法 YAML、resourceVersion 冲突和取消证据合并。临时 Workload 已删除，namespace 无本轮残留。完整字段覆盖、所有操作组合、低权限拒绝、故障恢复体验和 V3/Wujie 运行时移除仍未完成。
+
+## 2026-10-21 当前制品 A05～A08、A10 路由复核
+
+使用真实管理员浏览器对当前制品的入口进行顺序复核：
+
+| 入口                                                                                       | 页面结果                                           | Network/功能边界                                                                                                 |
+| ------------------------------------------------------------------------------------------ | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| 项目 Edge 应用 `/test-workspace/clusters/host/projects/v4-migration-e2e/applications/edge` | 原生应用列表可渲染，总数为 `1`，显示“创建”入口     | 当前列表对象不是 EdgeWorkload fixture，无法触发 A05/A10 的边缘模板创建或批量删除                                 |
+| 工作空间 DevOps `/workspaces/test-workspace/devops`                                        | 页面可渲染，显示“创建”，集群选择区提示“请选择集群” | 目标 DevOps 扩展未安装，不能进入真实创建/编辑流程；此前管理员 API 为 `404`                                       |
+| 通知静默策略 `/settings/silent-policy`                                                     | 页面可渲染，当前为空列表且显示“创建”               | 页面请求 `/consolev3/settings/silent-policy`、预加载 `/consolev3/dashboard` 和 `v3dist`；silences API 返回 `400` |
+| 应用模板 `/workspaces/test-workspace/app-templates`                                        | 原生应用模板页面可渲染，当前为空列表且显示“添加”   | A12 原生入口可达，但不关闭通知、DevOps、Edge 和全部 V3 Action 等价性                                             |
+
+该轮只验证当前入口、页面渲染和 Network 边界，没有把普通应用列表、空数据态或可见按钮当作 Edge/DevOps/通知功能等价通过。A05、A06、A07、A08、A10 继续保持未验证或环境不可执行。

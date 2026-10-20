@@ -538,3 +538,7 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 只读核对当前 131 集群后确认：`devops`、`kubefed`、`kubeedge`、`whizard-notification` 扩展对象均没有 `Installed` 状态；`FederatedProject`、`FederatedResource`、`EdgeWorkload` 目标 CRD 均不存在；当前扩展 APIService 列表没有 DevOps、联邦或 Edge 目标 API。因此 A05～A08、A10 的真实成功、失败、取消和 RBAC 组合仍不能执行，不能用普通 Kubernetes 资源、空列表或模拟状态码代替真实 fixture。
 
 当前 HEAD `017179af0` 的精确扫描（排除 `lib`、`node_modules` 和测试文件）命中 9 个 `useV3action/useV3Actions` 文件，其中 6 个是业务调用文件、2 个是桥接实现文件、1 个是导出文件；同口径的 V3/Wujie 兼容关键字命中 141 个源码文件。该统计修正历史扫描口径，不代表兼容依赖已经清理。
+
+## 2026-10-21 当前制品 A05～A08、A10 入口复核
+
+真实管理员浏览器顺序访问项目 Edge 应用、工作空间 DevOps、通知静默策略和工作空间应用模板入口。Edge 列表可渲染但没有 EdgeWorkload fixture；DevOps 页面显示创建入口但提示“请选择集群”，目标扩展未安装；通知页面为空列表但仍加载 `/consolev3`、`v3dist`，silences API 返回 `400`；应用模板原生入口可渲染但空列表。上述结果只关闭入口可达性复核，不关闭对应 Action 的成功、失败、取消、RBAC 或 V4 等价。

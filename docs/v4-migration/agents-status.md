@@ -931,3 +931,11 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - 排除 `lib`、`node_modules` 和测试文件后，`useV3action/useV3Actions` 命中 9 个文件：6 个业务调用文件、2 个桥接实现文件和 1 个导出文件。
 - 同一过滤条件下，`WujieReact`、`wujie-react`、`ConsoleV3ResourceList`、`consolev3` 或 `v3dist` 命中 141 个源码文件；浏览器仍请求 `/consolev3/dashboard` 和 `/dist/v3dist/*`。
 - 该扫描用于修正历史统计口径，不改变 A01～A12 全部 V3 功能等价性未完成的结论。
+
+## 2026-10-21 当前制品 A05～A08、A10 入口复核
+
+- 项目 Edge 应用页可渲染，列表总数 `1`，但没有 EdgeWorkload fixture，不能触发边缘创建或批量删除。
+- 工作空间 DevOps 页可渲染并显示创建入口，但集群选择提示“请选择集群”；目标 DevOps 扩展未安装，管理员 API 仍为 `404`。
+- `/settings/silent-policy` 可渲染空列表，但 Network 仍请求 `/consolev3/settings/silent-policy`、`/consolev3/dashboard` 和 `v3dist`，silences API 返回 `400`。
+- 应用模板工作空间入口可渲染，空列表和“添加”入口已见；该结果不改变 A09/A12 仅部分验证的结论。
+- 结论：A05、A06、A07、A08、A10 的入口复核完成，成功、失败、取消、RBAC 和 V4 替代行为仍未完成。
