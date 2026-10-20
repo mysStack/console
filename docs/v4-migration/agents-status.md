@@ -965,3 +965,9 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - 执行 8 个 V3 迁移相关 `node:test` 文件，共 15 个测试，全部通过。
 - 通过项包括三类原生 Workload 详情、项目 Workload 原生路由、ConfigMap/Secret/ServiceAccount 原生列表和 namespace 隔离。
 - `consoleV3Details.test.ts` 同时明确 Services、Volumes 详情仍保留共享 `consolev3` 实例；该测试通过并不表示 V3 已清理，反而记录了当前未迁移边界。
+
+## 2026-10-21 全仓库回归测试
+
+- 命令：`./scripts/test.sh`
+- 结果：66 个测试文件通过，210 个测试通过，0 个失败。
+- 说明：全仓库回归通过不等于全量 V3/Wujie 清理通过，因为测试集合仍包含 `ConsoleV3ResourceList`、`consolev3` 保留边界和扩展兼容代码相关断言。

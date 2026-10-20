@@ -556,3 +556,7 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 ## 2026-10-21 V3 边界静态回归测试
 
 当前仓库 8 个 V3 迁移相关 `node:test` 文件、15 个测试全部通过。测试确认 Deployment/StatefulSet/DaemonSet 详情和 ConfigMap/Secret/ServiceAccount 列表的原生静态边界没有回归；同时确认 Services、Volumes 详情仍保留共享 `consolev3` 实例，因此全量 V3 等价性仍未完成。
+
+## 2026-10-21 全仓库回归测试
+
+执行 `./scripts/test.sh`，结果为 66 个测试文件、210 个测试全部通过，0 个失败。该结果只说明当前静态/单元回归没有新增失败；测试集合仍覆盖并确认部分 `ConsoleV3ResourceList`、`consolev3` 和扩展兼容保留边界，不能据此标记全量 V3/Wujie 等价完成。

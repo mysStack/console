@@ -72,3 +72,5 @@ API Server 故障浏览器层覆盖已扩大到 Secret 和 ServiceAccount：两�
 扩展 RBAC 现有管理员对照：管理员可完整读取 `frontend-forge` 详情和制品文件（均为 `200`），全局只读用户可读取列表但制品文件为 `403` 并进入权限错误页。该证据仍不覆盖安装/卸载写权限或扩展运行时行为。
 
 当前源码回归测试 8 个文件、15 个测试全部通过，但其中 `consoleV3Details.test.ts` 明确保留 Services/Volumes 的共享 `consolev3` 实例；该证据支持已迁移 Workload 和配置资源边界稳定，也确认全量 V3/Wujie 清理尚未完成。
+
+仓库标准回归 `./scripts/test.sh` 已通过：66 个文件、210 个测试，0 个失败。由于测试集合包含当前仍保留的 `ConsoleV3ResourceList`、`consolev3` 和扩展兼容边界，该结果不能替代全量 V3/Wujie 运行时等价验证。
