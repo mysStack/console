@@ -752,3 +752,11 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 重新扫描确认当前项目活动路由使用原生 Deployment、StatefulSet、DaemonSet Detail，不再导入旧 `projects/containers/*/Detail` 包装器。删除无消费者的三个旧项目详情包装器、ConfigReference V3 DOM 注入桥及其专用测试/辅助文件；联邦项目下仍被 `fedprojects/routes/details.tsx` 导入的 V3 包装器没有删除。
 
 新增回归断言检查三个旧项目详情文件不存在。执行结果：`./scripts/test.sh` 为 65 个测试文件、206 个测试通过；`corepack yarn build:packages` 成功。当前变更尚未部署到 131，需完成新制品 rollout 和真实浏览器回归后，才能关闭部署后验证。
+
+## 2026-10-20 项目 Workload 兼容桥清理后的部署验收
+
+提交 `d091cb1cdc3d271e1632ed569decc9aeac75fb31` 对应 GitHub Actions Run `39398988900` 已成功完成单元测试和镜像构建。镜像 tag 为 `feature-v4-configmaps-secrets-20261020-171341-d091cb1cdc3d`，manifest digest 为 `sha256:1b82acae4539989150585dfd3e68376ad9bbb957302d82adb98bb19b4d58ce6e`。131 `ks-console` generation/observedGeneration 为 `548/548`，副本、Updated、Ready、Available 为 `1/1/1/1`；Pod `ks-console-f9958ffcd-8sd9z` Running/Ready，实际 imageID 与 manifest digest 一致，`/readyz` 为 `ok`。
+
+使用真实浏览器登录后，分别打开专用 Deployment、StatefulSet、DaemonSet 的项目详情 URL。三页都显示原生详情头部、资源状态、属性、修改记录、元数据、环境变量、配置引用、事件和 `1/1` 容器组列表，证明当前项目活动路由没有回退到已删除的旧详情包装器。临时资源已全部清理，namespace 最终没有本轮资源残留。
+
+浏览器控制台仍有已知扩展初始化错误，错误范围与既有 `getExtensionConsoleV3Embed is not a function` 记录一致，按负责人要求暂不处理。该错误不作为本轮 Workload 原生详情路由的成功依据；全部操作等价、全部 V3 功能逐项等价和完整 RBAC 组合矩阵仍保持未完成。

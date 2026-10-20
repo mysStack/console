@@ -422,3 +422,11 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 已确认项目 Deployment、StatefulSet、DaemonSet 的旧 V3 详情包装器没有活动路由或源码消费者，当前活动路由使用原生 Workload Detail 和原生 ConfigReferencePage。本轮删除无消费者的旧项目详情包装器、ConfigReference V3 DOM 注入桥及其专用测试/辅助文件，并新增回归断言防止旧项目包装器重新出现。
 
 联邦项目路由仍直接使用 `fedprojects/containers/*` 的 V3 包装器，因此本轮只关闭当前项目活动详情的静态桥接缺口；联邦资源的 V4 原生替代和运行时等价仍未完成。删除后本地 `./scripts/test.sh` 为 65 个测试文件、206 个测试通过，`corepack yarn build:packages` 成功；部署后浏览器复验仍需在新制品上完成。
+
+## 2026-10-20 项目 Workload 兼容桥清理后的部署验收
+
+本轮提交 `d091cb1cdc3d271e1632ed569decc9aeac75fb31` 已通过 GitHub Actions Run `39398988900` 的 Unit tests 和镜像构建。按分支、上海时间和 commit 短 SHA 生成的镜像为 `feature-v4-configmaps-secrets-20261020-171341-d091cb1cdc3d`，manifest digest 为 `sha256:1b82acae4539989150585dfd3e68376ad9bbb957302d82adb98bb19b4d58ce6e`。131 的 `ks-console` rollout 为 `548/548`，副本为 `1/1/1/1`，Pod `ks-console-f9958ffcd-8sd9z` 为 Running/Ready，实际 imageID 与该 digest 一致；`/readyz` 返回 `ok`。
+
+使用真实浏览器登录后，在专用 namespace 创建临时 Deployment、StatefulSet 和 DaemonSet，并分别直达三个项目详情 URL。三页均进入原生详情页并渲染资源状态、属性、修改记录、元数据、环境变量、配置引用和事件入口，容器组列表均显示 `1/1`。验证完成后只删除本轮资源，`v4-migration-e2e` 最终只保留系统 `kube-root-ca.crt` 和 `default` ServiceAccount。
+
+本轮浏览器控制台仍记录已知扩展初始化错误（包括 `getExtensionConsoleV3Embed is not a function`）；该问题属于已登记的扩展运行时范围，本轮不处理，也不把它写成 Workload 原生详情路由通过。新制品上的项目 Deployment、StatefulSet、DaemonSet 原生入口已完成部署后浏览器验收，但全部操作等价、全部 V3 功能逐项等价和完整 RBAC 组合矩阵仍未完成。
