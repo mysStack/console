@@ -99,3 +99,19 @@
 `EditAppModal`，保存调用 `openpitrixStore.updateApp`。该无调用旧桥已删除。
 
 这只证明当前源码不再保留该无调用组件，不证明 `v3dist` 中的同名 Action 字符串、边缘模板入口、低权限路径和远程扩展行为已经等价；A12 仍保持“部分验证”。
+
+## 2026-10-20 A12 部署后浏览器证据
+
+提交 `1c54df98d` 通过 CI Run `39361312595` 后部署到 131。当前部署镜像为
+`ghcr.io/mysstack/ks-console:feature-v4-configmaps-secrets-20261020-105412-1c54df98d124`，Pod imageID 为
+`sha256:49febd89201b7a887d30928ae31a3b296d459ed18dc7811b550a14719556fab2`，rollout 成功，Pod `Running/Ready`。
+
+真实浏览器登录并访问应用模板详情后，原生 `EditAppModal` 可以打开、字段正常回填、取消可以关闭；Network 未出现
+`openpitrix.template.edit.v2` 请求，只看到既有 `/consolev3/dashboard` 预加载和 V2 Application API 读取请求。
+因此关闭“当前源码无调用旧编辑桥且部署后原生编辑入口可渲染”的子项，A12 的边缘入口、低权限、冲突/失败和全部制品运行时等价仍未验证。
+
+## 2026-10-20 当前动态 Action 计数修正
+
+A12 清理后重新扫描当前非测试源码（排除 `v3dist`、编译输出和 `node_modules`）得到 10 个
+`useV3action/useV3Actions` 文件：7 个业务调用文件、2 个桥接实现/Hook 文件和 1 个导出文件，对应 8 个当前活动 Action 行。
+历史记录中的 11 个业务文件和 14 个命中文件保留为历史基线，不应继续作为当前计数。

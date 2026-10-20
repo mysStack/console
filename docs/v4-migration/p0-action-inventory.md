@@ -118,3 +118,13 @@ P0-U002 的 Action 部分仍未关闭。每个当前调用点必须补充：
 以当前 `feature/v4-configmaps-secrets` 工作树重新核对后，非测试源码中的 `useV3action/useV3Actions` 命中 11 个文件：8 个业务调用文件、2 个桥接实现/Hook 文件和 1 个导出文件；8 个业务文件对应 9 个当前活动 Action 行（DevOps 的 create/edit 分开计算）。此前本文件第 2 节的 14 个文件是历史 P0 取证基线口径，不能继续作为当前活动调用数量。
 
 当前项目 Deployment、StatefulSet、DaemonSet 详情活动路由由 `packages/console/src/pages/projects/routes/detail.tsx` 导入 `ApplicationWorkloads/Workloads/*/Detail/routes.tsx`，不再导入旧 `projects/containers/*/Detail` 文件。旧文件仍含 Wujie 代码，暂按兼容残留登记，待完成全仓库消费者复核后再决定是否删除。
+
+## 2026-10-20 A12 清理后的当前扫描口径
+
+删除无调用的 `packages/shared/src/components/Modals/AppTemplateEdit/index.tsx` 后，重新排除测试文件、`v3dist`、编译输出和 `node_modules` 扫描：
+
+- `useV3action/useV3Actions` 命中 10 个源码文件：7 个业务调用文件、2 个桥接实现/Hook 文件和 1 个导出文件。
+- 7 个业务文件对应 8 个当前活动 Action 行；DevOps 的 `create/edit` 仍拆成两个 Action。
+- 当前源码中已找不到 `AppTemplateEdit` 或 `openpitrix.template.edit.v2` 调用点。
+
+该结果只关闭当前源码中的无调用 A12 编辑桥，不代表 `v3dist` 中的同名字符串或其他边缘应用模板路径已经完成 V4 等价验证。

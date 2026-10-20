@@ -713,3 +713,12 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 当前源码扫描确认历史 `packages/shared/src/components/Modals/AppTemplateEdit/index.tsx` 没有任何调用者；应用模板详情使用原生 `EditAppModal` 和 `openpitrixStore.updateApp`。已删除该无调用旧 V3 编辑桥，并保留原生编辑器测试。
 
 本项只关闭当前源码中的无调用残留。`v3dist` 中的 `openpitrix.template.edit.v2` 字符串、边缘模板入口、正反 RBAC、失败/冲突路径和完整制品运行时等价仍未验证，A12 不得标记为已完成。
+
+## 2026-10-20 A12 部署后浏览器验证
+
+提交 `1c54df98d` 已推送到 `feature/v4-configmaps-secrets`，CI Run `39361312595` 成功。镜像
+`ghcr.io/mysstack/ks-console:feature-v4-configmaps-secrets-20261020-105412-1c54df98d124` 已部署到 131，rollout 成功；Pod 实际 imageID 为
+`sha256:49febd89201b7a887d30928ae31a3b296d459ed18dc7811b550a14719556fab2`，状态为 `Running/Ready`。
+
+真实浏览器登录后访问 `stakater-configmap` 应用模板详情，原生编辑弹窗可以打开、字段正常回填、取消正常关闭；Network 未出现
+`openpitrix.template.edit.v2` 请求。该证据只关闭当前活动编辑入口的部署后渲染和取消子路径，A12 仍为部分验证。

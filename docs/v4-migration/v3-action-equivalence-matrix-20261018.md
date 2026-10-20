@@ -225,6 +225,26 @@ A01 仍不能标记为完整 V3 等价：主工作负载模板编辑仍保留 V3
 - 已保留：`v3dist` 中的同名字符串、边缘模板入口和远程扩展运行时不因本次删除而被宣称完成。
 - 仍未关闭：A12 的完整边缘入口、冲突/失败、低权限、刷新/返回及制品运行时 V3 Action 移除。
 
+## 2026-10-20 A12 部署后浏览器复验
+
+提交 `1c54df98d` 已通过 GitHub Actions Run `39361312595` 的单元测试和镜像构建，并部署到 131 测试环境。部署镜像为
+`ghcr.io/mysstack/ks-console:feature-v4-configmaps-secrets-20261020-105412-1c54df98d124`，Pod 实际 imageID 为
+`sha256:49febd89201b7a887d30928ae31a3b296d459ed18dc7811b550a14719556fab2`，Deployment rollout 成功且 Pod 为 `Running/Ready`。
+
+使用真实浏览器登录后直达 `/workspaces/test-workspace/apps/stakater-configmap`：
+
+- 应用模板详情自动进入 `versions`，版本列表显示 3 条已有版本，页面正常渲染。
+- 点击“编辑”打开原生“编辑信息”弹窗，名称、描述、分类、服务商网站和应用介绍字段正常回填。
+- 点击“取消”关闭弹窗；本次操作的 Network 只有当前 V2 Application 详情/版本读取请求和已存在的 `/consolev3/dashboard` 预加载，没有出现 `openpitrix.template.edit.v2` Action 请求。
+
+这组证据证明当前活动详情编辑路径已使用原生组件并完成部署后浏览器回归；由于应用模板详情仍有历史 `/consolev3/dashboard` 预加载，且边缘模板、低权限、冲突/失败路径没有完整证据，A12 仍保持“部分验证”。
+
+## 2026-10-20 A12 清理后的当前静态计数
+
+重新排除测试文件、`packages/bootstrap/assets/v3dist`、编译输出和 `node_modules` 后，当前源码中的
+`useV3action/useV3Actions` 命中 10 个文件：7 个业务调用文件、2 个桥接实现/Hook 文件和 1 个导出文件；对应 8 个当前活动 Action 行。
+历史 14/11 个文件的数字保留为取证时点记录，不再作为当前分支计数。
+
 ## 2026-10-20 联邦项目与 Edge 入口运行时补测
 
 本轮使用真实 Playwright 以平台管理员访问当前 131 环境，补充 A05/A10 相关入口的运行时边界证据：
