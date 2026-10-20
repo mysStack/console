@@ -390,3 +390,11 @@ A11 边界修正：本轮应用模板安装实际走原生 `deployApp`，没有�
 ## 2026-10-20 Workload projectonly 有效账号复核
 
 使用只绑定项目 `viewer`、带有效邮箱且 Active 的临时账号，真实浏览器打开 Deployment、StatefulSet、DaemonSet 详情页，三类页面均正常渲染；三类资源 API 均为 GET `200`、POST/PUT/PATCH/DELETE `403`。该结果复现此前有效账号的读写边界，但与另一个账号上下文的全部 `403` 结果仍不一致，因此保留为待解释差异，不把 Workload `projectonly` 标记为全量 RBAC 通过。
+
+## 2026-10-20 当前制品原生 Workload 与应用模板页面复核
+
+在当前 HEAD `c3fa230ec3877bfe8bcafd48ee416b1014dbc1da` 对应的 131 制品上，使用真实 Playwright 登录平台管理员，创建临时 Deployment、StatefulSet 和 DaemonSet 并分别打开项目原生详情页。Deployment 页面实际渲染资源状态、修改记录、元数据、环境变量、配置引用和事件入口；“更多操作”菜单显示回退、编辑自动扩缩、编辑设置、编辑 YAML、重新创建和删除等原生操作入口。应用模板详情页的“编辑信息”弹窗也能正常渲染并回填基本字段，取消后未产生写请求。
+
+本轮只验证页面渲染和操作入口存在，没有逐项提交所有操作，也没有把入口存在当作 V3 功能等价通过。临时 Workload 已删除，`v4-migration-e2e` 最终只保留系统 `kube-root-ca.crt` ConfigMap 和默认 ServiceAccount；当前镜像 tag 为 `feature-v4-configmaps-secrets-20261020-105412-1c54df98d124`，Pod imageID 对应 manifest digest `sha256:49febd89201b7a887d30928ae31a3b296d459ed18dc7811b550a14719556fab2`。
+
+A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域和 `/consolev3/dashboard` 兼容预加载仍未关闭；A12 的原生编辑表单渲染和取消子路径已确认，但完整保存失败、冲突、低权限和制品内 V3 Action 移除仍未完成。

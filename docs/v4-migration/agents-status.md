@@ -722,3 +722,11 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 
 真实浏览器登录后访问 `stakater-configmap` 应用模板详情，原生编辑弹窗可以打开、字段正常回填、取消正常关闭；Network 未出现
 `openpitrix.template.edit.v2` 请求。该证据只关闭当前活动编辑入口的部署后渲染和取消子路径，A12 仍为部分验证。
+
+## 2026-10-20 当前制品原生 Workload 与应用模板页面复核
+
+当前 HEAD `c3fa230ec3877bfe8bcafd48ee416b1014dbc1da` 已部署到 131，镜像 tag 为 `feature-v4-configmaps-secrets-20261020-105412-1c54df98d124`，Pod imageID 与 manifest digest `sha256:49febd89201b7a887d30928ae31a3b296d459ed18dc7811b550a14719556fab2` 一致，rollout 成功。
+
+真实 Playwright 登录后，Deployment 原生详情页能够渲染资源状态、修改记录、元数据、环境变量、配置引用和事件入口；“更多操作”菜单显示回退、编辑自动扩缩、编辑设置、编辑 YAML、重新创建和删除入口。StatefulSet、DaemonSet 临时对象已创建并清理，namespace 无测试资源残留。应用模板详情页的原生“编辑信息”弹窗能够渲染并回填名称、描述、分类和服务商网站等字段，点击取消没有产生写请求。
+
+这轮只增加了原生入口和页面渲染证据，没有把菜单存在或弹窗可打开写成全部 V3 等价通过。A02～A04 的全量操作成功/失败/取消、全部作用域 RBAC 和 V3/Wujie 兼容残留仍未闭环；A12 的保存、冲突、低权限和制品运行时 Action 移除仍未完成。
