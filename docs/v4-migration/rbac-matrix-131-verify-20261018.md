@@ -415,3 +415,17 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 所有 POST 对象使用唯一名称，PUT/PATCH 仅修改本轮临时对象；删除响应为 `200`，之后通过 Kubernetes API 清理原始临时对象。临时用户、workspace/cluster 绑定、四类资源和凭据均已删除并复核不存在，测试 namespace 保留且无本轮对象残留。
 
 该结果补齐当前制品“workspace viewer + cluster admin”对四类项目资源的正向 CRUD 证据，与平台只读、workspaceonly、projectonly 和项目角色的拒绝/正向边界形成更完整的当前资源矩阵；它仍不能外推到 DevOps、Federation、Edge、Notification、Extension 或全部动态 Action。
+
+## 2026-10-21 工作空间 viewer 应用模板完整读取/拒绝复核
+
+使用当前 131 已部署制品创建临时工作空间 `viewer` 账号，仅绑定 `test-workspace-viewer`，不绑定项目角色。真实浏览器访问 `/workspaces/test-workspace/app-templates`，页面正常渲染空列表，没有创建入口；同一会话对工作空间应用模板 API 执行列表、创建、更新、Patch 和删除：
+
+| 操作        | 结果 |
+| ----------- | ---: |
+| 列表 GET    |  200 |
+| 创建 POST   |  403 |
+| 更新 PUT    |  403 |
+| Patch       |  403 |
+| 删除 DELETE |  403 |
+
+不存在对象的写请求使用唯一名称，未产生业务对象。临时用户、WorkspaceRoleBinding 和凭据已删除并复核不存在，测试 namespace 无本轮残留。该结果补齐 A09/A12 工作空间 viewer 的读取/写入拒绝组合，但不覆盖项目、集群、平台、DevOps、联邦、Edge、通知、扩展和完整动态 Action 矩阵。

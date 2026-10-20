@@ -77,6 +77,8 @@ API Server 故障浏览器层覆盖已扩大到 Secret 和 ServiceAccount：两�
 
 随后新增集群管理员正向组合：临时账号绑定 workspace viewer 和集群 `cluster-admin`，在真实浏览器中对 ConfigMap、Secret、ServiceAccount、Deployment 完成列表、详情、POST、PATCH、PUT、DELETE，结果分别为 `200/200/201/200/200/200`。该证据补齐当前可用核心资源的集群管理员正向边界，但不改变完整 RBAC 矩阵未完成的结论。
 
+同一制品又复核了工作空间 viewer 的应用模板边界：页面正常渲染空列表且没有创建入口；应用模板列表 GET 为 `200`，POST/PUT/PATCH/DELETE 均为 `403`。该结果补齐 A09/A12 的 workspace viewer 读取与写入拒绝路径，仍不能外推到其他作用域或全部 V3 Action。
+
 当前源码回归测试 8 个文件、15 个测试全部通过，但其中 `consoleV3Details.test.ts` 明确保留 Services/Volumes 的共享 `consolev3` 实例；该证据支持已迁移 Workload 和配置资源边界稳定，也确认全量 V3/Wujie 清理尚未完成。
 
 仓库标准回归 `./scripts/test.sh` 已通过：66 个文件、210 个测试，0 个失败。由于测试集合包含当前仍保留的 `ConsoleV3ResourceList`、`consolev3` 和扩展兼容边界，该结果不能替代全量 V3/Wujie 运行时等价验证。

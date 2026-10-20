@@ -581,3 +581,5 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 2026-10-21 新增工作空间管理员作用域复核：仅绑定 `test-workspace-admin` 的临时账号可以读取工作空间应用模板列表，但访问项目 ConfigMap、Secret、ServiceAccount、Deployment 页面进入 `/errors/403`，同一浏览器会话的列表/详情 API 均为 `403`。该结果补强 namespace/project 与 workspace 权限隔离证据，不扩大为完整 RBAC 组合通过。
 
 同日新增集群管理员正向复核：临时账号绑定 workspace viewer 与 cluster-admin 后，真实浏览器对 ConfigMap、Secret、ServiceAccount、Deployment 的列表、详情、POST、PATCH、PUT、DELETE 均取得 `200/200/201/200/200/200`；测试对象、账号和绑定均已清理。该结果补充当前核心资源的 cluster-admin 正向边界，完整 RBAC 组合仍未完成。
+
+同日补测工作空间 viewer 应用模板权限：真实浏览器页面正常显示空列表且没有创建入口，应用模板列表 GET 为 `200`，POST/PUT/PATCH/DELETE 均为 `403`。临时用户和绑定已清理；该结果补齐 A09/A12 的 workspace viewer 拒绝边界，不改变完整 RBAC 和全量 V3 等价性未完成的结论。

@@ -1014,3 +1014,10 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - 真实浏览器打开项目 ConfigMap 页面正常；ConfigMap、Secret、ServiceAccount、Deployment 的列表/详情/POST/PATCH/PUT/DELETE 均为 `200/200/201/200/200/200`。
 - 所有写入对象均使用唯一名称并在同一浏览器会话内删除；初始临时对象、账号、workspace/cluster 绑定和凭据均已清理并复核不存在。
 - 该证据补齐当前四类核心项目资源的集群管理员正向组合；DevOps、联邦、Edge、通知、扩展和全部动态 Action 仍未完成。
+
+## 2026-10-21 工作空间 viewer 应用模板权限复核
+
+- 临时账号仅绑定 `test-workspace-viewer`，真实浏览器访问工作空间应用模板页面，页面正常渲染空列表且没有创建入口。
+- 应用模板列表 GET 为 `200`，POST/PUT/PATCH/DELETE 均为 `403`；写请求使用唯一不存在对象，没有产生业务对象。
+- 临时用户、WorkspaceRoleBinding 和凭据已删除并复核不存在，测试 namespace 无本轮残留。
+- 结论：补齐 A09/A12 的 workspace viewer 读取/写入拒绝边界，完整 RBAC 仍未完成。
