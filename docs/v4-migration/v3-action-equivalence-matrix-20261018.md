@@ -522,3 +522,9 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 本轮在临时 Deployment 上生成两条修改记录，使用真实浏览器执行原生“回退”，选择目标修改记录 `#1` 并提交；API 回读确认镜像从 `busybox:1.36` 恢复为 `busybox:1.35`，generation 从 `2` 变为 `3`。临时对象已清理。该结果只关闭 A02 的管理员回滚成功子路径，A03/A04 回滚及其他完整操作、低权限和 V3/Wujie 去依赖仍未闭环。
 
 同一制品继续测试 A03/A04 回滚：StatefulSet、DaemonSet 的回滚请求都返回 `PATCH 200`，但请求体只有 `{ "spec": { "template": { "$patch": "replace" } } }`，API 回读镜像未从 `busybox:1.36` 恢复为历史版本 `busybox:1.35`。该结果是 A03/A04 的真实功能失败，不能用 HTTP `200` 作为通过依据；临时资源已清理，回滚功能需修复后重新验证。
+
+## 2026-10-21 A02～A04 回滚修复复验
+
+提交 `4b5c7f5670c46314690e259535ad000cad85a014` 修复回退弹窗的目标版本匹配和空模板保护。Run `39466765863` 通过单元测试及镜像构建；131 制品为 `feature-v4-configmaps-secrets-20261021-013709-4b5c7f5670c4`，manifest digest 为 `sha256:ffe166aa35e105d463e3b1d37e14fca3595088706e1eecfe5daf7c97518fb3ac`，部署 rollout `553/553` 成功，Pod Ready 且 imageID 与 digest 一致。
+
+真实浏览器在当前制品上对 Deployment、StatefulSet、DaemonSet 分别选择历史修改记录 `#1` 执行回退。三类请求均为 `PATCH 200`；StatefulSet、DaemonSet 的请求体带有历史 Pod 模板，Deployment 的 JSON Patch 带有历史 Pod 模板；三类 Kubernetes API 回读均确认镜像恢复为 `busybox:1.35`，generation 均由 `2` 变为 `3`。该结果把 A02～A04 的管理员回退成功子路径从失败/未验证推进为已验证，但不代表全部 V3 Action、全部失败/取消组合、低权限 RBAC 或 V3/Wujie 去依赖已闭环。

@@ -828,3 +828,18 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 在当前 131 制品上分别为 StatefulSet 和 DaemonSet 创建两条修改记录，真实浏览器打开“回退”，选择目标记录 `#1` 并确认。浏览器请求分别返回 `PATCH 200`，但请求体实际为 `{ "spec": { "template": { "$patch": "replace" } } }`，Kubernetes API 回读镜像仍为 `busybox:1.36`，没有恢复到目标记录的 `busybox:1.35`。
 
 该结果确认 A03/A04 的回滚入口可打开且后端返回成功码，但回滚内容没有实际应用，属于功能失败，不能标记为通过。临时 StatefulSet、DaemonSet 已清理；该缺陷需要单独修复后重新完成“代码 → 制品 → 浏览器 → API 回读”验证。
+
+## 2026-10-21 A02～A04 回滚缺陷修复与 131 浏览器复验
+
+定位确认根因是回退弹窗用表单值查找历史记录时，对数字和字符串版本号使用了严格比较；StatefulSet/DaemonSet 未找到目标记录时仍构造了只有 `$patch: replace` 的空模板，因此后端返回 `200` 但没有改变工作负载。提交 `4b5c7f5670c46314690e259535ad000cad85a014` 把版本号比较统一为数值比较，抽出回退数据组装函数，找不到目标模板时停止提交，并补充 4 个回归测试。
+
+验证链路如下：
+
+- 本地 `./scripts/test.sh`：66 个测试文件、210 个测试通过；`corepack yarn build:packages` 通过；变更文件 Prettier 检查和 `git diff --check` 通过。
+- GitHub Actions Run `39466765863`：Unit tests 和 Build and publish 均成功。
+- 制品：`feature-v4-configmaps-secrets-20261021-013709-4b5c7f5670c4`；manifest digest `sha256:ffe166aa35e105d463e3b1d37e14fca3595088706e1eecfe5daf7c97518fb3ac`。
+- 131 部署：因单节点 CPU 不足，首次保持 `maxUnavailable=0/maxSurge=1` 时新 Pod Pending；按测试环境授权临时切换为 `maxUnavailable=1/maxSurge=0` 完成替换，随后恢复为 `maxUnavailable=0/maxSurge=1`。最终 Deployment generation/observedGeneration `553/553`，副本、Updated、Ready、Available 为 `1/1/1/1`；Pod `ks-console-5f8c7cf7b6-pf666` Running/Ready，imageID 与 manifest digest 一致，`/readyz` 返回 `ok`，节点 `dev01` Ready。
+- 真实浏览器登录后，StatefulSet 和 DaemonSet 页面均渲染原生详情和“回退”弹窗，选择 `#1` 后请求均为 `PATCH 200`，请求体包含历史模板和 `busybox:1.35`；Kubernetes API 回读两者镜像均为 `busybox:1.35`，generation 均由 `2` 变为 `3`。
+- 同一制品的 Deployment 回退复验请求为 `PATCH 200`，JSON Patch 包含历史 `busybox:1.35` 模板；API 回读镜像为 `busybox:1.35`，generation 由 `2` 变为 `3`。
+
+本轮测试资源已清理，`v4-migration-e2e` 没有本轮 Workload 残留，仅保留系统 ConfigMap 和默认 ServiceAccount。浏览器仍记录已登记的扩展初始化错误（包括 `getExtensionConsoleV3Embed is not a function`、Ingress/监控扩展初始化错误），按负责人要求暂不处理；这些错误不影响本轮回退请求和 Kubernetes API 回读，但也不作为全局 V3/Wujie 等价通过依据。A02～A04 的管理员回退成功子路径已验证，完整操作组合、低权限 RBAC、全部 V3 等价性仍未完成。
