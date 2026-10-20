@@ -549,10 +549,16 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 
 ## 2026-10-21 当前源码 V3 Action 与兼容残留复核
 
-在当前 HEAD `fa8f2b3a4` 上重新扫描 `packages/console/src`、`packages/core/src` 和 `packages/shared/src`，排除 `lib`、`node_modules` 和测试文件：
+在取证时 HEAD `fa8f2b3a4` 上重新扫描 `packages/console/src`、`packages/core/src` 和 `packages/shared/src`，排除 `lib`、`node_modules` 和测试文件；本次文档提交后的当前 HEAD 以 Git 记录为准：
 
 - 仍有 6 个业务文件直接调用 `useV3action`：应用模板创建的 Edge 分支、应用列表的 Edge 模板创建、Edge 应用部署、EdgeWorkload 批量删除、DevOps 页面以及用户通知设置；DevOps 文件包含 `devops.edit` 和 `devops.create` 两个 Action。
 - 仍有 3 个桥接/导出文件：`packages/console/src/actions/v3actions.tsx`、`packages/shared/src/hooks/useV3Actions/index.tsx` 和 `packages/shared/src/hooks/index.ts`。
 - 当前源码中匹配 `WujieReact`、`wujie-react`、`ConsoleV3ResourceList`、`consolev3` 或 `v3dist` 的文件数为 157；当前制品的浏览器请求仍可观测到 `/consolev3/dashboard` 和 `/dist/v3dist/*`。
 
 该复核证明 A05～A08、A10 仍有活动 V3 Action 或兼容加载边界，不能仅凭 A09/A12 的部分原生成功路径宣称全部 V3 功能逐项等价。当前环境仍缺少 Edge/Federated 和 DevOps 业务 fixture，通知页面仍有已记录的 V3 资源加载及 API `400`；这些项必须补齐 V4 替代行为或明确作为未通过项，不能用空数据态豁免。
+
+## 2026-10-21 A09/A12 工作空间管理员成功路径补测
+
+当前 131 制品上，临时工作空间级用户通过真实浏览器完成应用模板 Chart 校验、上传、列表刷新和删除：校验 `POST`、创建 `POST` 和删除 `DELETE` 均返回 `200`，页面显示创建入口、临时模板，删除后回到空数据态。该结果证明当前原生入口存在一条工作空间管理员成功路径，但不证明 A09/A12 的全部 V3 行为等价。
+
+仍未验证工作空间级拒绝、冲突/网络失败、返回与直达 URL、全部动态 Action、旧 V3/Wujie 去依赖以及其他业务入口；临时测试身份和应用模板已清理。

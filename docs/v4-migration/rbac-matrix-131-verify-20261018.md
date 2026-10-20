@@ -341,3 +341,9 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 | 不存在对象 DELETE | `403` |
 
 该证据补齐了应用模板 A09/A12 的全局只读组合。不存在对象的 GET 为 `404`，因此没有把资源不存在和权限拒绝混为一谈。临时用户、GlobalRole、GlobalRoleBinding 和测试应用模板均已删除并复核不存在，测试 namespace 未删除且无资源残留。该结果不代表 DevOps、联邦、Edge、通知、扩展或全部动态 Action 的 RBAC 组合已完成。
+
+## 2026-10-21 工作空间应用模板管理权限补测
+
+在当前 131 部署制品上创建临时工作空间级用户、WorkspaceRole 和 WorkspaceRoleBinding，仅授予应用模板管理规则。真实浏览器登录该用户访问 `test-workspace` 应用模板页面，页面显示“添加/创建”入口；上传临时 Helm Chart `v4-a12-chart-r3y3x` 的校验请求返回 `200`，创建请求返回 `200`，列表刷新后出现该模板。通过页面删除确认后，`DELETE` 请求返回 `200`，列表回到空数据态。
+
+该证据补齐 A09/A12 工作空间级管理员的上传、刷新和删除成功组合。临时用户、WorkspaceRole、WorkspaceRoleBinding 和应用模板均已删除并复核不存在；`v4-migration-e2e` namespace 未删除且无本轮资源残留。工作空间级拒绝路径、冲突/网络失败、其他动态 Action，以及 DevOps、联邦、Edge、通知和扩展专用组合仍未完成，不能据此宣称完整 RBAC 矩阵通过。

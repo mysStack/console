@@ -890,8 +890,16 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 
 ## 2026-10-21 当前源码 V3 Action 残留复核
 
-- 当前 HEAD：`fa8f2b3a4`。
+- 取证时 HEAD：`fa8f2b3a4`；当前文档提交后的 HEAD 以 Git 记录为准。
 - 排除 `lib`、`node_modules` 和测试文件后，仍有 6 个业务文件直接调用 `useV3action`，涉及 Edge 应用模板创建、Edge 模板部署、EdgeWorkload 批量删除、DevOps 创建/编辑和通知设置；DevOps 文件包含两个 Action。
 - 仍有 3 个桥接/导出文件：`packages/console/src/actions/v3actions.tsx`、`packages/shared/src/hooks/useV3Actions/index.tsx`、`packages/shared/src/hooks/index.ts`。
 - 当前源码匹配 `WujieReact`、`wujie-react`、`ConsoleV3ResourceList`、`consolev3` 或 `v3dist` 的文件数为 157；部署后浏览器仍请求 `/consolev3/dashboard` 和 `/dist/v3dist/*`。
 - 结论：A05～A08、A10 和 A12 的制品级 V3/Wujie 清理条件仍未满足；该结果是当前状态复核，不把空数据态或部分原生成功路径写成全量等价通过。
+
+## 2026-10-21 A09/A12 工作空间级应用模板管理补测
+
+- 状态：已完成工作空间级管理员的应用模板上传、列表刷新和删除成功子路径；全量 RBAC 与 A09/A12 等价性仍未完成。
+- 真实浏览器证据：临时工作空间级用户登录 `test-workspace`，页面显示创建入口；Chart 校验 `POST` 返回 `200`，应用模板创建 `POST` 返回 `200`，列表出现唯一临时模板；页面删除确认后的 `DELETE` 返回 `200`，删除后列表回到空数据态。
+- 权限范围：临时用户只绑定工作空间应用模板管理规则，没有借用项目管理员权限；本轮未把成功结果外推到 viewer、projectonly、clusterviewer 或平台只读组合。
+- 清理与复核：临时用户、WorkspaceRole、WorkspaceRoleBinding 和应用模板已删除并复核不存在；测试 namespace 保留且无本轮资源残留。
+- 未闭环：工作空间级拒绝路径、冲突/网络失败、DevOps、联邦、Edge、通知、扩展及全部动态 Action 的正反权限和 V3 等价性。

@@ -516,3 +516,9 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 同一部署制品上又补测了平台全局只读应用模板组合：临时用户只绑定包含 `global-view-workspaces` 和 `workspace-view-app-templates` 只读规则的 GlobalRole。真实浏览器访问工作空间应用模板页面能够渲染空列表且没有“添加/创建”入口；列表 GET 为 `200`，创建 POST、更新 PUT/PATCH、删除 DELETE 均为 `403`。不存在对象的 GET 为 `404`，与权限拒绝区分记录。临时用户、GlobalRole、GlobalRoleBinding 和测试模板均已清理；该证据补齐 A09/A12 的全局只读边界，但 DevOps、联邦、Edge、通知、扩展和全部动态 Action 的完整 RBAC 仍未完成。
 
 当前源码复核显示，排除编译输出、依赖和测试文件后仍有 6 个业务文件直接调用 `useV3action`，另有 3 个 V3 桥接/导出文件；匹配 `WujieReact`、`wujie-react`、`ConsoleV3ResourceList`、`consolev3` 或 `v3dist` 的源码文件数为 157。部署后浏览器仍请求 `/consolev3/dashboard` 和 `/dist/v3dist/*`。因此“全部 V3 功能逐项等价性”仍为未完成，不能因 A09/A12 的部分浏览器成功证据而放行全量迁移。
+
+## 2026-10-21 A09/A12 工作空间级应用模板管理补测
+
+当前 131 制品上，临时工作空间级用户仅绑定应用模板管理规则。使用真实浏览器访问 `test-workspace` 应用模板页面，页面显示“添加/创建”入口；临时 Chart 的校验 `POST`、创建 `POST` 均返回 `200`，列表刷新后出现唯一模板；页面删除确认后的 `DELETE` 返回 `200`，删除后回到空数据态。
+
+临时用户、WorkspaceRole、WorkspaceRoleBinding 和应用模板均已删除并复核不存在，`v4-migration-e2e` namespace 保留且无本轮资源残留。本证据只关闭 A09/A12 工作空间管理员的成功子路径；工作空间级拒绝、冲突/网络失败、完整路由返回与刷新、DevOps、联邦、Edge、通知、扩展和全部 V3 Action 等价仍未完成。
