@@ -536,3 +536,13 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 该结果关闭 A02～A04 管理员“重新创建”成功子路径；没有扩大为伸缩、YAML 成功持久化、失败/取消组合、低权限拒绝或全部 V3 Action 等价通过。
 
 本轮尝试通过浏览器原生“编辑 YAML”修改 Deployment 副本数时，自动化编辑器输入未替换 Ace 编辑器原有全文，提交请求体包含两个 YAML 文档，Console API 返回 `PUT 400`，副本数保持 `0`。该次失败属于测试输入未形成单一合法资源文档，不能作为业务功能失败证据；由于没有得到干净的单文档提交，伸缩/YAML 成功路径仍保持未验证。另观察到 Deployment 的“编辑设置”和“编辑 YAML”都调用同一 YAML 编辑回调，当前只记录为待产品确认的交互差异，不据此自行修改功能代码。
+
+## 2026-10-21 A12 当前制品上传、刷新与删除闭环
+
+使用当前已部署制品和真实管理员浏览器，在 `test-workspace` 的应用模板列表上传临时 Helm Chart `v4-a12-chart-20261021-0.0.1.tgz`。浏览器与 API 证据如下：
+
+- Chart 校验请求 `POST /kapis/application.kubesphere.io/v2/workspaces/test-workspace/apps?validate=true` 返回 `200`，页面正确显示名称 `v4-a12-chart`、版本 `0.0.1` 和描述；
+- 提交请求 `POST /kapis/application.kubesphere.io/v2/workspaces/test-workspace/apps` 返回 `200`，列表刷新后出现唯一临时应用模板，状态为“未上架”，版本为 `0.0.1`；
+- 通过列表“更多操作 → 删除”打开确认框，输入系统生成的临时应用模板名称后，删除请求 `DELETE /kapis/application.kubesphere.io/v2/workspaces/test-workspace/apps/<临时名称>/` 返回 `200`；删除完成后列表回到空数据态，API 查询未发现该临时对象。
+
+该轮关闭 A12 当前制品管理员上传成功、列表刷新和删除成功子路径，并复核了删除后的空数据态。它不代表 A12 的完整等价性：低权限上传/删除、名称或版本冲突、网络失败、返回/直达 URL、全部 V3 Action/Wujie 移除仍未闭环；扩展初始化错误按负责人要求暂不处理。临时 Chart 和应用模板均已清理，`v4-migration-e2e` namespace 未删除。

@@ -506,3 +506,7 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 ## 2026-10-21 131 单节点部署状态修正
 
 复核发现 `ks-console` 在单节点 CPU 资源不足时采用 `maxUnavailable=0/maxSurge=1` 会保留 Pending 旧 ReplicaSet Pod，并导致 Deployment 超过 progress deadline。按授权将测试环境策略调整为 `maxUnavailable=1/maxSurge=0` 后 rollout 成功，当前 `replicas/updated/ready/available=1/1/1/1`，仅有一个 Running/Ready Pod，实际 imageID 与当前制品 digest 一致。该记录属于测试环境容量与 rollout 策略证据，不改变功能测试结论。
+
+## 2026-10-21 A12 当前制品管理员上传与删除闭环
+
+使用真实管理员浏览器在 `test-workspace` 应用模板列表上传临时 Helm Chart `v4-a12-chart-20261021-0.0.1.tgz`。Chart 校验和创建请求均返回 `200`，列表刷新后显示唯一临时模板；通过“更多操作 → 删除”确认删除，删除请求返回 `200`，删除后页面回到空数据态，API 查询未发现临时对象。该证据补齐 A12 当前制品管理员上传、刷新和删除成功子路径；低权限、冲突/失败、返回/直达 URL、全部 V3/Wujie 清理和其他资源的完整 RBAC 组合仍未完成。临时对象已清理。
