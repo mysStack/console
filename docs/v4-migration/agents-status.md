@@ -708,6 +708,12 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 
 只读复核 131 集群发现：当前没有 EdgeWorkload、FederatedProject 或 FederatedResource API/CRD；`devops` 扩展版本对象存在，但扩展状态不是 `Installed`，没有可用 DevOps API。A05、A06、A07、A10 仍属于环境不可执行项，未擅自安装扩展或创建伪造 fixture；A08 的通知扩展同样未启用。该结果继续作为 V3 Action 逐项矩阵的未验证边界。
 
+## 2026-10-20 扩展资源口径复核
+
+前一条记录中的“没有扩展 API/CRD”表述过宽，现按 Kubernetes API 的只读结果修正。当前集群存在 `extensions.kubesphere.io/v1alpha1` 下的 `APIService`、`JSBundle`、`ExtensionEntry`、`ReverseProxy`，以及 `kubesphere.io/v1alpha1` 下的 `Extension`、`ExtensionVersion` 资源；当前 `APIService` 可用的扩展后端包括 `copilot`、`whizard-telemetry`、`kubeeye` 和 `gateway`，其中 `notification.kubesphere.io/v2beta2` 由 `whizard-telemetry` 提供。
+
+只读回读 `Extension` 状态后，`cert-manager`、`frontend-forge`、`gateway`、`ingress-utils`、`ks-autoscaling`、`metrics-server`、`openkruise`、`openpitrix`、`vertical-pod-autoscaler`、`whizard-alerting`、`whizard-monitoring`、`whizard-monitoring-pro`、`whizard-telemetry`、`wiztelemetry-tracing` 和 `kubesphere-copilot` 为 `Installed`；`kubeeye` 为 `InstallFailed`。`devops`、`kubeedge`、`kubefed`、`whizard-notification` 等 Extension 对象存在但没有 `Installed` 状态。该证据修正扩展盘点口径，但没有关闭扩展逐项入口、权限、运行时错误或 V3 等价性；A06/A07 仍因 DevOps 后端不可用未验证，A05/A10 仍缺少 Edge/Federated 资源 Fixture，A08 的通知设置入口仍不可触发。
+
 ## 2026-10-20 A12 当前源码桥接清理
 
 当前源码扫描确认历史 `packages/shared/src/components/Modals/AppTemplateEdit/index.tsx` 没有任何调用者；应用模板详情使用原生 `EditAppModal` 和 `openpitrixStore.updateApp`。已删除该无调用旧 V3 编辑桥，并保留原生编辑器测试。
@@ -741,13 +747,22 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 
 | 专项                    | 执行和证据                                                                                                                                                                                                                                                                                                                                                            | 状态               |
 | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
-| 完整 RBAC 组合矩阵      | 复核当前 131 制品和既有真实浏览器/API记录。ConfigMap、Secret、ServiceAccount 已有六种项目/集群组合及平台只读组合；Workload 主要组合已有记录，但 `projectonly` 历史结果不一致，联邦、DevOps、Extension 作用域缺少可执行完整 fixture。                                                                                                                                  | 未完成             |
+| 完整 RBAC 组合矩阵      | 复核当前 131 制品和既有真实浏览器/API记录。ConfigMap、Secret、ServiceAccount 已有六种项目/集群组合及平台只读组合；Workload 和四类目标资源的有效 `projectonly`/平台只读 CRUD 边界已补测，联邦、DevOps、Extension 作用域仍缺少可执行完整 fixture。                                                                                                                      | 未完成             |
 | 全部 V3 功能逐项等价性  | 重新扫描当前源码并复核 A01～A12 矩阵。当前仍存在 V3 Action 桥接、Wujie、`consolev3/v3dist` 加载边界；A05/A10 缺少 Edge fixture，A06/A07 未安装 DevOps，A08 无可触发入口，其他 Action 仍有失败/冲突/低权限/刷新或替代行为缺口。                                                                                                                                        | 未完成             |
 | API Server 实际故障环境 | 在当前制品上使用已授权 `kubectl debug node/dev01` 停止并恢复 K3s；浏览器登录会话每 2 秒采样 7 个接口，共 185 组。六类 Kubernetes 列表均在故障期间出现 502/503，恢复后 200；Application 对照接口 185/185 为 200；`readyz`、节点和 `ks-console` rollout 恢复成功，debug Pod 已清理。恢复期间单节点 CPU 不足导致旧 ReplicaSet 短暂 Pending，清理旧副本后最终 `1/1/1/1`。 | 已完成（限定范围） |
 
 本轮提交前复核：Git HEAD 为 `b2bd7bf639ae0e42cbd92e4787d93dbf666a902a`；部署镜像为 `feature-v4-configmaps-secrets-20261020-105412-1c54df98d124`；最终运行 Pod 为 `ks-console-58794bfdc6-dc5j2`，imageID 对应 digest `sha256:49febd89201b7a887d30928ae31a3b296d459ed18dc7811b550a14719556fab2`。测试 namespace 复核无本轮临时资源残留，PR #1 仍保持 Draft。
 
 本轮又在项目 Workload 原生桥清理制品 `d091cb1cdc3d271e1632ed569decc9aeac75fb31` 上完成 API Server 实际故障复测。镜像 tag 为 `feature-v4-configmaps-secrets-20261020-171341-d091cb1cdc3d`，digest 为 `sha256:1b82acae4539989150585dfd3e68376ad9bbb957302d82adb98bb19b4d58ce6e`；7 个浏览器接口各采样 60 次，六类 Kubernetes 列表均出现 502/503，Application 对照接口 60/60 为 200。恢复后 `readyz=ok`、节点 Ready、Deployment `550/550` 且 `1/1/1/1`，Pod `ks-console-74899889df-gp9lq` Running/Ready，debug Pod 已清理。该证据仍只覆盖 Kubernetes 列表接口和恢复链路，不扩大为全部页面或写操作故障验证。
+
+## 2026-10-20 当前会话：RBAC projectonly 与平台只读完整组合复核
+
+本轮在当前 131 制品上使用真实 Playwright 和浏览器会话补齐两组组合：
+
+1. 有效 `projectonly`：只绑定 `v4-migration-e2e` 项目 `viewer` RoleBinding 的 Active 用户，ConfigMap、Secret、ServiceAccount、Deployment 的 GET 均为 `200`，POST/PUT/PATCH/DELETE 均为 `403`；Deployment 详情页正常渲染。此前全部 `403` 的账号上下文没有复现，作为历史异常保留。
+2. 平台只读：只绑定临时 GlobalRole、没有项目 RoleBinding 的用户，四类资源列表/详情均为 `200/200`，POST、PUT、PATCH、DELETE 均为 `403`。临时用户、绑定、GlobalRole、Workload 和资源已清理，namespace 无测试残留。
+
+这两组证据扩大了当前项目/平台只读 RBAC 矩阵的实际 CRUD 覆盖；联邦、DevOps、Edge、Extension 和全部 V3 Action 的全量组合仍按各自环境边界保持未完成。
 
 ## 2026-10-20 当前会话：项目 Workload V3 兼容桥清理
 

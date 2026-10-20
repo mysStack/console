@@ -469,3 +469,7 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 - 当前源码和部署制品仍可观测到 V3/Wujie 兼容加载边界，不能宣称全部 V3/Wujie 已移除。
 
 因此，“全部 V3 功能逐项等价性”本轮仍为**未完成**。完成条件仍是 A01～A12 每项都具备入口、成功、失败、取消、刷新/返回、权限和 V4 替代行为证据，并清理对应的运行时 V3/Wujie 依赖；环境缺少 fixture 时必须先补齐环境或明确记录为未通过，不能豁免。
+
+## 2026-10-20 扩展环境证据口径修正
+
+当前集群确实存在 `APIService` 和 `JSBundle` 扩展资源，并有 `copilot`、`whizard-telemetry`、`kubeeye`、`gateway` 等可用 APIService；这只能证明扩展基础设施存在。`devops` 没有 `Installed` 状态，FederatedProject/FederatedResource 和 EdgeWorkload 资源仍不存在，`whizard-notification` 也没有 `Installed` 状态。故 A05～A08 的未验证状态不应表述为“所有扩展 API 不存在”，而应表述为“目标扩展或业务 Fixture 不可执行”。该修正不改变 A01～A12 全量等价性仍未完成的结论。

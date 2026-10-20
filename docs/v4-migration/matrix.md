@@ -289,6 +289,18 @@ GitHub Actions Run `39209219839` 成功，镜像 tag 为 `feature-v4-configmaps-
 
 本轮补充了 A05/A10 的入口、空数据态和环境边界证据，但没有关闭成功、失败、取消、RBAC、刷新返回或 V4 原生替代验证；联邦页面仍加载 `/consolev3/dashboard` 与 `v3dist` 资源。A05/A10 继续标记为“环境不可执行/未验证”，三个目标资源模块的状态不变，全部 V3 功能等价性仍未完成。
 
+## 2026-10-20 RBAC 项目只读与平台只读完整 CRUD 复核
+
+本轮重新使用有效的仅项目 `viewer` 账号验证 ConfigMap、Secret、ServiceAccount、Deployment：四类资源 GET 均为 `200`，POST/PUT/PATCH/DELETE 均为 `403`，Deployment 原生详情页正常渲染。随后使用只绑定临时 GlobalRole 的平台只读账号验证同一四类资源：列表/详情均为 `200/200`，POST/PUT/PATCH/DELETE 均为 `403`。两组临时账号、绑定、GlobalRole、Workload 和资源均已清理，`v4-migration-e2e` 只剩系统对象。
+
+这轮关闭了此前 `projectonly` 有效登录上下文差异，并补齐平台只读对四类目标资源的完整 CRUD 拒绝证据；联邦、DevOps、Edge、Extension 以及全部 V3 Action 的全量 RBAC 仍未完成。
+
+## 2026-10-20 扩展 API 与安装状态口径修正
+
+只读复核发现当前集群并非没有扩展 API：`extensions.kubesphere.io/v1alpha1` 下的 `APIService`、`JSBundle` 等资源存在，`copilot`、`whizard-telemetry`、`kubeeye`、`gateway` 的 APIService 状态为 `Available`，并有多个已安装扩展的 JSBundle。缺失的是目标业务能力：`devops` Extension 没有 `Installed` 状态，当前 DevOps 列表 API 仍返回 `404`；没有可用的 FederatedProject/FederatedResource 或 EdgeWorkload API/CRD；`whizard-notification` Extension 没有 `Installed` 状态，用户通知设置入口仍不可触发。
+
+因此，扩展状态只能作为环境能力证据，不能替代 A05～A08 的运行时成功、失败、取消、权限和 V4 替代行为验证；之前将“没有扩展 API/CRD”作为整体结论的表述已废弃。
+
 ## 2026-10-20 测试 namespace 残留复核与清理
 
 在继续运行时核验前，对 `v4-migration-e2e` 做了只针对测试命名和测试标签的资源复核，发现此前应用模板安装与配置历史测试遗留的 Helm ConfigMap、Helm release Secret、应用生成的 `configmapname` 及配置历史 Secret 链。已删除这些明确属于本轮测试的对象，并复核 namespace 当前只剩系统 `kube-root-ca.crt` ConfigMap 和默认 ServiceAccount；没有删除 namespace，也没有修改其他 namespace 或业务资源。
@@ -409,11 +421,11 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 
 本轮基于当前分支提交 `b2bd7bf639ae0e42cbd92e4787d93dbf666a902a` 和 131 已部署制品执行，不重新初始化项目，不修改稳定分支。
 
-| 专项                    | 当前结论           | 实际证据                                                                                                                                                                                                                        |
-| ----------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 完整 RBAC 组合矩阵      | 未完成             | ConfigMap、Secret、ServiceAccount 已覆盖项目/集群六种组合及平台只读读写边界；Workload 已覆盖主要项目/集群组合，但 `projectonly` 存在历史结果差异；联邦、DevOps、Extension 和全部动态 Action 的全量组合仍无完整 fixture/后端能力 |
-| 全部 V3 功能逐项等价性  | 未完成             | A01～A12 仍有部分验证、未验证和环境不可执行项；源码仍有 `useV3action/useV3Actions`、Wujie 和 `consolev3/v3dist` 运行时残留，不能宣称全部 V4 原生化完成                                                                          |
-| API Server 实际故障环境 | 已完成（限定范围） | 本轮真实停止/恢复 K3s，185 组浏览器样本中六类 Kubernetes 列表在故障期间出现 502/503，恢复后回到 200；Application 对照接口保持 200；readyz、节点和 Console rollout 均恢复                                                        |
+| 专项                    | 当前结论           | 实际证据                                                                                                                                                                                                                         |
+| ----------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 完整 RBAC 组合矩阵      | 未完成             | ConfigMap、Secret、ServiceAccount 已覆盖项目/集群六种组合及平台只读读写边界；Workload 和四类目标资源的有效 `projectonly`/平台只读 CRUD 边界已补测；联邦、DevOps、Extension 和全部动态 Action 的全量组合仍无完整 fixture/后端能力 |
+| 全部 V3 功能逐项等价性  | 未完成             | A01～A12 仍有部分验证、未验证和环境不可执行项；源码仍有 `useV3action/useV3Actions`、Wujie 和 `consolev3/v3dist` 运行时残留，不能宣称全部 V4 原生化完成                                                                           |
+| API Server 实际故障环境 | 已完成（限定范围） | 本轮真实停止/恢复 K3s，185 组浏览器样本中六类 Kubernetes 列表在故障期间出现 502/503，恢复后回到 200；Application 对照接口保持 200；readyz、节点和 Console rollout 均恢复                                                         |
 
 本节的“已完成（限定范围）”只表示 API Server 故障注入、恢复和上述列表接口的浏览器/API链路已验证；不能扩展为全平台故障兼容或全部 V3 等价通过。
 
