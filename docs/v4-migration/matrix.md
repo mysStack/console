@@ -429,6 +429,8 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 
 本节的“已完成（限定范围）”只表示 API Server 故障注入、恢复和上述列表接口的浏览器/API链路已验证；不能扩展为全平台故障兼容或全部 V3 等价通过。
 
+随后在当前 131 制品上补测了六类资源写操作：ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet 的 PATCH 和 POST 在 API Server 故障窗口内均返回 `502`；六类 DELETE 均为连接级失败，没有收到 HTTP 状态码。恢复后已有对象没有出现故障期间的临时修改标签，故障期间尝试创建的新对象均不存在；`/readyz`、节点状态和 Console Pod 均恢复正常。该证据把实际故障范围扩展到六类资源的写入保护，但仍不覆盖页面级错误提示、自动重试、恢复后的前端缓存刷新和全部 V3 Action。
+
 本轮又在项目 Workload 原生桥清理对应的制品 `d091cb1cdc3d271e1632ed569decc9aeac75fb31` 上复测 API Server 实际故障：7 个接口各采样 60 次，ConfigMap 为 `200=24/502=24/503=12`，Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet 均为 `200=24/502=25/503=11`，Application 对照接口为 `200=60`。K3s 恢复后 `readyz`、节点、Console rollout 和 Pod imageID 均恢复正常。该结果更新了当前制品的故障证据，范围仍限于列表接口和恢复链路。
 
 ## 2026-10-21 通知配置与 V3 资源加载复核
