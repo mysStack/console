@@ -1,0 +1,62 @@
+# 2026-10-21 三项验证收口报告
+
+本报告汇总当前 `feature/v4-configmaps-secrets` 分支和 131 测试环境的三项专项验证状态。报告只引用真实浏览器、Kubernetes API、集群状态和当前源码扫描证据；“部分验证”“未验证”和“环境不可执行”不视为通过。
+
+## 1. 完整 RBAC 组合矩阵
+
+### 已取得证据
+
+| 资源或入口                         | 已验证组合                                                                        | 证据范围                                                                                |
+| ---------------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| ConfigMap、Secret、ServiceAccount  | 项目 viewer、operator、admin、workspaceonly、projectonly、clusterviewer；平台只读 | 真实浏览器/API 的读取、创建、更新、删除和拒绝状态码；`projectonly` 保留历史账号结果差异 |
+| Deployment、StatefulSet、DaemonSet | viewer、operator、admin、workspaceonly、projectonly、clusterviewer；平台只读      | 真实浏览器/API 的读取、写入和拒绝边界；`projectonly` 结果不一致，未作为稳定通过结论     |
+| 应用模板 A09/A12                   | workspace viewer、workspace 管理员、平台全局只读、当前管理员                      | 真实浏览器的列表、创建拒绝、Chart 校验/上传、刷新、删除和清理                           |
+
+### 尚未闭环
+
+- DevOps API/扩展当前不可用，相关请求为 `404`，没有可执行的真实业务 fixture。
+- Federation、EdgeWorkload 和 FederatedProject/FederatedResource CRD 或 fixture 不存在，不能执行正向、拒绝、错误、取消和刷新组合。
+- Extension 专用组合没有建立；扩展初始化错误按负责人要求延期。
+- 应用模板工作空间级拒绝、冲突/网络失败和全部动态 Action 尚未逐项验证。
+- `projectonly` 在不同临时账号上下文出现不同结果，根因未证明，不能按稳定组合关闭。
+
+结论：**完整 RBAC 组合矩阵未完成**。当前已验证的资源和组合只能作为部分证据，不能外推到缺少 fixture 的模块。
+
+## 2. 全部 V3 功能逐项等价性
+
+当前矩阵按 A01～A12 记录：
+
+| Action                    | 当前状态                                                                                                             |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| A01 ConfigReference       | 部分验证；有原生引用和持久化证据，仍有兼容入口、低权限和完整错误路径缺口                                             |
+| A02 Deployment            | 部分验证；原生详情、合法/非法 YAML、冲突、回退、重新创建、删除和部分 RBAC 已验证，完整操作组合及 V3 运行时清理未完成 |
+| A03 StatefulSet           | 部分验证；原生详情、合法/非法 YAML、冲突、回退、重新创建、删除和部分 RBAC 已验证，完整等价未完成                     |
+| A04 DaemonSet             | 部分验证；原生详情、合法/非法 YAML、冲突、回退、重新创建、删除和部分 RBAC 已验证，完整等价未完成                     |
+| A05 Edge 应用模板创建     | 未验证；没有 Edge fixture                                                                                            |
+| A06 DevOps 编辑           | 未验证；DevOps 后端能力不可用                                                                                        |
+| A07 DevOps 创建           | 未验证；DevOps 后端能力不可用                                                                                        |
+| A08 通知设置              | 未验证；当前入口仍加载兼容资源，未证明 V4 替代行为                                                                   |
+| A09 应用模板创建          | 部分验证；有原生模板选择/安装和 RBAC 子路径，完整失败、取消、返回和 V3 替代未完成                                    |
+| A10 EdgeWorkload 批量删除 | 未验证；没有 EdgeWorkload fixture                                                                                    |
+| A11 应用部署              | 部分验证；普通 Helm 安装成功，Edge 分支未触发                                                                        |
+| A12 应用模板编辑/制品     | 部分验证；原生编辑、上传、刷新、删除和错误子路径已有证据，完整等价和运行时清理未完成                                 |
+
+当前源码仍有 6 个业务文件直接调用 `useV3action`，另有 3 个桥接/导出文件；源码匹配 `WujieReact`、`wujie-react`、`ConsoleV3ResourceList`、`consolev3` 或 `v3dist` 的文件数为 157。当前制品浏览器仍可观测 `/consolev3/dashboard` 和 `/dist/v3dist/*`。
+
+结论：**全部 V3 功能逐项等价性未完成**。环境缺失 fixture 的 Action 不能以空列表、入口可达或页面渲染代替成功等价。
+
+## 3. API Server 实际故障环境验证
+
+该项已在负责人授权的维护窗口内执行真实 K3s 停止/恢复测试：
+
+- 读取链路：ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet 列表请求在 API Server 不可用期间取得 `502/503`，恢复后返回 `200`。
+- 写入链路：上述六类资源的临时 PATCH、POST 在故障期间失败；DELETE 为连接级失败；恢复后已有对象未被部分写入，新对象不存在。
+- 浏览器页面：故障期间 ConfigMap 页面保留故障前旧列表，没有显式错误页或重试提示；恢复后 `readyz`、节点、Console rollout 和页面刷新恢复正常。
+- 当前部署：镜像 tag `feature-v4-configmaps-secrets-20261021-013709-4b5c7f5670c4`，Pod imageID 对应 manifest digest `sha256:ffe166aa35e105d463e3b1d37e14fca3595088706e1eecfe5daf7c97518fb3ac`。
+- 清理：debug Pod、临时资源和故障测试对象均已清理；测试 namespace 保留。
+
+结论：**API Server 实际故障环境验证已完成限定范围**。页面显式错误、自动重试和恢复后的缓存策略表现仍记录为待改进项；该项不等同于全部 V3 Action 的故障测试。
+
+## 当前总判定
+
+三项中，API Server 实际故障验证已完成限定范围；完整 RBAC 组合矩阵和全部 V3 功能逐项等价性仍未完成。PR #1 继续保持 Draft，未进入合并或发布。
