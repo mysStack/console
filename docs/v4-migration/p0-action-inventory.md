@@ -32,7 +32,6 @@ packages/core/src/components/Layouts/Header/ProfileMenu/index.tsx
 packages/shared/src/components/Apps/AppCreate/index.tsx
 packages/shared/src/components/Apps/Applications/AppTypeTable/OPAppTable/EdgeWorkloads/index.tsx
 packages/shared/src/components/Apps/AppsDeploySpaceModal/index.tsx
-packages/shared/src/components/Modals/AppTemplateEdit/index.tsx
 packages/shared/src/hooks/useV3Actions/index.tsx
 packages/console/src/actions/v3actions.tsx
 packages/shared/src/hooks/index.ts
@@ -57,9 +56,15 @@ packages/shared/src/hooks/index.ts
 | `packages/shared/src/components/Apps/AppCreate/index.tsx:54`                                          | `app.template.create.v2`                       | `edgeStore` / `{ module: 'edgeappsets' }`                 | 传入 workspace、edge cluster、appName、`module: 'apptemplates'`；成功后刷新调用方              |
 | `packages/shared/src/components/Apps/Applications/AppTypeTable/OPAppTable/EdgeWorkloads/index.tsx:75` | `workload.batch.delete.v2`                     | `workload` / `'deployments'`                              | 传入 cluster、namespace、`type: 'DEPLOYMENT'` 和选中 resource；成功后更新本地边缘工作负载状态  |
 | `packages/shared/src/components/Apps/AppsDeploySpaceModal/index.tsx:71`                               | `batch.deploy.app.create.v2`                   | `edgeStore` / `{ module: 'edgeappsets' }`                 | 传入 cluster、workspace、namespace、版本和应用详情；`onOK` 回调随后调用当前 V4 `deployApp`     |
-| `packages/shared/src/components/Modals/AppTemplateEdit/index.tsx:32`                                  | `openpitrix.template.edit.v2`                  | `appStore` / `{ module: 'edgeappsets' }`                  | 传入 workspace 和整理后的模板详情；提供 `success`、`onCancel` 回调                             |
 
 当前 Hook 的默认值和 Wujie 生命周期由 `packages/shared/src/hooks/useV3Actions/index.tsx` 固定：首次打开延迟 1000ms 后发送 `triggerAction`，后续打开立即发送；目标实例名为 `consoleV3Actions`，URL 为 `/consolev3/dashboard`。旧兼容桥 `packages/console/src/actions/v3actions.tsx` 使用实例名 `consolev3` 和 `/consolev3/`，也使用同一个 `triggerAction` 总线。这两个实例路径不能在替换前合并推断，必须分别核对运行时加载和卸载行为。
+
+### 2026-10-20 当前源码复核
+
+`packages/shared/src/components/Modals/AppTemplateEdit/index.tsx` 在当前源码中没有任何导入、动态导入或导出引用，且应用模板详情实际使用
+`packages/console/src/pages/workspaces/components/Modals/EditAppModal/` 与 `openpitrixStore.updateApp`。
+该无调用的旧 V3 编辑桥已删除。这个删除只关闭了“当前源码中的无调用桥接残留”，不代表 `v3dist` 中的
+`openpitrix.template.edit.v2` 字符串、边缘模板入口或全部运行时等价性已经关闭；这些仍按对应 Action 的运行时证据继续跟踪。
 
 ### 2.2 旧源码与当前制品 Action 对照
 

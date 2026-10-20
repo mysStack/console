@@ -707,3 +707,9 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 ## 2026-10-20 当前环境 fixture 复核
 
 只读复核 131 集群发现：当前没有 EdgeWorkload、FederatedProject 或 FederatedResource API/CRD；`devops` 扩展版本对象存在，但扩展状态不是 `Installed`，没有可用 DevOps API。A05、A06、A07、A10 仍属于环境不可执行项，未擅自安装扩展或创建伪造 fixture；A08 的通知扩展同样未启用。该结果继续作为 V3 Action 逐项矩阵的未验证边界。
+
+## 2026-10-20 A12 当前源码桥接清理
+
+当前源码扫描确认历史 `packages/shared/src/components/Modals/AppTemplateEdit/index.tsx` 没有任何调用者；应用模板详情使用原生 `EditAppModal` 和 `openpitrixStore.updateApp`。已删除该无调用旧 V3 编辑桥，并保留原生编辑器测试。
+
+本项只关闭当前源码中的无调用残留。`v3dist` 中的 `openpitrix.template.edit.v2` 字符串、边缘模板入口、正反 RBAC、失败/冲突路径和完整制品运行时等价仍未验证，A12 不得标记为已完成。
