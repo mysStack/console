@@ -536,3 +536,5 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 ## 2026-10-21 目标业务 Fixture 就绪性复核
 
 只读核对当前 131 集群后确认：`devops`、`kubefed`、`kubeedge`、`whizard-notification` 扩展对象均没有 `Installed` 状态；`FederatedProject`、`FederatedResource`、`EdgeWorkload` 目标 CRD 均不存在；当前扩展 APIService 列表没有 DevOps、联邦或 Edge 目标 API。因此 A05～A08、A10 的真实成功、失败、取消和 RBAC 组合仍不能执行，不能用普通 Kubernetes 资源、空列表或模拟状态码代替真实 fixture。
+
+当前 HEAD `017179af0` 的精确扫描（排除 `lib`、`node_modules` 和测试文件）命中 9 个 `useV3action/useV3Actions` 文件，其中 6 个是业务调用文件、2 个是桥接实现文件、1 个是导出文件；同口径的 V3/Wujie 兼容关键字命中 141 个源码文件。该统计修正历史扫描口径，不代表兼容依赖已经清理。

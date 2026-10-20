@@ -563,6 +563,10 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 
 仍未验证工作空间级拒绝、冲突/网络失败、返回与直达 URL、全部动态 Action、旧 V3/Wujie 去依赖以及其他业务入口；临时测试身份和应用模板已清理。
 
+## 2026-10-21 当前 HEAD V3/Wujie 残留精确扫描
+
+当前 HEAD `017179af0` 上，排除 `lib`、`node_modules` 和测试文件后，`useV3action/useV3Actions` 命中 9 个文件：6 个业务调用文件、2 个桥接实现文件和 1 个导出文件。相同过滤条件下，`WujieReact`、`wujie-react`、`ConsoleV3ResourceList`、`consolev3` 或 `v3dist` 命中 141 个源码文件；当前制品浏览器仍请求 `/consolev3/dashboard` 和 `/dist/v3dist/*`。该统计修正历史扫描口径，不能作为 V3/Wujie 已清理的证据。
+
 ## 2026-10-21 A02～A04 合法 YAML 成功持久化补测
 
 在当前 131 制品上创建临时 Deployment、StatefulSet 和 DaemonSet，并使用真实管理员浏览器分别打开三个原生详情页的“编辑 YAML”。通过文件导入提交单一合法 YAML 文档：

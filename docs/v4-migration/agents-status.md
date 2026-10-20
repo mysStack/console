@@ -924,3 +924,10 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - `FederatedProject`、`FederatedResource`、`EdgeWorkload` 目标 CRD 均不存在；可用 `extensions.kubesphere.io` APIService 列表没有 DevOps、联邦或 Edge 目标 API。
 - 结论：A05～A08、A10 的成功、失败、取消和 RBAC 组合不能在当前环境执行；不能用普通 Kubernetes 资源、空列表或模拟状态码代替真实 fixture。
 - `projectonly` 当前有效账号的 GET `200`、写入 `403` 已复核；早期无法复现的全 `403` 保留为历史异常，不纳入当前通过矩阵。
+
+## 2026-10-21 当前 HEAD V3/Wujie 残留精确扫描
+
+- 当前 HEAD：`017179af0`。
+- 排除 `lib`、`node_modules` 和测试文件后，`useV3action/useV3Actions` 命中 9 个文件：6 个业务调用文件、2 个桥接实现文件和 1 个导出文件。
+- 同一过滤条件下，`WujieReact`、`wujie-react`、`ConsoleV3ResourceList`、`consolev3` 或 `v3dist` 命中 141 个源码文件；浏览器仍请求 `/consolev3/dashboard` 和 `/dist/v3dist/*`。
+- 该扫描用于修正历史统计口径，不改变 A01～A12 全部 V3 功能等价性未完成的结论。
