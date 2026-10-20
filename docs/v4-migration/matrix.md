@@ -451,6 +451,12 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 
 本轮为当前制品补充了逐入口浏览器证据，但没有把空数据态、页面可达或只读接口成功当作全部 V3 等价通过；A01～A12、完整 RBAC 组合和 V3/Wujie 清理结论保持原状态。
 
+## 2026-10-21 A02～A04 编辑与 YAML 取消复核
+
+在当前 131 已部署制品上创建临时 Deployment、StatefulSet、DaemonSet 和 Service，并通过真实浏览器访问三个项目原生详情页。三类页面的“编辑信息”均提交成功，描述注解经页面和 Kubernetes API 回读一致；三个页面的“编辑 YAML”弹窗均可打开并取消，未产生写请求；更多操作菜单按资源类型显示回退、自动扩缩、编辑服务、编辑设置、编辑 YAML、重新创建和删除等入口。
+
+本轮临时资源已删除，namespace 无测试残留。该证据补充 A02～A04 当前制品的编辑成功、菜单渲染和 YAML 取消子路径；StatefulSet/DaemonSet YAML 成功写入、全部操作成功/失败/取消、低权限和 V3/Wujie 兼容残留仍未闭环。
+
 ## 2026-10-20 当前项目 Workload V3 兼容桥清理
 
 已确认项目 Deployment、StatefulSet、DaemonSet 的旧 V3 详情包装器没有活动路由或源码消费者，当前活动路由使用原生 Workload Detail 和原生 ConfigReferencePage。本轮删除无消费者的旧项目详情包装器、ConfigReference V3 DOM 注入桥及其专用测试/辅助文件，并新增回归断言防止旧项目包装器重新出现。

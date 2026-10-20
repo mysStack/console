@@ -801,3 +801,16 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 浏览器控制台仍有已知扩展初始化错误，错误范围与既有 `getExtensionConsoleV3Embed is not a function` 记录一致，按负责人要求暂不处理。该错误不作为本轮 Workload 原生详情路由的成功依据；全部操作等价、全部 V3 功能逐项等价和完整 RBAC 组合矩阵仍保持未完成。
 
 本轮进一步核对 A02～A04 操作入口：Deployment 的回退、自动扩缩、编辑 YAML、删除确认打开后均取消；重新创建提交成功，generation 从 `1` 变为 `2`，Pod 替换后恢复 Ready。StatefulSet 的回退、自动扩缩、编辑服务、编辑设置、编辑 YAML、重新创建、删除，以及 DaemonSet 的回退、编辑设置、编辑 YAML、重新创建、删除入口均在浏览器中渲染；StatefulSet、DaemonSet 本轮未提交写操作。三类临时 Workload 已删除，测试 namespace 无本轮资源残留。该结果只补充当前制品的原生操作入口和部分成功/取消路径，不能关闭全部 V3 等价条件。
+
+## 2026-10-21 当前制品 A02～A04 编辑与 YAML 取消复核
+
+在当前 131 已部署的 `d091cb1cdc3d` 制品上，创建带 `v4-migration.test=workload-actions-20261021` 标签的临时 Deployment、StatefulSet、DaemonSet 和 Service，并使用真实管理员浏览器直达三个原生详情页。
+
+- 三个详情页均进入原生 `resource-status` 页面并显示资源状态、元数据、环境变量、配置引用、事件和容器组信息。
+- 三个页面的“编辑信息”均提交成功；Deployment、StatefulSet、DaemonSet 的 `kubesphere.io/description` 分别持久化为 `v4-verify-edit-20261021`、`v4-verify-stateful-edit-20261021`、`v4-verify-daemon-edit-20261021`，页面回读和 Kubernetes API 回读一致。
+- 三个页面的“更多操作”菜单均正常渲染。Deployment 显示回退、自动扩缩、编辑设置、编辑 YAML、重新创建和删除；StatefulSet 另显示编辑服务；DaemonSet 显示编辑设置、编辑 YAML、重新创建和删除。
+- 三个页面的原生“编辑 YAML”弹窗均能打开并通过取消关闭，没有产生 YAML 写请求。
+
+验证完成后只删除本轮创建的四个测试资源；`v4-migration-e2e` 最终仍只保留系统 ConfigMap 和默认 ServiceAccount。浏览器控制台仍有已登记的扩展初始化错误，本轮按负责人要求暂不处理。
+
+本轮补充了 A02～A04 当前制品的编辑成功、YAML 取消和操作菜单证据，但没有执行 StatefulSet/DaemonSet 的 YAML 成功写入、回滚、伸缩、重新创建和删除，也没有关闭低权限、全部失败/取消组合、`/consolev3/dashboard` 预加载或全量 V3 等价性。
