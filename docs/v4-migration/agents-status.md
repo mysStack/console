@@ -820,3 +820,5 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 在同一 131 制品上创建副本数为零或不可调度的临时 Deployment、StatefulSet、DaemonSet，真实浏览器分别打开删除确认框：三个确认框都要求输入资源名称，点击取消没有产生删除请求。随后仅对本轮临时资源输入准确名称并确认删除，三个页面均返回对应列表并显示“删除成功”；Kubernetes API 复核三类资源均为 `NotFound`，测试 namespace 无标签为 `workload-delete-20261021` 的资源。
 
 本轮补充了 A02～A04 当前制品的删除确认、取消和管理员成功删除路径。删除失败、低权限拒绝、回滚、伸缩、重启、StatefulSet/DaemonSet YAML 成功写入及全部 V3 等价条件仍未闭环。
+
+本轮另外创建两条 Deployment 修改记录，在真实浏览器打开“更多操作 → 回退”，选择目标修改记录 `#1` 并确认；浏览器请求完成后 Kubernetes API 回读镜像从 `busybox:1.36` 恢复为 `busybox:1.35`，generation 从 `2` 变为 `3`。临时 Deployment 已删除。该证据只关闭 A02 的管理员回滚成功子路径，A03/A04 回滚、回滚失败、低权限和全部 V3 等价仍未完成。
