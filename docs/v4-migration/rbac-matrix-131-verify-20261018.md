@@ -300,3 +300,20 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 | Deployment     |   200/200 |  403 | 403 |   403 |    403 |
 
 页面可渲染目标 Workload 详情，所有临时资源、用户、GlobalRole 和 GlobalRoleBinding 已删除；测试 namespace 复核只剩系统 ConfigMap 和默认 ServiceAccount。该证据关闭了平台只读组合对这四类资源的完整 CRUD 拒绝缺口，但不扩大为联邦、DevOps、Edge、Extension 或其他资源类型的全量 RBAC 通过。
+
+## 2026-10-21 当前范围 RBAC 组合总表
+
+为避免把三个资源模块的完整组合误写成全平台完整矩阵，本节按当前可执行的业务范围汇总已取得的真实浏览器/API证据，并把环境不可执行项单独列出：
+
+| 作用域组合                     | ConfigMap / Secret / ServiceAccount                              | Deployment / StatefulSet / DaemonSet                        | 应用模板 A09/A12                     | DevOps A06/A07                        | 联邦/Edge A05/A10                                              | 通知/扩展 A08                                             |
+| ------------------------------ | ---------------------------------------------------------------- | ----------------------------------------------------------- | ------------------------------------ | ------------------------------------- | -------------------------------------------------------------- | --------------------------------------------------------- |
+| 项目 `viewer`                  | GET `200`；写入 `403`；角色 PATCH `403`                          | GET `200`；写入 `403`                                       | 版本读取 `200`；创建 `403`           | 页面可达；后端能力 `404`              | 无 fixture                                                     | 未建立独立低权限入口证据                                  |
+| 项目 `operator`                | GET `200`；POST `201`；PUT/PATCH/DELETE `200`                    | GET/PUT/PATCH `200`；POST `201`；DELETE `200`               | 未建立完整组合                       | 后端能力 `404`                        | 无 fixture                                                     | 未建立独立组合                                            |
+| 项目 `admin`                   | GET `200`；POST `201`；PUT/PATCH/DELETE `200`                    | GET/PUT/PATCH `200`；POST `201`；DELETE `200`               | 原生编辑、上传和删除已有部分成功证据 | 后端能力 `404`                        | 无 fixture                                                     | 页面可达，但通知查询 `400`                                |
+| 仅 `workspaceonly`             | 项目资源读取/写入均 `403`                                        | 详情和 CRUD 均 `403`                                        | 版本读取 `200`、创建 `403`           | viewer 创建请求 `403`，列表后端 `404` | 无 fixture                                                     | 未建立独立组合                                            |
+| 仅 `projectonly`               | 有效 Active 账号 GET `200`；写入 `403`；页面入口结果存在历史差异 | 有效账号详情 GET `200`；写入 `403`；历史账号存在 `403` 差异 | 未建立完整组合                       | 未建立组合                            | 无 fixture                                                     | 未建立组合                                                |
+| `clusterviewer`                | 集群 GET `200`；项目写入 `403`                                   | 项目详情 GET `200`；写入 `403`                              | 未建立完整组合                       | 未建立组合                            | 无 fixture                                                     | 未建立组合                                                |
+| 平台只读                       | 三类资源列表/详情 GET `200`；POST/PUT/PATCH/DELETE `403`         | 四类目标资源 GET `200`；写入 `403`                          | 未建立完整组合                       | 管理员读取仍受后端 `404` 限制         | 无 fixture                                                     | 平台页面可达；完整权限未建立                              |
+| 联邦/DevOps/Extension 专用组合 | 不适用                                                           | 不适用                                                      | 不适用                               | DevOps 扩展未 `Installed`             | FederatedProject/FederatedResource/EdgeWorkload fixture 不存在 | `whizard-notification` 未 `Installed`，扩展错误按要求延期 |
+
+该表已经覆盖当前 131 能执行的项目、集群和平台主要组合，并明确记录未建立的组合和环境边界；它仍不能被解释为“全平台 RBAC 已通过”。完整 RBAC 的剩余条件是：补齐可用的联邦、DevOps、Edge、Extension fixture 后，对每个入口执行正向、拒绝、错误、取消和刷新路径，并解释 `projectonly` 历史结果差异。
