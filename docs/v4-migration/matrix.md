@@ -546,3 +546,7 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 ## 2026-10-21 Secret/ServiceAccount API Server 故障页面补测
 
 真实管理员浏览器在 API Server 故障窗口重新加载 Secret 和 ServiceAccount 页面：Secret 保留故障前总数 `0`，ServiceAccount 保留 `default` 和总数 `1`，均没有显式错误页或重试提示。故障恢复后 `readyz`、节点、Console rollout 和页面刷新恢复正常。该证据补充了两个页面的故障视觉表现，仍把页面旧数据保留和缺少错误反馈记录为待改进项。
+
+## 2026-10-21 扩展中心全局只读 RBAC 补测
+
+临时全局只读用户访问扩展中心，扩展列表页面和列表 GET `200`；点击已安装 `frontend-forge` 后进入 `/errors/403`，扩展、版本、InstallPlan、分类读取为 `200`，扩展制品文件读取为 `403`。该结果只补齐扩展列表/详情文件的权限边界，不代表扩展运行时或安装流程通过；临时 IAM 对象和凭据已清理。

@@ -351,3 +351,11 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 ## 2026-10-21 扩展与目标业务 Fixture 就绪性复核
 
 只读核对当前集群的 `extensions.kubesphere.io` 和 Kubernetes API 资源：`devops`、`kubefed`、`kubeedge`、`whizard-notification` 均没有 `Installed` 状态；`FederatedProject`、`FederatedResource`、`EdgeWorkload` 目标 CRD 均不存在；当前可用的扩展 APIService 列表中没有 DevOps、联邦或 Edge 目标 API。该证据确认 A05～A08、A10 的缺口是环境能力/fixture 缺失，不能通过创建普通 Kubernetes 资源或模拟状态码替代。
+
+## 2026-10-21 扩展中心全局只读 RBAC 补测
+
+创建临时 GlobalRole、GlobalRoleBinding 和用户，仅授予 Kubernetes/扩展 API 的 `get/list/watch`，没有写权限。真实浏览器登录后访问 `/extensions/management`：扩展列表页面正常渲染，列表接口 `GET /kapis/kubesphere.io/v1alpha1/extensions?limit=10&available=true` 返回 `200`，页面显示已安装和未安装状态，没有执行安装或卸载。
+
+点击已安装的 `frontend-forge` 详情后，页面进入 `/errors/403`。浏览器记录扩展、版本、InstallPlan 和分类读取请求为 `200`，扩展文件请求 `/kapis/package.kubesphere.io/v1alpha1/extensionversions/frontend-forge-1.0.0/files` 返回 `403`。该结果补齐“扩展列表可读、扩展制品文件读取被拒绝”的实际边界，不代表扩展详情或运行时初始化通过。
+
+临时用户、GlobalRole、GlobalRoleBinding 和凭据均已删除并复核不存在；本轮没有修改扩展、安装计划或业务资源。扩展运行时错误按负责人要求延期。

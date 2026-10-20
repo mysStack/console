@@ -946,3 +946,10 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - Secret 页面保留故障前空列表状态（总数 `0`）；ServiceAccount 页面保留 `default` 列表状态（总数 `1`）；两页均没有显式错误页或重试提示。
 - 故障期间 `readyz` 返回未就绪及 informer/controller 检查失败；恢复后 `readyz=ok`、节点 Ready、Console `1/1/1/1`，页面刷新恢复。
 - 所有 debug Pod 和测试资源已清理；该结果补充浏览器视觉层证据，但错误反馈、自动重试和缓存策略仍未验收。
+
+## 2026-10-21 扩展中心全局只读 RBAC 补测
+
+- 临时全局只读用户访问 `/extensions/management`，列表页面正常渲染；扩展列表 GET 返回 `200`。
+- 进入已安装 `frontend-forge` 详情后页面为 `/errors/403`；扩展、版本、InstallPlan、分类读取为 `200`，扩展制品文件读取返回 `403`。
+- 该证据补齐扩展中心列表与详情文件读取的权限边界，没有执行安装/卸载，也不关闭扩展运行时错误。
+- 临时用户、GlobalRole、GlobalRoleBinding 和凭据已清理并复核不存在。
