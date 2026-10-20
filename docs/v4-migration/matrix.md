@@ -560,3 +560,7 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 ## 2026-10-21 全仓库回归测试
 
 执行 `./scripts/test.sh`，结果为 66 个测试文件、210 个测试全部通过，0 个失败。该结果只说明当前静态/单元回归没有新增失败；测试集合仍覆盖并确认部分 `ConsoleV3ResourceList`、`consolev3` 和扩展兼容保留边界，不能据此标记全量 V3/Wujie 等价完成。
+
+2026-10-21 又在当前 131 制品上补测了 A02 Deployment 的管理员自动扩缩成功路径。真实浏览器在专用 namespace 创建临时 Deployment，从原生详情页设置 CPU 目标 `50%`、内存目标 `128Mi`、最小副本 `1`、最大副本 `2`；HPA 创建请求返回 `201`，Deployment 更新返回 `200`。Kubernetes API 回读确认 HPA 同时保存 CPU/内存目标，`AbleToScale=True`、`ScalingActive=True`；浏览器刷新后页面继续显示 `1/2` 副本范围和两个目标值。HPA 与临时 Deployment 已删除并复核无残留。
+
+该证据只关闭 A02 管理员自动扩缩的一条成功子路径，未覆盖 StatefulSet/DaemonSet、低权限拒绝、失败/取消、网络故障和全部 V3 Action 等价性；A02～A04 仍不能标记为完整等价。

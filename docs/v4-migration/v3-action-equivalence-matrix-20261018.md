@@ -603,3 +603,14 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 ## 2026-10-21 全仓库回归测试结果
 
 执行仓库标准命令 `./scripts/test.sh`：66 个测试文件全部通过，共 210 个测试通过，0 个失败。该结果证明当前工作区已有静态/单元回归没有新增失败，但测试集合同时包含 `ConsoleV3ResourceList`、`consolev3` 保留边界和扩展兼容代码的断言；因此全套测试通过不等同于全部 V3/Wujie 等价性通过。
+
+## 2026-10-21 A02 Deployment 自动扩缩成功路径补测
+
+在当前 131 制品上使用真实管理员浏览器，在专用 namespace 创建临时 Deployment `v4-ops-verify-20261021`，从原生详情页执行“更多操作 → 编辑自动扩缩”，填写 CPU 目标 `50%`、内存目标 `128Mi`、最小副本 `1`、最大副本 `2` 后提交。
+
+- 浏览器网络证据：创建 HPA 的 `POST /clusters/host/apis/autoscaling/v2/namespaces/v4-migration-e2e/horizontalpodautoscalers` 返回 `201`；随后 Deployment `PATCH` 返回 `200`，HPA 读取返回 `200`。
+- Kubernetes API 回读：HPA `minReplicas=1`、`maxReplicas=2`，同时保存 CPU `50%` 和内存 `128Mi` 两个目标；HPA 状态为 `AbleToScale=True`、`ScalingActive=True`，Deployment 保持 `1` 个期望副本。
+- 浏览器刷新后页面显示“自动扩缩”、最小/最大副本 `1/2`、CPU 目标 `50%` 和内存目标 `128Mi`，证明设置已持久化到页面和 API。
+- 测试完成后删除 HPA 和临时 Deployment，并复核专用 namespace 只剩系统 `kube-root-ca.crt` ConfigMap 与默认 ServiceAccount。
+
+该证据关闭 A02 管理员自动扩缩的一条成功路径；没有外推到 StatefulSet、DaemonSet、低权限拒绝、失败/取消、网络故障和全部动态 Action 等价性。当前 A02～A04 仍保持“部分验证”。

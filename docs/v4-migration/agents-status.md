@@ -971,3 +971,11 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - 命令：`./scripts/test.sh`
 - 结果：66 个测试文件通过，210 个测试通过，0 个失败。
 - 说明：全仓库回归通过不等于全量 V3/Wujie 清理通过，因为测试集合仍包含 `ConsoleV3ResourceList`、`consolev3` 保留边界和扩展兼容代码相关断言。
+
+## 2026-10-21 A02 Deployment 自动扩缩成功路径补测
+
+- 状态：已完成 A02 管理员自动扩缩成功子路径；A02～A04 全量等价仍未完成。
+- 浏览器：真实管理员登录当前 131 制品，在临时 Deployment 详情页打开“编辑自动扩缩”，提交 CPU `50%`、内存 `128Mi`、最小/最大副本 `1/2`。
+- API：HPA 创建 `POST` 返回 `201`，Deployment `PATCH` 返回 `200`；回读确认两个资源目标、HPA `AbleToScale=True` 和 `ScalingActive=True`；浏览器刷新后目标值和副本范围保持一致。
+- 清理：HPA 和临时 Deployment 已删除；`v4-migration-e2e` 只保留系统 ConfigMap 和默认 ServiceAccount。
+- 未闭环：StatefulSet/DaemonSet 自动扩缩、低权限拒绝、失败/取消、网络故障和全部 V3/Wujie 运行时清理。
