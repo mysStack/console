@@ -959,3 +959,9 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - 测试管理员直达 `/extensions/management/frontend-forge`，详情页显示已安装、已启用、版本和安装/卸载说明。
 - 扩展、版本、InstallPlan、分类和扩展制品文件请求均为 `200`。
 - 与全局只读用户详情文件 `403` 对照，扩展列表/详情的管理员与只读权限边界已有证据；没有执行安装、卸载或配置修改，运行时错误继续延期。
+
+## 2026-10-21 V3 边界静态回归测试
+
+- 执行 8 个 V3 迁移相关 `node:test` 文件，共 15 个测试，全部通过。
+- 通过项包括三类原生 Workload 详情、项目 Workload 原生路由、ConfigMap/Secret/ServiceAccount 原生列表和 namespace 隔离。
+- `consoleV3Details.test.ts` 同时明确 Services、Volumes 详情仍保留共享 `consolev3` 实例；该测试通过并不表示 V3 已清理，反而记录了当前未迁移边界。

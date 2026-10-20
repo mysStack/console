@@ -589,3 +589,13 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 | 应用模板 `/workspaces/test-workspace/app-templates`                                        | 原生应用模板页面可渲染，当前为空列表且显示“添加”   | A12 原生入口可达，但不关闭通知、DevOps、Edge 和全部 V3 Action 等价性                                             |
 
 该轮只验证当前入口、页面渲染和 Network 边界，没有把普通应用列表、空数据态或可见按钮当作 Edge/DevOps/通知功能等价通过。A05、A06、A07、A08、A10 继续保持未验证或环境不可执行。
+
+## 2026-10-21 当前源码 V3 边界回归测试
+
+使用仓库现有 `node:test`/`esno` 测试入口，单独执行当前 V3 迁移相关回归用例，共 8 个测试文件、15 个测试全部通过：
+
+- Deployment、StatefulSet、DaemonSet 原生详情无 `useV3action`/Wujie 桥接；项目详情路由指向原生 Workload 实现；
+- ConfigMap、Secret、ServiceAccount 列表使用原生实现，项目列表按路由 namespace 隔离，Secret 列表不解码或渲染明文；
+- 现有 `consoleV3Details.test.ts` 同时明确保留 Services 和 Volumes 详情的共享 `consolev3` 实例，而三类 Workload 详情不再保留 V3 包装器。
+
+测试通过证明当前已写入的静态边界没有回归，但最后一项也直接证明全仓库 V3/Wujie 尚未清理；它不能替代 A01～A12 的运行时逐项等价验证。
