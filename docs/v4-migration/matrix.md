@@ -577,3 +577,5 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 - A01～A12 RBAC 组合覆盖台账已补入 `rbac-matrix-131-verify-20261018.md`。当前已验证的是部分资源、角色和操作边界；A05～A07、A10 因目标扩展/CRD/fixture 缺失不能执行，完整矩阵保持未完成。
 - 当前源码精确扫描仍命中 9 个 `useV3action/useV3Actions` 文件和 141 个 V3/Wujie 兼容关键字源码文件；因此全部 V3 功能逐项等价性保持未完成。
 - API Server 实际故障验证在授权维护窗口内已覆盖六类资源的列表、PATCH、POST、DELETE 结果及 ConfigMap/Secret/ServiceAccount 页面故障态和恢复链路；限定范围结论为已完成。页面显式错误、自动重试和缓存策略未标记为通过。
+
+2026-10-21 新增工作空间管理员作用域复核：仅绑定 `test-workspace-admin` 的临时账号可以读取工作空间应用模板列表，但访问项目 ConfigMap、Secret、ServiceAccount、Deployment 页面进入 `/errors/403`，同一浏览器会话的列表/详情 API 均为 `403`。该结果补强 namespace/project 与 workspace 权限隔离证据，不扩大为完整 RBAC 组合通过。

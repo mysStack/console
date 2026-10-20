@@ -386,3 +386,17 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 ### 台账结论
 
 当前已取得的 RBAC 证据可以证明 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet 以及应用模板的若干角色和操作边界；不能证明 A01～A12 的全部角色、全部操作和全部结果路径均已通过。A05～A07、A10 的主要阻塞是 131 环境缺少目标扩展/CRD/fixture，A08 还存在明确的 V3/Wujie 兼容加载和 API `400`，这些项不能用管理员或普通资源的结果代替。完整 RBAC 组合矩阵继续保持**未完成**，直到环境补齐并完成逐项正反验证。
+
+## 2026-10-21 工作空间管理员与项目资源作用域隔离复核
+
+使用当前 131 已部署制品创建临时工作空间管理员账号，仅绑定 `test-workspace` 的 `test-workspace-admin` `WorkspaceRoleBinding`，未绑定 `v4-migration-e2e` 项目 RoleBinding。真实浏览器登录后取得以下结果：
+
+| 访问范围            | 浏览器页面                                                | API 读取结果                | 结论                                     |
+| ------------------- | --------------------------------------------------------- | --------------------------- | ---------------------------------------- |
+| 项目 ConfigMap      | 直达项目 ConfigMap 路由进入 `/errors/403`                 | ConfigMap 列表/详情均 `403` | 工作空间管理员没有项目资源读取权         |
+| 项目 Secret         | 与 ConfigMap 相同的项目作用域                             | 列表/详情均 `403`           | 不能把工作空间权限外推为项目 Secret 权限 |
+| 项目 ServiceAccount | 与 ConfigMap 相同的项目作用域                             | 列表/详情均 `403`           | 项目资源权限需要独立项目角色             |
+| 项目 Deployment     | 与 ConfigMap 相同的项目作用域                             | 列表/详情均 `403`           | Workload 也遵守项目作用域隔离            |
+| 工作空间应用模板    | `/workspaces/test-workspace/app-templates` 正常渲染空列表 | 应用模板列表 GET `200`      | 工作空间管理员权限只覆盖工作空间资源     |
+
+本轮没有创建、编辑或删除业务对象；只创建了带唯一标签的临时测试对象用于确认环境，已全部删除。临时用户和 `WorkspaceRoleBinding` 已删除并复核不存在，`v4-migration-e2e` namespace 仍保留且无本轮对象残留。该结果补强 `workspaceonly` 的负向项目资源边界和 A09/A12 工作空间读取边界，但不关闭完整 RBAC 组合矩阵。

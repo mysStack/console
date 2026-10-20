@@ -73,6 +73,8 @@ API Server 故障浏览器层覆盖已扩大到 Secret 和 ServiceAccount：两�
 
 本轮在 `rbac-matrix-131-verify-20261018.md` 增加了 A01～A12 的 RBAC 组合覆盖台账，逐项列出已验证组合、部分验证、环境阻塞和未验证路径。该台账用于防止把资源级 CRUD 结果外推为全量矩阵，未改变“完整 RBAC 组合矩阵未完成”的判定。
 
+同一轮新增了工作空间管理员与项目资源的隔离证据：仅绑定 `test-workspace-admin` 的账号可以读取工作空间应用模板列表，但对项目 ConfigMap、Secret、ServiceAccount、Deployment 的页面和 API 读取均为 `403`。该证据补强了 `workspaceonly` 的拒绝边界，不能替代项目、集群、平台、联邦、DevOps、Edge 和扩展组合的逐项验证。
+
 当前源码回归测试 8 个文件、15 个测试全部通过，但其中 `consoleV3Details.test.ts` 明确保留 Services/Volumes 的共享 `consolev3` 实例；该证据支持已迁移 Workload 和配置资源边界稳定，也确认全量 V3/Wujie 清理尚未完成。
 
 仓库标准回归 `./scripts/test.sh` 已通过：66 个文件、210 个测试，0 个失败。由于测试集合包含当前仍保留的 `ConsoleV3ResourceList`、`consolev3` 和扩展兼容边界，该结果不能替代全量 V3/Wujie 运行时等价验证。

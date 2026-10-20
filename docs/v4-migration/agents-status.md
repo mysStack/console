@@ -999,3 +999,11 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - 文档校验：两个修改文档通过 Prettier `--check` 和 `git diff --check`；提交钩子成功执行 lint-staged/Prettier。
 - 131 当前状态：`ks-console` `1/1/1/1`，部署镜像 tag `feature-v4-configmaps-secrets-20261021-013709-4b5c7f5670c4`，Pod imageID 对应 `sha256:ffe166aa35e105d463e3b1d37e14fca3595088706e1eecfe5daf7c97518fb3ac`，`/readyz=ok`。
 - 结论不变：API Server 实际故障验证已完成限定范围；完整 RBAC 组合和全部 V3 等价仍未完成。A05～A07、A10 受目标扩展/CRD/fixture 缺失阻塞，A08 仍有 V3/Wujie 兼容加载和 `400`；扩展运行时错误按负责人要求延期。
+
+## 2026-10-21 工作空间管理员项目资源隔离复核
+
+- 使用当前 131 制品创建临时工作空间管理员，仅绑定 `test-workspace-admin`，未绑定 `v4-migration-e2e` 项目 RoleBinding。
+- 真实浏览器直达项目 ConfigMap 路由进入 `/errors/403`；同一会话对 ConfigMap、Secret、ServiceAccount、Deployment 的列表和详情读取均返回 `403`。
+- 访问 `/workspaces/test-workspace/app-templates` 页面正常渲染；应用模板列表 GET 返回 `200`。该结果证明工作空间资源权限不能外推为项目资源权限。
+- 临时用户、WorkspaceRoleBinding、ConfigMap、Secret、ServiceAccount、Deployment 和凭据均已清理并复核不存在；测试 namespace 保留。
+- 结论：补强 `workspaceonly` 负向项目资源边界和 A09/A12 读取边界；完整 RBAC 矩阵仍未完成。
