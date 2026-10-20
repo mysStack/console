@@ -587,3 +587,5 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 当前分支回归复验：执行 `./scripts/test.sh`，66 个测试文件、210 个测试全部通过，0 个失败。回归通过只表示现有实现和已登记兼容边界没有新增失败，不能替代扩展 Fixture、全量 RBAC 和 V3 Action 运行时验证。
 
 A09/A12 作用域补测：仅项目 viewer 的 `projectonly` 账号，以及 workspace viewer + cluster viewer 的 `clusterviewer` 账号，访问工作空间应用模板列表均为 GET `200`；创建、更新、Patch、删除均为 `403`。两组临时身份和绑定已清理，该结果补齐读取/写入拒绝边界，不关闭完整应用模板等价性。
+
+继续补测 `workspace regular` 和仅集群 viewer 的 `clusteronly`：两组工作空间应用模板列表 GET 均为 `200`，POST/PUT/PATCH/DELETE 均为 `403`；临时身份已清理。A09/A12 的当前主要作用域权限边界已有记录，但完整操作和 V3 等价仍未完成。

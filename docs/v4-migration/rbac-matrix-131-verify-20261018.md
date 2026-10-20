@@ -442,3 +442,9 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 | `clusterviewer` |      200 |       403 |      403 |   403 |         403 |
 
 该结果说明应用模板列表读取由工作空间应用 API 单独授权，不能从项目页面权限直接推断；两组组合均没有写权限。临时用户、项目/工作空间/集群绑定和凭据已删除并复核不存在，测试 namespace 无本轮残留。A09/A12 的这两组读取/写入边界已补入矩阵，但应用模板完整成功、失败、冲突、取消、刷新和 V3 等价仍未完成。
+
+## 2026-10-21 应用模板 workspace regular 与 clusteronly 组合复核
+
+继续补测两个无项目写权限的作用域：`workspace regular` 仅绑定 `test-workspace-regular`，`clusteronly` 仅绑定集群 `cluster-viewer`。真实浏览器分别访问工作空间应用模板页面，页面均能渲染当前空列表；应用模板 API 结果均为 GET `200`、POST/PUT/PATCH/DELETE `403`。
+
+临时用户、WorkspaceRoleBinding、ClusterRoleBinding 和凭据已删除并复核不存在，测试 namespace 无残留。至此，A09/A12 当前环境已记录 `workspace viewer`、`workspace regular`、`projectonly`、`clusterviewer`、`clusteronly`、平台只读、workspace 管理员和管理员的主要读取/写入边界；成功、失败、冲突、取消、刷新和 V3 替代行为仍未全部验证。

@@ -1034,3 +1034,10 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - 真实浏览器访问工作空间应用模板页面，两组均可读取空列表；API GET 均为 `200`，POST/PUT/PATCH/DELETE 均为 `403`。
 - 临时用户、项目/工作空间/集群绑定和凭据已清理并复核不存在，测试 namespace 无本轮残留。
 - 结论：补齐 A09/A12 两组作用域的读取/写入边界；应用模板成功、失败、冲突、取消和 V3 等价仍未完成。
+
+## 2026-10-21 应用模板 workspace regular 与 clusteronly 权限复核
+
+- `workspace regular` 仅绑定 `test-workspace-regular`；`clusteronly` 仅绑定集群 `cluster-viewer`。
+- 真实浏览器访问工作空间应用模板页面，两组均可读取空列表；应用模板 API GET 为 `200`，POST/PUT/PATCH/DELETE 均为 `403`。
+- 临时账号、WorkspaceRoleBinding、ClusterRoleBinding 和凭据已清理并复核不存在。
+- A09/A12 当前环境的主要作用域读写边界已记录；成功、失败、冲突、取消、刷新和 V3 等价仍未完成。

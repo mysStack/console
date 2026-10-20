@@ -83,6 +83,8 @@ API Server 故障浏览器层覆盖已扩大到 Secret 和 ServiceAccount：两�
 
 本轮继续验证 A09/A12 的 `projectonly` 和 `clusterviewer`：两组真实浏览器页面均可读取应用模板列表，API GET 为 `200`，POST/PUT/PATCH/DELETE 均为 `403`。该结果补齐两组作用域的读写边界，但不代表应用模板成功、失败、冲突、取消或 V3 替代行为已完成。
 
+随后补测 `workspace regular` 和仅集群 viewer 的 `clusteronly`，两组页面列表均可读取，GET 为 `200`，POST/PUT/PATCH/DELETE 均为 `403`。A09/A12 的当前作用域读写边界已进一步完整化，但全量 RBAC 和应用模板 V3 等价仍未完成。
+
 当前源码回归测试 8 个文件、15 个测试全部通过，但其中 `consoleV3Details.test.ts` 明确保留 Services/Volumes 的共享 `consolev3` 实例；该证据支持已迁移 Workload 和配置资源边界稳定，也确认全量 V3/Wujie 清理尚未完成。
 
 仓库标准回归 `./scripts/test.sh` 已通过：66 个文件、210 个测试，0 个失败。由于测试集合包含当前仍保留的 `ConsoleV3ResourceList`、`consolev3` 和扩展兼容边界，该结果不能替代全量 V3/Wujie 运行时等价验证。
