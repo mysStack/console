@@ -61,6 +61,12 @@
 
 三项中，API Server 实际故障验证已完成限定范围；完整 RBAC 组合矩阵和全部 V3 功能逐项等价性仍未完成。PR #1 继续保持 Draft，未进入合并或发布。
 
+## 2026-10-21 A01 ConfigReference 低权限拒绝复核
+
+当前 131 制品上，临时 `workspace viewer + v4-migration-e2e 项目 viewer` 账号通过真实浏览器进入 Deployment ConfigReference 页面。页面显示当前 namespace 的 ConfigMap/Secret 引用名称和键数量，未显示 Secret 值；点击“应用”提交引用变更时，Deployment JSON Patch 返回 `403`，API 回读确认 `envFrom` 未发生变化。临时 Deployment、ConfigMap、Secret、IAM 绑定和凭据均已清理。
+
+该证据补齐 A01 的低权限拒绝子路径，但不改变完整 RBAC 矩阵和全部 V3 等价性未完成的总判定。A01 的全角色引用写入、错误/取消/网络失败、刷新返回和完整 V3 对照仍需继续验证。
+
 2026-10-21 的只读就绪性复核显示，`devops`、`kubefed`、`kubeedge`、`whizard-notification` 均没有 `Installed` 状态，`FederatedProject`、`FederatedResource`、`EdgeWorkload` 目标 CRD 不存在；当前扩展 APIService 列表也没有这些目标 API。当前有效 `projectonly` 账号的 GET `200`、写入 `403` 已重复复核，早期无法复现的全 `403` 只保留为历史异常。
 
 当前制品入口复核进一步确认：项目 Edge 页面只是普通应用列表，没有 EdgeWorkload fixture；DevOps 页面因扩展未安装停留在集群选择；通知静默策略页面仍加载 `/consolev3`/`v3dist` 且 silences API 为 `400`。这些入口可达性结果不能替代 A05～A08、A10 的逐项等价测试。

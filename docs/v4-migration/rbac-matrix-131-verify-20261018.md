@@ -454,3 +454,9 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 负责人确认 DevOps、KubeFed、KubeEdge、Notification 属于后续插件对接范围。本轮“核心 RBAC 组合矩阵”范围调整为 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet、应用模板及其现有平台/工作空间/项目/集群作用域。上述插件没有作为核心资源验收的统一阻塞条件，也不在本轮安装或配置。
 
 插件相关的 A05～A08、A10 仍保留在历史台账中，状态统一解释为“后置、未验证”，不能解释为本轮已通过。核心范围内 A01～A04、A09、A11、A12 仍有部分操作、失败/取消路径和等价性证据缺口，核心 RBAC 矩阵尚未全部完成。
+
+## 2026-10-21 A01 ConfigReference 低权限拒绝复核
+
+使用临时 `workspace viewer + v4-migration-e2e 项目 viewer` 账号，在当前 131 制品真实登录并直达 Deployment 的 ConfigReference 页面。页面能够读取当前 Deployment、当前 namespace 的 ConfigMap/Secret 名称和键数量；Secret 值没有出现在页面中。点击“应用”尝试提交引用变更时，原生 Deployment JSON Patch 返回 `403`，页面没有产生成功提示，Kubernetes API 回读确认 `envFrom` 未被修改。
+
+本轮临时 Deployment、ConfigMap、Secret、用户、WorkspaceRoleBinding、项目 RoleBinding 和临时凭据均已清理并复核不存在。该证据关闭 A01 的一条低权限拒绝子路径，并补充了引用页面的真实渲染和 Secret 脱敏边界；A01 仍缺少全角色引用写入矩阵、错误/取消/网络失败、刷新返回和完整 V3 对照，因此继续保持“部分验证”。

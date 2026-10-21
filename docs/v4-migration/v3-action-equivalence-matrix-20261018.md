@@ -640,3 +640,9 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 负责人确认 DevOps、KubeFed、KubeEdge、Notification 属于后续插件对接范围。本轮核心 V4 迁移验收不安装或配置这些插件，因此 A05 Edge 应用模板、A06 DevOps 编辑、A07 DevOps 创建、A08 通知设置和 A10 EdgeWorkload 批量删除不作为当前核心资源开发的统一阻塞项。
 
 这些 Action 仍保留在本矩阵中，状态为“后置、未验证”；后续插件对接时仍必须补齐真实扩展、CRD、Fixture、RBAC、成功/失败/取消、刷新/返回和 V4 替代行为证据，不能因为本轮范围后置而标记为等价通过。核心范围内 A01～A04、A09、A11、A12 的逐项等价性仍按本矩阵继续收尾。
+
+## 2026-10-21 A01 ConfigReference 低权限拒绝复核
+
+使用临时 `workspace viewer + v4-migration-e2e 项目 viewer` 账号，在当前 131 制品真实浏览器直达 Deployment ConfigReference 页面。页面成功渲染容器、ConfigMap/Secret 引用名称和键数量，Secret 值未显示。点击“应用”提交引用变更后，Deployment JSON Patch 返回 `403`；API 回读确认 `envFrom` 没有变化，未产生越权写入。
+
+该结果只关闭 A01 的一条低权限拒绝子路径。全角色引用读写、网络失败、错误反馈、取消、刷新/返回、所有工作负载类型以及对应 V3 行为仍未完成，A01 继续标记为“部分验证”。

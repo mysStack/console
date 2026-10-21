@@ -1047,3 +1047,9 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - 负责人确认 DevOps、KubeFed、KubeEdge、Notification 属于后续插件对接范围，本轮不安装、不配置，也不把它们作为当前核心 V4 资源验收的统一阻塞条件。
 - A05～A08、A10 涉及的插件依赖、真实 Fixture、动态 Action、RBAC 和 V3 等价性仍记录为后置未验证，不能标记为通过。
 - 曾创建 Vector `InstallPlan` 验证扩展安装链路。131 单节点 CPU 请求约为 `99%`，安装 Job 因 `Insufficient cpu` 保持 Pending；随后删除该临时 InstallPlan，未修改或伸缩业务工作负载。当前扩展安装尝试不作为核心迁移测试结果。
+
+## 2026-10-21 当前会话：A01 ConfigReference 低权限拒绝复核
+
+使用临时 `workspace viewer + v4-migration-e2e 项目 viewer` 账号登录当前 131 制品，真实浏览器直达 Deployment ConfigReference 页面。页面成功渲染当前 namespace 的 ConfigMap/Secret 引用名称和键数量，Secret 值没有显示；点击“应用”提交引用变更时，原生 Deployment JSON Patch 返回 `403`，API 回读确认 `envFrom` 未发生变化。
+
+本轮临时 Deployment、ConfigMap、Secret、IAM 绑定和凭据均已清理并复核不存在。该证据补齐 A01 的低权限拒绝子路径，但 A01 的全角色写入、错误/取消/网络失败、刷新返回和 V3 等价仍未闭环；没有安装或配置 DevOps、KubeFed、KubeEdge、Notification。
