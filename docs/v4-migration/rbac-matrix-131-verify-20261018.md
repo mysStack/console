@@ -448,3 +448,9 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 继续补测两个无项目写权限的作用域：`workspace regular` 仅绑定 `test-workspace-regular`，`clusteronly` 仅绑定集群 `cluster-viewer`。真实浏览器分别访问工作空间应用模板页面，页面均能渲染当前空列表；应用模板 API 结果均为 GET `200`、POST/PUT/PATCH/DELETE `403`。
 
 临时用户、WorkspaceRoleBinding、ClusterRoleBinding 和凭据已删除并复核不存在，测试 namespace 无残留。至此，A09/A12 当前环境已记录 `workspace viewer`、`workspace regular`、`projectonly`、`clusterviewer`、`clusteronly`、平台只读、workspace 管理员和管理员的主要读取/写入边界；成功、失败、冲突、取消、刷新和 V3 替代行为仍未全部验证。
+
+## 2026-10-21 插件范围与核心 RBAC 边界调整
+
+负责人确认 DevOps、KubeFed、KubeEdge、Notification 属于后续插件对接范围。本轮“核心 RBAC 组合矩阵”范围调整为 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet、应用模板及其现有平台/工作空间/项目/集群作用域。上述插件没有作为核心资源验收的统一阻塞条件，也不在本轮安装或配置。
+
+插件相关的 A05～A08、A10 仍保留在历史台账中，状态统一解释为“后置、未验证”，不能解释为本轮已通过。核心范围内 A01～A04、A09、A11、A12 仍有部分操作、失败/取消路径和等价性证据缺口，核心 RBAC 矩阵尚未全部完成。
