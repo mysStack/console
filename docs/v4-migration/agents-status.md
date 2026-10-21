@@ -1053,3 +1053,5 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 使用临时 `workspace viewer + v4-migration-e2e 项目 viewer` 账号登录当前 131 制品，真实浏览器直达 Deployment ConfigReference 页面。页面成功渲染当前 namespace 的 ConfigMap/Secret 引用名称和键数量，Secret 值没有显示；点击“应用”提交引用变更时，原生 Deployment JSON Patch 返回 `403`，API 回读确认 `envFrom` 未发生变化。
 
 本轮临时 Deployment、ConfigMap、Secret、IAM 绑定和凭据均已清理并复核不存在。该证据补齐 A01 的低权限拒绝子路径，但 A01 的全角色写入、错误/取消/网络失败、刷新返回和 V3 等价仍未闭环；没有安装或配置 DevOps、KubeFed、KubeEdge、Notification。
+
+同一提交后的仓库回归复验执行 `./scripts/test.sh`：66 个测试文件、210 个测试全部通过，0 个失败；ConfigReference 相关 6 个测试文件也全部通过。该结果只证明当前代码和测试资产没有新增回归，不能替代 A01～A12 的完整运行时等价性。
