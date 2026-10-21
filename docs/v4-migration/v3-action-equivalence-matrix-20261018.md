@@ -666,3 +666,7 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 使用真实浏览器登录当前 131 制品，顺序访问 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet、应用模板、DevOps、Edge 应用和通知静默策略入口。核心资源页面能够渲染并返回当前路由，但浏览器网络记录在这些页面加载期间仍出现 `/consolev3/dashboard` 和 `/dist/v3dist/*` 请求；应用模板页面还加载了 V3 字体/本地化资源。
 
 该结果证明当前核心原生页面的功能入口可达，同时证明“全部 V3/Wujie 运行时移除”尚未满足。页面渲染成功不能替代逐项 V3 行为对照；通知、DevOps、Edge 等插件或兼容入口仍按后置/未验证处理。
+
+## 2026-10-21 核心六类资源 RBAC 作用域等价边界
+
+同一当前制品上，`workspaceonly`、`projectonly`、`clusterviewer` 三种真实浏览器身份对 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet 均取得 GET `200`，POST/PATCH/PUT/DELETE 均为 `403`。这只补齐 V4 原生资源的权限边界，不代表 V3 角色语义、动态 Action 或全部页面行为已经逐项等价。

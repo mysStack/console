@@ -259,6 +259,18 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 
 该结果补齐核心六类资源的三组浏览器会话 API 正向/拒绝 CRUD 边界。它不等同于全部 UI 操作、全部错误/取消路径或 V3 逐项等价性通过；`workspaceonly`、`projectonly`、`clusterviewer`、平台只读以及应用模板作用域仍按本文件已有证据分别判断。
 
+## 2026-10-21 核心六类资源 workspace/project/cluster 作用域复核
+
+本轮继续使用独立临时用户和专用测试对象，在真实浏览器会话内对同一组 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet 执行 GET、POST、PATCH、PUT、DELETE。`workspaceonly` 仅绑定工作空间 viewer，`projectonly` 仅绑定项目 viewer，`clusterviewer` 绑定工作空间 viewer 与集群 viewer；三组均没有写权限。
+
+| 角色组合        | 六类资源 GET | 六类资源 POST | 六类资源 PATCH | 六类资源 PUT | 六类资源 DELETE |
+| --------------- | ------------ | ------------- | -------------- | ------------ | --------------- |
+| `workspaceonly` | 全部 `200`   | 全部 `403`    | 全部 `403`     | 全部 `403`   | 全部 `403`      |
+| `projectonly`   | 全部 `200`   | 全部 `403`    | 全部 `403`     | 全部 `403`   | 全部 `403`      |
+| `clusterviewer` | 全部 `200`   | 全部 `403`    | 全部 `403`     | 全部 `403`   | 全部 `403`      |
+
+本轮临时账号、WorkspaceRoleBinding、RoleBinding、ClusterRoleBinding 和测试对象均已删除，专用 namespace 只剩系统 ConfigMap 与默认 ServiceAccount。该结果统一了当前制品的核心资源作用域边界，但不关闭应用模板完整操作、错误/取消路径或全部 V3 等价性。
+
 ## 2026-10-20 Workload projectonly 有效账号复核
 
 为复核前一次 `projectonly` 全部 `403` 结果，本轮重新创建带有效邮箱、状态为 Active 的临时用户，只绑定 `v4-migration-e2e` 项目 `viewer` RoleBinding，不绑定企业空间权限。真实浏览器登录成功后，分别访问 Deployment、StatefulSet、DaemonSet 原生详情路由，页面均渲染资源详情和资源状态。

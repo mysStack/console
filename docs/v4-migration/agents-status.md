@@ -1079,3 +1079,10 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - 平台管理员：六类资源 GET 全部 `200`，POST 全部 `201`，PATCH/PUT/DELETE 全部 `200`。
 - 测试账号、角色绑定、临时对象已清理，namespace 只剩系统 ConfigMap 和默认 ServiceAccount。
 - 核心页面运行时记录仍出现 `/consolev3/dashboard` 与 `/dist/v3dist/*`，因此 V3/Wujie 全量清理和逐项等价性仍未完成。
+
+## 2026-10-21 核心资源三组只读作用域复核
+
+- `workspaceonly`（仅工作空间 viewer）、`projectonly`（仅项目 viewer）、`clusterviewer`（工作空间 viewer + 集群 viewer）均通过真实浏览器登录。
+- ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet 六类资源的 GET 均为 `200`；POST、PATCH、PUT、DELETE 均为 `403`。
+- 三组临时账号及对应绑定和测试对象已清理，namespace 只剩系统 ConfigMap 与默认 ServiceAccount。
+- 该结果补齐核心资源作用域 CRUD 拒绝边界；应用模板完整操作和全量 V3/Wujie 等价性仍未完成。
