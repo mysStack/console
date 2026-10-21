@@ -646,3 +646,5 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 使用临时 `workspace viewer + v4-migration-e2e 项目 viewer` 账号，在当前 131 制品真实浏览器直达 Deployment ConfigReference 页面。页面成功渲染容器、ConfigMap/Secret 引用名称和键数量，Secret 值未显示。点击“应用”提交引用变更后，Deployment JSON Patch 返回 `403`；API 回读确认 `envFrom` 没有变化，未产生越权写入。
 
 该结果只关闭 A01 的一条低权限拒绝子路径。全角色引用读写、网络失败、错误反馈、取消、刷新/返回、所有工作负载类型以及对应 V3 行为仍未完成，A01 继续标记为“部分验证”。
+
+继续使用 `workspace viewer + cluster viewer`、不绑定项目 RoleBinding 的临时账号访问同一 ConfigReference 页面。页面渲染和 Secret 脱敏正常；提交引用变更时 Deployment JSON Patch 返回 `403`，API 回读确认没有越权修改 `envFrom`。本轮只补充 A01 的集群只读拒绝组合，未关闭全角色权限、错误/取消/网络失败、刷新返回和 V3 替代行为。
