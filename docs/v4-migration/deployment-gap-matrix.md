@@ -25,4 +25,8 @@
 
 ## 晋级关卡
 
+2026-10-21 起，第一批实现范围收敛为项目 Deployment、StatefulSet、DaemonSet 列表。旧 V3 列表源码和 `workload.js` 行为已整理到 [Deployment V3/V4 证据记录](./deployment-v3-evidence.md)；下一步按实施计划先写三个列表的失败测试，再实现 V4 原生列表。详情页、容器模板设置、完整 RBAC、失败/取消路径和跨 namespace 证据仍不能由列表切换自动推断。
+
+2026-10-21 本地 DEV 已完成列表数据链路迁移和路由作用域改造。创建入口当前仍为空回调，创建表单、动作逐项等价、部署后 Network、namespace 隔离和 RBAC 仍为未验收项；本批状态为“开发完成，待部署验证”，不是“已验收”。
+
 完成 P3-REA 所需的 V3 Action 清单、131 Network、RBAC、缓存和作用域矩阵，并补齐“待实测”或“未确认”行后，Deployment 才能从“分析中”进入正式“开发中”。通过路由、数据、操作、RBAC 和缓存场景的部署后验证，并附可回读的制品 tag/digest、Pod imageID 和可复现证据后，才能标记为“已验收”。

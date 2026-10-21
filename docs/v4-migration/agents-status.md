@@ -1091,6 +1091,14 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 
 本轮不安装或配置 DevOps、KubeFed、KubeEdge、Notification，不为插件补造 Fixture。核心资源继续按当前可用环境顺序推进；A05～A08、A10 统一记录为后置未验证，待后续插件对接阶段单独执行 REA、DEV、VERIFY、PR。
 
+## 2026-10-21 V3 → V4 原生重构执行计划
+
+已将后续工作从“持续整理全局取证”调整为“旧 V3 源码行为基线 + 当前 `v3dist` REA 校准 + 现有 V4 组件重构 + 部署后验收”。正式执行计划见 [`2026-10-21-v3-to-v4-native-migration.md`](../superpowers/plans/2026-10-21-v3-to-v4-native-migration.md)。
+
+当前第一批为项目级 Deployment、StatefulSet、DaemonSet 列表：三类详情已有 V4 原生实现，三个项目列表已从 `ConsoleV3ResourceList` 切换到 `workloadStore` + `DataTable`，并补充了 namespace 路由、详情链接和 Workload Tab 的回归测试。`corepack yarn build:packages` 和 `./scripts/test.sh` 已通过（70 个测试文件、217 个测试）。创建入口仍沿用现有原生列表的空回调，创建表单、完整动作等价性和部署后浏览器验收尚未完成，不能把本批标记为模块验收通过。
+
+执行约束保持不变：单 Codex 会话、保留既有 Worktree/分支/历史、不开启子 Agent、不修改 `release-4.1.5`、不自动合并 Draft PR；插件范围继续“后置、未验证”。
+
 本轮文档更新后执行仓库回归 `./scripts/test.sh`：66 个测试文件、210 个测试全部通过，0 个失败。该回归不改变完整 RBAC 和全量 V3 等价性仍未完成的结论；测试集合仍包含对 `ConsoleV3ResourceList`、`consolev3` 保留边界的断言。
 
 ## 2026-10-21 当前制品核心路由 V3/Wujie 复核

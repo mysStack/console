@@ -8,9 +8,13 @@
 
 > 执行策略（2026-10-17 调整）：全局 P0-U001～P0-U004 风险持续跟踪，不再作为所有模块的统一开发阻塞。每个模块独立执行 `模块-REA → 模块-DEV → 模块-VERIFY → 模块-PR`；模块内影响功能正确性或安全性的高风险未知项仍然阻塞该模块。ConfigMap、Secret、ServiceAccount 之前已经发生的实现和测试作为先行证据保留，不自动等同于模块 REA 或 VERIFY 已通过。
 
+> 原生重构执行计划（2026-10-21）：后续开发以 [`V3 → V4 原生化迁移实施计划`](../superpowers/plans/2026-10-21-v3-to-v4-native-migration.md) 为当前执行清单。旧 V3 源码负责还原行为，当前 `v3dist` 的 REA 负责校准制品差异，131 浏览器/API 证据负责确认实际启用路径；先处理核心 Workload 列表，再顺序推进其他核心资源。DevOps、KubeFed、KubeEdge、Notification 明确为后置插件，不在当前核心验收中安装或配置。
+
 本轮 REA 结果和限制统一记录在[REA 阶段分析总结](./rea-analysis-summary.md)，该文档的阶段门禁结论优先于单次测试或部署记录。
 
 本轮模块 DEV 已在 `feature/v4-configmaps-secrets` 本地提交 `ec21875c1`、`5c0162517`：完成 ServiceAccount Secret 引用脱敏，并使 `corepack yarn build:packages` 在 Node `v22.22.1` 下通过；55 个测试文件、220 个测试通过。该证据不替代部署后制品的 rollout、Playwright、权限正反路径、namespace 隔离和 Secret 运行时关联验证。
+
+2026-10-21 第一批 Workload 列表已进入模块级 DEV：项目 Deployment、StatefulSet、DaemonSet 已切换至 V4 原生 `workloadStore` + `DataTable`，补充了三组列表回归测试和项目路径保持测试；构建通过，仓库测试为 70 个测试文件、217 个测试通过。当前仅完成本地 DEV，尚未完成部署、Playwright、RBAC、namespace 隔离和完整 V3 动作等价性验证。
 
 矩阵的“状态”描述模块执行进度，阶段门禁状态以 REA 总结中的 `未开始`、`分析中`、`待复核`、`已通过`、`不通过`、`阻塞`为准；模块出现“分析中”不表示对应阶段 REA 已通过。
 
