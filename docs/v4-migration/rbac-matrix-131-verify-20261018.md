@@ -518,3 +518,11 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 | `clusterviewer`：workspace viewer + cluster viewer | 正常渲染                       |      `200/200/200` | `200` |  `200` | 当前聚合角色实际包含应用模板更新/删除权限                          |
 
 `PUT` 返回 `405`，说明该 API 不提供 PUT 方法，不能把它当成 RBAC 拒绝。本轮使用有效 Helm Chart 对 workspaceonly 执行校验/创建 POST，均返回 `403`；PATCH/DELETE 则针对唯一临时 fixture 返回 `200`。操作后已删除 ApplicationVersion、用户、绑定和凭据并复核不存在。该结果是当前集群角色聚合权限的实际发现，不自动修改 RBAC 实现；应用模板冲突、失败、取消、刷新和 V3 等价性仍未全部闭环。
+
+## 2026-10-21 ServiceAccount Token Secret 关联复核
+
+在 Kubernetes `v1.31.13+k3s1` 的 `v4-migration-e2e` 中创建唯一临时 ServiceAccount。创建后立即核对 Kubernetes API：ServiceAccount 的 `.secrets` 为空，且没有因创建 ServiceAccount 自动产生的 `kubernetes.io/service-account-token` Secret。该结果确认当前版本不能假设自动创建长期 Token Secret。
+
+随后只在本轮临时对象上创建带 `kubernetes.io/service-account.name` 注解的 Token Secret，并显式把该 Secret 名称写入 ServiceAccount 的 `.secrets` 引用。真实浏览器访问 ServiceAccount 列表和详情页：列表显示临时 ServiceAccount，详情页显示关联的“保密字典”和数据设置区域；页面未把测试 Token 写入本记录。临时 ServiceAccount、Token Secret、关联历史 Secret、临时用户和绑定均已删除，namespace 最终只剩系统对象。
+
+该证据关闭 ServiceAccount 的“当前 Kubernetes 版本 Token Secret 行为”和“显式 Secret 关联详情渲染”子路径；自动 Token、手工关联和页面展示已区分，不能将手工关联结果外推为 Kubernetes 自动行为。

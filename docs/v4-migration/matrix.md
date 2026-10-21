@@ -631,3 +631,5 @@ A09/A12 作用域补测：仅项目 viewer 的 `projectonly` 账号，以及 wor
 ## 2026-10-21 当前制品核心路由 V3/Wujie 复核补充
 
 使用当前部署制品和真实浏览器顺序访问 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet、Service、Volume 和应用模板列表。九个路由均能导航到目标 URL，但均可观察到 `/consolev3/dashboard` 与 `/dist/v3dist/*` 请求；StatefulSet、DaemonSet、Volume 和部分应用模板路径还出现具体的 `/consolev3/...` 兼容请求。该证据确认全局兼容预加载仍存在，不能把核心页面渲染成功写成全部 V3 等价通过。
+
+同日补测 ServiceAccount Token Secret 行为：Kubernetes `v1.31.13+k3s1` 创建 ServiceAccount 后 `.secrets` 为空，也没有自动生成长期 Token Secret；显式创建并关联唯一临时 Token Secret 后，真实浏览器列表和详情页能显示 ServiceAccount 及关联 Secret 数据区。所有临时对象和关联历史 Secret 已删除。该结果补齐当前版本的实际关联语义，不把手工 Secret 关联误记为自动 Token 行为。

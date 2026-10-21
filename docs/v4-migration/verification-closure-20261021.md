@@ -139,4 +139,6 @@ A12 重复上传补测显示：相同 Chart 名称/版本连续上传两次时�
 
 当前制品的真实浏览器路由复核已覆盖 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet、Service、Volume 和应用模板列表。九个页面均能保持目标路由并导航完成，但均加载 `/consolev3/dashboard`、`/dist/v3dist/*`；StatefulSet、DaemonSet 和 Volume 还出现具体的 `/consolev3/...` 业务请求。该证据进一步确认全部 V3/Wujie 运行时清理尚未完成，不能据此把 V3 功能逐项等价标记为通过。
 
+ServiceAccount 补测确认：在当前 K3s v1.31.13+k3s1 中，新建 ServiceAccount 不自动产生长期 Token Secret，API 的 `.secrets` 为空；显式关联临时 Token Secret 后，浏览器详情页显示关联 Secret 数据区域。临时对象及其历史 Secret 已清理。该结果补齐 ServiceAccount Token 语义和浏览器关联展示，不能扩大为完整 ServiceAccount 功能等价。
+
 文档更新后执行 `./scripts/test.sh`，结果为 66 个测试文件、210 个测试通过，0 个失败。该结果只证明当前静态/单元回归没有新增失败，不能替代完整 RBAC 组合和全部 V3 功能逐项等价验证。
