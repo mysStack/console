@@ -589,3 +589,9 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 A09/A12 作用域补测：仅项目 viewer 的 `projectonly` 账号，以及 workspace viewer + cluster viewer 的 `clusterviewer` 账号，访问工作空间应用模板列表均为 GET `200`；创建、更新、Patch、删除均为 `403`。两组临时身份和绑定已清理，该结果补齐读取/写入拒绝边界，不关闭完整应用模板等价性。
 
 继续补测 `workspace regular` 和仅集群 viewer 的 `clusteronly`：两组工作空间应用模板列表 GET 均为 `200`，POST/PUT/PATCH/DELETE 均为 `403`；临时身份已清理。A09/A12 的当前主要作用域权限边界已有记录，但完整操作和 V3 等价仍未完成。
+
+## 2026-10-21 插件范围调整
+
+负责人确认 DevOps、KubeFed、KubeEdge、Notification 属于后续插件对接范围。本轮核心 V4 资源验收不安装、不配置这些扩展，也不把它们的缺失作为 ConfigMap、Secret、ServiceAccount、Workload 和应用模板核心流程的统一阻塞条件。对应 A05～A08、A10 的插件依赖、RBAC、动态 Action 和 V3 等价性继续登记为“后置、未验证”，不得写成已通过。
+
+本轮曾按授权创建 Vector 安装计划以验证扩展安装链路，但 131 单节点 CPU 请求已达约 `99%`，安装 Job 因 `Insufficient cpu` 无法调度；安装计划随后已删除，未删除或伸缩任何业务工作负载。该尝试不改变当前插件后置范围，也没有引入代码或稳定分支改动。

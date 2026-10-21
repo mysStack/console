@@ -1041,3 +1041,9 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - 真实浏览器访问工作空间应用模板页面，两组均可读取空列表；应用模板 API GET 为 `200`，POST/PUT/PATCH/DELETE 均为 `403`。
 - 临时账号、WorkspaceRoleBinding、ClusterRoleBinding 和凭据已清理并复核不存在。
 - A09/A12 当前环境的主要作用域读写边界已记录；成功、失败、冲突、取消、刷新和 V3 等价仍未完成。
+
+## 2026-10-21 插件范围调整
+
+- 负责人确认 DevOps、KubeFed、KubeEdge、Notification 属于后续插件对接范围，本轮不安装、不配置，也不把它们作为当前核心 V4 资源验收的统一阻塞条件。
+- A05～A08、A10 涉及的插件依赖、真实 Fixture、动态 Action、RBAC 和 V3 等价性仍记录为后置未验证，不能标记为通过。
+- 曾创建 Vector `InstallPlan` 验证扩展安装链路。131 单节点 CPU 请求约为 `99%`，安装 Job 因 `Insufficient cpu` 保持 Pending；随后删除该临时 InstallPlan，未修改或伸缩业务工作负载。当前扩展安装尝试不作为核心迁移测试结果。

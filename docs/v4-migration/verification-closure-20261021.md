@@ -96,3 +96,9 @@ API Server 故障浏览器层覆盖已扩大到 Secret 和 ServiceAccount：两�
 对临时 DaemonSet 的原生详情菜单复核显示回退、编辑设置、编辑 YAML、重新创建和删除入口，但没有“编辑自动扩缩”。该结果只记录当前 V4 操作边界，尚未证明与 V3 操作集合等价，A04 仍为部分验证。
 
 A12 重复上传补测显示：相同 Chart 名称/版本连续上传两次时，校验和创建请求均返回 `200`，系统生成两个不同模板名称，未返回 `409`；两个临时对象已删除并经刷新复核列表为空。该结果记录了当前制品的重复上传语义，但没有 V3 对照证据，A12 冲突等价仍未关闭。
+
+## 2026-10-21 插件范围决策
+
+负责人确认 DevOps、KubeFed、KubeEdge、Notification 为后续插件对接范围。本轮核心验收聚焦 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet 和应用模板，不安装或配置上述扩展。A05～A08、A10 的扩展依赖和对应 V3 等价性保持“后置、未验证”，不会被误记为测试通过。
+
+曾按授权创建 Vector 扩展安装计划，但 131 单节点 CPU 请求已达约 `99%`，Helm 安装 Job 因 `Insufficient cpu` 无法调度；临时 InstallPlan 已删除，业务工作负载未修改。该安装链路失败属于环境容量记录，不影响核心模块测试结论。
