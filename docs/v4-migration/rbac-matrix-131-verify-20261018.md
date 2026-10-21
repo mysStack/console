@@ -523,6 +523,6 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 
 在 Kubernetes `v1.31.13+k3s1` 的 `v4-migration-e2e` 中创建唯一临时 ServiceAccount。创建后立即核对 Kubernetes API：ServiceAccount 的 `.secrets` 为空，且没有因创建 ServiceAccount 自动产生的 `kubernetes.io/service-account-token` Secret。该结果确认当前版本不能假设自动创建长期 Token Secret。
 
-随后只在本轮临时对象上创建带 `kubernetes.io/service-account.name` 注解的 Token Secret，并显式把该 Secret 名称写入 ServiceAccount 的 `.secrets` 引用。真实浏览器访问 ServiceAccount 列表和详情页：列表显示临时 ServiceAccount，详情页显示关联的“保密字典”和数据设置区域；页面未把测试 Token 写入本记录。临时 ServiceAccount、Token Secret、关联历史 Secret、临时用户和绑定均已删除，namespace 最终只剩系统对象。
+随后只在本轮临时对象上创建带 `kubernetes.io/service-account.name` 注解的 Token Secret，并显式把该 Secret 名称写入 ServiceAccount 的 `.secrets` 引用。真实浏览器访问 ServiceAccount 列表和详情页：列表显示临时 ServiceAccount，详情页显示关联的“保密字典”和数据设置区域；测试凭据未写入仓库或验证文档。临时 ServiceAccount、Token Secret、关联历史 Secret、临时用户和绑定均已删除，namespace 最终只剩系统对象。
 
 该证据关闭 ServiceAccount 的“当前 Kubernetes 版本 Token Secret 行为”和“显式 Secret 关联详情渲染”子路径；自动 Token、手工关联和页面展示已区分，不能将手工关联结果外推为 Kubernetes 自动行为。
