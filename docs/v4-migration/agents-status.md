@@ -1090,3 +1090,7 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 ## 2026-10-21 核心与插件范围最终确认
 
 本轮不安装或配置 DevOps、KubeFed、KubeEdge、Notification，不为插件补造 Fixture。核心资源继续按当前可用环境顺序推进；A05～A08、A10 统一记录为后置未验证，待后续插件对接阶段单独执行 REA、DEV、VERIFY、PR。
+
+## 2026-10-21 当前制品核心路由 V3/Wujie 复核
+
+当前 HEAD `4b342e6e2` 的 131 制品使用真实浏览器顺序访问 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet、Service、Volume 和应用模板列表。九个页面均可导航，但均请求 `/consolev3/dashboard` 与 `/dist/v3dist/*`；StatefulSet、DaemonSet、Volume 还出现具体的 `/consolev3/...` 请求。临时平台管理员仅用于本轮登录，已删除用户和绑定。该结果补强了当前制品的运行时残留证据，全部 V3 等价性仍未完成。

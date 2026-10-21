@@ -134,3 +134,7 @@ A12 重复上传补测显示：相同 Chart 名称/版本连续上传两次时�
 ## 2026-10-21 核心与插件范围最终确认
 
 负责人确认 DevOps、KubeFed、KubeEdge、Notification 属于后续插件对接范围。本轮不安装、不配置这些扩展，不为核心 ConfigMap、Secret、ServiceAccount、Workload 和应用模板验收补造插件 Fixture。A05～A08、A10 继续登记为“后置、未验证”，不作为当前核心模块的统一阻塞条件，也不标记为通过。
+
+## 2026-10-21 核心路由运行时复核结果
+
+当前制品的真实浏览器路由复核已覆盖 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet、Service、Volume 和应用模板列表。九个页面均能保持目标路由并导航完成，但均加载 `/consolev3/dashboard`、`/dist/v3dist/*`；StatefulSet、DaemonSet 和 Volume 还出现具体的 `/consolev3/...` 业务请求。该证据进一步确认全部 V3/Wujie 运行时清理尚未完成，不能据此把 V3 功能逐项等价标记为通过。

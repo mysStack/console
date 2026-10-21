@@ -627,3 +627,7 @@ A09/A12 作用域补测：仅项目 viewer 的 `projectonly` 账号，以及 wor
 ## 2026-10-21 核心范围执行说明补充
 
 当前核心验收继续覆盖 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet、ConfigReference 和应用模板。DevOps、KubeFed、KubeEdge、Notification 的安装、Fixture、Action、RBAC 和 V3 等价验证留到后续插件对接阶段；这些项目仍保留在历史矩阵中，状态为“后置、未验证”，不作为当前核心资源验收的统一阻塞条件，也不能被解释为已测试通过。
+
+## 2026-10-21 当前制品核心路由 V3/Wujie 复核补充
+
+使用当前部署制品和真实浏览器顺序访问 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet、Service、Volume 和应用模板列表。九个路由均能导航到目标 URL，但均可观察到 `/consolev3/dashboard` 与 `/dist/v3dist/*` 请求；StatefulSet、DaemonSet、Volume 和部分应用模板路径还出现具体的 `/consolev3/...` 兼容请求。该证据确认全局兼容预加载仍存在，不能把核心页面渲染成功写成全部 V3 等价通过。

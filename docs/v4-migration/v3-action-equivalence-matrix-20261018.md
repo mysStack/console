@@ -674,3 +674,14 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 ## 2026-10-21 插件 Action 后置执行口径补充
 
 DevOps、KubeFed、KubeEdge、Notification 相关 Action 继续保留在矩阵中，当前状态统一为“后置、未验证”。本阶段不安装或配置这些插件，也不以缺少插件 Fixture 阻塞核心资源的 REA、DEV、VERIFY、PR；后续插件对接阶段再单独执行对应的入口、Action、RBAC、失败/取消和 V4 替代验证。
+
+## 2026-10-21 当前制品核心路由 V3/Wujie 运行时复核
+
+在当前分支 HEAD `4b342e6e2f6b2b87a0589848314af2ea225b1dc5` 对应的 131 已部署制品上，使用真实 Playwright 浏览器登录后顺序访问 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet、Service 和 Volume 列表，以及工作空间应用模板列表。九个路由均保持目标 URL 并完成页面导航；核心页面仍可观察到以下兼容请求：
+
+- 所有九个路由都请求 `/consolev3/dashboard` 和 `/dist/v3dist/*` 全局资源；
+- StatefulSet、DaemonSet 还请求对应的 `/consolev3/.../statefulsets`、`/consolev3/.../daemonsets`；
+- Volume 路由继续触发 `/consolev3/.../services` 等兼容路径；
+- 应用模板页面也加载 `v3dist` 字体、语言包和静态资源。
+
+本轮没有创建、修改或删除业务资源；临时平台管理员仅用于浏览器登录，测试结束后用户和绑定已删除并复核不存在。该结果是当前制品的部署后运行时证据：页面可达不等于 V3 等价，核心页面的全局 V3 预加载和部分列表/详情的 Wujie 嵌入仍未移除，因此全部 V3 功能逐项等价性继续保持未完成。
