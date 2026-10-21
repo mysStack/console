@@ -615,3 +615,9 @@ A09/A12 作用域补测：仅项目 viewer 的 `projectonly` 账号，以及 wor
 当前 131 制品上，临时 workspace viewer（无项目 RoleBinding）通过真实浏览器访问 Deployment、StatefulSet、DaemonSet 详情页，页面均正常渲染。三类资源的浏览器会话 API 结果均为 GET `200`、POST/PUT/PATCH/DELETE `403`。临时资源、账号、WorkspaceRoleBinding 和凭据已清理，namespace 无残留。
 
 早期单 Deployment 进入 `/errors/403` 且全部请求为 `403` 的记录继续作为历史异常保留，差异根因尚未证明。本轮只补充当前制品的 workspace viewer 读取/写入边界，A02～A04 完整 RBAC 和 V3 等价性仍未完成。
+
+## 2026-10-21 核心资源 RBAC CRUD 与 V3 运行时复核
+
+本轮通过真实浏览器登录 131 当前制品，在浏览器会话内对 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet 进行核心 CRUD 权限复核：`viewer` 的 GET 全部为 `200`、写请求全部为 `403`；`operator` 和平台管理员的 GET 全部为 `200`、POST 为 `201`、PATCH/PUT/DELETE 全部为 `200`。临时账号、绑定和测试对象均已清理，专用 namespace 无残留。
+
+同一轮顺序访问核心资源、应用模板及相关入口时，浏览器网络记录仍出现 `/consolev3/dashboard` 和 `/dist/v3dist/*` 请求。该证据补强核心 RBAC CRUD 矩阵，但同时确认全量 V3/Wujie 运行时清理尚未完成；不能将核心页面可渲染或 CRUD 通过升级为全部 V3 功能等价通过。

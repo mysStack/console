@@ -67,6 +67,12 @@
 
 早期单 Deployment 的 `/errors/403` 和全 `403` 结果保留为历史异常，当前尚不能解释两次结果差异。本轮结果只更新 workspace viewer 的当前读取/写入证据，不改变完整 RBAC 矩阵和全量 V3 等价性未完成的结论。
 
+## 2026-10-21 核心六类资源 CRUD 复核补充
+
+真实浏览器登录当前 131 制品后，在同一浏览器会话内对 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet 执行 CRUD：项目 `viewer` 的 GET 为 `200`、POST/PATCH/PUT/DELETE 为 `403`；项目 `operator` 和平台管理员的 GET 为 `200`、POST 为 `201`、PATCH/PUT/DELETE 为 `200`。专用测试对象、账号和绑定已清理，namespace 无残留。
+
+本轮顺序访问核心入口时仍观察到 `/consolev3/dashboard` 和 `/dist/v3dist/*` 请求，因此核心 CRUD 证据已增强，但全部 V3/Wujie 逐项等价性仍未完成。
+
 ## 2026-10-21 A01 ConfigReference 低权限拒绝复核
 
 当前 131 制品上，临时 `workspace viewer + v4-migration-e2e 项目 viewer` 账号通过真实浏览器进入 Deployment ConfigReference 页面。页面显示当前 namespace 的 ConfigMap/Secret 引用名称和键数量，未显示 Secret 值；点击“应用”提交引用变更时，Deployment JSON Patch 返回 `403`，API 回读确认 `envFrom` 未发生变化。临时 Deployment、ConfigMap、Secret、IAM 绑定和凭据均已清理。

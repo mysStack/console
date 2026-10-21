@@ -660,3 +660,9 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 使用只绑定 `test-workspace-viewer`、不绑定项目 RoleBinding 的临时账号，通过真实浏览器访问 Deployment、StatefulSet、DaemonSet 原生详情页，三类页面均正常渲染。浏览器会话内的集群代理请求结果一致：三类资源 GET 均为 `200`，POST、PUT、PATCH、DELETE 均为 `403`。
 
 临时 Workload、账号、WorkspaceRoleBinding 和凭据已清理，namespace 无本轮残留。早期单 Deployment 的 `/errors/403` 与全 `403` 结果作为历史异常保留，尚未证明其与当前结果差异的根因，因此本轮只补充当前制品的 workspace viewer 读取/写入边界，不关闭完整 RBAC 或 V3 等价性。
+
+## 2026-10-21 核心路由运行时 V3 依赖复核
+
+使用真实浏览器登录当前 131 制品，顺序访问 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet、应用模板、DevOps、Edge 应用和通知静默策略入口。核心资源页面能够渲染并返回当前路由，但浏览器网络记录在这些页面加载期间仍出现 `/consolev3/dashboard` 和 `/dist/v3dist/*` 请求；应用模板页面还加载了 V3 字体/本地化资源。
+
+该结果证明当前核心原生页面的功能入口可达，同时证明“全部 V3/Wujie 运行时移除”尚未满足。页面渲染成功不能替代逐项 V3 行为对照；通知、DevOps、Edge 等插件或兼容入口仍按后置/未验证处理。

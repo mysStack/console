@@ -1069,3 +1069,13 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - 浏览器会话内集群代理请求结果：三类资源 GET 均为 `200`，POST、PUT、PATCH、DELETE 均为 `403`。
 - 临时 Workload、账号、WorkspaceRoleBinding 和凭据已清理，专用 namespace 无本轮残留。
 - 早期单 Deployment 进入 `/errors/403` 且所有请求为 `403` 的记录保留为历史异常。当前结果只补充 workspace viewer 的读取/写入边界，不能解释历史差异，也不能关闭完整 RBAC 或 V3 等价性。
+
+## 2026-10-21 核心六类资源 CRUD 与 V3 运行时复核
+
+- 负责人：主 Codex 会话；分支：`feature/v4-configmaps-secrets`；环境：131 当前已部署制品。
+- 真实浏览器登录后，通过浏览器会话内的 Console 集群代理执行 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet 请求。
+- `viewer`：六类资源 GET 全部 `200`，POST/PATCH/PUT/DELETE 全部 `403`。
+- `operator`：六类资源 GET 全部 `200`，POST 全部 `201`，PATCH/PUT/DELETE 全部 `200`。
+- 平台管理员：六类资源 GET 全部 `200`，POST 全部 `201`，PATCH/PUT/DELETE 全部 `200`。
+- 测试账号、角色绑定、临时对象已清理，namespace 只剩系统 ConfigMap 和默认 ServiceAccount。
+- 核心页面运行时记录仍出现 `/consolev3/dashboard` 与 `/dist/v3dist/*`，因此 V3/Wujie 全量清理和逐项等价性仍未完成。

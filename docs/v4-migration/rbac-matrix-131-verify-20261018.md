@@ -247,6 +247,18 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 
 临时 Workload、用户、WorkspaceRoleBinding 和凭据均已删除，专用 namespace 复核只剩系统 `kube-root-ca.crt` ConfigMap 与默认 ServiceAccount。早期单 Deployment 进入 `/errors/403` 且全部请求为 `403` 的记录仍保留为历史异常；账号元数据、登录上下文或制品差异的根因尚未证明，不能覆盖历史证据，也不能将当前结果外推为完整 RBAC 通过。
 
+## 2026-10-21 核心六类资源 viewer/operator/platform-admin CRUD 复核
+
+本轮使用临时测试身份完成真实浏览器登录，并在浏览器会话内通过 Console 集群代理对 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet 执行读取和 CRUD 请求。所有对象均使用专用 namespace 和唯一名称，测试结束后已清理；Secret 测试值没有输出到日志或报告。
+
+| 角色组合        | 六类资源 GET | 六类资源 POST | 六类资源 PATCH | 六类资源 PUT | 六类资源 DELETE |
+| --------------- | ------------ | ------------- | -------------- | ------------ | --------------- |
+| 项目 `viewer`   | 全部 `200`   | 全部 `403`    | 全部 `403`     | 全部 `403`   | 全部 `403`      |
+| 项目 `operator` | 全部 `200`   | 全部 `201`    | 全部 `200`     | 全部 `200`   | 全部 `200`      |
+| 平台管理员      | 全部 `200`   | 全部 `201`    | 全部 `200`     | 全部 `200`   | 全部 `200`      |
+
+该结果补齐核心六类资源的三组浏览器会话 API 正向/拒绝 CRUD 边界。它不等同于全部 UI 操作、全部错误/取消路径或 V3 逐项等价性通过；`workspaceonly`、`projectonly`、`clusterviewer`、平台只读以及应用模板作用域仍按本文件已有证据分别判断。
+
 ## 2026-10-20 Workload projectonly 有效账号复核
 
 为复核前一次 `projectonly` 全部 `403` 结果，本轮重新创建带有效邮箱、状态为 Active 的临时用户，只绑定 `v4-migration-e2e` 项目 `viewer` RoleBinding，不绑定企业空间权限。真实浏览器登录成功后，分别访问 Deployment、StatefulSet、DaemonSet 原生详情路由，页面均渲染资源详情和资源状态。
