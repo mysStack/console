@@ -6,11 +6,11 @@
 
 ### 已取得证据
 
-| 资源或入口                         | 已验证组合                                                                        | 证据范围                                                                                |
-| ---------------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| ConfigMap、Secret、ServiceAccount  | 项目 viewer、operator、admin、workspaceonly、projectonly、clusterviewer；平台只读 | 真实浏览器/API 的读取、创建、更新、删除和拒绝状态码；`projectonly` 保留历史账号结果差异 |
-| Deployment、StatefulSet、DaemonSet | viewer、operator、admin、workspaceonly、projectonly、clusterviewer；平台只读      | 真实浏览器/API 的读取、写入和拒绝边界；`projectonly` 结果不一致，未作为稳定通过结论     |
-| 应用模板 A09/A12                   | workspace viewer、workspace 管理员、平台全局只读、当前管理员                      | 真实浏览器的列表、创建拒绝、Chart 校验/上传、刷新、删除和清理                           |
+| 资源或入口                         | 已验证组合                                                                               | 证据范围                                                                                                                                              |
+| ---------------------------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ConfigMap、Secret、ServiceAccount  | 项目 viewer、operator、admin、workspaceonly、projectonly、clusterviewer；平台只读        | 真实浏览器/API 的读取、创建、更新、删除和拒绝状态码；`projectonly` 保留历史账号结果差异                                                               |
+| Deployment、StatefulSet、DaemonSet | viewer、operator、admin、workspaceonly、projectonly、clusterviewer；平台只读             | 真实浏览器/API 的读取、写入和拒绝边界；`projectonly` 结果不一致，未作为稳定通过结论                                                                   |
+| 应用模板 A09/A12                   | workspace viewer、workspace 管理员、projectonly、clusterviewer、平台全局只读、当前管理员 | 真实浏览器的列表、创建拒绝、Chart 校验/上传、刷新、删除和清理；projectonly 写入 `403`，当前 workspace viewer/clusterviewer fixture PATCH/DELETE `200` |
 
 ### 尚未闭环
 
