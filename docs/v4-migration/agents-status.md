@@ -1057,3 +1057,5 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 同一提交后的仓库回归复验执行 `./scripts/test.sh`：66 个测试文件、210 个测试全部通过，0 个失败；ConfigReference 相关 6 个测试文件也全部通过。该结果只证明当前代码和测试资产没有新增回归，不能替代 A01～A12 的完整运行时等价性。
 
 随后使用 `workspace viewer + cluster viewer`、不绑定项目 RoleBinding 的临时账号复核 A01。真实浏览器页面正常渲染 ConfigReference，Secret 值未显示；点击“应用”后的 Deployment JSON Patch 返回 `403`，API 回读确认 `envFrom` 未改变。临时资源、IAM 绑定和凭据已清理并复核不存在。该结果补齐 A01 的集群只读拒绝子路径，完整 RBAC 和 V3 等价仍未完成。
+
+随后又使用仅绑定项目 `viewer`、没有 WorkspaceRoleBinding 的 `projectonly` 临时账号复核 A01。页面和 ConfigMap/Secret 读取请求均为 `200`，应用引用 PATCH 为 `403`，API 回读确认 `envFrom` 未变化。该结果复现当前有效 `projectonly` 的读写边界；早期全 `403` 记录继续作为历史异常保留，完整 RBAC 仍未完成。

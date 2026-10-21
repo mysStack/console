@@ -462,3 +462,5 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 本轮临时 Deployment、ConfigMap、Secret、用户、WorkspaceRoleBinding、项目 RoleBinding 和临时凭据均已清理并复核不存在。该证据关闭 A01 的一条低权限拒绝子路径，并补充了引用页面的真实渲染和 Secret 脱敏边界；A01 仍缺少全角色引用写入矩阵、错误/取消/网络失败、刷新返回和完整 V3 对照，因此继续保持“部分验证”。
 
 同一制品继续使用 `workspace viewer + cluster viewer`、不绑定项目 RoleBinding 的临时账号复核 A01。ConfigReference 页面正常渲染当前 Deployment、ConfigMap/Secret 引用名称和键数量，Secret 值未显示；点击“应用”后的 Deployment JSON Patch 返回 `403`，API 回读确认 `envFrom` 保持不变。临时 Workload、ConfigMap、Secret、IAM 绑定和凭据均已清理并复核不存在。该结果补齐 A01 的集群只读拒绝子路径，仍不等同于完整角色矩阵通过。
+
+随后使用仅绑定 `v4-migration-e2e` 项目 `viewer`、不绑定 WorkspaceRoleBinding 的 `projectonly` 临时账号复核 A01。当前制品中 ConfigReference 页面正常渲染，ConfigMap/Secret 列表和详情请求为 `200`，应用引用 PATCH 为 `403`，API 回读确认 `envFrom` 未变化。该结果复现当前有效 `projectonly` 的读权限/写拒绝边界；此前无法复现的全 `403` 账号上下文继续作为历史异常保留，不能与当前结果合并外推。
