@@ -582,7 +582,7 @@ A02～A04 的完整成功、失败、取消操作组合、全量 RBAC 作用域�
 
 同日新增集群管理员正向复核：临时账号绑定 workspace viewer 与 cluster-admin 后，真实浏览器对 ConfigMap、Secret、ServiceAccount、Deployment 的列表、详情、POST、PATCH、PUT、DELETE 均取得 `200/200/201/200/200/200`；测试对象、账号和绑定均已清理。该结果补充当前核心资源的 cluster-admin 正向边界，完整 RBAC 组合仍未完成。
 
-同日补测工作空间 viewer 应用模板权限：真实浏览器页面正常显示空列表且没有创建入口，应用模板列表 GET 为 `200`，POST/PUT/PATCH/DELETE 均为 `403`。临时用户和绑定已清理；该结果补齐 A09/A12 的 workspace viewer 拒绝边界，不改变完整 RBAC 和全量 V3 等价性未完成的结论。
+同日补测工作空间 viewer 应用模板权限：真实浏览器页面正常显示空列表且没有创建入口；使用有效 Helm Chart 的校验/创建 POST 均为 `403`，列表 GET 为 `200`。当前有效角色对已有临时 fixture 的 PATCH/DELETE 为 `200`，PUT 为 `405`（接口不支持该方法）。临时用户、绑定和 fixture 已清理；该结果修正了早期“所有写入均拒绝”的历史记录，不改变完整 RBAC 和全量 V3 等价性未完成的结论。
 
 当前分支回归复验：执行 `./scripts/test.sh`，66 个测试文件、210 个测试全部通过，0 个失败。回归通过只表示现有实现和已登记兼容边界没有新增失败，不能替代扩展 Fixture、全量 RBAC 和 V3 Action 运行时验证。
 

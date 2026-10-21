@@ -1094,3 +1094,7 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 ## 2026-10-21 当前制品核心路由 V3/Wujie 复核
 
 当前 HEAD `4b342e6e2` 的 131 制品使用真实浏览器顺序访问 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet、Service、Volume 和应用模板列表。九个页面均可导航，但均请求 `/consolev3/dashboard` 与 `/dist/v3dist/*`；StatefulSet、DaemonSet、Volume 还出现具体的 `/consolev3/...` 请求。临时平台管理员仅用于本轮登录，已删除用户和绑定。该结果补强了当前制品的运行时残留证据，全部 V3 等价性仍未完成。
+
+## 2026-10-21 应用模板 workspaceonly 有效创建权限复核
+
+使用临时 `test-workspace-viewer` 用户和真实浏览器验证有效 Helm Chart：页面显示空列表且没有创建入口；校验和创建 POST 均为 `403`，列表 GET 为 `200`。同一角色对既有唯一临时 Application 的 PATCH/DELETE 为 `200`，PUT 为 `405`（接口不支持）。用户、绑定、ApplicationVersion 和临时包均已清理；该结果修正早期“workspace viewer 所有写操作均为 `403`”的历史记录，不改变完整 RBAC 矩阵未完成的结论。
