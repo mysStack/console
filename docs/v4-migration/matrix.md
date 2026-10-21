@@ -623,3 +623,7 @@ A09/A12 作用域补测：仅项目 viewer 的 `projectonly` 账号，以及 wor
 同一轮顺序访问核心资源、应用模板及相关入口时，浏览器网络记录仍出现 `/consolev3/dashboard` 和 `/dist/v3dist/*` 请求。该证据补强核心 RBAC CRUD 矩阵，但同时确认全量 V3/Wujie 运行时清理尚未完成；不能将核心页面可渲染或 CRUD 通过升级为全部 V3 功能等价通过。
 
 继续对核心六类资源执行三组只读作用域复核：`workspaceonly`、`projectonly`、`clusterviewer` 的 GET 均为 `200`，POST/PATCH/PUT/DELETE 均为 `403`。三组临时身份、绑定和测试对象已清理。至此当前制品的核心资源主要项目/工作空间/集群作用域 CRUD 边界已有同一轮真实浏览器/API 记录，但应用模板全路径、低权限错误/取消路径和全量 V3 等价性仍未完成。
+
+## 2026-10-21 核心范围执行说明补充
+
+当前核心验收继续覆盖 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet、ConfigReference 和应用模板。DevOps、KubeFed、KubeEdge、Notification 的安装、Fixture、Action、RBAC 和 V3 等价验证留到后续插件对接阶段；这些项目仍保留在历史矩阵中，状态为“后置、未验证”，不作为当前核心资源验收的统一阻塞条件，也不能被解释为已测试通过。

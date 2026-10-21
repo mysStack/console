@@ -1086,3 +1086,7 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 - ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet 六类资源的 GET 均为 `200`；POST、PATCH、PUT、DELETE 均为 `403`。
 - 三组临时账号及对应绑定和测试对象已清理，namespace 只剩系统 ConfigMap 与默认 ServiceAccount。
 - 该结果补齐核心资源作用域 CRUD 拒绝边界；应用模板完整操作和全量 V3/Wujie 等价性仍未完成。
+
+## 2026-10-21 核心与插件范围最终确认
+
+本轮不安装或配置 DevOps、KubeFed、KubeEdge、Notification，不为插件补造 Fixture。核心资源继续按当前可用环境顺序推进；A05～A08、A10 统一记录为后置未验证，待后续插件对接阶段单独执行 REA、DEV、VERIFY、PR。

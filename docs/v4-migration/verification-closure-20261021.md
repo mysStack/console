@@ -130,3 +130,7 @@ A12 重复上传补测显示：相同 Chart 名称/版本连续上传两次时�
 负责人确认 DevOps、KubeFed、KubeEdge、Notification 为后续插件对接范围。本轮核心验收聚焦 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet 和应用模板，不安装或配置上述扩展。A05～A08、A10 的扩展依赖和对应 V3 等价性保持“后置、未验证”，不会被误记为测试通过。
 
 曾按授权创建 Vector 扩展安装计划，但 131 单节点 CPU 请求已达约 `99%`，Helm 安装 Job 因 `Insufficient cpu` 无法调度；临时 InstallPlan 已删除，业务工作负载未修改。该安装链路失败属于环境容量记录，不影响核心模块测试结论。
+
+## 2026-10-21 核心与插件范围最终确认
+
+负责人确认 DevOps、KubeFed、KubeEdge、Notification 属于后续插件对接范围。本轮不安装、不配置这些扩展，不为核心 ConfigMap、Secret、ServiceAccount、Workload 和应用模板验收补造插件 Fixture。A05～A08、A10 继续登记为“后置、未验证”，不作为当前核心模块的统一阻塞条件，也不标记为通过。

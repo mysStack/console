@@ -670,3 +670,7 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 ## 2026-10-21 核心六类资源 RBAC 作用域等价边界
 
 同一当前制品上，`workspaceonly`、`projectonly`、`clusterviewer` 三种真实浏览器身份对 ConfigMap、Secret、ServiceAccount、Deployment、StatefulSet、DaemonSet 均取得 GET `200`，POST/PATCH/PUT/DELETE 均为 `403`。这只补齐 V4 原生资源的权限边界，不代表 V3 角色语义、动态 Action 或全部页面行为已经逐项等价。
+
+## 2026-10-21 插件 Action 后置执行口径补充
+
+DevOps、KubeFed、KubeEdge、Notification 相关 Action 继续保留在矩阵中，当前状态统一为“后置、未验证”。本阶段不安装或配置这些插件，也不以缺少插件 Fixture 阻塞核心资源的 REA、DEV、VERIFY、PR；后续插件对接阶段再单独执行对应的入口、Action、RBAC、失败/取消和 V4 替代验证。
