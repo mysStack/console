@@ -1059,3 +1059,5 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 随后使用 `workspace viewer + cluster viewer`、不绑定项目 RoleBinding 的临时账号复核 A01。真实浏览器页面正常渲染 ConfigReference，Secret 值未显示；点击“应用”后的 Deployment JSON Patch 返回 `403`，API 回读确认 `envFrom` 未改变。临时资源、IAM 绑定和凭据已清理并复核不存在。该结果补齐 A01 的集群只读拒绝子路径，完整 RBAC 和 V3 等价仍未完成。
 
 随后又使用仅绑定项目 `viewer`、没有 WorkspaceRoleBinding 的 `projectonly` 临时账号复核 A01。页面和 ConfigMap/Secret 读取请求均为 `200`，应用引用 PATCH 为 `403`，API 回读确认 `envFrom` 未变化。该结果复现当前有效 `projectonly` 的读写边界；早期全 `403` 记录继续作为历史异常保留，完整 RBAC 仍未完成。
+
+随后在当前制品上创建临时项目管理员和三类 Workload，在线打开 Deployment、StatefulSet、DaemonSet 详情页后，分别对详情 API 注入 Playwright `internetdisconnected` 失败并刷新。三类页面均显示 `Network Error`，解除注入后页面恢复；临时账号、绑定和 Workload 均已清理。该结果补齐浏览器网络失败反馈，不替代真实 API Server 故障证据。

@@ -650,3 +650,7 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 继续使用 `workspace viewer + cluster viewer`、不绑定项目 RoleBinding 的临时账号访问同一 ConfigReference 页面。页面渲染和 Secret 脱敏正常；提交引用变更时 Deployment JSON Patch 返回 `403`，API 回读确认没有越权修改 `envFrom`。本轮只补充 A01 的集群只读拒绝组合，未关闭全角色权限、错误/取消/网络失败、刷新返回和 V3 替代行为。
 
 当前制品又复核了仅项目 `viewer`、无 WorkspaceRoleBinding 的 `projectonly` 组合：ConfigReference 页面和 ConfigMap/Secret 读取正常，引用 PATCH 返回 `403` 且 `envFrom` 保持不变。该证据补充 A01 的项目只读组合；早期全 `403` 记录仍缺少可复现上下文，不能被覆盖或外推为统一结果。
+
+## 2026-10-21 A02～A04 浏览器网络失败反馈复核
+
+在当前 131 制品上，临时管理员打开 Deployment、StatefulSet、DaemonSet 原生详情页后，对各详情 API 注入 Playwright `internetdisconnected` 请求失败并刷新。三类页面均显示 `Network Error` 状态提示，取消失败注入后可以重新加载。该证据关闭 A02～A04 的浏览器网络错误反馈子路径；它不等同于 API Server 实际故障，也不关闭完整失败/取消、RBAC 和 V3/Wujie 替代行为。

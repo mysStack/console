@@ -605,3 +605,7 @@ A09/A12 作用域补测：仅项目 viewer 的 `projectonly` 账号，以及 wor
 同一制品继续使用 `workspace viewer + cluster viewer`、不绑定项目 RoleBinding 的临时账号复核 A01。ConfigReference 页面正常渲染当前 Deployment、ConfigMap/Secret 引用名称和键数量，Secret 值未显示；点击“应用”后的 Deployment JSON Patch 返回 `403`，API 回读确认 `envFrom` 保持不变。临时 Workload、ConfigMap、Secret、IAM 绑定和凭据均已清理。该结果补齐 A01 的集群只读拒绝子路径，仍不等同于完整角色矩阵或 V3 等价通过。
 
 随后使用仅绑定 `v4-migration-e2e` 项目 `viewer`、不绑定 WorkspaceRoleBinding 的 `projectonly` 临时账号复核 A01。当前制品中 ConfigReference 页面同样正常渲染，ConfigMap/Secret 列表和详情请求为 `200`，应用引用 PATCH 为 `403`，API 回读确认 `envFrom` 未变化。该结果复现了当前有效 `projectonly` 的读权限/写拒绝边界；此前无法复现的全 `403` 账号上下文继续保留为历史异常，不能与当前结果合并外推。
+
+## 2026-10-21 A02～A04 浏览器网络失败反馈复核
+
+在当前 131 制品上创建临时管理员账号和 Deployment、StatefulSet、DaemonSet。页面在线加载完成后，使用 Playwright 对对应的详情 API 注入 `internetdisconnected` 请求失败，再刷新三个详情页。三类页面均保持原生路由并渲染 `Network Error` 状态提示；恢复请求后页面能够重新加载。该证据是浏览器请求失败模拟，不替代 API Server 实际停止/恢复证据，但补齐了 A02～A04 的页面网络错误反馈子路径。临时 Workload、账号、绑定和凭据均已清理。

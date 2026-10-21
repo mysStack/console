@@ -464,3 +464,7 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 同一制品继续使用 `workspace viewer + cluster viewer`、不绑定项目 RoleBinding 的临时账号复核 A01。ConfigReference 页面正常渲染当前 Deployment、ConfigMap/Secret 引用名称和键数量，Secret 值未显示；点击“应用”后的 Deployment JSON Patch 返回 `403`，API 回读确认 `envFrom` 保持不变。临时 Workload、ConfigMap、Secret、IAM 绑定和凭据均已清理并复核不存在。该结果补齐 A01 的集群只读拒绝子路径，仍不等同于完整角色矩阵通过。
 
 随后使用仅绑定 `v4-migration-e2e` 项目 `viewer`、不绑定 WorkspaceRoleBinding 的 `projectonly` 临时账号复核 A01。当前制品中 ConfigReference 页面正常渲染，ConfigMap/Secret 列表和详情请求为 `200`，应用引用 PATCH 为 `403`，API 回读确认 `envFrom` 未变化。该结果复现当前有效 `projectonly` 的读权限/写拒绝边界；此前无法复现的全 `403` 账号上下文继续作为历史异常保留，不能与当前结果合并外推。
+
+## 2026-10-21 A02～A04 浏览器网络失败反馈复核
+
+在当前 131 制品上使用临时项目管理员账号和临时 Deployment、StatefulSet、DaemonSet。三个详情页在线加载后，使用 Playwright 对各自详情 API 注入 `internetdisconnected` 请求失败并刷新页面。Deployment、StatefulSet、DaemonSet 均保持原生详情路由并显示 `Network Error` 状态提示；解除失败注入后页面恢复正常。该结果只证明浏览器请求失败时的页面反馈，不替代已单独记录的真实 API Server 故障；临时 Workload、账号、绑定和凭据均已清理。
