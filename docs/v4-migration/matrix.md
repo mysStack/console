@@ -609,3 +609,9 @@ A09/A12 作用域补测：仅项目 viewer 的 `projectonly` 账号，以及 wor
 ## 2026-10-21 A02～A04 浏览器网络失败反馈复核
 
 在当前 131 制品上创建临时管理员账号和 Deployment、StatefulSet、DaemonSet。页面在线加载完成后，使用 Playwright 对对应的详情 API 注入 `internetdisconnected` 请求失败，再刷新三个详情页。三类页面均保持原生路由并渲染 `Network Error` 状态提示；恢复请求后页面能够重新加载。该证据是浏览器请求失败模拟，不替代 API Server 实际停止/恢复证据，但补齐了 A02～A04 的页面网络错误反馈子路径。临时 Workload、账号、绑定和凭据均已清理。
+
+## 2026-10-21 A02～A04 workspaceonly 当前制品复核
+
+当前 131 制品上，临时 workspace viewer（无项目 RoleBinding）通过真实浏览器访问 Deployment、StatefulSet、DaemonSet 详情页，页面均正常渲染。三类资源的浏览器会话 API 结果均为 GET `200`、POST/PUT/PATCH/DELETE `403`。临时资源、账号、WorkspaceRoleBinding 和凭据已清理，namespace 无残留。
+
+早期单 Deployment 进入 `/errors/403` 且全部请求为 `403` 的记录继续作为历史异常保留，差异根因尚未证明。本轮只补充当前制品的 workspace viewer 读取/写入边界，A02～A04 完整 RBAC 和 V3 等价性仍未完成。

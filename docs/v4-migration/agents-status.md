@@ -1061,3 +1061,11 @@ A09 仍为“部分验证”；Workload `projectonly` 标记为“结果不一�
 随后又使用仅绑定项目 `viewer`、没有 WorkspaceRoleBinding 的 `projectonly` 临时账号复核 A01。页面和 ConfigMap/Secret 读取请求均为 `200`，应用引用 PATCH 为 `403`，API 回读确认 `envFrom` 未变化。该结果复现当前有效 `projectonly` 的读写边界；早期全 `403` 记录继续作为历史异常保留，完整 RBAC 仍未完成。
 
 随后在当前制品上创建临时项目管理员和三类 Workload，在线打开 Deployment、StatefulSet、DaemonSet 详情页后，分别对详情 API 注入 Playwright `internetdisconnected` 失败并刷新。三类页面均显示 `Network Error`，解除注入后页面恢复；临时账号、绑定和 Workload 均已清理。该结果补齐浏览器网络失败反馈，不替代真实 API Server 故障证据。
+
+## 2026-10-21 A02～A04 workspaceonly 当前制品复核
+
+- 负责人：主 Codex 会话；分支：`feature/v4-configmaps-secrets`；验证环境：131 当前 `ks-console` 制品。
+- 临时账号仅绑定 `test-workspace-viewer`，没有项目 RoleBinding。真实浏览器分别访问 Deployment、StatefulSet、DaemonSet 详情页，三类页面均正常渲染。
+- 浏览器会话内集群代理请求结果：三类资源 GET 均为 `200`，POST、PUT、PATCH、DELETE 均为 `403`。
+- 临时 Workload、账号、WorkspaceRoleBinding 和凭据已清理，专用 namespace 无本轮残留。
+- 早期单 Deployment 进入 `/errors/403` 且所有请求为 `403` 的记录保留为历史异常。当前结果只补充 workspace viewer 的读取/写入边界，不能解释历史差异，也不能关闭完整 RBAC 或 V3 等价性。

@@ -61,6 +61,12 @@
 
 三项中，API Server 实际故障验证已完成限定范围；完整 RBAC 组合矩阵和全部 V3 功能逐项等价性仍未完成。PR #1 继续保持 Draft，未进入合并或发布。
 
+## 2026-10-21 A02～A04 workspaceonly 当前制品复核补充
+
+当前制品上，只有 `test-workspace-viewer` WorkspaceRoleBinding、没有项目 RoleBinding 的临时账号通过真实浏览器访问三类 Workload 详情页，Deployment、StatefulSet、DaemonSet 均正常渲染；同一会话中三类资源 GET 均为 `200`，POST/PUT/PATCH/DELETE 均为 `403`。临时资源、账号、绑定和凭据均已清理，namespace 无残留。
+
+早期单 Deployment 的 `/errors/403` 和全 `403` 结果保留为历史异常，当前尚不能解释两次结果差异。本轮结果只更新 workspace viewer 的当前读取/写入证据，不改变完整 RBAC 矩阵和全量 V3 等价性未完成的结论。
+
 ## 2026-10-21 A01 ConfigReference 低权限拒绝复核
 
 当前 131 制品上，临时 `workspace viewer + v4-migration-e2e 项目 viewer` 账号通过真实浏览器进入 Deployment ConfigReference 页面。页面显示当前 namespace 的 ConfigMap/Secret 引用名称和键数量，未显示 Secret 值；点击“应用”提交引用变更时，Deployment JSON Patch 返回 `403`，API 回读确认 `envFrom` 未发生变化。临时 Deployment、ConfigMap、Secret、IAM 绑定和凭据均已清理。

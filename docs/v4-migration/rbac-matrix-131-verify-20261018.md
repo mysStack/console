@@ -222,16 +222,30 @@ POST 创建对象、PUT/PATCH 修改对象和 DELETE 均在浏览器会话中完
 
 以下汇总只统计当前已取得真实浏览器/API 证据的组合；`projectonly` 采用带有效邮箱且 Active 的当前复核结果，另一账号上下文的全部 `403` 记录单独保留，不混入通过结论。
 
-| 组合                        | 企业空间绑定 | 项目绑定 | 集群绑定       | 页面/API 结论                                                                |
-| --------------------------- | ------------ | -------- | -------------- | ---------------------------------------------------------------------------- |
-| viewer                      | viewer       | viewer   | 无             | 页面正常；GET `200`，POST/PUT/PATCH/DELETE `403`                             |
-| operator                    | viewer       | operator | 无             | 页面正常；GET/PUT/PATCH/DELETE `200`，POST `201`                             |
-| admin                       | viewer       | admin    | 无             | 页面正常；GET/PUT/PATCH/DELETE `200`，POST `201`                             |
-| workspaceonly               | viewer       | 无       | 无             | 页面 `/errors/403`；全部请求 `403`                                           |
-| projectonly（有效账号复核） | 无           | viewer   | 无             | 页面正常；GET `200`，POST/PUT/PATCH/DELETE `403`；另一账号上下文为全部 `403` |
-| clusterviewer               | viewer       | 无       | cluster-viewer | 页面正常；GET `200`，POST/PUT/PATCH/DELETE `403`                             |
+| 组合                        | 企业空间绑定 | 项目绑定 | 集群绑定       | 页面/API 结论                                                                                       |
+| --------------------------- | ------------ | -------- | -------------- | --------------------------------------------------------------------------------------------------- |
+| viewer                      | viewer       | viewer   | 无             | 页面正常；GET `200`，POST/PUT/PATCH/DELETE `403`                                                    |
+| operator                    | viewer       | operator | 无             | 页面正常；GET/PUT/PATCH/DELETE `200`，POST `201`                                                    |
+| admin                       | viewer       | admin    | 无             | 页面正常；GET/PUT/PATCH/DELETE `200`，POST `201`                                                    |
+| workspaceonly（当前复核）   | viewer       | 无       | 无             | 三类页面正常；GET `200`，POST/PUT/PATCH/DELETE `403`；早期单 Deployment 全 `403` 记录保留为历史异常 |
+| projectonly（有效账号复核） | 无           | viewer   | 无             | 页面正常；GET `200`，POST/PUT/PATCH/DELETE `403`；另一账号上下文为全部 `403`                        |
+| clusterviewer               | viewer       | 无       | cluster-viewer | 页面正常；GET `200`，POST/PUT/PATCH/DELETE `403`                                                    |
 
 该表闭合了 A02～A04 当前制品的六种账号组合记录，但不等同于联邦、DevOps、Extension 或其他 V3 Action 的全局 RBAC 验收。
+
+## 2026-10-21 A02～A04 workspaceonly 当前制品复核
+
+为复核早期 workspace viewer 进入 `/errors/403` 的记录，本轮在当前 131 制品上创建只绑定 `test-workspace-viewer` 的临时账号，不绑定项目 RoleBinding。真实浏览器分别打开 Deployment、StatefulSet、DaemonSet 详情页，三类页面均正常渲染。
+
+同一浏览器会话通过集群代理对三类临时 Workload 执行 API 验证：
+
+| 资源        | GET | POST | PUT | PATCH | DELETE |
+| ----------- | --: | ---: | --: | ----: | -----: |
+| Deployment  | 200 |  403 | 403 |   403 |    403 |
+| StatefulSet | 200 |  403 | 403 |   403 |    403 |
+| DaemonSet   | 200 |  403 | 403 |   403 |    403 |
+
+临时 Workload、用户、WorkspaceRoleBinding 和凭据均已删除，专用 namespace 复核只剩系统 `kube-root-ca.crt` ConfigMap 与默认 ServiceAccount。早期单 Deployment 进入 `/errors/403` 且全部请求为 `403` 的记录仍保留为历史异常；账号元数据、登录上下文或制品差异的根因尚未证明，不能覆盖历史证据，也不能将当前结果外推为完整 RBAC 通过。
 
 ## 2026-10-20 Workload projectonly 有效账号复核
 

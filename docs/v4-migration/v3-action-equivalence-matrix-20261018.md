@@ -654,3 +654,9 @@ A05、A10 继续保持“环境不可执行/未验证”，不能用路由可达
 ## 2026-10-21 A02～A04 浏览器网络失败反馈复核
 
 在当前 131 制品上，临时管理员打开 Deployment、StatefulSet、DaemonSet 原生详情页后，对各详情 API 注入 Playwright `internetdisconnected` 请求失败并刷新。三类页面均显示 `Network Error` 状态提示，取消失败注入后可以重新加载。该证据关闭 A02～A04 的浏览器网络错误反馈子路径；它不等同于 API Server 实际故障，也不关闭完整失败/取消、RBAC 和 V3/Wujie 替代行为。
+
+## 2026-10-21 A02～A04 workspaceonly 当前制品复核
+
+使用只绑定 `test-workspace-viewer`、不绑定项目 RoleBinding 的临时账号，通过真实浏览器访问 Deployment、StatefulSet、DaemonSet 原生详情页，三类页面均正常渲染。浏览器会话内的集群代理请求结果一致：三类资源 GET 均为 `200`，POST、PUT、PATCH、DELETE 均为 `403`。
+
+临时 Workload、账号、WorkspaceRoleBinding 和凭据已清理，namespace 无本轮残留。早期单 Deployment 的 `/errors/403` 与全 `403` 结果作为历史异常保留，尚未证明其与当前结果差异的根因，因此本轮只补充当前制品的 workspace viewer 读取/写入边界，不关闭完整 RBAC 或 V3 等价性。
