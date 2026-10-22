@@ -20,7 +20,7 @@
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
-        "sha256": "8b68d068886c4e3c59a05179b276aa9bb17707d99888f9dd06e7e3ed38d59eef"
+        "sha256": "9243782037745b37d159720c3be9feaf0340d9ec4dc0f122065b3815fad4d0c4"
       },
       {
         "path": "docs/v4-migration/workload-kind-capability-matrix.md",
@@ -45,6 +45,10 @@
       {
         "path": "docs/v4-migration/workload-runtime-rea-20261023.md",
         "sha256": "f321c16e274dafc71a87f11a7c1cfcd2b8c6a3a79dca2b803384caaaf41fddc6"
+      },
+      {
+        "path": "docs/v4-migration/workload-v3-field-equivalence-20261023.md",
+        "sha256": "b5f1903433c8a58695c0a148eb386fe5f046265ea0c2ed2090fd64a2561c58ce"
       }
     ],
     "coverage": {
@@ -53,7 +57,8 @@
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
-          "docs/v4-migration/workload-kind-capability-matrix.md"
+          "docs/v4-migration/workload-kind-capability-matrix.md",
+          "docs/v4-migration/workload-v3-field-equivalence-20261023.md"
         ]
       },
       "fields": {
@@ -61,7 +66,8 @@
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
-          "docs/v4-migration/workload-kind-capability-matrix.md"
+          "docs/v4-migration/workload-kind-capability-matrix.md",
+          "docs/v4-migration/workload-v3-field-equivalence-20261023.md"
         ]
       },
       "validation": {
@@ -69,7 +75,8 @@
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
-          "docs/v4-migration/workload-kind-capability-matrix.md"
+          "docs/v4-migration/workload-kind-capability-matrix.md",
+          "docs/v4-migration/workload-v3-field-equivalence-20261023.md"
         ]
       },
       "api": {
