@@ -3,7 +3,7 @@
  * https://github.com/kubesphere/console/blob/master/LICENSE
  */
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { isEmpty, get } from 'lodash';
 import { DeleteConfirmModal, useCacheStore as useStore } from '@ks-console/shared';
@@ -21,6 +21,7 @@ import {
   hasClusterModule,
   ClusterAliasName,
   ProjectAliasName,
+  request,
 } from '@ks-console/shared';
 import { useRollbackModal, useAutoScalingModal } from '../../../../../../clusters/hooks/useModal';
 import type { FormattedWorkload } from '@ks-console/shared';
@@ -36,6 +37,7 @@ const DeploymentDetail = () => {
   const params = useParams();
   const { workspace, cluster, namespace, name } = params;
   const navigate = useNavigate();
+  const [settingsResource, setSettingsResource] = useState<Record<string, any>>();
   const {
     useGetDetail,
     useUpdateDeploymentMutation,
@@ -178,7 +180,12 @@ const DeploymentDetail = () => {
       refetch();
     },
   });
-  const { mutate: mutateSettings, isLoading: settingsIsLoading } = store.usePutMutation(undefined, {
+  const {
+    mutate: mutateSettings,
+    isLoading: settingsIsLoading,
+    error: settingsError,
+    reset: resetSettings,
+  } = store.usePutMutation(undefined, {
     noGetDetail: true,
     onSuccess: () => {
       notify.success(t('UPDATE_SUCCESSFUL'));
@@ -297,7 +304,20 @@ const DeploymentDetail = () => {
         text: t('EDIT_SETTINGS'),
         action: 'edit',
         show: !detail.isFedManaged,
-        onClick: openSettingsModal,
+        onClick: async () => {
+          try {
+            // The formatted detail deliberately omits resourceVersion and ownerReferences.
+            // Edit a raw snapshot so concurrent updates return 409 instead of being overwritten.
+            const resource = await request.get<Record<string, any>, Record<string, any>>(
+              store.getDetailUrl({ cluster, namespace, name }),
+            );
+            setSettingsResource(resource);
+            resetSettings();
+            openSettingsModal();
+          } catch {
+            notify.error(t('WORKLOAD_SETTINGS_LOAD_FAILED'));
+          }
+        },
       },
       {
         key: 'editYaml',
@@ -372,13 +392,14 @@ const DeploymentDetail = () => {
       )}
       {renderRollbackModal()}
       {renderAutoScalingModal()}
-      {settingsModalIsOpen && (
+      {settingsModalIsOpen && settingsResource && (
         <WorkloadSettingsModal
           visible
           cluster={cluster!}
           namespace={namespace!}
-          resource={detail._originData}
+          resource={settingsResource}
           confirmLoading={settingsIsLoading}
+          error={settingsError}
           onOk={data =>
             mutateSettings({
               params: { cluster, namespace, name },

@@ -24,6 +24,7 @@ interface Props {
   namespace: string;
   resource: Record<string, any>;
   confirmLoading?: boolean;
+  error?: unknown;
   onOk: (resource: Record<string, any>) => void;
   onCancel: () => void;
 }
@@ -34,6 +35,7 @@ export default function WorkloadSettingsModal({
   namespace,
   resource,
   confirmLoading,
+  error: saveError,
   onOk,
   onCancel,
 }: Props) {
@@ -85,6 +87,15 @@ export default function WorkloadSettingsModal({
       bodyStyle={{ padding: 20, maxHeight: '72vh', overflowY: 'auto' }}
     >
       <Form form={form} initialValues={initialValues}>
+        {!!saveError && (
+          <div role="alert" style={{ color: '#ca2621', marginBottom: 16 }}>
+            {t(
+              (saveError as { response?: { status?: number } }).response?.status === 409
+                ? 'WORKLOAD_SETTINGS_CONFLICT'
+                : 'WORKLOAD_SETTINGS_SAVE_FAILED',
+            )}
+          </div>
+        )}
         <FormItem name="name" label={t('NAME')}>
           <Input disabled />
         </FormItem>

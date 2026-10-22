@@ -4,6 +4,12 @@
  */
 
 module.exports = {
+  WORKLOAD_SETTINGS_CONFLICT:
+    'Otra operación actualizó el recurso. Cancela y vuelve a abrir Editar ajustes.',
+  WORKLOAD_SETTINGS_SAVE_FAILED:
+    'No se guardaron los ajustes. Comprueba la red y los permisos e inténtalo de nuevo.',
+  WORKLOAD_SETTINGS_LOAD_FAILED:
+    'No se pudieron cargar los ajustes actuales. Actualiza e inténtalo de nuevo.',
   VOLUME_MOUNT_PL: 'Montajes de volumen',
   WORKLOAD_PRESERVED_VOLUME: 'El volumen {type} existente se conserva al editar otros ajustes.',
   WORKLOAD_ADD_CONTAINER: 'Añadir contenedor',

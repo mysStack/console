@@ -16,6 +16,6 @@ test('Deployment 编辑设置使用原生设置表单而不是 YAML 编辑器', 
     /key: 'editConfigTemplate'[\s\S]*?(?=\n\s*\{\n\s*key: 'editYaml')/,
   )?.[0];
   assert.ok(settingsAction);
-  assert.match(settingsAction, /onClick: openSettingsModal/);
+  assert.match(settingsAction, /openSettingsModal/);
   assert.doesNotMatch(settingsAction, /editYaml/);
 });
