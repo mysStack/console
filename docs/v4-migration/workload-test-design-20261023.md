@@ -13,8 +13,8 @@
 当前已经具备：
 
 - 旧源码设置分区、字段组和资源特有 Action 的静态清单；
-- 当前 `v3dist` 普通资源入口、Action 处理器和分区定位；
-- 当前 V4 Workload Store、URL、PATCH/删除、HPA 和 StatefulSet Service 的源码定位；
+- 当前 `v3dist` 普通资源入口、Action 处理器和分区定位，以及 131 已部署制品的限定浏览器观察；
+- 当前 V4 Workload Store、URL、PUT/PATCH/删除、HPA 和 StatefulSet Service 的源码定位；
 - 已有组件、Store、作用域和历史浏览器回归用例；
 - 131 测试环境、专用 namespace 约束和镜像部署链路记录。
 
@@ -44,7 +44,7 @@
 
 优先完成以下可自动化断言：
 
-1. 三类资源的列表、详情、Watch、创建、PATCH、删除 URL 均带正确 cluster/namespace/name 和 API version。
+1. 三类资源的列表、详情、Watch、创建、PUT/PATCH、删除 URL 均带正确 cluster/namespace/name 和 API version；编辑设置需区分 Deployment 的完整资源 PUT 与其他 Action 的 PATCH。
 2. 编辑设置保留 `resourceVersion`、不可编辑字段、ownerReferences、未知卷来源和未改字段；字段清空行为按 REA 记录逐项断言。
 3. Deployment 使用 `maxUnavailable/maxSurge`，StatefulSet 使用 `partition/serviceName/volumeClaimTemplates`，DaemonSet 使用 `maxUnavailable/minReadySeconds`；不允许将副本伸缩或停止逻辑跨资源复用。
 4. 关联 HPA 的创建、更新、删除和批量删除请求失败时，整体 mutation 失败且不报告成功。
@@ -99,9 +99,9 @@
 
 ## 开放风险
 
-- 131 当前没有取得有效浏览器登录会话，不能开始正式 VERIFY；
+- 131 已取得 admin 浏览器登录会话并完成限定页面观察，但当前部署镜像不是本分支当前 SHA，不能开始正式 VERIFY；
 - `origin/release-3.4` 不是当前制品源码证明，只能作为字段和历史行为参考；
-- 当前 V4 编辑使用 PATCH，旧 V3 使用 GET resourceVersion 后 PUT，等价性必须用真实请求和并发场景验证；
+- 当前 V4 Deployment 编辑设置使用原始资源 GET 后 PUT，StatefulSet/DaemonSet 当前入口仍为 YAML；旧 V3 也使用 GET resourceVersion 后 PUT，三类资源的等价性必须用真实请求和并发场景分别验证；其他运维 Action 仍可能使用 PATCH。
 - 当前 Store 没有统一 mutation 后缓存失效机制，依赖页面显式 `refetch()` 的路径必须逐项验证；
 - 旧源码 DaemonSet 停止逻辑与当前固定 `spec.replicas=0` 存在高风险差异；
 - PR #2 的完整历史差异在 REA 阶段仍会被门禁检查拒绝，不能把工具回归成功当成 PR 必检通过。

@@ -29,6 +29,7 @@ Deployment、StatefulSet、DaemonSet 共用一个模块分支和组合能力记�
 - [Deployment 静态入口/API/Store 记录](./deployment-v3-evidence.md)：历史源码输入，不能独自证明当前制品行为。
 - [缺口矩阵](./deployment-gap-matrix.md)：整体功能清单，编辑设置的详细清单从中链接。
 - [编辑设置有限 VERIFY](./deployment-settings-verify-20261022.md)：保留各自 SHA/镜像和已执行场景，不能作为完整等价或当前阶段通过。
+- [运行时 REA](./workload-runtime-rea-20261023.md)：记录 131 当前部署制品的页面形态；Deployment 可打开原生设置，StatefulSet/DaemonSet 仍打开 YAML。该制品不是当前分支 SHA，不能作为当前 VERIFY。
 - [Workload 首轮 VERIFY](./workload-131-verify-20261022.md)：保留列表、详情等历史观察，不倒推编辑设置 REA。
 
 全局 P0-U001～U004 继续跟踪。本索引没有关闭或豁免全局风险，也没有签署模块通过。

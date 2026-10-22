@@ -95,8 +95,8 @@ Action `3595` 从 `detail._originData` 取编辑对象，保存时处理 `spec.t
 
 ### 2026-10-23 Store/API 定向取证补充
 
-已将当前 V4 的作用域 URL、详情/Watch、PATCH 编辑、Background 删除、关联 HPA 和 StatefulSet Service PATCH 绑定到源码行号；同时确认三类 Workload 的查询 key 虽包含资源类型和 cluster/namespace/name，但当前 Store 未形成统一的 mutation 后缓存失效机制。旧源码的编辑设置为 GET resourceVersion 后 PUT 完整对象，DaemonSet 停止路径使用不可调度 nodeSelector；当前 V4 的设置编辑为 PATCH，Workload Store 的停止逻辑固定写入 `spec.replicas=0`，这两个差异都必须用真实 API 和浏览器证据关闭。
+已将当前 V4 的作用域 URL、Deployment 原生设置 PUT、其他 PATCH、Background 删除、关联 HPA 和 StatefulSet Service PATCH 绑定到源码行号；同时确认三类 Workload 的查询 key 虽包含资源类型和 cluster/namespace/name，但当前 Store 未形成统一的 mutation 后缓存失效机制。旧源码的编辑设置为 GET resourceVersion 后 PUT 完整对象，DaemonSet 停止路径使用不可调度 nodeSelector；当前 V4 的 Deployment 设置已是原始快照 PUT，而停止逻辑仍固定写入 `spec.replicas=0`，这两个资源差异都必须用真实 API 和浏览器证据关闭。
 
-本轮结论仍为 REA 未完成：静态请求边界已定位，真实 Network、完整 payload、RBAC 正反权限、缓存失效、错误/取消 UI、namespace 隔离和三类资源页面渲染尚未验证。详见[Store/API 取证](./workload-settings-source-evidence-20261024.md#storeapi作用域和缓存的定向取证2026-10-23)。
+本轮结论仍为 REA 未完成：静态请求边界已定位，浏览器已确认三类详情页和 STS/DS 的 YAML 缺口，但真实 Network、完整 payload、RBAC 正反权限、缓存失效、错误/取消 UI、namespace 隔离和当前 SHA 部署后的页面渲染尚未验证。详见[Store/API 取证](./workload-settings-source-evidence-20261024.md#storeapi作用域和缓存的定向取证2026-10-23)和[运行时 REA](./workload-runtime-rea-20261023.md)。
 
 补充边界：当前 `3.bb6cbee4309e765b70c1.js` 的普通设置注册和集群差异设置注册不是同一能力。集群差异注册包含 DaemonSet，不能据此证明普通项目 DaemonSet 的编辑设置完整可用；普通项目 DaemonSet 仍需单独核对入口、forms 参数和实际请求。

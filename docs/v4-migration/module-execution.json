@@ -20,11 +20,11 @@
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
-        "sha256": "4ba4cfb0796dbf4bd14b67da557a4b7d8049039f23d3668ff42e75a1c5a299b3"
+        "sha256": "8b68d068886c4e3c59a05179b276aa9bb17707d99888f9dd06e7e3ed38d59eef"
       },
       {
         "path": "docs/v4-migration/workload-kind-capability-matrix.md",
-        "sha256": "f4a6625cfdeca80003cbdb91f8923b672ca65c6cb77a2269d5167be1b05355e2"
+        "sha256": "b9de014be1aca43266707f3d6799e4d93f289835ef32bc6f651365d9996aab48"
       },
       {
         "path": "docs/v4-migration/evidence/workload-edit-factories-20261023-provenance.json",
@@ -36,11 +36,15 @@
       },
       {
         "path": "docs/v4-migration/workload-settings-source-evidence-20261024.md",
-        "sha256": "16412d5e7dd2cd4e36e56e057453787df0a4faad5c7ba168934dbeebd23ffca4"
+        "sha256": "0412d9d55ce30f718278973f05160c95ee6a78bbcfa2d0d884fe583ff03c3056"
       },
       {
         "path": "docs/v4-migration/workload-test-design-20261023.md",
-        "sha256": "fbfa9e669a3f9a7c8a28318f39c6964a6ba64307588df9bbbf83c3eab9783d07"
+        "sha256": "7ee12d794e34f23d5504af4e2962a2c6610e84c64fc76957cb66fb897493ecbf"
+      },
+      {
+        "path": "docs/v4-migration/workload-runtime-rea-20261023.md",
+        "sha256": "a61390f6c9210856fc0bc7138bc863d5088772d3a3eacc3c15b08fc0fdfa175e"
       }
     ],
     "coverage": {
