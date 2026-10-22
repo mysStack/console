@@ -2,3 +2,6 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 npx lint-staged --concurrent false
+
+# 检查格式化后的最终暂存内容；失败时停止提交。
+python3 docs/v4-migration/governance/scripts/v4-module-gate.py auto commit --hook

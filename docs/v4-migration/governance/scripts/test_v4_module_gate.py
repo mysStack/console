@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -39,6 +40,7 @@ class ModuleGateTest(unittest.TestCase):
         self.git("add", ".")
         self.git("commit", "-qm", "baseline")
         base = self.git("rev-parse", "HEAD")
+        self.base = base
         self.git("init", "--bare", "-q", str(self.root / "origin.git"))
         self.git("remote", "add", "origin", str(self.root / "origin.git"))
         self.git("push", "-q", "origin", "feature/v4-migration")
@@ -214,6 +216,194 @@ class ModuleGateTest(unittest.TestCase):
         self.git("push", "-q", "origin", "feature/v4-workloads")
         tag = "feature-v4-workloads-20261022-230000-" + self.git("rev-parse", "HEAD")[:12]
         self.assert_rejected("deploy", "--records-only", "--tag", tag)
+
+    def install_hooks(self):
+        source = Path(__file__).resolve().parents[4]
+        governance = self.docs / "governance"
+        (governance / "scripts").mkdir(parents=True)
+        shutil.copy(self.gate, governance / "scripts/v4-module-gate.py")
+        shutil.copy(self.root / "v4-module-branch-registry.json",
+                    governance / "v4-module-branch-registry.json")
+        hooks = self.repo / ".husky"
+        (hooks / "_").mkdir(parents=True)
+        # CI 不安装 Node/Husky；替代外部启动器，保留钩子的失败即停语义。
+        (hooks / "_/husky.sh").write_text("set -e\n")
+        for name in ("pre-commit", "commit-msg"):
+            if (source / ".husky" / name).exists():
+                shutil.copy(source / ".husky" / name, hooks / name)
+                (hooks / name).chmod(0o755)
+        self.git("add", ".")
+        self.git("commit", "-qm", "安装测试钩子")
+        self.git("config", "core.hooksPath", ".husky")
+        # 格式工具是外部依赖；门禁、Git、钩子和实际提交均真实执行。
+        tools = self.root / "bin"
+        tools.mkdir()
+        formatter = tools / "npx"
+        formatter.write_text("#!/bin/sh\nexit 0\n")
+        formatter.chmod(0o755)
+        self.hook_env = dict(os.environ, PATH=str(tools) + os.pathsep + os.environ["PATH"])
+        self.hook_env.pop("HUSKY", None)
+
+    def commit_with_hooks(self, message="docs(迁移): 补充取证记录"):
+        return subprocess.run(["git", "commit", "-m", message], cwd=self.repo,
+            capture_output=True, text=True, env=self.hook_env)
+
+    def ci(self, draft=True, branch="feature/v4-workloads", base_branch="feature/v4-migration"):
+        self.git("add", ".")
+        self.git("commit", "-qm", "测试 PR 提交", "--allow-empty")
+        args = [sys.executable, str(self.gate), "auto", "ci", "--head-branch", branch,
+            "--base-branch", base_branch, "--base", self.base]
+        if draft:
+            args.append("--draft")
+        return subprocess.run(args, cwd=self.repo, capture_output=True, text=True)
+
+    def prepare_ci(self):
+        governance = self.docs / "governance"
+        governance.mkdir()
+        shutil.copy(self.root / "v4-module-branch-registry.json",
+                    governance / "v4-module-branch-registry.json")
+
+    def test_real_commit_hook_rejects_rea_business_code(self):
+        self.install_hooks()
+        before = self.git("rev-parse", "HEAD")
+        (self.repo / "packages/editor.ts").write_text("export const changed = true;\n")
+        self.git("add", ".")
+        result = self.commit_with_hooks()
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(self.git("rev-parse", "HEAD"), before)
+        self.assertIn("门禁失败", result.stdout + result.stderr)
+
+    def test_real_commit_hook_allows_chinese_evidence_commit(self):
+        self.install_hooks()
+        (self.docs / "new.md").write_text("# 新增运行时观察\n")
+        self.git("add", ".")
+        result = self.commit_with_hooks()
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_real_commit_msg_hook_rejects_english_title_even_with_chinese_scope(self):
+        self.install_hooks()
+        (self.docs / "new.md").write_text("# 新证据\n")
+        self.git("add", ".")
+        before = self.git("rev-parse", "HEAD")
+        result = self.commit_with_hooks("docs(迁移): record evidence")
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(self.git("rev-parse", "HEAD"), before)
+        self.assertIn("中文", result.stdout + result.stderr)
+
+    def test_real_hook_rejects_unregistered_migration_branch(self):
+        self.install_hooks()
+        self.git("switch", "-qc", "feature/v4-unregistered")
+        (self.docs / "new.md").write_text("# 证据\n")
+        self.git("add", ".")
+        result = self.commit_with_hooks()
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_real_hook_preserves_unrelated_feature_branch(self):
+        self.install_hooks()
+        self.git("switch", "-qc", "feature/unrelated")
+        (self.repo / "packages/editor.ts").write_text("export const changed = true;\n")
+        self.git("add", ".")
+        result = self.commit_with_hooks("fix: unrelated change")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_hook_checks_final_content_after_formatter(self):
+        self.install_hooks()
+        (self.docs / "new.md").write_text("# 证据\n")
+        self.git("add", ".")
+        (self.root / "bin/npx").write_text(
+            "#!/bin/sh\nprintf 'export const changed = true;\\n' > packages/editor.ts\n"
+            "git add packages/editor.ts\n")
+        result = self.commit_with_hooks()
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("门禁失败", result.stdout + result.stderr)
+
+    def test_hook_rejects_wrong_worktree_and_direct_integration_commit(self):
+        self.install_hooks()
+        (self.docs / "new.md").write_text("# 证据\n")
+        self.git("add", ".")
+        registry = self.root / "v4-module-branch-registry.json"
+        config = json.loads(registry.read_text())
+        config["modules"]["workloads"]["worktree"] = "another-worktree"
+        registry.write_text(json.dumps(config))
+        result = self.commit_with_hooks()
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("Worktree", result.stdout + result.stderr)
+        self.git("branch", "-m", "feature/v4-migration-test")
+        config["integrationBranch"] = "feature/v4-migration-test"
+        registry.write_text(json.dumps(config))
+        result = self.commit_with_hooks()
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("禁止直接提交", result.stdout + result.stderr)
+
+    def test_ci_accepts_valid_dev_and_completed_pr_without_requiring_runner_worktree(self):
+        self.prepare_ci()
+        self.approve_fixture()
+        self.save_state()
+        (self.repo / "packages/editor.ts").write_text("export const changed = true;\n")
+        self.git("add", ".")
+        self.git("commit", "-qm", "开发实现")
+        result = self.ci()
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.state["phase"] = "PR"
+        report = {"status": "已完成", "sourceCommit": self.git("rev-parse", "HEAD"),
+            "documents": self.state["rea"]["documents"]}
+        self.state.update(dev=report, verify=report)
+        self.save_state()
+        self.git("switch", "--detach", "-q")
+        result = self.ci(draft=False)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_ci_rejects_rea_code_renamed_into_docs(self):
+        self.prepare_ci()
+        (self.repo / "packages/editor.ts").write_text("export const changed = true;\n")
+        self.git("add", ".")
+        self.git("commit", "-qm", "先行实现")
+        self.base = self.git("rev-parse", "HEAD")
+        # 删除源码也属于业务变化，不能利用 Git rename 检测藏到记录目录。
+        self.git("mv", "packages/editor.ts", "docs/v4-migration/editor.ts")
+        result = self.ci()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+
+    def test_ci_allows_draft_evidence_at_runner_path(self):
+        self.prepare_ci()
+        # Runner 没有根目录生效文件；CI 只能读取仓库中的版本化注册表。
+        (self.root / "v4-module-branch-registry.json").unlink()
+        result = self.ci()
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("不代表模块验收", result.stdout)
+
+    def test_ci_rejects_full_pr_business_diff_even_if_latest_commit_is_docs(self):
+        self.prepare_ci()
+        (self.repo / "packages/editor.ts").write_text("export const changed = true;\n")
+        self.git("add", ".")
+        self.git("commit", "-qm", "历史先行实现")
+        (self.docs / "new.md").write_text("# 最后一次只改文档\n")
+        result = self.ci()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("REA", result.stderr)
+
+    def test_ci_rejects_ready_pr_without_verify(self):
+        self.prepare_ci()
+        result = self.ci(draft=False)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("PR", result.stderr)
+
+    def test_ci_rejects_wrong_target(self):
+        self.prepare_ci()
+        result = self.ci(base_branch="release-4.1.5")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+
+    def test_records_channel_allows_only_authorized_hook_and_workflow_files(self):
+        for name in (".husky/pre-commit", ".husky/commit-msg", ".github/workflows/v4-module-gate.yml"):
+            path = self.repo / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("# 治理工具修复\n")
+        self.git("add", ".")
+        result = self.invoke("commit", "--records-only")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        (self.repo / ".github/workflows/deploy.yml").write_text("# 未授权工作流\n")
+        self.git("add", ".")
+        self.assert_rejected("commit", "--records-only")
 
 
 if __name__ == "__main__":

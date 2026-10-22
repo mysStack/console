@@ -8,8 +8,10 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-REGISTRY = ROOT / "v4-module-branch-registry.json"
 RECORD = "docs/v4-migration/module-execution.json"
+GOVERNANCE = "docs/v4-migration/governance"
+TOOL_PATHS = {".husky/pre-commit", ".husky/commit-msg",
+              ".github/workflows/v4-module-gate.yml"}
 PHASES = ("REA", "DEV", "VERIFY", "PR")
 DIMENSIONS = ("entry", "fields", "validation", "api", "store", "action",
               "rbac", "scope", "cache", "errors", "runtime", "v4")
@@ -23,7 +25,7 @@ def record_file(repo: Path, name: str) -> Path:
 
 
 def is_record_path(path: str) -> bool:
-    return (path.startswith("docs/v4-migration/") or
+    return (path in TOOL_PATHS or path.startswith("docs/v4-migration/") or
             path == "docs/superpowers/plans/2026-10-21-v3-to-v4-native-migration.md")
 
 
@@ -132,8 +134,9 @@ def check_phase(repo: Path, args, branch: str, head: str) -> tuple[str, str]:
     return phase, "REA 记录结构、覆盖维度与摘要检查通过；不替代内容复核或模块验收"
 
 
-def check_record_changes(repo: Path) -> None:
-    paths = run("git", "diff", "--no-renames", "--name-only", "-z", "HEAD", cwd=repo).split("\0")
+def check_record_changes(repo: Path, base: str = "HEAD", head: str | None = None) -> None:
+    revisions = [base, head] if head else [base]
+    paths = run("git", "diff", "--no-renames", "--name-only", "-z", *revisions, cwd=repo).split("\0")
     for path in filter(None, paths):
         if not is_record_path(path):
             fail(f"REA/记录通道禁止业务或无关改动：{path}")
@@ -164,17 +167,18 @@ def remote_sha(repo: Path, branch: str) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description="KubeSphere V4 模块开发硬门禁")
     parser.add_argument("module")
-    parser.add_argument("stage", choices=("start", "commit", "deploy", "pr"))
+    parser.add_argument("stage", choices=("start", "commit", "deploy", "pr", "message", "ci"))
     parser.add_argument("--tag")
     parser.add_argument("--pr", type=int)
     parser.add_argument("--phase", choices=PHASES, help="业务阶段，必须与模块记录一致")
     parser.add_argument("--records-only", action="store_true", help="仅文档、证据及门禁工具维护，不放行业务开发")
+    parser.add_argument("--hook", action="store_true", help="由 Git 钩子自动识别登记模块")
+    parser.add_argument("--message-file", type=Path)
+    parser.add_argument("--head-branch")
+    parser.add_argument("--base-branch")
+    parser.add_argument("--base", help="PR 目标完整 SHA；CI 不依赖本地 Worktree 路径或凭据")
+    parser.add_argument("--draft", action="store_true")
     args = parser.parse_args()
-
-    config = json.loads(REGISTRY.read_text())
-    module = config["modules"].get(args.module)
-    if not module:
-        fail(f"模块 {args.module!r} 未登记；先更新主计划和注册表")
 
     try:
         repo = Path(run("git", "rev-parse", "--show-toplevel")).resolve()
@@ -183,19 +187,53 @@ def main() -> None:
     except RuntimeError as error:
         fail(str(error))
 
-    expected_repo = (ROOT / module["worktree"]).resolve()
-    expected_branch = module["branch"]
+    workspace = repo.parent if ROOT.name == "governance" else ROOT
+    registry = repo / GOVERNANCE / "v4-module-branch-registry.json" if args.stage == "ci" else workspace / "v4-module-branch-registry.json"
+    config = json.loads(registry.read_text())
     integration = config["integrationBranch"]
+    if args.stage == "ci":
+        branch = args.head_branch or ""
+        if args.base_branch != integration:
+            fail(f"PR 目标必须为 {integration}")
+        if not re.fullmatch(r"[0-9a-f]{40}", args.base or ""):
+            fail("CI 缺少完整 PR Base SHA")
+    if args.module == "auto":
+        if branch in (integration, config["stableBranch"]):
+            fail("禁止直接提交集成分支或稳定分支")
+        registered = [key for key, item in config["modules"].items() if item["branch"] == branch]
+        if not registered:
+            if args.hook and branch and not branch.startswith("feature/v4-"):
+                print("非迁移功能分支，保留原有提交流程")
+                return
+            fail(f"迁移分支 {branch!r} 未登记；先更新主计划和注册表")
+        args.module = registered[0]
+    module = config["modules"].get(args.module)
+    if not module:
+        fail(f"模块 {args.module!r} 未登记；先更新主计划和注册表")
 
-    if repo != expected_repo:
+    expected_repo = (workspace / module["worktree"]).resolve()
+    expected_branch = module["branch"]
+
+    if args.stage != "ci" and repo != expected_repo:
         fail(f"Worktree 错误：当前 {repo}，要求 {expected_repo}")
     if branch != expected_branch:
         fail(f"分支错误：当前 {branch}，要求 {expected_branch}")
     if branch in (integration, config["stableBranch"]):
         fail("禁止在集成分支或稳定分支开发")
 
+    if args.stage == "message":
+        if not args.message_file:
+            fail("缺少提交说明文件")
+        lines = [line.strip() for line in args.message_file.read_text().splitlines()
+                 if line.strip() and not line.lstrip().startswith("#")]
+        title = re.sub(r"^\w+(?:\([^)]*\))?!?:\s*", "", lines[0] if lines else "")
+        if not re.search(r"[\u3400-\u4dbf\u4e00-\u9fff]", title):
+            fail("新提交标题须使用中文；只在 Conventional Commit scope 中写中文不符合要求")
+        print("中文提交标题检查通过")
+        return
+
     try:
-        integration_sha = remote_sha(repo, integration)
+        integration_sha = args.base if args.stage == "ci" else remote_sha(repo, integration)
         ancestor = subprocess.run(
             ["git", "merge-base", "--is-ancestor", integration_sha, head], cwd=repo
         ).returncode
@@ -205,7 +243,7 @@ def main() -> None:
         fail(f"远程集成基线 {integration_sha[:12]} 不是当前分支祖先；先核对分支来源")
 
     tracked_status = run("git", "status", "--porcelain", "--untracked-files=no", cwd=repo)
-    if args.stage in ("start", "deploy", "pr") and tracked_status:
+    if args.stage in ("start", "deploy", "pr", "ci") and tracked_status:
         fail(f"{args.stage} 阶段要求 tracked 工作区干净")
     if args.stage == "commit":
         for extra in ((), ("--cached",)):
@@ -213,9 +251,21 @@ def main() -> None:
             if result.returncode:
                 fail("git diff --check 工作区或暂存区未通过")
 
+    if args.stage == "ci":
+        run("git", "diff", "--check", args.base, head, cwd=repo)
+        paths = run("git", "diff", "--name-only", "--no-renames", "-z", args.base, head, cwd=repo)
+        args.records_only = args.draft and all(is_record_path(path) for path in paths.split("\0") if path)
+        if not args.draft:
+            state = json.loads((repo / RECORD).read_text())
+            if state.get("phase") != "PR":
+                fail("非 Draft PR 必须处于 PR 阶段并完成 DEV/VERIFY")
+
     phase, phase_message = check_phase(repo, args, branch, head)
     if args.stage == "commit" and (phase != "DEV" or args.records_only):
         check_record_changes(repo)
+    # PR/VERIFY 可包含已验证的业务实现；REA/记录通道限制完整 PR 差异。
+    if args.stage == "ci" and (phase == "REA" or args.records_only):
+        check_record_changes(repo, args.base, head)
 
     if args.stage in ("deploy", "pr"):
         branch_remote_sha = remote_sha(repo, expected_branch)
@@ -256,6 +306,8 @@ def main() -> None:
     print("Git/Worktree 身份检查通过")
     print(f"phase={phase}")
     print(f"阶段检查：{phase_message}")
+    if args.stage == "ci":
+        print("PR 阶段与完整差异检查完成，不代表模块验收；Draft 不授权合并")
     print("未自动验证：测试、CI Run、镜像 digest、Pod imageID、浏览器或证据语义真实性")
     print(f"module={args.module}")
     print(f"scope={module['scope']}")

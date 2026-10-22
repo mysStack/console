@@ -38,3 +38,21 @@ python3 docs/v4-migration/governance/scripts/test_v4_module_gate.py
 脚本只能检查结构、版本、路径和记录一致性，不能判断复核人是否真实签署、证据内容是否充分或测试是否真实执行，也无法阻止人绕过 CLI 直接操作。证据语义、实际测试/CI/镜像/Pod/浏览器和项目已有的独立复核要求仍需执行。
 
 当前不需要负责人新增风险豁免或重复审批流程修复。下一项为编辑设置 DS-01/DS-19 的定向 REA：从当前制品确认真实入口、加载模块和 Action 请求，随后逐字段展开，按证据选择 V4 复用/改造；不再从简化表单倒推需求。
+
+## 2026-10-23 执行入口补强
+
+负责人再次授权修复反复偏离文档的问题。执行前 HEAD/远程 Workload 均为 `f5c375f6b9e2b9ae66a4331289c2dbee7bee8bb4`；集成基线为 `3e09afd6a051d4091b3c887462c880eff2ba6754`，PR #2 Open/Draft，目标 `feature/v4-migration`。本地 tracked 干净，已有 `.playwright-cli/` 和 `output/` 保留。首次从非 Git 的根目录运行 start 失败后，已切回登记 Worktree，`workloads start --phase REA` 成功；未绕过门禁编码业务。
+
+根因：原 `pre-commit` 只执行 lint-staged，模块 CLI 依赖主动调用，缺少中文提交标题检查和 PR 阶段工作流。先更新主计划第 3.3 节，明确本次记录通道可改的三个执行入口，再修改工具；不新增开发阶段，不放行 REA。
+
+实际修改：
+
+- `pre-commit` 在 lint-staged 后调用同一门禁，检查最终暂存内容、登记分支/Worktree、阶段和范围。
+- 新增 `commit-msg`；中文必须出现在提交标题正文，技术名称和 Conventional Commit 前缀可保留。已推送英文历史不改写。
+- 新增 PR CI，工具回归与真实阶段检查分为两个 Job。检出实际 Head SHA、完整历史和只读权限；不访问测试环境、不使用部署凭据。
+- CI 用版本化注册表，在 Runner 路径或 detached HEAD 下检查 PR 目标、Base 祖先、完整差异及阶段证据；不只检查最后一次文档提交，不为历史先行实现设置豁免基线。非 Draft 必须完成 DEV/VERIFY 并处于 PR 阶段。
+- 当前 REA 的 PR #2 仍包含历史业务实现，真实阶段检查应拒绝；工具回归通过和 PR 业务门禁通过必须分开报告。保留分支、提交和 Draft，不强推、不自动合并。
+
+测试先行：新增用例首次在旧入口上出现 8 项失败，实际复现 REA 代码/英文标题/未登记迁移分支仍可提交、缺少 CI 模式和未授权工具路径。修复后 32 项回归通过，覆盖真实 Git 提交的拒绝和允许、格式化后越界、错误 Worktree、集成分支直提、普通功能分支兼容、Runner 注册表、完整 PR 差异、非 Draft 跳级和合法 DEV/PR 路径。外部格式化与 Husky 启动依赖采用测试替身；门禁、钩子、Git 提交和本地 bare origin 实际执行。
+
+本批只修复开发流程工具，没有业务界面或路由改动。未执行应用构建、镜像构建、131 部署和浏览器验收；无本批镜像、digest 或 Pod imageID。Deployment 编辑设置仍为 REA/分析中，已有高风险未知项与 `review: null` 保留。GitHub 实际 Run、检查结论和必需检查配置以推送后的远程回读为准，不用本地回归替代。

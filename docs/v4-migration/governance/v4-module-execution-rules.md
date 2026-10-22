@@ -53,7 +53,7 @@ REA 的 `partial/no-match` 不代表整体失败或功能不存在。通过当�
 
 进入 VERIFY 的前置交付记录为 `dev`，进入 PR 的前置记录为 `dev` 和 `verify`：每项包含 `status: 已完成`、完整 `sourceCommit` 及带 SHA-256 的 `documents`。源提交必须是当前分支祖先，其后只允许记录类改动；业务代码变化后必须回到 DEV，更新本地检查并重新完成相应 VERIFY。DEV 文档记录实际测试/构建/诊断，VERIFY 文档记录制品、部署、浏览器、RBAC、作用域、缓存和 V3 对照；未完成项不得填“已完成”。VERIFY/PR 阶段不得夹带新的业务代码提交。
 
-`--records-only` 用于证据整理、状态纠偏或门禁工具修复，只允许 `docs/v4-migration/` 及当前迁移实施计划的改动；治理脚本及其测试以 `docs/v4-migration/governance/` 的版本化快照保存。该通道禁止业务改动、部署及更新非 Draft PR。它不能把阶段标记为通过。
+`--records-only` 用于证据整理、状态纠偏或门禁工具修复，允许 `docs/v4-migration/`、当前迁移实施计划，以及主计划 2026-10-23 授权的三个执行入口 `.husky/pre-commit`、`.husky/commit-msg`、`.github/workflows/v4-module-gate.yml`；其他工作流和业务路径不在此范围。治理脚本及其测试以 `docs/v4-migration/governance/` 的版本化文件保存。该通道禁止业务改动、部署及更新非 Draft PR。它不能把阶段标记为通过。
 
 ## 分支和提交规则
 
@@ -62,6 +62,11 @@ REA 的 `partial/no-match` 不代表整体失败或功能不存在。通过当�
 3. 共享改动优先进入 `resource-framework`。模块内保留共享改动时，必须附调用方、原因、受影响回归和最终归属。
 4. 提交前运行 `v4-module-gate.py <module-id> commit`、相关测试、格式/静态检查和 `git diff --check`。
 5. 不强推、不改写历史、不直接提交 `release-4.1.5` 或 `feature/v4-migration`。
+6. 新提交标题和说明统一使用中文，保留必要技术名称和 Conventional Commit 前缀；`commit-msg` 自动检查标题正文部分包含中文，不能只在 scope 中写中文。已推送的英文历史保留，不擅自 amend 或强推。
+
+Git `pre-commit` 在现有 lint-staged 格式化之后调用版本化门禁，检查最终暂存内容；模块由登记分支自动识别，未登记的迁移分支、错误 Worktree 和不符合阶段的代码提交拒绝。普通非迁移功能分支保持原有流程，稳定/迁移集成分支禁止直接提交。独立工作副本需先正常安装 Husky；本地钩子不是不可绕过的安全边界。
+
+PR CI 检出实际 Head SHA，使用版本化注册表和本地 Git 对象校验目标、祖先关系、完整 PR 差异和阶段。Draft 的记录类 PR 可以持续补证；REA 阶段只要完整 PR 差异含业务代码就应失败，不能只检查最后一次提交。非 Draft 必须具有 PR 阶段及 DEV/VERIFY 证据。工具回归与实际阶段检查分开显示；工具测试通过不代表当前模块通过。CI 的工作目录由 Runner 决定，不套用本地绝对 Worktree 路径。
 
 REA 阶段提交仅允许上述记录路径。DEV/VERIFY/PR 必须有相符的 REA 通过记录、完整覆盖、当前 V3 tree、未变更的证据摘要、无未闭环高风险项及真实复核依据。提交检查工作区和暂存区的 `diff --check`，阶段记录与已绑定证据的暂存内容必须与检查内容一致。
 
