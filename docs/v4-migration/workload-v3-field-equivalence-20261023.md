@@ -97,6 +97,27 @@
 
 ## REA 结论
 
+## 当前已有测试的覆盖边界
+
+本轮在当前 HEAD 上运行了以下既有测试文件，结果为 6 个文件、27 个断言全部通过：
+
+- `packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/Deployments/Detail/native.test.ts`：2/2；
+- `packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/StatefulSets/Detail/native.test.ts`：1/1；
+- `packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/DaemonSets/Detail/native.test.ts`：1/1；
+- `packages/console/src/pages/projects/containers/StatefulSets/index.test.ts`：2/2；
+- `packages/console/src/pages/projects/containers/DaemonSets/index.test.ts`：2/2；
+- `packages/shared/src/stores/workload/index.test.ts`：19/19。
+
+这些测试证明项目级列表/详情没有直接引用 V3 桥接、Store 的部分成功/失败请求行为以及创建作用域保持；它们没有证明：
+
+1. StatefulSet 或 DaemonSet 的“编辑设置”打开原生表单；
+2. 集群级列表没有挂载 Wujie/V3；
+3. DaemonSet 的停止语义正确；
+4. StatefulSet Service、PVC 模板和三类资源高级字段等价；
+5. 当前 SHA 部署后的浏览器、RBAC、缓存和 namespace 隔离行为。
+
+因此，既有测试的绿色结果不能作为 REA 放行或 DEV/VERIFY 通过依据。
+
 本轮补充后，已进一步关闭以下静态定位未知：
 
 - 旧 V3 页面分区和资源差异的具体源码路径；
