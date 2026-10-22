@@ -83,3 +83,19 @@ git show origin/release-3.4:src/pages/projects/containers/DaemonSets/Detail/inde
 ### 本轮结论
 
 本轮关闭了当前 V4 Workload Store/API 的静态定位未知：三类资源的作用域 URL、详情/Watch、PATCH 更新、Background 删除、关联 HPA 和 StatefulSet Service PATCH 均已绑定文件与行号。仍未关闭的内容为：真实 V3/V4 Network 请求、DaemonSet 停止语义、完整字段 payload、RBAC 正反权限、列表/详情缓存失效、错误/取消 UI、跨 namespace 隔离和浏览器渲染。阶段仍为 `REA / 分析中`，不进入 DEV。
+
+## 旧源码字段清单（用于当前 V4 逐项对照）
+
+以下清单来自固定旧源码候选，不表示当前 V4 已实现或已验收；它用于把后续 REA 和测试拆成可核对的字段组。
+
+| 旧源码文件                                                                     | 已定位的能力组                                                                                                                   | 三类资源差异或验证重点                                                                              |
+| ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `src/components/Forms/Workload/BaseInfo/index.jsx`                             | 名称、别名、项目、描述；名称格式、别名格式、名称存在性和联邦项目校验                                                             | 编辑场景中项目不可随意切换；当前 V4 只读 namespace 与旧字段保留语义仍需验证                         |
+| `src/components/Forms/Workload/ContainerSettings/index.jsx`                    | 副本数、配额/LimitRange、容器和初始化容器列表、容器级表单、Pod 安全上下文、终止宽限期、更新策略、元数据                          | StatefulSet 使用 `withService: true`；DaemonSet 不应套用 Deployment 副本数停止假设                  |
+| `src/components/Forms/Workload/ContainerSettings/ContainerForm/index.jsx`      | 端口、镜像拉取策略、健康检查、生命周期、命令/参数、环境变量、SecurityContext、时区                                               | 当前 V4 `ContainerInput` 已覆盖部分字段；全部探针、生命周期、安全上下文、时区和清空语义仍需逐项对照 |
+| `src/components/Forms/Workload/VolumeSettings/index.jsx`                       | PVC、临时卷、HostPath、ConfigMap/Secret 引用、挂载配置、日志配置；StatefulSet 的 `volumeClaimTemplates`                          | STS 的卷模板及卷挂载不能被普通 `spec.volumes` 取代；当前 V4 需要确认来源保留、删除和空值写入        |
+| `src/components/Forms/Workload/AdvanceSettings/index.jsx`                      | 网络模块启用时的 Pod IP 池、节点选择（DaemonSet 排除）、元数据                                                                   | IP 池依赖集群模块；节点选择对 DaemonSet 的旧源码行为是明确差异，需保留为独立用例                    |
+| `src/components/Forms/Workload/ContainerSettings/UpdateStrategy/index.jsx`     | 更新策略选择；Deployment 的 `maxUnavailable/maxSurge`，StatefulSet 的 `partition`，DaemonSet 的 `maxUnavailable/minReadySeconds` | 旧源码存在模块级默认值和类型校验；当前 V4 尚未形成同等表单和 payload 证据                           |
+| `src/components/Forms/Workload/ContainerSettings/TerminationSeconds/index.jsx` | `spec.template.spec.terminationGracePeriodSeconds`，默认值 30                                                                    | 当前 V4 Settings Modal 未提供该字段；需要明确缺失、默认值和保留语义                                 |
+
+当前 V4 `WorkloadSettingsModal.tsx` 只展示名称、namespace、replicas、容器、初始化容器和卷；上表中更新策略、节点选择/IP 池、元数据、Service、终止宽限期、StatefulSet 卷模板、完整容器高级字段尚未进入该 Modal。该差异是已确认的 DEV 入口缺口，不在 REA 阶段直接补代码；需先完成每一组字段的当前制品/旧源码/运行时证据和对应测试设计。
