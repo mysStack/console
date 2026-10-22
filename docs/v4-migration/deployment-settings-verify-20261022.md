@@ -1,5 +1,7 @@
 # Deployment 编辑设置专项 VERIFY（2026-10-22）
 
+> 本文记录的是当前 V4 原生表单在已执行场景下的运行时证据，不等于 V3 编辑设置已经完成等价迁移。编辑设置的 REA 复核结果见[专项 REA 记录](./workload-settings-rea-20261022.md)。在 REA 行为矩阵闭环前，本记录不能单独将该功能标记为已验收。
+
 ## 范围和结论
 
 本轮专项来自负责人询问“编辑设置是否测试过”。此前首轮 Workload 记录覆盖列表、详情页签和删除，没有覆盖编辑设置提交，不能从首轮记录推导该功能通过。本轮只操作 `v4-migration-e2e` 中带 `v4-migration-run=settings-20261022` 标签的专用 Deployment 和 ConfigMap，使用真实浏览器原生表单并回读 Kubernetes API。

@@ -1,5 +1,7 @@
 # Deployment V3 / V4 证据记录
 
+> 本文是历史源码、当前 V4 源码和既有静态盘点的输入材料，不是编辑设置的完整 REA 结论。V3 `useV3action` 记录只能说明旧入口曾存在；必须结合绑定 `v3dist` 制品的 REA、运行时网络/浏览器证据和 RBAC 矩阵后，才能作为 V4 重构依据。编辑设置当前的 REA 状态见[专项记录](./workload-settings-rea-20261022.md)。
+
 > 检查日期：2026-10-16  
 > 仓库：`mysStack/console`  
 > 分支：`feature/v4-migration`  

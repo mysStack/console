@@ -1,5 +1,11 @@
 # Workload 模块任务状态
 
+## 2026-10-22 编辑设置 REA 纠偏
+
+- 已确认此前流程错误：原生 `WorkloadSettingsModal` 在完整 V3 行为矩阵和 REA 证据闭环前就开始实现，不能把已有浏览器场景通过等同于 V3 编辑设置完成。
+- 已对当前 `v3dist` 的相关 bundle 执行定向 REA；分析结果为部分覆盖，仍有动态路径、语义图和运行时未知项。编辑设置状态降回“REA 分析中”，DEV/VERIFY 不得据此关闭缺口。
+- 已保留现有提交、Worktree 和分支，不回写历史，不部署最终 `36ae2216` 制品。详见 [Workload 编辑设置 REA 复核](./workload-settings-rea-20261022.md)。
+
 ## 2026-10-22 Deployment 编辑设置专项
 
 - 负责人：当前 Codex 单会话；分支/Worktree 为登记的 `feature/v4-workloads` / `console-workloads`。
