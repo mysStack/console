@@ -4,6 +4,7 @@
  */
 
 import React, { useRef, useState } from 'react';
+import { useDisclosure } from '@kubed/hooks';
 import { useParams, Link } from 'react-router-dom';
 
 import { Field, notify } from '@kubed/components';
@@ -31,6 +32,7 @@ import { workloadStore } from '@ks-console/shared';
 import WorkloadStatus from '../../../../components/WorkloadStatus';
 import WorkloadBanner from '../../../clusters/components/WorkloadBanner';
 import WorkLoadAvatar from '../../../clusters/components/workloadAvatar';
+import WorkloadCreateModal from '../../components/WorkloadCreateModal';
 
 // types
 import { FormattedWorkload } from '@ks-console/shared';
@@ -45,6 +47,7 @@ const {
   useDeleteDeploymentMutation,
   useBatchDeleteWorkloadMutation,
   useBatchStopDeploymentMutation,
+  useCreateWorkloadMutation,
 } = workloadStore('deployments');
 
 const Deployment = () => {
@@ -52,6 +55,7 @@ const Deployment = () => {
   const authKey = module;
 
   const tableRef = useRef<TableRef<FormattedWorkload>>();
+  const createModal = useDisclosure();
 
   // for table batch action
   const [batchDeleteConfig, setBatchDeleteConfig] = useState<BatchOptConfig<FormattedWorkload>>();
@@ -136,9 +140,18 @@ const Deployment = () => {
     },
   });
 
+  const { mutate: mutateCreate, isLoading: createIsLoading } = useCreateWorkloadMutation({
+    onSuccess: () => {
+      createModal.close();
+      tableRef.current?.refetch();
+      notify.success(t('CREATE_SUCCESSFUL'));
+    },
+  });
+
   // page params
   const params: Record<string, any> = useParams();
   const { cluster, workspace, namespace = '' } = params;
+  const projectPrefix = `/${workspace}/clusters/${cluster}/projects/${namespace}`;
 
   // Table actions
   const renderTableAction = useTableActions({
@@ -153,7 +166,7 @@ const Deployment = () => {
           color: 'secondary',
           shadow: true,
         },
-        onClick: () => {},
+        onClick: createModal.open,
       },
     ],
   });
@@ -272,11 +285,7 @@ const Deployment = () => {
         <Field
           avatar={WorkLoadAvatar(record, WORKLOAD_TYPE)}
           value={
-            <Link
-              to={`/${workspace}/clusters/${cluster}/projects/${namespace}/deployments/${record.name}`}
-            >
-              {getDisplayName(record)}
-            </Link>
+            <Link to={`${projectPrefix}/deployments/${record.name}`}>{getDisplayName(record)}</Link>
           }
           label={getItemDesc(record)}
         />
@@ -405,6 +414,12 @@ const Deployment = () => {
       data: value,
     });
   };
+  const handleCreate = (data: Record<string, any>) => {
+    mutateCreate({
+      params: { cluster, namespace },
+      data,
+    });
+  };
 
   const url = getResourceUrl({ cluster, namespace });
   return (
@@ -429,6 +444,15 @@ const Deployment = () => {
         disableRowSelect={disableRowSelect}
         toolbarRight={renderTableAction()}
       />
+      {createModal.isOpen && (
+        <WorkloadCreateModal
+          visible
+          namespace={namespace}
+          confirmLoading={createIsLoading}
+          onOk={handleCreate}
+          onCancel={createModal.close}
+        />
+      )}
       {batchStopConfig?.visible && (
         <StopModal
           isSubmitting={stopIsLoading}

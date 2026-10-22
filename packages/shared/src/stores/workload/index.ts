@@ -16,6 +16,7 @@ import type {
   DeleteProps,
   DeploymentPatchProps,
   BatchOptProps,
+  CreateWorkloadProps,
 } from './types';
 
 async function settleWorkloadRequests(requests: Promise<unknown>[]) {
@@ -101,7 +102,7 @@ const workloadStore = (module: string) => {
     module,
     mapper,
   });
-  const { getDetailUrl, getPath, patch } = BaseStore;
+  const { getDetailUrl, getPath, patch, post } = BaseStore;
   const { deleteHpa } = hpaStore;
 
   const del = (params: PathParams, k8sVersion?: string) => {
@@ -147,6 +148,12 @@ const workloadStore = (module: string) => {
     const onSuccess = options?.onSuccess;
     return useMutation(({ params, data }: DeploymentPatchProps) => patch(params, data), {
       onSuccess,
+    });
+  };
+
+  const useCreateWorkloadMutation = (options?: SuccessProps) => {
+    return useMutation(({ params, data }: CreateWorkloadProps) => post(params, data), {
+      onSuccess: options?.onSuccess,
     });
   };
 
@@ -291,6 +298,7 @@ const workloadStore = (module: string) => {
     getReplica,
     switchStatus,
     useGetDetail,
+    useCreateWorkloadMutation,
     useUpdateDeploymentMutation,
     useDeleteDeploymentMutation,
     useBatchDeleteWorkloadMutation,
