@@ -1,0 +1,223 @@
+{
+  "sourceRoot": "/home/bruce/code/ks-develop/console-workloads/packages/bootstrap/assets/v3dist",
+  "method": "@babel/parser inert AST; literal webpack Array(base).concat index; no target code executed",
+  "missingModuleIds": [],
+  "records": [
+    {
+      "file": "1.9ca3a76d71946712055c.js",
+      "module": 1122,
+      "sourceSha256": "924556b7889c21dbd450535163cdd63e5a6c92daad2cbdc3ec8514a005d765a3",
+      "utf16Range": [636370, 638287],
+      "byteRange": [636402, 638319],
+      "factorySha256": "f109cf1092c62637ef3f61c0307626a110b34f4692424e49f85923799d8855bc",
+      "analysisFile": "webpack-1122.js",
+      "analysisSha256": "5c9bfbe38a46c26c611e4db42bf5038db2dbac2a667d3bf69cb664d3740c6db4",
+      "wrapper": {
+        "prefix": "(",
+        "suffix": ");\n"
+      },
+      "chars": 1917
+    },
+    {
+      "file": "1.9ca3a76d71946712055c.js",
+      "module": 1216,
+      "sourceSha256": "924556b7889c21dbd450535163cdd63e5a6c92daad2cbdc3ec8514a005d765a3",
+      "utf16Range": [813525, 819978],
+      "byteRange": [813557, 820010],
+      "factorySha256": "fcfcc7c3f8c46858f2fa61a32941bdab7b5acb748b6f24a8d804416be493cbd4",
+      "analysisFile": "webpack-1216.js",
+      "analysisSha256": "36a25d9bd8bc1be40eaeba35d97722fa76298a9cd70399b99bd95b742ca5084a",
+      "wrapper": {
+        "prefix": "(",
+        "suffix": ");\n"
+      },
+      "chars": 6453
+    },
+    {
+      "file": "1.9ca3a76d71946712055c.js",
+      "module": 1221,
+      "sourceSha256": "924556b7889c21dbd450535163cdd63e5a6c92daad2cbdc3ec8514a005d765a3",
+      "utf16Range": [830800, 835605],
+      "byteRange": [830832, 835637],
+      "factorySha256": "a2100dfdd79c8f1df0d08d0957ab82debe55226e1f805624f57aa4251fdcf969",
+      "analysisFile": "webpack-1221.js",
+      "analysisSha256": "949274b30080ed94687e6263775896ccfdece845804502383403701228b1d0ac",
+      "wrapper": {
+        "prefix": "(",
+        "suffix": ");\n"
+      },
+      "chars": 4805
+    },
+    {
+      "file": "1.9ca3a76d71946712055c.js",
+      "module": 1402,
+      "sourceSha256": "924556b7889c21dbd450535163cdd63e5a6c92daad2cbdc3ec8514a005d765a3",
+      "utf16Range": [1084253, 1090851],
+      "byteRange": [1084305, 1090903],
+      "factorySha256": "6fe7d0910a6cb4d1ce9237a793814f32e26112e13c148f9d3db77f962fb9a7ad",
+      "analysisFile": "webpack-1402.js",
+      "analysisSha256": "dfe7ceb3b2467dc6ed871dde832f0b3da72dc38a16768ff39e44b189438a8f33",
+      "wrapper": {
+        "prefix": "(",
+        "suffix": ");\n"
+      },
+      "chars": 6598
+    },
+    {
+      "file": "3.bb6cbee4309e765b70c1.js",
+      "module": 1679,
+      "sourceSha256": "eda50334c9aa4e6755b668612346edec0e559348eb5ca2088ec69a6df1d07391",
+      "utf16Range": [198282, 199521],
+      "byteRange": [198284, 199523],
+      "factorySha256": "c57cdcaa3fd0dc8ae007e64641e0e7f9daf421225165883bd7515d01b2de109a",
+      "analysisFile": "webpack-1679.js",
+      "analysisSha256": "67309029a5b756dd032894e9eef2629462344d11580df4757100778faa503ddc",
+      "wrapper": {
+        "prefix": "(",
+        "suffix": ");\n"
+      },
+      "chars": 1239
+    },
+    {
+      "file": "3.bb6cbee4309e765b70c1.js",
+      "module": 1680,
+      "sourceSha256": "eda50334c9aa4e6755b668612346edec0e559348eb5ca2088ec69a6df1d07391",
+      "utf16Range": [199522, 202194],
+      "byteRange": [199524, 202196],
+      "factorySha256": "ab8851547212358181b3701147ae9af64c5b127339f97a2d4111d015e2d067d2",
+      "analysisFile": "webpack-1680.js",
+      "analysisSha256": "c3c3a25c96b6f6334b3e984354c0c95c9539c29896d24ee55d4cece57b4e68d5",
+      "wrapper": {
+        "prefix": "(",
+        "suffix": ");\n"
+      },
+      "chars": 2672
+    },
+    {
+      "file": "3.bb6cbee4309e765b70c1.js",
+      "module": 1681,
+      "sourceSha256": "eda50334c9aa4e6755b668612346edec0e559348eb5ca2088ec69a6df1d07391",
+      "utf16Range": [202195, 203424],
+      "byteRange": [202197, 203426],
+      "factorySha256": "997bad47ca06d9d7ac464cd0fe6ecb7afcc5cdf8546ae0a80549fea72fbfcb7e",
+      "analysisFile": "webpack-1681.js",
+      "analysisSha256": "6740c773bc1922d01c594c96fbac5a01255a0a4dd4f581c758cadf75786de973",
+      "wrapper": {
+        "prefix": "(",
+        "suffix": ");\n"
+      },
+      "chars": 1229
+    },
+    {
+      "file": "3.bb6cbee4309e765b70c1.js",
+      "module": 1682,
+      "sourceSha256": "eda50334c9aa4e6755b668612346edec0e559348eb5ca2088ec69a6df1d07391",
+      "utf16Range": [203425, 204875],
+      "byteRange": [203427, 204877],
+      "factorySha256": "c65d286eb6457f625f9ac998868ff31f32b97530eff1346d2361a5aae979af2c",
+      "analysisFile": "webpack-1682.js",
+      "analysisSha256": "008dfed383d7c7878450da608001b08ccf81edc62b5657ae844fae0900f43ca5",
+      "wrapper": {
+        "prefix": "(",
+        "suffix": ");\n"
+      },
+      "chars": 1450
+    },
+    {
+      "file": "3.bb6cbee4309e765b70c1.js",
+      "module": 1683,
+      "sourceSha256": "eda50334c9aa4e6755b668612346edec0e559348eb5ca2088ec69a6df1d07391",
+      "utf16Range": [204876, 206194],
+      "byteRange": [204878, 206196],
+      "factorySha256": "3c3b1fbe48911eab531ff19b95f45096f66c2061fe5a432ac26f7822b94e5bc9",
+      "analysisFile": "webpack-1683.js",
+      "analysisSha256": "aedeb2f133d5addaaaf7b4cde5f48d3d5082c5b856d773458dc2796b41cff1ee",
+      "wrapper": {
+        "prefix": "(",
+        "suffix": ");\n"
+      },
+      "chars": 1318
+    },
+    {
+      "file": "3.bb6cbee4309e765b70c1.js",
+      "module": 3595,
+      "sourceSha256": "eda50334c9aa4e6755b668612346edec0e559348eb5ca2088ec69a6df1d07391",
+      "utf16Range": [1877501, 1885209],
+      "byteRange": [1881714, 1889422],
+      "factorySha256": "25b78b5a359f0c917a31bcdea0f5642d759001c36a93ed3429bad8c4ebe0e0d5",
+      "analysisFile": "webpack-3595.js",
+      "analysisSha256": "9e5bb0ea44c4065413a5378066e80dd93454270cf1b7d30930f67fb37b31e68a",
+      "wrapper": {
+        "prefix": "(",
+        "suffix": ");\n"
+      },
+      "chars": 7708
+    },
+    {
+      "file": "3.bb6cbee4309e765b70c1.js",
+      "module": 3601,
+      "sourceSha256": "eda50334c9aa4e6755b668612346edec0e559348eb5ca2088ec69a6df1d07391",
+      "utf16Range": [1896540, 1897870],
+      "byteRange": [1900753, 1902083],
+      "factorySha256": "4262b92a459017eb660e812c987da933bc5428690fb51d0b1c248eb3bc88fa7c",
+      "analysisFile": "webpack-3601.js",
+      "analysisSha256": "6121198d8a61f232b3f23fe873d516d364a3c56582e72e3455c05ba50099edb4",
+      "wrapper": {
+        "prefix": "(",
+        "suffix": ");\n"
+      },
+      "chars": 1330
+    },
+    {
+      "file": "3.bb6cbee4309e765b70c1.js",
+      "module": 3602,
+      "sourceSha256": "eda50334c9aa4e6755b668612346edec0e559348eb5ca2088ec69a6df1d07391",
+      "utf16Range": [1897871, 1899634],
+      "byteRange": [1902084, 1903847],
+      "factorySha256": "ae34fbacb9e53f8a2c80644095c89579baa28299906edd587310c059a5e2b16b",
+      "analysisFile": "webpack-3602.js",
+      "analysisSha256": "7d802ca0a8b662bf9ba1016403876b92fed0be0a82618b4421ad409fd216e113",
+      "wrapper": {
+        "prefix": "(",
+        "suffix": ");\n"
+      },
+      "chars": 1763
+    },
+    {
+      "file": "3.bb6cbee4309e765b70c1.js",
+      "module": 3603,
+      "sourceSha256": "eda50334c9aa4e6755b668612346edec0e559348eb5ca2088ec69a6df1d07391",
+      "utf16Range": [1899635, 1900200],
+      "byteRange": [1903848, 1904413],
+      "factorySha256": "806321b25665deb2a25c779ee356aa99a3e8f7692ea97e96b2b8dab31bd4ed07",
+      "analysisFile": "webpack-3603.js",
+      "analysisSha256": "082e6c400b53e71f438a67eda08ef88598990aef9f98297acb89202c44eec1ad",
+      "wrapper": {
+        "prefix": "(",
+        "suffix": ");\n"
+      },
+      "chars": 565
+    }
+  ],
+  "sourceCommit": "e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0",
+  "v3Tree": "1e499d92e11374e26c76f5e13be45251602bd596",
+  "analysisDirectory": "/tmp/ks-workload-batch-rea-Xlrm3X",
+  "parentEvidenceId": "ev_89e567e2ff36e72e827b17a09891d2400e902abafca83aab123de5e1585b2906",
+  "summaryEvidenceId": "ev_a16a88ff6512c0ecb2757c07515f0bfeae452cdab52f5413faf4c622ad83d141",
+  "portableSessionExport": {
+    "path": "/tmp/ks-workload-batch-rea-Xlrm3X-session.evidence.json",
+    "bytes": 48542292,
+    "sha256": "2df2ae6ea52b1622f78c3e62796d71f15c3634403d3f8e5a3c0debd09e50d118",
+    "scope": "本机临时归档，未提交；可按模块清单从已提交 v3dist 重建静态输入"
+  },
+  "limitations": [
+    "派生工厂未执行，数字模块 ID 仅对本制品有效",
+    "依赖导入未自动解析；完整字段、真实 API、RBAC 和页面尚未验证",
+    "REA 报告 semantic=unknown、2940 semantic unknowns，不能据此认定行为完整"
+  ],
+  "reusedEvidenceError": {
+    "code": "evidence_integrity_mismatch",
+    "category": "integrity_mismatch",
+    "message": "Evidence ev_d3a9f47a248d36f92a2463a9313e1f9a12b169698cb243779137416db93d8ab8 is not retained in this session. Supply complete inline Evidence, re-run its producer, or import its bundle before using this reference."
+  }
+}

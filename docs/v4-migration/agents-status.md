@@ -5,12 +5,14 @@
 - 负责人：当前 Codex 单会话，不使用子 Agent。模块/能力：`workloads / deployment-statefulset-daemonset`；资源：Deployment、StatefulSet、DaemonSet。
 - 分支/Worktree：`feature/v4-workloads` / `console-workloads`；代码输入 `36ae2216167ae27561c05e37e5157df0da322de8`。
 - 当前阶段 `REA`，结论“分析中”。[阶段记录](./module-execution.json)、[组合能力边界](./workload-kind-capability-matrix.md)、[REA 索引](./rea-analysis-summary.md)为当前依据；Deployment 专项矩阵是组合批次的输入之一。
-- 当前任务：将 Deployment、StatefulSet、DaemonSet 作为一个组合开发批次整理 REA；公共实现可以共用，三类资源的差异和验收必须分别记录。不修改业务表单，不部署。已有实现和限定浏览器观察保留为历史输入。
+- 当前任务：三类资源已定位普通编辑入口、Action 处理器和按资源登记的分区；继续展开表单子组件、Store 和运行时差异。公共实现可以共用，三类资源的差异和验收必须分别记录。不修改业务表单，不部署。已有实现和限定浏览器观察保留为历史输入。
 - 待关闭：三类资源的完整 V3 分区/字段、动态 Action/API/Store、RBAC/作用域和错误/缓存行为。尚无正式 REA 复核签署，不自动进入 DEV。
 - 当前模块的流程文件修复涉及所有后续模块：根目录主计划/规则/门禁脚本原位更新，版本化快照位于 `governance/`；不改公共业务组件。其他模块初始化阶段记录后才能继续，不继承 Workload 的状态。
 - 2026-10-23：在原门禁基础上接入真实 Git pre-commit、中文 commit-msg 和 PR CI。隔离 Git 回归由 18 项增至 32 项，通过；初次新增用例复现 8 项失败。工具测试通过不表示业务阶段放行，PR #2 的完整差异仍需接受阶段检查；部署和浏览器未执行。详见[修复记录补充](./module-process-repair-20261022.md#2026-10-23-执行入口补强)。
 - 工具代码提交 `da38cb87e` 已推送；[Run 39812232782](https://github.com/mysStack/console/actions/runs/39812232782) 的 32 项工具回归成功，阶段检查拒绝 REA 中的历史业务差异，总结果为 failure。`feature/v4-migration` 已配置这两个必需检查并对管理员生效。真实证据见[验证记录](./governance/module-gate-verification-20261023.json)；不改变当前模块 REA 状态。
 - 2026-10-23：确认 Deployment、StatefulSet、DaemonSet 放入同一 Workload 组合批次；共享实现不等于共享验收，三类资源必须分别完成 REA 证据和 VERIFY 场景。详见[组合能力边界](./workload-kind-capability-matrix.md)。
+
+- 本轮实际取证：普通详情工厂 1216/1221/1402、Action 3595、Modal/分区 3601/3602；确认 STS/DS 原生“编辑设置”当前仍调用 YAML。13 个派生工厂已执行 REA；解析成功不表示语义完整，字段/API/RBAC/运行时维度保持未完成。证据和下一项见[组合矩阵](./workload-kind-capability-matrix.md)。文档调整提交 `e67b95ccd` 的 [Run 39818401407](https://github.com/mysStack/console/actions/runs/39818401407) 工具回归 32 项成功，阶段检查因 REA 完整 PR 差异含历史业务代码而失败；不放行 PR。
 
 ## 2026-10-22 编辑设置 REA 纠偏
 

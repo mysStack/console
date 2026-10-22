@@ -7,7 +7,7 @@
   "phase": "REA",
   "rea": {
     "status": "分析中",
-    "sourceCommit": "87df0e024ea93333a2352fc92907007b86f5e33b",
+    "sourceCommit": "e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0",
     "artifactTree": "1e499d92e11374e26c76f5e13be45251602bd596",
     "documents": [
       {
@@ -20,11 +20,19 @@
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
-        "sha256": "13f285ac7ef68c12daedb9a3e6f0b12caf85ac70cbce51f2c81e5d4bd44040b4"
+        "sha256": "c2af985d15d94088b577474b863e8735ca0c035c9691ac4ad246f9e0844a9bc4"
       },
       {
         "path": "docs/v4-migration/workload-kind-capability-matrix.md",
-        "sha256": "54a1ef300869bfb859ca0debd2d873b6f4cb176e47d8987798509564c0bb8dcf"
+        "sha256": "426a4111fa17e7ed434ebc0fadd44bb1e2dc318fb4e741003d38ce2fd72400ac"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-edit-factories-20261023-provenance.json",
+        "sha256": "651bce8aaa6ec3d0c01221b8c01704f3d16ca3fcae04c105fdd38731b91e6b8d"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-edit-factories-20261023-summary.json",
+        "sha256": "a23555b4f9f15e09c2d7e37df055a71a3c40749881da63785b2e1b9493ff904d"
       }
     ],
     "coverage": {

@@ -52,3 +52,39 @@ Deployment 详细候选字段和行为见[编辑设置能力矩阵](./deployment
 - StatefulSet、DaemonSet 的独立 V3 入口、字段、Action/API/Store 和资源差异矩阵尚未形成。
 - 三类资源的完整 RBAC、作用域、缓存、错误/取消和真实部署后浏览器证据尚未闭环。
 - 本文不授权业务代码修改、部署或把历史 VERIFY 记录改成当前通过；下一步仍为组合 REA 取证。
+
+## 2026-10-23 定向制品证据：普通资源编辑入口与分区
+
+输入提交 `e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0`；V3 tree 未变。通过惰性 AST 定位当前编译制品的 Webpack 工厂，提取 13 个工厂供 REA 静态分析，未执行制品。数字模块 ID 只用于本制品定位，不视为跨版本标识或原始源码。
+
+[偏移及摘要清单](./evidence/workload-edit-factories-20261023-provenance.json)记录原 bundle SHA-256、UTF-16/UTF-8 字节范围、工厂摘要和括号包装规则；[REA 原始摘要](./evidence/workload-edit-factories-20261023-summary.json)保留完整限制。父 Evidence：`ev_89e567e2ff36e72e827b17a09891d2400e902abafca83aab123de5e1585b2906`。13 个 JavaScript 文件均解析成功，无解析失败；此派生输入的 application=complete 只表示选定输入已遍历，semantic=unknown、2940 semantic unknowns，不代表 Workload 行为完整。
+
+### 普通与联邦入口必须区分
+
+此前重点 bundle `8.efefc7072f02199ebc47.js` 中的相关候选主要调用 `federated.workload.template.edit`，不能单独证明普通项目编辑设置。普通三类资源的当前详情入口实际位于 `1.9ca3a76d71946712055c.js`：
+
+| 资源        | 工厂及 UTF-16 范围（左闭右开） | 静态可见调用                                                                                                                  | V4 对照及未闭环项                                                                                            |
+| ----------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Deployment  | `1216`，`[813525, 819978)`     | `workload.template.edit`，传 detail、match.params、success、rootStore、supportGpuSelect=true；另有回滚、HPA、YAML、重启、删除 | V4 详情已开原生设置 Modal，但完整分区和字段未等价                                                            |
+| DaemonSet   | `1221`，`[830800, 835605)`     | 同名编辑 Action，另有回滚、YAML、重启、删除                                                                                   | V4 `DaemonSets/Detail/index.tsx` 的 editConfigTemplate 仍调用 editYaml，与独立设置入口不等价                 |
+| StatefulSet | `1402`，`[1084253, 1090851)`   | 同名编辑 Action，另有回滚、HPA、`workload.service.edit`、YAML、重启、删除                                                     | V4 `StatefulSets/Detail/index.tsx` 的 editConfigTemplate 仍调用 editYaml；Service 编辑还需核对请求及错误路径 |
+
+上述 Action 名称仅说明当前工厂内存在调用，不证明每种账号、集群、项目均可见或执行成功。路由字符串同时涉及 workspace 项目、cluster 和 EdgeWize 分支，仍须结合实际启用范围验证。
+
+### 当前制品明确登记的编辑分区
+
+`3.bb6cbee4309e765b70c1.js` 中 `3595 → 3601 → 3602` 分别是 Action 处理器、设置 Modal、按资源选表单的配置；详见摘要清单中的范围。`3601` 取 `forms[module]` 并过滤 disabled 条目，`3602` 登记以下分区：
+
+| 资源        | 分区顺序（编译制品中的名称）                                                       | 差异                                                                               |
+| ----------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Deployment  | updateStrategy → podTemplate → volumeSettings → deploymentMode → podMode → ippools | 编辑入口传 supportGpuSelect=true；实际 GPU 字段尚未展开                            |
+| StatefulSet | updateStrategy → podTemplate → podMode → volumeSettings → deploymentMode → ippools | Action 传 hideVolumeSetting=true；不能据此推断整个卷分区隐藏，须追踪子组件及运行时 |
+| DaemonSet   | updateStrategy → podTemplate → volumeSettings → podMode → ippools                  | 该表没有 deploymentMode 分区；不能据此推断全部调度字段不存在                       |
+
+ippools 的 disabled 条件为 `!globals.app.hasKSModule("network")`，不是无条件展示。podMode 标题是 POD_GRACE_PERIOD；卷、容器、更新策略、调度和宽限期分别继续委托 `1682/1680/1681/1679/1683` 等组件，其下层字段与校验仍需展开，不能只依据分区名实现。
+
+Action `3595` 从 `detail._originData` 取编辑对象，保存时处理 `spec.template.spec.customMode` 后执行 `store.update(detail, data)`；Promise 成功后关闭 Modal 并调用 success。实际 HTTP 方法、payload 转换、错误传播、权限及缓存刷新仍需追踪 Store 和浏览器，不能从此调用推定已验证。`1122` 共享 Modal 进一步委托 `2925` 表单容器，字段、校验和取消行为尚未闭环。
+
+### 本轮结论和下一项
+
+已补齐普通三类资源的静态编辑入口、Action 处理器和分区登记定位，并确认 V4 的 STS/DS 编辑设置仍误用 YAML。尚未完成字段、校验、Store/API、RBAC、真实页面与请求的逐项核对；覆盖维度保持“未完成”，不签署 REA 或 VERIFY 通过。下一项沿已定位的表单子组件和 Store 做定向展开，再用真实 V3 页面/Network 校准，不重复全量 REA，不依据旧 release-3.4 直接编码。
