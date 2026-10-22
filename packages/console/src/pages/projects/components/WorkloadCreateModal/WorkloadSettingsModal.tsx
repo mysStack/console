@@ -88,7 +88,18 @@ export default function WorkloadSettingsModal({
     >
       <Form form={form} initialValues={initialValues}>
         {!!saveError && (
-          <div role="alert" style={{ color: '#ca2621', marginBottom: 16 }}>
+          <div
+            role="alert"
+            style={{
+              position: 'sticky',
+              top: 0,
+              zIndex: 1,
+              background: '#fff',
+              color: '#ca2621',
+              padding: 12,
+              marginBottom: 16,
+            }}
+          >
             {t(
               (saveError as { response?: { status?: number } }).response?.status === 409
                 ? 'WORKLOAD_SETTINGS_CONFLICT'
