@@ -13,6 +13,7 @@ import { Pen, TimedTask, Restart, Firewall, Trash, Storage } from '@kubed/icons'
 import {
   RecreateModal,
   workloadStore,
+  useWebSocket,
   hpaStore,
   DetailPagee,
   getDisplayName,
@@ -56,6 +57,14 @@ const DeploymentDetail = () => {
     cluster,
     name,
     namespace,
+  });
+
+  useWebSocket({
+    module,
+    url: store.getWatchListUrl({ cluster, namespace }),
+    params: { fieldSelector: `metadata.name=${name}` },
+    enabled: Boolean(cluster && namespace && name) && !isError,
+    onMessage: () => refetch(),
   });
 
   const [sharedDetail, setDetailProps] = useStore('DeploymentDetailProps', {

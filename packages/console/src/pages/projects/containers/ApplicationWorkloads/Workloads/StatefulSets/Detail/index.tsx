@@ -14,6 +14,7 @@ import {
   RecreateModal,
   DeleteConfirmModal,
   workloadStore,
+  useWebSocket,
   DetailPagee,
   getDisplayName,
   formatTime,
@@ -65,6 +66,14 @@ const StatefulSetsDetail = () => {
     cluster,
     name,
     namespace,
+  });
+
+  useWebSocket({
+    module,
+    url: store.getWatchListUrl({ cluster, namespace }),
+    params: { fieldSelector: `metadata.name=${name}` },
+    enabled: Boolean(cluster && namespace && name) && !isError,
+    onMessage: () => refetch(),
   });
   const [sharedDetail, setDetailProps] = useStore('StatefulSetDetailProps', {
     module,
