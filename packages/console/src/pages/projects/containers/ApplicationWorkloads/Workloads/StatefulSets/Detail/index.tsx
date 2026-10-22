@@ -73,7 +73,8 @@ const StatefulSetsDetail = () => {
     url: store.getWatchListUrl({ cluster, namespace }),
     params: { fieldSelector: `metadata.name=${name}` },
     enabled: Boolean(cluster && namespace && name) && !isError,
-    onMessage: () => refetch(),
+    onAdded: () => refetch(),
+    onModified: () => refetch(),
   });
   const [sharedDetail, setDetailProps] = useStore('StatefulSetDetailProps', {
     module,
