@@ -162,6 +162,13 @@
 - 第二批多个工作容器、初始化容器、普通环境变量和端口已由源码 `2a2aeb4f4` 完成本地 259 项回归、CI Run `39726084825`、131 rollout 和浏览器 25 项检查，见[容器设置记录](../../v4-migration/deployment-containers-131-verify-20261022.md)。页面布局和跨组旧校验提示按浏览器失败证据修复；共享 ArrayInput 额外补测原生服务端口编辑。
 - 测试工作负载使用 `replicas: 0`；下一独立任务补齐容器命令/参数并验证实际运行，然后继续配置引用、探针、资源、存储等原始向导差异。上述限定结果不勾选完整 RBAC、跨作用域或全部动作验收，不自动进入下一模块。
 
+## 2026-10-22 独立 Workload 分支归集
+
+- `feature/v4-workloads` 已从远程 `feature/v4-migration` 的 `3e09afd6a` 创建，专用 Worktree 为 `/home/bruce/code/ks-develop/console-workloads`。
+- 原混合分支的 Workload 代码已按功能逐项迁入到 `2168cbdb2` 至 `58ec1bb01`，没有整体合并 ConfigMap/Secret 分支，也没有迁入无关 P0、应用或扩展改动。
+- 启动命令/参数代码已归集；历史 ConfigMap 分支上的测试和 131 制品只作为输入。当前必须在独立分支重新执行完整本地回归、构建、镜像、rollout 和 Playwright，完成后才可勾选 Task 5、Task 6 和 Task 7。
+- `ArrayInput` 为本批唯一公共组件改动，限定用于正确保留显式空数组并允许删除最后一行，已补组件回归；独立 PR 必须显式标明调用方和受影响范围。
+
 ## 后续模块执行规则
 
 - 每个模块都必须先建立“V3 源码 + 当前制品 REA + 131 运行时”的行为矩阵，再进入代码修改。
