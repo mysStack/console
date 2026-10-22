@@ -9,7 +9,7 @@ import {
   FormItem,
   Input,
   Modal,
-  NumberInput,
+  InputNumber,
   Select,
   Textarea,
   useForm,
@@ -80,7 +80,7 @@ function WorkloadCreateModal({
           <Textarea maxLength={256} />
         </FormItem>
         <FormItem name="replicas" label={t('REPLICAS')} rules={[{ required: true }]}>
-          <NumberInput integer min={0} max={Infinity} />
+          <InputNumber min={0} precision={0} />
         </FormItem>
 
         <h3>{t('POD_SETTINGS')}</h3>
