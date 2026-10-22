@@ -66,6 +66,28 @@ Network 记录显示该列表使用带完整作用域的请求并返回 200：
 
 本轮页面加载时控制台仍出现已知扩展初始化错误，包括 `getExtensionConsoleV3Embed is not a function`，以及其他扩展的 `ConfigConstants` 错误。它们来自已安装扩展资源，不属于本轮 Workload 业务代码；本记录保留现象，不将其作为 Workload 通过依据，也不把它自动改成 Workload 缺陷结论。
 
+## 2026-10-23 集群级入口和旧 V3 设置复核
+
+本轮使用已存在的 131 浏览器登录会话进行只读页面观察，没有创建、编辑、删除或伸缩资源。浏览器会话显示为 `admin / platform-admin`；该会话只用于 REA 取证，不能替代低权限 UI 验证。
+
+部署身份经 Kubernetes 只读回读为：`ks-console` 使用镜像 tag `feature-v4-workloads-20261022-215739-27aaeced74e8`，digest 为 `sha256:919492fedf5eae6ee27fca84bb490897e557659ae79860b9e3f035e59c5f9179`，Pod Ready 且 imageID 与该 digest 一致。该镜像不是当前分支 `f2541f16c1040f70773c6e5fb744e984d21e1c4e`，所以以下结果只属于当前已部署旧 SHA 的 REA 输入，不属于当前分支 VERIFY。
+
+集群级路由复核结果：
+
+- 直达 `/clusters/host/workloads` 后重定向到 `/clusters/host/deployments`，页面显示原生 Workload 列表和 Deployment、StatefulSet、DaemonSet 三个入口。
+- `/clusters/host/deployments`、`/clusters/host/statefulsets`、`/clusters/host/daemonsets` 三个列表都能渲染对应资源类型，并分别请求 `GET /clusters/host/kapis/resources.kubesphere.io/v1alpha3/deployments`、`statefulsets`、`daemonsets`。
+- 三类列表的资源名称和项目链接仍指向 `/consolev3/clusters/host/projects/...`；页面加载过程中还实际请求 `/consolev3/dashboard` 和 `/dist/v3dist/*`。因此当前集群级页面是“V4 原生列表壳 + V3 详情/依赖”，不能作为全量移除 V3/Wujie 的证据。
+
+旧 V3 详情和“编辑设置”页面复核结果：
+
+| 资源        | 旧 V3 设置分区/字段观察                                                                                                                       | 详情请求                                                                                            |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Deployment  | `更新策略`、`容器`、`存储`、`容器组调度规则`、`容器组优雅终止`；更新策略可见 `最大不可用容器组数量` 和 `最大多余容器组数量`，当前值均为 `25%` | `GET /clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-watch-20261022-02`      |
+| StatefulSet | `更新策略`、`容器`、`容器组优雅终止`、`存储`、`容器组调度规则`；更新策略可见 `容器组副本分组序号`，当前值为 `0`；详情另有 `编辑服务`          | `GET /clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01` |
+| DaemonSet   | `更新策略`、`容器组`、`存储`、`容器组优雅终止`；更新策略可见 `最大不可用容器组数量` 和 `容器组就绪最短运行时长（s）`，当前值为 `1` 和 `0`     | `GET /clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/daemonsets/v4-watch-ds-20261022-01`    |
+
+这批页面证据把三类资源的资源特有分区和默认值从“旧源码候选”提升为“旧 V3 页面已观察”；仍未证明保存时的完整 Payload、字段转换、RBAC、错误/取消和缓存行为。当前 V4 代码的 StatefulSet、DaemonSet 编辑设置仍进入 YAML，与上述旧 V3 原生设置分区形成已确认的 DEV 差异。浏览器原始 snapshot/console 输出保留在本地 `.playwright-cli/`，未加入 Git。
+
 ## 低权限 API 矩阵
 
 本轮在 `v4-migration-e2e` 中创建了专用 viewer 用户 `v4-workload-viewer-20261023`，并只绑定该 namespace 的 `viewer` 项目角色。使用 Kubernetes `auth can-i` 做非破坏性授权核对，未输出该用户密码：

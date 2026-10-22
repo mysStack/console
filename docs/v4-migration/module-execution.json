@@ -44,7 +44,7 @@
       },
       {
         "path": "docs/v4-migration/workload-runtime-rea-20261023.md",
-        "sha256": "f321c16e274dafc71a87f11a7c1cfcd2b8c6a3a79dca2b803384caaaf41fddc6"
+        "sha256": "d7b5b7e41ee61c6f1949df1ca92d12a17df59c3dc51a4f9f30bdca834d23d99b"
       },
       {
         "path": "docs/v4-migration/workload-v3-field-equivalence-20261023.md",
@@ -56,7 +56,7 @@
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "fb39f4ba7a54f3c37161953681cb245ca841410be6b9a8fa94e7728491704826"
+        "sha256": "5adcb37cceea8b4b7d5feb1f6eda26345e35b70c683c932ae22ce2e4b26116e5"
       }
     ],
     "coverage": {
