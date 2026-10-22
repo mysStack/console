@@ -24,4 +24,6 @@ test('project Deployment list opens the native create form and submits through t
   assert.match(source, /useCreateWorkloadMutation/);
   assert.match(source, /onClick:\s*createModal\.open/);
   assert.match(source, /params:\s*\{\s*cluster,\s*namespace\s*\}/);
+  assert.match(source, /onError:/);
+  assert.match(source, /notify\.error\(t\('CREATE_DEPLOYMENT_FAILED'\)\)/);
 });

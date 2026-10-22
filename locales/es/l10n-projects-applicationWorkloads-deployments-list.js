@@ -10,6 +10,9 @@ module.exports = {
   WORKLOAD_EMPTY_DESC:
     'La carga de trabajo suele ser el operador real para acceder a los servicios y también es el operador real para las aplicaciones del sistema, como la recopilación y supervisión de registros de nodos. Workload es también un modelo abstracto para un grupo de Pods.',
   // List > Create > Basic Information
+  CREATE_DEPLOYMENT: 'Crear deployment',
+  CREATE_DEPLOYMENT_FAILED: 'No se pudo crear el deployment.',
+  REPLICAS: 'Réplicas',
   // List > Create > Pod Settings
   // List > Create > Pod Settings > Add Container > Container Settings
   INVALID_IMAGE: 'Imagen inválida.',

@@ -10,6 +10,9 @@ module.exports = {
   WORKLOAD_EMPTY_DESC:
     '工作負載 (Workload) 通常是訪問服務的實際載體, 也是對節點紀錄收集、監控等系統應用的實際運行載體，是對一組容器組 (Pod) 的抽象模型。',
   // List > Create > Basic Information
+  CREATE_DEPLOYMENT: '建立部署',
+  CREATE_DEPLOYMENT_FAILED: '建立部署失敗。',
+  REPLICAS: '副本數量',
   // List > Create > Pod Settings
   // List > Create > Pod Settings > Add Container > Container Settings
   INVALID_IMAGE: '鏡像無效。',
