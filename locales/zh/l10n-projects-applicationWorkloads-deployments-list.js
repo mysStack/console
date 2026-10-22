@@ -12,6 +12,9 @@ module.exports = {
   WORKLOAD_ENV_DUPLICATE: '同一容器的环境变量名称不能重复。',
   WORKLOAD_PORT_INVALID: '请填写合法端口（1–65535）、协议和端口名称（可选，最长 15 个字符）。',
   WORKLOAD_PORT_DUPLICATE: '容器端口名称在整个容器组中不能重复。',
+  STARTUP_COMMAND: '启动命令',
+  COMMAND: '命令',
+  PARAMETERS: '参数',
 
   // Banner
   // List

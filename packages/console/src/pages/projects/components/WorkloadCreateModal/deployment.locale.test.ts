@@ -9,21 +9,33 @@ const expected = {
     CREATE_DEPLOYMENT: 'Create Deployment',
     CREATE_DEPLOYMENT_FAILED: 'Failed to create Deployment.',
     REPLICAS: 'Replicas',
+    STARTUP_COMMAND: 'Start Command',
+    COMMAND: 'Command',
+    PARAMETERS: 'Parameters',
   },
   es: {
     CREATE_DEPLOYMENT: 'Crear deployment',
     CREATE_DEPLOYMENT_FAILED: 'No se pudo crear el deployment.',
     REPLICAS: 'Réplicas',
+    STARTUP_COMMAND: 'Comando de inicio',
+    COMMAND: 'Comando',
+    PARAMETERS: 'Parámetros',
   },
   tc: {
     CREATE_DEPLOYMENT: '建立部署',
     CREATE_DEPLOYMENT_FAILED: '建立部署失敗。',
     REPLICAS: '副本數量',
+    STARTUP_COMMAND: '啟動命令',
+    COMMAND: '命令',
+    PARAMETERS: '參數',
   },
   zh: {
     CREATE_DEPLOYMENT: '创建部署',
     CREATE_DEPLOYMENT_FAILED: '创建部署失败。',
     REPLICAS: '副本数量',
+    STARTUP_COMMAND: '启动命令',
+    COMMAND: '命令',
+    PARAMETERS: '参数',
   },
 };
 
@@ -36,5 +48,8 @@ test('Deployment 创建表单在所有内置语言中提供本地化标题和副
     assert.equal(locale.CREATE_DEPLOYMENT, values.CREATE_DEPLOYMENT, language);
     assert.equal(locale.CREATE_DEPLOYMENT_FAILED, values.CREATE_DEPLOYMENT_FAILED, language);
     assert.equal(locale.REPLICAS, values.REPLICAS, language);
+    assert.equal(locale.STARTUP_COMMAND, values.STARTUP_COMMAND, language);
+    assert.equal(locale.COMMAND, values.COMMAND, language);
+    assert.equal(locale.PARAMETERS, values.PARAMETERS, language);
   }
 });

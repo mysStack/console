@@ -13,6 +13,9 @@ module.exports = {
   WORKLOAD_PORT_INVALID:
     'Enter a valid port (1–65535), protocol and optional port name (up to 15 characters).',
   WORKLOAD_PORT_DUPLICATE: 'Port names must be unique across the Pod.',
+  STARTUP_COMMAND: 'Start Command',
+  COMMAND: 'Command',
+  PARAMETERS: 'Parameters',
 
   // Banner
   // List

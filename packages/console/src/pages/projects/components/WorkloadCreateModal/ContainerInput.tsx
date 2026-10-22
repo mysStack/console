@@ -19,6 +19,14 @@ const ContainerField = styled.label`
   }
 `;
 
+function parseCommaSeparated(value: string): string[] {
+  return value ? value.split(',') : [];
+}
+
+function stringifyCommaSeparated(value: string[] = []): string {
+  return value.join(',');
+}
+
 function PortInput({
   value = {},
   onChange,
@@ -140,6 +148,29 @@ export default function ContainerInput({
           onChange={imagePullPolicy => update({ imagePullPolicy })}
         />
       </ContainerField>
+      <div role="group" aria-label={t('STARTUP_COMMAND')}>
+        <h4>{t('STARTUP_COMMAND')}</h4>
+        <ContainerField>
+          <span>{t('COMMAND')}</span>
+          <Input
+            style={{ width: '100%', maxWidth: 'none' }}
+            aria-label={t('COMMAND')}
+            value={stringifyCommaSeparated(value.command)}
+            placeholder="/bin/sh"
+            onChange={event => update({ command: parseCommaSeparated(event.target.value) })}
+          />
+        </ContainerField>
+        <ContainerField>
+          <span>{t('PARAMETERS')}</span>
+          <Input
+            style={{ width: '100%', maxWidth: 'none' }}
+            aria-label={t('PARAMETERS')}
+            value={stringifyCommaSeparated(value.args)}
+            placeholder="-c,sleep 3600"
+            onChange={event => update({ args: parseCommaSeparated(event.target.value) })}
+          />
+        </ContainerField>
+      </div>
       <div role="group" aria-label={t('PORT_SETTINGS')}>
         <h4>{t('PORT_SETTINGS')}</h4>
         <ArrayInput
