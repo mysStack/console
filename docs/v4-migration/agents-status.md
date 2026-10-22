@@ -1,6 +1,18 @@
 # P0 风险与模块任务状态
 
-## 2026-10-22 当前独立任务：Workload 错误反馈
+## 2026-10-22 本轮最终结果：Workload 操作子路径通过
+
+- 负责人：当前 Codex 主会话；分支：`feature/v4-configmaps-secrets`；无子 Agent，四个既有 Worktree 保留。
+- 独立提交：`b08d3421e` 传播删除/批量操作错误；`b329aae26` 修正项目权限和行 cluster；`7961eaedce6626e33b17a2b3399c41ce772e6206` 修正成功刷新及状态原因。首次部署发现缺陷后继续修复，没有以本地测试替代环境验收。
+- 本地与 CI：仓库 72 个文件、246 项通过；最终包构建通过；ESLint 0 错误、3 条已有警告，Prettier/diff 检查通过。shared 类型检查通过；Console 全量类型检查失败，1320 项既有诊断与前次一致，改动列表无诊断；不宣称整体质量门禁通过。
+- 最终 CI：[39711771206](https://github.com/mysStack/console/actions/runs/39711771206)，源码与镜像 SHA 一致；镜像 `ghcr.io/mysstack/ks-console:feature-v4-configmaps-secrets-20261022-103154-7961eaedce66`，OCI index digest 和 Pod imageID digest 均为 `sha256:cd358cb4d3f422d04091133dd7cd6d83e0cf1a290d842b41e7e67ed6780087fa`。
+- 131：Deployment `563/563`、单副本 Ready，Pod `ks-console-7d46dc6d7c-pfvlh` Running/Ready、0 重启。真实重新登录及 Playwright 24 个检查点通过；首次确认按钮定位失败记录保留，修正后完整重跑。
+- 已验证：三类列表/刷新/原生详情链接、行/批量控件、删除取消、合成 403/双对象 500/网络失败；六个真实删除和两个真实停止均为 200，API 回读及无需手动刷新的列表更新通过。部分成功和 HPA 失败仅有单元证据，低权限拒绝不以合成错误代验。
+- 清理：六个专用控制器及其 Pod 均不存在；namespace 保留。页面异常类型与基线相同，`common is not defined` 仍存在，未出现新增类型。
+- 详细命令、制品身份、截图及执行脚本哈希见[操作验收记录](./workload-actions-131-verify-20261022.md)。生成物留在本地，不加入 Git；记录提交只含文档，不重新生成镜像。
+- 未完成：创建向导、完整动作/RBAC/作用域等价、DaemonSet 停止边界、Console 历史类型诊断及全局 P0 风险。下一项优先推进 Deployment 原生创建，保留完整 V3 表单行为；模块仍为开发中。PR #1 继续 Draft、不合并，稳定分支不修改，不自动进入下一资源模块部署。
+
+## 2026-10-22 初始任务记录：Workload 错误反馈（历史快照）
 
 - 负责人：当前 Codex 主会话；执行模式：单会话顺序执行；分支：`feature/v4-configmaps-secrets`，起始 SHA `412358f5f0424801688c99ea4340fb83dda197b5`。四个既有 Worktree 保留，稳定分支未修改。
 - 已核验：远程分支与起始 SHA 一致；PR #1 仍为 Open/Draft，目标 `feature/v4-migration`，133 个变更文件；GitHub 返回的提交数组上限为 100，不将其误写为 PR 总提交数。

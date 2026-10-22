@@ -6,7 +6,7 @@
 
 **Architecture:** 先把 V3 源码中的页面、Action、Store、API、RBAC、作用域、缓存和错误行为整理成模块行为基线，再复用当前 `packages/core`、`packages/console`、`packages/shared` 中的 React、React Router、React Query、Store、ListPage、DataTable 和 Kubed UI 实现 V4 原生模块。每个模块独立完成 `REA → DEV → VERIFY → PR`，全局 P0 风险继续记录但不统一阻塞已具备模块依据的核心模块。
 
-**Tech Stack:** React、TypeScript、React Router、React Query、Kubed UI、Kubernetes API、Jest/仓库测试脚本、Playwright、Docker/GitHub Actions、131 K3s 测试环境。
+**Tech Stack:** React、TypeScript、React Router、React Query、Kubed UI、Kubernetes API、node:test/esno/仓库测试脚本、Playwright、Docker/GitHub Actions、131 K3s 测试环境。
 
 **Spec:** `../console-v4-migration-plan.md`、`docs/v4-migration/matrix.md`、`docs/v4-migration/rea-analysis-summary.md`。
 
@@ -48,6 +48,8 @@
 
 ## 第一批执行：Workload 列表原生化
 
+以下保留最初任务拆分及完整验收要求；当前实现与部署进展以本文 2026-10-22 补充及其链接的操作验收记录为准。未关闭的创建、RBAC、作用域和完整动作不能因已有列表代码而勾选通过。
+
 第一批目标是项目级 Deployment、StatefulSet、DaemonSet 列表。详情页已存在 V4 原生实现，但当前三个列表入口仍使用 `ConsoleV3ResourceList`，因此先关闭这个真实的核心 V3 运行时缺口。
 
 ### Task 1：建立 Workload 行为基线
@@ -77,7 +79,7 @@
 
 - [ ] 测试源文件必须断言项目 Deployment 列表使用 `DataTable`、`workloadStore('deployments')`、当前路由 `namespace` 和原生详情链接。
 - [ ] 测试源文件必须断言项目 Deployment 列表不再包含 `ConsoleV3ResourceList`、`wujieUrlPrefix`、`WujieReact` 或 `consolev3`。
-- [ ] 运行 `corepack yarn jest packages/console/src/pages/projects/containers/Deployments/index.test.ts --runInBand`。
+- [ ] 运行 `./node_modules/.bin/esno packages/console/src/pages/projects/containers/Deployments/index.test.ts`。
 - [ ] 在生产代码未修改时确认测试因旧 V3 实现而失败，并保留失败原因作为 RED 证据。
 
 ### Task 3：实现项目 Deployment 原生列表
@@ -93,7 +95,7 @@
 - [ ] 复用 V4 `workloadStore`、`mapper`、`DataTable`、`WorkloadStatus`、`EditBaseInfoModal`、`EditYamlModal`、`RecreateModal`、`DeleteConfirmModal` 和现有权限动作。
 - [ ] 项目列表不显示跨 namespace 选择器；列表链接必须保留 workspace、cluster、namespace 和 Deployment 名称。
 - [ ] 成功、失败和取消回调必须刷新当前表格或保持对象未改变；不能用旧 V3 Action 代发请求。
-- [ ] 运行同一个 Jest 命令确认测试 GREEN，再运行受影响的现有 Workload/Detail 测试。
+- [ ] 运行同一个测试命令确认测试 GREEN，再运行受影响的现有 Workload/Detail 测试。
 
 ### Task 4：迁移 StatefulSet 和 DaemonSet 项目列表
 
@@ -112,7 +114,7 @@
 
 ### Task 5：第一批本地质量验证
 
-- [ ] 执行 `corepack yarn jest packages/console/src/pages/projects/containers/Deployments/index.test.ts packages/console/src/pages/projects/containers/StatefulSets/index.test.ts packages/console/src/pages/projects/containers/DaemonSets/index.test.ts --runInBand`。
+- [ ] 执行 `./scripts/test.sh`（包含三类列表、页面作用域及共享 Store 回归）。
 - [ ] 执行 `./scripts/test.sh`，记录文件数、测试数和失败分类。
 - [ ] 执行 `corepack yarn build:packages`。
 - [ ] 执行变更范围相关的 ESLint/Prettier/TypeScript 检查和 `git diff --check`。
@@ -134,6 +136,13 @@
 - [ ] 创建一个描述实际行为变化的提交，例如 `feat: migrate project workload lists to native v4`。
 - [ ] 推送当前功能分支，不强推、不改写历史、不自动合并 Draft PR #1。
 - [ ] 提交后回读 Git SHA、远程分支、PR 状态和 131 部署身份，并在 `agents-status.md` 写入独立结果。
+
+## 2026-10-22 当前批次补充
+
+- 第一批列表实现基线为 `412358f5f`。部署后发现的操作可见性、状态原因占位及成功刷新问题按独立提交修复，不将列表切换直接视为验收。
+- 当前修复提交为 `b08d3421e`（失败反馈）、`b329aae26`（项目作用域）、`7961eaedc`（列表刷新及状态原因）。具体本地、CI 和 131 证据见[项目 Workload 操作验证记录](../../v4-migration/workload-actions-131-verify-20261022.md)。
+- 已核验当前测试入口：`scripts/test.sh` 逐文件使用 esno 执行 node:test；原计划中的 Jest 命令不适用于这些现有用例，已修正。源文件关键词测试只保留为已有结构约束，新缺陷使用实际函数行为测试和部署后浏览器证据。
+- 原生创建向导、DaemonSet 操作边界、全部动作等价、低权限组合及完整作用域隔离仍需继续；当前不进入下一资源模块，也不自动部署下一模块。
 
 ## 后续模块执行规则
 
