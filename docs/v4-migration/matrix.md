@@ -5,7 +5,7 @@
 > 迁移集成分支：`feature/v4-migration`
 >
 > 基线：`release-4.1.5` / `fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`
-> Workload 业务代码输入 SHA：`feature/v4-workloads` / `36ae2216167ae27561c05e37e5157df0da322de8`；当前记录 HEAD 为 `09725c83a811b474e471f8788b803a3a02637339`。当前阶段为 `REA`、状态为“分析中，待负责人复核”；部分原生运行时证据仅作历史输入。唯一当前状态见 [module-execution.json](./module-execution.json)，细节见 [REA 索引](./rea-analysis-summary.md)、[REA 复核结论](./workload-rea-review-20261023.md)、[字段级对照](./workload-v3-field-equivalence-20261023.md)、[Store/API 取证](./workload-settings-source-evidence-20261024.md)和[测试设计](./workload-test-design-20261023.md)。
+> Workload 业务代码输入 SHA：`feature/v4-workloads` / `36ae2216167ae27561c05e37e5157df0da322de8`；本轮 REA 复核记录提交为 `e020ef85186c04deacff893878453dde997a0d12`。当前阶段为 `REA`、状态为“分析中，待负责人复核”；部分原生运行时证据仅作历史输入。唯一当前状态见 [module-execution.json](./module-execution.json)，细节见 [REA 索引](./rea-analysis-summary.md)、[REA 复核结论](./workload-rea-review-20261023.md)、[字段级对照](./workload-v3-field-equivalence-20261023.md)、[Store/API 取证](./workload-settings-source-evidence-20261024.md)和[测试设计](./workload-test-design-20261023.md)。
 
 > 2026-10-23 执行入口补强：接入 Git 阶段检查、中文提交标题和 PR 全量差异检查；32 项隔离 Git 回归通过。此结果仅覆盖工具，不改变下表的功能状态，不代表 Deployment 编辑设置或其他模块已验收。
 
