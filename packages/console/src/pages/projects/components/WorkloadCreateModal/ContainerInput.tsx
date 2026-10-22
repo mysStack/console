@@ -4,9 +4,20 @@
  */
 
 import React from 'react';
+import styled from 'styled-components';
 import { Input, InputNumber, Select } from '@kubed/components';
 import { ArrayInput } from '@ks-console/shared';
 import { ContainerCreateValues, ContainerPortValues, EnvironmentValues } from './deployment';
+
+const ContainerField = styled.label`
+  display: block;
+  margin-bottom: 12px;
+
+  & > span:first-child {
+    display: block;
+    margin-bottom: 4px;
+  }
+`;
 
 function PortInput({
   value = {},
@@ -18,12 +29,14 @@ function PortInput({
   return (
     <div style={{ display: 'flex', gap: 8, width: '100%' }}>
       <Input
+        style={{ flex: '1 1 0', minWidth: 0 }}
         aria-label={t('NAME')}
         placeholder={t('NAME')}
         value={value.name || ''}
         onChange={event => onChange?.({ ...value, name: event.target.value })}
       />
       <InputNumber
+        style={{ width: 120, flex: '0 0 120px' }}
         aria-label={t('CONTAINER_PORT')}
         placeholder={t('CONTAINER_PORT')}
         min={1}
@@ -39,6 +52,7 @@ function PortInput({
         }
       />
       <Select
+        style={{ width: 120, flex: '0 0 120px' }}
         aria-label={t('PROTOCOL')}
         value={value.protocol || 'TCP'}
         options={['TCP', 'UDP', 'SCTP'].map(protocol => ({ label: protocol, value: protocol }))}
@@ -92,27 +106,30 @@ export default function ContainerInput({
       <h4>
         {t(kind)} {index + 1}
       </h4>
-      <label>
-        {t('CONTAINER_NAME')}
+      <ContainerField>
+        <span>{t('CONTAINER_NAME')}</span>
         <Input
+          style={{ width: '100%', maxWidth: 'none' }}
           aria-label={t('CONTAINER_NAME')}
           value={value.name || ''}
           maxLength={63}
           onChange={event => update({ name: event.target.value })}
         />
-      </label>
-      <label>
-        {t('CONTAINER_IMAGE')}
+      </ContainerField>
+      <ContainerField>
+        <span>{t('CONTAINER_IMAGE')}</span>
         <Input
+          style={{ width: '100%', maxWidth: 'none' }}
           aria-label={t('CONTAINER_IMAGE')}
           value={value.image || ''}
           placeholder="nginx:alpine"
           onChange={event => update({ image: event.target.value })}
         />
-      </label>
-      <label>
-        {t('IMAGE_PULL_POLICY')}
+      </ContainerField>
+      <ContainerField>
+        <span>{t('IMAGE_PULL_POLICY')}</span>
         <Select
+          style={{ width: '100%' }}
           aria-label={t('IMAGE_PULL_POLICY')}
           value={value.imagePullPolicy || 'IfNotPresent'}
           options={[
@@ -122,7 +139,7 @@ export default function ContainerInput({
           ]}
           onChange={imagePullPolicy => update({ imagePullPolicy })}
         />
-      </label>
+      </ContainerField>
       <div role="group" aria-label={t('PORT_SETTINGS')}>
         <h4>{t('PORT_SETTINGS')}</h4>
         <ArrayInput
