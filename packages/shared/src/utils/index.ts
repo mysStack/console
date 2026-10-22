@@ -36,6 +36,7 @@ export * from './apps';
 export * from './time';
 export * from './globals';
 export * from './getApiVersion';
+export * from './hpaLookup';
 export * as pages from './pages';
 export * from './caches';
 export * from './licenses';
