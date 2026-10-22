@@ -3,12 +3,19 @@
  * https://github.com/kubesphere/console/blob/master/LICENSE
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { isEmpty, sortBy } from 'lodash';
 import { Alert, Card, TypeSelect, Tag, Loading } from '@kubed/components';
 import { DiffViewer } from '@kubed/diff-viewer';
 
-import { Icon, useRevisionStore, formatTime, getCurrentRevision, yaml } from '@ks-console/shared';
+import {
+  Icon,
+  useRevisionStore,
+  formatTime,
+  getCurrentRevision,
+  getWorkloadRevisionLookupKey,
+  yaml,
+} from '@ks-console/shared';
 import { useCacheStore as useStore } from '@ks-console/shared';
 import Text from '../Text';
 import { YamlHeader, DiffWrapper } from './styles';
@@ -23,26 +30,46 @@ const RevisionControl = ({ detailPropsName }: IProps) => {
   const [selectRevision, setSelectRevision] = useState<Number>(0);
 
   const { list, fetchList } = useRevisionStore({ module: module });
+  const revisionLookupKey = getWorkloadRevisionLookupKey(module, detail);
+  const detailRef = useRef(detail);
+  const fetchListRef = useRef(fetchList);
+  detailRef.current = detail;
+  fetchListRef.current = fetchList;
 
   const getCurRevision = ({ revisions }: { revisions: any }) => {
     return getCurrentRevision({ workloadDetail: detail, revisions, module: module });
   };
 
-  const fetchData = async () => {
-    if (isEmpty(detail)) {
-      return;
+  useEffect(() => {
+    if (!revisionLookupKey) {
+      return undefined;
     }
 
-    const revisions = await fetchList(
-      detail as { name: string; cluster: string; namespace: string; selector: string },
-    );
+    let active = true;
+    const workload = detailRef.current as {
+      name: string;
+      cluster: string;
+      namespace: string;
+      selector: string;
+    };
 
-    setSelectRevision(getCurRevision({ revisions }));
-  };
+    fetchListRef
+      .current(workload)
+      .then(revisions => {
+        if (active) {
+          setSelectRevision(getCurrentRevision({ workloadDetail: workload, revisions, module }));
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setSelectRevision(0);
+        }
+      });
 
-  useEffect(() => {
-    fetchData();
-  }, [detail]);
+    return () => {
+      active = false;
+    };
+  }, [module, revisionLookupKey]);
 
   const getRevisions = ({ revisions }: { revisions: any }) => {
     const curRevision = getCurRevision({ revisions });

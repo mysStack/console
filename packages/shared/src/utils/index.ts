@@ -37,6 +37,7 @@ export * from './time';
 export * from './globals';
 export * from './getApiVersion';
 export * from './hpaLookup';
+export * from './workloadRevision';
 export * as pages from './pages';
 export * from './caches';
 export * from './licenses';
