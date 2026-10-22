@@ -6,14 +6,16 @@
 
 当前 `feature/v4-workloads` 中的 `WorkloadSettingsModal` 是 V4 原生 React 表单，运行时不再通过 V3 iframe/Wujie 打开；但该实现形成时，编辑设置的 V3 行为、完整字段、动态 Action、请求 payload、作用域、RBAC、校验和错误路径尚未由 REA 逐项闭环。因此它只能作为尚未验收的阶段性实现，不能标记为完成，也不能作为完整 V3 等价实现。
 
-当前模块状态：`REA 分析中，DEV/VERIFY 不得据此关闭编辑设置缺口`。
+当前能力状态：`REA / 分析中`，以 [module-execution.json](./module-execution.json) 为唯一当前记录；[REA 索引](./rea-analysis-summary.md)和[分区/字段能力清单](./deployment-settings-capability-matrix.md)提供对应说明。现有 DEV/VERIFY 输入不得据此关闭编辑设置缺口。
+
+REA 的 `partial/no-match` 不要求重做整个模块或恢复所有原始源码；须逐项判断它对当前能力的影响，用 Bundle 定位、合法旧源码参考和真实 V3 运行时证据互相校准后即可推进。
 
 ## 分析对象和证据
 
 | 项目                | 内容                                                                                                                                                  |
 | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 当前分支            | `feature/v4-workloads`                                                                                                                                |
-| 当前 HEAD           | `36ae2216167ae27561c05e37e5157df0da322de8`                                                                                                            |
+| 分析输入 HEAD       | `36ae2216167ae27561c05e37e5157df0da322de8`                                                                                                            |
 | 旧制品目录          | `packages/bootstrap/assets/v3dist`                                                                                                                    |
 | 重点 V3 bundle      | `8.efefc7072f02199ebc47.js`，SHA-256 `4dee3cff0872f24fe4405b76df383e723272bb67af8419988e4fdd91e11daea5`                                               |
 | 重点字面量          | `EDIT_SETTINGS`、`editConfigTemplate`                                                                                                                 |

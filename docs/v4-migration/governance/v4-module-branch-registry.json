@@ -1,0 +1,66 @@
+{
+  "integrationBranch": "feature/v4-migration",
+  "stableBranch": "release-4.1.5",
+  "modules": {
+    "resource-framework": {
+      "branch": "feature/v4-resource-framework",
+      "worktree": "console-resource-framework",
+      "scope": "公共作用域、RBAC、缓存、Store、列表/详情、路由和共享组件底座"
+    },
+    "config-resources": {
+      "branch": "feature/v4-configmaps-secrets",
+      "worktree": "console",
+      "scope": "ConfigMap、Secret、ServiceAccount；保留已有历史分组"
+    },
+    "workloads": {
+      "branch": "feature/v4-workloads",
+      "worktree": "console-workloads",
+      "scope": "Deployment、StatefulSet、DaemonSet、Pod、Job、CronJob"
+    },
+    "storage-network": {
+      "branch": "feature/v4-storage-network",
+      "worktree": "console-storage-network",
+      "scope": "Service、Ingress、PVC、PV、StorageClass、快照和网络资源"
+    },
+    "workspace": {
+      "branch": "feature/v4-workspace",
+      "worktree": "console-workspace",
+      "scope": "Workspace 页面、资源、成员、权限及设置"
+    },
+    "applications": {
+      "branch": "feature/v4-applications",
+      "worktree": "console-applications",
+      "scope": "应用模板、应用部署、应用仓库和 ConfigReference 复杂核心流程"
+    },
+    "devops": {
+      "branch": "feature/v4-devops",
+      "worktree": "console-devops",
+      "scope": "DevOps 后置插件对接"
+    },
+    "federation": {
+      "branch": "feature/v4-federation",
+      "worktree": "console-federation",
+      "scope": "KubeFed 与联邦项目后置对接"
+    },
+    "edge": {
+      "branch": "feature/v4-edge",
+      "worktree": "console-edge",
+      "scope": "KubeEdge 后置对接"
+    },
+    "notification": {
+      "branch": "feature/v4-notification",
+      "worktree": "console-notification",
+      "scope": "Notification 后置对接"
+    },
+    "extension": {
+      "branch": "feature/v4-extension",
+      "worktree": "console-extension",
+      "scope": "扩展中心和扩展运行时后置对接"
+    },
+    "cleanup": {
+      "branch": "feature/v4-cleanup",
+      "worktree": "console-v4-cleanup",
+      "scope": "全模块验收后移除 V3/Wujie、清理构建并准备发布候选"
+    }
+  }
+}

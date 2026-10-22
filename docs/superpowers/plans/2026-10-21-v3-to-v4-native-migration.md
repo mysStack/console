@@ -1,6 +1,7 @@
 # KubeSphere Console V3 → V4 原生化迁移实施计划
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> 执行模式：单 Codex 会话顺序执行，不创建子 Agent。本文为实施清单，主计划和模块规则优先。
+> 当前 Workload 能力为 Deployment 编辑设置，阶段 `REA`、状态“分析中”，见 [阶段记录](../../v4-migration/module-execution.json)。以下历史任务与限定 VERIFY 不等于当前能力已放行。
 
 **Goal:** 以现有 V3 源码、当前 `v3dist`、REA 证据和 131 浏览器证据为行为基线，逐模块把 KubeSphere Console 重构为 V4 原生实现，最终移除所有实际启用功能对 V3/Wujie 的运行时依赖。
 
@@ -33,11 +34,11 @@
 /home/bruce/code/ks-develop/scripts/v4-module-gate.py workloads start
 ```
 
-提交前执行 `workloads commit`，部署前执行 `workloads deploy --tag <tag>`，创建或更新 PR 前执行 `workloads pr --pr <编号>`。任一门禁失败都先纠正工作区、分支、基线、远程同步或 PR 目标，不继续编码。其他模块不得复用本 Worktree；须根据注册表建立其自身分支和 Worktree。
+业务阶段由 `module-execution.json` 决定。REA 仅允许取证和记录，不允许业务编码或部署；文档与工具维护使用 `--records-only`。先展开当前能力清单，再在 REA 依据闭环且按现有规范复核后进入 DEV。提交前执行 `workloads commit`，部署前执行 `workloads deploy --tag <tag>`，创建或更新 PR 前执行 `workloads pr --pr <编号>`。任一门禁失败都先纠正工作区、分支、基线、远程同步或 PR 目标，不继续编码。其他模块不得复用本 Worktree；须根据注册表建立其自身分支和 Worktree。
 
 ## 行为基线与证据规则
 
-1. `origin/release-3.4` 的 V3 源码用于还原页面结构、Action、Store、API 和已知业务流程；不能假定它与当前 `v3dist` 完全相同。
+1. `origin/release-3.4` 的 V3 源码仅用于结构和历史行为参考；不能单独据此确定当前界面或表单字段。必须用当前 `v3dist` 的 REA 和真实 V3 页面/Network/API 校准差异，不假定旧源码与当前制品一致。
 2. 当前 `packages/bootstrap/assets/v3dist` 用 REA 做制品差异和入口定位；当前已形成摘要证据 `ev_fcff357b62b59dde503f98837df84bb87e06ba6db2a48c7616ec1bda2ac6c9c8`，其语义图存在截断，不能单独作为完整行为结论。
 3. 131 的真实浏览器、Network、Kubernetes API 和部署回读用于确认当前真正启用的路由、请求、权限和错误行为。
 4. 每个模块的行为矩阵必须逐项记录：路由、列表、详情、创建、编辑、YAML、批量操作、删除、事件、历史、配置引用、缓存刷新、返回/刷新、错误/取消、RBAC、namespace 隔离、V3 对照和 V4 文件。

@@ -1,0 +1,125 @@
+{
+  "module": "workloads",
+  "branch": "feature/v4-workloads",
+  "capability": "deployment-settings",
+  "phase": "REA",
+  "rea": {
+    "status": "分析中",
+    "sourceCommit": "87df0e024ea93333a2352fc92907007b86f5e33b",
+    "artifactTree": "1e499d92e11374e26c76f5e13be45251602bd596",
+    "documents": [
+      {
+        "path": "docs/v4-migration/workload-settings-rea-20261022.md",
+        "sha256": "a535aaf34d7bc0a7b639443c814d1d560c3545a2b3f3eecae719cfab1cf35d60"
+      },
+      {
+        "path": "docs/v4-migration/deployment-settings-capability-matrix.md",
+        "sha256": "3a36bc7730e09c5e90232c0fc7a61b01c62d1b65e27e0a36e3a6b361ba5393c5"
+      },
+      {
+        "path": "docs/v4-migration/rea-analysis-summary.md",
+        "sha256": "ea0d7abd4293ec7a704d508ce250bf1592ae878bd5da6c6f184cb44a202731a6"
+      }
+    ],
+    "coverage": {
+      "entry": {
+        "status": "未完成",
+        "evidence": [
+          "docs/v4-migration/workload-settings-rea-20261022.md",
+          "docs/v4-migration/deployment-settings-capability-matrix.md"
+        ]
+      },
+      "fields": {
+        "status": "未完成",
+        "evidence": [
+          "docs/v4-migration/workload-settings-rea-20261022.md",
+          "docs/v4-migration/deployment-settings-capability-matrix.md"
+        ]
+      },
+      "validation": {
+        "status": "未完成",
+        "evidence": [
+          "docs/v4-migration/workload-settings-rea-20261022.md",
+          "docs/v4-migration/deployment-settings-capability-matrix.md"
+        ]
+      },
+      "api": {
+        "status": "未完成",
+        "evidence": [
+          "docs/v4-migration/workload-settings-rea-20261022.md",
+          "docs/v4-migration/deployment-settings-capability-matrix.md"
+        ]
+      },
+      "store": {
+        "status": "未完成",
+        "evidence": [
+          "docs/v4-migration/workload-settings-rea-20261022.md",
+          "docs/v4-migration/deployment-settings-capability-matrix.md"
+        ]
+      },
+      "action": {
+        "status": "未完成",
+        "evidence": [
+          "docs/v4-migration/workload-settings-rea-20261022.md",
+          "docs/v4-migration/deployment-settings-capability-matrix.md"
+        ]
+      },
+      "rbac": {
+        "status": "未完成",
+        "evidence": [
+          "docs/v4-migration/workload-settings-rea-20261022.md",
+          "docs/v4-migration/deployment-settings-capability-matrix.md"
+        ]
+      },
+      "scope": {
+        "status": "未完成",
+        "evidence": [
+          "docs/v4-migration/workload-settings-rea-20261022.md",
+          "docs/v4-migration/deployment-settings-capability-matrix.md"
+        ]
+      },
+      "cache": {
+        "status": "未完成",
+        "evidence": [
+          "docs/v4-migration/workload-settings-rea-20261022.md",
+          "docs/v4-migration/deployment-settings-capability-matrix.md"
+        ]
+      },
+      "errors": {
+        "status": "未完成",
+        "evidence": [
+          "docs/v4-migration/workload-settings-rea-20261022.md",
+          "docs/v4-migration/deployment-settings-capability-matrix.md"
+        ]
+      },
+      "runtime": {
+        "status": "未完成",
+        "evidence": [
+          "docs/v4-migration/workload-settings-rea-20261022.md",
+          "docs/v4-migration/deployment-settings-capability-matrix.md"
+        ]
+      },
+      "v4": {
+        "status": "未完成",
+        "evidence": [
+          "docs/v4-migration/workload-settings-rea-20261022.md",
+          "docs/v4-migration/deployment-settings-capability-matrix.md"
+        ]
+      }
+    },
+    "highRiskUnknowns": [
+      "DS-01 当前 V3 编辑入口/页面分区未闭环",
+      "DS-03～18 完整字段、默认值、校验及写入/清空/保留语义未闭环",
+      "DS-19～22 Action/API/Store、RBAC/作用域、缓存和错误行为未闭环"
+    ],
+    "review": null
+  },
+  "dev": {
+    "status": "未完成",
+    "reason": "已有简化表单是先行实现，不作为当前能力 DEV 放行"
+  },
+  "verify": {
+    "status": "未完成",
+    "reason": "旧镜像有限场景证据保留，不能继承为当前能力完整等价通过"
+  }
+}
