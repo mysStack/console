@@ -96,6 +96,7 @@ function WorkloadCreateModal({
         <FormItem
           name="containers"
           label={t('CONTAINERS')}
+          dependencies={['initContainers']}
           rules={[{ validator: containersValidator }]}
         >
           <ArrayInput
@@ -109,6 +110,7 @@ function WorkloadCreateModal({
         <FormItem
           name="initContainers"
           label={t('INIT_CONTAINER')}
+          dependencies={['containers']}
           rules={[{ validator: containersValidator }]}
         >
           <ArrayInput
