@@ -40,6 +40,6 @@ Deployment、StatefulSet、DaemonSet 共用一个模块分支和组合能力记�
 
 2026-10-23 UI 分区复核：只读遍历旧 V3 Deployment、StatefulSet、DaemonSet 设置弹窗的所有已挂载分区，确认更新策略、容器/容器组、普通卷、调度和终止分区的资源差异；结果见[结构化快照](./evidence/workload-settings-ui-20261023.json)。同时补齐当前 V4 Store/API/Action 静态矩阵，明确 DaemonSet 停止误用 `spec.replicas=0`、StatefulSet Service/PVC 模板及缓存失效仍待 DEV/VERIFY 处理。当前 REA 仍为“分析中”，未写入复核签署。
 
-2026-10-23 REA 材料复核结论见[Workload 组合批次 REA 复核结论](./workload-rea-review-20261023.md)：当前 REA 不通过，继续保持“分析中，待负责人复核”。本次把配置引用的 V3 Action/Wujie 依赖和集群级 Workload 列表的 Wujie/V3 主入口从“未知”校准为已确认实现缺口，同时保留字段、RBAC、作用域、缓存、错误和三类资源逐项等价的未闭环状态；不进入 DEV。
+2026-10-23 REA 材料复核结论见[Workload 组合批次 REA 复核结论](./workload-rea-review-20261023.md)：当前材料不足以放行，继续保持“分析中，待负责人复核”。本次把配置引用的 V3 Action/Wujie 依赖和集群级 Workload 列表的 Wujie/V3 主入口从“未知”校准为已确认实现缺口，同时保留字段、RBAC、作用域、缓存、错误和三类资源逐项等价的未闭环状态；不进入 DEV。
 
 同时纠正集群列表判定：活跃入口是 V4 Banner/Tab + Wujie 内 V3 列表；独立 STS/DS Embed 文件的 URL 互换没有在该主入口复现。REA 证据应明确当前行为与拟开发行为；当前 SHA 的最终构建部署验收属于 VERIFY，不作为 REA 完成前的循环前置条件。当前完整 REA 仍未闭环。
