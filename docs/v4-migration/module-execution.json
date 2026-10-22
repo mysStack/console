@@ -56,7 +56,7 @@
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "4961b69b6ff4786a2e32143faa1795bee92fc4f084d2266bb0417f63e70db160"
+        "sha256": "fb39f4ba7a54f3c37161953681cb245ca841410be6b9a8fa94e7728491704826"
       }
     ],
     "coverage": {

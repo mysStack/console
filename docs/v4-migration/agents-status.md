@@ -7,12 +7,13 @@
 - 当前阶段 `REA`，结论“分析中”。[阶段记录](./module-execution.json)、[组合能力边界](./workload-kind-capability-matrix.md)、[REA 索引](./rea-analysis-summary.md)为当前依据；Deployment 专项矩阵是组合批次的输入之一。
 - 当前任务：三类资源已定位普通编辑入口、Action 处理器和按资源登记的分区；继续展开表单子组件、Store 和运行时差异。公共实现可以共用，三类资源的差异和验收必须分别记录。不修改业务表单，不部署。已有实现和限定浏览器观察保留为历史输入。
 - 已关闭的定向未知：旧源码四个设置分区、StatefulSet Service 差异、Deployment HPA 差异，以及当前制品的普通入口和 Action 定位。待关闭：三类资源完整字段/校验、动态 Action/API/Store、RBAC/作用域和错误/缓存行为。尚无正式 REA 复核签署，不自动进入 DEV。
-- 当前 HEAD：`9667d99c339df16040bbadbe82d86506d72cbd6d`。本轮新增确认：集群级三类入口仍挂载 Wujie/V3，StatefulSet/DaemonSet Embed URL 互换；联邦 Deployment/StatefulSet 仍为 Wujie/V3，联邦 DaemonSet 范围未确认；普通 Workload 配置引用仍调用 `useV3action` 并绑定 V3 DOM。上述内容已列为明确缺口或高风险，不把它们当作“没有功能”。
+- 当前 HEAD：`24e87aec244ef265ef14fc3201603e42a1233978`。本轮新增确认：集群级三类入口仍挂载 Wujie/V3，StatefulSet/DaemonSet Embed URL 互换；联邦 Deployment/StatefulSet 仍为 Wujie/V3，联邦 DaemonSet 范围未确认；普通 Workload 配置引用仍调用 `useV3action` 并绑定 V3 DOM。上述内容已列为明确缺口或高风险，不把它们当作“没有功能”。
 - 当前既有回归中，项目级详情/列表、Workload Store 和 ConfigReference 的 9 个测试文件共 62 个断言通过；其中 ConfigReference 的 35 个断言验证的是当前 V3/Wujie 桥接、Shadow DOM 锚点和原生 Patch 协作行为，不能被解释为已移除 V3 Action。整体测试只覆盖静态入口和部分请求错误传播，不覆盖集群桥接移除、配置引用 V3 Action 移除、三类资源高级字段或当前 SHA 部署后的浏览器行为。
 - 当前 DEV 前置仍未满足：StatefulSet/DaemonSet 原生设置、DaemonSet 停止语义、StatefulSet Service/PVC 模板、完整字段保留/清空、集群级作用域和配置引用桥接均未闭环。对应测试设计已加入 `WL-MV-09`、`WL-MV-10`，不修改业务代码。
 - 当前模块的流程文件修复涉及所有后续模块：根目录主计划/规则/门禁脚本原位更新，版本化快照位于 `governance/`；不改公共业务组件。其他模块初始化阶段记录后才能继续，不继承 Workload 的状态。
 - 2026-10-23：在原门禁基础上接入真实 Git pre-commit、中文 commit-msg 和 PR CI。隔离 Git 回归由 18 项增至 32 项，通过；初次新增用例复现 8 项失败。工具测试通过不表示业务阶段放行，PR #2 的完整差异仍需接受阶段检查；部署和浏览器未执行。详见[修复记录补充](./module-process-repair-20261022.md#2026-10-23-执行入口补强)。
 - 工具代码提交 `da38cb87e` 已推送；[Run 39812232782](https://github.com/mysStack/console/actions/runs/39812232782) 的 32 项工具回归成功，阶段检查拒绝 REA 中的历史业务差异，总结果为 failure。`feature/v4-migration` 已配置这两个必需检查并对管理员生效。真实证据见[验证记录](./governance/module-gate-verification-20261023.json)；不改变当前模块 REA 状态。
+- PR #2 当前 Head `24e87aec244ef265ef14fc3201603e42a1233978` 的 [Run 39855770994](https://github.com/mysStack/console/actions/runs/39855770994) 中，“门禁工具回归”成功，“模块阶段与 PR 范围”失败。失败原因为 REA/记录通道禁止业务或无关改动，首先命中 `locales/en/l10n-projects-applicationWorkloads-deployments-list.js`；完整差异还包含 Workload 业务代码。该结果证明 PR 当前不能作为 REA 记录提交，不执行历史改写或强推。
 - 2026-10-23：确认 Deployment、StatefulSet、DaemonSet 放入同一 Workload 组合批次；共享实现不等于共享验收，三类资源必须分别完成 REA 证据和 VERIFY 场景。详见[组合能力边界](./workload-kind-capability-matrix.md)。
 
 - 本轮实际取证：普通详情工厂 1216/1221/1402、Action 3595、Modal/分区 3601/3602；确认 STS/DS 原生“编辑设置”当前仍调用 YAML。13 个派生工厂已执行 REA；解析成功不表示语义完整，字段/API/RBAC/运行时维度保持未完成。证据和下一项见[组合矩阵](./workload-kind-capability-matrix.md)。文档调整提交 `e67b95ccd` 的 [Run 39818401407](https://github.com/mysStack/console/actions/runs/39818401407) 工具回归 32 项成功，阶段检查因 REA 完整 PR 差异含历史业务代码而失败；不放行 PR。
@@ -21,6 +22,13 @@
 - 2026-10-23：完成 Workload Store/API 的定向静态取证，绑定三类资源的作用域 URL、Deployment 原生设置 PUT、其他 PATCH、Background 删除、关联 HPA 和 StatefulSet Service PATCH；同时确认当前代码没有统一的 mutation 后 React Query 失效机制，DaemonSet 停止语义与旧源码不同，必须进入后续独立验证。详见[Store/API 取证](./workload-settings-source-evidence-20261024.md#storeapi作用域和缓存的定向取证2026-10-23)。本轮只补证据，不修改业务代码、不部署，阶段仍为 REA/分析中。
 - 2026-10-23：使用 `/home/bruce/.bashrc` 专用测试账号在 131 完成限定浏览器 REA。确认项目列表和三类详情页可渲染；Deployment“编辑设置”打开原生表单，StatefulSet 和 DaemonSet 的同名入口均实际打开“编辑 YAML”。当前部署镜像仍是旧 SHA，证据只用于 REA 校准，不计为当前分支 VERIFY。详见[运行时 REA](./workload-runtime-rea-20261023.md)。
 - 2026-10-23：依据测试准入规则完成三类 Workload 的分层测试设计，复用现有表单、Store、作用域和配置引用回归资产，登记 API/Service Guard、稳定 UI、草稿流程和人工探索的 MVTests。131 已取得 admin 浏览器会话并完成限定 REA 页面观察，但当前部署制品不是当前分支 SHA，VERIFY 前置条件仍未满足；本文件只约束后续验证，不放行 DEV。详见[测试设计](./workload-test-design-20261023.md)和[运行时 REA](./workload-runtime-rea-20261023.md)。
+
+## 2026-10-23 当前 REA 复核结论
+
+- 复核范围：`module-execution.json`、组合能力矩阵、字段级 V3/V4 对照、Store/API 静态取证、运行时 REA、测试设计及当前 PR 门禁结果。
+- 结论：当前材料支持“已定位主要入口、部分字段和请求边界”，不支持“Deployment、StatefulSet、DaemonSet 已完成 REA”。三类资源的字段/默认值/校验、资源特有 Action、RBAC 与作用域、缓存失效、错误/取消路径、当前 SHA 浏览器行为和 V3/Wujie 去除范围仍未闭环。
+- 当前阶段保持 `REA`，REA 结论保持“分析中”；没有正式复核签署，不进入 `DEV`，不部署。该结论不是对功能不存在的判断，也不是对历史代码的否定。
+- 不属于本轮 REA 结论的历史事实：已有单元测试、旧 SHA 131 浏览器记录和旧镜像结果只能作为输入，不能替代当前 SHA 的模块阶段证据；ConfigReference 当前测试还验证了 V3/Wujie 桥接的存在，不能作为桥接已移除的证明。
 
 ## 2026-10-22 编辑设置 REA 纠偏
 
