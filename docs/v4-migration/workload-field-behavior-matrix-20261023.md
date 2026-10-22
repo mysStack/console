@@ -2,17 +2,18 @@
 
 ## 1. 取证范围与结论边界
 
-| 项目             | 取值                                                                                           |
-| ---------------- | ---------------------------------------------------------------------------------------------- |
-| 模块             | `workloads`                                                                                    |
-| 资源             | Deployment、StatefulSet、DaemonSet                                                             |
-| 当前分支         | `feature/v4-workloads`                                                                         |
-| 当前复核基线     | `50cccc46833df72c056046e3b9cfc530ca957451`                                                     |
-| 集成基线         | `origin/feature/v4-migration` / `3e09afd6a051d4091b3c887462c880eff2ba6754`                     |
-| 旧 V3 参考树     | `origin/release-3.4` / `175710fefeeba6ff295c2c0967b4d45b83563d26`                              |
-| 当前 V4 编辑入口 | `packages/console/src/pages/projects/components/WorkloadCreateModal/WorkloadSettingsModal.tsx` |
-| 当前 V4 转换逻辑 | `packages/console/src/pages/projects/components/WorkloadCreateModal/deployment.ts`             |
-| 当前阶段         | `REA` / 分析中，待负责人复核                                                                   |
+| 项目             | 取值                                                                                                                                        |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| 模块             | `workloads`                                                                                                                                 |
+| 资源             | Deployment、StatefulSet、DaemonSet                                                                                                          |
+| 当前分支         | `feature/v4-workloads`                                                                                                                      |
+| 当前复核基线     | `50cccc46833df72c056046e3b9cfc530ca957451`                                                                                                  |
+| 集成基线         | `origin/feature/v4-migration` / `3e09afd6a051d4091b3c887462c880eff2ba6754`                                                                  |
+| 旧 V3 参考树     | `origin/release-3.4` / `175710fefeeba6ff295c2c0967b4d45b83563d26`                                                                           |
+| 当前 V4 编辑入口 | `packages/console/src/pages/projects/components/WorkloadCreateModal/WorkloadSettingsModal.tsx`                                              |
+| 当前 V4 转换逻辑 | `packages/console/src/pages/projects/components/WorkloadCreateModal/deployment.ts`                                                          |
+| 当前阶段         | `REA` / 分析中，待负责人复核                                                                                                                |
+| 只读页面制品     | `feature-v4-workloads-20261022-215739-27aaeced74e8` / Pod imageID `sha256:919492fedf5eae6ee27fca84bb490897e557659ae79860b9e3f035e59c5f9179` |
 
 旧 V3 源码用于确认历史字段和页面分区；它不证明当前 `v3dist` 的构建来源。当前 V4 源码用于确认已存在的编辑范围；存在解析或构造函数也不等于页面已经接入三类资源。当前矩阵不把未验证行为写成已实现，也不把旧镜像结果继承为当前 SHA 的验收。
 
@@ -87,7 +88,31 @@
 
 因此，本矩阵扩大了可执行的 DEV 输入，但不改变当前门禁结论：**REA 仍未放行，不能修改业务代码或部署。**
 
-## 7. 可复现来源命令
+## 7. 真实 V3 页面只读复核
+
+在 131 已部署的旧 V3 页面上使用 Playwright 进行只读复核，未点击“确定”、未发起资源写入：
+
+| 项目           | 观察结果                                                                                                                                      |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| 页面           | StatefulSet 详情 `v4-watch-sts-20261022-01`，项目 `v4-migration-e2e`                                                                          |
+| 制品           | `feature-v4-workloads-20261022-215739-27aaeced74e8`，Pod imageID 为 `sha256:919492fedf5eae6ee27fca84bb490897e557659ae79860b9e3f035e59c5f9179` |
+| 入口           | “更多操作 → 编辑设置”打开 V3 设置弹窗，页面 URL 为 `/consolev3/clusters/host/projects/v4-migration-e2e/statefulsets/...`                      |
+| 设置分区       | 更新策略、容器、容器组优雅终止、存储、容器组调度规则                                                                                          |
+| 更新策略默认值 | 滚动更新；容器组副本分组序号为 `0`                                                                                                            |
+| 页面状态       | Playwright snapshot 显示弹窗和字段正常渲染；本次无资源变更                                                                                    |
+| 证据限制       | 这是旧 V3 部署制品的行为输入，不是 `feature/v4-workloads` 当前 SHA 的部署验收；只读打开弹窗不能证明保存请求、RBAC 或错误路径                  |
+
+本次复核使用的入口命令：
+
+```bash
+bash /home/bruce/.codex/skills/playwright/scripts/playwright_cli.sh tab-list
+bash /home/bruce/.codex/skills/playwright/scripts/playwright_cli.sh snapshot
+bash /home/bruce/.codex/skills/playwright/scripts/playwright_cli.sh click '[data-test="detail-more"]'
+bash /home/bruce/.codex/skills/playwright/scripts/playwright_cli.sh click '[data-test="detail-editConfigTemplate"]'
+bash /home/bruce/.codex/skills/playwright/scripts/playwright_cli.sh snapshot
+```
+
+## 8. 可复现来源命令
 
 ```bash
 git rev-parse origin/release-3.4
