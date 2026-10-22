@@ -56,3 +56,23 @@ python3 docs/v4-migration/governance/scripts/test_v4_module_gate.py
 测试先行：新增用例首次在旧入口上出现 8 项失败，实际复现 REA 代码/英文标题/未登记迁移分支仍可提交、缺少 CI 模式和未授权工具路径。修复后 32 项回归通过，覆盖真实 Git 提交的拒绝和允许、格式化后越界、错误 Worktree、集成分支直提、普通功能分支兼容、Runner 注册表、完整 PR 差异、非 Draft 跳级和合法 DEV/PR 路径。外部格式化与 Husky 启动依赖采用测试替身；门禁、钩子、Git 提交和本地 bare origin 实际执行。
 
 本批只修复开发流程工具，没有业务界面或路由改动。未执行应用构建、镜像构建、131 部署和浏览器验收；无本批镜像、digest 或 Pod imageID。Deployment 编辑设置仍为 REA/分析中，已有高风险未知项与 `review: null` 保留。GitHub 实际 Run、检查结论和必需检查配置以推送后的远程回读为准，不用本地回归替代。
+
+### 真实提交、CI 和分支保护
+
+工具实现提交 `da38cb87ec683a6bf67b3f3a90764a6f2910b0af`：`fix(migration): 将模块门禁接入提交钩子和 PR 检查`。真实 Husky、lint-staged、模块检查和中文标题检查均执行成功，正常推送；未使用跳过钩子或强推。证据详见[实际验证 JSON](./governance/module-gate-verification-20261023.json)。该证据绑定工具代码 SHA；后续仅记录结果的提交不会冒充该 Run 已验证的新版本。
+
+| 检查                                                                                                                    | 实际结果                                                                                                                            |
+| ----------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `python3 docs/v4-migration/governance/scripts/test_v4_module_gate.py`                                                   | 本地 32 项通过；远程 Python 3.12 同样 32 项通过                                                                                     |
+| `go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.7 -shellcheck= -pyflakes= .github/workflows/v4-module-gate.yml` | 工作流检查通过                                                                                                                      |
+| 变更 Markdown/JSON/YAML 的 Prettier、Python 编译、`sh -n`、工作区/暂存区及提交 `git diff --check`                       | 通过；不是业务完整测试                                                                                                              |
+| `workloads commit --records-only` 与真实提交钩子                                                                        | 通过，仅提交治理改动                                                                                                                |
+| `workloads pr --pr 2 --records-only`                                                                                    | 通过，远程 Head 与本地相同，PR 仍为 Open/Draft                                                                                      |
+| [Run 39812232782](https://github.com/mysStack/console/actions/runs/39812232782)                                         | 实际 Head 为 `da38cb87e`；工具回归成功，阶段检查失败，总结论为 failure                                                              |
+| 本地及远程 `auto ci ... --draft`                                                                                        | 拒绝 REA 中的历史业务差异，首个路径 `locales/en/l10n-projects-applicationWorkloads-deployments-list.js`；这是应有拦截，不是环境故障 |
+
+已通过 GitHub API 为 `feature/v4-migration` 配置并再次 GET 核验两个必需检查：“门禁工具回归”和“模块阶段与 PR 范围”，均绑定 GitHub Actions App `15368`；要求分支最新，对管理员生效，禁止强推和删除。未新增评审人数要求、未修改稳定分支、未合并 PR。首次 PUT 因同时提交 `contexts` 和 `checks` 返回 HTTP 422；删除重复的 `contexts` 参数后成功，最终配置已回读，不把首次失败写成成功。
+
+远程集成提交仍为 `3e09afd6a051d4091b3c887462c880eff2ba6754`，稳定分支仍为 `fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`。钩子代码目前位于 Workload 分支，未覆盖其他已有 Worktree；其他 PR/后续分支必须取得这些版本化入口并实际产生必需检查，缺少检查时不能合并，不能用手工通过或管理员绕过代替。
+
+本次修复的是提交/PR 执行入口，不能阻止编辑器写文件、不能自动判断页面语义或代替指定复核。下一项仍是 Deployment 编辑设置的定向 REA 与真实字段/行为对照，满足既定模块条件后再进行 DEV；不重新启动全量 P0。

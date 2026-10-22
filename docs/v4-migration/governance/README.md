@@ -37,6 +37,8 @@ python3 docs/v4-migration/governance/scripts/v4-module-gate.py auto ci \
 
 Draft 记录可持续提交；REA 中完整 PR 差异含业务代码必须失败。当前 PR #2 保留了历史先行实现，不能为了 CI 变绿改用最后一次提交作为比较基线，不能继承旧镜像验收。
 
+[2026-10-23 实际验证](./module-gate-verification-20261023.json)保存工具提交 `da38cb87e`、远程 Run、32 项回归和真实阶段拒绝结果。集成分支的两个必需检查已配置，对管理员同样生效；它们未放行当前 PR #2。其他既有 Worktree 没有被覆盖，后续分支/PR 取得这些入口并产生检查后才能合并。
+
 未来模块尚无阶段记录时，使用 `start --phase REA --records-only` 初始化文档；缺记录时普通 start、DEV、VERIFY 和部署应拒绝，不能继承其他模块结论。
 
 测试只在临时目录创建本地 Git 仓库和 bare origin，不访问 GitHub、集群或真实业务数据。测试中的复核人/签署属于隔离 fixture，不写入真实项目记录。脚本只检查数据结构与证据绑定；实际签署、测试真实性、CI、digest、Pod imageID 和浏览器结果仍须独立回读。
