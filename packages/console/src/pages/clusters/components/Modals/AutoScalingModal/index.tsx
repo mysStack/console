@@ -11,7 +11,7 @@ import {
   NumberInput,
   hpaStore,
   IHpaDetail,
-  getApiVersion,
+  getHpaApiVersion,
   memoryFormat,
 } from '@ks-console/shared';
 import { Loading, StyledFormItem, StyledForm } from './styles';
@@ -95,7 +95,7 @@ const AutoScalingModal = ({ visible, confirmLoading, detail, onOk, onCancel }: I
     const name = annotations['kubesphere.io/relatedHPA'] || detail.name;
     const checkNameParams = { name, cluster, namespace };
     const k8sVersion = globals.clusterConfig?.[cluster!]?.k8sVersion;
-    const version = getApiVersion('horizontalpodautoscalers', k8sVersion);
+    const version = getHpaApiVersion(k8sVersion);
     const url = `/clusters/${cluster}/apis/${version}/namespaces/${namespace}/horizontalpodautoscalers/${name}`;
     setLoading(true);
     const checkResult = await checkName(checkNameParams, {}, url);
