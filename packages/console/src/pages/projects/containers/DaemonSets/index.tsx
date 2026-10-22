@@ -146,7 +146,7 @@ const DaemonSets = () => {
   });
   const renderBatchActions = useBatchActions({
     authKey,
-    params: { cluster },
+    params,
     actions: [
       {
         key: 'delete',
@@ -179,7 +179,7 @@ const DaemonSets = () => {
   });
   const renderItemActions = useItemActions({
     authKey,
-    params: { cluster },
+    params,
     actions: [
       {
         key: 'edit',
@@ -404,7 +404,7 @@ const DaemonSets = () => {
         rowKey="uid"
         placeholder={t('SEARCH_BY_NAME')}
         url={url}
-        format={data => mapper(data)}
+        format={data => ({ ...mapper(data), cluster })}
         columns={columns}
         parameters={{}}
         useStorageState={false}
