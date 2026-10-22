@@ -4,12 +4,28 @@
  */
 
 module.exports = {
+  WORKLOAD_ADD_CONTAINER: 'Añadir contenedor',
+  WORKLOAD_ADD_INIT_CONTAINER: 'Añadir contenedor de inicio',
+  WORKLOAD_ADD_ENV: 'Añadir variable de entorno',
+  WORKLOAD_CONTAINER_INVALID: 'Introduce un nombre de contenedor y una imagen válidos.',
+  WORKLOAD_CONTAINER_DUPLICATE: 'Los nombres de los contenedores deben ser únicos.',
+  WORKLOAD_ENV_DUPLICATE: 'Las variables de entorno de un contenedor deben tener nombres únicos.',
+  WORKLOAD_PORT_INVALID:
+    'Introduce un puerto válido (1–65535), un protocolo y un nombre opcional (hasta 15 caracteres).',
+  WORKLOAD_PORT_DUPLICATE: 'Los nombres de los puertos deben ser únicos en el Pod.',
+  STARTUP_COMMAND: 'Comando de inicio',
+  COMMAND: 'Comando',
+  PARAMETERS: 'Parámetros',
+
   // Banner
   // List
   HPA_SET_TIP: 'El Autoscaling Horizontal de Pods ha sido configurado',
   WORKLOAD_EMPTY_DESC:
     'La carga de trabajo suele ser el operador real para acceder a los servicios y también es el operador real para las aplicaciones del sistema, como la recopilación y supervisión de registros de nodos. Workload es también un modelo abstracto para un grupo de Pods.',
   // List > Create > Basic Information
+  CREATE_DEPLOYMENT: 'Crear deployment',
+  CREATE_DEPLOYMENT_FAILED: 'No se pudo crear el deployment.',
+  REPLICAS: 'Réplicas',
   // List > Create > Pod Settings
   // List > Create > Pod Settings > Add Container > Container Settings
   INVALID_IMAGE: 'Imagen inválida.',

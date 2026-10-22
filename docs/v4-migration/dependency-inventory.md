@@ -1,11 +1,11 @@
 # V3 / Wujie 依赖清单
 
-> 检查日期：2026-10-16  
+> 事实检查日期：2026-10-16；文档复核日期：2026-10-17
 > 仓库：`mysStack/console`  
 > 分支：`feature/v4-migration`  
 > 基线提交：`fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`
 
-这是 P0 阶段的静态依赖清单，记录源码和构建配置中的 V3/Wujie 引用。它不代表每个引用都一定会在当前部署中被访问。删除依赖前，必须在 131 测试环境使用部署后的制品和 Playwright 确认运行时行为。
+这是 P0-REA 阶段的静态依赖清单，记录源码和构建配置中的 V3/Wujie 引用。它不代表每个引用都一定会在当前部署中被访问，也不代表 P0-REA 已通过。第一轮 `v3dist` REA 的 Evidence ID、覆盖范围和限制见[REA 阶段分析总结](./rea-analysis-summary.md)。删除依赖前，必须在 131 测试环境使用部署后的制品和 Playwright 确认运行时行为。
 
 ## 扫描命令
 
@@ -33,6 +33,33 @@ rg -l --hidden --glob '!.git/**' --glob '!node_modules/**' \
 | `v3dist` 构建引用                           |      2 | Webpack/资源构建配置；编译产物单独保留              |
 
 这些数字存在交集。例如一个 Deployment 详情文件可以同时包含 Wujie 组件和 V3 路由地址。
+
+## 2026-10-18 当前分支复核
+
+在 `feature/v4-configmaps-secrets` 当前工作树重新执行上面的扫描命令，仍排除
+`node_modules` 和 `packages/bootstrap/assets/v3dist`。本次结果如下：
+
+| 引用类型                       | 当前文件数 | 说明                                                                                     |
+| ------------------------------ | ---------: | ---------------------------------------------------------------------------------------- |
+| `wujie-react` / `WujieReact`   |        133 | 包含构建配置、测试文件和现有 `packages/shared/lib` 编译输出；不能直接视为 133 个启用页面 |
+| `ConsoleV3ResourceList`        |         28 | 与首轮结果一致                                                                           |
+| `ExtensionConsoleV3Embed`      |         17 | 包含源码、导出、类型和现有编译输出；当前启用扩展数量仍需运行时清单确认                   |
+| `useV3action` / `useV3Actions` |         14 | 与业务调用文件和桥接文件的静态盘点一致                                                   |
+| `/consolev3` 或 `consolev3/`   |        101 | 路由、测试、工具和编译输出均可能命中                                                     |
+
+复核命令仍是文件级统计，结果存在交集，不能替代菜单启用状态、Network、API RBAC 或浏览器功能等价性证据。当前只更新静态取证范围，未因数字变化关闭任何 V3/Wujie 迁移项。
+
+## 2026-10-20 活动源码口径复核
+
+为区分历史编译输出、旧兼容文件和当前活动路由，本轮在 `packages/console/src`、`packages/core/src`、`packages/shared/src` 中排除测试文件后重新统计：
+
+| 引用类型                       | 当前源码文件数 | 说明                                                                    |
+| ------------------------------ | -------------: | ----------------------------------------------------------------------- |
+| `useV3action` / `useV3Actions` |             11 | 8 个业务调用文件、2 个桥接实现/Hook 文件、1 个导出文件                  |
+| `WujieReact`                   |            117 | 当前源码仍有活动 Embed、兼容残留和扩展入口，不能直接视为 117 个启用页面 |
+| `consolev3`                    |            121 | URL、Wujie 工具、路由转换和桥接实现的文件级命中                         |
+
+当前项目 Deployment、StatefulSet、DaemonSet 活动详情路由已由 `projects/routes/detail.tsx` 导入 `ApplicationWorkloads/Workloads/*/Detail/routes.tsx`；旧 `projects/containers/*/Detail` 文件仍被静态扫描命中，但不在该活动导入链上。历史 P0 统计保留作为历史证据，本节数字用于当前分支的活动源码复核，不代表全仓库 V3/Wujie 已移除。
 
 ## 运行时入口
 
@@ -99,3 +126,10 @@ services、statefulsets、volume-snapshots、volumes
 | 131 环境运行时 Network | 待实测     | 部署带 tag 的镜像，逐个模块采集脱敏请求                     |
 | V3 Action/菜单完整性   | 待实测     | 完成 Deployment 证据包，逐项对照菜单、弹窗和 RBAC           |
 | 扩展模块 V4 契约       | 未确认     | 盘点当前启用扩展，再删除公共 V3 包装器                      |
+
+## P0-REA 晋级条件
+
+- [ ] 当前部署启用的路由、扩展、V3/Wujie 入口和动态 Action 均有来源定位和责任人。
+- [ ] 旧 V3 源码来源或“仅有编译产物”的边界已固定，并记录 tag/commit、许可证和制品摘要。
+- [ ] 131 运行时 Network、路由和菜单行为已按部署制品核对；静态引用数量与运行时使用范围的差异已记录。
+- [ ] 高风险未知项有关闭证据、明确的阻塞状态或经复核的范围排除。

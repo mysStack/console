@@ -16,7 +16,16 @@ import type {
   DeleteProps,
   DeploymentPatchProps,
   BatchOptProps,
+  CreateWorkloadProps,
 } from './types';
+
+async function settleWorkloadRequests(requests: Promise<unknown>[]) {
+  const results = await Promise.allSettled(requests);
+  for (const result of results) {
+    if (result.status === 'rejected') throw result.reason;
+  }
+  return results;
+}
 
 //TODO: type
 export const getWorkloadVolumes = async (detail: any, setDetail = false) => {
@@ -93,7 +102,7 @@ const workloadStore = (module: string) => {
     module,
     mapper,
   });
-  const { getDetailUrl, getPath, patch } = BaseStore;
+  const { getDetailUrl, getPath, patch, post } = BaseStore;
   const { deleteHpa } = hpaStore;
 
   const del = (params: PathParams, k8sVersion?: string) => {
@@ -119,7 +128,7 @@ const workloadStore = (module: string) => {
       }
     });
 
-    return Promise.allSettled(promises);
+    return settleWorkloadRequests(promises);
   };
 
   const getReplica = async (params: PathParams) => {
@@ -139,6 +148,13 @@ const workloadStore = (module: string) => {
     const onSuccess = options?.onSuccess;
     return useMutation(({ params, data }: DeploymentPatchProps) => patch(params, data), {
       onSuccess,
+    });
+  };
+
+  const useCreateWorkloadMutation = (options?: SuccessProps) => {
+    return useMutation(({ params, data }: CreateWorkloadProps) => post(params, data), {
+      onSuccess: options?.onSuccess,
+      onError: options?.onError,
     });
   };
 
@@ -165,7 +181,7 @@ const workloadStore = (module: string) => {
 
         reqs.push(del(params, k8sVersion));
 
-        return Promise.allSettled(reqs);
+        return settleWorkloadRequests(reqs);
       },
       {
         onSuccess,
@@ -179,7 +195,7 @@ const workloadStore = (module: string) => {
       (params: BatchOptProps) => {
         const { data } = params;
 
-        return Promise.allSettled(data!.map(p => del(p)));
+        return settleWorkloadRequests(data!.map(p => del(p)));
       },
       {
         onSuccess,
@@ -200,7 +216,7 @@ const workloadStore = (module: string) => {
     return useMutation(
       (params: BatchOptProps) => {
         const { data } = params;
-        return Promise.allSettled(data!.map(stopDeployment));
+        return settleWorkloadRequests(data!.map(stopDeployment));
       },
       {
         onSuccess,
@@ -283,6 +299,7 @@ const workloadStore = (module: string) => {
     getReplica,
     switchStatus,
     useGetDetail,
+    useCreateWorkloadMutation,
     useUpdateDeploymentMutation,
     useDeleteDeploymentMutation,
     useBatchDeleteWorkloadMutation,

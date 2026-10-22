@@ -5,37 +5,29 @@
 
 import React, { useState } from 'react';
 import cx from 'classnames';
-import { get } from 'lodash';
 import { Card, Button } from '@kubed/components';
 
 import { Icon, useDetailPage } from '@ks-console/shared';
 import type { FormattedSecret } from '@ks-console/shared';
 
 import { DefaultWrapper, CardTitle, TlsWrapper, ImageWrapper, StyledDescription } from './styles';
+import { getSecretDisplayValue } from './maskSecretValue';
 
 function SecretsData(): JSX.Element {
   const [showSecret, setShowSecret] = useState(false);
   const { detail } = useDetailPage<FormattedSecret>();
-  const originData = detail?._originData?.data ?? {};
 
-  const convert = (value: string, key: string): string => {
-    return showSecret
-      ? value
-      : detail?.type === 'kubernetes.io/dockerconfigjson' && value
-        ? value
-            .split('')
-            .map(item => item.replace(/[\s\S]/g, '*'))
-            .join('')
-        : get(originData, key, '');
+  const convert = (value: string): string => {
+    return getSecretDisplayValue(value, showSecret);
   };
 
   const renderTLS = (data: { [x: string]: any; release?: string }) => {
     return (
       <TlsWrapper>
         <h6>{t('CREDENTIAL_SI')}</h6>
-        <pre>{convert(data['tls.crt'], 'tls.crt')}</pre>
+        <pre>{convert(data['tls.crt'])}</pre>
         <h6 style={{ marginTop: '20px' }}>{t('PRIVATE_KEY_TCAP')}</h6>
-        <pre>{convert(data['tls.key'], 'tls.key')}</pre>
+        <pre>{convert(data['tls.key'])}</pre>
       </TlsWrapper>
     );
   };
@@ -45,7 +37,7 @@ function SecretsData(): JSX.Element {
       <DefaultWrapper>
         {Object.entries(data).map(([key, value]) => (
           <StyledDescription label={key} key={key} className={cx({ showSecret: showSecret })}>
-            {convert(value, key)}
+            {convert(value)}
           </StyledDescription>
         ))}
       </DefaultWrapper>
@@ -76,16 +68,16 @@ function SecretsData(): JSX.Element {
               <ul>
                 <li>
                   <span>{t('USERNAME')}:</span>
-                  <span>{convert(value.username, 'username')}</span>
+                  <span>{convert(value.username)}</span>
                 </li>
                 <li>
                   <span>{t('PASSWORD')}:</span>
-                  <span>{convert(value.password, 'password')}</span>
+                  <span>{convert(value.password)}</span>
                 </li>
                 {value.email && (
                   <li>
                     <span>{t('EMAIL')}:</span>
-                    <span>{convert(value.email, 'email')}</span>
+                    <span>{convert(value.email)}</span>
                   </li>
                 )}
               </ul>
@@ -104,7 +96,7 @@ function SecretsData(): JSX.Element {
             <li key={key}>
               <span>{t(key.toUpperCase())}:</span>
               <span>
-                <pre>{convert(value, key)}</pre>
+                <pre>{convert(value)}</pre>
               </span>
             </li>
           ))}

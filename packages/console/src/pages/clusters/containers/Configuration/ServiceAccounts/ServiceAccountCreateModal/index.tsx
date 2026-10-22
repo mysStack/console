@@ -12,6 +12,7 @@ interface Props {
   visible: boolean;
   cluster?: string;
   workspace?: string;
+  namespace?: string;
   confirmLoading?: boolean;
   onOk: (data: Record<string, any>) => void;
   onCancel: () => void;
@@ -21,6 +22,7 @@ function ServiceAccountCreateModal({
   visible,
   cluster = '',
   workspace,
+  namespace,
   confirmLoading,
   onOk,
   onCancel,
@@ -37,7 +39,11 @@ function ServiceAccountCreateModal({
       onCancel={onCancel}
       bodyStyle={{ padding: '20px' }}
     >
-      <Form form={form} initialValues={{ metadata: { name: '', namespace: '' } }} onFinish={onOk}>
+      <Form
+        form={form}
+        initialValues={{ metadata: { name: '', namespace: namespace || '' } }}
+        onFinish={onOk}
+      >
         <FormItem name={['metadata', 'name']} label={t('NAME')} rules={[{ required: true }]}>
           <Input />
         </FormItem>
@@ -46,7 +52,11 @@ function ServiceAccountCreateModal({
           label={t('PROJECT')}
           rules={[{ required: true, message: t('PROJECT_EMPTY_DESC') }]}
         >
-          <NamespaceSelector cluster={cluster} workspace={workspace} style={{ width: '100%' }} />
+          {namespace ? (
+            <Input disabled />
+          ) : (
+            <NamespaceSelector cluster={cluster} workspace={workspace} style={{ width: '100%' }} />
+          )}
         </FormItem>
       </Form>
     </Modal>

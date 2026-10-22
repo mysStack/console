@@ -10,6 +10,7 @@ import { Form, FormItem, Input, Select } from '@kubed/components';
 import { Pattern, openpitrixStore, AppDetail } from '@ks-console/shared';
 
 import IconUploadField from './IconUploadField';
+import { getCategoryDisplayName } from './categoryOptions';
 
 import { TextArea } from '../styles';
 
@@ -18,25 +19,33 @@ const { useCategoryList } = openpitrixStore;
 type Props = {
   form: any;
   detail: AppDetail;
+  initialValues: Record<string, unknown>;
 };
 
-function AppBaseEditForm({ form, detail }: Props): JSX.Element {
+function AppBaseEditForm({ form, detail, initialValues }: Props): JSX.Element {
   const { data: categories, isLoading } = useCategoryList();
   const categoryOptions = useMemo(() => {
     if (isLoading || isEmpty(categories)) {
       return [];
     }
 
-    return categories?.map(({ name, category_id }: any) => ({
-      label: t(`APP_CATE_${name.toUpperCase().replace(/[^A-Z]+/g, '_')}`, {
-        defaultValue: name,
-      }),
-      value: category_id,
-    }));
+    return categories?.map(({ name, category_id }: any) => {
+      const displayName = getCategoryDisplayName(name, category_id);
+
+      return {
+        label:
+          displayName === '-'
+            ? displayName
+            : t(`APP_CATE_${displayName.toUpperCase().replace(/[^A-Z]+/g, '_')}`, {
+                defaultValue: displayName,
+              }),
+        value: category_id,
+      };
+    });
   }, [categories, isLoading]);
 
   return (
-    <Form form={form} initialValues={detail}>
+    <Form form={form} initialValues={initialValues}>
       <FormItem
         name={['name']}
         label={t('NAME')}

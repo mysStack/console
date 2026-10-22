@@ -21,3 +21,6 @@ export const getApiVersion = (module?: string, k8sVersion?: string) => {
     cronjobs: isK8sVersionAbove('v1.21.0', k8sVersion) ? 'apis/batch/v1' : 'apis/batch/v1beta1',
   }[module];
 };
+
+export const getHpaApiVersion = (k8sVersion?: string) =>
+  (getApiVersion('horizontalpodautoscalers', k8sVersion) ?? '').replace(/^apis\//, '');

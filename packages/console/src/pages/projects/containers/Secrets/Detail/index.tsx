@@ -17,6 +17,8 @@ import {
   secretStore,
   useCommonActions,
   invalidateResourceList,
+  getSecretYamlEditorValue,
+  mergeSecretYaml,
 } from '@ks-console/shared';
 import type { FormattedSecret } from '@ks-console/shared';
 
@@ -72,6 +74,13 @@ export default function SecretDetail(): JSX.Element {
     },
   });
 
+  const editSecretYaml = (record: FormattedSecret) =>
+    editYaml({
+      initialValues: record,
+      yamlValue: getSecretYamlEditorValue(record._originData),
+      transformYaml: (data, initialValues) => mergeSecretYaml(initialValues._originData, data),
+    });
+
   const attrs = (data: FormattedSecret) => [
     { label: t('CLUSTER_PL'), value: cluster ? cluster : '' },
     { label: t('PROJECT_PL'), value: data?.namespace },
@@ -101,7 +110,7 @@ export default function SecretDetail(): JSX.Element {
       text: t('EDIT_YAML'),
       action: 'edit',
       show: true,
-      onClick: editYaml,
+      onClick: editSecretYaml,
     },
     {
       key: 'editSecret',

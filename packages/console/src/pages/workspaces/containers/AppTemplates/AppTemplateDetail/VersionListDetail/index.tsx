@@ -4,15 +4,19 @@
  */
 
 import React from 'react';
-// import { useCacheStore as useStore } from '@ks-console/shared';
+import { useCacheStore as useStore } from '@ks-console/shared';
 
-// import { VersionList } from '@ks-console/shared';
+import { VersionList } from '@ks-console/shared';
 
 function VersionListDetail(): JSX.Element {
-  // const [, setModalType] = useStore<string>('modalType');
-  //
-  // return <VersionList onAddVersion={() => setModalType('upload')} />;
-  return <></>;
+  const [, setModalType] = useStore<string>('modalType');
+
+  return (
+    <VersionList
+      actionKey={{ appKey: 'app-templates', create: 'create' }}
+      onAddVersion={() => setModalType('upload')}
+    />
+  );
 }
 
 export default VersionListDetail;

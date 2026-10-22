@@ -24,7 +24,7 @@ import AppTemplate from '../containers/AppTemplates';
 import repoDetailRoutes from '../containers/Repos/RepoDetail/routes';
 import Gateway from '../containers/Gateway';
 import GatewayDetail from '../containers/Gateway/Detail/routes';
-// import appTemplateDetailRoutes from '../containers/AppTemplates/AppTemplateDetail/routes';
+import appTemplateDetailRoutes from '../containers/AppTemplates/AppTemplateDetail/routes';
 
 const PATH = '/workspaces/:workspace';
 
@@ -107,7 +107,7 @@ export default [
       ...memberDetailRoutes,
       ...repoDetailRoutes,
       ...GatewayDetail,
-      // ...appTemplateDetailRoutes,
+      ...appTemplateDetailRoutes,
     ],
   },
 ];

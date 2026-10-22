@@ -14,12 +14,15 @@ import CheckFiles from './CheckFiles';
 import CreateInfo from './CreateInfo';
 
 import { IconHelm, StyledModal } from './styles';
+import { getHelmUploadData } from './uploadData';
 
 type FormattedFileInfo = {
   status?: string;
   name?: string;
   base64Str?: string;
   icon?: string;
+  appName?: string;
+  versionName?: string;
 };
 
 type Props = {
@@ -38,13 +41,13 @@ const { fileStore } = openpitrixStore;
 export function HelmUploadModal({
   visible,
   workspace,
+  type,
   title,
   description,
   onCancel,
   onOk,
 }: Props): JSX.Element {
   const { appName = '' } = useParams();
-  const [iconStr, setIconStr] = useState<string>();
   const [canCreate, setCanCreate] = useState<boolean>(false);
   const [checkedFileInfo, setCheckedFileInfo] = useState<FormattedFileInfo>();
   const htmlDesc = t('APP_CREATE_GUIDE', { docUrl: getWebsiteUrl() });
@@ -57,6 +60,10 @@ export function HelmUploadModal({
     setCheckedFileInfo(prevChecked => ({ ...prevChecked, status: 'init' }));
   }
 
+  function handleIconChange(icon: string): void {
+    setCheckedFileInfo(prevChecked => ({ ...prevChecked, icon }));
+  }
+
   function handleCancel(): void {
     onCancel?.();
     setCanCreate(false);
@@ -64,10 +71,7 @@ export function HelmUploadModal({
   }
 
   async function submitData(): Promise<void> {
-    const data: Record<string, unknown> = {
-      appType: 'helm',
-      package: checkedFileInfo?.base64Str,
-    };
+    const data = getHelmUploadData(type || 'CREATE_APP', checkedFileInfo || {});
     await fileStore.uploadPackage('CREATE_APP', data, onOk);
   }
 
@@ -98,6 +102,7 @@ export function HelmUploadModal({
       <IconHelm size={60} />
       <PackageUpload
         appName={appName}
+        workspace={workspace}
         fileStore={fileStore}
         canCreate={canCreate}
         onCheckStatusChange={setCheckedFileInfo}
@@ -112,7 +117,7 @@ export function HelmUploadModal({
           )}
         </>
       ) : (
-        <CreateInfo createInfo={checkedFileInfo} onIconChange={setIconStr} />
+        <CreateInfo createInfo={checkedFileInfo} onIconChange={handleIconChange} />
       )}
     </StyledModal>
   );

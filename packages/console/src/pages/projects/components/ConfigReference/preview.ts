@@ -27,7 +27,7 @@ export const ENV_FROM_NAME_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
  * dropped-key check. KubeSphere already shows Secret-derived variable NAMES in
  * the environment tab and only masks the values, so showing names is consistent.
  *
- * The keys are read with a RAW request (see ConfigReferenceInline) that bypasses
+ * The keys are read with a RAW request (see the native ConfigReferencePanel) that bypasses
  * the shared Secret mapper, so values are never base64-decoded, stored or
  * rendered. They do still transit the wire. CONFIG_REFERENCE_SECRET_NOTICE says
  * exactly that and no more.

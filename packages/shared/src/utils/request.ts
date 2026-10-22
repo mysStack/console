@@ -40,6 +40,34 @@ function formatError(response: AxiosResponse): GlobalMessage {
   };
 }
 
+export function getGlobalMessage(error: any): GlobalMessage {
+  if (!error?.response) {
+    return {
+      status: 0,
+      reason: 'Network Error',
+      message: error?.message || 'Network request failed',
+    };
+  }
+
+  return formatError(error.response);
+}
+
+export function isPackageValidationRequest(url?: string): boolean {
+  return Boolean(
+    url?.includes('/kapis/application.kubesphere.io/v2/') &&
+      url.includes('/versions?validate=true'),
+  );
+}
+
+export function normalizePackageValidationError(data: unknown): Record<string, unknown> {
+  const response = data && typeof data === 'object' && !Array.isArray(data) ? data : {};
+
+  return {
+    ...response,
+    error: 'UPLOAD_AGAIN_TIP',
+  };
+}
+
 axios.interceptors.request.use((config: AxiosRequestConfig) => {
   config.url = getRequestUrl(config.url);
 
@@ -86,8 +114,12 @@ axios.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    if (!error.response.config.headers['x-ignore-error-notify']) {
-      const msg = formatError(error.response);
+    if (isPackageValidationRequest(error.response?.config?.url)) {
+      return normalizePackageValidationError(error.response?.data);
+    }
+
+    if (!error.response?.config?.headers?.['x-ignore-error-notify']) {
+      const msg = getGlobalMessage(error);
       const { $emit } = useEventEmitter();
       $emit('globalMsg', msg);
     }

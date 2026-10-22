@@ -4,12 +4,27 @@
  */
 
 module.exports = {
+  WORKLOAD_ADD_CONTAINER: '新增工作容器',
+  WORKLOAD_ADD_INIT_CONTAINER: '新增初始化容器',
+  WORKLOAD_ADD_ENV: '新增環境變數',
+  WORKLOAD_CONTAINER_INVALID: '請填寫合法的容器名稱和映像。',
+  WORKLOAD_CONTAINER_DUPLICATE: '工作容器和初始化容器的名稱不能重複。',
+  WORKLOAD_ENV_DUPLICATE: '同一容器的環境變數名稱不能重複。',
+  WORKLOAD_PORT_INVALID: '請填寫合法連接埠（1–65535）、協定和連接埠名稱（選填，最長 15 個字元）。',
+  WORKLOAD_PORT_DUPLICATE: '容器連接埠名稱在整個容器群組中不能重複。',
+  STARTUP_COMMAND: '啟動命令',
+  COMMAND: '命令',
+  PARAMETERS: '參數',
+
   // Banner
   // List
   HPA_SET_TIP: '已設置彈性伸縮策略',
   WORKLOAD_EMPTY_DESC:
     '工作負載 (Workload) 通常是訪問服務的實際載體, 也是對節點紀錄收集、監控等系統應用的實際運行載體，是對一組容器組 (Pod) 的抽象模型。',
   // List > Create > Basic Information
+  CREATE_DEPLOYMENT: '建立部署',
+  CREATE_DEPLOYMENT_FAILED: '建立部署失敗。',
+  REPLICAS: '副本數量',
   // List > Create > Pod Settings
   // List > Create > Pod Settings > Add Container > Container Settings
   INVALID_IMAGE: '鏡像無效。',

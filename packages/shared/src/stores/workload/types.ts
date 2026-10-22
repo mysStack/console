@@ -9,9 +9,15 @@ export { PathParams } from '../../types';
 
 export interface SuccessProps {
   onSuccess?: () => void;
+  onError?: (error: unknown) => void;
 }
 
 export interface DeploymentPatchProps {
+  params: PathParams;
+  data: Record<string, any>;
+}
+
+export interface CreateWorkloadProps {
   params: PathParams;
   data: Record<string, any>;
 }

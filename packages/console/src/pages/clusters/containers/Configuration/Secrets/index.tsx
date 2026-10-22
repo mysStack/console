@@ -20,6 +20,8 @@ import {
   useActionMenu,
   getDisplayName,
   useCommonActions,
+  getSecretYamlEditorValue,
+  mergeSecretYaml,
 } from '@ks-console/shared';
 import type { FormattedSecret } from '@ks-console/shared';
 
@@ -75,6 +77,13 @@ function Secrets(): JSX.Element {
     callback,
   });
 
+  const editSecretYaml = (record: FormattedSecret) =>
+    editYaml({
+      initialValues: record,
+      yamlValue: getSecretYamlEditorValue(record._originData),
+      transformYaml: (data, initialValues) => mergeSecretYaml(initialValues._originData, data),
+    });
+
   const renderItemAction = useActionMenu<FormattedSecret>({
     authKey: module,
     params,
@@ -93,7 +102,7 @@ function Secrets(): JSX.Element {
         text: t('EDIT_YAML'),
         action: 'edit',
         show: row => !row.isFedManaged,
-        onClick: editYaml,
+        onClick: editSecretYaml,
       },
       {
         key: 'editSecret',
@@ -197,14 +206,14 @@ function Secrets(): JSX.Element {
       title: t('TYPE'),
       field: 'type',
       canHide: true,
-      width: '20%',
+      width: '15%',
       render: type => (type ? (SECRET_TYPES[type] ? t(SECRET_TYPES[type]) : type) : ''),
     },
     {
       title: t('SECRET_FIELD_COUNT'),
       field: 'data',
       canHide: true,
-      width: '16%',
+      width: '12%',
       render: data => (data && Object.keys(data)?.length) ?? 0,
     },
     {
@@ -212,7 +221,7 @@ function Secrets(): JSX.Element {
       field: 'createTime',
       sortable: true,
       canHide: true,
-      width: 250,
+      width: 180,
       render: time => formatTime(time),
     },
     {

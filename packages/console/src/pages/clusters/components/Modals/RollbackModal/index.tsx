@@ -9,6 +9,7 @@ import { StyledModal } from './styles';
 import { Icon, useRevisionStore, getCurrentRevision } from '@ks-console/shared';
 import type { OriginData } from '@ks-console/shared';
 import { Form, useForm, FormItem, Input, Select, LoadingOverlay } from '@kubed/components';
+import { getRollbackData } from './rollback';
 
 interface IProps {
   module: string;
@@ -65,31 +66,12 @@ const RollbackModal = ({
     form.validateFields().then(() => {
       const formData = form.getFieldsValue(true);
       const selectedRevision = revisionList.find(
-        item => Number(item.revision) === formData.revision,
+        item => Number(item.revision) === Number(formData.revision),
       );
-      let data;
-      if (module === 'deployments') {
-        data = [
-          {
-            op: 'replace',
-            path: '/spec/template',
-            value: get(selectedRevision, 'spec.template'),
-          },
-          {
-            op: 'replace',
-            path: '/metadata/annotations',
-            value: detail.annotations,
-          },
-        ];
-      } else {
-        data = {
-          spec: {
-            template: {
-              $patch: 'replace',
-              ...get(selectedRevision, 'spec.template'),
-            },
-          },
-        };
+      const data = getRollbackData(module, selectedRevision, detail.annotations);
+
+      if (!data) {
+        return;
       }
 
       onOk?.(data);

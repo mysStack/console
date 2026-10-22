@@ -21,6 +21,7 @@ import {
   StatusAvatar,
   StyledDropzone,
 } from './styles';
+import { getUploadValidationFailure } from './uploadState';
 
 type Props = {
   packageName?: string;
@@ -82,7 +83,6 @@ export function PackageUpload({
     uploadPackage,
     uploadPackageFormData,
   } = fileStore;
-  const state: Record<string, any> = {};
   const { workspace = ws } = useParams();
   const [errorInfo, setErrorInfo] = useState<any>('');
   const [missFile, setMissFile] = useState<any>();
@@ -95,16 +95,26 @@ export function PackageUpload({
   const uploadStatusWord: Record<string, any> = useMemo(() => {
     return {
       ...UPLOAD_STATUS_WORD,
-      error: state.errorInfo,
+      error: errorInfo || 'UPLOAD_AGAIN_TIP',
     };
-  }, state.errorInfo);
+  }, [errorInfo]);
 
   async function packageValidator(base64Str: string): Promise<any> {
-    const result = await validatePackage({
-      base64Str,
-      appName,
-      workspace,
-    });
+    let result;
+    try {
+      result = await validatePackage({
+        base64Str,
+        appName,
+        workspace,
+      });
+    } catch {
+      const failure = getUploadValidationFailure();
+      setErrorInfo(failure.error);
+      setMissFile(undefined);
+      setUploadStatus(failure.status);
+      onCheckStatusChange?.(failure);
+      return;
+    }
     const status = result.error ? 'error' : 'success';
     setMissFile(result.missFile);
     setErrorInfo(result.error);
@@ -126,11 +136,21 @@ export function PackageUpload({
   }
 
   async function packageValidatorFormData(formData: FormData): Promise<any> {
-    const result = await validatePackageFormData({
-      formData,
-      appName,
-      workspace,
-    });
+    let result;
+    try {
+      result = await validatePackageFormData({
+        formData,
+        appName,
+        workspace,
+      });
+    } catch {
+      const failure = getUploadValidationFailure();
+      setErrorInfo(failure.error);
+      setMissFile(undefined);
+      setUploadStatus(failure.status);
+      onCheckStatusChangeFormData?.({ ...failure, formData });
+      return;
+    }
     const status = result.error ? 'error' : 'success';
     setMissFile(result.missFile);
     setErrorInfo(result.error);

@@ -13,13 +13,15 @@ import fg from 'fast-glob';
 import { Logger } from './libs/logger';
 import createRollupConfig from './libs/create-rollup-config';
 
-import { PATHS, PACKAGES_TO_BUILD } from './constants';
+import constants from './constants';
+
+const { PATHS, PACKAGES_TO_BUILD } = constants;
 
 const logger = new Logger('build-package');
 
 async function locatePackage(packageName) {
   const folder = packageName.split('/')[1];
-  const packagePath = path.join(__dirname, '../packages', folder);
+  const packagePath = path.join(PATHS.root, 'packages', folder);
   const exists = await fs.pathExists(packagePath);
   return exists ? packagePath : null;
 }

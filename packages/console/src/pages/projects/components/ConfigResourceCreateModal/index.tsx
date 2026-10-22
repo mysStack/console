@@ -3,11 +3,12 @@
  * https://github.com/kubesphere/console/blob/master/LICENSE
  */
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { Form, FormItem, Input, Modal, useForm } from '@kubed/components';
 
 import { NamespaceSelector } from '@ks-console/shared';
 import { ConfigMapSettings, SecretSettings } from '../../../clusters/components';
+import type { SecretSettingRef } from '../../../clusters/components/ConfigMapEditModal';
 
 type ResourceModule = 'configmaps' | 'secrets';
 
@@ -16,15 +17,16 @@ interface Props {
   visible: boolean;
   cluster?: string;
   workspace?: string;
+  namespace?: string;
   confirmLoading?: boolean;
   onOk: (data: Record<string, any>) => void;
   onCancel: () => void;
 }
 
-const getInitialValues = (module: ResourceModule) => ({
+const getInitialValues = (module: ResourceModule, namespace = '') => ({
   metadata: {
     name: '',
-    namespace: '',
+    namespace,
   },
   ...(module === 'secrets' ? { type: 'Opaque' } : {}),
   data: {},
@@ -35,14 +37,27 @@ function ConfigResourceCreateModal({
   visible,
   cluster = '',
   workspace,
+  namespace,
   confirmLoading,
   onOk,
   onCancel,
 }: Props): JSX.Element {
   const [form] = useForm();
-  const initialValues = getInitialValues(module);
-  const handleSubmit = () => {
+  const settingsRef = useRef<SecretSettingRef>(null);
+  const initialValues = getInitialValues(module, namespace);
+
+  const validateAndSubmit = () => {
     form.validateFields().then(data => onOk(data));
+  };
+
+  const handleSubmit = () => {
+    const dataForm = settingsRef.current?.dataFormRef?.current;
+    if (dataForm) {
+      dataForm.handleSubmit(validateAndSubmit);
+      return;
+    }
+
+    validateAndSubmit();
   };
 
   return (
@@ -64,11 +79,16 @@ function ConfigResourceCreateModal({
           label={t('PROJECT')}
           rules={[{ required: true, message: t('PROJECT_EMPTY_DESC') }]}
         >
-          <NamespaceSelector cluster={cluster} workspace={workspace} style={{ width: '100%' }} />
+          {namespace ? (
+            <Input disabled />
+          ) : (
+            <NamespaceSelector cluster={cluster} workspace={workspace} style={{ width: '100%' }} />
+          )}
         </FormItem>
         {module === 'secrets' ? (
           <SecretSettings
             form={form}
+            ref={settingsRef}
             formTemplate={initialValues as any}
             isFederated={false}
             mode="create"
@@ -77,6 +97,7 @@ function ConfigResourceCreateModal({
         ) : (
           <ConfigMapSettings
             form={form}
+            ref={settingsRef}
             formTemplate={initialValues as any}
             isFederated={false}
             onOk={() => undefined}

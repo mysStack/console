@@ -1,0 +1,117 @@
+# P0-U002/U003 针对性风险关闭矩阵
+
+> 取证日期：2026-10-17（上海时间）
+> 风险核验起点：`feature/v4-configmaps-secrets` / `3f19924fc665dcfdb1a1fdee840bcef1d73f9d97`
+> 迁移基线：`feature/v4-migration` / `3e09afd6a051d4091b3c887462c880eff2ba6754`
+> 证据对象：当前源码、`v3dist` 静态证据、已存在的 131 只读运行时证据
+
+本文把 P0-U002（启用入口、扩展和动态 Action）与 P0-U003（运行时菜单、路由、Network、权限和错误态）拆成可逐项复核的矩阵。`已验证`只表示对应证据已经存在；`部分验证`表示只覆盖代表性入口；`未验证`表示当前没有足够的 131 运行时或独立复核证据。静态 UI 权限判断不能替代 Kubernetes API 的实际 RBAC 返回。
+
+## 1. 作用域、路由、RBAC 和运行时矩阵
+
+| 作用域    | 当前 V4 路由注册和关键源码                                                                                                                                      | V3/Wujie 入口                                                                                                   | 静态权限证据                                                                                                                         | 当前 V4 API/Store 证据                                                                                                                           | 131 运行时证据                                                                                                                                                                 | V4 替代与剩余风险                                                                                                                   |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| cluster   | `packages/console/src/pages/clusters/routes/`；工作负载、配置、网络、存储等路由树存在                                                                           | `p0-route-inventory.md` 记录 `/consolev3/clusters/:cluster/...` 和集群 Embed；仍有 `WujieReact` 消费者          | `permissionStore.getClusterNavs(cluster)` 先检查 `globals.user.clusterRules[cluster]`，再调用 `hasPermission`                        | 集群工作负载使用 `packages/shared/src/stores/workload/`；其余资源由对应 V4 Store 或 Embed 组件决定                                               | **未验证全量**；当前运行时记录只证明代表性项目入口和公共 Wujie frame                                                                                                           | 集群工作负载有 V4 列表/详情；集群配置、网络、存储和扩展入口仍需逐项确认最终渲染组件、API、错误态和权限                              |
+| workspace | `packages/console/src/pages/workspaces/routes/index.tsx` 注册 `overview`、`projects`、`federatedprojects`、`devops`、`apps`、`repos` 等                         | `p0-route-inventory.md` 记录 Workspace V3 URL 和 DevOps Embed                                                   | `permissionStore.getWorkspaceNavs(workspace, clusters)` 先检查 `workspaceRules[workspace]`，再按 `hasPermission` 过滤                | DevOps 列表使用 `devopsStore`，静态列表 API 为 `kapis/devops.kubesphere.io/v1alpha3` 下的 workspace/cluster namespaces；创建和编辑仍走 V3 Action | **未验证** workspace 菜单、DevOps Action、低权限错误态和 Network                                                                                                               | Workspace 原生列表存在；`devops.create`、`devops.edit` 的弹窗和权限行为没有 V4 等价证据                                             |
+| project   | `packages/console/src/pages/projects/routes/index.tsx`、`detail.tsx` 注册项目列表、ConfigMap、Secret、ServiceAccount、工作负载详情和 ConfigReference            | `ConsoleV3ResourceList` 仍覆盖多个项目资源；`wujieUrlPrefix` 和项目详情桥接仍存在                               | `permissionStore.getProjectNavs({ cluster, workspace, project })` 先检查 `projectRules[cluster][project]`，再按 `hasPermission` 过滤 | 原生 ConfigMap/Secret/ServiceAccount 页面和对应 Store 已存在；工作负载详情的编辑仍通过 `useV3action`                                             | **部分验证**：已部署制品上完成项目基本信息、日志收集 Wujie frame、Secret 原生详情 Tab、刷新/返回和部分 Network；ConfigMap/Secret/ServiceAccount 的历史 CRUD 证据另见各验收记录 | ConfigMap/Secret/ServiceAccount 的列表和详情有原生替代；项目工作负载编辑、其他 `ConsoleV3ResourceList` 资源和完整跨项目隔离仍未关闭 |
+| federated | `packages/console/src/pages/fedprojects/routes/index.tsx`、`details.tsx` 注册联邦项目的 applications、workloads、ConfigMap、Secret、Service、Ingress、Volume 等 | 联邦项目仍有 `/consolev3/:workspace/federatedprojects/:namespace/...` 候选入口，且与项目作用域不能共用结论      | `getfederatedProjectNavs()` 对菜单项调用 `checkNavItem(item, () => true)`；源码未形成与 projectRules 对等的联邦运行时权限证明        | 联邦列表和详情组件存在，但本矩阵没有把每个资源的 Store、联邦 API version 和写操作逐项固定                                                        | **未验证**联邦菜单、直达、刷新、返回、Network、RBAC 和错误态                                                                                                                   | 不能沿用 project 的 V4 等价结论；必须单独确认联邦资源版本、传播行为、权限和 V3 Embed 是否仍被启用                                   |
+| platform  | `packages/console/src/pages/platform/routes/index.tsx` 注册 `/dashboard` 和 `/settings/*`                                                                       | `p0-route-inventory.md` 记录 `/consolev3/settings/*` 候选入口；ProfileMenu 仍可触发 `notification.user.setting` | `getPlatformSettingsNavs()` 先检查 `globals.user.globalRules.platform-settings`，再按 `hasPermission` 过滤                           | V4 原生平台设置页包括 notification configuration、history、silent policy、language；用户通知 Action 仍通过 `userStore` 的 V3 弹窗                | **未验证**平台设置菜单、用户通知 Action、Network 和低权限错误态                                                                                                                | 平台设置有 V4 路由，但 `notification.user.setting` 的行为、保存 API、权限和替代入口尚未证明等价                                     |
+| extension | `packages/shared/src/components/ExtensionConsoleV3Embed/` 提供扩展 V3 嵌入包装器；扩展入口由扩展配置和运行时对象决定                                            | 已安装扩展可能继续消费 `ExtensionConsoleV3Embed`，不能由 5 个源码引用推断实际启用范围                           | 扩展详情可读取扩展包中的 `permissions.yaml`；当前没有把每个启用扩展的权限与 Embed 行为逐项关联                                       | 扩展状态通过 `extensions.kubesphere.io/v1alpha1/extensions` API 回读；扩展自身 API/Store 取决于扩展包                                            | **部分验证**：131 只读 API 得到 15 个 `Installed`、1 个 `InstallFailed`；`kubeeye` 仍有 frontend bundle 且控制台存在初始化错误                                                 | 必须逐个关联 Installed/Failed 扩展、入口、权限、V3 Embed、V4 契约和失败降级；`kubeeye` 不能按“未安装”排除                           |
+
+### 1.1 当前运行时证据边界
+
+已存在的运行时证据对象为：镜像 tag `feature-v4-configmaps-secrets-20261016-170820-277e50781a04`，Pod imageID `sha256:04650b2ddbb79dcb19443fafa639cabbb62cb08d8c0087b7a8f850402bd3e018`，本地证据 ID `ev_local_p0_runtime_20261017_131_01`。该证据覆盖项目侧代表性入口、Wujie frame、直达/刷新/返回、原生 Secret 详情 Tab、Network 和扩展状态。
+
+本轮没有重新部署、修改集群资源、创建/删除资源或切换低权限账号。因而 cluster、workspace、federated、platform 的全量菜单/路由/Network/RBAC，以及 extension 的逐扩展入口仍标记为未验证；不能把静态路由树或 `200` 响应扩展列表写成全量运行时通过。
+
+## 2. 11 个业务 `useV3action` 调用矩阵
+
+下表中的 API/Store 是源码可确认的调用边界；“RBAC”只记录当前源码可见的 UI 作用域门槛，API 服务端允许/拒绝结果仍需在 131 以正反权限账号验证。
+
+| 调用文件                                                                                                                                               | Action                         | 作用域与关键参数                                                                                                               | 旧 V3 模块/行为证据                                                                        | 当前 V4 API/替代行为                                                                                                                     | RBAC 与运行时状态                                                                                 |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `packages/console/src/pages/projects/components/ConfigReference/entry.tsx:404`                                                                         | `workload.template.edit`       | project：`cluster`、`namespace`、`name`、`detail`、`supportGpuSelect`；`v3Module=workload`                                     | `origin/release-3.4/src/actions/workload.js`；原 Action 打开工作负载模板编辑并调用旧 Store | 原生 ConfigReference 先通过 `workloadStore(module).getDetailUrl()` 读取，提交回调调用原生 editor store `update`；工作负载主编辑器仍为 V3 | 项目菜单静态权限已定位；Action 触发、PATCH/PUT、权限拒绝和错误态未在 131 逐项验证                 |
+| `.../Workloads/DaemonSets/Detail/index.tsx:242`                                                                                                        | 默认 `workload.template.edit`  | project workload：`cluster`、`namespace`、`name`、`module=daemonsets`、`hasRootStore=true`                                     | 同上；V3 modal 成功后 `refetch`                                                            | 原生详情页已有 delete/recreate/YAML 等操作；设置编辑仍由 V3 Action 提供                                                                  | `projectRules`/`hasPermission` 只证明菜单过滤；弹窗、Network、API RBAC 未验证                     |
+| `.../Workloads/Deployments/Detail/index.tsx:282`                                                                                                       | 默认 `workload.template.edit`  | project workload：`module=deployments`，传 `detail` 和路由参数                                                                 | `release-3.4` 可定位 `workload.template.edit`                                              | `workloadStore` 可确认 GET/PATCH/DELETE 基础能力；当前编辑模板仍走 V3                                                                    | 同上；不能把集群 V4 工作负载代码推断为项目编辑已替代                                              |
+| `.../Workloads/StatefulSets/Detail/index.tsx:280`                                                                                                      | 默认 `workload.template.edit`  | project workload：`module=statefulsets`，传 `detail` 和路由参数                                                                | `release-3.4` 可定位 `workload.template.edit`                                              | `workloadStore` 和原生详情操作存在；编辑模板仍走 V3                                                                                      | 同上；联邦管理、权限拒绝和刷新结果未验证                                                          |
+| `.../Applications/AppTypeTable/OPAppTable/index.tsx:323`                                                                                               | `batch.deploy.app.create.v2`   | project/edge：`v3Module=edgeTemplateStore`，`module=edgeappsets`，传模板 `detail`                                              | 当前 `v3dist` 重点 Chunk 含 key；`release-3.4` 未找到同名 `.v2` 源码定义                   | 普通应用创建/部署有 `openpitrixStore`/`deployApp`；边缘模板弹窗仍为 V3                                                                   | workspace/project/edge 菜单静态范围可定位；触发、API、权限、失败回滚未验证                        |
+| `packages/console/src/pages/workspaces/containers/Devops/index.tsx:86,158`                                                                             | `devops.edit`、`devops.create` | workspace + selected cluster；创建传 `cluster`、`workspace`，编辑传 `detail`                                                   | `origin/release-3.4/src/actions/devops.js` 明确调用旧 `store.create/update`                | `devopsStore` 的列表 API 为 `kapis/devops.kubesphere.io/v1alpha3`；V4 表格存在，弹窗仍为 V3                                              | `workspaceRules` 和 `hasPermission` 只覆盖菜单；创建/编辑按钮、API method、拒绝结果和错误态未验证 |
+| `packages/core/src/components/Layouts/Header/ProfileMenu/index.tsx:89`                                                                                 | `notification.user.setting`    | platform/global user；`v3Module=userStore`，无资源作用域                                                                       | 当前 `v3dist` 含 key；`release-3.4` 未找到直接同名源码匹配                                 | 平台有原生 notification configuration/history/subscription 路由，但用户通知设置是否等价未确认                                            | global/platform UI 门槛可定位；用户设置 Action 和保存 API 未验证                                  |
+| `packages/shared/src/components/Apps/AppCreate/index.tsx:54`                                                                                           | `app.template.create.v2`       | workspace + edge cluster；`v3Module=edgeStore`，`module=apptemplates`，传 `workspace`、`cluster`                               | 当前 `v3dist` 含 key；旧 `release-3.4` 无直接同名匹配                                      | Helm/YAML 创建走 `openpitrixStore`；edge template 创建仍 V3                                                                              | workspace/edge 权限、API、失败反馈和替代行为未验证                                                |
+| `packages/shared/src/components/Apps/Applications/AppTypeTable/OPAppTable/EdgeWorkloads/index.tsx:75`                                                  | `workload.batch.delete.v2`     | edge project：`cluster`、`namespace`、`type=DEPLOYMENT`、selected resources；列表使用 `/v2/edgewize/clusters/.../projects/...` | 当前 `v3dist` 含 key；旧源码未直接匹配                                                     | `deploymentStore.fetchList` 可见边缘列表请求；批量删除仍为 V3 Action                                                                     | project/edge API 的 delete、批量部分成功、RBAC 和错误态未验证                                     |
+| `packages/shared/src/components/Apps/AppsDeploySpaceModal/index.tsx:71`                                                                                | `batch.deploy.app.create.v2`   | workspace/project/cluster；传 placement、version、`isManage` 和 `edgeStore`                                                    | 当前 `v3dist` 含 key；旧源码未直接匹配                                                     | V3 `onOK` 后调用当前 `deployApp`，因此是混合桥接流程，不是完整 V4 替代                                                                   | 跨 workspace/project placement、API、权限和取消/失败恢复未验证                                    |
+| 历史 `packages/shared/src/components/Modals/AppTemplateEdit/index.tsx`；当前为 `packages/console/src/pages/workspaces/components/Modals/EditAppModal/` | `openpitrix.template.edit.v2`  | workspace；历史桥传 `v3Module=appStore`，当前活动详情使用原生编辑器                                                            | 当前 `v3dist` 含 key；旧源码未直接匹配                                                     | 当前源码中的无调用旧桥已删除；原生编辑器调用 `openpitrixStore.updateApp`，但边缘模板和制品运行时等价仍未证明                             | workspace 正反权限、冲突/失败、错误态和制品内 V3 Action 移除仍未验证                              |
+
+## 3. 三个桥接文件矩阵
+
+| 文件                                               | 类型           | 已确认协议                                                                                                                               | 风险和关闭条件                                                                                         |
+| -------------------------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `packages/shared/src/hooks/useV3Actions/index.tsx` | 共享 Hook 实现 | 默认 `workload.template.edit`；首次打开延迟 1000ms；实例名 `consoleV3Actions`；URL `/consolev3/dashboard`；通过 `triggerAction` 总线发送 | 需要在运行时确认挂载、事件到达、卸载、多次打开和 Action 失败反馈；不能只因 Hook 有单测或源码存在就删除 |
+| `packages/console/src/actions/v3actions.tsx`       | 兼容桥实现     | 实例名 `consolev3`；URL `/consolev3/`；可传固定 Action 和任意参数；同样通过 `triggerAction`                                              | 与 shared Hook 是两条实例生命周期路径；必须分别验证消费者和替代 V4 行为                                |
+| `packages/shared/src/hooks/index.ts`               | 导出文件       | 只导出 `useV3action`，没有独立运行时行为                                                                                                 | 不应重复计算为业务调用；删除前需确认所有导入已迁移，并完成构建和运行时回归                             |
+
+## 4. P0-U001/P0-U004 制品来源结论
+
+已确认：`origin/release-3.4` 为可核验的 V3 源码候选，commit `175710fefeeba6ff295c2c0967b4d45b83563d26`，版本 `3.0.0`，许可证 `AGPL-3.0`；历史 `mysStack/kse-console-v3` commit `8843eadf162919f60c823192ea8ef30572aa9408` 也已独立核验版本、许可证和树身份。
+
+未确认：当前 `v3dist` 最近更新提交 `3f3064787042a95792b591f4aea4231ea7988bb0` 的提交信息只给出外部输入 `kse-console-embed:kse-release-4.1`，当前 tree 为 `1e499d92e11374e26c76f5e13be45251602bd596`，没有 `.v3dist-source.json`。历史元数据指向的 2026 tree `e6c16ea260a8c32227149135f3f5fe3b5a2c5fc2` 与当前 tree 有 750 个文件变化，不能复用其 provenance。
+
+处置：P0-U001/P0-U004 保持“分析中”，不自动豁免。若项目负责人不能提供 `kse-console-embed:kse-release-4.1` 的构建元数据，则必须书面确认“仅当前编译制品分析”的范围、风险和回滚依据；在此确认前不能把 `release-3.4` 或 `8843eadf1` 写成当前制品源码来源。
+
+## 5. `.husky/pre-commit` 失效原因与最小修复方案
+
+### 已验证原因
+
+- `.husky/pre-commit` 固定执行 `. "$(dirname -- "$0")/_/husky.sh"`，随后执行 `npx lint-staged --concurrent false`。
+- `package.json` 使用 Husky `^8.0.3`，`prepare` 为 `husky install`；`.husky/_/husky.sh` 被 `.husky/_/.gitignore` 忽略，不在 Git index 中。
+- 主工作区存在 `.husky/_/husky.sh`，三个 P0 Worktree 都缺失；因此在 P0 Worktree 提交时出现 `.husky/pre-commit: 2: .: cannot open .husky/_/husky.sh: No such file`。
+- 这不是 `git diff --check` 的质量检查结果；原先为提交文档使用 `git -c core.hooksPath=/dev/null` 绕过 Hook，不能证明 lint-staged、TypeScript、测试或构建通过。
+
+### 最小修复方案
+
+1. 保持现有 Husky 8 Hook 内容不变，先在每个新 Worktree 完成依赖安装或显式执行仓库既有的 `yarn prepare`，生成被忽略的 `.husky/_/husky.sh`。
+2. 在 Worktree 初始化检查中增加 `test -f .husky/_/husky.sh`，缺失时把环境初始化标记为失败，不能静默跳过 lint-staged。
+3. 后续提交不再用 `core.hooksPath=/dev/null` 作为质量证明；若 Hook 环境未修复，只能明确记录“提交使用了绕过 Hook 的技术手段”，并单独执行可复现的 lint-staged/测试/构建检查。
+
+当前只提出方案，没有修改 Hook、package.json 或业务代码。
+
+## 6. 本轮运行时收尾后的 P0 结论
+
+| 状态     | 项目                                                                                                                                                                                                                      |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 已验证   | 分支关系、Worktree 干净状态、PR #1 远程头、11 个业务 Action 调用点、3 个桥接文件、作用域权限代码路径、当前 `v3dist` 提交/tree、131 当前 Pod 镜像身份；cluster、workspace DevOps、platform、extension 代表性入口和 Network |
+| 部分验证 | project 代表性运行时入口、Wujie frame、原生 Secret 详情、workspace DevOps 打开/取消 Action、扩展管理和一个已安装扩展详情、focused REA、ConfigMap/Secret/ServiceAccount 历史 CRUD 证据                                     |
+| 未验证   | federated project 有效 fixture、低权限账号，全部 Action 的触发/Network/RBAC/错误态，逐扩展 V4 契约，扩展初始化错误闭环，当前制品到旧源码的 provenance                                                                     |
+| 阻塞     | P0-U001/P0-U004 缺少当前外部 V3 镜像的源码构建元数据；独立人工/其他复核未完成；PR #1 同时混入 P0 文档，尚未具备合并条件                                                                                                   |
+
+本矩阵不改变 P0 门禁结论：P0-REA 仍为“分析中，待负责人复核”，不进入 P1/P2 正式开发，不删除 V3/Wujie，不合并 Draft PR #1。运行时细节见 [`p0-runtime-closure-20261017.md`](./p0-runtime-closure-20261017.md)。
+
+## 2026-10-20 当前活动调用口径修正
+
+当前分支非测试源码重新扫描得到 11 个 `useV3action/useV3Actions` 文件：8 个业务调用文件、2 个桥接实现/Hook 文件和 1 个导出文件。A02～A04 的活动项目详情路由已切换到原生 `ApplicationWorkloads/Workloads/*/Detail/routes.tsx`，因此历史矩阵中的 11 个业务调用文件属于早期基线，不能直接套用于当前活动调用统计。
+
+旧 `projects/containers/{Deployments,StatefulSets,DaemonSets}/Detail` 文件仍包含 Wujie 代码，当前仅确认它们不在活动项目详情路由导入链上；其他消费者、联邦入口和测试引用仍需继续复核。该修正不关闭 P0-U002/P0-U003。
+
+## 2026-10-20 A12 当前源码桥接清理
+
+扫描当前源码（排除 `packages/bootstrap/assets/v3dist`、编译输出和 `node_modules`）确认，历史
+`packages/shared/src/components/Modals/AppTemplateEdit/index.tsx` 没有导入、动态导入或导出引用；活动应用模板详情使用原生
+`EditAppModal`，保存调用 `openpitrixStore.updateApp`。该无调用旧桥已删除。
+
+这只证明当前源码不再保留该无调用组件，不证明 `v3dist` 中的同名 Action 字符串、边缘模板入口、低权限路径和远程扩展行为已经等价；A12 仍保持“部分验证”。
+
+## 2026-10-20 A12 部署后浏览器证据
+
+提交 `1c54df98d` 通过 CI Run `39361312595` 后部署到 131。当前部署镜像为
+`ghcr.io/mysstack/ks-console:feature-v4-configmaps-secrets-20261020-105412-1c54df98d124`，Pod imageID 为
+`sha256:49febd89201b7a887d30928ae31a3b296d459ed18dc7811b550a14719556fab2`，rollout 成功，Pod `Running/Ready`。
+
+真实浏览器登录并访问应用模板详情后，原生 `EditAppModal` 可以打开、字段正常回填、取消可以关闭；Network 未出现
+`openpitrix.template.edit.v2` 请求，只看到既有 `/consolev3/dashboard` 预加载和 V2 Application API 读取请求。
+因此关闭“当前源码无调用旧编辑桥且部署后原生编辑入口可渲染”的子项，A12 的边缘入口、低权限、冲突/失败和全部制品运行时等价仍未验证。
+
+## 2026-10-20 当前动态 Action 计数修正
+
+A12 清理后重新扫描当前非测试源码（排除 `v3dist`、编译输出和 `node_modules`）得到 9 个
+`useV3action/useV3Actions` 文件：6 个业务调用文件、2 个桥接实现/Hook 文件和 1 个导出文件，对应 7 个当前活动 Action 行。
+历史记录中的 11 个业务文件和 14 个命中文件保留为历史基线，不应继续作为当前计数。
