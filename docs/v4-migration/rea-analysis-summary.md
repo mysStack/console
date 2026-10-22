@@ -3,20 +3,20 @@
 > 当前状态以 [module-execution.json](./module-execution.json) 为准。
 > 本索引属于 `feature/v4-workloads`，不复制或覆盖 ConfigMap/Secret 分支的全局 P0 证据。历史全局索引保留在 `feature/v4-configmaps-secrets:docs/v4-migration/rea-analysis-summary.md`；需要输入时按固定 SHA 读取，不能继承其通过结论。
 
-| 项目              | 当前事实                                                                                                                                                              |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 模块/当前能力     | Workload / Deployment、StatefulSet、DaemonSet 组合批次                                                                                                                |
-| Worktree/分支     | `console-workloads` / `feature/v4-workloads`                                                                                                                          |
-| 当前阶段/REA 结论 | `REA` / 分析中                                                                                                                                                        |
-| 事实输入提交      | 本轮制品定位 `e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0`；历史复核 `87df0e024ea93333a2352fc92907007b86f5e33b`；业务代码输入 `36ae2216167ae27561c05e37e5157df0da322de8` |
-| 观察              | 已有原生简化表单和有限部署后测试；当前 V3 编辑行为尚未逐项还原                                                                                                        |
-| 推断              | 表单覆盖不足，不能凭现有 V4 测试证明当前 V3 等价；具体缺失须由制品和真实 V3 行为确认                                                                                  |
-| 制品/REA 证据     | [REA 复核及完整 Evidence ID](./workload-settings-rea-20261022.md)；V3 Git tree 绑定在阶段记录中，不能与 REA 目录摘要混用                                              |
-| 行为和字段清单    | [组合能力边界](./workload-kind-capability-matrix.md)、[编辑设置能力矩阵](./deployment-settings-capability-matrix.md)；三类资源均未标记为已还原                        |
-| 未知及影响        | 三类资源的入口/分区、完整字段、Action/API/Store、RBAC/作用域、错误态和缓存尚未闭环，影响功能完整性、权限和数据保留                                                    |
-| 关闭条件          | 公共行为和三类资源差异均有可追溯制品定位、运行时对照、V4 替代与差异；所有高风险已关闭或经复核明确隔离                                                                 |
-| 复核人/日期/依据  | 尚无本能力正式签署，不填造；阶段记录中的 `review` 为 `null`                                                                                                           |
-| 下一步            | 沿已定位表单子组件和 Store 展开字段/校验/API，再以真实 V3 页面校准；不重复全量 REA，不提前编码或部署                                                                  |
+| 项目              | 当前事实                                                                                                                                                                                                      |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 模块/当前能力     | Workload / Deployment、StatefulSet、DaemonSet 组合批次                                                                                                                                                        |
+| Worktree/分支     | `console-workloads` / `feature/v4-workloads`                                                                                                                                                                  |
+| 当前阶段/REA 结论 | `REA` / 分析中                                                                                                                                                                                                |
+| 事实输入提交      | 本轮制品定位 `e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0`；历史复核 `87df0e024ea93333a2352fc92907007b86f5e33b`；业务代码输入 `36ae2216167ae27561c05e37e5157df0da322de8`                                         |
+| 观察              | 已有原生简化表单和有限部署后测试；当前 V3 编辑行为尚未逐项还原                                                                                                                                                |
+| 推断              | 表单覆盖不足，不能凭现有 V4 测试证明当前 V3 等价；具体缺失须由制品和真实 V3 行为确认                                                                                                                          |
+| 制品/REA 证据     | [REA 复核及完整 Evidence ID](./workload-settings-rea-20261022.md)；V3 Git tree 绑定在阶段记录中，不能与 REA 目录摘要混用                                                                                      |
+| 行为和字段清单    | [组合能力边界](./workload-kind-capability-matrix.md)、[编辑设置能力矩阵](./deployment-settings-capability-matrix.md)、[旧源码对照](./workload-settings-source-evidence-20261024.md)；三类资源均未标记为已还原 |
+| 未知及影响        | 三类资源的入口/分区、完整字段、Action/API/Store、RBAC/作用域、错误态和缓存尚未闭环，影响功能完整性、权限和数据保留                                                                                            |
+| 关闭条件          | 公共行为和三类资源差异均有可追溯制品定位、运行时对照、V4 替代与差异；所有高风险已关闭或经复核明确隔离                                                                                                         |
+| 复核人/日期/依据  | 尚无本能力正式签署，不填造；阶段记录中的 `review` 为 `null`                                                                                                                                                   |
+| 下一步            | 沿已定位表单子组件和 Store 展开字段/校验/API，再以真实 V3 页面校准；不重复全量 REA，不提前编码或部署                                                                                                          |
 
 REA 的 `partial/no-match` 是覆盖限制，不能证明功能不存在，也不是所有模块必须停止的理由。当前受限的是尚未证明的 Workload 组合批次；无关模块仍遵循自己的证据和门禁。无需恢复全部原始 TSX，只需要公共行为和三类资源差异的证据足以指导完整 V4 重构。
 

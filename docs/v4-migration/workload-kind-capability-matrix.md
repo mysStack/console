@@ -85,6 +85,10 @@ ippools 的 disabled 条件为 `!globals.app.hasKSModule("network")`，不是无
 
 Action `3595` 从 `detail._originData` 取编辑对象，保存时处理 `spec.template.spec.customMode` 后执行 `store.update(detail, data)`；Promise 成功后关闭 Modal 并调用 success。实际 HTTP 方法、payload 转换、错误传播、权限及缓存刷新仍需追踪 Store 和浏览器，不能从此调用推定已验证。`1122` 共享 Modal 进一步委托 `2925` 表单容器，字段、校验和取消行为尚未闭环。
 
+### 旧源码与当前实现的补充对照
+
+固定 `origin/release-3.4` 确认三类资源均有基础信息、Pod、存储和高级四个设置分区；StatefulSet 额外启用 Service 设置。旧源码还确认 Deployment 有 HPA 编辑入口，StatefulSet 有 Service 编辑入口，三类资源共用模板编辑、回滚、重建、YAML 和删除入口。完整对照见[旧源码与当前实现对照](./workload-settings-source-evidence-20261024.md)。这些事实与当前制品事实相互印证资源差异，但不能证明当前制品的完整字段和运行时行为已经恢复。
+
 ### 本轮结论和下一项
 
 已补齐普通三类资源的静态编辑入口、Action 处理器和分区登记定位，并确认 V4 的 STS/DS 编辑设置仍误用 YAML。尚未完成字段、校验、Store/API、RBAC、真实页面与请求的逐项核对；覆盖维度保持“未完成”，不签署 REA 或 VERIFY 通过。下一项沿已定位的表单子组件和 Store 做定向展开，再用真实 V3 页面/Network 校准，不重复全量 REA，不依据旧 release-3.4 直接编码。
