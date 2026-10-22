@@ -42,4 +42,6 @@ Deployment、StatefulSet、DaemonSet 共用一个模块分支和组合能力记�
 
 2026-10-23 REA 材料复核结论见[Workload 组合批次 REA 复核结论](./workload-rea-review-20261023.md)：当前材料不足以放行，继续保持“分析中，待负责人复核”。本次把配置引用的 V3 Action/Wujie 依赖和集群级 Workload 列表的 Wujie/V3 主入口从“未知”校准为已确认实现缺口，同时保留字段、RBAC、作用域、缓存、错误和三类资源逐项等价的未闭环状态；不进入 DEV。
 
+2026-10-23 字段行为矩阵见[Workload 三类资源字段行为矩阵](./workload-field-behavior-matrix-20261023.md)：逐项绑定旧 V3 的字段分区、默认值/校验、当前 V4 解析与写回逻辑，单独列出 StatefulSet 的 Service/PVC 模板和 DaemonSet 的无副本/更新策略差异。该矩阵把“已定位事实”和“待实测行为”分开，扩大 DEV 输入但不关闭高风险项。
+
 同时纠正集群列表判定：活跃入口是 V4 Banner/Tab + Wujie 内 V3 列表；独立 STS/DS Embed 文件的 URL 互换没有在该主入口复现。REA 证据应明确当前行为与拟开发行为；当前 SHA 的最终构建部署验收属于 VERIFY，不作为 REA 完成前的循环前置条件。当前完整 REA 仍未闭环。

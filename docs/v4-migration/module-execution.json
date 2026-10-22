@@ -20,7 +20,7 @@
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
-        "sha256": "dee4e318da691f5536b5da1465542583fab78950b0b3ced11e3f33ecd0c9f8ad"
+        "sha256": "309212c8ab9e8afe4b5e4f1e0ca7f029c6db1d90ed1ce5ba203c48332a745c71"
       },
       {
         "path": "docs/v4-migration/workload-kind-capability-matrix.md",
@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "1b7ba36f059f25efd300afb8b0aa5a0d34c14706c7924d7c07349b2845ec09be"
+        "sha256": "79ede18db7b62a62d39b3d97a5840786b672ea39f1da7bf9eab62dc3ff250dd7"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "5642c280e0eddc11ddd6da7e45849581d2e4449ba1482dfca4666ebdf9d673ac"
+        "sha256": "38e65d4828cae084269f7925f36801ccbf3be3ff3ed2973e36f0c13be1e0b9e5"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -81,6 +81,10 @@
       {
         "path": "docs/v4-migration/workload-rea-review-20261023.md",
         "sha256": "7bcad7b2f77752b00ae97693f832a84e6949d685f60350e4c5c277fb5aa67922"
+      },
+      {
+        "path": "docs/v4-migration/workload-field-behavior-matrix-20261023.md",
+        "sha256": "35997c92392b9c1de3c12f81a62cf939b4335543a5dcf85a2456fee48a0045c1"
       }
     ],
     "coverage": {
@@ -101,7 +105,8 @@
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
           "docs/v4-migration/workload-kind-capability-matrix.md",
-          "docs/v4-migration/workload-v3-field-equivalence-20261023.md"
+          "docs/v4-migration/workload-v3-field-equivalence-20261023.md",
+          "docs/v4-migration/workload-field-behavior-matrix-20261023.md"
         ]
       },
       "validation": {
@@ -110,7 +115,8 @@
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
           "docs/v4-migration/workload-kind-capability-matrix.md",
-          "docs/v4-migration/workload-v3-field-equivalence-20261023.md"
+          "docs/v4-migration/workload-v3-field-equivalence-20261023.md",
+          "docs/v4-migration/workload-field-behavior-matrix-20261023.md"
         ]
       },
       "api": {
@@ -186,7 +192,8 @@
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
           "docs/v4-migration/workload-kind-capability-matrix.md",
-          "docs/v4-migration/workload-rea-review-20261023.md"
+          "docs/v4-migration/workload-rea-review-20261023.md",
+          "docs/v4-migration/workload-field-behavior-matrix-20261023.md"
         ]
       }
     },
