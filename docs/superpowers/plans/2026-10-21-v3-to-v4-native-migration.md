@@ -8,7 +8,7 @@
 
 **Tech Stack:** React、TypeScript、React Router、React Query、Kubed UI、Kubernetes API、node:test/esno/仓库测试脚本、Playwright、Docker/GitHub Actions、131 K3s 测试环境。
 
-**Spec:** `../console-v4-migration-plan.md`、`docs/v4-migration/matrix.md`、`docs/v4-migration/rea-analysis-summary.md`。
+**Spec:** `/home/bruce/code/ks-develop/console-v4-migration-plan.md`、`/home/bruce/code/ks-develop/v4-module-execution-rules.md`、`docs/v4-migration/matrix.md`、`docs/v4-migration/rea-analysis-summary.md`。
 
 ## 全局约束
 
@@ -24,6 +24,16 @@
 - 浏览器账号从 `/home/bruce/.bashrc` 的测试环境变量读取；任何输出、日志、截图、文档、测试配置和提交都不得包含用户名密码、Token、Kubeconfig 或 Secret 明文。
 - 当前 131 是测试环境；生产、稳定分支和非测试业务资源不操作。测试资源使用唯一名称和标签，只清理本轮创建的对象，不删除 `v4-migration-e2e` namespace。
 - 镜像 tag 使用 `分支名-上海时间-Git短SHA`；每次部署记录 Git SHA、CI Run、镜像 tag、digest 和 Pod imageID。
+
+## 开工硬门禁
+
+每次继续本模块，在修改文件前执行：
+
+```bash
+/home/bruce/code/ks-develop/scripts/v4-module-gate.py workloads start
+```
+
+提交前执行 `workloads commit`，部署前执行 `workloads deploy --tag <tag>`，创建或更新 PR 前执行 `workloads pr --pr <编号>`。任一门禁失败都先纠正工作区、分支、基线、远程同步或 PR 目标，不继续编码。其他模块不得复用本 Worktree；须根据注册表建立其自身分支和 Worktree。
 
 ## 行为基线与证据规则
 
@@ -123,7 +133,7 @@
 
 ### Task 6：第一批 131 部署和浏览器 VERIFY
 
-- [ ] 生成 tag：`feature-v4-configmaps-secrets-上海时间-Git短SHA`，记录 Git SHA、CI Run、镜像 digest。
+- [ ] 生成 tag：`feature-v4-workloads-上海时间-Git短SHA`，记录 Git SHA、CI Run、镜像 digest；部署前通过 `workloads deploy` 门禁。
 - [ ] 按授权构建并推送测试镜像，更新 131 `kubesphere-system/ks-console`，等待 rollout 成功并回读 Pod imageID。
 - [ ] 使用新浏览器上下文从测试环境变量登录，不复用旧会话。
 - [ ] 逐项验证三个项目列表：当前 namespace 数据、跨 namespace 哨兵隔离、列表/详情、直达 URL、刷新、返回、编辑、YAML、重建、删除、批量删除、取消、错误反馈和 Network。
@@ -134,9 +144,10 @@
 ### Task 7：提交第一批独立变更
 
 - [ ] 运行 `git status --short --branch` 和 `git diff --check`，只暂存 Workload 代码、测试和对应中文文档。
+- [ ] 执行 `/home/bruce/code/ks-develop/scripts/v4-module-gate.py workloads commit`，确认分支和 Worktree 与注册表一致。
 - [ ] 创建一个描述实际行为变化的提交，例如 `feat: migrate project workload lists to native v4`。
 - [ ] 推送当前功能分支，不强推、不改写历史、不自动合并 Draft PR #1。
-- [ ] 提交后回读 Git SHA、远程分支、PR 状态和 131 部署身份，并在 `agents-status.md` 写入独立结果。
+- [ ] 为 `feature/v4-workloads` 创建独立 Draft PR，目标为 `feature/v4-migration`；执行 `workloads pr --pr <编号>` 后，回读 Git SHA、远程分支、PR 状态和 131 部署身份，并在 `agents-status.md` 写入独立结果。
 
 ## 2026-10-22 当前批次补充
 
