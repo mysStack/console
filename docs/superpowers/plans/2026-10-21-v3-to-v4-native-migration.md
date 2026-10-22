@@ -1,7 +1,7 @@
 # KubeSphere Console V3 → V4 原生化迁移实施计划
 
 > 执行模式：单 Codex 会话顺序执行，不创建子 Agent。本文为实施清单，主计划和模块规则优先。
-> 当前 Workload 能力为 Deployment 编辑设置，阶段 `REA`、状态“分析中”，见 [阶段记录](../../v4-migration/module-execution.json)。以下历史任务与限定 VERIFY 不等于当前能力已放行。
+> 当前 Workload 能力为 Deployment、StatefulSet、DaemonSet 组合批次（`deployment-statefulset-daemonset`），阶段 `REA`、状态“分析中”，见[阶段记录](../../v4-migration/module-execution.json)和[组合能力边界](../../v4-migration/workload-kind-capability-matrix.md)。公共实现可以共用，三类资源分别完成差异核对和验收；以下历史任务与限定 VERIFY 不等于当前能力已放行。
 
 **Goal:** 以现有 V3 源码、当前 `v3dist`、REA 证据和 131 浏览器证据为行为基线，逐模块把 KubeSphere Console 重构为 V4 原生实现，最终移除所有实际启用功能对 V3/Wujie 的运行时依赖。
 
@@ -60,7 +60,7 @@
 
 ## 第一批执行：Workload 列表原生化
 
-以下保留最初任务拆分及完整验收要求；当前实现与部署进展以本文 2026-10-22 补充及其链接的操作验收记录为准。未关闭的创建、RBAC、作用域和完整动作不能因已有列表代码而勾选通过。
+以下保留最初任务拆分及完整验收要求。2026-10-22 补充及其链接属于历史实现和限定部署证据；当前阶段以 `module-execution.json` 为准。2026-10-23 负责人已确认组合开发，先完成三类资源的公共/差异 REA，再共用实现并分别 VERIFY；未关闭的创建、RBAC、作用域和完整动作不能因已有列表代码而勾选通过。
 
 第一批目标是项目级 Deployment、StatefulSet、DaemonSet 列表。详情页已存在 V4 原生实现，但当前三个列表入口仍使用 `ConsoleV3ResourceList`，因此先关闭这个真实的核心 V3 运行时缺口。
 
@@ -153,14 +153,14 @@
 ## 2026-10-22 当前批次补充
 
 - 第一批列表实现基线为 `412358f5f`。部署后发现的操作可见性、状态原因占位及成功刷新问题按独立提交修复，不将列表切换直接视为验收。
-- 当前修复提交为 `b08d3421e`（失败反馈）、`b329aae26`（项目作用域）、`7961eaedc`（列表刷新及状态原因）。具体本地、CI 和 131 证据见[项目 Workload 操作验证记录](../../v4-migration/workload-actions-131-verify-20261022.md)。
+- 当前修复提交为 `b08d3421e`（失败反馈）、`b329aae26`（项目作用域）、`7961eaedc`（列表刷新及状态原因）。具体本地、CI 和 131 证据见[项目 Workload 操作验证记录](https://github.com/mysStack/console/blob/9fa3c15b4eef8c1d7986b4afe79f97704a160d5a/docs/v4-migration/workload-actions-131-verify-20261022.md)。
 - 已核验当前测试入口：`scripts/test.sh` 逐文件使用 esno 执行 node:test；原计划中的 Jest 命令不适用于这些现有用例，已修正。源文件关键词测试只保留为已有结构约束，新缺陷使用实际函数行为测试和部署后浏览器证据。
 - 原生创建向导、DaemonSet 操作边界、全部动作等价、低权限组合及完整作用域隔离仍需继续；当前不进入下一资源模块，也不自动部署下一模块。
 
 ## 2026-10-22 Deployment 创建分批进度
 
-- 第一批基础创建已由源码 `a05a96518` 完成 131 验证，见[第一批记录](../../v4-migration/deployment-create-131-verify-20261022.md)。
-- 第二批多个工作容器、初始化容器、普通环境变量和端口已由源码 `2a2aeb4f4` 完成本地 259 项回归、CI Run `39726084825`、131 rollout 和浏览器 25 项检查，见[容器设置记录](../../v4-migration/deployment-containers-131-verify-20261022.md)。页面布局和跨组旧校验提示按浏览器失败证据修复；共享 ArrayInput 额外补测原生服务端口编辑。
+- 第一批基础创建已由源码 `a05a96518` 完成 131 验证，见[第一批记录](https://github.com/mysStack/console/blob/9fa3c15b4eef8c1d7986b4afe79f97704a160d5a/docs/v4-migration/deployment-create-131-verify-20261022.md)。
+- 第二批多个工作容器、初始化容器、普通环境变量和端口已由源码 `2a2aeb4f4` 完成本地 259 项回归、CI Run `39726084825`、131 rollout 和浏览器 25 项检查，见[容器设置记录](https://github.com/mysStack/console/blob/9fa3c15b4eef8c1d7986b4afe79f97704a160d5a/docs/v4-migration/deployment-containers-131-verify-20261022.md)。页面布局和跨组旧校验提示按浏览器失败证据修复；共享 ArrayInput 额外补测原生服务端口编辑。
 - 测试工作负载使用 `replicas: 0`；下一独立任务补齐容器命令/参数并验证实际运行，然后继续配置引用、探针、资源、存储等原始向导差异。上述限定结果不勾选完整 RBAC、跨作用域或全部动作验收，不自动进入下一模块。
 
 ## 2026-10-22 独立 Workload 分支归集

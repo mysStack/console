@@ -15,7 +15,12 @@
     "workloads": {
       "branch": "feature/v4-workloads",
       "worktree": "console-workloads",
-      "scope": "Deployment、StatefulSet、DaemonSet、Pod、Job、CronJob"
+      "scope": "Deployment、StatefulSet、DaemonSet、Pod、Job、CronJob",
+      "currentBatch": {
+        "capability": "deployment-statefulset-daemonset",
+        "resources": ["Deployment", "StatefulSet", "DaemonSet"],
+        "developmentModel": "公共 Workload 能力共用实现，三类资源分别 REA/VERIFY；Pod、Job、CronJob 保留在后续批次"
+      }
     },
     "storage-network": {
       "branch": "feature/v4-storage-network",

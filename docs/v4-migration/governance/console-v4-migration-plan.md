@@ -12,7 +12,7 @@
 >
 > 测试环境：`192.168.2.131:30880`（仅经授权后部署）
 
-> **当前执行口径（2026-10-22）：** 本文第 3～8 节为有效规则，下方日期记录为历史事实，不能据此恢复旧的全局 P0 阻塞策略或倒推模块 REA 已通过。Workload 使用 `feature/v4-workloads` / `console-workloads`；当前聚焦 Deployment 编辑设置，阶段为 `REA`、状态为“分析中”。既有原生实现及浏览器场景保留为先行证据，未完成 V3 行为对照前不继续该能力的 DEV/VERIFY。其他模块状态以其分支内经核对的记录为准，不复制本分支旧表格的进度。
+> **当前执行口径（2026-10-23）：** 本文第 3～8 节为有效规则，下方日期记录为历史事实，不能据此恢复旧的全局 P0 阻塞策略或倒推模块 REA 已通过。Workload 使用 `feature/v4-workloads` / `console-workloads`；当前范围调整为 Deployment、StatefulSet、DaemonSet 的组合批次，阶段为 `REA`、状态为“分析中”。公共列表、详情、容器/模板编辑、作用域、缓存和错误处理可以共用实现；三类资源的入口、字段差异、Action、RBAC 和验收结果必须分别记录，一类资源通过不代表另外两类通过。既有原生实现及浏览器场景保留为先行证据，未完成组合批次的 V3 行为对照前不继续该能力的 DEV/VERIFY。其他模块状态以其分支内经核对的记录为准，不复制本分支旧表格的进度。
 
 ### 历史执行与策略调整记录（不作为当前阶段授权）
 
@@ -89,7 +89,7 @@ release-4.2.0                 全量验收通过后再创建的发布分支（�
 
 ### 3.2 REA 完成条件与门禁检查边界
 
-- **固定交付范围：** 每次明确模块与当前能力，例如 Workload / Deployment 编辑设置。先列出现有 V3 的页面分区、字段、默认值、校验、Action、API/Store、RBAC、作用域、缓存、路由和错误行为，再对照 V4；不能只按新表单已经实现的字段生成测试。能力拆分不得把遗漏功能排除出模块总清单，范围改变必须重新评估证据。
+- **固定交付范围：** 每次明确模块与当前能力，例如 Workload / Deployment、StatefulSet、DaemonSet 组合批次。先列出现有 V3 的页面分区、字段、默认值、校验、Action、API/Store、RBAC、作用域、缓存、路由和错误行为，再对照 V4；不能只按新表单已经实现的字段生成测试。公共能力可以一次实现，但必须为每类资源保留差异矩阵和独立验收结论；能力拆分不得把遗漏功能排除出模块总清单，范围改变必须重新评估证据。
 - **三类输入分开：** 旧 V3 源码是结构参考；当前 `v3dist` 的 REA 是制品证据；真实 V3 页面、Network 和 API 是运行时行为证据。记录实际观察、静态推断和未知项，不把 `release-3.4` 当作当前制品完整源码。
 - **足够证据的定义：** 当前能力的行为矩阵完整、结论可追溯、影响正确性/权限/数据保留的高风险未知项已经关闭或经复核明确隔离。不要求恢复整个 V3 原始源码，也不要求 REA 大型语义图达到无截断；`partial`、`no-match` 需要逐项解释影响，既不自动放行，也不自动阻塞无关能力。
 - **唯一当前状态：** 模块分支维护 `docs/v4-migration/module-execution.json`，记录模块、能力、当前阶段、REA 状态、源提交、V3 tree、带摘要的证据文件、覆盖维度、未闭环高风险项和复核依据；`rea-analysis-summary.md` 为该分支索引。人工文档的当前状态必须与之相同，历史快照放在明确标记的历史区。
@@ -99,7 +99,7 @@ release-4.2.0                 全量验收通过后再创建的发布分支（�
 
 ### 3.3 执行入口补强（2026-10-23 负责人授权）
 
-复用现有模块门禁，接入 Git `pre-commit`、中文标题 `commit-msg` 和 PR CI；不新增业务阶段、不重做全量 REA。当前 Workload 仍处于 `deployment-settings / REA / 分析中`。
+复用现有模块门禁，接入 Git `pre-commit`、中文标题 `commit-msg` 和 PR CI；不新增业务阶段、不重做全量 REA。当前 Workload 处于 `deployment-statefulset-daemonset / REA / 分析中`。
 
 本次治理修复可通过记录通道修改 `.husky/pre-commit`、`.husky/commit-msg` 和 `.github/workflows/v4-module-gate.yml`，以及既有 `docs/v4-migration/` 治理脚本、测试和记录；这是明确列举的工具路径，不授权业务代码、其他工作流或部署。后续各模块复用同一套入口，不复制另一套阶段判断。
 
@@ -119,7 +119,7 @@ REA 作为**功能取证与逆向辅助**，Codex 负责 V4 实现；Dot/Work �
 
 ### 4.2 试点顺序和 Deployment 证据包
 
-之前本节把 Deployment 写成首个试点，与 ConfigMap/Secret/ServiceAccount 的现有实现和当前收尾优先级冲突。现行顺序调整为：全局 P0 风险持续跟踪；先对 ConfigMap、Secret、ServiceAccount 分别完成模块级 REA，再按模块推进 DEV、VERIFY 和 PR。Deployment 文档继续作为逆向输入，进入 Deployment 前仍需完成 Deployment 自身的模块级 REA，不能用其他模块的证据替代。
+之前本节把 Deployment 写成首个试点，与 ConfigMap/Secret/ServiceAccount 的现有实现和当前收尾优先级冲突。现行顺序调整为：全局 P0 风险持续跟踪；先对 ConfigMap、Secret、ServiceAccount 分别完成模块级 REA，再按模块推进 DEV、VERIFY 和 PR。当前 Workload 批次将 Deployment、StatefulSet、DaemonSet 放在同一登记模块中，先完成三类资源的组合 REA；公共实现可以共用，资源差异必须逐项核对，不能用 Deployment 的证据或结果替代 StatefulSet/DaemonSet。组合批次进入 DEV 前，三类资源的高风险未知项都必须关闭或明确隔离。
 
 依次还原：
 
@@ -137,7 +137,7 @@ REA 作为**功能取证与逆向辅助**，Codex 负责 V4 实现；Dot/Work �
 
 - `docs/v4-migration/deployment-v3-evidence.md`：路由、API、Store、操作调用链。
 - `docs/v4-migration/deployment-gap-matrix.md`：V3 功能与 V4 对应文件、缺口和测试场景。
-- 待开发事项拆分为可独立评审的 PR，而非直接一次性替换整个 Deployment。
+- 待开发事项按公共能力和资源差异拆分为可独立评审的提交或 PR，不直接一次性替换整个 Workload 批次。公共实现提交必须列出 Deployment、StatefulSet、DaemonSet 的调用方和回归范围。
 
 ## 5. V4 技术方案
 
@@ -155,7 +155,7 @@ REA 作为**功能取证与逆向辅助**，Codex 负责 V4 实现；Dot/Work �
 | P0   | 基线与依赖风险持续跟踪                                   | 分支差异、旧 V3 源码基线、全部路由/Wujie/`useV3action` 依赖、WSL REA 集成、Deployment 逆向输入 | 维护风险清单、证据和矩阵，不作为所有模块的统一开发阻塞 | P0 风险在全局持续跟踪；模块内命中的高风险未知项仍阻塞对应模块              |
 | P1   | V4 资源公共底座                                          | 作用域、权限、缓存、列表/详情和返回恢复的 V3 行为证据                                          | 公共底座实现与隔离回归                                 | 公共底座模块 REA 完成并复核后才能修改；验收通过后提交独立 PR               |
 | P2   | ConfigMap、Secret、ServiceAccount                        | 每个模块分别完成旧 V3 参考、REA 静态/运行时、API/Action、RBAC、脱敏、批量操作和作用域矩阵      | 原生列表、详情、创建、编辑、删除、批量操作和配置历史   | 每个模块独立执行 `REA → DEV → VERIFY → PR`；一个模块通过不代表其他模块通过 |
-| P3   | Deployment、StatefulSet、DaemonSet                       | 逐模块完成旧 V3 行为和关键运维 Action、API、权限、缓存证据                                     | 列表/详情/编辑/伸缩/回滚/重启/配置引用                 | P3-REA 完成后才能开发；关键运维操作无需 V3 Action 且部署验收通过           |
+| P3   | Deployment、StatefulSet、DaemonSet 组合批次              | 公共行为及三类资源差异分别完成旧 V3、Action、API、权限、缓存证据                               | 共用公共实现；按资源完成列表/详情/编辑及适用运维操作   | 组合 REA 完成后开发；三类资源分别完成无 V3 Action 的部署后验收             |
 | P4   | Pod、Service、Ingress、Job、CronJob                      | 日志、终端、资源状态、端口/路由、执行历史、触发/暂停等 V3 对照证据                             | 原生功能逐项实现                                       | P4-REA 完成后开发，逐项等价且无数据串用后关闭阶段                          |
 | P5   | Storage、NetworkPolicy、告警、监控等                     | PVC/PV、快照、网络规则、告警和监控的 V3 行为与权限证据                                         | 原生资源和必要可视化                                   | P5-REA 完成后开发，所有启用功能部署回归通过                                |
 | P6   | Gateway、ImageBuilder、SpringCloud、应用编排、工作空间等 | 复杂业务模块的旧源码、运行时流程、RBAC 和错误态证据                                            | 复杂业务模块原生化                                     | 每个模块完成 REA 关卡后才能开发，功能/操作/RBAC/错误态完整                 |
@@ -255,7 +255,9 @@ M2 完成后，以实际 PR 改动、测试缺陷、回归工时重新估算 P3�
 - [ ] 完成公共底座模块 REA：形成作用域、RBAC、缓存和返回恢复矩阵；该模块自身 REA 通过前不修改公共底座。
 - [x] 生成 Deployment 的路由、API、Store、编辑/伸缩/回滚证据与 V4 差异矩阵，文件为 `docs/v4-migration/deployment-v3-evidence.md` 和 `deployment-gap-matrix.md`。
 - [ ] 分别完成 ConfigMap、Secret、ServiceAccount 的模块级 REA：旧源码参考、静态/运行时证据、Action/API、RBAC、脱敏、批量操作、Secret 关联和作用域矩阵；未完成的模块继续保持“分析中”或“阻塞”。
-- [ ] 当前批次按 `ConfigMap-REA → ConfigMap-DEV → ConfigMap-VERIFY → ConfigMap-PR`、`Secret-REA → Secret-DEV → Secret-VERIFY → Secret-PR`、`ServiceAccount-REA → ServiceAccount-DEV → ServiceAccount-VERIFY → ServiceAccount-PR` 顺序推进；一次只处理一个模块，已有实现和 Draft PR 作为输入，不改写历史。
+- [ ] ConfigMap、Secret、ServiceAccount 各自按 `REA → DEV → VERIFY → PR` 收尾，状态回到对应模块分支核对，不从 Workload 分支推定其通过；一次集中处理一个登记模块，已有实现和 Draft PR 作为输入，不改写历史。
+- [x] 2026-10-23 经负责人确认，将 Deployment、StatefulSet、DaemonSet 调整为同一 Workload 组合批次，使用已有 `feature/v4-workloads` / `console-workloads`，不重复创建资源分支。公共实现共用，资源差异与验收分别记录；Pod、Job、CronJob 不纳入本批，但保留后续迁移范围。
+- [ ] 当前 Workload 批次先完成三类资源的组合 REA 与差异矩阵，再进入 DEV、VERIFY、PR；每类资源均须完成必要测试、构建、131 部署后 Playwright 与逐项等价验证，不能相互替代。
 - [x] 启动 ConfigMap/Secret 原生列表试点，提交 `ac99e46ae`；本地回归、131 构建、部署、rollout 和列表/详情 Playwright 验收已完成，记录见 `docs/v4-migration/config-secrets-131-acceptance.md`。
 - [x] 补齐 ConfigMap/Secret 原生创建弹窗，提交 `28a1635b3`；第二轮 131 制品已验证两个创建弹窗可打开和取消。
 - [x] 完成 ConfigMap/Secret 真实创建、编辑、删除、批量删除和一组最小 RBAC/作用域正负复验；完整权限矩阵和跨项目全量隔离回归仍待补，完成后再标记 M2。
@@ -266,6 +268,6 @@ M2 完成后，以实际 PR 改动、测试缺陷、回归工时重新估算 P3�
 - [ ] 每个模块开工前先创建并登记短期分支和 Worktree；在该分支依次完成自身 REA、DEV、VERIFY，再整理独立 PR 指向 `feature/v4-migration`。已有提交不改写历史，Draft PR 不代表模块门禁通过。
 - [x] 已补充项目 namespace 作用域防漏测门禁：跨 namespace 哨兵数据、选择器状态、namespaced Network、刷新/返回、制品身份和独立登录均为模块 VERIFY 必填证据；相关漏测复盘见 `console/docs/v4-migration/matrix.md` 和 `console/docs/v4-migration/agents-status.md`。
 - [x] 已将上一轮 ConfigMap/Secret/ServiceAccount 实现、测试、部署和 Draft PR 标注为先行证据；本轮以模块级 REA 复核后继续收尾，不将历史实现自动标记为模块验收完成。
-- [x] 已完成本次执行策略调整：全局 P0 风险持续跟踪，模块按 `REA → DEV → VERIFY → PR` 独立推进；Deployment 证据包继续作为逆向输入，正式开发前必须完成 Deployment 自身模块级 REA。
+- [x] 已完成执行策略调整：全局 P0 风险持续跟踪，模块按 `REA → DEV → VERIFY → PR` 独立推进；Deployment 证据包作为当前三类资源组合 REA 的输入之一，不能替代 StatefulSet、DaemonSet 的独立行为核对。
 
 **完成定义：** 当所有实际启用的 V3 能力都由 V4 原生实现，全部功能验收通过，运行时与构建时已无 V3/Wujie 依赖，才将全量迁移标记为 Done，并创建最终发布候选。

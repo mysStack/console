@@ -1,7 +1,9 @@
 {
   "module": "workloads",
   "branch": "feature/v4-workloads",
-  "capability": "deployment-settings",
+  "capability": "deployment-statefulset-daemonset",
+  "resources": ["Deployment", "StatefulSet", "DaemonSet"],
+  "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "phase": "REA",
   "rea": {
     "status": "分析中",
@@ -14,11 +16,15 @@
       },
       {
         "path": "docs/v4-migration/deployment-settings-capability-matrix.md",
-        "sha256": "3a36bc7730e09c5e90232c0fc7a61b01c62d1b65e27e0a36e3a6b361ba5393c5"
+        "sha256": "71a09ed59a3958f8b7997d69f4954eb34a9f247ae7515a25d7312b451b29f324"
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
-        "sha256": "ea0d7abd4293ec7a704d508ce250bf1592ae878bd5da6c6f184cb44a202731a6"
+        "sha256": "13f285ac7ef68c12daedb9a3e6f0b12caf85ac70cbce51f2c81e5d4bd44040b4"
+      },
+      {
+        "path": "docs/v4-migration/workload-kind-capability-matrix.md",
+        "sha256": "54a1ef300869bfb859ca0debd2d873b6f4cb176e47d8987798509564c0bb8dcf"
       }
     ],
     "coverage": {
@@ -26,100 +32,112 @@
         "status": "未完成",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
-          "docs/v4-migration/deployment-settings-capability-matrix.md"
+          "docs/v4-migration/deployment-settings-capability-matrix.md",
+          "docs/v4-migration/workload-kind-capability-matrix.md"
         ]
       },
       "fields": {
         "status": "未完成",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
-          "docs/v4-migration/deployment-settings-capability-matrix.md"
+          "docs/v4-migration/deployment-settings-capability-matrix.md",
+          "docs/v4-migration/workload-kind-capability-matrix.md"
         ]
       },
       "validation": {
         "status": "未完成",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
-          "docs/v4-migration/deployment-settings-capability-matrix.md"
+          "docs/v4-migration/deployment-settings-capability-matrix.md",
+          "docs/v4-migration/workload-kind-capability-matrix.md"
         ]
       },
       "api": {
         "status": "未完成",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
-          "docs/v4-migration/deployment-settings-capability-matrix.md"
+          "docs/v4-migration/deployment-settings-capability-matrix.md",
+          "docs/v4-migration/workload-kind-capability-matrix.md"
         ]
       },
       "store": {
         "status": "未完成",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
-          "docs/v4-migration/deployment-settings-capability-matrix.md"
+          "docs/v4-migration/deployment-settings-capability-matrix.md",
+          "docs/v4-migration/workload-kind-capability-matrix.md"
         ]
       },
       "action": {
         "status": "未完成",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
-          "docs/v4-migration/deployment-settings-capability-matrix.md"
+          "docs/v4-migration/deployment-settings-capability-matrix.md",
+          "docs/v4-migration/workload-kind-capability-matrix.md"
         ]
       },
       "rbac": {
         "status": "未完成",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
-          "docs/v4-migration/deployment-settings-capability-matrix.md"
+          "docs/v4-migration/deployment-settings-capability-matrix.md",
+          "docs/v4-migration/workload-kind-capability-matrix.md"
         ]
       },
       "scope": {
         "status": "未完成",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
-          "docs/v4-migration/deployment-settings-capability-matrix.md"
+          "docs/v4-migration/deployment-settings-capability-matrix.md",
+          "docs/v4-migration/workload-kind-capability-matrix.md"
         ]
       },
       "cache": {
         "status": "未完成",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
-          "docs/v4-migration/deployment-settings-capability-matrix.md"
+          "docs/v4-migration/deployment-settings-capability-matrix.md",
+          "docs/v4-migration/workload-kind-capability-matrix.md"
         ]
       },
       "errors": {
         "status": "未完成",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
-          "docs/v4-migration/deployment-settings-capability-matrix.md"
+          "docs/v4-migration/deployment-settings-capability-matrix.md",
+          "docs/v4-migration/workload-kind-capability-matrix.md"
         ]
       },
       "runtime": {
         "status": "未完成",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
-          "docs/v4-migration/deployment-settings-capability-matrix.md"
+          "docs/v4-migration/deployment-settings-capability-matrix.md",
+          "docs/v4-migration/workload-kind-capability-matrix.md"
         ]
       },
       "v4": {
         "status": "未完成",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
-          "docs/v4-migration/deployment-settings-capability-matrix.md"
+          "docs/v4-migration/deployment-settings-capability-matrix.md",
+          "docs/v4-migration/workload-kind-capability-matrix.md"
         ]
       }
     },
     "highRiskUnknowns": [
-      "DS-01 当前 V3 编辑入口/页面分区未闭环",
-      "DS-03～18 完整字段、默认值、校验及写入/清空/保留语义未闭环",
-      "DS-19～22 Action/API/Store、RBAC/作用域、缓存和错误行为未闭环"
+      "WL-01 Deployment、StatefulSet、DaemonSet 当前 V3 编辑入口和页面分区未闭环",
+      "WL-02 三类资源的完整字段、默认值、校验及写入/清空/保留语义未闭环",
+      "WL-03 三类资源的 Action/API/Store、RBAC/作用域、缓存和错误行为未闭环"
     ],
     "review": null
   },
   "dev": {
     "status": "未完成",
-    "reason": "已有简化表单是先行实现，不作为当前能力 DEV 放行"
+    "reason": "已有简化表单是先行实现；组合批次及三类资源差异未完成 REA，不作为当前能力 DEV 放行"
   },
   "verify": {
     "status": "未完成",
-    "reason": "旧镜像有限场景证据保留，不能继承为当前能力完整等价通过"
+    "reason": "旧镜像有限场景证据保留，不能继承为三类资源当前组合批次的完整等价通过"
   }
 }

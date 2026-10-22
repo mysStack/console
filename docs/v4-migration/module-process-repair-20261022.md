@@ -10,7 +10,7 @@
 
 - 主计划新增第 3.2 节，明确能力范围、三类输入、REA 完成条件、阶段记录和脚本能力边界，保留全局 P0 持续跟踪策略。
 - 根目录执行规则和 AGENTS 补充阶段与检查时机的区别；纠正“完成后再建分支”的旧清单，与开工前独立分支规则一致。
-- 建立本分支的 `module-execution.json` 和 `rea-analysis-summary.md`；当前仅为 `workloads / deployment-settings / REA / 分析中`，未签署任何通过结论。
+- 建立本分支的 `module-execution.json` 和 `rea-analysis-summary.md`；当时为 `workloads / deployment-settings / REA / 分析中`，未签署任何通过结论；后续组合范围调整见本文末尾的日期记录。
 - 新增编辑设置 22 类候选能力清单及逐字段展开模板。所有 V3 行为保持待核对，不把 Kubernetes 可配置字段冒充 V3 已有 UI 功能。
 - 当前阶段与历史代码/测试/镜像记录分开；既有观察保留其原版本，不能反推 REA 已通过。
 - 门禁检查阶段冲突、REA 覆盖、高风险未知项、源提交/V3 tree、证据 SHA-256 与暂存内容、复核依据、前置 DEV/VERIFY 记录；提交检查同时包含工作区和暂存区。
@@ -75,4 +75,14 @@ python3 docs/v4-migration/governance/scripts/test_v4_module_gate.py
 
 远程集成提交仍为 `3e09afd6a051d4091b3c887462c880eff2ba6754`，稳定分支仍为 `fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`。钩子代码目前位于 Workload 分支，未覆盖其他已有 Worktree；其他 PR/后续分支必须取得这些版本化入口并实际产生必需检查，缺少检查时不能合并，不能用手工通过或管理员绕过代替。
 
-本次修复的是提交/PR 执行入口，不能阻止编辑器写文件、不能自动判断页面语义或代替指定复核。下一项仍是 Deployment 编辑设置的定向 REA 与真实字段/行为对照，满足既定模块条件后再进行 DEV；不重新启动全量 P0。
+本次修复的是提交/PR 执行入口，不能阻止编辑器写文件、不能自动判断页面语义或代替指定复核。当前范围已调整为 Deployment、StatefulSet、DaemonSet 组合批次；下一项是先完成三类资源的组合 REA 与差异矩阵，再满足既定模块条件后进入 DEV；不重新启动全量 P0。
+
+## 2026-10-23 组合批次范围调整
+
+依据负责人“Deployment、DS、STS 放在一起开发”及确认调整文档的指令，当前能力改为 `deployment-statefulset-daemonset`。执行前本地和远程 HEAD 均为 `1412940b00c19ff2413758d4a233176afa73df5e`；PR #2 Open/Draft，目标和集成提交未变。沿用登记 Worktree 和分支，不改写历史。
+
+主计划、执行规则、注册表、实施清单和模块状态同步调整。公共 Workload 能力共用实现，三类资源单独记录 REA、差异、测试和验收；Deployment 的 `DS-*` 清单表示 Deployment Settings，DaemonSet 使用 `DAEMON-*`，避免条目混淆。Pod、Job、CronJob 保留后续范围。新增[组合边界矩阵](./workload-kind-capability-matrix.md)只用于防遗漏，不将候选字段冒充当前 V3 功能。
+
+当前阶段仍为 REA/分析中，三项高风险未知和 `review: null` 保留。原 Deployment 证据保持其提交和观察边界；更新文档摘要只绑定修订后的记录，不表示新增运行时证据。此次未修改业务代码，未构建镜像、部署或执行浏览器验收，无本批镜像和 Pod imageID。
+
+本批记录检查：变更文档/JSON 的 `corepack yarn prettier --check` 通过；5 份根目录治理文件与版本化快照逐字节一致，4 份证据摘要、12 个未完成覆盖维度、3 类资源范围、源提交/V3 tree 及 66 个相对链接核对通过。另将实施清单中 3 个本分支缺失的历史验证链接改为原分支固定提交 `9fa3c15b4eef8c1d7986b4afe79f97704a160d5a` 的引用，不复制历史验收结论。恢复时因已有本批文档改动，普通 start 拒绝脏工作区；暂存前 commit 检查亦拒绝未暂存阶段记录，均未绕过。后续按记录通道检查最终暂存内容。上述检查不等于业务测试或阶段通过。

@@ -6,14 +6,14 @@
 
 本次属于负责人授权的流程修复，影响所有后续模块的阶段检查；不修改共享业务组件。治理文件归档在 Workload 分支只用于保留本次纠偏历史，不授权其他模块借用 Workload 分支开发。
 
-| 快照                             | 生效路径                                                  |
-| -------------------------------- | --------------------------------------------------------- |
-| `console-v4-migration-plan.md`   | `ks-develop/console-v4-migration-plan.md`                 |
-| `v4-module-execution-rules.md`   | `ks-develop/v4-module-execution-rules.md`                 |
-| `v4-module-branch-registry.json` | `ks-develop/v4-module-branch-registry.json`（内容未调整） |
-| `AGENTS.md`                      | `ks-develop/AGENTS.md`                                    |
-| `scripts/v4-module-gate.py`      | `ks-develop/scripts/v4-module-gate.py`                    |
-| `scripts/test_v4_module_gate.py` | 同上级脚本的隔离 Git 回归；可直接在本目录运行             |
+| 快照                             | 生效路径                                                                      |
+| -------------------------------- | ----------------------------------------------------------------------------- |
+| `console-v4-migration-plan.md`   | `ks-develop/console-v4-migration-plan.md`                                     |
+| `v4-module-execution-rules.md`   | `ks-develop/v4-module-execution-rules.md`                                     |
+| `v4-module-branch-registry.json` | `ks-develop/v4-module-branch-registry.json`（登记当前三类 Workload 组合批次） |
+| `AGENTS.md`                      | `ks-develop/AGENTS.md`                                                        |
+| `scripts/v4-module-gate.py`      | `ks-develop/scripts/v4-module-gate.py`                                        |
+| `scripts/test_v4_module_gate.py` | 同上级脚本的隔离 Git 回归；可直接在本目录运行                                 |
 
 执行方式：
 
