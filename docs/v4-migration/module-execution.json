@@ -48,11 +48,11 @@
       },
       {
         "path": "docs/v4-migration/workload-v3-field-equivalence-20261023.md",
-        "sha256": "b5f1903433c8a58695c0a148eb386fe5f046265ea0c2ed2090fd64a2561c58ce"
+        "sha256": "acb7c03b4bbd70190f05dc67614f476ee98ac347881a3e02af8f2f28e8f18ed9"
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "168ee08f9915f2cf609485f836150b5691be4ca54c14f80a9f01e0a8047de352"
+        "sha256": "3cdca9b7cb58dae53dc3b9de8fc3418a17ce778141936b4a799ca191ac01602f"
       }
     ],
     "coverage": {

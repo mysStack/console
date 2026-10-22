@@ -56,6 +56,27 @@
 
 当前 `buildDeploymentSettingsResource` 先克隆原始对象并删除 `status`，对容器和普通卷执行局部合并；这能证明实现有保留未知字段的意图，但不能证明所有字段的清空语义正确。尤其是未进入表单的更新策略、亲和性、安全上下文、终止宽限期、元数据和 StatefulSet 专属字段，目前没有对应的解析、编辑和回写测试。
 
+## 集群级路由边界
+
+本批次不能只验收项目级 `projects/:namespace` 页面。主迁移计划要求集群级页面保留跨 namespace 选择能力，同时移除 Workload 的 V3/Wujie 运行时依赖。当前源码的实际边界如下：
+
+| 路径                                                                                                                                    | 当前实现                                                                                                                                          | 证据                                          | 结论                                                          |
+| --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------- |
+| `packages/console/src/pages/clusters/containers/ApplicationWorkloads/routes.tsx`                                                        | `/deployments`、`/statefulsets`、`/daemonsets` 都挂载 `../Workload/Workloads` 的 `WorkLoadList`，原生 `ApplicationWorkloads/Workloads` 导入被注释 | `routes.tsx:8-15,34-47`                       | 当前集群级入口没有使用已存在的原生列表实现                    |
+| `packages/console/src/pages/clusters/containers/Workload/Workloads/index.tsx`                                                           | 三个 Tab 都渲染同一个 `./Embed`                                                                                                                   | `Workloads/index.tsx:20-43`                   | 集群级 Workload 列表仍走桥接组件                              |
+| `packages/console/src/pages/clusters/containers/Workload/Deployments/Embed.tsx`                                                         | Wujie URL 为 `/consolev3/clusters/:cluster/deployments`                                                                                           | `Deployments/Embed.tsx:8-17`                  | Deployment 集群列表仍依赖 V3                                  |
+| `packages/console/src/pages/clusters/containers/Workload/StatefulSets/Embed.tsx`                                                        | Wujie URL 实际指向 `/consolev3/clusters/:cluster/daemonsets`                                                                                      | `StatefulSets/Embed.tsx:12-17`                | StatefulSet 集群入口与目标资源不一致，属于已确认路由缺陷      |
+| `packages/console/src/pages/clusters/containers/Workload/DaemonSets/Embed.tsx`                                                          | Wujie URL 实际指向 `/consolev3/clusters/:cluster/statefulsets`                                                                                    | `DaemonSets/Embed.tsx:12-17`                  | DaemonSet 集群入口与目标资源不一致，属于已确认路由缺陷        |
+| `packages/console/src/pages/clusters/containers/ApplicationWorkloads/Workloads/index.tsx`                                               | 已有原生 `ListPage`、namespace 选择器、项目列和三类 Tab；但没有被上述路由挂载                                                                     | `Workloads/index.tsx:1-32,250-327`            | 可作为迁移输入，不能因为代码存在就算集群级原生功能已接通      |
+| `packages/console/src/pages/clusters/containers/ApplicationWorkloads/Workloads/{Deployments,StatefulSets,DaemonSets}/Detail/routes.tsx` | 集群详情路由由项目 Workload Detail 路由复用                                                                                                       | `ApplicationWorkloads/routes.tsx:15-20,79-89` | 详情路由复用本身不证明列表、集群作用域、Action 和缓存已经等价 |
+
+集群级工作负载的 REA 结论是：
+
+1. 当前项目级列表/详情的有限原生证据不能覆盖集群级列表。
+2. 集群级列表仍有 Wujie/V3 运行时依赖，且 StatefulSet 与 DaemonSet Embed 的 URL 互换必须在 DEV 中修复并用浏览器验证。
+3. 集群级原生列表虽然已有代码输入，但其 namespace 选择、跨 namespace 查询、批量 Action、RBAC、缓存和三类详情跳转必须按当前 SHA 独立验证。
+4. 在集群级入口完成替换前，不能宣称三类 Workload 已经完成“彻底移除 V3/Wujie”的原生化目标。
+
 ## REA 结论
 
 本轮补充后，已进一步关闭以下静态定位未知：
@@ -74,5 +95,6 @@
 4. StatefulSet Service、卷模板、更新策略及三类资源的完整 API/Store/缓存/错误边界未闭环；
 5. 当前 SHA 尚未完成构建、部署和浏览器 VERIFY，低权限浏览器正反路径也未完成；
 6. `module-execution.json` 尚无负责人复核记录，不能由本记录自签放行 DEV。
+7. 集群级列表仍由 Wujie/V3 承载，StatefulSet/DaemonSet Embed URL 互换，集群作用域和跨 namespace 行为尚未闭环。
 
 结论保持：**REA / 分析中，待负责人复核；暂不进入 DEV。**
