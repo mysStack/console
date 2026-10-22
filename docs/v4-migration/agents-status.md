@@ -1,5 +1,17 @@
 # Workload 模块任务状态
 
+## 2026-10-22 Deployment 编辑设置专项
+
+- 负责人：当前 Codex 单会话；分支/Worktree 为登记的 `feature/v4-workloads` / `console-workloads`。
+- 当前代码 SHA：`9587f2c543ff123bf4e033148cc16015a5ea4929`；本节之后的文档提交仅归档证据，不作为重新构建的应用代码。
+- 已修复：编辑设置错误进入 YAML、projected 卷遗漏、字段清空/保留、并发 resourceVersion 丢失、失败无提示、滚动后提示在屏幕外。
+- 本地 70 文件/287 项通过；相关 ESLint/Prettier/diff 检查通过；`build:packages` 在 `dec969432` 通过，最终生产构建由精确 SHA CI Run `39786947128` 完成。完整 TypeScript 仍有 1316 条既有诊断，不能记为通过。
+- 最终镜像 tag `feature-v4-workloads-20261022-212830-9587f2c543ff`，digest `sha256:cf9e9d7f9400b273ca4711fa03c1d4668686ec42c2b0c6e9459d96b2034af923`；Pod `ks-console-69bbd8bd7-86wgh` Running/Ready、imageID 匹配，重启 0。
+- 新登录后的 Playwright：原生保存、取消、刷新/返回/重开、原有 projected/headers/ownerReferences 保留、emptyDir 挂载、ConfigMap 前缀引用、实际 409、实际 422 后重试、网络失败可见提示通过；专用工作负载 Pod Ready，配置/挂载已在容器内检查。
+- 本轮 UI 删除补测因 dialog 定位错误未执行，不计通过；资源已通过测试 owner 的 GC 清理，namespace 保留。
+- 仍未验收：Secret/PVC/HostPath 等来源、全部探针和多容器组合、完整 RBAC/跨集群缓存、V3 设置编辑等价能力；Pod Watch `403` 及共享 request 网络异常处理继续单列。
+- Workload 整体保持“开发中”，Draft PR #2 不合并。详见[专项 VERIFY](./deployment-settings-verify-20261022.md)。
+
 ## 2026-10-22 独立分支首次 131 VERIFY
 
 - 当前阶段：`DEV` 中的首轮 `VERIFY` 已完成；Workload 整体仍为“开发中”，没有进入 REVIEWED 或 INTEGRATED。
