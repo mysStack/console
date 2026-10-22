@@ -7,7 +7,7 @@ const detailFiles = [
   ['Volumes', 'volumes'],
 ] as const;
 
-for (const [resource, route] of detailFiles) {
+detailFiles.forEach(([resource, route]) => {
   test(`${resource} detail keeps the shared consolev3 instance alive`, () => {
     const source = readFileSync(
       __filename.replace(/Base\/BaseLayout\/[^/]+$/, `${resource}/Detail/index.tsx`),
@@ -17,7 +17,7 @@ for (const [resource, route] of detailFiles) {
     assert.match(source, /name="consolev3"/);
     assert.match(source, /alive/);
   });
-}
+});
 
 test('project Deployment, StatefulSet and DaemonSet details do not retain V3 wrappers', () => {
   for (const resource of ['Deployments', 'StatefulSets', 'DaemonSets']) {
