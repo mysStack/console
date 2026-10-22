@@ -20,7 +20,7 @@
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
-        "sha256": "38edbf665d687ca8b0b47de71d8aad67e9a443a01b1226dd8bf8c7cb8bc3354c"
+        "sha256": "f9116ed2582a0b3f74d230645061191a83f320e527d136f334d4166a02e7a6dd"
       },
       {
         "path": "docs/v4-migration/workload-kind-capability-matrix.md",
@@ -96,7 +96,7 @@
       },
       {
         "path": "docs/v4-migration/workload-v3-runtime-rea-20261023.md",
-        "sha256": "130485265d6ff574e236623c6419bc07322576bdb1116d3ded798b18dcb34a4b"
+        "sha256": "c2d4a86d048c53a97610de5d42fdf06f0134cfd089767e8c1ed0ea373efa6dfe"
       }
     ],
     "coverage": {
