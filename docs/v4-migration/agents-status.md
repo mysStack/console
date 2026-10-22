@@ -1,5 +1,16 @@
 # P0 风险与模块任务状态
 
+## 2026-10-22 当前任务结果：Deployment 原生创建第一批通过
+
+- 负责人：当前 Codex 主会话；分支 `feature/v4-configmaps-secrets`；无子 Agent。最终源码 `a05a96518fcfe3189c213e5c057cdeec4f37e850` 与远程分支一致，PR #1 保持 Draft。
+- 实现提交：`b84eccc56` 增加原生创建入口和 Deployment 对象构造；`caf9cd6dd` 修复组件库不支持的数字输入；`a05a96518` 补齐中文文案、Mutation 错误回调和重复名可见错误。
+- focused REA：当前 `v3dist` SHA-256 为 `0cfc6e64...b0bf4`；完整收据 `ev_06201f7208bb80a18d8c1dfe8ffa4d35140e7d47bc4c080185660378f62c1c1f`，结果为 `partial`。旧源码和 REA 足以支持本批基础字段，不能证明完整四步向导已还原。
+- 本地验证：`./scripts/test.sh` 为 74 个测试文件、252 项通过；相关 ESLint、Prettier、shared TypeScript、`build:packages`、`build:prod` 和 `git diff --check` 通过。CI Run `39719303168` 的 `NumberInput` 失败被保留并修复；最终 CI Run [39722386439](https://github.com/mysStack/console/actions/runs/39722386439) 成功。
+- 部署身份：镜像 `feature-v4-configmaps-secrets-20261022-122739-a05a96518fcf`；OCI digest/Pod imageID digest `sha256:842c057345bfcea3edb6af388ff8db5b3260fc98b6f813a8f7f7b7195235da24`；Deployment `565/565`，Pod `ks-console-78bbfbb5ff-qxnvq` Running/Ready、0 重启。
+- 浏览器：从 `/login` 登录后，Deployment 原生创建 11 项检查通过。覆盖固定 namespace、中文渲染、取消、`201`、对象语义、列表刷新、原生详情、浏览器返回、重复名 `409`、可见错误、UI 删除和无 `/consolev3` 业务请求。临时资源已清理。
+- 状态：Deployment 为“开发中，VERIFY 部分通过”。多/初始化容器、端口、环境变量、探针、资源、存储、镜像凭据、调度、安全、高级设置、创建 RBAC 正反矩阵和 watch WebSocket `403` 未完成。扩展运行时错误按负责人决定后置。
+- 完整证据见[Deployment 原生创建 131 验证记录](./deployment-create-131-verify-20261022.md)。下一独立任务继续补齐 Deployment 创建能力，不进入下一资源模块。
+
 ## 2026-10-22 本轮最终结果：Workload 操作子路径通过
 
 - 负责人：当前 Codex 主会话；分支：`feature/v4-configmaps-secrets`；无子 Agent，四个既有 Worktree 保留。

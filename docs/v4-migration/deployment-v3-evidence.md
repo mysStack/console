@@ -1,6 +1,6 @@
 # Deployment V3 / V4 证据记录
 
-> 2026-10-22 最新模块进展：项目 Workload 列表已进入 DEV/VERIFY，旧日期内容为历史证据，不再构成全局 P0 阻塞。源码 `7961eaedc` 已在 131 部署，CI `39711771206` 成功；仓库 246 项、浏览器 24 个操作检查点通过，错误反馈、项目操作作用域、真实状态原因及成功后的实时列表更新已补齐。原生创建、完整 RBAC/作用域和功能等价未完成，Console 全量类型检查仍有历史诊断，模块不标记已验收。详见[本轮操作验证](./workload-actions-131-verify-20261022.md)。
+> 2026-10-22 最新模块进展：项目 Workload 列表已进入 DEV/VERIFY。Deployment 原生创建第一批已在提交 `a05a96518` 对应制品上完成 131 浏览器验证，创建、取消、409 错误、刷新、原生详情、返回、UI 删除和缓存刷新通过；多容器、存储、调度、安全等完整 V3 创建能力尚未实现，模块不标记已验收。详见[原生创建验收记录](./deployment-create-131-verify-20261022.md)和[操作验收记录](./workload-actions-131-verify-20261022.md)。
 
 > 事实检查日期：2026-10-16；文档复核日期：2026-10-17
 > 仓库：`mysStack/console`  
@@ -99,7 +99,8 @@ V3 列表和详情请求隐藏在编译后的 `v3dist` 应用和 Wujie 子应用
 
 - [ ] P0-REA：旧 V3 源码基线、全量启用路由/扩展和动态 Action 未完成。
 - [ ] P3-REA：Deployment 的旧 V3 行为、关键 Action、API、RBAC、缓存和运行时 Network 矩阵未完成。
-- [ ] P3-DEV：未开始正式开发；现有 V4 代码和本文件仅作为对照输入。
+- [x] P3-DEV：已开始；项目列表、部分操作和 Deployment 原生创建第一批已实现。
+- [ ] P3-VERIFY：原生创建第一批通过，完整创建能力、RBAC、作用域和全部动作等价仍未完成。
 
 ## 2026-10-21 第一批原生重构输入：项目 Workload 列表
 
@@ -136,3 +137,11 @@ V3 列表和详情请求隐藏在编译后的 `v3dist` 应用和 Wujie 子应用
 当前 `v3dist` 重新执行 REA 的摘要证据为 `ev_fcff357b62b59dde503f98837df84bb87e06ba6db2a48c7616ec1bda2ac6c9c8`，制品 SHA-256 为 `0cfc6e64a2555f12b1ebca6d87ae8713bdae5dbad04c2ec2093d1d4de50b0bf4`。REA 结果覆盖 440 个相关文件和 434 个 JavaScript 文件，但语义图存在资源限制和未知项，因此只用于定位差异，不替代旧源码和浏览器验证。
 
 当前 131 浏览器证据仍观察到项目 Workload 列表加载 `/consolev3/dashboard`，StatefulSet、DaemonSet 还出现具体 `/consolev3/...` 请求。第一批完成条件是项目三个列表改为 V4 原生请求，并在部署后的 Network 中确认不再出现对应的 V3 列表请求；此项尚未执行。
+
+## 2026-10-22 Deployment 原生创建 focused REA 与运行时校准
+
+当前 `v3dist` SHA-256 为 `0cfc6e64a2555f12b1ebca6d87ae8713bdae5dbad04c2ec2093d1d4de50b0bf4`。本轮 focused REA 的完整收据 `ev_06201f7208bb80a18d8c1dfe8ffa4d35140e7d47bc4c080185660378f62c1c1f`（父证据 `ev_262589fd4558a51d78ac7dc539d4936246e06ae39737683903e905b72a7fde36`）覆盖 `main.558...`、`3.bb6...`、`12.2...` 三个创建相关 Chunk。结果确认 `workload.create` 入口、基础信息标签同步、`apps/v1` Deployment 模板、默认 ServiceAccount 和 RollingUpdate `25%/25%`，但主 Chunk 语义分析受 worker 堆内存限制，结论为 `partial`。
+
+`origin/release-3.4` 只作为旧行为参考，用于补充基础信息、容器、存储和高级设置四步流程，不能当成当前制品的完整对应源码。当前 V4 第一批只实现名称、别名、描述、副本、单容器名称/镜像/拉取策略；完整差异保留在缺口矩阵。
+
+源码 `a05a96518` 的 CI Run `39722386439` 成功，131 Pod 实际 imageID 为 `sha256:842c057345bfcea3edb6af388ff8db5b3260fc98b6f813a8f7f7b7195235da24`。真实浏览器创建返回 `201`，重复名称返回 `409` 且显示错误，UI 删除返回 `200`；创建与详情流程无 `/consolev3` 请求。该证据关闭原生创建第一批链路，不关闭完整 V3 功能等价。

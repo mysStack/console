@@ -1,6 +1,6 @@
 # REA 阶段分析总结
 
-> 2026-10-22 模块级进展：沿用现有 Workload 行为基线顺序修复，并完成源码 `7961eaedc` 的 131 部署和 24 项浏览器操作检查，未重新开展全量 REA。错误态、项目权限作用域和列表刷新取得了限定范围证据，完整创建/RBAC/作用域等价仍未完成。此结果不改变全局 P0 风险或替代独立复核，也不表示 Console 全量质量检查通过。完整制品身份及边界见[Workload 操作验收记录](./workload-actions-131-verify-20261022.md)。
+> 2026-10-22 模块级进展：沿用现有 Workload 行为基线并对 Deployment 创建 Chunk 做 focused REA，源码 `a05a96518` 已完成 131 原生创建第一批浏览器验证。错误态、项目权限作用域、列表刷新和创建基础链路取得限定范围证据；REA 结果仍为 `partial`，完整创建/RBAC/作用域等价未完成。此结果不改变全局 P0 风险或替代独立复核。详见[Deployment 原生创建验收记录](./deployment-create-131-verify-20261022.md)和[Workload 操作验收记录](./workload-actions-131-verify-20261022.md)。
 
 > 执行策略（2026-10-17 调整）：P0-U001～P0-U004 继续作为全局风险跟踪项，但不再统一阻塞所有模块开发。ConfigMap、Secret、ServiceAccount 以及后续资源分别执行模块级 `REA → DEV → VERIFY → PR`；模块内的高风险未知项仍然阻塞该模块。本文保留全局 P0 证据和结论，不把模块开发进度写成 P0 已通过。
 
@@ -192,3 +192,11 @@ ConfigMap、Secret、ServiceAccount 进入正式 P2-DEV 前，必须分别完成
 当前分支重新扫描非测试源码后，`useV3action/useV3Actions` 为 11 个文件，其中 8 个是业务调用文件，2 个是桥接实现/Hook，1 个是导出文件；当前活动项目 Workload 详情路由已经导入原生 `ApplicationWorkloads/Workloads/*/Detail/routes.tsx`。历史记录中的 11 个业务调用文件属于早期取证口径，保留用于追溯，不再用于描述当前活动调用数量。旧 `projects/containers/*/Detail` 文件仍有 Wujie 代码，完整清理前必须完成消费者复核。
 
 同一口径下，当前源码仍有 117 个 `WujieReact` 文件和 121 个 `consolev3` 命中文件。该结果进一步确认 P0-U002 只能标记为“分析中”，不能因为 A02～A04 活动路由切换而宣布全量 V3 等价。
+
+## 2026-10-22 Deployment 创建 focused REA
+
+分析对象固定为当前 `v3dist` SHA-256 `0cfc6e64a2555f12b1ebca6d87ae8713bdae5dbad04c2ec2093d1d4de50b0bf4`。第一轮 focused REA 解析三个文件、6,129,520 字节并产生 88 项发现；第二轮收据为 `ev_06201f7208bb80a18d8c1dfe8ffa4d35140e7d47bc4c080185660378f62c1c1f`，父证据为 `ev_262589fd4558a51d78ac7dc539d4936246e06ae39737683903e905b72a7fde36`，解析三个文件、4,959,801 字节并产生 64 项发现。
+
+第二轮覆盖 `main.558...`、`3.bb6...`、`12.2...`，确认 `workload.create` 入口、基础信息名称处理和 `app` 标签同步、项目列表创建 Action、`apps/v1` Deployment 模板、默认 ServiceAccount 和 RollingUpdate `25%/25%`。第一轮和第二轮均为 `partial`；第二轮主 Chunk 语义 worker 堆内存耗尽，并保留 71,162 个 semantic unknown。三次 trace 无命中只表示指定切片没有匹配，不能作为功能不存在的证据。
+
+`origin/release-3.4` 确认旧创建流程包含基础信息、容器、存储和高级设置四步，但该分支不完整，也没有证据证明它与当前制品一一对应。因此本轮只将旧源码、REA 和运行时三者交集用于实现基础字段与单容器第一批；其余能力保留为 Deployment 模块缺口。当前模块结论为“REA 持续补充、DEV 已开始、第一批 VERIFY 通过”，不是完整 REA 或模块验收通过。
