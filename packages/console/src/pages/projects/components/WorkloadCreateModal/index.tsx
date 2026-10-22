@@ -4,18 +4,11 @@
  */
 
 import React from 'react';
-import {
-  Form,
-  FormItem,
-  Input,
-  Modal,
-  InputNumber,
-  Select,
-  Textarea,
-  useForm,
-} from '@kubed/components';
+import { Form, FormItem, Input, Modal, InputNumber, Textarea, useForm } from '@kubed/components';
 
-import { buildDeployment, DeploymentCreateValues } from './deployment';
+import { ArrayInput } from '@ks-console/shared';
+import { buildDeployment, DeploymentCreateValues, validateContainers } from './deployment';
+import ContainerInput from './ContainerInput';
 
 interface Props {
   visible: boolean;
@@ -37,25 +30,41 @@ function WorkloadCreateModal({
   const [form] = useForm<DeploymentCreateValues>();
 
   const handleSubmit = () => {
-    form.validateFields().then(values => onOk(buildDeployment(values)));
+    form.validateFields().then(
+      values => onOk(buildDeployment({ ...values, namespace })),
+      () => {},
+    );
+  };
+
+  const containersValidator = (
+    _rule: unknown,
+    _value: unknown,
+    callback: (error?: string) => void,
+  ) => {
+    const error = validateContainers(
+      form.getFieldValue('containers'),
+      form.getFieldValue('initContainers'),
+    );
+    callback(error ? t(error) : undefined);
   };
 
   return (
     <Modal
       title={t('CREATE_DEPLOYMENT')}
-      width={720}
+      width={900}
       visible={visible}
       confirmLoading={confirmLoading}
       onOk={handleSubmit}
       onCancel={onCancel}
-      bodyStyle={{ padding: '20px' }}
+      bodyStyle={{ padding: '20px', maxHeight: '70vh', overflowY: 'auto' }}
     >
       <Form
         form={form}
         initialValues={{
           namespace,
           replicas: 1,
-          imagePullPolicy: 'IfNotPresent',
+          containers: [{ name: '', image: '', imagePullPolicy: 'IfNotPresent' }],
+          initContainers: [],
         }}
       >
         <h3>{t('BASIC_INFORMATION')}</h3>
@@ -85,27 +94,30 @@ function WorkloadCreateModal({
 
         <h3>{t('POD_SETTINGS')}</h3>
         <FormItem
-          name="containerName"
-          label={t('CONTAINER_NAME')}
-          rules={[
-            { required: true },
-            { pattern: DNS_LABEL, message: t('INVALID_NAME_DESC') },
-            { max: 63, message: t('INVALID_NAME_DESC') },
-          ]}
+          name="containers"
+          label={t('CONTAINERS')}
+          rules={[{ validator: containersValidator }]}
         >
-          <Input />
+          <ArrayInput
+            itemType="object"
+            addText={t('WORKLOAD_ADD_CONTAINER')}
+            checkItemValid={() => true}
+          >
+            <ContainerInput kind="CONTAINER" />
+          </ArrayInput>
         </FormItem>
-        <FormItem name="image" label={t('CONTAINER_IMAGE')} rules={[{ required: true }]}>
-          <Input placeholder="nginx:alpine" />
-        </FormItem>
-        <FormItem name="imagePullPolicy" label={t('IMAGE_PULL_POLICY')}>
-          <Select
-            options={[
-              { label: t('IMAGE_PULL_POLICY_IFNOTPRESENT'), value: 'IfNotPresent' },
-              { label: t('IMAGE_PULL_POLICY_ALWAYS'), value: 'Always' },
-              { label: t('IMAGE_PULL_POLICY_NEVER'), value: 'Never' },
-            ]}
-          />
+        <FormItem
+          name="initContainers"
+          label={t('INIT_CONTAINER')}
+          rules={[{ validator: containersValidator }]}
+        >
+          <ArrayInput
+            itemType="object"
+            addText={t('WORKLOAD_ADD_INIT_CONTAINER')}
+            checkItemValid={() => true}
+          >
+            <ContainerInput kind="INIT_CONTAINER" />
+          </ArrayInput>
         </FormItem>
       </Form>
     </Modal>

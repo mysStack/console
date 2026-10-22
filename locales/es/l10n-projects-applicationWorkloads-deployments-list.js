@@ -4,6 +4,16 @@
  */
 
 module.exports = {
+  WORKLOAD_ADD_CONTAINER: 'Añadir contenedor',
+  WORKLOAD_ADD_INIT_CONTAINER: 'Añadir contenedor de inicio',
+  WORKLOAD_ADD_ENV: 'Añadir variable de entorno',
+  WORKLOAD_CONTAINER_INVALID: 'Introduce un nombre de contenedor y una imagen válidos.',
+  WORKLOAD_CONTAINER_DUPLICATE: 'Los nombres de los contenedores deben ser únicos.',
+  WORKLOAD_ENV_DUPLICATE: 'Las variables de entorno de un contenedor deben tener nombres únicos.',
+  WORKLOAD_PORT_INVALID:
+    'Introduce un puerto válido (1–65535), un protocolo y un nombre opcional (hasta 15 caracteres).',
+  WORKLOAD_PORT_DUPLICATE: 'Los nombres de los puertos deben ser únicos en el Pod.',
+
   // Banner
   // List
   HPA_SET_TIP: 'El Autoscaling Horizontal de Pods ha sido configurado',
