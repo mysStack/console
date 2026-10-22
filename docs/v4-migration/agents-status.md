@@ -7,6 +7,9 @@
 - 当前阶段 `REA`，结论“分析中”。[阶段记录](./module-execution.json)、[组合能力边界](./workload-kind-capability-matrix.md)、[REA 索引](./rea-analysis-summary.md)为当前依据；Deployment 专项矩阵是组合批次的输入之一。
 - 当前任务：三类资源已定位普通编辑入口、Action 处理器和按资源登记的分区；继续展开表单子组件、Store 和运行时差异。公共实现可以共用，三类资源的差异和验收必须分别记录。不修改业务表单，不部署。已有实现和限定浏览器观察保留为历史输入。
 - 已关闭的定向未知：旧源码四个设置分区、StatefulSet Service 差异、Deployment HPA 差异，以及当前制品的普通入口和 Action 定位。待关闭：三类资源完整字段/校验、动态 Action/API/Store、RBAC/作用域和错误/缓存行为。尚无正式 REA 复核签署，不自动进入 DEV。
+- 当前 HEAD：`bc5ab62157aa707e337779e33a89a66ebae2c134`。本轮新增确认：集群级三类入口仍挂载 Wujie/V3，StatefulSet/DaemonSet Embed URL 互换；联邦 Deployment/StatefulSet 仍为 Wujie/V3，联邦 DaemonSet 范围未确认；普通 Workload 配置引用仍调用 `useV3action` 并绑定 V3 DOM。上述内容已列为明确缺口或高风险，不把它们当作“没有功能”。
+- 当前既有回归中，项目级详情/列表和 Workload Store 的 6 个测试文件共 27 个断言通过；测试只覆盖静态入口和部分请求错误传播，不覆盖集群桥接移除、配置引用 V3 Action 移除、三类资源高级字段或当前 SHA 部署后的浏览器行为。
+- 当前 DEV 前置仍未满足：StatefulSet/DaemonSet 原生设置、DaemonSet 停止语义、StatefulSet Service/PVC 模板、完整字段保留/清空、集群级作用域和配置引用桥接均未闭环。对应测试设计已加入 `WL-MV-09`、`WL-MV-10`，不修改业务代码。
 - 当前模块的流程文件修复涉及所有后续模块：根目录主计划/规则/门禁脚本原位更新，版本化快照位于 `governance/`；不改公共业务组件。其他模块初始化阶段记录后才能继续，不继承 Workload 的状态。
 - 2026-10-23：在原门禁基础上接入真实 Git pre-commit、中文 commit-msg 和 PR CI。隔离 Git 回归由 18 项增至 32 项，通过；初次新增用例复现 8 项失败。工具测试通过不表示业务阶段放行，PR #2 的完整差异仍需接受阶段检查；部署和浏览器未执行。详见[修复记录补充](./module-process-repair-20261022.md#2026-10-23-执行入口补强)。
 - 工具代码提交 `da38cb87e` 已推送；[Run 39812232782](https://github.com/mysStack/console/actions/runs/39812232782) 的 32 项工具回归成功，阶段检查拒绝 REA 中的历史业务差异，总结果为 failure。`feature/v4-migration` 已配置这两个必需检查并对管理员生效。真实证据见[验证记录](./governance/module-gate-verification-20261023.json)；不改变当前模块 REA 状态。

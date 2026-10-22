@@ -53,6 +53,10 @@
       {
         "path": "docs/v4-migration/matrix.md",
         "sha256": "3cdca9b7cb58dae53dc3b9de8fc3418a17ce778141936b4a799ca191ac01602f"
+      },
+      {
+        "path": "docs/v4-migration/agents-status.md",
+        "sha256": "f8c7a3b1fd7f057a478b0451a2868ad8443214a8038b1871ceea7c4a39801592"
       }
     ],
     "coverage": {
