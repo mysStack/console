@@ -168,6 +168,7 @@
 - 原混合分支的 Workload 代码已按功能逐项迁入到 `2168cbdb2` 至 `58ec1bb01`，没有整体合并 ConfigMap/Secret 分支，也没有迁入无关 P0、应用或扩展改动。
 - 启动命令/参数代码已归集；历史 ConfigMap 分支上的测试和 131 制品只作为输入。当前必须在独立分支重新执行完整本地回归、构建、镜像、rollout 和 Playwright，完成后才可勾选 Task 5、Task 6 和 Task 7。
 - `ArrayInput` 为本批唯一公共组件改动，限定用于正确保留显式空数组并允许删除最后一行，已补组件回归；独立 PR 必须显式标明调用方和受影响范围。
+- 独立分支本地验证已完成：67 个测试文件、273 项通过；`build:packages`、`build:dll` 和 `build:prod` 通过。生产构建使用 Worktree 自身依赖并设置旧版 Webpack 在 Node 22 所需的 `NODE_OPTIONS=--openssl-legacy-provider`；镜像、131 rollout 和 Playwright 尚未完成。
 
 ## 后续模块执行规则
 

@@ -5,8 +5,10 @@
 - 负责人：当前 Codex 会话，无子 Agent。
 - Worktree：`/home/bruce/code/ks-develop/console-workloads`；分支：`feature/v4-workloads`；PR 目标：`feature/v4-migration`。
 - 当前阶段：`DEV`。项目级 Deployment、StatefulSet、DaemonSet 原生列表与详情、Workload Store 错误传播、项目作用域、列表刷新、Deployment 基础创建、多个工作容器、初始化容器、端口、普通环境变量及启动命令已迁入独立分支。
-- 当前 HEAD：`58ec1bb01`。相对迁移基线新增 14 个代码提交；远程分支尚未推送这些提交，完整本地回归、构建、独立镜像、131 rollout 和 Playwright 验收仍待执行。
-- 已执行针对性验证：HPA API 1 项、原生详情/路由 5 项、旧详情外壳 3 项、原生列表 7 项、Store 错误传播 17 项、项目作用域/刷新/状态原因 12 项、创建 Store 19 项、Deployment 构建/校验 8 项、容器表单结构 4 项、ArrayInput 2 项及多语言 1 项均通过；相关 ESLint 无错误，Prettier 通过。完整 `scripts/test.sh` 尚未在本 HEAD 上执行，因此不标记 VERIFY 通过。
+- 当前代码 HEAD：`aad2e9248`。相对迁移基线新增 17 个代码/测试提交；远程分支尚未推送这些提交，独立镜像、131 rollout 和 Playwright 验收仍待执行。
+- 本地回归：`./scripts/test.sh` 为 67 个文件、273 项通过、0 失败；变更文件 ESLint 为 0 错误、16 个既有警告；Prettier 与 `git diff --check` 通过。
+- 构建：`corepack yarn build:packages` 通过；使用 Worktree 自身按 `yarn.lock` 安装的依赖及 `NODE_OPTIONS=--openssl-legacy-provider` 后，`build:dll` 和 `build:prod` 通过。生产构建保留 4 个既有警告；`build:locales` 额外报告 ConfigHistory 西班牙语、繁体中文重复键，但命令退出 0，该问题不属于 Workload 改动，继续登记为质量风险。
+- 首次 `build:packages` 暴露迁移基线缺少现代 Node 兼容修复，已迁入 `6376e818b`；该构建脚本为当前模块必需共享依赖，独立 PR 中必须明确标注，最终公共归属由集成评审决定。
 - 共享改动：`packages/shared/src/components/Inputs/ArrayInput` 仅修复显式空数组与删除最后一行后的行为，调用方为 Deployment 容器、端口和环境变量编辑；已补 ArrayInput 自身回归。该变更最终归属仍需在独立 PR 评审时确认，不能扩张为公共底座已验收。
 - 历史 `feature/v4-configmaps-secrets` 上的 CI、镜像和 131 浏览器证据只作为输入，不继承为本分支 VERIFY 证据。
 
