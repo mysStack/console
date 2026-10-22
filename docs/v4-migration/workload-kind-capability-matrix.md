@@ -99,4 +99,4 @@ Action `3595` 从 `detail._originData` 取编辑对象，保存时处理 `spec.t
 
 本轮结论仍为 REA 未完成：静态请求边界已定位，浏览器已确认三类详情页和 STS/DS 的 YAML 缺口，但真实 Network、完整 payload、RBAC 正反权限、缓存失效、错误/取消 UI、namespace 隔离和当前 SHA 部署后的页面渲染尚未验证。详见[Store/API 取证](./workload-settings-source-evidence-20261024.md#storeapi作用域和缓存的定向取证2026-10-23)和[运行时 REA](./workload-runtime-rea-20261023.md)。
 
-补充边界：当前 `3.bb6cbee4309e765b70c1.js` 的普通设置注册和集群差异设置注册不是同一能力。集群差异注册包含 DaemonSet，不能据此证明普通项目 DaemonSet 的编辑设置完整可用；普通项目 DaemonSet 仍需单独核对入口、forms 参数和实际请求。
+补充边界：当前 `3.bb6cbee4309e765b70c1.js` 的普通设置注册和集群差异设置注册不是同一能力。普通设置注册 `3602` 已包含 DaemonSet，集群差异注册也包含 DaemonSet；两者的入口、参数和字段差异仍需分别核对，不能把任一注册结果直接当成普通项目 DaemonSet 的完整等价证明。当前 131 浏览器观察已确认普通项目 DaemonSet 的“编辑设置”仍打开 YAML。
