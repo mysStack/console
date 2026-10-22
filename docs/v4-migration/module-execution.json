@@ -49,6 +49,10 @@
       {
         "path": "docs/v4-migration/workload-v3-field-equivalence-20261023.md",
         "sha256": "b5f1903433c8a58695c0a148eb386fe5f046265ea0c2ed2090fd64a2561c58ce"
+      },
+      {
+        "path": "docs/v4-migration/matrix.md",
+        "sha256": "168ee08f9915f2cf609485f836150b5691be4ca54c14f80a9f01e0a8047de352"
       }
     ],
     "coverage": {
@@ -58,7 +62,8 @@
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
           "docs/v4-migration/workload-kind-capability-matrix.md",
-          "docs/v4-migration/workload-v3-field-equivalence-20261023.md"
+          "docs/v4-migration/workload-v3-field-equivalence-20261023.md",
+          "docs/v4-migration/matrix.md"
         ]
       },
       "fields": {
