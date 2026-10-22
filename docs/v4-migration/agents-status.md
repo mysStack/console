@@ -1,5 +1,15 @@
 # P0 风险与模块任务状态
 
+## 2026-10-22 当前任务结果：Deployment 原生容器设置通过限定范围 VERIFY
+
+- 负责人：当前 Codex 主会话；分支 `feature/v4-configmaps-secrets`；单会话顺序执行，无子 Agent，既有 Worktree 保留。
+- 实现提交：`449bb9db5` 增加多个工作容器、初始化容器、端口、普通环境变量和校验，修复共享 ArrayInput 空数组行为；`6689ad88f` 修正浏览器发现的布局问题；最终源码 `2a2aeb4f4038f53ebe6b847ae10a843fcbcbf235` 修正跨组校验依赖。
+- 本地：先 RED 后 GREEN；仓库 75 个文件、259 项通过，相关 ESLint、Prettier、shared TypeScript、`build:packages`、`build:prod`、diff 检查通过。Console 全量类型检查仍失败，1320 项既有诊断，本轮改动无新增诊断；生产构建保留 12 项警告。
+- CI/部署：最终 [Run 39726084825](https://github.com/mysStack/console/actions/runs/39726084825) 成功；tag `feature-v4-configmaps-secrets-20261022-130717-2a2aeb4f4038`；OCI digest 与 Pod imageID digest 均为 `sha256:5eb8046de7e04d128d0da178ae648d288f395f31ea2fcb3a4a6e896c883ee9cb`。131 `ks-console` generation `567/567`，Pod `ks-console-6d4b6857c5-jxww9` Running/Ready、0 重启。
+- 最终 Playwright：登录后 25 个检查点通过，包含反向校验、真实 `201/409/200`、API 持久化、刷新/返回、列表缓存、截图复核和 StatefulSet 原生服务端口编辑回归。纠错后的错误状态类和红边均清除；本轮创建/详情无 V3 Deployment 业务请求。专用资源已清理，namespace 保留。
+- 未完成：Deployment 完整创建向导、命令/参数、配置引用、探针、资源/存储/调度/安全设置、业务 Pod 运行、创建完整 RBAC/作用域和全部动作等价。既有 Console 类型问题、`common is not defined`、watch `403` 继续跟踪，扩展问题后置；全局 P0 风险不变。
+- 状态：本批限定能力 VERIFY 通过，Deployment 整体仍“开发中，VERIFY 部分通过”，PR #1 保持 Draft、不合并。下一独立任务补齐 Deployment 创建容器命令/参数及其运行验证，不进入下一资源模块。完整证据见[容器设置验证记录](./deployment-containers-131-verify-20261022.md)。以下保留历史记录。
+
 ## 2026-10-22 当前任务结果：Deployment 原生创建第一批通过
 
 - 负责人：当前 Codex 主会话；分支 `feature/v4-configmaps-secrets`；无子 Agent。最终源码 `a05a96518fcfe3189c213e5c057cdeec4f37e850` 与远程分支一致，PR #1 保持 Draft。

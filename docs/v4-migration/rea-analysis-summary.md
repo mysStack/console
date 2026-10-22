@@ -1,5 +1,7 @@
 # REA 阶段分析总结
 
+> 2026-10-22 最新模块进展：沿用已有 focused REA，补充固定旧源码 `175710fefeeba6ff295c2c0967b4d45b83563d26` 的容器/端口/环境变量行为输入；源码 `2a2aeb4f4` 已完成 131 容器设置限定 VERIFY，25 个浏览器检查点通过。未扩大为全量 REA 完成，未把旧源码视为当前制品完整源码，未改变全局 P0 风险。详见[Deployment 容器设置验证记录](./deployment-containers-131-verify-20261022.md)。
+
 > 2026-10-22 模块级进展：沿用现有 Workload 行为基线并对 Deployment 创建 Chunk 做 focused REA，源码 `a05a96518` 已完成 131 原生创建第一批浏览器验证。错误态、项目权限作用域、列表刷新和创建基础链路取得限定范围证据；REA 结果仍为 `partial`，完整创建/RBAC/作用域等价未完成。此结果不改变全局 P0 风险或替代独立复核。详见[Deployment 原生创建验收记录](./deployment-create-131-verify-20261022.md)和[Workload 操作验收记录](./workload-actions-131-verify-20261022.md)。
 
 > 执行策略（2026-10-17 调整）：P0-U001～P0-U004 继续作为全局风险跟踪项，但不再统一阻塞所有模块开发。ConfigMap、Secret、ServiceAccount 以及后续资源分别执行模块级 `REA → DEV → VERIFY → PR`；模块内的高风险未知项仍然阻塞该模块。本文保留全局 P0 证据和结论，不把模块开发进度写成 P0 已通过。
