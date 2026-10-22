@@ -111,6 +111,50 @@ test('创建多个工作容器和初始化容器，分别保留端口和环境�
   ]);
 });
 
+test('工作容器和初始化容器分别保留启动命令及参数，并省略空项', () => {
+  const deployment = buildDeployment({
+    name: 'native-command',
+    namespace: 'v4-migration-e2e',
+    replicas: 1,
+    containers: [
+      {
+        name: 'worker',
+        image: 'busybox:1.36',
+        command: [' /bin/sh ', '', '   '],
+        args: [' -c ', ' printf ready >/tmp/ready; sleep 3600 '],
+      },
+    ],
+    initContainers: [
+      {
+        name: 'init',
+        image: 'busybox:1.36',
+        command: ['/bin/sh'],
+        args: ['-c', 'printf initialized >/work/marker'],
+      },
+    ],
+  });
+
+  assert.deepEqual(deployment.spec.template.spec.containers[0].command, ['/bin/sh']);
+  assert.deepEqual(deployment.spec.template.spec.containers[0].args, [
+    '-c',
+    'printf ready >/tmp/ready; sleep 3600',
+  ]);
+  assert.deepEqual(deployment.spec.template.spec.initContainers[0].command, ['/bin/sh']);
+  assert.deepEqual(deployment.spec.template.spec.initContainers[0].args, [
+    '-c',
+    'printf initialized >/work/marker',
+  ]);
+
+  const defaults = buildDeployment({
+    name: 'native-default-command',
+    namespace: 'v4-migration-e2e',
+    replicas: 0,
+    containers: [{ name: 'worker', image: 'busybox', command: [], args: [] }],
+  });
+  assert.equal('command' in defaults.spec.template.spec.containers[0], false);
+  assert.equal('args' in defaults.spec.template.spec.containers[0], false);
+});
+
 test('没有初始化容器时省略字段，空环境变量值保留，不生成 Service', () => {
   const deployment = buildDeployment({
     name: 'web',

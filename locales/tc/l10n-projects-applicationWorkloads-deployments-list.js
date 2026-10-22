@@ -12,6 +12,9 @@ module.exports = {
   WORKLOAD_ENV_DUPLICATE: '同一容器的環境變數名稱不能重複。',
   WORKLOAD_PORT_INVALID: '請填寫合法連接埠（1–65535）、協定和連接埠名稱（選填，最長 15 個字元）。',
   WORKLOAD_PORT_DUPLICATE: '容器連接埠名稱在整個容器群組中不能重複。',
+  STARTUP_COMMAND: '啟動命令',
+  COMMAND: '命令',
+  PARAMETERS: '參數',
 
   // Banner
   // List

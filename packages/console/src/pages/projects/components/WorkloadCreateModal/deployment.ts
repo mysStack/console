@@ -13,6 +13,8 @@ export interface ContainerCreateValues {
   name: string;
   image: string;
   imagePullPolicy?: 'Always' | 'IfNotPresent' | 'Never';
+  command?: string[];
+  args?: string[];
   ports?: ContainerPortValues[];
   env?: EnvironmentValues[];
 }
@@ -72,10 +74,14 @@ export function validateContainers(
 }
 
 function buildContainer(container: ContainerCreateValues) {
+  const command = container.command?.map(trim).filter(Boolean);
+  const args = container.args?.map(trim).filter(Boolean);
   return {
     name: trim(container.name),
     image: trim(container.image),
     imagePullPolicy: container.imagePullPolicy || 'IfNotPresent',
+    ...(command?.length ? { command } : {}),
+    ...(args?.length ? { args } : {}),
     ...(container.ports?.length
       ? {
           ports: container.ports.map(port => ({
