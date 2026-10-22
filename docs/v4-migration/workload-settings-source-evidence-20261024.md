@@ -100,6 +100,16 @@ git show origin/release-3.4:src/pages/projects/containers/DaemonSets/Detail/inde
 
 当前 V4 `WorkloadSettingsModal.tsx` 只展示名称、namespace、replicas、容器、初始化容器和卷；上表中更新策略、节点选择/IP 池、元数据、Service、终止宽限期、StatefulSet 卷模板、完整容器高级字段尚未进入该 Modal。该差异是已确认的 DEV 入口缺口，不在 REA 阶段直接补代码；需先完成每一组字段的当前制品/旧源码/运行时证据和对应测试设计。
 
+## 当前制品中的表单注册边界补充
+
+对 `packages/bootstrap/assets/v3dist/3.bb6cbee4309e765b70c1.js` 直接读取后，发现同一 bundle 中存在两套容易混淆的 forms 注册：
+
+- 普通设置注册（工厂 `2928`）包含 `deployments`、`statefulsets` 和 `service`；从该注册不能推出普通项目 DaemonSet 具有同样的完整设置表单。
+- 集群差异设置注册（工厂 `3564`）包含 `deployments`、`statefulsets`、`daemonsets`；其中 StatefulSet 和 DaemonSet 的差异配置额外绑定 `withService: true`。
+- Action 工厂 `3595` 对普通和联邦入口的 `workload.template.edit` 处理不同；联邦入口明确处理 `spec.overrides` 并传递 `hideVolumeSetting`，不能把联邦表单注册当成普通项目入口证据。
+
+因此，普通项目 DaemonSet 的设置入口必须继续用其详情路由、调用参数和实际页面/Network 证据单独确认。此前“当前制品存在 DaemonSet 分区”的结论只适用于已定位的集群差异注册，不能替代普通项目编辑设置的等价性证明。
+
 ## 131 浏览器运行时取证状态
 
 本轮按专用测试账号从 `http://192.168.2.131:30880/login` 进行只读登录尝试，页面返回“用户名或密码错误”。没有继续进行路由、Network、页面渲染或资源操作，也没有部署、修改集群资源或创建新账号。该结果只能说明当前会话没有取得有效登录，不代表 V4 功能失败；V3 页面和 V4 当前制品的运行时 REA 仍未完成，后续需要可用的测试登录会话后再采集。
