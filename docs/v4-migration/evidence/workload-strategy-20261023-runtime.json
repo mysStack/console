@@ -1,0 +1,121 @@
+{
+  "date": "2026-10-23",
+  "sourceCommit": "45f104b6e18215bb6b4f273e1dd16da30107188a",
+  "artifactTree": "1e499d92e11374e26c76f5e13be45251602bd596",
+  "deployment": {
+    "tag": "feature-v4-workloads-20261022-215739-27aaeced74e8",
+    "digest": "sha256:919492fedf5eae6ee27fca84bb490897e557659ae79860b9e3f035e59c5f9179"
+  },
+  "purpose": "旧 V3 更新策略浏览器 REA；不是当前分支 V4 VERIFY",
+  "method": "浏览器拦截非 GET/HEAD/OPTIONS 请求并返回带 REA_CAPTURE_ONLY 标记的模拟 409；取消对话框后以 kubectl 回读；未向 API Server 提交设置",
+  "statefulsetCliResult": {
+    "kind": "statefulsets",
+    "initial": [
+      {
+        "name": "spec.updateStrategy.rollingUpdate.partition",
+        "value": "0"
+      }
+    ],
+    "confirmDisabledBeforeSectionSave": true,
+    "confirmDisabledAfterSectionSave": false,
+    "captures": [
+      {
+        "method": "PUT",
+        "pathname": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01",
+        "resourceVersionPresent": true,
+        "updateStrategy": {
+          "type": "RollingUpdate",
+          "rollingUpdate": {
+            "partition": 1
+          }
+        },
+        "hasReplicas": true,
+        "terminationGracePeriodSeconds": 30,
+        "specKeys": [
+          "persistentVolumeClaimRetentionPolicy",
+          "podManagementPolicy",
+          "replicas",
+          "revisionHistoryLimit",
+          "selector",
+          "serviceName",
+          "template",
+          "updateStrategy"
+        ]
+      }
+    ],
+    "blocked": [
+      {
+        "method": "PUT",
+        "pathname": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01"
+      }
+    ],
+    "conflictVisible": true,
+    "serverWritesAllowed": false
+  },
+  "otherObservedPayloads": [
+    {
+      "kind": "deployments",
+      "method": "PUT",
+      "pathname": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-watch-20261022-02",
+      "resourceVersionPresent": true,
+      "strategy": {
+        "type": "RollingUpdate",
+        "rollingUpdate": {
+          "maxUnavailable": 2,
+          "maxSurge": "30%"
+        }
+      },
+      "hasReplicas": true,
+      "terminationGracePeriodSeconds": 30
+    },
+    {
+      "kind": "daemonsets",
+      "method": "PUT",
+      "pathname": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/daemonsets/v4-watch-ds-20261022-01",
+      "resourceVersionPresent": true,
+      "updateStrategy": {
+        "type": "RollingUpdate",
+        "rollingUpdate": {
+          "maxUnavailable": "2",
+          "maxSurge": 0
+        }
+      },
+      "minReadySeconds": 1,
+      "hasReplicas": false,
+      "terminationGracePeriodSeconds": 30
+    }
+  ],
+  "unchangedApiReadback": [
+    {
+      "kind": "deployments",
+      "name": "v4-watch-20261022-02",
+      "resourceVersionBefore": "134424170",
+      "resourceVersionAfter": "134424170",
+      "specSha256Before": "6a0a1fa50a1f566619dfc886572aca45698f7745e8dc64ea58ac49522d7ae4f1",
+      "specSha256After": "6a0a1fa50a1f566619dfc886572aca45698f7745e8dc64ea58ac49522d7ae4f1"
+    },
+    {
+      "kind": "statefulsets",
+      "name": "v4-watch-sts-20261022-01",
+      "resourceVersionBefore": "134420852",
+      "resourceVersionAfter": "134420852",
+      "specSha256Before": "c4406fc197c91d44e72db6928a56df343f8564f31a7a3b4dc25a291cef632735",
+      "specSha256After": "c4406fc197c91d44e72db6928a56df343f8564f31a7a3b4dc25a291cef632735"
+    },
+    {
+      "kind": "daemonsets",
+      "name": "v4-watch-ds-20261022-01",
+      "resourceVersionBefore": "134421481",
+      "resourceVersionAfter": "134421481",
+      "specSha256Before": "45028210500ad4745fa9f49c79c07c1bfa7bd3a2febcd6fa65db8aedd1a1eb2d",
+      "specSha256After": "45028210500ad4745fa9f49c79c07c1bfa7bd3a2febcd6fa65db8aedd1a1eb2d"
+    }
+  ],
+  "specHashMethod": "sha256(json.dumps(spec, sort_keys=True, separators=(',', ':')).encode())",
+  "limitations": [
+    "模拟 409 不等于 API Server 实际冲突验证",
+    "其他两类请求为现场观察摘录；StatefulSet 为 CLI JSON 原始结果",
+    "未验证服务端接受、持久化、低权限 UI、缓存失效或全部字段保留",
+    "旧部署 SHA 不等于本次 sourceCommit"
+  ]
+}

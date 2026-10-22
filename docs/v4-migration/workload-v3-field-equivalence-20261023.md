@@ -56,7 +56,26 @@
 
 当前 `buildDeploymentSettingsResource` 先克隆原始对象并删除 `status`，对容器和普通卷执行局部合并；这能证明实现有保留未知字段的意图，但不能证明所有字段的清空语义正确。尤其是未进入表单的更新策略、亲和性、安全上下文、终止宽限期、元数据和 StatefulSet 专属字段，目前没有对应的解析、编辑和回写测试。
 
-## 集群级路由边界
+## 当前编译制品的策略、调度及优雅终止补证
+
+本节输入提交为 `45f104b6e18215bb6b4f273e1dd16da30107188a`，绑定 V3 tree `1e499d92e11374e26c76f5e13be45251602bd596`。[偏移和摘要清单](./evidence/workload-strategy-20261023-provenance.json)从当前 `1.9ca3a76d71946712055c.js` 惰性提取工厂 1299、1530、1542，不执行 Bundle；源文件 SHA-256 为 `924556b7889c21dbd450535163cdd63e5a6c92daad2cbdc3ec8514a005d765a3`。Byte range 为左闭右开：1299 `[938572,944395)`、1530 `[1191228,1197161)`、1542 `[1217216,1218574)`。
+
+实际 REA 摘要见[归档 JSON](./evidence/workload-strategy-20261023-rea-summary.json)，Evidence ID 为 `ev_6ab1c1b7b16c642fb73277880b271b7da6e4c34b369b16e128f73fdbdacaa646`，父证据为 `ev_41d69a375320fb929ebf0dcc88ac3aba2e5136bf3c94bebc4afc5e248abf1358`。3 个 JS 解析成功、0 解析失败；应用图和语义图仍是 partial，分别有 1 和 820 项 unknown，不能据此声称所有行为已还原。以下字段事实来自具体工厂语法和限定运行时对照。
+
+| 资源/能力            | 当前制品字段、默认值与校验                                                                                                                                                                             | 运行时与差异边界                                                                                                   |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| Deployment 更新策略  | `spec.strategy.type` 默认 RollingUpdate；`rollingUpdate.maxUnavailable/maxSurge` 渲染默认值均 `25%`，必填，允许非负整数字符串或整数百分比；纯数字在 `getDerivedStateFromProps` 中转为 number           | 真实 V3 草稿改为 `2`、`30%` 后生成 PUT，类型分别为 number/string；不是服务端持久化测试                             |
+| StatefulSet 更新策略 | `spec.updateStrategy.rollingUpdate.partition` 默认 0，必填，整数、最小 0；切回 RollingUpdate 的默认初始化分支却拼作 `statfulsets`                                                                      | 草稿改为 1 后生成 number；拼写问题可能影响清空后切回的初始化，尚未运行时复现，不能自动修正或宣称默认恢复正确       |
+| DaemonSet 更新策略   | `spec.updateStrategy.rollingUpdate.maxUnavailable` 输入默认 `20%`；但切回 RollingUpdate、原分支为空时写入 `25%`，两处不一致；该输入只有 required，未见 Deployment 同款整数/百分比 validator            | 已有 fixture 当前值为 1，不能据此宣称默认值为 1；编辑后请求值为字符串 `"2"`，保留 `maxSurge:0`，服务端接受性未验证 |
+| DaemonSet 就绪时间   | `spec.minReadySeconds`，默认 0，必填，整数、最小 0                                                                                                                                                     | 草稿填 1 后请求值为 number；不产生 `spec.replicas`                                                                 |
+| 普通资源优雅终止     | 工厂 1542：`spec.template.spec.terminationGracePeriodSeconds`，默认 30，整数、最小 0；显式 prefix 优先，联邦路径另有模板层级                                                                           | DaemonSet 页面已有值 30；未单独捕获该分区修改请求，不能把策略 PUT 保留原值当成编辑测试                             |
+| 调度                 | 工厂 1530：affinity 默认 `{}`；分散使用 podAntiAffinity，聚合使用 podAffinity，preferred 权重 100、hostname topology；自定义 policy/type/target 有完整性检查，关联 Workload 请求使用 cluster/namespace | 当前只取得静态路径；尚未逐项浏览器修改和核对最终写回，不能将编辑器临时 customMode 直接写入 API                     |
+
+工厂 1299 在非 RollingUpdate 策略切换时会 unset 对应 rollingUpdate 分支。以上是当前制品的清除意图；取消后恢复、切回后的默认、字段保留与失败重试仍须用相应场景确认。V4 应保留有效业务语义，并明确处理旧制品自身的不一致，不能机械复制未经确认的缺陷。
+
+浏览器的分区草稿 → 分区勾选保存 → 外层确定、模拟 409、取消和 API 未变更证据见[运行时记录](./workload-runtime-rea-20261023.md#更新策略草稿请求和取消的定向证据)。本节只关闭这些有限字段的定位和请求形态未知；未关闭完整容器/存储、StatefulSet Service/PVC 模板、DaemonSet 运维语义、RBAC、缓存或当前 V4 实现的验收。
+
+## 集群级路由边界（活跃入口与候选组件区分）
 
 本批次不能只验收项目级 `projects/:namespace` 页面。主迁移计划要求集群级页面保留跨 namespace 选择能力，同时移除 Workload 的 V3/Wujie 运行时依赖。当前源码的实际边界如下：
 
@@ -65,15 +84,15 @@
 | `packages/console/src/pages/clusters/containers/ApplicationWorkloads/routes.tsx`                                                        | `/deployments`、`/statefulsets`、`/daemonsets` 都挂载 `../Workload/Workloads` 的 `WorkLoadList`，原生 `ApplicationWorkloads/Workloads` 导入被注释 | `routes.tsx:8-15,34-47`                       | 当前集群级入口没有使用已存在的原生列表实现                    |
 | `packages/console/src/pages/clusters/containers/Workload/Workloads/index.tsx`                                                           | 三个 Tab 都渲染同一个 `./Embed`                                                                                                                   | `Workloads/index.tsx:20-43`                   | 集群级 Workload 列表仍走桥接组件                              |
 | `packages/console/src/pages/clusters/containers/Workload/Deployments/Embed.tsx`                                                         | Wujie URL 为 `/consolev3/clusters/:cluster/deployments`                                                                                           | `Deployments/Embed.tsx:8-17`                  | Deployment 集群列表仍依赖 V3                                  |
-| `packages/console/src/pages/clusters/containers/Workload/StatefulSets/Embed.tsx`                                                        | Wujie URL 实际指向 `/consolev3/clusters/:cluster/daemonsets`                                                                                      | `StatefulSets/Embed.tsx:12-17`                | StatefulSet 集群入口与目标资源不一致，属于已确认路由缺陷      |
-| `packages/console/src/pages/clusters/containers/Workload/DaemonSets/Embed.tsx`                                                          | Wujie URL 实际指向 `/consolev3/clusters/:cluster/statefulsets`                                                                                    | `DaemonSets/Embed.tsx:12-17`                  | DaemonSet 集群入口与目标资源不一致，属于已确认路由缺陷        |
+| `packages/console/src/pages/clusters/containers/Workload/StatefulSets/Embed.tsx`                                                        | Wujie URL 实际指向 `/consolev3/clusters/:cluster/daemonsets`                                                                                      | `StatefulSets/Embed.tsx:12-17`                | 独立候选 Embed URL 互换；不是活跃主入口已复现缺陷             |
+| `packages/console/src/pages/clusters/containers/Workload/DaemonSets/Embed.tsx`                                                          | Wujie URL 实际指向 `/consolev3/clusters/:cluster/statefulsets`                                                                                    | `DaemonSets/Embed.tsx:12-17`                  | 独立候选 Embed URL 互换；不是活跃主入口已复现缺陷             |
 | `packages/console/src/pages/clusters/containers/ApplicationWorkloads/Workloads/index.tsx`                                               | 已有原生 `ListPage`、namespace 选择器、项目列和三类 Tab；但没有被上述路由挂载                                                                     | `Workloads/index.tsx:1-32,250-327`            | 可作为迁移输入，不能因为代码存在就算集群级原生功能已接通      |
 | `packages/console/src/pages/clusters/containers/ApplicationWorkloads/Workloads/{Deployments,StatefulSets,DaemonSets}/Detail/routes.tsx` | 集群详情路由由项目 Workload Detail 路由复用                                                                                                       | `ApplicationWorkloads/routes.tsx:15-20,79-89` | 详情路由复用本身不证明列表、集群作用域、Action 和缓存已经等价 |
 
 集群级工作负载的 REA 结论是：
 
 1. 当前项目级列表/详情的有限原生证据不能覆盖集群级列表。
-2. 集群级列表仍有 Wujie/V3 运行时依赖，且 StatefulSet 与 DaemonSet Embed 的 URL 互换必须在 DEV 中修复并用浏览器验证。
+2. 集群级列表仍有 Wujie/V3 运行时依赖。主入口使用通用 `Workloads/Embed/index.tsx` 按 tab 生成 URL，运行时三类资源类型正确；另两个独立 Embed 文件的 URL 互换是未挂载候选组件中的静态风险，不能写成当前主入口已复现的路由缺陷。DEV 应接通原生列表并核对遗留调用方。
 3. 集群级原生列表虽然已有代码输入，但其 namespace 选择、跨 namespace 查询、批量 Action、RBAC、缓存和三类详情跳转必须按当前 SHA 独立验证。
 4. 在集群级入口完成替换前，不能宣称三类 Workload 已经完成“彻底移除 V3/Wujie”的原生化目标。
 
@@ -140,16 +159,15 @@
 - StatefulSet Service 和 `volumeClaimTemplates` 的旧 V3 写回路径；
 - 当前 V4 设置 Modal 和转换函数实际覆盖的字段边界。
 
-仍未满足 REA 放行条件：
+本次复核把待补证与后续实现分开：
 
-1. 当前 `v3dist` 的完整三类资源行为、字段和默认值尚未逐项与真实旧 V3 页面/Network 对齐；
-2. StatefulSet、DaemonSet 当前原生编辑设置入口尚未实现，当前运行时仍打开 YAML；
-3. DaemonSet 停止/恢复语义与公共 `spec.replicas=0` mutation 的差异未处理；
-4. StatefulSet Service、卷模板、更新策略及三类资源的完整 API/Store/缓存/错误边界未闭环；
-5. 当前 SHA 尚未完成构建、部署和浏览器 VERIFY，低权限浏览器正反路径也未完成；
-6. `module-execution.json` 尚无负责人复核记录，不能由本记录自签放行 DEV。
-7. 集群级列表仍由 Wujie/V3 承载，StatefulSet/DaemonSet Embed URL 互换，集群作用域和跨 namespace 行为尚未闭环。
-8. 联邦 Deployment/StatefulSet 仍由 Wujie/V3 承载，联邦 DaemonSet 的产品范围和入口尚未证实。
-9. 普通 Workload 配置引用仍调用 `useV3action` 并绑定 Wujie/V3 DOM，原生 Patch 组件尚未成为唯一编辑入口。
+| 分类          | 当前结论与后续动作                                                                                                                              |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| REA 待补证    | 当前制品三类资源的完整容器/卷字段、默认值、校验、保留与清空语义尚未逐项与真实 V3 页面/请求对齐；更新策略的有限补证不覆盖这些字段                |
+| REA 待补证    | StatefulSet Service/PVC 模板、DaemonSet 停止/恢复的实际 Action 语义，以及三类资源的权限、作用域、缓存和错误边界仍需限定取证                     |
+| 已知 DEV 差异 | STS/DS 编辑设置仍打开 YAML；集群列表仍走 Wujie/V3；配置引用仍调用 `useV3action` 并绑定 V3 DOM。REA 需明确替代边界，不能要求本阶段先实现后续功能 |
+| 后续 VERIFY   | 当前 SHA 的构建、部署、持久化、低权限 UI、namespace 隔离、缓存和完整等价验收均未完成；这些不是 REA 前置要求                                     |
+| 后置范围      | 联邦对接另行登记；不能把它算作当前普通项目/集群批次已完成，也不将未安装插件等后置项扩大为当前批次统一阻塞                                       |
+| 正式复核      | `module-execution.json` 的 review 仍为空；证据补齐后按既定规则提交真实复核，不补造签署                                                          |
 
 结论保持：**REA / 分析中，待负责人复核；暂不进入 DEV。**

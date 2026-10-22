@@ -20,7 +20,7 @@
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
-        "sha256": "c476ed3e2d1cd2c8109a3f0c2914d46c55a8ea05a3d1e64e67748779292cca58"
+        "sha256": "746059639afa81816a71edcb477954f882cfab022fc2c92da5665c4bced6c372"
       },
       {
         "path": "docs/v4-migration/workload-kind-capability-matrix.md",
@@ -44,11 +44,11 @@
       },
       {
         "path": "docs/v4-migration/workload-runtime-rea-20261023.md",
-        "sha256": "d7b5b7e41ee61c6f1949df1ca92d12a17df59c3dc51a4f9f30bdca834d23d99b"
+        "sha256": "6036336293dbd1085ed3f0de39e44b65b712a1060b6b656203815e95049cedd8"
       },
       {
         "path": "docs/v4-migration/workload-v3-field-equivalence-20261023.md",
-        "sha256": "984610f7b7d677b501d5e97eb9faf86c16678f6fa29963c98b26756809416142"
+        "sha256": "d21f9ac86b8d0cbc66f0fd333865afd7045664e5abdc0d18742bd3c54a1a45f8"
       },
       {
         "path": "docs/v4-migration/matrix.md",
@@ -56,7 +56,23 @@
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "5adcb37cceea8b4b7d5feb1f6eda26345e35b70c683c932ae22ce2e4b26116e5"
+        "sha256": "f2557f3882ad496a312f1c84e8879055d24f30827c3d322eb329dadfd6da759e"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
+        "sha256": "f30783c0fa5fa67c85298f7ba9502c31b396c79474c900a3132711222d2343fe"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-strategy-20261023-rea-summary.json",
+        "sha256": "8635b54013e95a444364dd49e1f503ffa1f992a9f72a4396e6e727c55d99f2ae"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-strategy-20261023-runtime.json",
+        "sha256": "10d7111d9e24dd8bb5280376b8257da4e1d3b9336338ce1fbd173d7dedc7915a"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-strategy-capture-20261023.js.txt",
+        "sha256": "9b401f072e2780e6a02fd0eb4c17c5437a5fe2ea68f47ea082f43fd065f5c178"
       }
     ],
     "coverage": {

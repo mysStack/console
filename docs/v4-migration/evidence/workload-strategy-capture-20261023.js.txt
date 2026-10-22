@@ -1,0 +1,36 @@
+async page => {
+  const resource = page.url().match(/\/(deployments|statefulsets|daemonsets)\/([^/]+)/);
+  if (!resource || !page.url().includes('/projects/v4-migration-e2e/')) throw new Error('限定测试资源 URL 不匹配');
+  const kind = resource[1], name = resource[2];
+  const expected = '/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/'+kind+'/'+name;
+  const captures = [], blocked = [];
+  const handler = async route => {
+    const req=route.request();
+    if (['GET','HEAD','OPTIONS'].includes(req.method())) return route.continue();
+    const pathname=req.url().replace(/^https?:\/\/[^/]+/,'').split('?')[0];
+    blocked.push({method:req.method(),pathname});
+    if(pathname===expected){const body=req.postDataJSON();captures.push({method:req.method(),pathname,resourceVersionPresent:Boolean(body.metadata?.resourceVersion),strategy:body.spec?.strategy,updateStrategy:body.spec?.updateStrategy,minReadySeconds:body.spec?.minReadySeconds,hasReplicas:Object.hasOwn(body.spec||{},'replicas'),terminationGracePeriodSeconds:body.spec?.template?.spec?.terminationGracePeriodSeconds,specKeys:Object.keys(body.spec||{}).sort()});}
+    return route.fulfill({status:409,contentType:'application/json',body:JSON.stringify({kind:'Status',apiVersion:'v1',status:'Failure',reason:'Conflict',code:409,message:'REA_CAPTURE_ONLY: request intercepted; no API Server write'})});
+  };
+  await page.route('**/*',handler);
+  try {
+    await page.locator('[data-test=detail-more]').click();
+    await page.locator('[data-test=detail-editConfigTemplate]').click();
+    const d=page.getByRole('dialog');
+    const initial=await d.locator('input').evaluateAll(els=>els.map(x=>({name:x.name,value:x.value})));
+    if(kind==='statefulsets') await d.getByRole('textbox',{name:'容器组副本分组序号*',exact:true}).fill('1');
+    else {await d.getByRole('textbox',{name:'最大不可用容器组数量*',exact:true}).fill('2');
+      if(kind==='deployments') await d.getByRole('textbox',{name:'最大多余容器组数量*',exact:true}).fill('30%');
+      else await d.getByRole('textbox',{name:'容器组就绪最短运行时长（s）*',exact:true}).fill('1');}
+    const confirmDisabledBeforeSectionSave=await d.getByRole('button',{name:'确定',exact:true}).isDisabled();
+    await d.locator('svg.kubed-icon-check').click();
+    const confirmDisabledAfterSectionSave=await d.getByRole('button',{name:'确定',exact:true}).isDisabled();
+    if(confirmDisabledAfterSectionSave)throw new Error('分区保存后确定仍禁用');
+    await d.getByRole('button',{name:'确定',exact:true}).click();
+    for(let i=0;i<25&&!captures.length;i++)await page.waitForTimeout(100);
+    const conflictVisible=(await page.locator('body').innerText()).includes('REA_CAPTURE_ONLY');
+    if(await d.count()) await d.getByRole('button',{name:'取消',exact:true}).click();
+    if(captures.length!==1)throw new Error('预期恰好拦截一次设置请求');
+    return {kind,initial,confirmDisabledBeforeSectionSave,confirmDisabledAfterSectionSave,captures,blocked,conflictVisible,serverWritesAllowed:false};
+  } finally {await page.unroute('**/*',handler);}
+}

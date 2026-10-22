@@ -74,9 +74,9 @@ Network 记录显示该列表使用带完整作用域的请求并返回 200：
 
 集群级路由复核结果：
 
-- 直达 `/clusters/host/workloads` 后重定向到 `/clusters/host/deployments`，页面显示原生 Workload 列表和 Deployment、StatefulSet、DaemonSet 三个入口。
+- 直达 `/clusters/host/workloads` 后重定向到 `/clusters/host/deployments`，页面显示 V4 Banner/Tab 外壳及嵌入的 V3 Workload 列表，提供 Deployment、StatefulSet、DaemonSet 三个入口。
 - `/clusters/host/deployments`、`/clusters/host/statefulsets`、`/clusters/host/daemonsets` 三个列表都能渲染对应资源类型，并分别请求 `GET /clusters/host/kapis/resources.kubesphere.io/v1alpha3/deployments`、`statefulsets`、`daemonsets`。
-- 三类列表的资源名称和项目链接仍指向 `/consolev3/clusters/host/projects/...`；页面加载过程中还实际请求 `/consolev3/dashboard` 和 `/dist/v3dist/*`。因此当前集群级页面是“V4 原生列表壳 + V3 详情/依赖”，不能作为全量移除 V3/Wujie 的证据。
+- 三类列表的资源名称和项目链接仍指向 `/consolev3/clusters/host/projects/...`；页面加载过程中还实际请求 `/consolev3/dashboard` 和 `/dist/v3dist/*`。集群 StatefulSet 页面实际检测到 1 个 `wujie-app`；活跃路由挂载 `Workload/Workloads/Embed/index.tsx`，其 URL 由当前 tab 插值生成。因此列表本身仍是 V3，不能写成已接通原生 `ListPage`。单独的 `StatefulSets/Embed.tsx` 和 `DaemonSets/Embed.tsx` 有 URL 互换，但不是这条活跃路由使用的组件，本轮未复现主入口跳错资源。
 
 旧 V3 详情和“编辑设置”页面复核结果：
 
@@ -86,7 +86,23 @@ Network 记录显示该列表使用带完整作用域的请求并返回 200：
 | StatefulSet | `更新策略`、`容器`、`容器组优雅终止`、`存储`、`容器组调度规则`；更新策略可见 `容器组副本分组序号`，当前值为 `0`；详情另有 `编辑服务`          | `GET /clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01` |
 | DaemonSet   | `更新策略`、`容器组`、`存储`、`容器组优雅终止`；更新策略可见 `最大不可用容器组数量` 和 `容器组就绪最短运行时长（s）`，当前值为 `1` 和 `0`     | `GET /clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/daemonsets/v4-watch-ds-20261022-01`    |
 
-这批页面证据把三类资源的资源特有分区和默认值从“旧源码候选”提升为“旧 V3 页面已观察”；仍未证明保存时的完整 Payload、字段转换、RBAC、错误/取消和缓存行为。当前 V4 代码的 StatefulSet、DaemonSet 编辑设置仍进入 YAML，与上述旧 V3 原生设置分区形成已确认的 DEV 差异。浏览器原始 snapshot/console 输出保留在本地 `.playwright-cli/`，未加入 Git。
+这批页面证据确认了三类资源的特有分区和已有对象的当前值；当前值不能作为空对象的默认值。保存策略的有限请求证据见下一节，完整字段、RBAC 和缓存仍未闭环。当前 V4 代码的 StatefulSet、DaemonSet 编辑设置仍进入 YAML，与上述旧 V3 设置分区形成已确认的 DEV 差异。浏览器原始 snapshot/console 输出保留在本地 `.playwright-cli/`，未加入 Git。
+
+## 更新策略草稿、请求和取消的定向证据
+
+取证输入为 `45f104b6e18215bb6b4f273e1dd16da30107188a`，V3 tree 为 `1e499d92e11374e26c76f5e13be45251602bd596`；部署仍是上述旧镜像。使用[限定请求捕获脚本](./evidence/workload-strategy-capture-20261023.js.txt)拦截浏览器非 GET/HEAD/OPTIONS 请求，返回含 `REA_CAPTURE_ONLY` 标记的模拟 409，随后取消。脚本不保存请求头、Token 或完整容器/环境变量数据。[运行时摘录](./evidence/workload-strategy-20261023-runtime.json)保存限定字段及前后 API 回读摘要。
+
+| 资源        | 草稿修改与浏览器生成的 PUT                                                                               | 边界                                                                                                                         |
+| ----------- | -------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Deployment  | `spec.strategy.rollingUpdate.maxUnavailable=2`（number）、`maxSurge="30%"`（string）                     | 保留 `resourceVersion`，对象含 `replicas`                                                                                    |
+| StatefulSet | `spec.updateStrategy.rollingUpdate.partition=1`（number）                                                | 保留 `resourceVersion` 和 `replicas/serviceName`；此 fixture 的 specKeys 不含 `volumeClaimTemplates`，未证明卷模板保留或编辑 |
+| DaemonSet   | `spec.updateStrategy.rollingUpdate.maxUnavailable="2"`（string）、`maxSurge=0`、`spec.minReadySeconds=1` | 保留 `resourceVersion`，不含 `replicas`；字符串类型是实际捕获结果，不推定服务端接受                                          |
+
+三类设置请求均针对 `/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/{kind}/{name}`，每次只捕获一次 PUT。页面流程分两层：先点分区勾选保存草稿，再点外层“确定”；分区保存前外层按钮禁用，之后启用。模拟 409 后显示标记错误，随后取消关闭。早期直接点击禁用按钮的超时是测试步骤错误，不登记为产品缺陷；定位隐藏 radio 的等待超时也不计页面失败。
+
+三类资源的 `resourceVersion` 和规范化 `spec` SHA-256 在取证前后均相同，具体值见 JSON。它证明本次观察没有持久化设置变更；模拟 409 只覆盖前端错误反馈，不能冒充实际 API Server 冲突、持久化、缓存或低权限验证。
+
+另外，DaemonSet 容器新增页面已观察到普通/初始化容器、镜像、CPU/内存、端口、拉取策略、三类探针、生命周期、命令参数、环境变量及引用、安全上下文和宿主时区；存储页面可见 PVC/临时卷/HostPath 和 ConfigMap/Secret 挂载入口。这里只确认可见入口，没有验证全部嵌套字段、写回或跨资源等价。
 
 ## 低权限 API 矩阵
 
@@ -105,4 +121,4 @@ Network 记录显示该列表使用带完整作用域的请求并返回 200：
 1. 运行时已确认 131 的集群标识、项目路由、三类详情页和当前部署制品的实际页面形态。
 2. Deployment 的原生编辑设置入口可渲染；StatefulSet、DaemonSet 的“编辑设置”仍打开 YAML，这是明确的 DEV 缺口。
 3. 本轮没有执行资源创建、编辑、删除、伸缩或部署，未取得当前 SHA 的部署链路、Network 请求、RBAC 正反和缓存失效证据。
-4. 当前组合批次仍为 `REA / 分析中`；修复前不能进入业务 DEV，修复后必须以当前 SHA 重新执行构建、部署和浏览器验收。
+4. 当前组合批次仍为 `REA / 分析中`；REA 证据闭环前不能进入业务 DEV，修复后必须以当前 SHA 重新执行构建、部署和浏览器验收。
