@@ -53,6 +53,18 @@
 
 本轮页面加载时控制台仍出现已知扩展初始化错误，包括 `getExtensionConsoleV3Embed is not a function`，以及其他扩展的 `ConfigConstants` 错误。它们来自已安装扩展资源，不属于本轮 Workload 业务代码；本记录保留现象，不将其作为 Workload 通过依据，也不把它自动改成 Workload 缺陷结论。
 
+## 低权限 API 矩阵
+
+本轮在 `v4-migration-e2e` 中创建了专用 viewer 用户 `v4-workload-viewer-20261023`，并只绑定该 namespace 的 `viewer` 项目角色。使用 Kubernetes `auth can-i` 做非破坏性授权核对，未输出该用户密码：
+
+| 资源        | 当前 namespace 的 list/get/watch | 当前 namespace 的 patch/delete | all-namespaces 的 list/get/watch |
+| ----------- | -------------------------------- | ------------------------------ | -------------------------------- |
+| Deployment  | 允许                             | 拒绝                           | 拒绝                             |
+| StatefulSet | 允许                             | 拒绝                           | 拒绝                             |
+| DaemonSet   | 允许                             | 拒绝                           | 拒绝                             |
+
+这组结果证明了测试账号的预期授权边界和 namespace 级拒绝路径，但尚未在浏览器中使用该账号登录，也未将拒绝操作发送到当前 SHA 的 Console 页面；因此不能替代低权限 UI 和实际 API 请求证据。该用户和 RoleBinding 属于本轮专用测试 fixture，完成 VERIFY 清理时一并删除。
+
 ## 结论与下一步
 
 1. 运行时已确认 131 的集群标识、项目路由、三类详情页和当前部署制品的实际页面形态。
