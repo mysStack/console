@@ -45,4 +45,6 @@
 
 ## 当前验证结论
 
-本次核验 Git 基线、分支、Worktree 和原 PR 状态，并在工作区根目录建立适用于所有后续模块的主计划门禁、模块注册表、执行规则和检查脚本。`workloads start` 与合法部署标签检查通过；用错误模块 ID 和 ConfigMap/Secret 标签执行时均按预期失败。历史 Workload 代码已迁入并完成分批针对性测试，但尚未完成本 HEAD 的完整回归、构建、镜像、131 rollout 和 Playwright 验收。Workload 整体开发测试目标仍未完成，131 已部署的上一轮制品不因本次归集而改变。
+本次核验 Git 基线、分支、Worktree 和原 PR 状态，并在工作区根目录建立适用于所有后续模块的主计划门禁、模块注册表、执行规则和检查脚本。`workloads start`、`deploy` 和 PR 门禁均以登记分支及精确 SHA 为准。
+
+纠正后已创建 Draft PR #2，并在 `288fbccab63bebf76c3677beadc8b00c60c3cfd3` 完成本地回归、GitHub Actions 镜像构建、131 rollout、Pod imageID 回读和全新浏览器 Playwright 验收。该结果证明分支和首轮 VERIFY 链路已闭环，详见 [Workload 131 VERIFY 记录](./workload-131-verify-20261022.md)。Workload 整体功能仍未完成，继续保持“开发中”。

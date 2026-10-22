@@ -1,5 +1,17 @@
 # Workload 模块任务状态
 
+## 2026-10-22 独立分支首次 131 VERIFY
+
+- 当前阶段：`DEV` 中的首轮 `VERIFY` 已完成；Workload 整体仍为“开发中”，没有进入 REVIEWED 或 INTEGRATED。
+- 分支/Worktree：`feature/v4-workloads` / `/home/bruce/code/ks-develop/console-workloads`；当前代码 SHA `288fbccab63bebf76c3677beadc8b00c60c3cfd3`。
+- Draft PR：[#2](https://github.com/mysStack/console/pull/2)，Head 与远程分支均为当前代码 SHA，目标为 `feature/v4-migration`。
+- 本地验证：70 个测试文件、278 项通过；相关 ESLint 0 错误；Prettier、`git diff --check` 通过。
+- CI/镜像：Run `39754337878` 成功；tag `feature-v4-workloads-20261022-171926-288fbccab63b`；index digest `sha256:52ef9ca542462c0404ef8e3ac2f44579c8df8bd3993d0d1c4a5ba6e2e8a44378`。
+- 131：`ks-console` rollout 成功；Pod `ks-console-c9767f8f-bvdkg` 为 Running/Ready、重启 0，imageID 与 index digest 一致。
+- 浏览器：Deployment、StatefulSet、DaemonSet 原生列表及 Deployment 六个详情页签通过直达、刷新、返回、namespace 隔离和无可见 iframe 检查；Revision 不再洪泛或触发 React `#185`；原生删除成功并由 API 确认资源已清理。
+- 未关闭：Deployment 高级创建配置、全部 Action、完整 RBAC、Pod Watch WebSocket `403`、StatefulSet/DaemonSet 创建，以及后续 Pod、Job/CronJob 等 Workload 资源。
+- 完整证据见[Workload 131 VERIFY 记录](./workload-131-verify-20261022.md)。
+
 ## 2026-10-22 独立分支开发恢复
 
 - 负责人：当前 Codex 会话，无子 Agent。
