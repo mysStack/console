@@ -67,6 +67,32 @@ git show origin/release-3.4:src/components/Forms/Workload/VolumeSettings/VolumeT
 
 当前 `WorkloadSettingsModal` 面向 Deployment 字段，不能直接作为 StatefulSet/DaemonSet 的等价实现。三类资源可以共用容器、探针、资源和卷编辑底座，但必须通过资源类型参数控制更新策略、调度、Service、卷模板和适用 Action；不适用字段要明确只读或隐藏，并记录依据。
 
+## 131 旧 V3 分区快照的结构化归档
+
+本次只读浏览器记录已归档为[结构化快照](./evidence/workload-settings-ui-20261023.json)。它确认当前已部署旧 V3 的分区名、输入路径和已有测试对象值：Deployment 有更新策略、容器、普通卷、调度和终止分区；StatefulSet 有更新策略、容器、终止、普通卷和调度分区；DaemonSet 有更新策略、容器组、普通卷和终止分区。StatefulSet 的 Service 操作在详情页单独存在，PVC 模板属于旧源码确认的专属能力。
+
+快照只记录可见 UI，不代表默认值、保存结果或字段完整性。它与[更新策略请求记录](./evidence/workload-strategy-20261023-runtime.json)共同说明了当前 V3 的资源差异，不能替代后续 V4 当前 SHA 的浏览器验收。
+
+## 当前 V4 Action、API、作用域和缓存边界复核（2026-10-23）
+
+| Action              | Deployment | StatefulSet       | DaemonSet            | 当前 V4 静态证据与结论                                                                                                                                          |
+| ------------------- | ---------- | ----------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 列表/详情/Watch     | 有         | 有                | 有                   | `useUrl.ts:85-109` 按 `cluster/namespace/module/name` 构造资源 URL；`workload/index.ts:140-145` 详情查询 key 含 module 和 params。真实当前 SHA Network 尚未验证 |
+| 创建                | 有         | 有                | 有                   | `base.ts:145-147` POST 到带作用域的 list URL；资源差异由创建转换处理，当前组合批次未逐项部署验证                                                                |
+| 基础信息编辑        | 有         | 有                | 有                   | `useCommonActions:54-65` PATCH 详情 URL，成功后使列表 revision 增加并调用页面回调；403/404/缓存刷新 UI 未完成运行时闭环                                         |
+| 编辑 YAML           | 有         | 有                | 有                   | `useCommonActions:119-161` PUT 完整 YAML，BaseStore 自动补 resourceVersion；仍需当前 SHA 的三类浏览器验收                                                       |
+| 原生编辑设置        | 部分       | 无，当前进入 YAML | 无，当前进入 YAML    | Deployment 当前只覆盖简化字段；STS/DS 是已确认 DEV 缺口                                                                                                         |
+| 重启/重新创建       | 有         | 有                | 有                   | 详情页对 `spec.template.metadata.annotations['kubesphere.io/restartedAt']` 发 PATCH；成功/失败/取消和回读未分别验证                                             |
+| 回滚                | 有         | 有                | 有                   | `useRollbackMutation:271-288` 发详情 PATCH，Deployment 使用 JSON Patch content type；Revision 控制器和权限错误需后续验证                                        |
+| 删除/批量删除       | 有         | 有                | 有                   | `workload/index.ts:108-132,161-204` 使用 Background DeleteOptions 并等待所有请求；关联 HPA 清理、取消、403/404 和列表刷新需后续验证                             |
+| 停止/批量停止       | 有         | 有                | 有（当前实现有风险） | `workload/index.ts:206-224` 对所有 module 固定 PATCH `spec.replicas=0`；旧 V3 对 DaemonSet 不显示副本控件，必须在 DEV 修复资源分派，不能宣称现状等价            |
+| HPA                 | 有         | 不适用            | 不适用               | 旧源码和当前详情只在 Deployment 展示 HPA；不把该 Action 复制到 STS/DS                                                                                           |
+| StatefulSet Service | 不适用     | 有                | 不适用               | `useWorkloadService.tsx:14-39` 调用 `serviceStore.patch`；Headless/Selector payload、权限和失败提示仍需验证                                                     |
+
+请求静态边界：`BaseStore.fetchListByK8s:98-115` 和 `useUrl.ts:97-109` 均接受 cluster/namespace；`useCommonActions` 在编辑/删除成功后调用 `invalidateResourceList(store.module)`，但该 revision 机制不是 React Query 自动失效，详情查询仍依赖显式 `refetch()`。当前证据只支持“有作用域构造和显式回调”，不支持“全部缓存已正确失效”。
+
+因此，当前 REA 材料可以把 Action/API/作用域/缓存的未知项拆成已定位的实现事实和待验证的行为项；DaemonSet 停止语义、STS Service/PVC 模板、完整设置字段和集群 V3/Wujie 入口仍是进入 DEV 前需要明确处理的高风险差异。
+
 ## 进入 DEV 前仍需关闭
 
 1. 当前 `v3dist` 对四个分区的完整字段、默认值、跨字段校验和清空/保留语义；

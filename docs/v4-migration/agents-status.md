@@ -33,6 +33,7 @@
 
 - 定向补证输入 `45f104b6e18215bb6b4f273e1dd16da30107188a`：当前 Bundle 的策略/调度/优雅终止三个工厂完成静态 REA，并捕获三类旧 V3 更新策略的浏览器 PUT，保留资源版本，模拟 409 后取消，三类资源 API 回读的 resourceVersion/spec 摘要前后均相同。新发现包括 DaemonSet 默认 20%/切回初始化 25% 不一致、数字输入仍为字符串，以及 StatefulSet 初始化分支的 `statfulsets` 拼写。详见[字段补证](./workload-v3-field-equivalence-20261023.md#当前编译制品的策略调度及优雅终止补证)和[请求记录](./evidence/workload-strategy-20261023-runtime.json)。未验证真实持久化、低权限 UI 或全部字段。
 - 依据固定 `origin/release-3.4` 的行级复核补齐了旧 V3 的 Service 初始化、DaemonSet 无副本控件、Pod 安全/调度/宽限期/元数据分区、普通卷与 StatefulSet PVC 模板的关系。该证据关闭静态结构未知，不关闭当前 V4 字段写回、RBAC、缓存或浏览器等价性。
+- 通过 Playwright 只读遍历 131 旧 V3 三类设置弹窗的全部 `data-name` 分区，已归档输入路径、已有值和资源差异；没有提交保存请求。结构化结果见[旧 V3 UI 快照](./evidence/workload-settings-ui-20261023.json)，不能替代当前 SHA VERIFY。
 - 同一输入 SHA 的 PR #2 [Run 39859664115](https://github.com/mysStack/console/actions/runs/39859664115) 工具回归成功，阶段/范围检查失败；PR 仍为 Open/Draft，不合并。仅记录真实结果，不为消除红灯改写历史。
 - 本次复核结论：继续 REA，优先补齐容器/卷的保留与清空、StatefulSet Service/PVC 模板、DaemonSet Action 语义和低权限/缓存边界；已知实现缺口属于后续 DEV，最终部署浏览器验收属于 VERIFY，不混用阶段要求。
 

@@ -38,4 +38,6 @@ Deployment、StatefulSet、DaemonSet 共用一个模块分支和组合能力记�
 
 2026-10-23 策略专项补证输入 `45f104b6e18215bb6b4f273e1dd16da30107188a`：当前制品三个工厂完成惰性提取和实际 REA，三类旧 V3 更新策略生成的 PUT 已在浏览器拦截，模拟 409 后取消，API 回读无变化。已区分已有值与缺省值、Deployment 数字转换与 DaemonSet 字符串，以及 StatefulSet 初始化拼写和 DaemonSet 默认不一致。详见[字段补证](./workload-v3-field-equivalence-20261023.md#当前编译制品的策略调度及优雅终止补证)、[来源偏移](./evidence/workload-strategy-20261023-provenance.json)、[REA 摘要](./evidence/workload-strategy-20261023-rea-summary.json)及[运行时摘录](./evidence/workload-strategy-20261023-runtime.json)。这不是实际服务端冲突/持久化测试，不晋级当前阶段。
 
+2026-10-23 UI 分区复核：只读遍历旧 V3 Deployment、StatefulSet、DaemonSet 设置弹窗的所有已挂载分区，确认更新策略、容器/容器组、普通卷、调度和终止分区的资源差异；结果见[结构化快照](./evidence/workload-settings-ui-20261023.json)。同时补齐当前 V4 Store/API/Action 静态矩阵，明确 DaemonSet 停止误用 `spec.replicas=0`、StatefulSet Service/PVC 模板及缓存失效仍待 DEV/VERIFY 处理。当前 REA 仍为“分析中”，未写入复核签署。
+
 同时纠正集群列表判定：活跃入口是 V4 Banner/Tab + Wujie 内 V3 列表；独立 STS/DS Embed 文件的 URL 互换没有在该主入口复现。REA 证据应明确当前行为与拟开发行为；当前 SHA 的最终构建部署验收属于 VERIFY，不作为 REA 完成前的循环前置条件。当前完整 REA 仍未闭环。
