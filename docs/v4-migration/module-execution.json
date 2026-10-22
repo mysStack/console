@@ -20,7 +20,7 @@
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
-        "sha256": "9243782037745b37d159720c3be9feaf0340d9ec4dc0f122065b3815fad4d0c4"
+        "sha256": "c476ed3e2d1cd2c8109a3f0c2914d46c55a8ea05a3d1e64e67748779292cca58"
       },
       {
         "path": "docs/v4-migration/workload-kind-capability-matrix.md",
@@ -48,7 +48,7 @@
       },
       {
         "path": "docs/v4-migration/workload-v3-field-equivalence-20261023.md",
-        "sha256": "8225c5059cb324386ea6bd310efd87e4f4090979c58cb34923df644131d4f103"
+        "sha256": "984610f7b7d677b501d5e97eb9faf86c16678f6fa29963c98b26756809416142"
       },
       {
         "path": "docs/v4-migration/matrix.md",
@@ -160,7 +160,8 @@
     "highRiskUnknowns": [
       "WL-01 Deployment、StatefulSet、DaemonSet 当前 V3 编辑入口和页面分区未闭环",
       "WL-02 三类资源的完整字段、默认值、校验及写入/清空/保留语义未闭环",
-      "WL-03 三类资源的 Action/API/Store、RBAC/作用域、缓存和错误行为未闭环"
+      "WL-03 三类资源的 Action/API/Store、RBAC/作用域、缓存和错误行为未闭环",
+      "WL-04 普通 Workload 配置引用仍通过 useV3action 和 Wujie/V3 DOM 编辑桥接"
     ],
     "review": null
   },

@@ -95,6 +95,20 @@
 2. 联邦 DaemonSet 是产品不支持、V3 隐藏能力，还是遗漏路由；在没有证据前不能把它标记为“不适用”。
 3. 在联邦范围仍使用 Wujie 的前提下，普通项目和集群级 Workload 的完成结论不能扩展为“Workload 全量已无 V3/Wujie”。
 
+## 配置引用的 V3 Action 桥接
+
+普通项目三类 Workload 的配置引用页面虽然有 V4 原生的摘要、预览和编辑组件，但当前编辑入口仍保留 V3 Action 桥接：
+
+| 位置                                                                                    | 当前事实                                                                                                        | 影响                                                              |
+| --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `packages/console/src/pages/projects/components/ConfigReference/entry.tsx:4,29-32`      | 导入并调用 `useV3action()`                                                                                      | 配置引用入口仍依赖 V3 Action 总线                                 |
+| `entry.tsx:99-114,267-377`                                                              | 绑定 `consolev3` / `consoleV3Actions` 的 Wujie shadow root，并监听 V3 DOM                                       | 原生页面仍依赖嵌入 V3 页面结构和 `data-test` 锚点                 |
+| `entry.tsx:383-414`                                                                     | 先读取原生 Workload API，再调用 `actions.open({ action: 'workload.template.edit', v3Module: 'workload', ... })` | 配置引用编辑仍由 V3 表单承载，不能算完全脱离 V3                   |
+| `packages/console/src/pages/projects/components/ConfigReference/bridge.ts:16-25,97-101` | 明确描述 Wujie、embedded V3 form 和 V3 action row                                                               | 该桥接是已确认依赖，不是未知项                                    |
+| `packages/console/src/pages/projects/components/ConfigReference/nativeEdit.ts`          | 提供原生回调和 Patch 生成逻辑                                                                                   | 这是可复用的 V4 替代输入，但尚未替换 `useV3action` 的入口生命周期 |
+
+当前配置引用测试覆盖了 Patch 构造、容器选择和摘要显示，但没有证明 `useV3action`、Wujie shadow root 和 V3 表单可以移除。三类 Workload 的“配置引用已原生化”结论必须等替换入口并在当前 SHA 浏览器中验证后才能成立。
+
 ## REA 结论
 
 ## 当前已有测试的覆盖边界
@@ -136,5 +150,6 @@
 6. `module-execution.json` 尚无负责人复核记录，不能由本记录自签放行 DEV。
 7. 集群级列表仍由 Wujie/V3 承载，StatefulSet/DaemonSet Embed URL 互换，集群作用域和跨 namespace 行为尚未闭环。
 8. 联邦 Deployment/StatefulSet 仍由 Wujie/V3 承载，联邦 DaemonSet 的产品范围和入口尚未证实。
+9. 普通 Workload 配置引用仍调用 `useV3action` 并绑定 Wujie/V3 DOM，原生 Patch 组件尚未成为唯一编辑入口。
 
 结论保持：**REA / 分析中，待负责人复核；暂不进入 DEV。**
