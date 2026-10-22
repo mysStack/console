@@ -72,7 +72,7 @@ git show origin/release-3.4:src/pages/projects/containers/DaemonSets/Detail/inde
 
 固定旧源码 `origin/release-3.4`（`175710fefeeba6ff295c2c0967b4d45b83563d26`）的 `src/stores/base.js:253-267` 显示，编辑设置历史路径先 GET 详情读取 `metadata.resourceVersion`，再使用 PUT 写回完整对象。当前 V4 Deployment 详情同样先读取原始资源，再以 `noGetDetail: true` 调用 `store.usePutMutation`，因此静态上已确认是“原始快照 + PUT”路径；StatefulSet、DaemonSet 尚未接入该 Modal。仍必须在真实环境记录三类资源的请求方法、请求体、并发更新和未编辑字段保留结果，不能把静态一致直接写成等价通过。
 
-旧源码的删除路径还会以 Background 传播策略删除资源，并在关联 HPA 时追加 HPA 删除请求；当前 V4 保留了这条静态关系，但 `batchDelete` 的参数、cluster 传递和成功后列表刷新需要单独验证。旧源码 `stop` 对 DaemonSet 使用不可调度的 nodeSelector，而当前 V4 当前 Workload Store 的 `stopDeployment` 固定向 `spec.replicas` 写入 0；这属于高风险资源差异，不能把 Deployment 的停止行为复用为 DaemonSet 通过证据。
+旧源码的删除路径还会以 Background 传播策略删除资源，并在关联 HPA 时追加 HPA 删除请求；当前 V4 保留了这条静态关系，但 `batchDelete` 的参数、cluster 传递和成功后列表刷新需要单独验证。旧源码 `stop` 对 DaemonSet 使用不可调度的 nodeSelector，而当前 V4 `workloadStore('daemonsets')` 复用 `useBatchStopDeploymentMutation`，其 `stopDeployment` 固定向 `spec.replicas` 写入 0；项目 DaemonSet 列表和集群 Workload 列表都实际挂载该批量停止入口。这已经是需要 DEV 处理的高风险资源差异，不能把 Deployment 的停止行为复用为 DaemonSet 通过证据。
 
 ### 缓存和错误边界
 

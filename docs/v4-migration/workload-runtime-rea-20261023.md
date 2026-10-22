@@ -52,6 +52,8 @@
 从该页面的浏览器 Network 记录还观察到：详情请求为
 `GET /clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/daemonsets/v4-watch-ds-20261022-01`，返回 200；在 YAML 对话框确认未改变内容后，浏览器向同一详情 URL发送 `PUT`，返回 200，随后再次 GET 详情。该请求证明当前已部署制品的 DaemonSet YAML 保存使用完整资源 PUT；它不是当前分支 SHA 的实现验证，也不能替代原生设置表单的字段、并发、RBAC 和缓存验收。
 
+源码侧还确认项目 DaemonSet 列表和集群 Workload 列表都挂载了 `useBatchStopDeploymentMutation`，共享 Store 的停止实现固定向 `spec.replicas` 写入 0。Kubernetes DaemonSet 不使用 Deployment 的副本伸缩模型；该组合是当前进入 DEV 前必须先处理的高风险差异，当前没有执行停止操作，也没有把它写成已验证缺陷修复。
+
 ## 当前页面错误边界
 
 本轮页面加载时控制台仍出现已知扩展初始化错误，包括 `getExtensionConsoleV3Embed is not a function`，以及其他扩展的 `ConfigConstants` 错误。它们来自已安装扩展资源，不属于本轮 Workload 业务代码；本记录保留现象，不将其作为 Workload 通过依据，也不把它自动改成 Workload 缺陷结论。

@@ -36,7 +36,7 @@
       },
       {
         "path": "docs/v4-migration/workload-settings-source-evidence-20261024.md",
-        "sha256": "0412d9d55ce30f718278973f05160c95ee6a78bbcfa2d0d884fe583ff03c3056"
+        "sha256": "01089705ca34ea0f0909cfa218aa35e0bb27cc628b9e9024751aed421743e6e4"
       },
       {
         "path": "docs/v4-migration/workload-test-design-20261023.md",
@@ -44,7 +44,7 @@
       },
       {
         "path": "docs/v4-migration/workload-runtime-rea-20261023.md",
-        "sha256": "fda4a54da108398b1bde3112785c56f300d37204a3b122c4c3ecadee559e6049"
+        "sha256": "13a2081f8ce40b4bc7359a62a233821eb692e88c34c4ef542e2e985009b8cf68"
       }
     ],
     "coverage": {
