@@ -49,6 +49,9 @@
 
 该结果关闭了“DaemonSet 编辑设置当前仍转 YAML”的运行时未知。页面还显示 DaemonSet 的期望副本数和当前副本数均为 1，但这不能证明 DaemonSet 可以按 Deployment 语义执行副本伸缩；停止语义仍需单独按资源类型验证。
 
+从该页面的浏览器 Network 记录还观察到：详情请求为
+`GET /clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/daemonsets/v4-watch-ds-20261022-01`，返回 200；在 YAML 对话框确认未改变内容后，浏览器向同一详情 URL发送 `PUT`，返回 200，随后再次 GET 详情。该请求证明当前已部署制品的 DaemonSet YAML 保存使用完整资源 PUT；它不是当前分支 SHA 的实现验证，也不能替代原生设置表单的字段、并发、RBAC 和缓存验收。
+
 ## 当前页面错误边界
 
 本轮页面加载时控制台仍出现已知扩展初始化错误，包括 `getExtensionConsoleV3Embed is not a function`，以及其他扩展的 `ConfigConstants` 错误。它们来自已安装扩展资源，不属于本轮 Workload 业务代码；本记录保留现象，不将其作为 Workload 通过依据，也不把它自动改成 Workload 缺陷结论。
