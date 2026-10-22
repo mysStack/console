@@ -99,3 +99,7 @@ git show origin/release-3.4:src/pages/projects/containers/DaemonSets/Detail/inde
 | `src/components/Forms/Workload/ContainerSettings/TerminationSeconds/index.jsx` | `spec.template.spec.terminationGracePeriodSeconds`，默认值 30                                                                    | 当前 V4 Settings Modal 未提供该字段；需要明确缺失、默认值和保留语义                                 |
 
 当前 V4 `WorkloadSettingsModal.tsx` 只展示名称、namespace、replicas、容器、初始化容器和卷；上表中更新策略、节点选择/IP 池、元数据、Service、终止宽限期、StatefulSet 卷模板、完整容器高级字段尚未进入该 Modal。该差异是已确认的 DEV 入口缺口，不在 REA 阶段直接补代码；需先完成每一组字段的当前制品/旧源码/运行时证据和对应测试设计。
+
+## 131 浏览器运行时取证状态
+
+本轮按专用测试账号从 `http://192.168.2.131:30880/login` 进行只读登录尝试，页面返回“用户名或密码错误”。没有继续进行路由、Network、页面渲染或资源操作，也没有部署、修改集群资源或创建新账号。该结果只能说明当前会话没有取得有效登录，不代表 V4 功能失败；V3 页面和 V4 当前制品的运行时 REA 仍未完成，后续需要可用的测试登录会话后再采集。
