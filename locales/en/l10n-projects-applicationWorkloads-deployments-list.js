@@ -9,6 +9,9 @@ module.exports = {
   HPA_SET_TIP: 'Horizontal pod autoscaling has been set.',
   WORKLOAD_EMPTY_DESC: 'Please create a workload.',
   // List > Create > Basic Information
+  CREATE_DEPLOYMENT: 'Create Deployment',
+  CREATE_DEPLOYMENT_FAILED: 'Failed to create Deployment.',
+  REPLICAS: 'Replicas',
   // List > Create > Pod Settings
   // List > Create > Pod Settings > Add Container > Container Settings
   INVALID_IMAGE: 'Invalid image.',

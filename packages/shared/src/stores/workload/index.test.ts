@@ -185,10 +185,14 @@ test('native workload create mutation keeps the cluster and namespace scope', as
 test('native workload create mutation rejects API failures without reporting success', async () => {
   const error = Object.assign(new Error('Forbidden'), { response: { status: 403 } });
   let successes = 0;
+  let reportedError: unknown;
   const store = loadStore('deployments', async () => {
     throw error;
   });
-  const mutation = store.useCreateWorkloadMutation({ onSuccess: () => successes++ });
+  const mutation = store.useCreateWorkloadMutation({
+    onSuccess: () => successes++,
+    onError: (reason: unknown) => (reportedError = reason),
+  });
 
   await assert.rejects(
     mutation.mutate({
@@ -198,5 +202,6 @@ test('native workload create mutation rejects API failures without reporting suc
     reason => reason === error,
   );
   assert.equal(successes, 0);
+  assert.equal(reportedError, error);
   assert.equal(mutation.getCurrentResult().isError, true);
 });

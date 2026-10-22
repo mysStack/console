@@ -9,6 +9,9 @@ module.exports = {
   HPA_SET_TIP: '已设置容器组水平自动扩缩策略。',
   WORKLOAD_EMPTY_DESC: '请创建一个工作负载。',
   // List > Create > Basic Information
+  CREATE_DEPLOYMENT: '创建部署',
+  CREATE_DEPLOYMENT_FAILED: '创建部署失败。',
+  REPLICAS: '副本数量',
   // List > Create > Pod Settings
   // List > Create > Pod Settings > Add Container > Container Settings
   INVALID_IMAGE: '镜像无效。',

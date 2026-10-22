@@ -154,6 +154,7 @@ const workloadStore = (module: string) => {
   const useCreateWorkloadMutation = (options?: SuccessProps) => {
     return useMutation(({ params, data }: CreateWorkloadProps) => post(params, data), {
       onSuccess: options?.onSuccess,
+      onError: options?.onError,
     });
   };
 

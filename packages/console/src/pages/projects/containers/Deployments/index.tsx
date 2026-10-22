@@ -146,6 +146,9 @@ const Deployment = () => {
       tableRef.current?.refetch();
       notify.success(t('CREATE_SUCCESSFUL'));
     },
+    onError: () => {
+      notify.error(t('CREATE_DEPLOYMENT_FAILED'));
+    },
   });
 
   // page params

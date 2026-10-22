@@ -9,6 +9,7 @@ export { PathParams } from '../../types';
 
 export interface SuccessProps {
   onSuccess?: () => void;
+  onError?: (error: unknown) => void;
 }
 
 export interface DeploymentPatchProps {
