@@ -14,6 +14,11 @@ git show origin/release-3.4:src/actions/workload.js
 git show origin/release-3.4:src/pages/projects/containers/Deployments/Detail/index.jsx
 git show origin/release-3.4:src/pages/projects/containers/StatefulSets/Detail/index.jsx
 git show origin/release-3.4:src/pages/projects/containers/DaemonSets/Detail/index.jsx
+git show origin/release-3.4:src/components/Forms/Workload/ContainerSettings/index.jsx
+git show origin/release-3.4:src/components/Forms/Workload/ContainerSettings/UpdateStrategy/index.jsx
+git show origin/release-3.4:src/components/Forms/Workload/ContainerSettings/Affinity/index.jsx
+git show origin/release-3.4:src/components/Forms/Workload/VolumeSettings/index.jsx
+git show origin/release-3.4:src/components/Forms/Workload/VolumeSettings/VolumeTemplateList/index.jsx
 ```
 
 ## 旧源码确认的公共结构与资源差异
@@ -29,6 +34,25 @@ git show origin/release-3.4:src/pages/projects/containers/DaemonSets/Detail/inde
 `src/actions/workload.js` 确认：`workload.template.edit` 保存前移除非空 `spec.template.spec.customMode`，调用 `store.update(detail, data)`；StatefulSet 传入 `hideVolumeSetting`。`workload.service.edit` 根据 `spec.serviceName` 构造 `Headless(Selector)` Service 详情并通过 Service Store 更新。`workload.redeploy` 写入 `spec.template.metadata.annotations['kubesphere.io/restartedAt']`。`workload.hpa.edit` 由 Deployment 使用，涉及 HPA Store 和 Deployment 关联注解。删除及批量删除由独立 Action 处理，批量删除还会清理关联 HPA。
 
 这些事实只证明旧源码中存在这些路径，不能证明当前制品和 V4 已完整等价。
+
+## 旧源码分区与资源差异的行级复核（2026-10-23）
+
+本节绑定 `origin/release-3.4` 的固定提交 `175710fefeeba6ff295c2c0967b4d45b83563d26`。行号来自以下命令输出的 `git show ... | nl -ba`，用于复核字段边界；它不把该分支当作当前 `v3dist` 构建来源。
+
+| 证据位置                                                                   | 已确认行为                                                                                                                        | 对当前 V4 的影响                                                                            |
+| -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `src/components/Forms/Workload/ContainerSettings/index.jsx:97-100,175-197` | `withService` 时会初始化 StatefulSet Service 名称，并写入 `spec.serviceName`；普通 Deployment/DaemonSet 不进入该路径              | StatefulSet 必须保留 Service 关联语义，不能只复用 Deployment 的 Pod 表单                    |
+| `ContainerSettings/index.jsx:697-709`                                      | `renderReplicasControl` 对 DaemonSet 直接返回空；Deployment/StatefulSet 才渲染副本或联邦部署位置控件                              | DaemonSet 的停止、恢复和列表批量 Action 不能复用 `spec.replicas` 语义                       |
+| `ContainerSettings/index.jsx:722-743,745-752`                              | 容器列表、更新策略均是公共设置分区                                                                                                | 公共底座可以复用，但更新策略字段必须按资源类型分派                                          |
+| `ContainerSettings/index.jsx:754-791`                                      | Pod SecurityContext、调度、终止宽限期都是独立分区；宽限期使用 `spec.template.spec.terminationGracePeriodSeconds`，默认 30，最小 0 | 当前 V4 简化 Modal 未覆盖这些字段，需区分未编辑保留和主动清空                               |
+| `ContainerSettings/index.jsx:793-803,827-838`                              | Pod 元数据是独立可勾选分区；页面顺序为副本/容器、更新策略、安全上下文、调度、优雅终止、元数据                                     | 三类资源的原生设置需要恢复分区边界和取消/草稿语义，不能只增加几个输入框                     |
+| `VolumeSettings/index.jsx:129-173,190-250`                                 | 普通卷支持已有卷、PVC/临时卷、HostPath、ConfigMap/Secret 和挂载同步；编辑 ConfigMap/Secret 卷进入单独配置路径                     | V4 的 `preserved` 只保留未识别来源，不能替代已知来源的编辑、删除和挂载联动验证              |
+| `VolumeSettings/index.jsx:284-298`                                         | Deployment/DaemonSet 的 PVC 会影响最大不可用校验，卷变化可能触发策略约束                                                          | 卷和更新策略不能完全独立处理，至少要保留该跨字段关系的测试项                                |
+| `VolumeSettings/index.jsx:333-355,420-440`                                 | StatefulSet 单独维护 `spec.volumeClaimTemplates`，模板更新和普通卷更新是两条路径                                                  | StatefulSet 的 PVC 模板不能通过 `spec.template.spec.volumes` 代替；当前 V4 必须单独建模     |
+| `VolumeSettings/index.jsx:649-690`                                         | 只有 StatefulSet 展示 VolumeTemplateList；普通资源展示普通 VolumeList                                                             | 三类资源的存储分区存在明确差异，不能用同一组字段隐藏资源类型                                |
+| `ContainerSettings/Affinity/index.jsx:122-249`                             | 调度支持默认、分散、聚合和自定义；自定义项要求 policy/type/target 完整，并向 namespace 内 Workload Store 取目标                   | 当前 V4 尚未覆盖调度写回和校验；`customMode` 只能作为 UI 临时状态，不能写进 Kubernetes 资源 |
+
+这次行级复核关闭了“旧 V3 是否包含 StatefulSet Service/PVC 模板、DaemonSet 无副本控件、调度/安全/宽限期/元数据分区”的静态未知。它没有关闭当前制品运行时保存、当前 V4 组件实现、RBAC、缓存或浏览器等价性；这些仍按阶段记录保留为未完成。
 
 ## 当前 V4 对照结果
 

@@ -5,7 +5,7 @@
 > 迁移集成分支：`feature/v4-migration`
 >
 > 基线：`release-4.1.5` / `fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`
-> Workload 业务代码输入 SHA：`feature/v4-workloads` / `36ae2216167ae27561c05e37e5157df0da322de8`。当前阶段为 `REA`、状态为“分析中”；部分原生运行时证据仅作历史输入。唯一当前状态见 [module-execution.json](./module-execution.json)，细节见 [REA 索引](./rea-analysis-summary.md)、[字段级对照](./workload-v3-field-equivalence-20261023.md)、[Store/API 取证](./workload-settings-source-evidence-20261024.md)和[测试设计](./workload-test-design-20261023.md)。
+> Workload 业务代码输入 SHA：`feature/v4-workloads` / `36ae2216167ae27561c05e37e5157df0da322de8`；当前记录 HEAD 为 `598891d678b07d8628983da7a637b667c8f17976`。当前阶段为 `REA`、状态为“分析中”；部分原生运行时证据仅作历史输入。唯一当前状态见 [module-execution.json](./module-execution.json)，细节见 [REA 索引](./rea-analysis-summary.md)、[字段级对照](./workload-v3-field-equivalence-20261023.md)、[Store/API 取证](./workload-settings-source-evidence-20261024.md)和[测试设计](./workload-test-design-20261023.md)。
 
 > 2026-10-23 执行入口补强：接入 Git 阶段检查、中文提交标题和 PR 全量差异检查；32 项隔离 Git 回归通过。此结果仅覆盖工具，不改变下表的功能状态，不代表 Deployment 编辑设置或其他模块已验收。
 
@@ -45,17 +45,17 @@
 
 本次按 `console-v4-migration-plan.md` 逐项核对后的结论如下：
 
-| 计划项                | 当前结论       | 依据和未完成项                                                                                                                                                               |
-| --------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 发布基线              | 已完成         | `v4.1.5` 与 `release-4.1.5` 均指向 `fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`；`feature/config-history` 末提交 `2656419bc` 已在基线历史中，分支引用已删除。                  |
-| 迁移集成分支          | 已完成         | `feature/v4-migration` 已在本地和 `origin` 存在；文档提交以该分支当前 HEAD 和 Git 历史为准。                                                                                 |
-| 模块短期分支 / PR     | 进行中         | `feature/v4-configmaps-secrets` / Draft PR #1 与 `feature/v4-workloads` / Draft PR #2 均已存在；其他模块只在对应模块开工时从最新迁移集成分支创建。                           |
-| P0 静态盘点           | 部分完成       | 依赖清单、Deployment 证据和缺口矩阵已生成；WSL REA 验证、131 全启用路由/扩展映射、V3 Action 完整实测和每行 PR 证据仍未完成。                                                 |
-| P1 公共底座           | 未形成完成证据 | 复用了现有 `ListPage`、`DataTable` 和 Store，但 cluster/workspace/project 作用域、缓存隔离、权限和返回恢复的统一验收尚未完成。                                               |
-| P2 ConfigMap / Secret | 测试中         | 列表、详情和创建弹窗已完成 131 浏览器验证；真实创建、编辑、删除、批量删除、权限和完整作用域回归待补。                                                                        |
-| P2 ServiceAccount     | 测试中         | 项目/集群列表、详情、创建弹窗、路由和项目 namespace 作用域已完成 131 浏览器验证；真实创建、编辑、删除、角色修改和 RBAC 待补。                                                |
-| M1 Deployment         | 开发中         | 独立分支已完成首轮 131 VERIFY：原生列表、六个详情页签、namespace 隔离、Revision 稳定性和删除通过；探针、资源、存储、配置引用、完整 Action/RBAC 与 Pod Watch `403` 仍未关闭。 |
-| M2 ConfigMap + Secret | 未完成         | 真实操作和权限回归尚未完成，不能标记为 `已验收`。                                                                                                                            |
-| P3-P8 / release-4.2.0 | 未开始         | 后续资源迁移、V3/Wujie 清理和 `release-4.2.0` 创建均未达到前置条件。                                                                                                         |
+| 计划项                | 当前结论       | 依据和未完成项                                                                                                                                              |
+| --------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 发布基线              | 已完成         | `v4.1.5` 与 `release-4.1.5` 均指向 `fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`；`feature/config-history` 末提交 `2656419bc` 已在基线历史中，分支引用已删除。 |
+| 迁移集成分支          | 已完成         | `feature/v4-migration` 已在本地和 `origin` 存在；文档提交以该分支当前 HEAD 和 Git 历史为准。                                                                |
+| 模块短期分支 / PR     | 进行中         | `feature/v4-configmaps-secrets` / Draft PR #1 与 `feature/v4-workloads` / Draft PR #2 均已存在；其他模块只在对应模块开工时从最新迁移集成分支创建。          |
+| P0 静态盘点           | 部分完成       | 依赖清单、Deployment 证据和缺口矩阵已生成；WSL REA 验证、131 全启用路由/扩展映射、V3 Action 完整实测和每行 PR 证据仍未完成。                                |
+| P1 公共底座           | 未形成完成证据 | 复用了现有 `ListPage`、`DataTable` 和 Store，但 cluster/workspace/project 作用域、缓存隔离、权限和返回恢复的统一验收尚未完成。                              |
+| P2 ConfigMap / Secret | 测试中         | 列表、详情和创建弹窗已完成 131 浏览器验证；真实创建、编辑、删除、批量删除、权限和完整作用域回归待补。                                                       |
+| P2 ServiceAccount     | 测试中         | 项目/集群列表、详情、创建弹窗、路由和项目 namespace 作用域已完成 131 浏览器验证；真实创建、编辑、删除、角色修改和 RBAC 待补。                               |
+| M1 Deployment         | 分析中         | 当前 Workload 组合批次仍在 REA；旧 SHA 的限定 VERIFY 只作历史输入。原生设置的完整字段、Action/RBAC、集群级 V3/Wujie 去除和当前 SHA 部署验收尚未闭环。       |
+| M2 ConfigMap + Secret | 未完成         | 真实操作和权限回归尚未完成，不能标记为 `已验收`。                                                                                                           |
+| P3-P8 / release-4.2.0 | 未开始         | 后续资源迁移、V3/Wujie 清理和 `release-4.2.0` 创建均未达到前置条件。                                                                                        |
 
 历史顺序冲突记录：2026-10-16 时第 4.2/12 节曾存在试点顺序冲突；主计划现已明确模块级门禁与当前顺序，该历史冲突不再作为当前开发阻塞。

@@ -36,7 +36,7 @@
       },
       {
         "path": "docs/v4-migration/workload-settings-source-evidence-20261024.md",
-        "sha256": "01089705ca34ea0f0909cfa218aa35e0bb27cc628b9e9024751aed421743e6e4"
+        "sha256": "9e3d57feb65dc3e20c743bab7012e254dcc9b5cc277ab4c26de9c82530ab8488"
       },
       {
         "path": "docs/v4-migration/workload-test-design-20261023.md",
@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "3cdca9b7cb58dae53dc3b9de8fc3418a17ce778141936b4a799ca191ac01602f"
+        "sha256": "dda592c9d412f2ae7ff79b7bd002d9d19c4609096efdb552df0c482574ec54e4"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "f2557f3882ad496a312f1c84e8879055d24f30827c3d322eb329dadfd6da759e"
+        "sha256": "6acd32213229aa9f05ea03c7e5a313d1f81a14a104550ed28700be4f31f12fc3"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
