@@ -77,6 +77,24 @@
 3. 集群级原生列表虽然已有代码输入，但其 namespace 选择、跨 namespace 查询、批量 Action、RBAC、缓存和三类详情跳转必须按当前 SHA 独立验证。
 4. 在集群级入口完成替换前，不能宣称三类 Workload 已经完成“彻底移除 V3/Wujie”的原生化目标。
 
+## 联邦项目边界
+
+主迁移计划把 `federated` 作为独立作用域，不能用普通项目或集群级资源的证据代替。当前登记批次的能力范围是普通项目与集群级 Deployment、StatefulSet、DaemonSet；联邦对接属于后续独立范围，本节记录它对“全量移除 V3/Wujie”结论的边界，不把后置联邦工作冒充为当前批次已验收。当前联邦 Workload 的源码事实如下：
+
+| 作用域                | 当前实现                                                                                    | 证据                                                                                        | 结论                                                         |
+| --------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| 联邦 Deployment 列表  | `WujieReact` 加载 `/consolev3/:workspace/federatedprojects/:namespace/deployments`          | `packages/console/src/pages/fedprojects/containers/Deployments/index.tsx:7-14`              | 仍依赖 V3/Wujie                                              |
+| 联邦 Deployment 详情  | `WujieReact` 加载对应 Deployment 详情 URL                                                   | `packages/console/src/pages/fedprojects/containers/Deployments/Detail/index.tsx:7-14`       | 仍依赖 V3/Wujie                                              |
+| 联邦 StatefulSet 列表 | `WujieReact` 加载 `/consolev3/:workspace/federatedprojects/:namespace/statefulsets`         | `packages/console/src/pages/fedprojects/containers/StatefulSets/index.tsx:7-14`             | 仍依赖 V3/Wujie                                              |
+| 联邦 StatefulSet 详情 | `WujieReact` 加载对应 StatefulSet 详情 URL                                                  | `packages/console/src/pages/fedprojects/containers/StatefulSets/Detail/index.tsx:7-14`      | 仍依赖 V3/Wujie                                              |
+| 联邦 DaemonSet        | 当前 `fedprojects/routes/index.tsx` 和 `routes/details.tsx` 未登记 DaemonSet 列表或详情路由 | `packages/console/src/pages/fedprojects/routes/index.tsx:51-60`、`routes/details.tsx:15-48` | 当前没有可证明的联邦 DaemonSet V4 或 V3 入口，属于未确认范围 |
+
+因此，当前批次需要保留联邦后置边界，并为最终全量迁移明确三项决策和证据：
+
+1. 联邦 Deployment/StatefulSet 是否纳入当前批次的原生化交付；若纳入，必须建立 federation API、override、RBAC、跨集群错误和缓存矩阵。
+2. 联邦 DaemonSet 是产品不支持、V3 隐藏能力，还是遗漏路由；在没有证据前不能把它标记为“不适用”。
+3. 在联邦范围仍使用 Wujie 的前提下，普通项目和集群级 Workload 的完成结论不能扩展为“Workload 全量已无 V3/Wujie”。
+
 ## REA 结论
 
 本轮补充后，已进一步关闭以下静态定位未知：
@@ -96,5 +114,6 @@
 5. 当前 SHA 尚未完成构建、部署和浏览器 VERIFY，低权限浏览器正反路径也未完成；
 6. `module-execution.json` 尚无负责人复核记录，不能由本记录自签放行 DEV。
 7. 集群级列表仍由 Wujie/V3 承载，StatefulSet/DaemonSet Embed URL 互换，集群作用域和跨 namespace 行为尚未闭环。
+8. 联邦 Deployment/StatefulSet 仍由 Wujie/V3 承载，联邦 DaemonSet 的产品范围和入口尚未证实。
 
 结论保持：**REA / 分析中，待负责人复核；暂不进入 DEV。**
