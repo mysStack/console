@@ -5,9 +5,10 @@
 - 负责人：当前 Codex 单会话，不使用子 Agent。模块/能力：`workloads / deployment-statefulset-daemonset`；资源：Deployment、StatefulSet、DaemonSet。
 - 分支/Worktree：`feature/v4-workloads` / `console-workloads`；代码输入 `36ae2216167ae27561c05e37e5157df0da322de8`。
 - 当前阶段 `REA`，结论“分析中”。[阶段记录](./module-execution.json)、[组合能力边界](./workload-kind-capability-matrix.md)、[REA 索引](./rea-analysis-summary.md)为当前依据；Deployment 专项矩阵是组合批次的输入之一。
-- 当前任务：三类资源已定位普通编辑入口、Action 处理器和按资源登记的分区；继续展开表单子组件、Store 和运行时差异。公共实现可以共用，三类资源的差异和验收必须分别记录。不修改业务表单，不部署。已有实现和限定浏览器观察保留为历史输入。
+- 当前任务：三类资源已定位普通编辑入口、Action 处理器、Store/API 请求边界、权限键和按资源登记的分区；继续关闭字段、作用域、RBAC、缓存和运行时差异。公共实现可以共用，三类资源的差异和验收必须分别记录。不修改业务表单，不部署。已有实现和限定浏览器观察保留为历史输入。
 - 当前 REA 材料复核结论：不足以放行 DEV，继续“分析中，待负责人复核”。复核记录见 [workload-rea-review-20261023.md](./workload-rea-review-20261023.md)。本次确认普通 Workload 配置引用仍依赖 `useV3action`、Wujie Shadow DOM 和 V3 编辑器实例，集群级三类 Workload 列表主入口仍挂载 `/consolev3`；这两项是明确的 DEV 缺口，不再作为未知行为豁免。`module-execution.json` 的 `rea.review` 继续为 `null`。
 - 已建立 [三类资源字段行为矩阵](./workload-field-behavior-matrix-20261023.md)，覆盖公共字段、默认值/校验、清空/保留语义，以及 StatefulSet Service/PVC 模板和 DaemonSet 无副本/更新策略差异。矩阵将待实测项明确列出；字段、API、RBAC、缓存和错误仍未闭环，不改变 REA 门禁。
+- 已建立 [Action、API、权限与缓存静态证据](./workload-action-api-rbac-evidence-20261023.md)，覆盖三类资源详情操作、权限键、项目 URL、HTTP 方法、删除/HPA、版本冲突和缓存失效事实；运行时 RBAC、namespace 隔离、缓存刷新和错误态仍未验证，不改变 REA 门禁。
 - 已关闭的定向未知：旧源码四个设置分区、StatefulSet Service 差异、Deployment HPA 差异，以及当前制品的普通入口和 Action 定位。待关闭：三类资源完整字段/校验、动态 Action/API/Store、RBAC/作用域和错误/缓存行为。尚无正式 REA 复核签署，不自动进入 DEV。
 - 历史取证输入 SHA：`24e87aec244ef265ef14fc3201603e42a1233978`。本轮新增确认：集群级三类入口仍挂载 Wujie/V3，两个未挂载的独立 StatefulSet/DaemonSet Embed 文件 URL 互换（不作为主入口已复现缺陷）；联邦 Deployment/StatefulSet 仍为 Wujie/V3，联邦 DaemonSet 范围未确认；普通 Workload 配置引用仍调用 `useV3action` 并绑定 V3 DOM。上述内容已列为明确缺口或高风险，不把它们当作“没有功能”。
 - 当前既有回归中，项目级详情/列表、Workload Store 和 ConfigReference 的 9 个测试文件共 62 个断言通过；其中 ConfigReference 的 35 个断言验证的是当前 V3/Wujie 桥接、Shadow DOM 锚点和原生 Patch 协作行为，不能被解释为已移除 V3 Action。整体测试只覆盖静态入口和部分请求错误传播，不覆盖集群桥接移除、配置引用 V3 Action 移除、三类资源高级字段或当前 SHA 部署后的浏览器行为。

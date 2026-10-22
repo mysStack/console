@@ -20,7 +20,7 @@
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
-        "sha256": "309212c8ab9e8afe4b5e4f1e0ca7f029c6db1d90ed1ce5ba203c48332a745c71"
+        "sha256": "64822c4155681cd7bfac92c2418aa2c65b189d193a57af92ef93884e51668564"
       },
       {
         "path": "docs/v4-migration/workload-kind-capability-matrix.md",
@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "79ede18db7b62a62d39b3d97a5840786b672ea39f1da7bf9eab62dc3ff250dd7"
+        "sha256": "dd0ca7e61ab57c2648ae4573e4b4d7834b0e619ed19af6a67e18a8c2c00db519"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "38e65d4828cae084269f7925f36801ccbf3be3ff3ed2973e36f0c13be1e0b9e5"
+        "sha256": "2d70dcb1f710cb9382dc3b6a349380d12843ca862acc467bac68a319b550a717"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -80,11 +80,15 @@
       },
       {
         "path": "docs/v4-migration/workload-rea-review-20261023.md",
-        "sha256": "7bcad7b2f77752b00ae97693f832a84e6949d685f60350e4c5c277fb5aa67922"
+        "sha256": "cabfc03e7fd0fb85149327f3a368d9090fb9b0de1da916618e97e0d1153a6fc4"
       },
       {
         "path": "docs/v4-migration/workload-field-behavior-matrix-20261023.md",
         "sha256": "9ecc21e98fa9f7ea828e8e283722cf4916583fcfa068dba54bc157da3bffcb6a"
+      },
+      {
+        "path": "docs/v4-migration/workload-action-api-rbac-evidence-20261023.md",
+        "sha256": "02d051e472c0f07c7026c4a3a1f6f78a3f73a4628df30bdda3125cd49bc689c9"
       }
     ],
     "coverage": {

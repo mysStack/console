@@ -8,10 +8,10 @@
 | 模块/当前能力     | Workload / Deployment、StatefulSet、DaemonSet 组合批次                                                                                                                                                                                                                   |
 | Worktree/分支     | `console-workloads` / `feature/v4-workloads`                                                                                                                                                                                                                             |
 | 当前阶段/REA 结论 | `REA` / 分析中                                                                                                                                                                                                                                                           |
-| 事实输入提交      | 本轮制品定位 `e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0`；历史复核 `87df0e024ea93333a2352fc92907007b86f5e33b`；业务代码输入 `36ae2216167ae27561c05e37e5157df0da322de8`                                                                                                    |
+| 事实输入提交      | 本轮制品定位 `e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0`；当前复核记录 `ef2b03aac646545d3703c1b51e39c5a23b63df44`；业务代码输入以当前分支 HEAD 为准                                                                                                                       |
 | 观察              | 已有原生简化表单和有限部署后测试；当前 V3 编辑行为尚未逐项还原                                                                                                                                                                                                           |
 | 推断              | 表单覆盖不足，不能凭现有 V4 测试证明当前 V3 等价；具体缺失须由制品和真实 V3 行为确认                                                                                                                                                                                     |
-| 制品/REA 证据     | [REA 复核及完整 Evidence ID](./workload-settings-rea-20261022.md)；V3 Git tree 绑定在阶段记录中，不能与 REA 目录摘要混用                                                                                                                                                 |
+| 制品/REA 证据     | [REA 复核及完整 Evidence ID](./workload-settings-rea-20261022.md)；[Action/API/权限与缓存静态证据](./workload-action-api-rbac-evidence-20261023.md)；V3 Git tree 绑定在阶段记录中，不能与 REA 目录摘要混用                                                               |
 | 行为和字段清单    | [组合能力边界](./workload-kind-capability-matrix.md)、[编辑设置能力矩阵](./deployment-settings-capability-matrix.md)、[旧源码对照](./workload-settings-source-evidence-20261024.md)；三类资源均未标记为已还原、[字段级对照](./workload-v3-field-equivalence-20261023.md) |
 | 未知及影响        | 三类资源的入口/分区、完整字段、Action/API/Store、RBAC/作用域、错误态和缓存尚未闭环，影响功能完整性、权限和数据保留；配置引用仍有 V3 Action/Wujie 桥接                                                                                                                    |
 | 关闭条件          | 公共行为和三类资源差异均有可追溯制品定位、运行时对照、V4 替代与差异；所有高风险已关闭或经复核明确隔离                                                                                                                                                                    |
@@ -43,5 +43,7 @@ Deployment、StatefulSet、DaemonSet 共用一个模块分支和组合能力记�
 2026-10-23 REA 材料复核结论见[Workload 组合批次 REA 复核结论](./workload-rea-review-20261023.md)：当前材料不足以放行，继续保持“分析中，待负责人复核”。本次把配置引用的 V3 Action/Wujie 依赖和集群级 Workload 列表的 Wujie/V3 主入口从“未知”校准为已确认实现缺口，同时保留字段、RBAC、作用域、缓存、错误和三类资源逐项等价的未闭环状态；不进入 DEV。
 
 2026-10-23 字段行为矩阵见[Workload 三类资源字段行为矩阵](./workload-field-behavior-matrix-20261023.md)：逐项绑定旧 V3 的字段分区、默认值/校验、当前 V4 解析与写回逻辑，单独列出 StatefulSet 的 Service/PVC 模板和 DaemonSet 的无副本/更新策略差异。该矩阵把“已定位事实”和“待实测行为”分开，扩大 DEV 输入但不关闭高风险项。
+
+2026-10-23 Action/API/权限补证见[静态证据矩阵](./workload-action-api-rbac-evidence-20261023.md)：确认三类详情页的权限键、操作差异、请求方法和作用域构造，明确 DaemonSet 停止语义、集群级 Wujie/V3 列表、配置引用桥接以及按资源类型失效缓存的限制。该补证仍未提供当前 SHA 的运行时 RBAC、隔离、缓存和错误态证据，不能放行 DEV。
 
 同时纠正集群列表判定：活跃入口是 V4 Banner/Tab + Wujie 内 V3 列表；独立 STS/DS Embed 文件的 URL 互换没有在该主入口复现。REA 证据应明确当前行为与拟开发行为；当前 SHA 的最终构建部署验收属于 VERIFY，不作为 REA 完成前的循环前置条件。当前完整 REA 仍未闭环。
