@@ -4,6 +4,8 @@
  */
 
 module.exports = {
+  VOLUME_MOUNT_PL: 'Montajes de volumen',
+  WORKLOAD_PRESERVED_VOLUME: 'El volumen {type} existente se conserva al editar otros ajustes.',
   WORKLOAD_ADD_CONTAINER: 'Añadir contenedor',
   WORKLOAD_ADD_INIT_CONTAINER: 'Añadir contenedor de inicio',
   WORKLOAD_ADD_ENV: 'Añadir variable de entorno',

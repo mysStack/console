@@ -4,6 +4,8 @@
  */
 
 module.exports = {
+  VOLUME_MOUNT_PL: '卷挂载',
+  WORKLOAD_PRESERVED_VOLUME: '已有 {type} 卷原样保留；此处可编辑其他设置。',
   WORKLOAD_ADD_CONTAINER: '添加工作容器',
   WORKLOAD_ADD_INIT_CONTAINER: '添加初始化容器',
   WORKLOAD_ADD_ENV: '添加环境变量',

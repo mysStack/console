@@ -1,3 +1,5 @@
+import { cloneDeep, isEqual, omit } from 'lodash';
+
 export interface ContainerPortValues {
   name?: string;
   containerPort?: number;
@@ -18,7 +20,7 @@ export interface EnvironmentFromValues {
 export interface ProbeValues {
   type: 'http' | 'tcp' | 'command';
   path?: string;
-  port?: number;
+  port?: number | string;
   scheme?: 'HTTP' | 'HTTPS';
   command?: string[];
   initialDelaySeconds?: number;
@@ -42,7 +44,8 @@ export interface VolumeMountValues {
 
 export interface VolumeValues {
   name: string;
-  type: 'persistentVolumeClaim' | 'emptyDir' | 'hostPath' | 'configMap' | 'secret';
+  type: 'persistentVolumeClaim' | 'emptyDir' | 'hostPath' | 'configMap' | 'secret' | 'preserved';
+  source?: Record<string, any>;
   sourceName?: string;
   medium?: '' | 'Memory';
   sizeLimit?: string;
@@ -52,6 +55,7 @@ export interface VolumeValues {
 
 export interface ContainerCreateValues {
   name: string;
+  originalName?: string;
   image: string;
   imagePullPolicy?: 'Always' | 'IfNotPresent' | 'Never';
   command?: string[];
@@ -85,8 +89,10 @@ function isDnsLabel(value: string): boolean {
   return value.length <= 63 && DNS_LABEL.test(value);
 }
 
-function isValidPort(port?: number): boolean {
-  return Number.isInteger(port) && port! >= 1 && port! <= 65535;
+function isValidPort(port?: number | string): boolean {
+  return typeof port === 'string'
+    ? port.length <= 15 && /^[a-z]([-a-z0-9]*[a-z0-9])?$/.test(port)
+    : Number.isInteger(port) && port! >= 1 && port! <= 65535;
 }
 
 function validateProbe(probe?: ProbeValues): boolean {
@@ -300,6 +306,7 @@ function buildContainer(container: ContainerCreateValues) {
 }
 
 function buildVolume(volume: VolumeValues) {
+  if (volume.type === 'preserved') return cloneDeep(volume.source || {});
   const name = trim(volume.name);
   if (volume.type === 'persistentVolumeClaim') {
     return { name, persistentVolumeClaim: { claimName: trim(volume.sourceName) } };
@@ -337,13 +344,13 @@ function parseProbe(probe: Record<string, any> | undefined): ProbeValues | undef
     return {
       type: 'http',
       path: probe.httpGet.path || '/',
-      port: Number(probe.httpGet.port),
+      port: probe.httpGet.port,
       scheme: probe.httpGet.scheme || 'HTTP',
       ...timing,
     };
   }
   if (probe.tcpSocket) {
-    return { type: 'tcp', port: Number(probe.tcpSocket.port), ...timing };
+    return { type: 'tcp', port: probe.tcpSocket.port, ...timing };
   }
   if (probe.exec) {
     return { type: 'command', command: probe.exec.command || [], ...timing };
@@ -354,6 +361,7 @@ function parseProbe(probe: Record<string, any> | undefined): ProbeValues | undef
 function parseContainer(container: Record<string, any>): ContainerCreateValues {
   return {
     name: container.name || '',
+    originalName: container.name,
     image: container.image || '',
     imagePullPolicy: container.imagePullPolicy || 'IfNotPresent',
     command: container.command,
@@ -409,11 +417,11 @@ function parseVolume(volume: Record<string, any>): VolumeValues | undefined {
       sizeLimit: volume.emptyDir.sizeLimit,
     };
   }
-  return undefined;
+  return { name: volume.name, type: 'preserved', source: cloneDeep(volume) };
 }
 
 export function parseDeploymentSettings(resource: Record<string, any>): DeploymentCreateValues {
-  const podSpec = resource.spec?.template?.spec || {};
+  const podSpec = cloneDeep(resource.spec?.template?.spec || {});
   return {
     name: resource.metadata?.name || '',
     namespace: resource.metadata?.namespace || '',
@@ -447,7 +455,9 @@ function mergeContainerSettings(
 ) {
   return values.map(value => {
     const original =
-      originalContainers.find(container => container.name === trim(value.name)) || {};
+      originalContainers.find(
+        container => container.name === (value.originalName || trim(value.name)),
+      ) || {};
     const next = { ...original };
     for (const field of EDITABLE_CONTAINER_FIELDS) delete next[field];
     const built: Record<string, any> = buildContainer(value);
@@ -483,7 +493,7 @@ function mergeContainerSettings(
             : item.secretRef?.name === reference.secretRef?.name,
         );
         return {
-          ...originalReference,
+          ...omit(originalReference, ['prefix']),
           ...reference,
           ...(reference.configMapRef
             ? {
@@ -518,18 +528,37 @@ function mergeContainerSettings(
 
     if (built.volumeMounts) {
       built.volumeMounts = built.volumeMounts.map((mount: Record<string, any>) => ({
-        ...(original.volumeMounts || []).find(
-          (item: Record<string, any>) =>
-            item.name === mount.name && item.mountPath === mount.mountPath,
+        ...omit(
+          (original.volumeMounts || []).find(
+            (item: Record<string, any>) =>
+              item.name === mount.name && item.mountPath === mount.mountPath,
+          ),
+          ['name', 'mountPath', 'subPath', 'readOnly'],
         ),
         ...mount,
       }));
     }
 
-    for (const field of ['readinessProbe', 'livenessProbe', 'startupProbe'] as const) {
-      if (!built[field] && original[field] && !parseProbe(original[field])) {
-        built[field] = original[field];
+    const parsed = parseContainer(original);
+    for (const field of EDITABLE_CONTAINER_FIELDS) {
+      if (isEqual(value[field], parsed[field])) {
+        if (original[field] === undefined) delete built[field];
+        else built[field] = cloneDeep(original[field]);
       }
+    }
+    for (const field of ['readinessProbe', 'livenessProbe', 'startupProbe'] as const) {
+      if (!built[field] || isEqual(value[field], parsed[field])) continue;
+      const handler = built[field].httpGet
+        ? 'httpGet'
+        : built[field].tcpSocket
+          ? 'tcpSocket'
+          : 'exec';
+      const oldProbe = original[field] || {};
+      built[field] = {
+        ...omit(oldProbe, ['httpGet', 'tcpSocket', 'exec', 'grpc']),
+        ...built[field],
+        [handler]: { ...oldProbe[handler], ...built[field][handler] },
+      };
     }
     return { ...next, ...built };
   });
@@ -537,13 +566,24 @@ function mergeContainerSettings(
 
 function mergeVolumeSettings(originalVolumes: Record<string, any>[] = [], values: VolumeValues[]) {
   return values.map(value => {
+    if (value.type === 'preserved') return cloneDeep(value.source);
     const built: Record<string, any> = buildVolume(value);
     const original = originalVolumes.find(volume => volume.name === built.name) || {};
     const sourceKey = ['persistentVolumeClaim', 'emptyDir', 'hostPath', 'configMap', 'secret'].find(
       key => built[key],
     );
+    const fields =
+      sourceKey === 'emptyDir'
+        ? ['medium', 'sizeLimit']
+        : sourceKey === 'hostPath'
+          ? ['path', 'type']
+          : sourceKey === 'secret'
+            ? ['secretName']
+            : sourceKey === 'configMap'
+              ? ['name']
+              : ['claimName'];
     return sourceKey && original[sourceKey]
-      ? { ...built, [sourceKey]: { ...original[sourceKey], ...built[sourceKey] } }
+      ? { ...built, [sourceKey]: { ...omit(original[sourceKey], fields), ...built[sourceKey] } }
       : built;
   });
 }
@@ -552,7 +592,7 @@ export function buildDeploymentSettingsResource(
   original: Record<string, any>,
   values: DeploymentCreateValues,
 ) {
-  const result = JSON.parse(JSON.stringify(original));
+  const result = cloneDeep(original);
   delete result.status;
   const originalPodSpec = original.spec?.template?.spec || {};
   const nextPodSpec = result.spec.template.spec;

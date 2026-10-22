@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Form, FormItem, Input, InputNumber, Modal, useForm } from '@kubed/components';
+import { Form, FormItem, Input, InputNumber, Modal, useForm, useWatch } from '@kubed/components';
 import { ArrayInput } from '@ks-console/shared';
 import ContainerInput from './ContainerInput';
 import VolumeInput from './VolumeInput';
@@ -38,9 +38,10 @@ export default function WorkloadSettingsModal({
   onCancel,
 }: Props) {
   const [form] = useForm<DeploymentCreateValues>();
+  const volumes = useWatch('volumes', form);
   const resources = useWorkloadResourceOptions(cluster, namespace);
   const initialValues = parseDeploymentSettings(resource);
-  const volumeNames = (form.getFieldValue('volumes') || initialValues.volumes || [])
+  const volumeNames = (volumes || initialValues.volumes || [])
     .map((volume: VolumeValues) => volume.name)
     .filter(Boolean);
 

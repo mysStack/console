@@ -179,6 +179,7 @@ const DeploymentDetail = () => {
     },
   });
   const { mutate: mutateSettings, isLoading: settingsIsLoading } = store.usePutMutation(undefined, {
+    noGetDetail: true,
     onSuccess: () => {
       notify.success(t('UPDATE_SUCCESSFUL'));
       closeSettingsModal();

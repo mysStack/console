@@ -21,6 +21,20 @@ export default function VolumeInput({
   onChange,
   resourceOptions,
 }: Props) {
+  if (value.type === 'preserved') {
+    return (
+      <div style={{ width: '100%' }}>
+        <Input disabled aria-label={t('VOLUME_NAME')} value={value.name} />
+        <p>
+          {t('WORKLOAD_PRESERVED_VOLUME', {
+            type: Object.keys(value.source || {})
+              .filter(key => key !== 'name')
+              .join(', '),
+          })}
+        </p>
+      </div>
+    );
+  }
   const update = (patch: Partial<VolumeValues>) => onChange?.({ ...value, ...patch });
   const resourceNames =
     value.type === 'persistentVolumeClaim'

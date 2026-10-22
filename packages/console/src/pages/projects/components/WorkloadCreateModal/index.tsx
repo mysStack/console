@@ -4,7 +4,16 @@
  */
 
 import React from 'react';
-import { Form, FormItem, Input, Modal, InputNumber, Textarea, useForm } from '@kubed/components';
+import {
+  Form,
+  FormItem,
+  Input,
+  Modal,
+  InputNumber,
+  Textarea,
+  useForm,
+  useWatch,
+} from '@kubed/components';
 
 import { ArrayInput } from '@ks-console/shared';
 import {
@@ -38,6 +47,7 @@ function WorkloadCreateModal({
   onCancel,
 }: Props): JSX.Element {
   const [form] = useForm<DeploymentCreateValues>();
+  const volumes = useWatch('volumes', form);
   const resources = useWorkloadResourceOptions(cluster, namespace);
 
   const handleSubmit = () => {
@@ -69,9 +79,7 @@ function WorkloadCreateModal({
     callback(error ? t(error) : undefined);
   };
 
-  const volumeNames = (form.getFieldValue('volumes') || [])
-    .map((volume: VolumeValues) => volume.name)
-    .filter(Boolean);
+  const volumeNames = (volumes || []).map((volume: VolumeValues) => volume.name).filter(Boolean);
 
   return (
     <Modal
@@ -122,7 +130,7 @@ function WorkloadCreateModal({
         <FormItem
           name="containers"
           label={t('CONTAINERS')}
-          dependencies={['initContainers']}
+          dependencies={['initContainers', 'volumes']}
           rules={[{ validator: containersValidator }]}
         >
           <ArrayInput
@@ -140,7 +148,7 @@ function WorkloadCreateModal({
         <FormItem
           name="initContainers"
           label={t('INIT_CONTAINER')}
-          dependencies={['containers']}
+          dependencies={['containers', 'volumes']}
           rules={[{ validator: containersValidator }]}
         >
           <ArrayInput

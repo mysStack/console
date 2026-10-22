@@ -530,3 +530,110 @@ test('编辑设置解析 Kubernetes 原生三类探针和五类卷', () => {
     ['persistentVolumeClaim', 'emptyDir', 'hostPath', 'configMap', 'secret'],
   );
 });
+
+test('编辑其他设置不丢失 projected 卷、命名端口探针和 HTTP 头', () => {
+  const original: any = {
+    metadata: { name: 'preserve', namespace: 'v4-migration-e2e', resourceVersion: '42' },
+    spec: {
+      replicas: 0,
+      template: {
+        spec: {
+          containers: [
+            {
+              name: 'web',
+              image: 'nginx',
+              readinessProbe: {
+                httpGet: {
+                  path: '/',
+                  port: 'http',
+                  httpHeaders: [{ name: 'X-Probe', value: 'check' }],
+                },
+                timeoutSeconds: 2,
+              },
+              volumeMounts: [{ name: 'runtime', mountPath: '/runtime', readOnly: true }],
+            },
+          ],
+          volumes: [
+            {
+              name: 'runtime',
+              projected: {
+                sources: [
+                  {
+                    downwardAPI: {
+                      items: [{ path: 'namespace', fieldRef: { fieldPath: 'metadata.namespace' } }],
+                    },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
+    },
+  };
+  const before = JSON.parse(JSON.stringify(original));
+  const values = parseDeploymentSettings(original);
+  assert.equal(values.volumes?.length, 1);
+  assert.equal(
+    validateContainers(values.containers, values.initContainers, values.volumes),
+    undefined,
+  );
+  const submitted = buildDeploymentSettingsResource(original, values);
+  assert.deepEqual(submitted, before);
+  values.containers[0].readinessProbe!.path = '/health';
+  const edited = buildDeploymentSettingsResource(original, values);
+  assert.deepEqual(edited.spec.template.spec.containers[0].readinessProbe.httpGet, {
+    path: '/health',
+    port: 'http',
+    scheme: 'HTTP',
+    httpHeaders: [{ name: 'X-Probe', value: 'check' }],
+  });
+  assert.deepEqual(original, before);
+});
+
+test('编辑设置允许关闭只读和清空 subPath、envFrom prefix 与 emptyDir 容量', () => {
+  const original: any = {
+    metadata: { name: 'clear', namespace: 'v4-migration-e2e' },
+    spec: {
+      replicas: 0,
+      template: {
+        spec: {
+          containers: [
+            {
+              name: 'web',
+              image: 'nginx',
+              volumeMounts: [
+                {
+                  name: 'cache',
+                  mountPath: '/data',
+                  readOnly: true,
+                  subPath: 'logs',
+                  mountPropagation: 'None',
+                },
+              ],
+              envFrom: [{ prefix: 'OLD_', configMapRef: { name: 'config', optional: true } }],
+            },
+          ],
+          volumes: [{ name: 'cache', emptyDir: { medium: 'Memory', sizeLimit: '128Mi' } }],
+        },
+      },
+    },
+  };
+  const values = parseDeploymentSettings(original);
+  values.containers[0].volumeMounts![0] = {
+    name: 'cache',
+    mountPath: '/data',
+    readOnly: false,
+    subPath: '',
+  };
+  values.containers[0].envFrom![0].prefix = '';
+  values.volumes![0] = { name: 'cache', type: 'emptyDir', medium: '', sizeLimit: '' };
+  const submitted = buildDeploymentSettingsResource(original, values);
+  assert.deepEqual(submitted.spec.template.spec.containers[0].volumeMounts, [
+    { name: 'cache', mountPath: '/data', mountPropagation: 'None' },
+  ]);
+  assert.deepEqual(submitted.spec.template.spec.containers[0].envFrom, [
+    { configMapRef: { name: 'config', optional: true } },
+  ]);
+  assert.deepEqual(submitted.spec.template.spec.volumes, [{ name: 'cache', emptyDir: {} }]);
+});

@@ -234,13 +234,13 @@ function ProbeInput({
               <span />
             )}
             {value.type !== 'command' && (
-              <InputNumber
+              <Input
                 aria-label={`${label} ${t('PORT')}`}
-                min={1}
-                max={65535}
-                precision={0}
                 value={value.port}
-                onChange={port => update({ port: port == null ? undefined : Number(port) })}
+                onChange={event => {
+                  const port = event.target.value;
+                  update({ port: /^\d+$/.test(port) ? Number(port) : port });
+                }}
               />
             )}
           </div>
