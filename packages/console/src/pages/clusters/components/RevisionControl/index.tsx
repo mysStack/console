@@ -19,6 +19,7 @@ import {
 import { useCacheStore as useStore } from '@ks-console/shared';
 import Text from '../Text';
 import { YamlHeader, DiffWrapper } from './styles';
+import { EMPTY_REVISION_YAML } from './revisionDiff';
 
 interface IProps {
   detailPropsName: string;
@@ -111,7 +112,7 @@ const RevisionControl = ({ detailPropsName }: IProps) => {
     const oldRevision = list.find((item: Record<string, any>) => item.revision === lastRevision);
 
     const newYaml = newRevision ? yaml.getValue(newRevision._originData) : '';
-    const oldYaml = oldRevision ? yaml.getValue(oldRevision._originData) : '';
+    const oldYaml = oldRevision ? yaml.getValue(oldRevision._originData) : EMPTY_REVISION_YAML;
     return (
       <DiffViewer
         oldValue={oldYaml}
