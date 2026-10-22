@@ -16,6 +16,7 @@
 
 - 2026-10-24：通过固定 `origin/release-3.4` 补齐三类资源的设置分区和资源特有 Action 对照；当前 V4 仅 Deployment 接入简化设置 Modal，STS/DS 编辑设置仍调用 YAML。详见[旧源码与当前实现对照](./workload-settings-source-evidence-20261024.md)。此项只关闭结构未知，不代表 REA 通过。
 - 2026-10-23：完成 Workload Store/API 的定向静态取证，绑定三类资源的作用域 URL、详情/Watch、PATCH 编辑、Background 删除、关联 HPA 和 StatefulSet Service PATCH；同时确认当前代码没有统一的 mutation 后 React Query 失效机制，DaemonSet 停止语义与旧源码不同，必须进入后续独立验证。详见[Store/API 取证](./workload-settings-source-evidence-20261024.md#storeapi作用域和缓存的定向取证2026-10-23)。本轮只补证据，不修改业务代码、不部署，阶段仍为 REA/分析中。
+- 2026-10-23：依据测试准入规则完成三类 Workload 的分层测试设计，复用现有表单、Store、作用域和配置引用回归资产，登记 API/Service Guard、稳定 UI、草稿流程和人工探索的 MVTests。由于 131 浏览器登录未取得有效会话，VERIFY 前置条件仍未满足；本文件只约束后续验证，不放行 DEV。详见[测试设计](./workload-test-design-20261023.md)。
 
 ## 2026-10-22 编辑设置 REA 纠偏
 
