@@ -22,6 +22,7 @@ import {
   TableRef,
   getDisplayName,
   getWorkloadStatus,
+  StatusReason,
   formatTime,
   yaml,
   OriginData,
@@ -54,6 +55,7 @@ const DaemonSets = () => {
   const { mutate: mutateBatchDelete, isLoading: batchDeleteIsLoading } =
     useBatchDeleteWorkloadMutation({
       onSuccess: () => {
+        tableRef.current?.refetch();
         notify.success(t('DELETED_SUCCESSFULLY'));
         setBatchDeleteConfig({
           visible: false,
@@ -63,6 +65,7 @@ const DaemonSets = () => {
     });
   const { mutate: mutateBatchStop, isLoading: stopIsLoading } = useBatchStopDeploymentMutation({
     onSuccess: () => {
+      tableRef.current?.refetch();
       notify.success(t('STOP_SUCCESS_DESC'));
       setBatchStopConfig({
         visible: false,
@@ -87,6 +90,7 @@ const DaemonSets = () => {
 
   const { mutate: mutateEditBaseInfo, isLoading: baseInfoIsLoading } = useUpdateDeploymentMutation({
     onSuccess: () => {
+      tableRef.current?.refetch();
       notify.success(t('UPDATE_SUCCESSFUL'));
       setBaseConfig({
         visible: false,
@@ -97,6 +101,7 @@ const DaemonSets = () => {
 
   const { mutate: mutateUpdateYamlOpt, isLoading: yamlIsLoading } = useUpdateDeploymentMutation({
     onSuccess: () => {
+      tableRef.current?.refetch();
       notify.success(t('UPDATE_SUCCESSFUL'));
       setEditYamlConfig({
         visible: false,
@@ -109,6 +114,7 @@ const DaemonSets = () => {
 
   const { mutate: mutateRecreateOpt, isLoading: recreateIsLoading } = useUpdateDeploymentMutation({
     onSuccess: () => {
+      tableRef.current?.refetch();
       notify.success(t('RECREATE_SUCCESS_DESC'));
       setRecreateConfig({
         visible: false,
@@ -119,6 +125,7 @@ const DaemonSets = () => {
 
   const { mutate: mutateDeleteOpt, isLoading: deleteIsLoading } = useDeleteDeploymentMutation({
     onSuccess: () => {
+      tableRef.current?.refetch();
       notify.success(t('DELETED_SUCCESSFULLY'));
       setDeleteConfig({
         visible: false,
@@ -241,13 +248,10 @@ const DaemonSets = () => {
   // table columns
   const getItemDesc = (record: any) => {
     const asRecord = record as FormattedWorkload;
-    const { reason } = getWorkloadStatus(asRecord, module);
-    // const { status, reason } = getWorkloadStatus(asRecord, module);
+    const { status, reason } = getWorkloadStatus(asRecord, module);
 
     return reason !== '' ? (
-      // TODO: implement here with exist component
-      // <StatusReason status={status} reason={t(reason)} data={record} />
-      <span>reason</span>
+      <StatusReason status={status} reason={t(reason)} data={record} hasTip />
     ) : (
       record.description || '-'
     );

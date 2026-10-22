@@ -11,6 +11,8 @@ import ts from 'typescript';
 function inspectList(directory: string) {
   const params = { cluster: 'member-one', workspace: 'team-a', namespace: 'project-a' };
   const actionScopes: Record<string, any> = {};
+  const mutationCallbacks: (() => void)[] = [];
+  let refreshes = 0;
   const source = ts.transpileModule(
     readFileSync(path.join(__dirname, directory, 'index.tsx'), 'utf8'),
     {
@@ -27,15 +29,30 @@ function inspectList(directory: string) {
     mapper: (item: any) => ({ name: item.metadata.name, namespace: item.metadata.namespace }),
     getResourceUrl: () => 'workloads',
     getWatchListUrl: () => 'watch-workloads',
-    useUpdateDeploymentMutation: () => ({}),
-    useDeleteDeploymentMutation: () => ({}),
-    useBatchDeleteWorkloadMutation: () => ({}),
-    useBatchStopDeploymentMutation: () => ({}),
+    useUpdateDeploymentMutation: (options: any) => {
+      mutationCallbacks.push(options.onSuccess);
+      return {};
+    },
+    useDeleteDeploymentMutation: (options: any) => {
+      mutationCallbacks.push(options.onSuccess);
+      return {};
+    },
+    useBatchDeleteWorkloadMutation: (options: any) => {
+      mutationCallbacks.push(options.onSuccess);
+      return {};
+    },
+    useBatchStopDeploymentMutation: (options: any) => {
+      mutationCallbacks.push(options.onSuccess);
+      return {};
+    },
   };
   const shared = {
     workloadStore: () => store,
     DataTable,
     Icon: Empty,
+    StatusReason: Empty,
+    getDisplayName: (item: any) => item.name,
+    getWorkloadStatus: (item: any) => ({ status: 'warning', reason: item.statusReason || '' }),
     useTableActions: ({ params: scope }: any) => {
       actionScopes.table = scope;
       return Empty;
@@ -56,20 +73,34 @@ function inspectList(directory: string) {
     t: (key: string) => key,
     require: (name: string) => {
       if (name === 'react') {
-        return { ...React, useRef: () => ({}), useState: (value: unknown) => [value, () => {}] };
+        return {
+          ...React,
+          useRef: () => ({ current: { refetch: () => refreshes++ } }),
+          useState: (value: unknown) => [value, () => {}],
+        };
       }
-      if (name === 'react-router-dom') return { useParams: () => params };
+      if (name === 'react-router-dom') return { useParams: () => params, Link: Empty };
       if (name === '@ks-console/shared') return shared;
-      if (name === '@kubed/components') return {};
+      if (name === '@kubed/components') return { Field: Empty, notify: { success: () => {} } };
       return Empty;
     },
   });
   const view = module.exports.default();
   const table = view.props.children.find((child: any) => child?.type === shared.DataTable);
-  return { actionScopes, table };
+  return { actionScopes, table, mutationCallbacks, getRefreshCount: () => refreshes };
 }
 
 for (const resource of ['Deployments', 'StatefulSets', 'DaemonSets']) {
+  test(`${resource} successful mutations refresh the current list`, () => {
+    const { mutationCallbacks, getRefreshCount } = inspectList(resource);
+    assert.equal(mutationCallbacks.length, 6);
+    for (const onSuccess of mutationCallbacks) {
+      const before = getRefreshCount();
+      onSuccess();
+      assert.equal(getRefreshCount(), before + 1);
+    }
+  });
+
   test(`${resource} list uses project permissions for every action group`, () => {
     const { actionScopes } = inspectList(resource);
     for (const group of ['table', 'batch', 'item']) {
@@ -87,5 +118,20 @@ for (const resource of ['Deployments', 'StatefulSets', 'DaemonSets']) {
     assert.equal(row.cluster, 'member-one');
     assert.equal(row.namespace, 'project-a');
     assert.equal(row.name, 'test-workload');
+  });
+
+  test(`${resource} name cell shows the resource failure reason and preserves description fallback`, () => {
+    const { table } = inspectList(resource);
+    const nameColumn = table.props.columns.find((column: any) => column.field === 'name');
+    const failed = { name: 'test-workload', statusReason: 'MinimumReplicasUnavailable' };
+    const label = nameColumn.render(failed.name, failed).props.label;
+    assert.equal(label.props.reason, 'MinimumReplicasUnavailable');
+    assert.equal(label.props.status, 'warning');
+    assert.equal(label.props.data, failed);
+    assert.equal(
+      nameColumn.render('healthy', { name: 'healthy', description: 'kept' }).props.label,
+      'kept',
+    );
+    assert.equal(nameColumn.render('healthy', { name: 'healthy' }).props.label, '-');
   });
 }
