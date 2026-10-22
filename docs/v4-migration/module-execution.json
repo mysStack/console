@@ -20,11 +20,11 @@
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
-        "sha256": "c9e9a4cb6dbe9e4f159b3165cec20f3cfe5c522b98ab88fd701810e3ee47305a"
+        "sha256": "4ba4cfb0796dbf4bd14b67da557a4b7d8049039f23d3668ff42e75a1c5a299b3"
       },
       {
         "path": "docs/v4-migration/workload-kind-capability-matrix.md",
-        "sha256": "6e28e6fff077f905dc57b6e43f42f3bd246b4e4a23184ac5af745290cedd447e"
+        "sha256": "4a0702fd2c220e03af8f06c3b6b0ad79252e9ee8334aab7a61642dc1713ed4b2"
       },
       {
         "path": "docs/v4-migration/evidence/workload-edit-factories-20261023-provenance.json",
@@ -36,7 +36,7 @@
       },
       {
         "path": "docs/v4-migration/workload-settings-source-evidence-20261024.md",
-        "sha256": "58843364901bc4f924ede6039e54c4d673019a45c6cedffea370f54523237f25"
+        "sha256": "ffe24b11a8fec43a451f2a09378152261c0295dd088f4a18fa3f464f82767d0c"
       }
     ],
     "coverage": {

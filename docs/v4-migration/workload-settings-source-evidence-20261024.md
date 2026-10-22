@@ -52,3 +52,34 @@ git show origin/release-3.4:src/pages/projects/containers/DaemonSets/Detail/inde
 5. 当前 V4 三类资源分别的组件测试和后续 131 浏览器验收场景。
 
 本记录支持下一轮定向 REA 和 DEV 设计，不授权跳过阶段门禁直接修改业务代码。阶段记录继续保持 `REA / 分析中`，`review` 仍为 `null`。
+
+## Store、API、作用域和缓存的定向取证（2026-10-23）
+
+### 当前 V4 的请求边界
+
+以下结论来自当前分支源码，属于静态取证；没有把静态 URL 生成等同于 131 环境的实际网络验证。
+
+| 能力                 | 当前 V4 证据                                                                                                                                                                                                                                               | 当前结论                                                                                                                  |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| 项目/集群列表        | `packages/shared/src/hooks/useUrl/index.ts:85-87` 生成 `kapis/resources.kubesphere.io/v1alpha3` 加 cluster、workspace 或 namespace 路径；`packages/shared/src/stores/store.ts:67-101` 将 `cluster`、`namespace` 从查询参数中拆出后请求                     | 具备作用域参数入口；仍需浏览器 Network 证明项目列表没有越界到全量资源                                                     |
+| Kubernetes 列表/创建 | `useUrl/index.ts:97-102` 使用 `getApiVersion(module, k8sVersion)` 加 namespace 路径；`store.ts:151-153` 的 `post` 使用同一列表 URL                                                                                                                         | URL 构造可追溯；API 版本、RBAC 403 和创建后的列表刷新尚未在三类资源上逐项验证                                             |
+| 详情/Watch           | `useUrl/index.ts:89-109` 从同一列表 URL 派生详情 URL 和 Watch URL；三类详情分别调用 `store.getWatchListUrl({cluster, namespace})` 并在事件后 `refetch()`                                                                                                   | 详情和 Watch 带作用域；Watch 失败、断线重连和直达 URL 仍需运行时证据                                                      |
+| 编辑设置             | `packages/shared/src/stores/workload/index.ts:147-151` 的 `useUpdateDeploymentMutation` 调用 `BaseStore.patch`；`packages/shared/src/stores/store.ts:199-205` 使用详情 URL发送 PATCH                                                                       | 当前 V4 与旧源码 `store.update` 的 PUT + 资源版本注入不同；必须以实际 payload、resourceVersion 冲突和字段保留结果证明等价 |
+| 删除                 | `workload/index.ts:108-115` 使用详情 URL和 `DeleteOptions`，传播策略为 `Background`；带关联 HPA 时先加入 HPA 删除请求                                                                                                                                      | 删除链路有静态证据；多选、关联 HPA、403/404、取消和删除后列表刷新仍未分别验证                                             |
+| StatefulSet Service  | `packages/console/src/pages/clusters/hooks/useModal/useWorkloadService.tsx:14-39` 通过 `serviceStore.patch(detail, data)` 保存；`packages/shared/src/stores/service.ts:163-180` 对 Service 详情发 PATCH；项目详情仍由 `StatefulSets/Detail/index.tsx` 触发 | 已确认原生 Service Store 入口；Headless/Selector payload、权限拒绝、错误提示和保存后详情刷新未闭环                        |
+
+### 旧 V3 与当前 V4 的请求差异
+
+固定旧源码 `origin/release-3.4`（`175710fefeeba6ff295c2c0967b4d45b83563d26`）的 `src/stores/base.js:253-267` 显示，编辑设置历史路径先 GET 详情读取 `metadata.resourceVersion`，再使用 PUT 写回完整对象；当前 V4 `WorkloadStore` 的编辑设置路径使用 PATCH，且当前已定位代码没有在该 mutation 中显式注入资源版本。这个差异不能直接判定为缺陷，也不能直接判定为等价，必须在真实环境记录请求方法、请求体、并发更新和未编辑字段保留结果。
+
+旧源码的删除路径还会以 Background 传播策略删除资源，并在关联 HPA 时追加 HPA 删除请求；当前 V4 保留了这条静态关系，但 `batchDelete` 的参数、cluster 传递和成功后列表刷新需要单独验证。旧源码 `stop` 对 DaemonSet 使用不可调度的 nodeSelector，而当前 V4 当前 Workload Store 的 `stopDeployment` 固定向 `spec.replicas` 写入 0；这属于高风险资源差异，不能把 Deployment 的停止行为复用为 DaemonSet 通过证据。
+
+### 缓存和错误边界
+
+- 当前详情查询 key 为 `[module, params]`（`workload/index.ts:140-145`），其中 `module` 区分三类资源，`params` 包含 cluster、namespace、name；这证明了查询键包含作用域，但没有证明列表查询和详情查询在 mutation 成功后自动失效。
+- 当前详情页多数 mutation 成功后显式调用 `refetch()`；静态搜索未发现三类 Workload Store 在更新、创建、删除后统一调用 `invalidateQueries` 或 `setQueryData`。因此“缓存失效”只能记录为未验证，不能由 `onSuccess` 存在推断为通过。
+- `settleWorkloadRequests` 会等待所有请求并重新抛出任一失败（`workload/index.ts:10-18`），现有 Store 测试覆盖了部分 403、500、网络错误和关联 HPA 失败；这些是请求层单元证据，不能替代浏览器中的错误文案、按钮状态、取消路径和权限页面证据。
+
+### 本轮结论
+
+本轮关闭了当前 V4 Workload Store/API 的静态定位未知：三类资源的作用域 URL、详情/Watch、PATCH 更新、Background 删除、关联 HPA 和 StatefulSet Service PATCH 均已绑定文件与行号。仍未关闭的内容为：真实 V3/V4 Network 请求、DaemonSet 停止语义、完整字段 payload、RBAC 正反权限、列表/详情缓存失效、错误/取消 UI、跨 namespace 隔离和浏览器渲染。阶段仍为 `REA / 分析中`，不进入 DEV。

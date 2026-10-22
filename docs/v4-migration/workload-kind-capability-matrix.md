@@ -92,3 +92,9 @@ Action `3595` 从 `detail._originData` 取编辑对象，保存时处理 `spec.t
 ### 本轮结论和下一项
 
 已补齐普通三类资源的静态编辑入口、Action 处理器和分区登记定位，并确认 V4 的 STS/DS 编辑设置仍误用 YAML。尚未完成字段、校验、Store/API、RBAC、真实页面与请求的逐项核对；覆盖维度保持“未完成”，不签署 REA 或 VERIFY 通过。下一项沿已定位的表单子组件和 Store 做定向展开，再用真实 V3 页面/Network 校准，不重复全量 REA，不依据旧 release-3.4 直接编码。
+
+### 2026-10-23 Store/API 定向取证补充
+
+已将当前 V4 的作用域 URL、详情/Watch、PATCH 编辑、Background 删除、关联 HPA 和 StatefulSet Service PATCH 绑定到源码行号；同时确认三类 Workload 的查询 key 虽包含资源类型和 cluster/namespace/name，但当前 Store 未形成统一的 mutation 后缓存失效机制。旧源码的编辑设置为 GET resourceVersion 后 PUT 完整对象，DaemonSet 停止路径使用不可调度 nodeSelector；当前 V4 的设置编辑为 PATCH，Workload Store 的停止逻辑固定写入 `spec.replicas=0`，这两个差异都必须用真实 API 和浏览器证据关闭。
+
+本轮结论仍为 REA 未完成：静态请求边界已定位，真实 Network、完整 payload、RBAC 正反权限、缓存失效、错误/取消 UI、namespace 隔离和三类资源页面渲染尚未验证。详见[Store/API 取证](./workload-settings-source-evidence-20261024.md#storeapi作用域和缓存的定向取证2026-10-23)。
