@@ -45,6 +45,10 @@ function inspectList(directory: string) {
       mutationCallbacks.push(options.onSuccess);
       return {};
     },
+    useCreateWorkloadMutation: (options: any) => {
+      mutationCallbacks.push(options.onSuccess);
+      return {};
+    },
   };
   const shared = {
     workloadStore: () => store,
@@ -80,6 +84,9 @@ function inspectList(directory: string) {
         };
       }
       if (name === 'react-router-dom') return { useParams: () => params, Link: Empty };
+      if (name === '@kubed/hooks') {
+        return { useDisclosure: () => ({ isOpen: false, open: () => {}, close: () => {} }) };
+      }
       if (name === '@ks-console/shared') return shared;
       if (name === '@kubed/components') return { Field: Empty, notify: { success: () => {} } };
       return Empty;
@@ -93,7 +100,8 @@ function inspectList(directory: string) {
 for (const resource of ['Deployments', 'StatefulSets', 'DaemonSets']) {
   test(`${resource} successful mutations refresh the current list`, () => {
     const { mutationCallbacks, getRefreshCount } = inspectList(resource);
-    assert.equal(mutationCallbacks.length, 6);
+    const expectedCallbackCount = resource === 'Deployments' ? 7 : 6;
+    assert.equal(mutationCallbacks.length, expectedCallbackCount);
     for (const onSuccess of mutationCallbacks) {
       const before = getRefreshCount();
       onSuccess();
@@ -120,7 +128,7 @@ for (const resource of ['Deployments', 'StatefulSets', 'DaemonSets']) {
     assert.equal(row.name, 'test-workload');
   });
 
-  test(`${resource} name cell shows the resource failure reason and preserves description fallback`, () => {
+  test(`${resource} name cell shows failure reason and description fallback`, () => {
     const { table } = inspectList(resource);
     const nameColumn = table.props.columns.find((column: any) => column.field === 'name');
     const failed = { name: 'test-workload', statusReason: 'MinimumReplicasUnavailable' };

@@ -16,6 +16,11 @@ export interface DeploymentPatchProps {
   data: Record<string, any>;
 }
 
+export interface CreateWorkloadProps {
+  params: PathParams;
+  data: Record<string, any>;
+}
+
 export interface DeleteProps extends PathParams {
   annotations?: Record<string, any>;
 }

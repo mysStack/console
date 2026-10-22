@@ -21,13 +21,17 @@ function loadStore(
 ) {
   const client = new QueryClient();
   const module = { exports: {} as any };
-  const request = { delete: send, patch: send };
+  const request = { delete: send, patch: send, post: send };
   const dependencies: Record<string, unknown> = {
     'react-query': {
       useMutation: (mutationFn: any, options: any) =>
         new MutationObserver(client, { ...options, mutationFn, retry: false }),
     },
-    '../store': () => ({ getDetailUrl: ({ name }: any) => name }),
+    '../store': () => ({
+      getDetailUrl: ({ name }: any) => name,
+      post: (params: any, data: any) =>
+        send(`create:${params.cluster}:${params.namespace}:${data.metadata.name}`),
+    }),
     '../../utils': { request },
     '../../utils/object.mapper': { [moduleName]: (value: unknown) => value },
     '../volume': {},
@@ -49,12 +53,12 @@ for (const resource of ['deployments', 'statefulsets', 'daemonsets']) {
     {
       hook: 'useDeleteDeploymentMutation',
       params: item,
-      error: { response: { status: 403 }, message: 'Forbidden' },
+      error: Object.assign(new Error('Forbidden'), { response: { status: 403 } }),
     },
     {
       hook: 'useBatchDeleteWorkloadMutation',
       params: { data: [item] },
-      error: { response: { status: 500 }, message: 'Internal Server Error' },
+      error: Object.assign(new Error('Internal Server Error'), { response: { status: 500 } }),
     },
     {
       hook: 'useBatchStopDeploymentMutation',
@@ -158,4 +162,41 @@ test('empty batches finish successfully without sending requests', async () => {
     await mutation.mutate({ data: [] });
     assert.equal(mutation.getCurrentResult().isSuccess, true);
   }
+});
+
+test('native workload create mutation keeps the cluster and namespace scope', async () => {
+  const calls: string[] = [];
+  let successes = 0;
+  const store = loadStore('deployments', async url => {
+    calls.push(url);
+    return { status: 'Success' };
+  });
+  const mutation = store.useCreateWorkloadMutation({ onSuccess: () => successes++ });
+
+  await mutation.mutate({
+    params: { cluster: 'host', namespace: 'v4-migration-e2e' },
+    data: { metadata: { name: 'native-deployment' } },
+  });
+
+  assert.deepEqual(calls, ['create:host:v4-migration-e2e:native-deployment']);
+  assert.equal(successes, 1);
+});
+
+test('native workload create mutation rejects API failures without reporting success', async () => {
+  const error = Object.assign(new Error('Forbidden'), { response: { status: 403 } });
+  let successes = 0;
+  const store = loadStore('deployments', async () => {
+    throw error;
+  });
+  const mutation = store.useCreateWorkloadMutation({ onSuccess: () => successes++ });
+
+  await assert.rejects(
+    mutation.mutate({
+      params: { cluster: 'host', namespace: 'v4-migration-e2e' },
+      data: { metadata: { name: 'native-deployment' } },
+    }),
+    reason => reason === error,
+  );
+  assert.equal(successes, 0);
+  assert.equal(mutation.getCurrentResult().isError, true);
 });

@@ -18,3 +18,10 @@ test('project Deployment list has no V3 list bridge', () => {
     /ConsoleV3ResourceList|wujieUrlPrefix|WujieReact|wujie-react|consolev3/,
   );
 });
+
+test('project Deployment list opens the native create form and submits through the store', () => {
+  assert.match(source, /WorkloadCreateModal/);
+  assert.match(source, /useCreateWorkloadMutation/);
+  assert.match(source, /onClick:\s*createModal\.open/);
+  assert.match(source, /params:\s*\{\s*cluster,\s*namespace\s*\}/);
+});
