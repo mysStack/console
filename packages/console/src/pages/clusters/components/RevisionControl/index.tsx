@@ -26,7 +26,7 @@ interface IProps {
 
 const RevisionControl = ({ detailPropsName }: IProps) => {
   const [props] = useStore(detailPropsName);
-  const { detail, module, isLoading } = props;
+  const { detail = {}, module, isLoading } = props;
   const [selectRevision, setSelectRevision] = useState<Number>(0);
 
   const { list, fetchList } = useRevisionStore({ module: module });

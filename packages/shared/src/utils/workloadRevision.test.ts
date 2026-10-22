@@ -2,7 +2,9 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 test('builds one stable revision lookup key per workload resource version', async () => {
-  const { getWorkloadRevisionLookupKey } = await import('./workloadRevision');
+  const { getWorkloadIdentityKey, getWorkloadRevisionLookupKey } = await import(
+    './workloadRevision'
+  );
   const detail = {
     cluster: 'host',
     namespace: 'v4-migration-e2e',
@@ -21,4 +23,9 @@ test('builds one stable revision lookup key per workload resource version', asyn
     false,
   );
   assert.equal(getWorkloadRevisionLookupKey('deployments', {}), '');
+  assert.equal(getWorkloadRevisionLookupKey('deployments', undefined), '');
+  assert.equal(
+    getWorkloadIdentityKey('deployments', detail),
+    getWorkloadRevisionLookupKey('deployments', detail),
+  );
 });

@@ -6,9 +6,9 @@ type RevisionWorkload = {
   resourceVersion?: string;
 };
 
-export const getWorkloadRevisionLookupKey = (
+export const getWorkloadIdentityKey = (
   module: string | undefined,
-  detail: RevisionWorkload,
+  detail: RevisionWorkload = {},
 ) => {
   const { cluster, namespace, name, uid, resourceVersion } = detail;
 
@@ -18,3 +18,5 @@ export const getWorkloadRevisionLookupKey = (
 
   return [module, cluster, namespace, name, uid, resourceVersion].join('/');
 };
+
+export const getWorkloadRevisionLookupKey = getWorkloadIdentityKey;
