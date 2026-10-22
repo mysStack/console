@@ -4,6 +4,15 @@
  */
 
 module.exports = {
+  WORKLOAD_ADD_CONTAINER: '添加工作容器',
+  WORKLOAD_ADD_INIT_CONTAINER: '添加初始化容器',
+  WORKLOAD_ADD_ENV: '添加环境变量',
+  WORKLOAD_CONTAINER_INVALID: '请填写合法的容器名称和镜像。',
+  WORKLOAD_CONTAINER_DUPLICATE: '工作容器和初始化容器的名称不能重复。',
+  WORKLOAD_ENV_DUPLICATE: '同一容器的环境变量名称不能重复。',
+  WORKLOAD_PORT_INVALID: '请填写合法端口（1–65535）、协议和端口名称（可选，最长 15 个字符）。',
+  WORKLOAD_PORT_DUPLICATE: '容器端口名称在整个容器组中不能重复。',
+
   // Banner
   // List
   HPA_SET_TIP: '已设置容器组水平自动扩缩策略。',

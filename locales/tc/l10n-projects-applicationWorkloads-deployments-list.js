@@ -4,6 +4,15 @@
  */
 
 module.exports = {
+  WORKLOAD_ADD_CONTAINER: '新增工作容器',
+  WORKLOAD_ADD_INIT_CONTAINER: '新增初始化容器',
+  WORKLOAD_ADD_ENV: '新增環境變數',
+  WORKLOAD_CONTAINER_INVALID: '請填寫合法的容器名稱和映像。',
+  WORKLOAD_CONTAINER_DUPLICATE: '工作容器和初始化容器的名稱不能重複。',
+  WORKLOAD_ENV_DUPLICATE: '同一容器的環境變數名稱不能重複。',
+  WORKLOAD_PORT_INVALID: '請填寫合法連接埠（1–65535）、協定和連接埠名稱（選填，最長 15 個字元）。',
+  WORKLOAD_PORT_DUPLICATE: '容器連接埠名稱在整個容器群組中不能重複。',
+
   // Banner
   // List
   HPA_SET_TIP: '已設置彈性伸縮策略',

@@ -4,6 +4,16 @@
  */
 
 module.exports = {
+  WORKLOAD_ADD_CONTAINER: 'Add Container',
+  WORKLOAD_ADD_INIT_CONTAINER: 'Add Init Container',
+  WORKLOAD_ADD_ENV: 'Add Environment Variable',
+  WORKLOAD_CONTAINER_INVALID: 'Enter a valid container name and image.',
+  WORKLOAD_CONTAINER_DUPLICATE: 'Container and init container names must be unique.',
+  WORKLOAD_ENV_DUPLICATE: 'Environment variable names must be unique within a container.',
+  WORKLOAD_PORT_INVALID:
+    'Enter a valid port (1–65535), protocol and optional port name (up to 15 characters).',
+  WORKLOAD_PORT_DUPLICATE: 'Port names must be unique across the Pod.',
+
   // Banner
   // List
   HPA_SET_TIP: 'Horizontal pod autoscaling has been set.',

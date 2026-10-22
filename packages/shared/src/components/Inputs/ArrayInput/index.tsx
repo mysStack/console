@@ -32,6 +32,9 @@ function ArrayInput<T>(propsData: IProps<T>) {
   };
 
   const props = merge(defaultProps, propsData);
+  // Arrays are controlled values, not defaults to merge by index. In particular,
+  // [] must remain empty after the final row is deleted.
+  if (propsData.value) props.value = propsData.value;
 
   const { desc, addText } = props;
 
