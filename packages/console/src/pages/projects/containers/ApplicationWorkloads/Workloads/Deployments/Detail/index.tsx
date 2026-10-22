@@ -18,7 +18,6 @@ import {
   getDisplayName,
   formatTime,
   useCommonActions,
-  useV3action,
   hasClusterModule,
   ClusterAliasName,
   ProjectAliasName,
@@ -34,7 +33,7 @@ const { usePatchHpaMutation } = hpaStore;
 const DeploymentDetail = () => {
   const authKey = module;
   const params = useParams();
-  const { cluster, namespace, name } = params;
+  const { workspace, cluster, namespace, name } = params;
   const navigate = useNavigate();
   const {
     useGetDetail,
@@ -64,11 +63,16 @@ const DeploymentDetail = () => {
   });
 
   const listUrl = useMemo(() => {
-    return `/clusters/${cluster}/deployments`;
-  }, []);
+    return workspace
+      ? `/${workspace}/clusters/${cluster}/projects/${namespace}/deployments`
+      : `/clusters/${cluster}/deployments`;
+  }, [workspace, cluster, namespace]);
 
   const tabs = useMemo(() => {
-    const path = `/clusters/${cluster}/projects/${namespace}/deployments/${name}`;
+    const prefix = workspace
+      ? `/${workspace}/clusters/${cluster}/projects/${namespace}`
+      : `/clusters/${cluster}/projects/${namespace}`;
+    const path = `${prefix}/deployments/${name}`;
 
     return cluster && hasClusterModule(cluster, 'whizard-monitoring')
       ? [
@@ -88,7 +92,7 @@ const DeploymentDetail = () => {
           { title: t('CONFIG_REFERENCE'), path: `${path}/config-reference` },
           { title: t('EVENT_PL'), path: `${path}/events` },
         ];
-  }, []);
+  }, [workspace, cluster, namespace, name]);
 
   const isCustomScaling = useMemo(() => {
     const labels = get(detail, 'labels', {});
@@ -128,7 +132,7 @@ const DeploymentDetail = () => {
         value: creator,
       },
     ];
-  }, [detail]);
+  }, [detail, cluster, namespace]);
 
   const { editBaseInfo, editYaml } = useCommonActions({
     store,
@@ -140,7 +144,7 @@ const DeploymentDetail = () => {
     callback: (type: string) => {
       switch (type) {
         case 'delete':
-          navigate('/clusters/host/deployments');
+          navigate(listUrl);
           break;
         default:
           refetch();
@@ -236,9 +240,8 @@ const DeploymentDetail = () => {
 
   useEffect(() => {
     setDetailProps({ module, detail, isLoading, isError });
-  }, [detail]);
+  }, [detail, isLoading, isError, setDetailProps]);
 
-  const { open, render: renderV3Modal } = useV3action();
   const isExtensionEnabledInCluster = hasClusterModule(cluster!, 'metrics-server');
   const actions = () => {
     return [
@@ -278,20 +281,7 @@ const DeploymentDetail = () => {
         icon: <Storage />,
         text: t('EDIT_SETTINGS'),
         action: 'edit',
-        onClick: () => {
-          open({
-            module,
-            ...params,
-            detail,
-            v3Module: 'workload',
-            v3StoreParams: module,
-            hasRootStore: true,
-            success: () => {
-              notify.success(t('UPDATE_SUCCESSFUL'));
-              refetch();
-            },
-          });
-        },
+        onClick: () => editYaml(detail),
       },
       {
         key: 'editYaml',
@@ -364,7 +354,6 @@ const DeploymentDetail = () => {
           }}
         />
       )}
-      {renderV3Modal()}
       {renderRollbackModal()}
       {renderAutoScalingModal()}
       {recreateModalIsOpen && (

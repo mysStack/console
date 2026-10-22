@@ -9,7 +9,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Loading, notify } from '@kubed/components';
 import { useCacheStore as useStore } from '@ks-console/shared';
 import { useDisclosure } from '@kubed/hooks';
-import { hasClusterModule, useV3action } from '@ks-console/shared';
+import { hasClusterModule } from '@ks-console/shared';
 
 import {
   Icon,
@@ -40,12 +40,14 @@ const {
 const DaemonSetDetail = () => {
   const authKey = module;
   const params = useParams();
-  const { cluster, namespace, name } = params;
+  const { workspace, cluster, namespace, name } = params;
   const navigate = useNavigate();
 
   const listUrl = useMemo(() => {
-    return `/clusters/${cluster}/daemonsets`;
-  }, []);
+    return workspace
+      ? `/${workspace}/clusters/${cluster}/projects/${namespace}/daemonsets`
+      : `/clusters/${cluster}/daemonsets`;
+  }, [workspace, cluster, namespace]);
 
   const {
     data: detail,
@@ -143,10 +145,13 @@ const DaemonSetDetail = () => {
 
   useEffect(() => {
     setDetailProps({ module, detail, isLoading, isError });
-  }, [detail]);
+  }, [detail, isLoading, isError, setDetailProps]);
 
   const tabs = useMemo(() => {
-    const path = `/clusters/${cluster}/projects/${namespace}/daemonsets/${name}`;
+    const prefix = workspace
+      ? `/${workspace}/clusters/${cluster}/projects/${namespace}`
+      : `/clusters/${cluster}/projects/${namespace}`;
+    const path = `${prefix}/daemonsets/${name}`;
     return cluster && hasClusterModule(cluster, 'whizard-monitoring')
       ? [
           { title: t('RESOURCE_STATUS'), path: `${path}/resource-status` },
@@ -165,7 +170,7 @@ const DaemonSetDetail = () => {
           { title: t('CONFIG_REFERENCE'), path: `${path}/config-reference` },
           { title: t('EVENT_PL'), path: `${path}/events` },
         ];
-  }, []);
+  }, [workspace, cluster, namespace, name]);
 
   const attrs = useMemo(() => {
     if (isEmpty(detail)) {
@@ -200,9 +205,7 @@ const DaemonSetDetail = () => {
         value: creator ? creator : '',
       },
     ];
-  }, [detail]);
-
-  const { open, render: renderV3Modal } = useV3action();
+  }, [detail, cluster, namespace]);
 
   const actions = () => {
     return [
@@ -238,20 +241,7 @@ const DaemonSetDetail = () => {
         icon: <Icon name="storage" />,
         text: t('EDIT_SETTINGS'),
         action: 'edit',
-        onClick: () => {
-          open({
-            module,
-            ...params,
-            detail,
-            v3Module: 'workload',
-            v3StoreParams: module,
-            hasRootStore: true,
-            success: () => {
-              notify.success(t('UPDATE_SUCCESSFUL'));
-              refetch();
-            },
-          });
-        },
+        onClick: () => editYaml(detail),
       },
       {
         key: 'editYaml',
@@ -349,7 +339,6 @@ const DaemonSetDetail = () => {
           onCancel={() => closeDeleteModal()}
         ></DeleteConfirmModal>
       )}
-      {renderV3Modal()}
     </>
   );
 };
