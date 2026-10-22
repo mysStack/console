@@ -17,6 +17,14 @@
 
 页面渲染为原生 Workload 页面，显示 Deployment、StatefulSet、DaemonSet 三个单选入口。Deployment 列表只显示 `v4-watch-20261022-02`，项目列为 `v4-migration-e2e`，本次页面观察没有出现其他 namespace 的 Workload。该结果只覆盖当前 admin 会话和当前已部署镜像，仍需在当前 SHA 以及低权限账号下重复。
 
+Network 记录显示该列表使用带完整作用域的请求并返回 200：
+
+- Deployment：`GET /clusters/host/kapis/resources.kubesphere.io/v1alpha3/namespaces/v4-migration-e2e/deployments?sortBy=createTime&limit=10&page=1`。
+- StatefulSet：`GET /clusters/host/kapis/resources.kubesphere.io/v1alpha3/namespaces/v4-migration-e2e/statefulsets?sortBy=createTime&limit=10&page=1`。
+- DaemonSet：`GET /clusters/host/kapis/resources.kubesphere.io/v1alpha3/namespaces/v4-migration-e2e/daemonsets?sortBy=createTime&limit=10&page=1`。
+
+因此当前部署制品的三类项目列表作用域已取得浏览器 Network 证据；该证据仍受旧镜像身份限制，不等同于当前 SHA 的 VERIFY。
+
 ## 三类详情和编辑入口
 
 ### Deployment
