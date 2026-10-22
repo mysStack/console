@@ -152,7 +152,7 @@ const Deployment = () => {
   });
   const renderBatchActions = useBatchActions({
     authKey,
-    params: { cluster },
+    params,
     actions: [
       {
         key: 'delete',
@@ -185,7 +185,7 @@ const Deployment = () => {
   });
   const renderItemActions = useItemActions({
     authKey,
-    params: { cluster },
+    params,
     actions: [
       {
         key: 'edit',
@@ -420,7 +420,7 @@ const Deployment = () => {
           module,
           url: getWatchListUrl(params),
         }}
-        format={data => mapper(data)}
+        format={data => ({ ...mapper(data), cluster })}
         batchActions={renderBatchActions()}
         disableRowSelect={disableRowSelect}
         toolbarRight={renderTableAction()}
