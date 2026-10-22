@@ -5,9 +5,22 @@
 
 import React from 'react';
 import styled from 'styled-components';
-import { Input, InputNumber, Select } from '@kubed/components';
+import { Input, InputNumber, Select, Switch } from '@kubed/components';
 import { ArrayInput } from '@ks-console/shared';
-import { ContainerCreateValues, ContainerPortValues, EnvironmentValues } from './deployment';
+import {
+  ContainerCreateValues,
+  ContainerPortValues,
+  EnvironmentFromValues,
+  EnvironmentValues,
+  ProbeValues,
+  VolumeMountValues,
+} from './deployment';
+
+export interface WorkloadResourceOptions {
+  configMaps: string[];
+  secrets: string[];
+  persistentVolumeClaims: string[];
+}
 
 const ContainerField = styled.label`
   display: block;
@@ -95,11 +108,226 @@ function EnvironmentInput({
   );
 }
 
+const toOptions = (items: string[]) => items.map(item => ({ label: item, value: item }));
+
+function EnvironmentFromInput({
+  value = { kind: 'configMap', name: '' },
+  onChange,
+  resourceOptions,
+}: {
+  value?: EnvironmentFromValues;
+  onChange?: (value: EnvironmentFromValues) => void;
+  resourceOptions: WorkloadResourceOptions;
+}) {
+  const names = value.kind === 'secret' ? resourceOptions.secrets : resourceOptions.configMaps;
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: '140px 1fr 140px', gap: 8, width: '100%' }}>
+      <Select
+        aria-label={t('WORKLOAD_REFERENCE_TYPE')}
+        value={value.kind}
+        options={[
+          { label: 'ConfigMap', value: 'configMap' },
+          { label: 'Secret', value: 'secret' },
+        ]}
+        onChange={kind => onChange?.({ ...value, kind, name: '' })}
+      />
+      <Select
+        aria-label={t('WORKLOAD_REFERENCE_RESOURCE')}
+        value={value.name || ''}
+        options={toOptions(names)}
+        placeholder={t('WORKLOAD_SELECT_RESOURCE')}
+        onChange={name => onChange?.({ ...value, name: String(name) })}
+      />
+      <Input
+        aria-label={t('PREFIX')}
+        placeholder={t('PREFIX')}
+        value={value.prefix || ''}
+        onChange={event => onChange?.({ ...value, prefix: event.target.value })}
+      />
+    </div>
+  );
+}
+
+function ProbeInput({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value?: ProbeValues;
+  onChange: (value?: ProbeValues) => void;
+}) {
+  const enabled = Boolean(value);
+  const update = (patch: Partial<ProbeValues>) =>
+    onChange({ type: 'http', path: '/', port: 80, ...value, ...patch });
+  return (
+    <div style={{ borderTop: '1px solid #e3e9ef', paddingTop: 12, marginTop: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <strong>{label}</strong>
+        <Switch
+          aria-label={`${label} ${t('ENABLE')}`}
+          checked={enabled}
+          onChange={checked =>
+            onChange(
+              checked
+                ? {
+                    type: 'http',
+                    path: '/',
+                    port: 80,
+                    initialDelaySeconds: 0,
+                    timeoutSeconds: 1,
+                    periodSeconds: 10,
+                    successThreshold: 1,
+                    failureThreshold: 3,
+                  }
+                : undefined,
+            )
+          }
+        />
+      </div>
+      {value && (
+        <>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '140px 1fr 120px',
+              gap: 8,
+              marginTop: 8,
+            }}
+          >
+            <Select
+              aria-label={`${label} ${t('TYPE')}`}
+              value={value.type}
+              options={[
+                { label: 'HTTP', value: 'http' },
+                { label: 'TCP', value: 'tcp' },
+                { label: t('COMMAND'), value: 'command' },
+              ]}
+              onChange={type =>
+                onChange(
+                  type === 'command'
+                    ? { ...value, type, command: value.command || [] }
+                    : {
+                        ...value,
+                        type,
+                        path: type === 'http' ? value.path || '/' : undefined,
+                        port: value.port || 80,
+                      },
+                )
+              }
+            />
+            {value.type === 'command' ? (
+              <Input
+                aria-label={`${label} ${t('COMMAND')}`}
+                value={stringifyCommaSeparated(value.command)}
+                placeholder="cat,/tmp/ready"
+                onChange={event => update({ command: parseCommaSeparated(event.target.value) })}
+              />
+            ) : value.type === 'http' ? (
+              <Input
+                aria-label={`${label} ${t('PATH')}`}
+                value={value.path || ''}
+                placeholder="/healthz"
+                onChange={event => update({ path: event.target.value })}
+              />
+            ) : (
+              <span />
+            )}
+            {value.type !== 'command' && (
+              <InputNumber
+                aria-label={`${label} ${t('PORT')}`}
+                min={1}
+                max={65535}
+                precision={0}
+                value={value.port}
+                onChange={port => update({ port: port == null ? undefined : Number(port) })}
+              />
+            )}
+          </div>
+          <div
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8, marginTop: 8 }}
+          >
+            {(
+              [
+                ['initialDelaySeconds', 'WORKLOAD_INITIAL_DELAY'],
+                ['timeoutSeconds', 'WORKLOAD_TIMEOUT'],
+                ['periodSeconds', 'WORKLOAD_PERIOD'],
+                ['successThreshold', 'WORKLOAD_SUCCESS_THRESHOLD'],
+                ['failureThreshold', 'WORKLOAD_FAILURE_THRESHOLD'],
+              ] as const
+            ).map(([field, text]) => (
+              <ContainerField key={field}>
+                <span>{t(text)}</span>
+                <InputNumber
+                  style={{ width: '100%' }}
+                  min={field === 'initialDelaySeconds' ? 0 : 1}
+                  precision={0}
+                  value={value[field]}
+                  onChange={number =>
+                    update({ [field]: number == null ? undefined : Number(number) })
+                  }
+                />
+              </ContainerField>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function VolumeMountInput({
+  value = { name: '', mountPath: '' },
+  onChange,
+  volumeNames,
+}: {
+  value?: VolumeMountValues;
+  onChange?: (value: VolumeMountValues) => void;
+  volumeNames: string[];
+}) {
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '180px 1fr 150px 90px',
+        gap: 8,
+        width: '100%',
+      }}
+    >
+      <Select
+        aria-label={t('VOLUME')}
+        value={value.name || ''}
+        options={toOptions(volumeNames)}
+        onChange={name => onChange?.({ ...value, name: String(name) })}
+      />
+      <Input
+        aria-label={t('MOUNT_PATH')}
+        placeholder="/data"
+        value={value.mountPath || ''}
+        onChange={event => onChange?.({ ...value, mountPath: event.target.value })}
+      />
+      <Input
+        aria-label="subPath"
+        placeholder="subPath"
+        value={value.subPath || ''}
+        onChange={event => onChange?.({ ...value, subPath: event.target.value })}
+      />
+      <Switch
+        label={t('READ_ONLY')}
+        checked={Boolean(value.readOnly)}
+        onChange={readOnly => onChange?.({ ...value, readOnly })}
+      />
+    </div>
+  );
+}
+
 interface Props {
   value?: ContainerCreateValues;
   onChange?: (value: ContainerCreateValues) => void;
   index?: number;
   kind: 'CONTAINER' | 'INIT_CONTAINER';
+  resourceOptions?: WorkloadResourceOptions;
+  volumeNames?: string[];
 }
 
 export default function ContainerInput({
@@ -107,6 +335,8 @@ export default function ContainerInput({
   onChange,
   index = 0,
   kind,
+  resourceOptions = { configMaps: [], secrets: [], persistentVolumeClaims: [] },
+  volumeNames = [],
 }: Props) {
   const update = (patch: Partial<ContainerCreateValues>) => onChange?.({ ...value, ...patch });
   return (
@@ -193,6 +423,74 @@ export default function ContainerInput({
           onChange={env => update({ env })}
         >
           <EnvironmentInput />
+        </ArrayInput>
+        <ArrayInput
+          itemType="object"
+          value={value.envFrom || []}
+          addText={t('WORKLOAD_ADD_CONFIG_REFERENCE')}
+          checkItemValid={() => true}
+          onChange={envFrom => update({ envFrom })}
+        >
+          <EnvironmentFromInput resourceOptions={resourceOptions} />
+        </ArrayInput>
+      </div>
+      <div role="group" aria-label={t('WORKLOAD_HEALTH_CHECKS')}>
+        <h4>{t('WORKLOAD_HEALTH_CHECKS')}</h4>
+        <ProbeInput
+          label={t('READINESS_PROBE')}
+          value={value.readinessProbe}
+          onChange={readinessProbe => update({ readinessProbe })}
+        />
+        <ProbeInput
+          label={t('LIVENESS_PROBE')}
+          value={value.livenessProbe}
+          onChange={livenessProbe => update({ livenessProbe })}
+        />
+        <ProbeInput
+          label={t('STARTUP_PROBE')}
+          value={value.startupProbe}
+          onChange={startupProbe => update({ startupProbe })}
+        />
+      </div>
+      <div role="group" aria-label={t('RESOURCE_LIMITS')}>
+        <h4>{t('RESOURCE_LIMITS')}</h4>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+          {(
+            [
+              ['requests', 'cpu', 'WORKLOAD_CPU_REQUEST'],
+              ['requests', 'memory', 'WORKLOAD_MEMORY_REQUEST'],
+              ['limits', 'cpu', 'WORKLOAD_CPU_LIMIT'],
+              ['limits', 'memory', 'WORKLOAD_MEMORY_LIMIT'],
+            ] as const
+          ).map(([group, field, label]) => (
+            <ContainerField key={`${group}.${field}`}>
+              <span>{t(label)}</span>
+              <Input
+                value={value.resources?.[group]?.[field] || ''}
+                placeholder={field === 'cpu' ? '100m' : '128Mi'}
+                onChange={event =>
+                  update({
+                    resources: {
+                      ...value.resources,
+                      [group]: { ...value.resources?.[group], [field]: event.target.value },
+                    },
+                  })
+                }
+              />
+            </ContainerField>
+          ))}
+        </div>
+      </div>
+      <div role="group" aria-label={t('VOLUME_MOUNT_PL')}>
+        <h4>{t('VOLUME_MOUNT_PL')}</h4>
+        <ArrayInput
+          itemType="object"
+          value={value.volumeMounts || []}
+          addText={t('WORKLOAD_ADD_VOLUME_MOUNT')}
+          checkItemValid={() => true}
+          onChange={volumeMounts => update({ volumeMounts })}
+        >
+          <VolumeMountInput volumeNames={volumeNames} />
         </ArrayInput>
       </div>
     </div>

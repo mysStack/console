@@ -1,7 +1,13 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { buildDeployment, validateContainers } from './deployment';
+import {
+  buildDeployment,
+  buildDeploymentSettingsResource,
+  parseDeploymentSettings,
+  validateContainers,
+  validateVolumes,
+} from './deployment';
 
 test('buildDeployment creates a namespace-scoped apps/v1 deployment', () => {
   const deployment = buildDeployment({
@@ -239,5 +245,288 @@ test('端口校验覆盖范围、整数、协议、名称格式和跨容器名�
       },
     ]),
     undefined,
+  );
+});
+
+test('创建容器时保留健康检查、资源限制和 ConfigMap/Secret 环境引用', () => {
+  const deployment = buildDeployment({
+    name: 'advanced-web',
+    namespace: 'v4-migration-e2e',
+    replicas: 1,
+    containers: [
+      {
+        name: 'web',
+        image: 'nginx:alpine',
+        readinessProbe: {
+          type: 'http',
+          path: '/ready',
+          port: 8080,
+          scheme: 'HTTP',
+          initialDelaySeconds: 2,
+          timeoutSeconds: 3,
+          periodSeconds: 5,
+          successThreshold: 2,
+          failureThreshold: 4,
+        },
+        livenessProbe: {
+          type: 'tcp',
+          port: 8080,
+          initialDelaySeconds: 10,
+        },
+        startupProbe: {
+          type: 'command',
+          command: [' cat ', ' /tmp/started '],
+          failureThreshold: 30,
+          periodSeconds: 2,
+        },
+        resources: {
+          requests: { cpu: '100m', memory: '64Mi' },
+          limits: { cpu: '1', memory: '256Mi' },
+        },
+        envFrom: [
+          { kind: 'configMap', name: ' app-config ', prefix: 'APP_' },
+          { kind: 'secret', name: ' app-secret ' },
+        ],
+      },
+    ],
+  });
+
+  const container = deployment.spec.template.spec.containers[0];
+  assert.deepEqual(container.readinessProbe, {
+    httpGet: { path: '/ready', port: 8080, scheme: 'HTTP' },
+    initialDelaySeconds: 2,
+    timeoutSeconds: 3,
+    periodSeconds: 5,
+    successThreshold: 2,
+    failureThreshold: 4,
+  });
+  assert.deepEqual(container.livenessProbe, {
+    tcpSocket: { port: 8080 },
+    initialDelaySeconds: 10,
+    timeoutSeconds: 1,
+    periodSeconds: 10,
+    successThreshold: 1,
+    failureThreshold: 3,
+  });
+  assert.deepEqual(container.startupProbe, {
+    exec: { command: ['cat', '/tmp/started'] },
+    initialDelaySeconds: 0,
+    timeoutSeconds: 1,
+    periodSeconds: 2,
+    successThreshold: 1,
+    failureThreshold: 30,
+  });
+  assert.deepEqual(container.resources, {
+    requests: { cpu: '100m', memory: '64Mi' },
+    limits: { cpu: '1', memory: '256Mi' },
+  });
+  assert.deepEqual(container.envFrom, [
+    { prefix: 'APP_', configMapRef: { name: 'app-config' } },
+    { secretRef: { name: 'app-secret' } },
+  ]);
+});
+
+test('创建 Deployment 时生成 PVC、临时卷、HostPath 和配置资源卷及容器挂载', () => {
+  const deployment = buildDeployment({
+    name: 'storage-web',
+    namespace: 'v4-migration-e2e',
+    replicas: 0,
+    volumes: [
+      { name: 'data', type: 'persistentVolumeClaim', sourceName: 'data-pvc' },
+      { name: 'cache', type: 'emptyDir', medium: 'Memory', sizeLimit: '128Mi' },
+      { name: 'host', type: 'hostPath', hostPath: '/var/lib/app', hostPathType: 'Directory' },
+      { name: 'config', type: 'configMap', sourceName: 'app-config' },
+      { name: 'secret', type: 'secret', sourceName: 'app-secret' },
+    ],
+    containers: [
+      {
+        name: 'web',
+        image: 'nginx',
+        volumeMounts: [
+          { name: 'data', mountPath: '/data' },
+          { name: 'cache', mountPath: '/cache' },
+          { name: 'config', mountPath: '/etc/app', readOnly: true },
+          { name: 'secret', mountPath: '/etc/secret', subPath: 'token', readOnly: true },
+        ],
+      },
+    ],
+  });
+
+  assert.deepEqual(deployment.spec.template.spec.volumes, [
+    { name: 'data', persistentVolumeClaim: { claimName: 'data-pvc' } },
+    { name: 'cache', emptyDir: { medium: 'Memory', sizeLimit: '128Mi' } },
+    { name: 'host', hostPath: { path: '/var/lib/app', type: 'Directory' } },
+    { name: 'config', configMap: { name: 'app-config' } },
+    { name: 'secret', secret: { secretName: 'app-secret' } },
+  ]);
+  assert.deepEqual(deployment.spec.template.spec.containers[0].volumeMounts, [
+    { name: 'data', mountPath: '/data' },
+    { name: 'cache', mountPath: '/cache' },
+    { name: 'config', mountPath: '/etc/app', readOnly: true },
+    { name: 'secret', mountPath: '/etc/secret', subPath: 'token', readOnly: true },
+  ]);
+});
+
+test('高级容器设置校验拒绝无效探针、资源、配置引用和挂载', () => {
+  const base = { name: 'web', image: 'nginx' };
+  assert.equal(
+    validateContainers([{ ...base, readinessProbe: { type: 'http', path: 'ready', port: 80 } }]),
+    'WORKLOAD_PROBE_INVALID',
+  );
+  assert.equal(
+    validateContainers([{ ...base, livenessProbe: { type: 'tcp', port: 0 } }]),
+    'WORKLOAD_PROBE_INVALID',
+  );
+  assert.equal(
+    validateContainers([{ ...base, startupProbe: { type: 'command', command: [] } }]),
+    'WORKLOAD_PROBE_INVALID',
+  );
+  assert.equal(
+    validateContainers([{ ...base, resources: { requests: { cpu: 'bad cpu' } } }]),
+    'WORKLOAD_RESOURCE_INVALID',
+  );
+  assert.equal(
+    validateContainers([{ ...base, envFrom: [{ kind: 'secret', name: '' }] }]),
+    'WORKLOAD_CONFIG_REFERENCE_INVALID',
+  );
+  assert.equal(
+    validateContainers(
+      [{ ...base, volumeMounts: [{ name: 'missing', mountPath: '/data' }] }],
+      [],
+      [{ name: 'data', type: 'emptyDir' }],
+    ),
+    'WORKLOAD_VOLUME_MOUNT_INVALID',
+  );
+});
+
+test('存储卷校验名称、来源、路径和唯一性', () => {
+  assert.equal(validateVolumes([{ name: 'data', type: 'emptyDir' }]), undefined);
+  assert.equal(
+    validateVolumes([
+      { name: 'data', type: 'emptyDir' },
+      { name: ' data ', type: 'emptyDir' },
+    ]),
+    'WORKLOAD_VOLUME_DUPLICATE',
+  );
+  assert.equal(
+    validateVolumes([{ name: 'pvc', type: 'persistentVolumeClaim', sourceName: '' }]),
+    'WORKLOAD_VOLUME_INVALID',
+  );
+  assert.equal(
+    validateVolumes([{ name: 'host', type: 'hostPath', hostPath: 'relative/path' }]),
+    'WORKLOAD_VOLUME_INVALID',
+  );
+});
+
+test('编辑设置读取现有容器、探针、资源和卷，并保留未暴露的 Pod 字段', () => {
+  const original: any = buildDeployment({
+    name: 'editable',
+    namespace: 'v4-migration-e2e',
+    replicas: 2,
+    volumes: [{ name: 'cache', type: 'emptyDir', medium: 'Memory' }],
+    containers: [
+      {
+        name: 'web',
+        image: 'nginx:1.27',
+        readinessProbe: { type: 'http', path: '/ready', port: 8080 },
+        resources: { limits: { cpu: '1', memory: '256Mi' } },
+        volumeMounts: [{ name: 'cache', mountPath: '/cache' }],
+      },
+    ],
+  });
+  original.spec.template.spec.nodeSelector = { role: 'worker' };
+  original.spec.template.spec.containers[0].securityContext = { runAsNonRoot: true };
+  original.spec.template.spec.containers[0].env = [
+    { name: 'VISIBLE', value: 'one' },
+    { name: 'PASSWORD', valueFrom: { secretKeyRef: { name: 'db', key: 'password' } } },
+  ];
+  original.spec.template.spec.containers[0].ports = [
+    { name: 'http', containerPort: 8080, protocol: 'TCP', hostPort: 18080 },
+  ];
+  original.spec.template.spec.containers[0].resources.requests = {
+    cpu: '100m',
+    'ephemeral-storage': '1Gi',
+  };
+
+  const values = parseDeploymentSettings(original);
+  assert.equal(values.name, 'editable');
+  assert.equal(values.replicas, 2);
+  assert.equal(values.containers[0].readinessProbe?.type, 'http');
+  assert.equal(values.containers[0].resources?.limits?.memory, '256Mi');
+  assert.equal(values.volumes?.[0].type, 'emptyDir');
+
+  values.containers[0].image = 'nginx:1.28';
+  values.containers[0].readinessProbe = undefined;
+  const submitted = buildDeploymentSettingsResource(original, values);
+  assert.equal(submitted.spec.template.spec.containers[0].image, 'nginx:1.28');
+  assert.equal('readinessProbe' in submitted.spec.template.spec.containers[0], false);
+  assert.deepEqual(submitted.spec.template.spec.containers[0].securityContext, {
+    runAsNonRoot: true,
+  });
+  assert.deepEqual(submitted.spec.template.spec.containers[0].env, [
+    { name: 'VISIBLE', value: 'one' },
+    { name: 'PASSWORD', valueFrom: { secretKeyRef: { name: 'db', key: 'password' } } },
+  ]);
+  assert.equal(submitted.spec.template.spec.containers[0].ports[0].hostPort, 18080);
+  assert.equal(
+    submitted.spec.template.spec.containers[0].resources.requests['ephemeral-storage'],
+    '1Gi',
+  );
+  assert.deepEqual(submitted.spec.template.spec.nodeSelector, { role: 'worker' });
+  assert.equal(submitted.metadata.resourceVersion, undefined);
+  assert.equal(submitted.status, undefined);
+});
+
+test('编辑设置解析 Kubernetes 原生三类探针和五类卷', () => {
+  const original: any = {
+    apiVersion: 'apps/v1',
+    kind: 'Deployment',
+    metadata: { name: 'native', namespace: 'v4-migration-e2e', resourceVersion: '10' },
+    status: { readyReplicas: 1 },
+    spec: {
+      replicas: 1,
+      template: {
+        metadata: { labels: { app: 'native' } },
+        spec: {
+          containers: [
+            {
+              name: 'web',
+              image: 'nginx',
+              readinessProbe: { httpGet: { path: '/ready', port: 8080, scheme: 'HTTPS' } },
+              livenessProbe: { tcpSocket: { port: 8080 } },
+              startupProbe: { exec: { command: ['test', '-f', '/tmp/ready'] } },
+              envFrom: [
+                { prefix: 'APP_', configMapRef: { name: 'app-config' } },
+                { secretRef: { name: 'app-secret' } },
+              ],
+            },
+          ],
+          volumes: [
+            { name: 'pvc', persistentVolumeClaim: { claimName: 'claim' } },
+            { name: 'tmp', emptyDir: { sizeLimit: '1Gi' } },
+            { name: 'host', hostPath: { path: '/data', type: 'Directory' } },
+            { name: 'cfg', configMap: { name: 'app-config' } },
+            { name: 'sec', secret: { secretName: 'app-secret' } },
+          ],
+        },
+      },
+    },
+  };
+  const values = parseDeploymentSettings(original);
+  assert.deepEqual(
+    values.containers.map(container => [
+      container.readinessProbe?.type,
+      container.livenessProbe?.type,
+      container.startupProbe?.type,
+    ]),
+    [['http', 'tcp', 'command']],
+  );
+  assert.deepEqual(values.containers[0].envFrom, [
+    { kind: 'configMap', name: 'app-config', prefix: 'APP_' },
+    { kind: 'secret', name: 'app-secret', prefix: undefined },
+  ]);
+  assert.deepEqual(
+    values.volumes?.map(volume => volume.type),
+    ['persistentVolumeClaim', 'emptyDir', 'hostPath', 'configMap', 'secret'],
   );
 });

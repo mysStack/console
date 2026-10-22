@@ -24,6 +24,7 @@ import {
 } from '@ks-console/shared';
 import { useRollbackModal, useAutoScalingModal } from '../../../../../../clusters/hooks/useModal';
 import type { FormattedWorkload } from '@ks-console/shared';
+import { WorkloadSettingsModal } from '../../../../../components/WorkloadCreateModal';
 
 const module = 'deployments';
 const WORKLOAD_TYPE = 'DEPLOYMENT';
@@ -159,6 +160,12 @@ const DeploymentDetail = () => {
   } = useDisclosure();
 
   const {
+    open: openSettingsModal,
+    close: closeSettingsModal,
+    isOpen: settingsModalIsOpen,
+  } = useDisclosure();
+
+  const {
     open: openDeleteModal,
     close: closeDeleteModal,
     isOpen: deleteModalIsOpen,
@@ -168,6 +175,13 @@ const DeploymentDetail = () => {
     onSuccess: () => {
       notify.success(t('RECREATE_SUCCESS_DESC'));
       closeRecreateModal();
+      refetch();
+    },
+  });
+  const { mutate: mutateSettings, isLoading: settingsIsLoading } = store.usePutMutation(undefined, {
+    onSuccess: () => {
+      notify.success(t('UPDATE_SUCCESSFUL'));
+      closeSettingsModal();
       refetch();
     },
   });
@@ -281,7 +295,8 @@ const DeploymentDetail = () => {
         icon: <Storage />,
         text: t('EDIT_SETTINGS'),
         action: 'edit',
-        onClick: () => editYaml(detail),
+        show: !detail.isFedManaged,
+        onClick: openSettingsModal,
       },
       {
         key: 'editYaml',
@@ -356,6 +371,22 @@ const DeploymentDetail = () => {
       )}
       {renderRollbackModal()}
       {renderAutoScalingModal()}
+      {settingsModalIsOpen && (
+        <WorkloadSettingsModal
+          visible
+          cluster={cluster!}
+          namespace={namespace!}
+          resource={detail._originData}
+          confirmLoading={settingsIsLoading}
+          onOk={data =>
+            mutateSettings({
+              params: { cluster, namespace, name },
+              data,
+            })
+          }
+          onCancel={closeSettingsModal}
+        />
+      )}
       {recreateModalIsOpen && (
         <RecreateModal
           name={detail?.name}

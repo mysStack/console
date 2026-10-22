@@ -450,6 +450,7 @@ const Deployment = () => {
       {createModal.isOpen && (
         <WorkloadCreateModal
           visible
+          cluster={cluster!}
           namespace={namespace}
           confirmLoading={createIsLoading}
           onOk={handleCreate}

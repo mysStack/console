@@ -7,11 +7,20 @@ import React from 'react';
 import { Form, FormItem, Input, Modal, InputNumber, Textarea, useForm } from '@kubed/components';
 
 import { ArrayInput } from '@ks-console/shared';
-import { buildDeployment, DeploymentCreateValues, validateContainers } from './deployment';
+import {
+  buildDeployment,
+  DeploymentCreateValues,
+  VolumeValues,
+  validateContainers,
+  validateVolumes,
+} from './deployment';
 import ContainerInput from './ContainerInput';
+import VolumeInput from './VolumeInput';
+import useWorkloadResourceOptions from './useWorkloadResourceOptions';
 
 interface Props {
   visible: boolean;
+  cluster: string;
   namespace: string;
   confirmLoading?: boolean;
   onOk: (data: Record<string, any>) => void;
@@ -22,12 +31,14 @@ const DNS_LABEL = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/;
 
 function WorkloadCreateModal({
   visible,
+  cluster,
   namespace,
   confirmLoading,
   onOk,
   onCancel,
 }: Props): JSX.Element {
   const [form] = useForm<DeploymentCreateValues>();
+  const resources = useWorkloadResourceOptions(cluster, namespace);
 
   const handleSubmit = () => {
     form.validateFields().then(
@@ -44,9 +55,23 @@ function WorkloadCreateModal({
     const error = validateContainers(
       form.getFieldValue('containers'),
       form.getFieldValue('initContainers'),
+      form.getFieldValue('volumes'),
     );
     callback(error ? t(error) : undefined);
   };
+
+  const volumesValidator = (
+    _rule: unknown,
+    value: DeploymentCreateValues['volumes'],
+    callback: (error?: string) => void,
+  ) => {
+    const error = validateVolumes(value);
+    callback(error ? t(error) : undefined);
+  };
+
+  const volumeNames = (form.getFieldValue('volumes') || [])
+    .map((volume: VolumeValues) => volume.name)
+    .filter(Boolean);
 
   return (
     <Modal
@@ -65,6 +90,7 @@ function WorkloadCreateModal({
           replicas: 1,
           containers: [{ name: '', image: '', imagePullPolicy: 'IfNotPresent' }],
           initContainers: [],
+          volumes: [],
         }}
       >
         <h3>{t('BASIC_INFORMATION')}</h3>
@@ -104,7 +130,11 @@ function WorkloadCreateModal({
             addText={t('WORKLOAD_ADD_CONTAINER')}
             checkItemValid={() => true}
           >
-            <ContainerInput kind="CONTAINER" />
+            <ContainerInput
+              kind="CONTAINER"
+              resourceOptions={resources.options}
+              volumeNames={volumeNames}
+            />
           </ArrayInput>
         </FormItem>
         <FormItem
@@ -118,7 +148,28 @@ function WorkloadCreateModal({
             addText={t('WORKLOAD_ADD_INIT_CONTAINER')}
             checkItemValid={() => true}
           >
-            <ContainerInput kind="INIT_CONTAINER" />
+            <ContainerInput
+              kind="INIT_CONTAINER"
+              resourceOptions={resources.options}
+              volumeNames={volumeNames}
+            />
+          </ArrayInput>
+        </FormItem>
+        <h3>{t('STORAGE_SETTINGS')}</h3>
+        {resources.isLoading && <div role="status">{t('LOADING')}</div>}
+        {resources.isError && <div role="alert">{t('WORKLOAD_RESOURCE_OPTIONS_FAILED')}</div>}
+        <FormItem
+          name="volumes"
+          label={t('VOLUME_PL')}
+          dependencies={['containers', 'initContainers']}
+          rules={[{ validator: volumesValidator }]}
+        >
+          <ArrayInput
+            itemType="object"
+            addText={t('WORKLOAD_ADD_VOLUME')}
+            checkItemValid={() => true}
+          >
+            <VolumeInput resourceOptions={resources.options} />
           </ArrayInput>
         </FormItem>
       </Form>
@@ -127,3 +178,4 @@ function WorkloadCreateModal({
 }
 
 export default WorkloadCreateModal;
+export { default as WorkloadSettingsModal } from './WorkloadSettingsModal';
