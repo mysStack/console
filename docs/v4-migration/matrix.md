@@ -16,6 +16,8 @@
 
 2026-10-21 第一批 Workload 列表已进入模块级 DEV：项目 Deployment、StatefulSet、DaemonSet 已切换至 V4 原生 `workloadStore` + `DataTable`，补充了三组列表回归测试和项目路径保持测试；构建通过，仓库测试为 70 个测试文件、217 个测试通过。当前仅完成本地 DEV，尚未完成部署、Playwright、RBAC、namespace 隔离和完整 V3 动作等价性验证。
 
+2026-10-22 顺序处理 Workload 操作失败误报成功缺陷：共享 Store 在等待全部请求结束后传播错误，防止删除/批量删除/批量停止 API 失败却触发成功回调。新增 17 个行为测试，仓库回归 71 个文件、234 个测试通过，ESLint/Prettier/shared TypeScript 检查及 `build:packages` 通过。131 部署及浏览器证据按后续记录回填；原生创建入口和其余动作仍未完成，Deployment/StatefulSet/DaemonSet 继续为“开发中”。
+
 矩阵的“状态”描述模块执行进度，阶段门禁状态以 REA 总结中的 `未开始`、`分析中`、`待复核`、`已通过`、`不通过`、`阻塞`为准；模块出现“分析中”不表示对应阶段 REA 已通过。
 
 ## 模块级门禁

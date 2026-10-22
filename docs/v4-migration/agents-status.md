@@ -1,4 +1,14 @@
-# P0 任务状态
+# P0 风险与模块任务状态
+
+## 2026-10-22 当前独立任务：Workload 错误反馈
+
+- 负责人：当前 Codex 主会话；执行模式：单会话顺序执行；分支：`feature/v4-configmaps-secrets`，起始 SHA `412358f5f0424801688c99ea4340fb83dda197b5`。四个既有 Worktree 保留，稳定分支未修改。
+- 已核验：远程分支与起始 SHA 一致；PR #1 仍为 Open/Draft，目标 `feature/v4-migration`，133 个变更文件；GitHub 返回的提交数组上限为 100，不将其误写为 PR 总提交数。
+- 当前缺口：三个原生项目列表创建入口为空；共享 Store 的删除/批量操作吞掉拒绝错误；新列表尚未部署到 131。
+- 本轮只处理第二项：修复失败误报成功，并新增行为回归。RED 为 17 个测试中 13 个因缺少 rejection 失败；GREEN 为 17/17。仓库回归 71 个文件、234 个测试通过；ESLint、Prettier、shared TypeScript、`build:packages` 和 `git diff --check` 通过。
+- 测试边界：三类 Workload、403/500/网络错误、HPA 清理失败、混合批次、等待所有请求和空批次；使用真实 Store 函数和 React Query MutationObserver，替换浏览器相关导入与 HTTP 边界，不是源码字符串断言。
+- 待完成：当前提交的 CI、镜像、131 rollout、实际登录和浏览器操作复验；未完成前不报告环境测试通过。下一独立任务为原生创建流程，保留完整功能差异清单。
+- 部署前观察：`default` context、节点 `dev01`（K3s v1.31.13+k3s1）、`kubesphere-system/ks-console` 单副本 Ready；当前镜像 `ghcr.io/mysstack/ks-console:feature-v4-configmaps-secrets-20261021-013709-4b5c7f5670c4`，imageID `ghcr.io/mysstack/ks-console@sha256:ffe166aa35e105d463e3b1d37e14fca3595088706e1eecfe5daf7c97518fb3ac`。部署前再次回读并记录回滚信息。
 
 > 任务启动日期：2026-10-17（上海时间）  
 > 协调工作区：`/home/bruce/code/ks-develop/console`  
