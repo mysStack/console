@@ -46,6 +46,6 @@ Deployment、StatefulSet、DaemonSet 共用一个模块分支和组合能力记�
 
 2026-10-23 Action/API/权限补证见[静态证据矩阵](./workload-action-api-rbac-evidence-20261023.md)：确认三类详情页的权限键、操作差异、请求方法和作用域构造，明确 DaemonSet 停止语义、集群级 Wujie/V3 列表、配置引用桥接以及按资源类型失效缓存的限制。该补证仍未提供当前 SHA 的运行时 RBAC、隔离、缓存和错误态证据，不能放行 DEV。
 
-2026-10-23 REA 阶段定向测试见[测试证据](./workload-rea-test-evidence-20261023.md)：15 个既有测试文件、106 个断言全部通过。测试覆盖当前源码的解析、Store、权限参数、错误传播和 V3 桥接协作；不覆盖当前 SHA 构建部署后的浏览器、真实 RBAC、跨 namespace 隔离或完整三类资源等价，因此不改变 REA 门禁。
+2026-10-23 REA 阶段测试见[测试证据](./workload-rea-test-evidence-20261023.md)：`./scripts/test.sh` 的 70 个测试文件、287 个断言全部通过；另有 15 个 Workload 定向测试文件、106 个断言通过。测试覆盖当前源码的解析、Store、权限参数、错误传播和 V3 桥接协作；不覆盖当前 SHA 构建部署后的浏览器、真实 RBAC、跨 namespace 隔离或完整三类资源等价，因此不改变 REA 门禁。
 
 同时纠正集群列表判定：活跃入口是 V4 Banner/Tab + Wujie 内 V3 列表；独立 STS/DS Embed 文件的 URL 互换没有在该主入口复现。REA 证据应明确当前行为与拟开发行为；当前 SHA 的最终构建部署验收属于 VERIFY，不作为 REA 完成前的循环前置条件。当前完整 REA 仍未闭环。

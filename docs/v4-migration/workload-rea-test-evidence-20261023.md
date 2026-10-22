@@ -7,7 +7,7 @@
 | 模块     | `workloads`                                       |
 | 资源     | Deployment、StatefulSet、DaemonSet                |
 | 分支     | `feature/v4-workloads`                            |
-| 执行提交 | `3f6d71d41cccd956185621e54a3f3be894338174`        |
+| 执行提交 | `dc04a7d00`                                       |
 | 执行方式 | 单 Codex 会话；并行启动互不依赖的本地只读测试进程 |
 | 阶段     | `REA` / 分析中，待负责人复核                      |
 
@@ -41,6 +41,18 @@ packages/shared/src/utils/workloadRevision.test.ts
 
 ## 3. 结果
 
+### 3.1 全仓库脚本
+
+```bash
+./scripts/test.sh
+```
+
+结果：`70` 个测试文件通过，`287` 个断言通过，`0` 个失败。
+
+该结果覆盖仓库当前已登记的 Node/esno 测试文件，但仍属于本地源码测试，不包含构建制品、部署后浏览器或真实 Kubernetes 授权。
+
+### 3.2 Workload 定向回归
+
 | 范围                       | 文件数 |  断言数 |    通过 |  失败 |
 | -------------------------- | -----: | ------: | ------: | ----: |
 | ConfigReference            |      6 |      53 |      53 |     0 |
@@ -70,7 +82,7 @@ packages/shared/src/utils/workloadRevision.test.ts
 3. 配置引用已移除 `useV3action`、Wujie Shadow DOM 和 V3 编辑器；其中部分通过测试恰好验证了现有桥接行为仍存在。
 4. 当前提交已构建、部署到 131，或在当前提交上完成 Playwright 页面验收。
 5. Kubernetes API 的真实 403/404/409、低权限 RBAC、跨 namespace 隔离、缓存隔离和持久化行为已经通过。
-6. 全仓库 `scripts/test.sh`、`corepack yarn build:packages`、完整 lint、镜像构建和部署链路已经通过。
+6. `corepack yarn build:packages`、完整 lint、镜像构建和部署链路已经通过。
 
 ## 6. REA 结论
 
