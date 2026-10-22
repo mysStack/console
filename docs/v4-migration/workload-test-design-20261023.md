@@ -20,11 +20,13 @@
 
 当前缺少：
 
-- 有效的 131 浏览器测试登录会话；本轮登录尝试返回凭据错误，因此没有把运行时结果写成通过；
+- 当前 SHA 的有效 131 浏览器测试登录会话；历史记录中有旧镜像的 admin 会话，但不能作为当前 SHA 的 VERIFY 证据；另一次专用账号尝试返回凭据错误，因此没有把运行时结果写成通过；
 - 低权限账号及其明确的 Role/RoleBinding 数据；
 - 三类资源各自可复现的 Deployment、StatefulSet、DaemonSet fixture；
 - 当前版本三类资源完整的 V3 Network/Action 采集；
 - 当前分支最终镜像、Pod imageID 和部署后页面证据。
+- 集群级 Workload 路由切换到原生列表且不再加载 `Workload/Workloads/Embed` 的证据；当前源码仍有 Wujie 桥接，StatefulSet/DaemonSet Embed URL 还存在互换。
+- 配置引用编辑不再调用 `useV3action`、不再绑定 `consolev3`/`consoleV3Actions` DOM 的证据；当前原生 Patch 组件与 V3 Action 桥接并存。
 
 ## 已有回归资产与复用方式
 
@@ -63,6 +65,24 @@
 - 低权限账号分别验证列表、详情、编辑、删除和 Service 操作的拒绝路径；
 - 失败、取消、刷新和重新打开后不残留旧错误或旧 namespace 数据。
 
+### 集群级作用域与桥接移除
+
+集群级 Workload 必须与项目级 Workload 分开验收：
+
+- 直接访问 `/clusters/:cluster/deployments`、`statefulsets`、`daemonsets`，页面渲染原生 `ListPage`，不创建 `wujie-app`，不加载 `/consolev3`；三个 Tab 的资源类型、URL 和 API 路径一致。StatefulSet 不得请求 DaemonSet，DaemonSet 不得请求 StatefulSet。
+- 集群列表保留 namespace 选择器；至少使用两个测试 namespace 的哨兵资源，切换 namespace、刷新、返回和直达后，表格及请求只对应当前选择。
+- 集群列表进入三类详情后，详情 URL、返回路径和 API 作用域保持 cluster/namespace/resource 一致；列表 Action 的 RBAC 与项目级规则分别记录。
+- `ApplicationWorkloads/Workloads/index.tsx` 的原生实现必须成为实际路由入口；`Workload/Workloads/Embed.tsx` 及三类 `Embed.tsx` 不能再作为当前 Workload 入口。
+
+### 配置引用桥接移除
+
+三类 Workload 的配置引用需要同时验证显示和编辑链路：
+
+- 详情的环境变量、配置引用摘要和预览仍由原生组件渲染，不读取 ConfigMap/Secret 明文。
+- 点击配置引用编辑后，使用 V4 原生表单或原生编辑器完成 Draft、确认、取消、冲突和失败重试；Network 只出现当前 Workload API 请求，不调用 `useV3action`、`workload.template.edit` 或 `/consolev3`。
+- 多容器场景只修改选中的容器；取消、切换 Tab、关闭页面不会把未确认 Draft 写回其他容器。
+- 配置引用保存后重新读取详情、刷新页面和切换 namespace，`envFrom`、文件挂载、Reloader 注解及缓存状态与 API 回读一致。
+
 ### Natural Language Draft Flows
 
 在有效浏览器会话取得后，先以草稿流程覆盖复杂组合：多容器、初始化容器、三类探针、ConfigMap/Secret 环境引用、PVC/emptyDir/HostPath、节点选择、亲和性、污点容忍、安全上下文、元数据和 IP 池。草稿只用于发现字段遗漏和页面渲染问题，未稳定前不升级为 CI 回归。
@@ -83,6 +103,8 @@
 | WL-MV-06 | 修改后刷新、Watch 和缓存回读            | 不出现旧值、跨资源串值、请求洪泛或已删除资源 404 洪泛                  |
 | WL-MV-07 | StatefulSet Service 和卷模板            | Headless/Selector、serviceName、volumeClaimTemplates 的保存和回读一致  |
 | WL-MV-08 | 失败和取消                              | 网络失败、403、404、409、422、取消都不报告假成功，修正后可重试         |
+| WL-MV-09 | 集群级三类 Workload 原生入口            | 三个入口不加载 Wujie/V3，Tab、资源类型、namespace 选择和详情跳转一致   |
+| WL-MV-10 | 配置引用原生编辑                        | 不调用 V3 Action，保存/取消/冲突/失败路径和多容器 Draft 均有证据       |
 
 测试资源统一使用 `v4-migration-e2e` namespace、唯一时间后缀和 `v4-migration` 标签；清理只删除本轮创建的资源，保留 namespace。Secret 值使用随机非敏感值，日志、截图和报告不记录账号、密码、Token 或 Secret 内容。
 
@@ -96,6 +118,7 @@
 4. DaemonSet 停止/重启与 Deployment/StatefulSet 的差异已有明确实现方案；
 5. 负责人完成 REA 复核并在 `module-execution.json` 中登记，不由本测试设计自动放行；
 6. 新增代码前先补可复用的 API/Store 或组件测试，再实现功能。
+7. 若本批次暂不纳入联邦范围，必须在 PR 和验收记录中明确“联邦后置”，不能把普通项目/集群级结果扩展为全量 Workload 已无 V3/Wujie。
 
 ## 开放风险
 
