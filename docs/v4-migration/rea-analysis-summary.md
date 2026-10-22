@@ -11,7 +11,7 @@
 | 事实输入提交      | 本轮制品定位 `e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0`；当前记录提交 `2c3ee6c0f`；业务代码输入以当前分支 HEAD 为准                                                                                                                                                      |
 | 观察              | 已有原生简化表单和有限部署后测试；当前 V3 编辑行为尚未逐项还原                                                                                                                                                                                                           |
 | 推断              | 表单覆盖不足，不能凭现有 V4 测试证明当前 V3 等价；具体缺失须由制品和真实 V3 行为确认                                                                                                                                                                                     |
-| 制品/REA 证据     | [REA 复核及完整 Evidence ID](./workload-settings-rea-20261022.md)；[Action/API/权限与缓存静态证据](./workload-action-api-rbac-evidence-20261023.md)；V3 Git tree 绑定在阶段记录中，不能与 REA 目录摘要混用                                                               |
+| 制品/REA 证据     | [REA 复核及完整 Evidence ID](./workload-settings-rea-20261022.md)；[Action/API/权限与缓存静态证据](./workload-action-api-rbac-evidence-20261023.md)；[旧 V3 运行时补证](./workload-v3-runtime-rea-20261023.md)；V3 Git tree 绑定在阶段记录中，不能与 REA 目录摘要混用    |
 | 行为和字段清单    | [组合能力边界](./workload-kind-capability-matrix.md)、[编辑设置能力矩阵](./deployment-settings-capability-matrix.md)、[旧源码对照](./workload-settings-source-evidence-20261024.md)；三类资源均未标记为已还原、[字段级对照](./workload-v3-field-equivalence-20261023.md) |
 | 未知及影响        | 三类资源的入口/分区、完整字段、Action/API/Store、RBAC/作用域、错误态和缓存尚未闭环，影响功能完整性、权限和数据保留；配置引用仍有 V3 Action/Wujie 桥接                                                                                                                    |
 | 关闭条件          | 公共行为和三类资源差异均有可追溯制品定位、运行时对照、V4 替代与差异；所有高风险已关闭或经复核明确隔离                                                                                                                                                                    |
@@ -47,5 +47,7 @@ Deployment、StatefulSet、DaemonSet 共用一个模块分支和组合能力记�
 2026-10-23 Action/API/权限补证见[静态证据矩阵](./workload-action-api-rbac-evidence-20261023.md)：确认三类详情页的权限键、操作差异、请求方法和作用域构造，明确 DaemonSet 停止语义、集群级 Wujie/V3 列表、配置引用桥接以及按资源类型失效缓存的限制。该补证仍未提供当前 SHA 的运行时 RBAC、隔离、缓存和错误态证据，不能放行 DEV。
 
 2026-10-23 REA 阶段测试见[测试证据](./workload-rea-test-evidence-20261023.md)：`./scripts/test.sh` 的 70 个测试文件、287 个断言全部通过；另有 15 个 Workload 定向测试文件、106 个断言通过。测试覆盖当前源码的解析、Store、权限参数、错误传播和 V3 桥接协作；不覆盖当前 SHA 构建部署后的浏览器、真实 RBAC、跨 namespace 隔离或完整三类资源等价，因此不改变 REA 门禁。
+
+2026-10-23 旧 V3 运行时补证见[运行时记录](./workload-v3-runtime-rea-20261023.md)：在固定历史镜像 `feature-v4-workloads-20261022-215739-27aaeced74e8` 上只读观察 StatefulSet 设置弹窗和 GET 请求，确认更新策略、容器、优雅终止、存储、调度五个分区及 partition `0`。该镜像不是当前分支 HEAD，证据用于校准 V3 行为，不作为当前 VERIFY。
 
 同时纠正集群列表判定：活跃入口是 V4 Banner/Tab + Wujie 内 V3 列表；独立 STS/DS Embed 文件的 URL 互换没有在该主入口复现。REA 证据应明确当前行为与拟开发行为；当前 SHA 的最终构建部署验收属于 VERIFY，不作为 REA 完成前的循环前置条件。当前完整 REA 仍未闭环。
