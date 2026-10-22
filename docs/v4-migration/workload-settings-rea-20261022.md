@@ -27,7 +27,8 @@
 1. REA 识别到相关 bundle 和 `EDIT_SETTINGS`/`editConfigTemplate` 候选，但没有形成可直接用于完整重构的闭合行为链。
 2. 完整目录分析存在未选取文件、主 bundle 资源限制、动态属性解析和运行时执行未知项；分析结果明确为 `partial`，不能把未知解释为“没有功能”。
 3. 单 bundle 定向分析仍存在 1 个 application unknown、12 个 semantic unknown，语义图为 `partial/truncated`。REA 未执行 bundle bootstrap 或真实 UI，因此它不能单独证明菜单可见性、Action 参数、请求结果、权限和错误反馈。
-4. 所有静态候选都需要与运行时网络、浏览器页面和 Kubernetes API 证据对齐。当前已有浏览器测试只覆盖部分原生 V4 表单场景，不能替代 V3 行为矩阵。
+4. 对定向分析执行 `EDIT_SETTINGS` 精确追踪得到 `ev_3acad7360b5bbe8ebb8390ba9f718bfadd4fabc9e8b4360ed01b9985ab635216`，结果为 `no-match`。REA 明确规定 `no-match` 不能解释为功能不存在；它只说明当前静态图没有恢复出可用的精确行为路径，因此不能据此生成实现结论。
+5. 所有静态候选都需要与运行时网络、浏览器页面和 Kubernetes API 证据对齐。当前已有浏览器测试只覆盖部分原生 V4 表单场景，不能替代 V3 行为矩阵。
 
 ## 当前实现与已证明范围
 
