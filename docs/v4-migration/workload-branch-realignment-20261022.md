@@ -1,0 +1,32 @@
+# Workload 分支偏差与纠正记录（2026-10-22）
+
+## 依据与已确认偏差
+
+项目主计划 `/home/bruce/code/ks-develop/console-v4-migration-plan.md` 第 3 节要求按模块使用独立短期分支及 PR；Workload 对应 `feature/v4-workloads`，目标为 `feature/v4-migration`。单 Codex 会话、顺序执行及模块级门禁没有取消这一分支规则。
+
+此前 Workload 代码继续提交到 `feature/v4-configmaps-secrets`，最新历史提交为 `9fa3c15b4eef8c1d7986b4afe79f97704a160d5a`。2026-10-21 的执行清单将该分支作为后续 Workload 开发分支，也偏离了主计划。本记录纠正执行归属，不将后续清单作为变更主计划分支规则的授权。
+
+## 本次实际建立的隔离
+
+| 项目          | 实际状态                                                                         |
+| ------------- | -------------------------------------------------------------------------------- |
+| Workload 分支 | `feature/v4-workloads`                                                           |
+| Worktree      | `/home/bruce/code/ks-develop/console-workloads`                                  |
+| 创建基线      | `3e09afd6a051d4091b3c887462c880eff2ba6754`，已与远程 `feature/v4-migration` 核对 |
+| 原工作区      | `/home/bruce/code/ks-develop/console`，继续保留原分支、提交及未跟踪文件          |
+| 原 Draft PR   | #1 保持 Draft，不合并、不强推、不改写历史                                        |
+| P0 Worktree   | Audit、REA、Baseline 三个工作区全部保留                                          |
+
+本分支从迁移集成基线创建，没有从混合分支整体派生。当前仅完成分支和归属纠正记录，尚未迁入历史 Workload 代码，不能将“已建分支”写成“已完成拆分”。原分支中的已有实现、测试和 131 证据继续保留其原始 Git/镜像版本边界。
+
+## 后续归集范围与约束
+
+1. 先核对原生项目列表、详情路由、Workload Store、创建表单及必要共享依赖的提交和文件清单，再迁入当前分支；不能整条合并 ConfigMap/Secret/P0 混合开发线。
+2. 直接相关的已知历史提交包括：`79b691d2e`（HPA API）、`d091cb1cd`（旧桥清理）、`412358f5f`（三个列表）、`b08d3421e`（操作失败）、`b329aae26`（项目作用域）、`7961eaedc`（列表刷新）、`b84eccc56`/`caf9cd6dd`/`a05a96518`（创建）、`449bb9db5`/`6689ad88f`/`2a2aeb4f4`（容器设置）、`9fa3c15b4`（启动命令）。这只是候选清单，不表示依赖已核验完毕。
+3. 不迁入无关 ConfigMap/Secret/ServiceAccount、应用模板、扩展改动或全局 P0 文档；确有共享依赖时逐项说明用途并补受影响回归。
+4. 在独立分支重新运行本地测试和构建；只有该分支制品完成 131 rollout、镜像身份回读及浏览器验收后，才能登记新的 VERIFY 通过结果。此前 25 项浏览器结果不能直接继承为新分支通过。
+5. Workload 后续代码只提交到本分支，完成对应验证后准备独立 PR 指向 `feature/v4-migration`。原 PR #1 中的混合范围仍需另行整理，本次不自动合并、关闭或改变其目标分支。
+
+## 当前验证结论
+
+本次只核验 Git 基线、分支、Worktree 和原 PR 状态；没有部署或重新运行浏览器验收。Workload 整体开发测试目标仍未完成。131 已部署的上一轮制品不因创建本分支而改变。
