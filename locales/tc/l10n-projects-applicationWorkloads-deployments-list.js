@@ -27,6 +27,7 @@ module.exports = {
     '請填寫合法的生命週期動作、路徑、連接埠或命令；一般初始化容器不支援生命週期動作。',
   WORKLOAD_SECURITY_CONTEXT_INVALID:
     '請填寫合法的安全上下文布林值、整數用戶或用戶組 ID、SELinux 值和權能名稱。',
+  WORKLOAD_ANNOTATIONS_INVALID: '請填寫合法的 Kubernetes 註解名稱和文字值。',
   CONTAINER_SECURITY_CONTEXT: '容器 Security Context',
   POD_SECURITY_CONTEXT: '容器組 Security Context',
   PRIVILEGED_MODE: '特權模式',

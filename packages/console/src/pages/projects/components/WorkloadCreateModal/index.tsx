@@ -21,6 +21,7 @@ import {
   DeploymentCreateValues,
   VolumeValues,
   validateContainers,
+  validatePodAnnotations,
   validateSecurityContext,
   validateVolumes,
 } from './deployment';
@@ -28,6 +29,7 @@ import ContainerInput from './ContainerInput';
 import VolumeInput from './VolumeInput';
 import useWorkloadResourceOptions from './useWorkloadResourceOptions';
 import SecurityContextInput from './SecurityContextInput';
+import PodAnnotationsInput from './PodAnnotationsInput';
 
 interface Props {
   visible: boolean;
@@ -90,6 +92,14 @@ function WorkloadCreateModal({
       ? undefined
       : t('WORKLOAD_SECURITY_CONTEXT_INVALID');
     callback(error);
+  };
+
+  const podAnnotationsValidator = (
+    _rule: unknown,
+    value: DeploymentCreateValues['podAnnotations'],
+    callback: (error?: string) => void,
+  ) => {
+    callback(validatePodAnnotations(value) ? undefined : t('WORKLOAD_ANNOTATIONS_INVALID'));
   };
 
   const volumeNames = (volumes || []).map((volume: VolumeValues) => volume.name).filter(Boolean);
@@ -195,6 +205,14 @@ function WorkloadCreateModal({
           >
             <VolumeInput resourceOptions={resources.options} />
           </ArrayInput>
+        </FormItem>
+        <h3>{t('ADD_METADATA')}</h3>
+        <FormItem
+          name="podAnnotations"
+          label={t('ANNOTATION_PL')}
+          rules={[{ validator: podAnnotationsValidator }]}
+        >
+          <PodAnnotationsInput />
         </FormItem>
       </Form>
     </Modal>

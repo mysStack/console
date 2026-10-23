@@ -112,6 +112,7 @@ export interface DeploymentCreateValues {
   initContainers?: ContainerCreateValues[];
   volumes?: VolumeValues[];
   podSecurityContext?: SecurityContextValues;
+  podAnnotations?: Record<string, string>;
 }
 
 export type WorkloadKind = 'Deployment' | 'StatefulSet' | 'DaemonSet';
@@ -133,6 +134,27 @@ const QUANTITY = /^(?:[0-9]+(?:\.[0-9]+)?|\.[0-9]+)(?:m|[EPTGMK]i?|[eE][+-]?[0-9
 
 function isDnsLabel(value: string): boolean {
   return value.length <= 63 && DNS_LABEL.test(value);
+}
+
+const QUALIFIED_NAME = /^[A-Za-z0-9](?:[-_.A-Za-z0-9]*[A-Za-z0-9])?$/;
+
+export function validatePodAnnotations(annotations?: Record<string, string>): boolean {
+  if (annotations === undefined) return true;
+  if (annotations === null || Array.isArray(annotations) || typeof annotations !== 'object') {
+    return false;
+  }
+  return Object.entries(annotations).every(([key, value]) => {
+    if (typeof value !== 'string') return false;
+    const parts = key.split('/');
+    if (parts.length > 2) return false;
+    const name = parts.at(-1) || '';
+    if (name.length > 63 || !QUALIFIED_NAME.test(name)) return false;
+    if (parts.length === 1) return true;
+    const prefix = parts[0];
+    return (
+      prefix.length > 0 && prefix.length <= 253 && prefix.split('.').every(part => isDnsLabel(part))
+    );
+  });
 }
 
 function isValidPort(port?: number | string): boolean {
@@ -662,6 +684,7 @@ export function parseDeploymentSettings(resource: Record<string, any>): Workload
     containers: (podSpec.containers || []).map(parseContainer),
     initContainers: (podSpec.initContainers || []).map(parseContainer),
     volumes: (podSpec.volumes || []).map(parseVolume).filter(Boolean) as VolumeValues[],
+    podAnnotations: cloneDeep(resource.spec?.template?.metadata?.annotations),
     updateStrategy: {
       type: strategy?.type || 'RollingUpdate',
       ...(kind === 'StatefulSet'
@@ -921,6 +944,7 @@ export function validateWorkloadSettings(
   if (!validateSecurityContext(values.podSecurityContext, false)) {
     return 'WORKLOAD_SECURITY_CONTEXT_INVALID';
   }
+  if (!validatePodAnnotations(values.podAnnotations)) return 'WORKLOAD_ANNOTATIONS_INVALID';
   const strategy = values.updateStrategy;
   if (!strategy) return undefined;
   if (!['RollingUpdate', kind === 'Deployment' ? 'Recreate' : 'OnDelete'].includes(strategy.type)) {
@@ -1021,10 +1045,20 @@ export function buildDeploymentSettingsResource(
       };
     } else delete nextPodSpec.securityContext;
   }
+  if (!isEqual(values.podAnnotations, initial.podAnnotations)) {
+    if (values.podAnnotations && Object.keys(values.podAnnotations).length) {
+      result.spec.template.metadata.annotations = cloneDeep(values.podAnnotations);
+    } else {
+      delete result.spec.template.metadata.annotations;
+    }
+  }
   return result;
 }
 
 export function buildDeployment(values: DeploymentCreateValues) {
+  if (!validatePodAnnotations(values.podAnnotations)) {
+    throw new Error('WORKLOAD_ANNOTATIONS_INVALID');
+  }
   const name = trim(values.name);
   const aliasName = trim(values.aliasName);
   const description = trim(values.description);
@@ -1050,7 +1084,12 @@ export function buildDeployment(values: DeploymentCreateValues) {
       replicas: values.replicas,
       selector: { matchLabels: labels },
       template: {
-        metadata: { labels },
+        metadata: {
+          labels,
+          ...(values.podAnnotations && Object.keys(values.podAnnotations).length
+            ? { annotations: cloneDeep(values.podAnnotations) }
+            : {}),
+        },
         spec: {
           serviceAccountName: 'default',
           ...(compactSecurityContext(values.podSecurityContext, false)

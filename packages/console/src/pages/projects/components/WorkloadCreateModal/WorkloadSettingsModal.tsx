@@ -10,6 +10,7 @@ import ContainerInput from './ContainerInput';
 import VolumeInput from './VolumeInput';
 import WorkloadUpdateStrategyInput from './WorkloadUpdateStrategyInput';
 import SecurityContextInput from './SecurityContextInput';
+import PodAnnotationsInput from './PodAnnotationsInput';
 import useWorkloadResourceOptions from './useWorkloadResourceOptions';
 import {
   buildDeploymentSettingsResource,
@@ -227,6 +228,14 @@ export default function WorkloadSettingsModal({
           rules={[{ required: true }, { validator: validateSettings }]}
         >
           <InputNumber min={0} precision={0} />
+        </FormItem>
+        <h3>{t('ADD_METADATA')}</h3>
+        <FormItem
+          name="podAnnotations"
+          label={t('ANNOTATION_PL')}
+          rules={[{ validator: validateSettings }]}
+        >
+          <PodAnnotationsInput />
         </FormItem>
       </Form>
     </Modal>

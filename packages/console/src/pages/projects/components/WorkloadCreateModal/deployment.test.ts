@@ -5,6 +5,7 @@ import {
   buildDeployment,
   buildDeploymentSettingsResource,
   parseDeploymentSettings,
+  validatePodAnnotations,
   validateContainers,
   validateVolumes,
 } from './deployment';
@@ -1234,4 +1235,89 @@ test('StatefulSet 的 PVC 模板可作为容器挂载来源，仍拒绝未定义
   assert.equal(validateContainers(containers, [], [], ['data']), undefined);
   assert.equal(validateContainers(containers, [], [], []), 'WORKLOAD_VOLUME_MOUNT_INVALID');
   assert.equal(validateContainers(containers, [], [], ['other']), 'WORKLOAD_VOLUME_MOUNT_INVALID');
+});
+
+for (const kind of ['Deployment', 'StatefulSet', 'DaemonSet']) {
+  test(`${kind} Pod 模板注解支持回填、修改和清空且不改变模板标签`, () => {
+    const original = settingsFixture(kind);
+    original.spec.template.metadata.annotations = {
+      'example.com/editable': 'before',
+      'kubesphere.io/restartedAt': '2026-10-23T00:00:00Z',
+    };
+    const before = structuredClone(original);
+    const values = parseDeploymentSettings(original);
+
+    assert.deepEqual(values.podAnnotations, original.spec.template.metadata.annotations);
+    assert.deepEqual(buildDeploymentSettingsResource(original, values), before);
+
+    values.podAnnotations = {
+      ...values.podAnnotations,
+      'example.com/editable': 'after',
+      'example.com/new': '',
+    };
+    let submitted = buildDeploymentSettingsResource(original, values);
+    assert.deepEqual(submitted.spec.template.metadata.annotations, {
+      'example.com/editable': 'after',
+      'kubesphere.io/restartedAt': '2026-10-23T00:00:00Z',
+      'example.com/new': '',
+    });
+    assert.deepEqual(submitted.spec.template.metadata.labels, { app: 'native-settings' });
+
+    values.podAnnotations = {};
+    submitted = buildDeploymentSettingsResource(original, values);
+    assert.equal('annotations' in submitted.spec.template.metadata, false);
+    assert.deepEqual(submitted.spec.template.metadata.labels, { app: 'native-settings' });
+    assert.deepEqual(original, before);
+  });
+}
+
+test('Pod 模板注解校验 Kubernetes qualified name 并允许空值', () => {
+  assert.equal(
+    validatePodAnnotations({
+      'example.com/key': 'value',
+      'UPPER_case.with-dots': '',
+    }),
+    true,
+  );
+  for (const annotations of [
+    { '': 'value' },
+    { '/key': 'value' },
+    { 'Example.com/key': 'value' },
+    { 'example..com/key': 'value' },
+    { [`example.com/${'a'.repeat(64)}`]: 'value' },
+    { 'example.com/key': 1 },
+  ]) {
+    assert.equal(validatePodAnnotations(annotations as any), false);
+  }
+});
+
+test('创建 Deployment 将 Pod 模板注解写入模板元数据', () => {
+  const resource = buildDeployment({
+    name: 'metadata-create',
+    namespace: 'v4-migration-e2e',
+    replicas: 1,
+    podAnnotations: {
+      'example.com/owner': 'migration',
+      'example.com/empty': '',
+    },
+    containers: [{ name: 'web', image: 'nginx' }],
+  });
+  assert.deepEqual(resource.spec.template.metadata, {
+    labels: { app: 'metadata-create' },
+    annotations: {
+      'example.com/owner': 'migration',
+      'example.com/empty': '',
+    },
+  });
+  assert.throws(
+    () =>
+      buildDeployment({
+        name: 'metadata-invalid',
+        namespace: 'v4-migration-e2e',
+        replicas: 1,
+        podAnnotations: { '/invalid': 'value' },
+        containers: [{ name: 'web', image: 'nginx' }],
+      }),
+    /WORKLOAD_ANNOTATIONS_INVALID/,
+  );
 });

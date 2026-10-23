@@ -33,6 +33,8 @@ module.exports = {
     'Introduzca una acción de ciclo de vida, ruta, puerto o comando válido. Los contenedores de inicio normales no admiten estas acciones.',
   WORKLOAD_SECURITY_CONTEXT_INVALID:
     'Introduzca valores booleanos, identificadores enteros, valores SELinux y nombres de capacidades válidos.',
+  WORKLOAD_ANNOTATIONS_INVALID:
+    'Introduzca nombres de anotación de Kubernetes y valores de texto válidos.',
   CONTAINER_SECURITY_CONTEXT: 'Contexto de seguridad del contenedor',
   POD_SECURITY_CONTEXT: 'Contexto de seguridad de pod',
   PRIVILEGED_MODE: 'Privilegiado',

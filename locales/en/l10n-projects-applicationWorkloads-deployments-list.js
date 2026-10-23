@@ -31,6 +31,7 @@ module.exports = {
     'Enter a valid lifecycle action, path, port, or command. Regular init containers do not support lifecycle actions.',
   WORKLOAD_SECURITY_CONTEXT_INVALID:
     'Enter valid security context booleans, integer user or group IDs, SELinux values, and capability names.',
+  WORKLOAD_ANNOTATIONS_INVALID: 'Enter valid Kubernetes annotation names and text values.',
   CONTAINER_SECURITY_CONTEXT: 'Container Security Context',
   POD_SECURITY_CONTEXT: 'Pod Security Context',
   PRIVILEGED_MODE: 'Privileged Mode',
