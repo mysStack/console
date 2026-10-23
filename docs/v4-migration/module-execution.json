@@ -4,7 +4,7 @@
   "capability": "deployment-statefulset-daemonset",
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
-  "phase": "DEV",
+  "phase": "VERIFY",
   "rea": {
     "status": "已通过",
     "sourceCommit": "e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0",
@@ -224,8 +224,8 @@
     }
   },
   "dev": {
-    "status": "进行中",
-    "reason": "当前 VERIFY 发现集群级三类 Workload 列表仍使用 Wujie/V3 Embed；先退回 DEV，替换为已有 V4 原生列表并补回归测试，再重新构建、部署和浏览器验收。",
+    "status": "已完成",
+    "reason": "已移除共享启动层的全局 preloadApp，仅保留 setupApp 按需注册；针对延迟 V3 CSS 请求的回归测试和本地验证完成。90 个测试文件/401 项通过，build:packages 通过。集群级三类 Workload 列表当前由 ApplicationWorkloads/Workloads 原生 ListPage、Store 和创建弹窗提供；此前将其误判为 Wujie 入口，已由现有 nativeWorkloads 回归测试核实。",
     "sourceCommit": "45d9f14e53d6a0c1d74011197ade9d5accbcdae9",
     "documents": [
       {
@@ -502,7 +502,7 @@
   ],
   "verify": {
     "status": "未完成",
-    "reason": "集群级 Workload 列表仍有 Wujie/V3 入口，且批量删除、回退确认写入、伸缩确认结果、完整错误/缓存和逐项 V3 等价仍未完成；本轮退回 DEV。",
+    "reason": "精确制品部署、三类原生路由无 V3 预加载、设置页面、配置引用保存/取消/失败反馈、Action 菜单与取消、重新创建、DaemonSet 批量停止、低权限拒绝和第二 namespace 正反隔离已验证；批量删除、回退确认写入、伸缩确认结果、完整错误/缓存和逐项 V3 等价仍未完成。",
     "sourceCommit": "45d9f14e53d6a0c1d74011197ade9d5accbcdae9",
     "documents": [
       {
