@@ -1,3 +1,12 @@
+# 当前状态补充（2026-10-24：V3 预加载缺口）
+
+- 当前模块：`workloads`，分支 `feature/v4-workloads`，Worktree `console-workloads`；单 Codex 顺序执行，无子 Agent。
+- 精确制品：源提交 `8220090837bf9fe1e924578cc3bfc9e3115608ac`，镜像 tag `feature-v4-workloads-20261024-024809-8220090837bf`，digest `sha256:b0903903c81b655c7e65c7085ced370d6ff04fde303244f7de35e20e744766b0`。
+- 已验证：新 context 登录成功；三类原生 Workload 详情页直达、刷新、返回、设置页面渲染和项目 namespace API 作用域通过，页面错误为 0。
+- 新发现且未关闭：三类原生路由仍观察到 `/consolev3/dashboard` 与 `/dist/v3dist/*` 请求。根因是 `run.tsx` 无条件调用 `initWujie()`，`utils/wujie.ts` 无条件 `preloadApp()`。
+- 阶段调整：模块从 `VERIFY` 退回 `DEV`。必须先完成测试锁定、最小代码修复、构建和新制品浏览器复验；旧镜像和本轮修复前证据不继承为当前通过。
+- 证据：[Workload 原生路由 V3 预加载复现](./evidence/workload-native-v3-preload-20261024.json)。
+
 # Workload 模块任务状态
 
 > 2026-10-24 当前进展：DEV 源提交 `3e1d40eae` 的 400 项本地回归通过；构建提交 `3d255eaf8` 的 CI Run 40000821377 和首次 131 rollout 成功。新 context 登录未通过后已回滚旧镜像；专用测试凭据在旧镜像也被拒绝，当前浏览器 VERIFY 阻塞。三类资源均未整体验收，旧 SHA 结果不继承。详见 [部署与回滚](./workload-131-verify-20261024.md#当前增量部署与登录阻塞0229-上海时间)。

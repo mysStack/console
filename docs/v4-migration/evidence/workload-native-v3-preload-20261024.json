@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-24",
+  "module": "workloads",
+  "sourceCommit": "8220090837bf9fe1e924578cc3bfc9e3115608ac",
+  "artifact": {
+    "imageTag": "feature-v4-workloads-20261024-024809-8220090837bf",
+    "digest": "sha256:b0903903c81b655c7e65c7085ced370d6ff04fde303244f7de35e20e744766b0"
+  },
+  "runtime": {
+    "environment": "131 / kubesphere-system/ks-console",
+    "freshContextLogin": true,
+    "routes": [
+      "/test-workspace/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/resource-status",
+      "/test-workspace/clusters/host/projects/v4-migration-e2e/statefulsets/v4-pvc-sts-7fa/resource-status",
+      "/test-workspace/clusters/host/projects/v4-migration-e2e/daemonsets/v4-stop-ds-7fa/resource-status"
+    ],
+    "nativePagesRendered": true,
+    "pageErrors": 0,
+    "legacyRequests": [
+      "/consolev3/dashboard",
+      "/dist/v3dist/main.*",
+      "/dist/v3dist/0.*",
+      "/dist/v3dist/1.*",
+      "/dist/v3dist/3.*",
+      "/dist/v3dist/5.*"
+    ],
+    "legacyRequestsObservedOnAllThreeRoutes": true
+  },
+  "rootCause": {
+    "file": "packages/core/src/run.tsx",
+    "call": "initWujie()",
+    "file2": "packages/core/src/utils/wujie.ts",
+    "behavior": "initWujie 无条件 preload consoleV3Actions 和 consolev3；native Workload 路由进入后仍加载 V3 制品",
+    "classification": "已确认的共享启动层缺口；需要模块级修复并评估旧入口按需兼容"
+  },
+  "conclusion": "三类 Workload 页面功能路径为原生 V4，但当前制品尚未满足该模块的运行时零 V3 预加载要求；VERIFY 退回 DEV。",
+  "secretsPrinted": false
+}

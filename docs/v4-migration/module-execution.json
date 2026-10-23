@@ -4,7 +4,7 @@
   "capability": "deployment-statefulset-daemonset",
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
-  "phase": "VERIFY",
+  "phase": "DEV",
   "rea": {
     "status": "已通过",
     "sourceCommit": "e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0",
@@ -56,7 +56,7 @@
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "3c8a74d94d1cbcb683e7ed53f05a9b38d6bd7fb21f97443b70ec9e38205e1d9b"
+        "sha256": "3c295efd607a3304925185f40ffc10ef003ab5ec67f7c61175d54d428972b7a0"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -224,9 +224,9 @@
     }
   },
   "dev": {
-    "status": "已完成",
-    "reason": "当前制品设置与权限差异已有原生实现，89 文件/400 项回归及本地构建/检查完成；以 sourceCommit 和本地证据绑定。进入 VERIFY，未宣称环境验收通过。",
-    "sourceCommit": "3e1d40eae023cf54905e9c298f1ddd387ab2a98a",
+    "status": "进行中",
+    "reason": "当前精确制品的三类原生 Workload 页面已完成基础浏览器渲染，但 Network 发现共享启动层仍无条件预加载 /consolev3 与 /dist/v3dist；已定位 packages/core/src/run.tsx → utils/wujie.ts 的根因。先补回归测试和最小按路由预加载修复，再重新构建、部署和验证。",
+    "sourceCommit": "8220090837bf9fe1e924578cc3bfc9e3115608ac",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
@@ -497,8 +497,8 @@
     "WL-04：移除普通 Workload 配置引用的 useV3action、Wujie Shadow DOM 和 V3 编辑器桥接"
   ],
   "verify": {
-    "status": "未完成",
-    "reason": "CI Run 40000821377 与精确镜像首次 rollout/imageID 已通过；登录脚本失败后已回滚，专用账号在旧镜像也被认证拒绝。等待有效凭据，再部署同一制品执行三类完整浏览器验证，未整体验收。",
+    "status": "已暂停（发现新缺口）",
+    "reason": "当前精确制品的基础页面、直达/刷新/返回和 namespace API 作用域已验证，但原生 Workload 路由仍触发 V3/Wujie 全局预加载；原 VERIFY 证据保留为历史输入，修复后必须重新构建部署并复验。",
     "sourceCommit": "3e1d40eae023cf54905e9c298f1ddd387ab2a98a",
     "documents": [
       {

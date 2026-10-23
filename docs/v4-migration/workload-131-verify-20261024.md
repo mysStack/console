@@ -1,5 +1,13 @@
 # Workload 131 专项 VERIFY（2026-10-24）
 
+## 当前增量：原生 Workload 路由仍触发 V3 预加载（2026-10-24）
+
+在精确制品 `8220090837bf9fe1e924578cc3bfc9e3115608ac` 对应的 131 部署上，使用零初始 Cookie 的新浏览器 context 登录，并逐一访问 Deployment、StatefulSet、DaemonSet 专用详情路由。三类页面均渲染了原生 V4 设置界面，直达、刷新、返回和 namespace API 作用域检查通过；但 Network 仍观察到 `/consolev3/dashboard` 以及 `/dist/v3dist/*` 请求。
+
+根因已定位：`packages/core/src/run.tsx` 启动时无条件调用 `initWujie()`，`packages/core/src/utils/wujie.ts` 随后无条件执行两个 `preloadApp()`。这不是 Workload 详情组件主动嵌入 V3，而是共享启动层的全局预加载。当前页面没有可见 iframe，不能作为运行时无 V3 的证明。
+
+结构化证据：[Workload 原生路由 V3 预加载复现](./evidence/workload-native-v3-preload-20261024.json)。由于该问题属于代码缺口，模块阶段从 VERIFY 退回 DEV；先补“原生 Workload 路由不预加载 V3、旧 V3 入口仍可按需加载”的回归测试和最小修复，再重新构建、部署和浏览器验收。
+
 ## 当前增量部署与登录阻塞（02:29 上海时间）
 
 本节是当前状态，以下 `ef3b4f1a8` 专项成功结果保留其历史制品边界，不能直接继承给新代码。
