@@ -1,0 +1,29 @@
+{
+  "sourceCommit": "86ce8b4abdb4a27b8b6bd35e55406d238eb56383",
+  "artifactTree": "1e499d92e11374e26c76f5e13be45251602bd596",
+  "method": "@babel/parser inert literal webpack factory extraction; character offsets; no target execution",
+  "bundles": [
+    {
+      "path": "packages/bootstrap/assets/v3dist/1.9ca3a76d71946712055c.js",
+      "sha256": "924556b7889c21dbd450535163cdd63e5a6c92daad2cbdc3ec8514a005d765a3",
+      "factory": {
+        "id": 2439,
+        "start": 2103402,
+        "end": 2106128,
+        "sha256": "e3c5002088b36ec9b9073743d70528504a25661d4d2ca5dff07eca882d425a1d",
+        "analysisFile": "webpack-2439.js"
+      }
+    },
+    {
+      "path": "packages/bootstrap/assets/v3dist/main.558f452048e49db23323.js",
+      "sha256": "7cfddd4e32fd4a038b917bebbcf78dc8b4a51a48058062fe365bb20c28ad5ad0",
+      "factory": {
+        "id": 52,
+        "start": 161485,
+        "end": 186073,
+        "sha256": "c3b0b759f7de47ae581ce749d5d98f2f7344ec78d469eca8db7b22191eb7eb9f",
+        "analysisFile": "webpack-main-52.js"
+      }
+    }
+  ]
+}

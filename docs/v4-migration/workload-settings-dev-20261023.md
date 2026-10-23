@@ -5,7 +5,7 @@
 - 模块：`workloads / deployment-statefulset-daemonset`。
 - 分支 / Worktree：`feature/v4-workloads` / `console-workloads`。
 - 负责人批准进入 DEV：`5c24342571419708b6f0c21f3ce9e8f193da0e17`，批准原文见 [REA 复核记录](./workload-rea-review-20261023.md)。
-- 首批功能提交：`0c1d9aadf219fcabf5e6a310722591c9d7bef136`；生命周期增量提交：`da25187d33ca49d21afa0ad748b619e8a2786c64`；安全上下文增量提交：`9e2f4148f2abde58b6eec850612d99dc1ac3f0a8`。
+- 首批功能提交：`0c1d9aadf219fcabf5e6a310722591c9d7bef136`；生命周期增量提交：`da25187d33ca49d21afa0ad748b619e8a2786c64`；安全上下文增量提交：`9e2f4148f2abde58b6eec850612d99dc1ac3f0a8`；当前功能提交：`86ce8b4abdb4a27b8b6bd35e55406d238eb56383`。
 - 阶段仍为 DEV / 进行中；不是三类资源完整验收，也没有进入 VERIFY。
 
 ## 本次实现与保留行为
@@ -166,3 +166,28 @@ DaemonSet 的旧 V3 UI 快照没有调度分区，因此当前 V4 不为它虚�
 - [可复现服务端验证脚本](./evidence/workload-scheduling-server-validation.cjs)
 
 本增量没有构建或推送测试镜像，没有更新 131 的 `ks-console`、rollout 或登录当前 SHA 浏览器。workload 顶层 labels/annotations、时区挂载、StatefulSet Service/PVC 模板、集群原生入口、DaemonSet 停止语义、配置引用和完整 Action/RBAC 仍在 DEV 清单，因此阶段保持 DEV。
+
+## Deployment 创建顶层元数据增量（2026-10-23）
+
+代码提交 `86ce8b4abdb4a27b8b6bd35e55406d238eb56383`（功能提交 `55817d12ffaf81630a625871d15db215fd1e3b34`，类型兼容修复 `86ce8b4abdb4a27b8b6bd35e55406d238eb56383`）依据当前 `v3dist` 工厂 2439 与 main 工厂 52 的定向 REA，补齐 Deployment 创建中的 workload 顶层标签和注解。自定义标签与系统 `app=<name>` 合并后，同步写入 `metadata.labels`、`spec.selector.matchLabels` 和 `spec.template.metadata.labels`；系统 app、`kubesphere.io/alias-name` 和 `kubesphere.io/description` 保持优先，避免自定义值破坏 selector 或系统元数据。顶层注解与 Pod 模板注解使用独立字段。
+
+表单复用 `PropertiesInput`，执行 Kubernetes label key/value 与 annotation key 校验；在提交前通过既有 `deploymentStore.checkLabels` 按当前 cluster、namespace、name 检查标签重复。重复返回 `DUPLICATE_LABELS`，请求失败返回 `WORKLOAD_LABEL_CHECK_FAILED`，不会静默放行。
+
+### REA 与可复现来源
+
+- 固定制品 tree：`1e499d92e11374e26c76f5e13be45251602bd596`。
+- 工厂 2439：高级创建元数据分区、`preservedAnnotations`、标签校验和 `checkLabels`；工厂 52：`updateLabels` 同步资源、selector 和 Pod 模板 labels。
+- 实际 REA：parent `ev_9092fbb9bbe8885efccb23873640773befb0a1d02e9a2a3909f5ce667c72468e`，summary `ev_a2c4463abf38b503c69f44e6bb79e97df99d62444efacd391f4c02824660f40e`，输入摘要 `31859fceccf9de31164c812f7f844f17f4010fa122bd61f2d197e89f5bcacb65`。覆盖为 partial，不能推断未命中行为不存在。
+- 可复现命令：`node docs/v4-migration/evidence/workload-top-metadata-extract.cjs /tmp/<尚不存在的绝对目录>`；来源偏移、Bundle 和工厂哈希见[来源记录](./evidence/workload-top-metadata-20261023-provenance.json)，分析范围见[REA 摘要](./evidence/workload-top-metadata-20261023-rea-summary.json)。
+
+### 实际验证
+
+| 命令/检查                                                                                       | 结果                                                                              | 边界                                                                                     |
+| ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `esno .../WorkloadCreateModal/deployment.test.ts`、`esno .../WorkloadCreateModal/index.test.ts` | 测试先行复现标签未同步、校验/字段缺失；实现后定向测试 55/55 通过                  | 覆盖转换、系统字段优先、重复/失败返回和表单接线；不证明浏览器渲染                        |
+| `./scripts/test.sh`                                                                             | 精确代码提交 `86ce8b4ab`：77 个文件、340 项通过、0 失败                           | 仓库现有测试范围                                                                         |
+| `corepack yarn build:packages`                                                                  | 精确代码提交 `86ce8b4ab`：退出 0，`@ks-console/shared` 完成 633/633 minify        | 未构建、推送 Console 镜像                                                                |
+| TypeScript 生产源基线比较                                                                       | 基线 `5a792bac47e3cd0f92daa49e81c3b2ecbe0902ec` 691，当前 691，新增 0、改动文件 0 | 全项目既有诊断仍存在；见[记录](./evidence/workload-top-metadata-20261023-typecheck.json) |
+| `node docs/v4-migration/evidence/workload-top-metadata-server-validation.cjs`                   | 131 `v1.31.13+k3s1` 接受 Deployment server dry-run；5 项字段检查通过，残留资源 0  | 不保存资源；见[API 记录](./evidence/workload-top-metadata-20261023-api-validation.json)  |
+
+本增量没有构建或推送测试镜像，没有更新 131 的 `ks-console`、rollout 或登录当前 SHA 浏览器。StatefulSet/DaemonSet 创建、已有资源顶层元数据编辑、时区、StatefulSet Service/PVC 模板、集群原生入口、DaemonSet 停止语义、配置引用和完整 Action/RBAC 仍在 DEV 清单，因此阶段保持 DEV。

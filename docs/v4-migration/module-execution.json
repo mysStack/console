@@ -20,7 +20,7 @@
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
-        "sha256": "b576e464cb96f1e987d5ae94768fee191f6e43b661fb903b592c8a70f7c237e5"
+        "sha256": "68eb1dbc6c79636e526bc93508609f867293448da437fe25b3b4b31e2330b7c0"
       },
       {
         "path": "docs/v4-migration/workload-kind-capability-matrix.md",
@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "87fe67dee589c5874d5cf6686aed034f945a618fa5bd85b94b8da421e938a056"
+        "sha256": "78a9700cb57202185d818289c25c0fef2257597af8d0cd810ee2d0e6c1b9eb7c"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "be24f7b205a696479a49be77561e1d6839fa1fbd231b398e890c6e51f2e89aac"
+        "sha256": "5b6b053a173c192aa405c4d202ef2b1568102e40f8c886139bc7e4b8871ad504"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -84,7 +84,7 @@
       },
       {
         "path": "docs/v4-migration/workload-field-behavior-matrix-20261023.md",
-        "sha256": "ef1fd47871d58a0985ca9f66c0a27397d2b72239cfb9c4ed313f7a70af492c20"
+        "sha256": "02adda4a92e298f5432e7a9dcf373d79910ceef9ee508c238fe91ffbb114dbfb"
       },
       {
         "path": "docs/v4-migration/workload-action-api-rbac-evidence-20261023.md",
@@ -225,12 +225,12 @@
   },
   "dev": {
     "status": "进行中",
-    "reason": "进行中：原生设置入口、策略、优雅终止、生命周期、安全上下文、Pod 模板注解及 Deployment/StatefulSet Pod 调度已实现；Deployment 创建已补节点选择；workload 顶层元数据、时区、StatefulSet Service/PVC、集群入口、完整 Action 和配置引用等仍待补齐；未进入 VERIFY",
-    "sourceCommit": "7db1a9353ea42ce2e4a8898bd4cf8110ac2d97a9",
+    "reason": "进行中：原生设置入口、策略、优雅终止、生命周期、安全上下文、Pod 模板注解及 Deployment/StatefulSet Pod 调度已实现；Deployment 创建已补节点选择和顶层 labels/annotations；StatefulSet/DaemonSet 创建、已有资源顶层元数据编辑、时区、StatefulSet Service/PVC、集群入口、完整 Action 和配置引用等仍待补齐；未进入 VERIFY",
+    "sourceCommit": "86ce8b4abdb4a27b8b6bd35e55406d238eb56383",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
-        "sha256": "d74815138134f9dedcba607b66c90e8d0bf4526590bcda8962429f97ee740e76"
+        "sha256": "e951d86bbfdaaf14fe1ed619273591ec4fe76e15d4e982c145f5953eb9f1a568"
       },
       {
         "path": "docs/v4-migration/evidence/workload-lifecycle-20261023-api-validation.json",
@@ -331,6 +331,30 @@
       {
         "path": "docs/v4-migration/evidence/workload-scheduling-server-validation.cjs",
         "sha256": "f517cdaeb2fe4a82e7b35abf43d1692424d62fd2d813f65fd1a80a31b5f60fc9"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-top-metadata-20261023-api-validation.json",
+        "sha256": "204705ec132b8729d82ecc44df2f0abbea928e146b0cfe0fea7b34f09a6b210e"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-top-metadata-20261023-provenance.json",
+        "sha256": "8b7dc99ea67bc7b89e4cdc1c086103c1333c0e42d74089d95359c9d55d0fe1e5"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-top-metadata-20261023-rea-summary.json",
+        "sha256": "d1e9c31eff625c9c4aa695f776d6d5610dcf67cfa89fa82606fb819b0bd460fd"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-top-metadata-20261023-typecheck.json",
+        "sha256": "04ecc558482894986b9b435628567a66fed21bfc53bf717ac218cf5f78f5e8e3"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-top-metadata-extract.cjs",
+        "sha256": "66a83a2a39e477306421c8d4d47852c35827949e32f7f17297d12e7d59920770"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-top-metadata-server-validation.cjs",
+        "sha256": "62682b50ea1fd96292939212b6d523913741dea36f900e7f8d0d9a00bfbf3c55"
       }
     ]
   },

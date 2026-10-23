@@ -3,9 +3,9 @@
 ## 唯一当前状态（2026-10-23 组合批次范围调整）
 
 - 负责人：当前 Codex 单会话，不使用子 Agent。模块/能力：`workloads / deployment-statefulset-daemonset`；资源：Deployment、StatefulSet、DaemonSet。
-- 分支/Worktree：`feature/v4-workloads` / `console-workloads`；当前功能提交 `7db1a9353ea42ce2e4a8898bd4cf8110ac2d97a9`。
+- 分支/Worktree：`feature/v4-workloads` / `console-workloads`；当前功能提交 `86ce8b4abdb4a27b8b6bd35e55406d238eb56383`。
 - 当前阶段 `DEV`，REA 结论“已通过”。[阶段记录](./module-execution.json)、[组合能力边界](./workload-kind-capability-matrix.md)、[REA 索引](./rea-analysis-summary.md)为当前依据；Deployment 专项矩阵是组合批次的输入之一。
-- 最新 DEV 交付：`7db1a9353` 补齐 Deployment/StatefulSet 的 Pod 调度模式和 Deployment 创建节点选择器；无法精确回填的现有 affinity 显式保留，DaemonSet 保留原配置且不显示旧 V3 没有的调度区。精确提交 77 文件/336 项回归和包构建通过，相关 ESLint 通过；类型基线对照新增 0。131 三类 API 服务端 dry-run 接受且残留资源为 0。未部署新 SHA、未做 Playwright，不标记验收，见 [DEV 记录](./workload-settings-dev-20261023.md#pod-调度与节点选择增量2026-10-23)。
+- 最新 DEV 交付：`86ce8b4ab` 补齐 Deployment 创建的 workload 顶层 labels/annotations、三处标签同步和同作用域重复标签检查；系统 app 标签、别名和描述不可被自定义值覆盖。精确提交 77 文件/340 项回归及包构建通过，类型基线 691→691、新增 0。131 Deployment API 服务端 dry-run 接受、字段检查全通过且残留资源为 0。StatefulSet/DaemonSet 创建和已有资源顶层元数据编辑仍未完成；未部署新 SHA、未做 Playwright，不标记验收，见 [DEV 记录](./workload-settings-dev-20261023.md#deployment-创建顶层元数据增量2026-10-23)。
 - 当前任务：三类资源已定位普通编辑入口、Action 处理器、Store/API 请求边界、权限键和按资源登记的分区；按 WL-01～WL-04 验收清单补齐字段、作用域、RBAC、缓存和运行时差异。公共实现可以共用，三类资源的差异和验收必须分别记录。当前阶段允许修改业务代码，但不部署，直到 DEV 交付完成。已有实现和限定浏览器观察保留为历史输入。
 - 当前 REA 材料已获项目负责人批准进入 DEV。复核记录见 [workload-rea-review-20261023.md](./workload-rea-review-20261023.md)。本次确认普通 Workload 配置引用仍依赖 `useV3action`、Wujie Shadow DOM 和 V3 编辑器实例，集群级三类 Workload 列表主入口仍挂载 `/consolev3`；这些是明确的 DEV 验收缺口，不得当作已完成。`module-execution.json` 已记录复核依据和日期。
 - 已建立 [三类资源字段行为矩阵](./workload-field-behavior-matrix-20261023.md)，覆盖公共字段、默认值/校验、清空/保留语义，以及 StatefulSet Service/PVC 模板和 DaemonSet 无副本/更新策略差异。矩阵将待实测项明确列出；字段、API、RBAC、缓存和错误仍未闭环，不改变 REA 门禁。

@@ -1,0 +1,36 @@
+{
+  "operation": "analyze_javascript_application",
+  "authority": "shipped-artifact",
+  "confidence": "derived",
+  "parentEvidenceId": "ev_9092fbb9bbe8885efccb23873640773befb0a1d02e9a2a3909f5ce667c72468e",
+  "summaryEvidenceId": "ev_a2c4463abf38b503c69f44e6bb79e97df99d62444efacd391f4c02824660f40e",
+  "inputDigest": "31859fceccf9de31164c812f7f844f17f4010fa122bd61f2d197e89f5bcacb65",
+  "selectedFactories": [
+    { "bundle": "1.9ca3a76d71946712055c.js", "id": 2439 },
+    { "bundle": "main.558f452048e49db23323.js", "id": 52 }
+  ],
+  "statistics": {
+    "relevantFiles": 2,
+    "bytes": 27352,
+    "parsedJavascriptFiles": 2,
+    "parseFailures": 0,
+    "visitedAstNodes": 8368,
+    "findings": 5
+  },
+  "coverage": {
+    "application": "partial",
+    "semantic": "partial",
+    "semanticUnknowns": 2177
+  },
+  "observations": [
+    "工厂 2439 的创建高级设置渲染 workload metadata.labels、metadata.annotations 和隐藏 preservedAnnotations，并调用标签格式校验及同 cluster/namespace 的 checkLabels。",
+    "main 工厂 52 的 updateLabels 将 workload metadata.labels、spec.selector.matchLabels 和 spec.template.metadata.labels 同步更新。",
+    "旧入口把 workload 顶层元数据与 Pod 模板注解分开处理；系统 app 标签、别名和描述仍由资源基础信息控制。"
+  ],
+  "limitations": [
+    "输入是固定当前 v3dist 的两个定向工厂，不是完整 V3 应用或原始完整源码。",
+    "静态证据不能证明当前 V4 的页面渲染、实际保存、RBAC、缓存或错误提示；这些属于 VERIFY。",
+    "本增量只实现 Deployment 创建；StatefulSet、DaemonSet 创建入口及现有资源顶层元数据编辑仍在 DEV 清单。",
+    "语义覆盖为 partial，2177 个未知节点未被自动解释，不能据此证明未观察到的行为不存在。"
+  ]
+}
