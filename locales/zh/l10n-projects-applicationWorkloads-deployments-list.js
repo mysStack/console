@@ -143,4 +143,11 @@ module.exports = {
     '资源由应用 <strong>{app}</strong> 管理，删除后可能影响应用的正常使用。请输入{type}名称 <strong>{resource}</strong> 以确认您了解此操作的风险。',
   STOP_APP_RESOURCE_TIP:
     '资源由应用 <strong>{app}</strong> 管理，停止后可能影响应用的正常使用。请输入{type}名称 <strong>{resource}</strong> 以确认您了解此操作的风险。',
+  WORKLOAD_ENV_SOURCE: '变量来源',
+  WORKLOAD_ENV_FIELD_PATH: '容器组字段路径',
+  WORKLOAD_ENV_RESOURCE: '容器资源引用',
+  WORKLOAD_ENV_DIVISOR: '资源换算单位',
+  WORKLOAD_REFERENCE_OPTIONAL: '允许资源或键不存在',
+  WORKLOAD_ENV_REFERENCE_INVALID:
+    '请输入有效且唯一的变量来源、资源名称、键或字段，资源换算单位必须大于零。',
 };

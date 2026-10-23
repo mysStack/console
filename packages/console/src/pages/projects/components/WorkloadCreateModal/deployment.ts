@@ -11,12 +11,19 @@ export interface ContainerPortValues {
 export interface EnvironmentValues {
   name: string;
   value?: string;
+  valueFrom?: {
+    configMapKeyRef?: { name: string; key: string; optional?: boolean };
+    secretKeyRef?: { name: string; key: string; optional?: boolean };
+    fieldRef?: { apiVersion?: string; fieldPath: string };
+    resourceFieldRef?: { containerName?: string; resource: string; divisor?: string };
+  };
 }
 
 export interface EnvironmentFromValues {
   kind: 'configMap' | 'secret';
   name: string;
   prefix?: string;
+  optional?: boolean;
 }
 
 export interface ProbeValues {
@@ -502,6 +509,29 @@ export function validateContainers(
       if (!/^[-._a-zA-Z][-._a-zA-Z0-9]*$/.test(envName)) return 'ENVIRONMENT_INVALID_TIP';
       if (envNames.has(envName)) return 'WORKLOAD_ENV_DUPLICATE';
       envNames.add(envName);
+      if (env.valueFrom !== undefined) {
+        const source = env.valueFrom;
+        const ref = source.configMapKeyRef || source.secretKeyRef;
+        const resource = source.resourceFieldRef;
+        if (
+          env.value !== undefined ||
+          Object.keys(source).length !== 1 ||
+          !Object.keys(source).every(key =>
+            ['configMapKeyRef', 'secretKeyRef', 'fieldRef', 'resourceFieldRef'].includes(key),
+          ) ||
+          (ref &&
+            (!isDnsSubdomain(trim(ref.name)) ||
+              !/^[-._a-zA-Z0-9]+$/.test(ref.key) ||
+              (ref.optional !== undefined && typeof ref.optional !== 'boolean'))) ||
+          (source.fieldRef && !trim(source.fieldRef.fieldPath)) ||
+          (resource &&
+            (!/^(requests|limits)\.(cpu|memory|ephemeral-storage)$/.test(resource.resource) ||
+              (resource.containerName && !isDnsLabel(trim(resource.containerName))) ||
+              (resource.divisor !== undefined && !isPositiveQuantity(resource.divisor))))
+        ) {
+          return 'WORKLOAD_ENV_REFERENCE_INVALID';
+        }
+      }
     }
     for (const port of container.ports || []) {
       const portName = buildPortName(port) || '';
@@ -698,15 +728,32 @@ function buildContainer(container: ContainerCreateValues) {
         }
       : {}),
     ...(container.env?.length
-      ? { env: container.env.map(env => ({ name: trim(env.name), value: env.value ?? '' })) }
+      ? {
+          env: container.env.map(env => ({
+            name: trim(env.name),
+            ...(env.valueFrom
+              ? { valueFrom: cloneDeep(env.valueFrom) }
+              : { value: env.value ?? '' }),
+          })),
+        }
       : {}),
     ...(container.envFrom?.length
       ? {
           envFrom: container.envFrom.map(reference => ({
             ...(trim(reference.prefix) ? { prefix: trim(reference.prefix) } : {}),
             ...(reference.kind === 'configMap'
-              ? { configMapRef: { name: trim(reference.name) } }
-              : { secretRef: { name: trim(reference.name) } }),
+              ? {
+                  configMapRef: {
+                    name: trim(reference.name),
+                    ...(reference.optional !== undefined ? { optional: reference.optional } : {}),
+                  },
+                }
+              : {
+                  secretRef: {
+                    name: trim(reference.name),
+                    ...(reference.optional !== undefined ? { optional: reference.optional } : {}),
+                  },
+                }),
           })),
         }
       : {}),
@@ -1008,15 +1055,29 @@ function parseContainer(container: Record<string, any>): ContainerCreateValues {
       ...port,
       applicationProtocol: parseApplicationProtocol(port),
     })),
-    env: container.env
-      ?.filter((item: Record<string, any>) => Object.prototype.hasOwnProperty.call(item, 'value'))
-      .map((item: Record<string, any>) => ({ name: item.name, value: item.value })),
+    env: container.env?.map((item: Record<string, any>) => cloneDeep(item)),
     envFrom: container.envFrom?.flatMap((item: Record<string, any>) => {
       if (item.configMapRef?.name) {
-        return [{ kind: 'configMap' as const, name: item.configMapRef.name, prefix: item.prefix }];
+        return [
+          {
+            kind: 'configMap' as const,
+            name: item.configMapRef.name,
+            prefix: item.prefix,
+            ...(item.configMapRef.optional !== undefined
+              ? { optional: item.configMapRef.optional }
+              : {}),
+          },
+        ];
       }
       if (item.secretRef?.name) {
-        return [{ kind: 'secret' as const, name: item.secretRef.name, prefix: item.prefix }];
+        return [
+          {
+            kind: 'secret' as const,
+            name: item.secretRef.name,
+            prefix: item.prefix,
+            ...(item.secretRef.optional !== undefined ? { optional: item.secretRef.optional } : {}),
+          },
+        ];
       }
       return [];
     }),
@@ -1175,19 +1236,6 @@ function mergeContainerSettings(
     const parsed = parseContainer(original);
     for (const field of EDITABLE_CONTAINER_FIELDS) delete next[field];
     const built: Record<string, any> = buildContainer(value);
-
-    if (built.env) {
-      const literalNames = new Set(built.env.map((item: Record<string, any>) => item.name));
-      built.env = [
-        ...built.env,
-        ...(original.env || []).filter(
-          (item: Record<string, any>) => item.valueFrom && !literalNames.has(item.name),
-        ),
-      ];
-    } else {
-      const valueFrom = (original.env || []).filter((item: Record<string, any>) => item.valueFrom);
-      if (valueFrom.length) built.env = valueFrom;
-    }
 
     if (built.ports) {
       built.ports = built.ports.map((port: Record<string, any>) => ({

@@ -157,4 +157,11 @@ module.exports = {
     'The resource is managed by <strong>{app}</strong>, which may affect the normal use of this app if the resource is deleted. Please enter the {type} name <strong>{resource}</strong> to make sure you understand the risks associated with the operation.',
   STOP_APP_RESOURCE_TIP:
     'The resource is managed by <strong>{app}</strong>, which may affect the normal use of this app if the resource is stopped. Please enter the {type} name <strong>{resource}</strong> to make sure you understand the risks associated with the operation.',
+  WORKLOAD_ENV_SOURCE: 'Origen de variable',
+  WORKLOAD_ENV_FIELD_PATH: 'Ruta de campo del pod',
+  WORKLOAD_ENV_RESOURCE: 'Referencia de recurso del contenedor',
+  WORKLOAD_ENV_DIVISOR: 'Divisor de recurso',
+  WORKLOAD_REFERENCE_OPTIONAL: 'Permitir recurso o clave ausente',
+  WORKLOAD_ENV_REFERENCE_INVALID:
+    'Especifique un único origen válido, nombre, clave o campo; el divisor debe ser positivo.',
 };

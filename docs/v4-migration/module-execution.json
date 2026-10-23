@@ -16,7 +16,7 @@
       },
       {
         "path": "docs/v4-migration/deployment-settings-capability-matrix.md",
-        "sha256": "3694bcac13a9ce340540fb0d8657bc9a11561bf4be2abc919e1a3a630e36d386"
+        "sha256": "78be7b44f6fbcacf08417b6cacb997199a93e710d4428de7a7924c5d796efdce"
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "5bf0a8596f2429267156d4e089a62af9319e02398af5305d1b484f28a7304e99"
+        "sha256": "97322eeae9956aaf9cf85363c88867c4a38900a879855d39579f9fea84f193a1"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "daa554561028d919c92fee82787d32d3b1e44d99887a8d0eefdab2def7edc166"
+        "sha256": "e6f635fa9ded328d5c34c8e23df2a1f9d96f705cf614ee7b033bbbcdc19c7902"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -84,7 +84,7 @@
       },
       {
         "path": "docs/v4-migration/workload-field-behavior-matrix-20261023.md",
-        "sha256": "c5c860197f6456ca7b36187a938f94e3299b62b3c6d9914ffb8e6ca9f3af849a"
+        "sha256": "30ee482544b37f88a8980adabd513f346ce8c7e8f4169fc60c6caa3e52b07d33"
       },
       {
         "path": "docs/v4-migration/workload-action-api-rbac-evidence-20261023.md",
@@ -225,12 +225,12 @@
   },
   "dev": {
     "status": "进行中",
-    "reason": "2026-10-24 已补镜像凭据/GPU/协议、设置分区/二级编辑、配置引用 edit 权限与本地回归；环境变量引用及完整交互仍待补齐。保持 DEV，新代码尚未部署/浏览器验收。",
+    "reason": "2026-10-24 已补镜像凭据/GPU/协议、设置分区/二级编辑、配置引用 edit 权限，以及 valueFrom 回填/修改/删除和 optional。本地 86 文件/383 项回归通过；key 下拉与镜像完整交互待补齐，仍为 DEV，尚未部署/浏览器验收。",
     "sourceCommit": "f6b7c689b55b1561d474dcb6dc056a39e2166e51",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
-        "sha256": "e1edd3892fa944b8f32aea22c75c7e8d4ba6835d566cc868de65c9feaff1cc4f"
+        "sha256": "62daf7afd70377a7a771c4161bea13254dde840877684198575e4609574fd4f4"
       },
       {
         "path": "docs/v4-migration/evidence/workload-lifecycle-20261023-api-validation.json",
@@ -475,6 +475,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-config-reference-permission-local-20261024.json",
         "sha256": "3a26f609d3109b64617d0fef82c3d191eb5cdffbeb0ffec588d650ef3b11eb4d"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-environment-local-20261024.json",
+        "sha256": "04ec395888cda69833446653bffacddd71b91e7e3f0c5c41c536d1f756a3fb38"
       }
     ]
   },

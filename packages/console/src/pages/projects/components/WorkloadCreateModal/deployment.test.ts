@@ -2163,3 +2163,124 @@ test('应用协议转换后仍校验真实端口名称唯一性并保留 SCTP', 
     'SCTP',
   );
 });
+
+test('三类设置完整回填 valueFrom，允许引用切换、修改及删除，不恢复已删除引用', () => {
+  const env = [
+    { name: 'TEXT', value: 'unchanged' },
+    {
+      name: 'CONFIG',
+      valueFrom: { configMapKeyRef: { name: 'settings', key: 'mode', optional: false } },
+    },
+    {
+      name: 'CREDENTIAL',
+      valueFrom: { secretKeyRef: { name: 'fixture', key: 'item', optional: true } },
+    },
+    { name: 'POD', valueFrom: { fieldRef: { apiVersion: 'v1', fieldPath: 'metadata.name' } } },
+    {
+      name: 'CPU',
+      valueFrom: {
+        resourceFieldRef: { containerName: 'web', resource: 'limits.cpu', divisor: '1m' },
+      },
+    },
+  ];
+  for (const kind of ['Deployment', 'StatefulSet', 'DaemonSet']) {
+    const original: any = {
+      kind,
+      metadata: { name: 'web', namespace: 'v4-migration-e2e' },
+      spec: {
+        template: { metadata: {}, spec: { containers: [{ name: 'web', image: 'nginx', env }] } },
+      },
+    };
+    const values = parseDeploymentSettings(original);
+    assert.deepEqual(values.containers[0].env, env, '引用应完整显示而不是只保留');
+    assert.deepEqual(
+      buildDeploymentSettingsResource(original, values).spec.template.spec.containers[0].env,
+      env,
+    );
+    (values.containers[0].env![1] as any).valueFrom.configMapKeyRef.key = 'next';
+    values.containers[0].env![2] = { name: 'CREDENTIAL', value: 'fixture-literal' };
+    values.containers[0].env!.splice(3, 1);
+    const next = buildDeploymentSettingsResource(original, values).spec.template.spec.containers[0]
+      .env;
+    assert.equal(next.length, 4);
+    assert.equal(next[1].valueFrom.configMapKeyRef.key, 'next');
+    assert.deepEqual(next[2], { name: 'CREDENTIAL', value: 'fixture-literal' });
+    assert.equal(
+      next.some((item: any) => item.name === 'POD'),
+      false,
+    );
+    values.containers[0].env = [];
+    assert.equal(
+      'env' in buildDeploymentSettingsResource(original, values).spec.template.spec.containers[0],
+      false,
+    );
+    assert.equal(env[1].valueFrom!.configMapKeyRef!.key, 'mode', '不得改写源对象');
+  }
+});
+
+test('创建 valueFrom 只写单个来源，并校验引用名称/键、字段、资源、divisor 与重名', () => {
+  const refs: any[] = [
+    { name: 'A', valueFrom: { configMapKeyRef: { name: 'settings', key: 'mode' } } },
+    { name: 'B', valueFrom: { secretKeyRef: { name: 'fixture', key: 'item', optional: true } } },
+    { name: 'C', valueFrom: { fieldRef: { fieldPath: 'metadata.namespace' } } },
+    { name: 'D', valueFrom: { resourceFieldRef: { resource: 'requests.memory', divisor: '1Mi' } } },
+  ];
+  const container = { name: 'web', image: 'nginx', env: refs };
+  assert.equal(validateContainers([container]), undefined);
+  assert.deepEqual(
+    buildDeployment({ name: 'web', namespace: 'v4-migration-e2e', containers: [container] }).spec
+      .template.spec.containers[0].env,
+    refs,
+  );
+  for (const valueFrom of [
+    {},
+    { configMapKeyRef: { name: '', key: 'key' } },
+    { secretKeyRef: { name: 'fixture', key: '' } },
+    { fieldRef: { fieldPath: '' } },
+    { resourceFieldRef: { resource: 'limits.disk' } },
+    { resourceFieldRef: { resource: 'limits.cpu', divisor: '0' } },
+    { fieldRef: { fieldPath: 'metadata.name' }, secretKeyRef: { name: 'fixture', key: 'key' } },
+  ]) {
+    assert.equal(
+      validateContainers([{ ...container, env: [{ name: 'ITEM', valueFrom } as any] }]),
+      'WORKLOAD_ENV_REFERENCE_INVALID',
+    );
+  }
+  assert.equal(
+    validateContainers([
+      { ...container, env: [{ name: 'BOTH', value: 'text', valueFrom: refs[0].valueFrom } as any] },
+    ]),
+    'WORKLOAD_ENV_REFERENCE_INVALID',
+  );
+  assert.equal(
+    validateContainers([{ ...container, env: [refs[0], { name: 'A', value: 'text' }] }]),
+    'WORKLOAD_ENV_DUPLICATE',
+  );
+});
+
+test('envFrom optional 回填后可关闭并保留原前缀清空行为', () => {
+  const original: any = {
+    metadata: { name: 'web' },
+    spec: {
+      template: {
+        spec: {
+          containers: [
+            {
+              name: 'web',
+              image: 'nginx',
+              envFrom: [{ prefix: 'OLD_', secretRef: { name: 'fixture', optional: true } }],
+            },
+          ],
+        },
+      },
+    },
+  };
+  const values = parseDeploymentSettings(original);
+  assert.equal((values.containers[0].envFrom![0] as any).optional, true);
+  (values.containers[0].envFrom![0] as any).optional = false;
+  values.containers[0].envFrom![0].prefix = '';
+  assert.deepEqual(
+    buildDeploymentSettingsResource(original, values).spec.template.spec.containers[0].envFrom,
+    [{ secretRef: { name: 'fixture', optional: false } }],
+  );
+});

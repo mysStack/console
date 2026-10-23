@@ -145,4 +145,11 @@ module.exports = {
     'The resource is managed by <strong>{app}</strong>, which may affect the normal use of this app if the resource is deleted. Please enter the {type} name <strong>{resource}</strong> to make sure you understand the risks associated with the operation.',
   STOP_APP_RESOURCE_TIP:
     'The resource is managed by <strong>{app}</strong>, which may affect the normal use of this app if the resource is stopped. Please enter the {type} name <strong>{resource}</strong> to make sure you understand the risks associated with the operation.',
+  WORKLOAD_ENV_SOURCE: '變數來源',
+  WORKLOAD_ENV_FIELD_PATH: '容器組欄位路徑',
+  WORKLOAD_ENV_RESOURCE: '容器資源引用',
+  WORKLOAD_ENV_DIVISOR: '資源換算單位',
+  WORKLOAD_REFERENCE_OPTIONAL: '允許資源或鍵不存在',
+  WORKLOAD_ENV_REFERENCE_INVALID:
+    '請輸入有效且唯一的變數來源、資源名稱、鍵或欄位，資源換算單位必須大於零。',
 };

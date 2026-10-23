@@ -103,3 +103,22 @@ test('Workload 创建表单在所有内置语言中提供 PVC 标题、操作和
     );
   }
 });
+
+test('环境引用的类型、字段、资源、divisor、optional 和校验提示均有四语言文案', () => {
+  for (const language of ['en', 'es', 'tc', 'zh']) {
+    const locale = require(
+      path.join(localeRoot, language, 'l10n-projects-applicationWorkloads-deployments-list.js'),
+    );
+    for (const key of [
+      'WORKLOAD_ENV_SOURCE',
+      'WORKLOAD_ENV_FIELD_PATH',
+      'WORKLOAD_ENV_RESOURCE',
+      'WORKLOAD_ENV_DIVISOR',
+      'WORKLOAD_REFERENCE_OPTIONAL',
+      'WORKLOAD_ENV_REFERENCE_INVALID',
+    ]) {
+      assert.equal(typeof locale[key], 'string', `${language}: ${key}`);
+      assert.notEqual(locale[key], key);
+    }
+  }
+});

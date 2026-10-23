@@ -387,3 +387,17 @@ TDD 首次两个编辑器用例因缺少组件失败，另两个设置用例因�
 本次完整回归 `./scripts/test.sh` 为 85 文件/377 项通过、0 失败，追加的按钮禁用断言定向 2/2 通过；变更生产文件 ESLint、源码/测试格式检查与 `git diff --check` 通过。TypeScript 基线/当前诊断同为 1326，新诊断及变更文件直接诊断均为 0，全项目类型检查仍未通过。
 
 `corepack yarn build:packages` 退出 0，四个包构建完成，shared 压缩 633/633；结构化本地证据见 [权限修复记录](./evidence/workload-config-reference-permission-local-20261024.json)。本增量无新 CI 镜像、digest、Pod imageID 或部署后的 Playwright 结果。
+
+## 环境变量引用可编辑（2026-10-24，DEV 增量）
+
+基于 `22e65745611339817c5c1fd514915ba40d95f3c8`，DEV start 检查通过。定向读取当前 `v3dist/1.9ca3a76d71946712055c.js` 的静态 webpack 工厂 2254：UTF-16 范围 `[1893307,1900832)`，工厂 SHA256 `649c48cd1c0c8435ca495cf145e153e0ffdc01755117b894a97cd5a1e977a092`，Bundle SHA256 `924556b7889c21dbd450535163cdd63e5a6c92daad2cbdc3ec8514a005d765a3`。该工厂直接提供自定义值、ConfigMap key、Secret key 三种入口及 key 选择；未出现 fieldRef/resourceFieldRef 字样，不能由旧源码推定这两项是当前 V3 的可见入口。字段/资源引用本次作为已有 Kubernetes 配置的原生编辑支持。
+
+三类资源共用的创建/设置容器表单新增来源类型切换、ConfigMap/Secret 名称与 key、optional、字段路径、资源字段/containerName/divisor。引用资源名仍来自当前 cluster/namespace 的元数据名称接口，本增量不读取、解码或渲染 Secret 值。**当前 key 使用输入框，尚未补齐 V3 key 下拉选择，不声明交互完全等价。**
+
+`parseContainer` 完整深拷贝 env；构造器只写 value 或 valueFrom 之一，保持顺序与嵌套引用字段。去掉旧的“将原始 valueFrom 自动补回”逻辑，引用可以真正删除或切换成普通值；不修改源对象。envFrom optional 回填并可显式关闭，已有前缀清空和扩展字段保留行为继续保留。校验增加来源唯一、资源名/key、字段非空、资源类型和正 divisor，并保留重复变量检查。六项标题/校验文案补齐四种内置语言。
+
+TDD：对象测试初始 70/73（新增 3 项失败），交互 0/2，语言新增 1 项失败；实现后分别 73/73、2/2、2/2 通过。完整 `./scripts/test.sh` 为 86 文件/383 项通过，0 失败。首次 ESLint 命名/定义顺序 4 项错误已修正，复查生产文件通过；TypeScript 基线/当前均 1326 项，新诊断和变更文件直接诊断均为 0，全项目类型检查未通过。`build:locales` 退出 0，仍有基线西语/繁体 configHistory 重复键警告，未在本模块夹带修复。
+
+结构化证据见 [环境引用本地记录](./evidence/workload-environment-local-20261024.json)。仍在 DEV，尚无当前代码的镜像部署、digest/imageID、Playwright 或真实 RBAC 验收；key 下拉、镜像选择完整交互和三类资源当前 SHA VERIFY 继续处理。历史镜像 `ef3b4f1a8` 不证明本次新增控件通过。
+
+本增量 `corepack yarn build:packages` 退出 0，四个包构建完成，shared 压缩 633/633。构建成功只记为本地检查，不改变 DEV 状态。

@@ -117,32 +117,157 @@ function PortInput({
   );
 }
 
+const toOptions = (items: string[]) => items.map(item => ({ label: item, value: item }));
+
 function EnvironmentInput({
   value = { name: '' },
   onChange,
+  resourceOptions,
 }: {
   value?: EnvironmentValues;
   onChange?: (value: EnvironmentValues) => void;
+  resourceOptions: WorkloadResourceOptions;
 }) {
+  const source = value.valueFrom;
+  const type = source ? Object.keys(source)[0] : 'literal';
+  const reference = source?.configMapKeyRef || source?.secretKeyRef;
+  const updateSource = (next: NonNullable<EnvironmentValues['valueFrom']>) => {
+    const rest = { ...value };
+    delete rest.value;
+    onChange?.({ ...rest, valueFrom: next });
+  };
+  const updateReference = (next: Partial<NonNullable<typeof reference>>) =>
+    updateSource({ [type]: { ...reference, ...next } });
   return (
-    <div style={{ display: 'flex', gap: 8, width: '100%' }}>
-      <Input
-        aria-label={t('NAME')}
-        placeholder={t('NAME')}
-        value={value.name || ''}
-        onChange={event => onChange?.({ ...value, name: event.target.value })}
-      />
-      <Input
-        aria-label={t('VALUE')}
-        placeholder={t('VALUE')}
-        value={value.value || ''}
-        onChange={event => onChange?.({ ...value, value: event.target.value })}
-      />
+    <div style={{ display: 'grid', gap: 8, width: '100%' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+        <Input
+          aria-label={t('NAME')}
+          placeholder={t('NAME')}
+          value={value.name || ''}
+          onChange={event => onChange?.({ ...value, name: event.target.value })}
+        />
+        <Select
+          aria-label={t('WORKLOAD_ENV_SOURCE')}
+          value={type}
+          options={[
+            { label: t('CUSTOM'), value: 'literal' },
+            { label: t('FROM_CONFIGMAP'), value: 'configMapKeyRef' },
+            { label: t('FROM_SECRET'), value: 'secretKeyRef' },
+            { label: t('WORKLOAD_ENV_FIELD_PATH'), value: 'fieldRef' },
+            { label: t('WORKLOAD_ENV_RESOURCE'), value: 'resourceFieldRef' },
+          ]}
+          onChange={next => {
+            if (next === 'literal') {
+              const rest = { ...value };
+              delete rest.valueFrom;
+              onChange?.({ ...rest, value: '' });
+            } else {
+              updateSource({
+                [String(next)]:
+                  next === 'fieldRef'
+                    ? { fieldPath: 'metadata.name' }
+                    : next === 'resourceFieldRef'
+                      ? { resource: 'limits.cpu' }
+                      : { name: '', key: '' },
+              });
+            }
+          }}
+        />
+      </div>
+      {type === 'literal' && (
+        <Input
+          aria-label={t('VALUE')}
+          placeholder={t('VALUE')}
+          value={value.value || ''}
+          onChange={event => onChange?.({ ...value, value: event.target.value })}
+        />
+      )}
+      {reference && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: 8 }}>
+          <Select
+            aria-label={t('WORKLOAD_REFERENCE_RESOURCE')}
+            value={reference.name}
+            options={toOptions(
+              type === 'secretKeyRef' ? resourceOptions.secrets : resourceOptions.configMaps,
+            )}
+            placeholder={t('WORKLOAD_SELECT_RESOURCE')}
+            onChange={name => updateReference({ name: String(name || ''), key: '' })}
+          />
+          <Input
+            aria-label={t('KEY_IN_RESOURCE')}
+            placeholder={t('KEY_IN_RESOURCE')}
+            value={reference.key}
+            onChange={event => updateReference({ key: event.target.value })}
+          />
+          <Switch
+            aria-label={t('WORKLOAD_REFERENCE_OPTIONAL')}
+            label={t('WORKLOAD_REFERENCE_OPTIONAL')}
+            checked={Boolean(reference.optional)}
+            onChange={optional => updateReference({ optional })}
+          />
+        </div>
+      )}
+      {source?.fieldRef && (
+        <Input
+          aria-label={t('WORKLOAD_ENV_FIELD_PATH')}
+          placeholder="metadata.name"
+          value={source.fieldRef.fieldPath}
+          onChange={event =>
+            updateSource({ fieldRef: { ...source.fieldRef!, fieldPath: event.target.value } })
+          }
+        />
+      )}
+      {source?.resourceFieldRef && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+          <Select
+            aria-label={t('WORKLOAD_ENV_RESOURCE')}
+            value={source.resourceFieldRef.resource}
+            options={toOptions([
+              'requests.cpu',
+              'limits.cpu',
+              'requests.memory',
+              'limits.memory',
+              'requests.ephemeral-storage',
+              'limits.ephemeral-storage',
+            ])}
+            onChange={resource =>
+              updateSource({
+                resourceFieldRef: { ...source.resourceFieldRef!, resource: String(resource) },
+              })
+            }
+          />
+          <Input
+            aria-label={t('CONTAINER_NAME')}
+            placeholder={t('CONTAINER_NAME')}
+            value={source.resourceFieldRef.containerName || ''}
+            onChange={event =>
+              updateSource({
+                resourceFieldRef: {
+                  ...source.resourceFieldRef!,
+                  containerName: event.target.value || undefined,
+                },
+              })
+            }
+          />
+          <Input
+            aria-label={t('WORKLOAD_ENV_DIVISOR')}
+            placeholder={t('WORKLOAD_ENV_DIVISOR')}
+            value={source.resourceFieldRef.divisor || ''}
+            onChange={event =>
+              updateSource({
+                resourceFieldRef: {
+                  ...source.resourceFieldRef!,
+                  divisor: event.target.value || undefined,
+                },
+              })
+            }
+          />
+        </div>
+      )}
     </div>
   );
 }
-
-const toOptions = (items: string[]) => items.map(item => ({ label: item, value: item }));
 
 function EnvironmentFromInput({
   value = { kind: 'configMap', name: '' },
@@ -155,7 +280,14 @@ function EnvironmentFromInput({
 }) {
   const names = value.kind === 'secret' ? resourceOptions.secrets : resourceOptions.configMaps;
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '140px 1fr 140px', gap: 8, width: '100%' }}>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '120px 1fr 120px auto',
+        gap: 8,
+        width: '100%',
+      }}
+    >
       <Select
         aria-label={t('WORKLOAD_REFERENCE_TYPE')}
         value={value.kind}
@@ -177,6 +309,12 @@ function EnvironmentFromInput({
         placeholder={t('PREFIX')}
         value={value.prefix || ''}
         onChange={event => onChange?.({ ...value, prefix: event.target.value })}
+      />
+      <Switch
+        aria-label={t('WORKLOAD_REFERENCE_OPTIONAL')}
+        label={t('WORKLOAD_REFERENCE_OPTIONAL')}
+        checked={Boolean(value.optional)}
+        onChange={optional => onChange?.({ ...value, optional })}
       />
     </div>
   );
@@ -508,7 +646,7 @@ export default function ContainerInput({
           checkItemValid={() => true}
           onChange={env => update({ env })}
         >
-          <EnvironmentInput />
+          <EnvironmentInput resourceOptions={resourceOptions} />
         </ArrayInput>
         <ArrayInput
           itemType="object"
