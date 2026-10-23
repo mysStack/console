@@ -5,7 +5,7 @@
 > 迁移集成分支：`feature/v4-migration`
 >
 > 基线：`release-4.1.5` / `fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`
-> Workload DEV 源提交：`feature/v4-workloads` / `0a44f5706`；当前阶段为 `VERIFY`，REA 已通过、DEV 已完成。WL-01～WL-04 的代码与本地测试已关闭，真实部署、Playwright、RBAC、namespace、缓存和功能等价性仍待当前 SHA 验证。唯一当前状态见 [module-execution.json](./module-execution.json)，交付边界见 [DEV 完成记录](./workload-dev-completion-20261023.md)，REA 与测试输入继续见原有证据文档。
+> Workload DEV 源提交：`feature/v4-workloads` / `b1ec3593d`；当前阶段为 `VERIFY`，REA 已通过、DEV 已完成。首次 VERIFY 发现 StatefulSet 删除后配套 Headless Service 遗留，已按状态机回退 DEV 修复并重新进入 VERIFY；真实部署、Playwright、RBAC、namespace、缓存和功能等价性仍待新 SHA 验证。唯一当前状态见 [module-execution.json](./module-execution.json)，交付边界见 [DEV 完成记录](./workload-dev-completion-20261023.md)，REA 与测试输入继续见原有证据文档。
 
 > 2026-10-23 执行入口补强：接入 Git 阶段检查、中文提交标题和 PR 全量差异检查；32 项隔离 Git 回归通过。此结果仅覆盖工具，不改变下表的功能状态，不代表 Deployment 编辑设置或其他模块已验收。
 

@@ -4,7 +4,7 @@
   "capability": "deployment-statefulset-daemonset",
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
-  "phase": "DEV",
+  "phase": "VERIFY",
   "rea": {
     "status": "已通过",
     "sourceCommit": "e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0",
@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "ef9667d0583a9029152f0339a516c7abf382bdf585f9961dee3a4a1cc6279e63"
+        "sha256": "762274aebf5e48915d21d089c58857f7b575f898399d5ac81cf8fa2370ab7c18"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "5b78bfbe242f270f50934399e6c18ddc1e3213ac55dd4b925f42b0eab7a93e10"
+        "sha256": "04e09b240b7b061c1b8a54d308af856765faa5ff0efc40260d2776f2e6b63dc2"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -224,9 +224,9 @@
     }
   },
   "dev": {
-    "status": "进行中",
-    "reason": "VERIFY 浏览器/API 删除验收发现原生 StatefulSet 删除后遗留配套 Headless Service，已按状态机回退 DEV 修复；既有 DEV 交付保留为历史输入，完成修复与本地回归后重新进入 VERIFY。",
-    "sourceCommit": "0a44f5706d1a6ba9b266360caa2d4128d8bb08a2",
+    "status": "已完成",
+    "reason": "三类原生入口、列表、详情、创建、设置、Action/Store 与配置引用替代已完成；首次 VERIFY 发现的 StatefulSet 删除后 Headless Service 遗留已按状态机回退 DEV 修复，并通过新增单项/批量删除回归、完整测试和包构建。",
+    "sourceCommit": "b1ec3593d479ddbb3548e495d77085ccaeb13191",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
@@ -466,7 +466,7 @@
       },
       {
         "path": "docs/v4-migration/workload-dev-completion-20261023.md",
-        "sha256": "52e5e0d57fc700b4877ff260e919d69911e7b7191a5b5ebbb912b6def0403713"
+        "sha256": "aa17c130951dc27bcdd158f0f77f03db78e51c67c0e4b8a5e3da43dc89f783fb"
       }
     ]
   },
@@ -477,9 +477,9 @@
     "WL-04：移除普通 Workload 配置引用的 useV3action、Wujie Shadow DOM 和 V3 编辑器桥接"
   ],
   "verify": {
-    "status": "待重新执行",
-    "reason": "精确 SHA cc3b04c2a3408538e45bdd81c7e804413e527f2f 的构建、部署及三类资源浏览器流程已执行，但 StatefulSet 删除后 Headless Service 遗留；缺陷关闭并部署新 SHA 前不得标记通过。",
-    "sourceCommit": "0a44f5706d1a6ba9b266360caa2d4128d8bb08a2",
+    "status": "进行中",
+    "reason": "等待精确 DEV 源提交 b1ec3593d479ddbb3548e495d77085ccaeb13191 的 CI 镜像、131 rollout、Pod imageID 与 StatefulSet Service 清理重验；此前 cc3b04c2a340 的部署和页面证据保留为缺陷发现输入，不继承为新 SHA 通过。",
+    "sourceCommit": "b1ec3593d479ddbb3548e495d77085ccaeb13191",
     "documents": []
   }
 }

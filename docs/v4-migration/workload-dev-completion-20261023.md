@@ -4,7 +4,7 @@
 
 - 模块：`workloads / deployment-statefulset-daemonset`。
 - 分支 / Worktree：`feature/v4-workloads` / `/home/bruce/code/ks-develop/console-workloads`。
-- DEV 源提交：`0a44f5706d1a6ba9b266360caa2d4128d8bb08a2`。
+- DEV 源提交：`b1ec3593d479ddbb3548e495d77085ccaeb13191`。
 - 当前阶段结论：DEV 已完成，进入 VERIFY；本记录不表示部署或浏览器验收已经通过。
 
 ## DEV 验收清单
@@ -22,13 +22,15 @@
 
 | 检查                           | 结果                                                                                 |
 | ------------------------------ | ------------------------------------------------------------------------------------ |
-| `./scripts/test.sh`            | 81 个测试文件、361 项通过，0 失败                                                    |
+| `./scripts/test.sh`            | 81 个测试文件、363 项通过，0 失败                                                    |
 | `corepack yarn build:packages` | 通过；四个 package 构建完成，shared 压缩 633/633                                     |
 | 变更文件 ESLint                | 0 错误、0 警告                                                                       |
 | Prettier、`git diff --check`   | 通过                                                                                 |
 | 完整 TypeScript                | 仓库仍有 1316 条既有诊断，不能登记为通过；此前同配置对照未发现本模块新增生产文件诊断 |
 
 回滚版本必填修复提交为 `cf4cfc2ba2cf27ebd241b41f4e93f24317734e74`；StatefulSet 创建残留回收提交为 `0a44f5706d1a6ba9b266360caa2d4128d8bb08a2`。后者的 Store 定向回归为 24/24，通过 Service 创建失败不发送 Workload、Workload 创建失败删除本轮 Service 两条失败路径。
+
+首次 VERIFY 在精确 SHA `cc3b04c2a3408538e45bdd81c7e804413e527f2f` 上通过浏览器创建并删除 StatefulSet 后，API 回读发现随机生成的 Headless Service 仍存在。该结果按状态机将模块退回 DEV。提交 `b1ec3593d479ddbb3548e495d77085ccaeb13191` 为原生创建的 StatefulSet 登记 `kubesphere.io/related-service`，单项删除和批量删除仅在 `statefulsets` Store 中清理该登记 Service，Deployment 不响应同名注解。新增测试先复现 3 项失败，实现后转换测试 65/65、Store 测试 26/26、完整回归 81 文件/363 项及包构建通过；遗留测试 Service 已单独删除，namespace 保留。修复后的真实创建/删除仍须部署该精确 SHA 后重新验证。
 
 ## VERIFY 必须完成
 
