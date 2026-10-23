@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "d2556c484eeb351deff095642afe0433b3fa88f37612753baa02bf2ec49437c0"
+        "sha256": "32979aae835ab903f797d5b0d56f5a54c6da6bc981b3024635916ee74f95e45f"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "eeb7d1a995af12a0675d51bf6a2d46a432b768b5b6bb43a61e557ac07a97c5cb"
+        "sha256": "f1570ff1247c5ce17d37c0099c6a3839cfae899d5864721aabdfe8ed982d4f40"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -225,12 +225,12 @@
   },
   "dev": {
     "status": "进行中",
-    "reason": "进行中：三类原生设置及顶层元数据、DaemonSet 原生创建与停止补丁、StatefulSet PVC 模板/Service payload 已实现，普通项目配置引用已移除 V3 Action/Wujie DOM 桥接；集群级原生入口、StatefulSet 双资源创建、完整 Action、Service/PVC 真实保存、RBAC、缓存和部署后浏览器验收仍待补齐；未进入 VERIFY",
-    "sourceCommit": "35ca7fb7968821606ae581ef7ccc3758908b8c6f",
+    "reason": "进行中：三类原生设置及顶层元数据、StatefulSet/DaemonSet 原生创建、DaemonSet 停止补丁、StatefulSet PVC 模板/Service payload 已实现，普通项目配置引用已移除 V3 Action/Wujie DOM 桥接；集群级原生入口、完整 Action、双资源部分成功恢复、真实保存、RBAC、缓存和部署后浏览器验收仍待补齐；未进入 VERIFY",
+    "sourceCommit": "6328e67aa3c93234d62150337dd4dd2a0df770ff",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
-        "sha256": "5659665a775d6b530d5347ad5bdfaac8e845c931106d83c4210e81d0d0b2bd94"
+        "sha256": "94c7f66f01e99d054e589a138c7990784769888b72220ab9631e8fdc64cd8483"
       },
       {
         "path": "docs/v4-migration/evidence/workload-lifecycle-20261023-api-validation.json",
@@ -447,6 +447,14 @@
       {
         "path": "docs/v4-migration/evidence/workload-daemonset-create-20261023-api-validation.json",
         "sha256": "6f5138add34b250b1e5a04664df3c21efd619a814eda658929fe668cd5d032b4"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-statefulset-create-server-validation.cjs",
+        "sha256": "19abeb17c9b0226b11b8ebf4673fab78a7208d4cd7a174cbd3a6d9c84daf89ab"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-statefulset-create-20261023-api-validation.json",
+        "sha256": "e2de49d576aa55b18778802e3b364b61fb322372f61ed7b6b51e1871e6b8bae7"
       }
     ]
   },

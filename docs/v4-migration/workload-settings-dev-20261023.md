@@ -5,7 +5,7 @@
 - 模块：`workloads / deployment-statefulset-daemonset`。
 - 分支 / Worktree：`feature/v4-workloads` / `console-workloads`。
 - 负责人批准进入 DEV：`5c24342571419708b6f0c21f3ce9e8f193da0e17`，批准原文见 [REA 复核记录](./workload-rea-review-20261023.md)。
-- 首批功能提交：`0c1d9aadf219fcabf5e6a310722591c9d7bef136`；生命周期增量提交：`da25187d33ca49d21afa0ad748b619e8a2786c64`；安全上下文增量提交：`9e2f4148f2abde58b6eec850612d99dc1ac3f0a8`；当前功能提交：`35ca7fb7968821606ae581ef7ccc3758908b8c6f`。
+- 首批功能提交：`0c1d9aadf219fcabf5e6a310722591c9d7bef136`；生命周期增量提交：`da25187d33ca49d21afa0ad748b619e8a2786c64`；安全上下文增量提交：`9e2f4148f2abde58b6eec850612d99dc1ac3f0a8`；当前功能提交：`6328e67aa3c93234d62150337dd4dd2a0df770ff`。
 - 阶段仍为 DEV / 进行中；不是三类资源完整验收，也没有进入 VERIFY。
 
 ## 本次实现与保留行为
@@ -16,7 +16,7 @@
 4. StatefulSet 容器挂载校验同时识别 `volumeClaimTemplates` 的隐式卷名，不把这些模板伪造进 `template.spec.volumes`；未定义的卷名仍拒绝。
 5. 保存使用原始 resourceVersion，`noGetDetail: true`；成功后刷新详情，读取失败显示错误，保存失败和 409 继续由原生 Modal 展示，不自动覆盖并发版本。
 
-本次共享范围只在 Workload 编辑和创建组件内：Deployment、StatefulSet、DaemonSet 共用转换和校验；创建表单现已按资源类型支持 Deployment 和 DaemonSet，StatefulSet 的双资源创建仍待实现。未修改跨模块的通用 Store、缓存或 RBAC 底座。后续若需改这些底座，须先登记影响和回归范围。
+本次共享范围在 Workload 编辑/创建组件和 Workload Store 内：Deployment、StatefulSet、DaemonSet 共用转换和校验；创建表单现已按资源类型支持三类资源，StatefulSet 通过专用 mutation 创建 Workload 与 Headless Service。未修改跨模块缓存或 RBAC 底座。后续若需改这些底座，须先登记影响和回归范围。
 
 ## 实际执行与结果
 
@@ -50,8 +50,8 @@ console 定向重建复用 `scripts/libs/create-rollup-config.js`，分别传入
 ## 剩余清单
 
 - 三类资源已确认的公共设置和资源特有设置已完成主要代码增量；仍须按字段矩阵关闭未建模高级字段、Action 及错误边界，不能因现有表单可用而关闭 WL-02。
-- 集群级三类列表仍挂载 V3/Wujie；StatefulSet 创建尚未闭环，不能直接接路由后宣称完成。
-- StatefulSet 创建和各类未完成 Action 仍需继续补齐；DaemonSet 原生创建和停止语义已完成 DEV 代码与本地/API dry-run 验证，真实持久化和浏览器行为留待 VERIFY。
+- 集群级三类列表仍挂载 V3/Wujie；StatefulSet 创建已完成 DEV 代码，但真实持久化与双资源错误恢复尚未闭环，不能直接接路由后宣称完成。
+- StatefulSet 与 DaemonSet 原生创建、DaemonSet 停止语义已完成 DEV 代码与本地/API dry-run 验证；真实持久化、双资源部分成功恢复和浏览器行为留待 VERIFY，各类未完成 Action 继续列入 DEV 清单。
 - 普通项目三类配置引用的不可达 V3 Action/DOM 桥接已移除；真实保存、失败、权限、namespace 和缓存行为仍须在 VERIFY 关闭。
 - 真实 RBAC 正反权限、namespace 隔离、缓存失效、API 持久化、保存/取消/冲突及当前制品渲染未完成。
 - 三类资源分别完成 DEV 后，再按门禁构建当前 SHA 镜像、部署 131 并执行 Playwright；PR #2 保持 Draft，不自动合并。
@@ -297,4 +297,31 @@ DaemonSet 的旧 V3 UI 快照没有调度分区，因此当前 V4 不为它虚�
 | `tsc --noEmit -p packages/console/tsconfig.json`                                                                           | **未通过**：依赖 `type-fest` 产生 147 条既有解析诊断；本次 WorkloadCreateModal/DaemonSets 文件匹配 0 条                                                | 不报告全项目 TypeScript 通过                                                                 |
 | `node docs/v4-migration/evidence/workload-daemonset-create-server-validation.cjs`                                          | 绑定精确源码提交 `35ca7fb79`；131 `v1.31.13+k3s1` 接受生成的 DaemonSet server dry-run，无 `replicas`，策略、就绪时间和优雅终止字段检查通过，残留资源 0 | 不保存资源；见 [API 记录](./evidence/workload-daemonset-create-20261023-api-validation.json) |
 
-本次关闭项目级 DaemonSet 原生创建的 DEV 代码缺口。当前 SHA 尚未构建 Console 镜像、部署 131、执行 rollout 或登录已部署制品做 Playwright；真实创建/删除、API 持久化、RBAC 正反权限、namespace 隔离、缓存刷新、失败/取消路径和 V3 功能等价性仍归 VERIFY。下一项是 StatefulSet 原生创建：必须在提交实际对象前先对 StatefulSet 和配套 Headless Service 执行双资源服务端 dry-run，并处理双资源创建的错误边界。集群级三类入口在创建和 Action 等价性关闭前不切换。阶段保持 DEV，PR #2 保持 Draft。
+本次关闭项目级 DaemonSet 原生创建的 DEV 代码缺口。当前 SHA 尚未构建 Console 镜像、部署 131、执行 rollout 或登录已部署制品做 Playwright；真实创建/删除、API 持久化、RBAC 正反权限、namespace 隔离、缓存刷新、失败/取消路径和 V3 功能等价性仍归 VERIFY。后续 StatefulSet 原生创建增量已按要求加入双资源 dry-run；集群级三类入口在创建和 Action 等价性关闭前不切换。阶段保持 DEV，PR #2 保持 Draft。
+
+## StatefulSet 原生创建（2026-10-23）
+
+代码提交 `6328e67aa3c93234d62150337dd4dd2a0df770ff` 将项目级 StatefulSet 列表的创建入口替换为原生表单，并按当前 V3 制品与合法旧源码的交叉证据构造 StatefulSet 和配套 Headless Service。旧源码仅用于核对双资源流程、Service 名称、selector、端口和注解，不作为当前 `v3dist` 的源码身份声明。
+
+### 实现与边界
+
+1. StatefulSet 复用三类 Workload 的容器、初始化容器、更新策略、终止宽限期、调度、节点选择、卷、PVC 模板、标签与注解输入；工作容器端口可以独立填写 Service 端口，初始化容器不会生成 Service 端口。
+2. StatefulSet 写入 `spec.serviceName`、`RollingUpdate.partition` 或 `OnDelete`、PVC 模板与 Pod 终止宽限期。Headless Service 写入 `clusterIP=None`、`sessionAffinity=None`、去除 `version` 的 Pod selector、别名/类型注解及已选择的端口映射。
+3. Service 名称沿用已核对的 V3 规则：工作负载名称截到 57 位后拼接 4 位后缀；首字符不是字母时增加 `s`。同一次失败重试保留名称，工作负载名称变化时重新生成。
+4. Store 先并行 dry-run StatefulSet 和 Service；两项均成功后才并行提交实际创建。dry-run 任一失败时不会发出持久化请求。Kubernetes 不提供这两个 POST 的事务，实际提交阶段仍可能出现一项成功、一项失败；VERIFY 必须验证错误提示、残留识别和人工恢复路径，在关闭前不宣称原子创建。
+5. 成功后关闭弹窗、刷新当前 namespace 列表并显示成功消息；失败时保留弹窗并显示本地化错误。实际浏览器、权限、namespace、缓存与持久化行为尚未验证。
+
+### 测试先行与本地验证
+
+- RED：构建器 3 项、Store 2 项、Modal 1 项、列表接线 1 项及四种语言键先因实现缺失失败，再进入生产代码修改。
+- 定向测试：构建器 65/65、Workload Store 22/22、创建 Modal 5/5、StatefulSet 列表 3/3、作用域刷新 12/12、四种语言 4/4 通过。
+- `./scripts/test.sh`：79 个文件、352 项通过，0 失败。
+- `corepack yarn build:packages`：退出 0，appstore、console、core、shared 均构建完成，shared 完成 633/633 minify；保留既有循环依赖和 Node 模块警告。
+- 变更文件 Prettier、`git diff --check`、提交门禁与中文提交标题检查通过。定向 ESLint 无错误；StatefulSet 列表保留一条改动前已有的 `max-len` warning。
+- `corepack yarn tsc -p packages/console/tsconfig.json --noEmit --pretty false`：退出 2，共 1316 条仓库既有诊断；本次 console 生产文件直接诊断为 0，shared Store 命中的是以 console tsconfig 跨包检查产生的 TS6059/TS6307 `rootDir`/文件列表错误。全项目 TypeScript 不能记录为通过。
+
+### 131 API Server 验证
+
+可复现脚本 [workload-statefulset-create-server-validation.cjs](./evidence/workload-statefulset-create-server-validation.cjs) 从精确提交 `6328e67aa` 的构建器生成双资源对象，并在已授权的 `default` context、`https://192.168.2.131:6443`、Kubernetes `v1.31.13+k3s1`、namespace `v4-migration-e2e` 执行两次 `kubectl create --dry-run=server`。Service 和 StatefulSet 均被接受；`serviceName`、Headless Service、selector、15432→5432 端口、partition 0、1Gi `local-path` PVC 模板和 45 秒终止宽限期全部通过结构检查，标签查询残留为 0。结构化结果见 [API 记录](./evidence/workload-statefulset-create-20261023-api-validation.json)。
+
+本增量没有构建或推送 Console 测试镜像，没有更新 131 的 `ks-console`、rollout、核对 digest/imageID 或登录当前 SHA 页面。真实双资源创建/删除、部分成功恢复、RBAC 正反权限、namespace 隔离、缓存刷新、失败/取消、刷新/返回和 V3 功能等价性仍归 VERIFY。集群级三类原生入口及其余未完成 Action 继续留在 DEV；阶段保持 DEV，PR #2 保持 Draft。

@@ -1,0 +1,79 @@
+{
+  "date": "2026-10-23T06:56:15.435Z",
+  "sourceCommit": "6328e67aa3c93234d62150337dd4dd2a0df770ff",
+  "uncommittedSourceFiles": [],
+  "server": "https://192.168.2.131:6443",
+  "version": "v1.31.13+k3s1",
+  "namespace": "v4-migration-e2e",
+  "mode": "server dry-run; no resource persisted",
+  "serviceResult": "service/v4-native-sts-dryrun-1792738573852-ab12",
+  "serviceError": "",
+  "workloadResult": "statefulset.apps/v4-native-sts-dryrun-1792738573852",
+  "workloadError": "",
+  "residualResources": [],
+  "resourceSummary": {
+    "workload": {
+      "apiVersion": "apps/v1",
+      "kind": "StatefulSet",
+      "name": "v4-native-sts-dryrun-1792738573852",
+      "serviceName": "v4-native-sts-dryrun-1792738573852-ab12",
+      "updateStrategy": {
+        "type": "RollingUpdate",
+        "rollingUpdate": {
+          "partition": 0
+        }
+      },
+      "terminationGracePeriodSeconds": 45,
+      "volumeClaimTemplates": [
+        {
+          "metadata": {
+            "name": "data"
+          },
+          "spec": {
+            "accessModes": ["ReadWriteOnce"],
+            "resources": {
+              "requests": {
+                "storage": "1Gi"
+              }
+            },
+            "storageClassName": "local-path"
+          }
+        }
+      ]
+    },
+    "service": {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "name": "v4-native-sts-dryrun-1792738573852-ab12",
+      "clusterIP": "None",
+      "selector": {
+        "v4-migration-e2e": "statefulset-create-dryrun",
+        "tier": "database",
+        "app": "v4-native-sts-dryrun-1792738573852"
+      },
+      "ports": [
+        {
+          "name": "sql",
+          "protocol": "TCP",
+          "port": 15432,
+          "targetPort": 5432
+        }
+      ]
+    }
+  },
+  "checks": {
+    "serviceAccepted": true,
+    "workloadAccepted": true,
+    "isStatefulSet": true,
+    "serviceBinding": true,
+    "headlessService": true,
+    "serviceSelectorPreserved": true,
+    "servicePortPreserved": true,
+    "strategyPreserved": true,
+    "volumeClaimPreserved": true,
+    "terminationPreserved": true,
+    "namespacePreserved": true,
+    "noResourcePersisted": true,
+    "exactCommittedSource": true
+  }
+}

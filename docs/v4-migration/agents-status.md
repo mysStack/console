@@ -3,9 +3,9 @@
 ## 唯一当前状态（2026-10-23 组合批次范围调整）
 
 - 负责人：当前 Codex 单会话，不使用子 Agent。模块/能力：`workloads / deployment-statefulset-daemonset`；资源：Deployment、StatefulSet、DaemonSet。
-- 分支/Worktree：`feature/v4-workloads` / `console-workloads`；当前功能提交 `35ca7fb7968821606ae581ef7ccc3758908b8c6f`。
+- 分支/Worktree：`feature/v4-workloads` / `console-workloads`；当前功能提交 `6328e67aa3c93234d62150337dd4dd2a0df770ff`。
 - 当前阶段 `DEV`，REA 结论“已通过”。[阶段记录](./module-execution.json)、[组合能力边界](./workload-kind-capability-matrix.md)、[REA 索引](./rea-analysis-summary.md)为当前依据；Deployment 专项矩阵是组合批次的输入之一。
-- 最新 DEV 交付：`35ca7fb79` 完成项目级 DaemonSet 原生创建，按资源类型复用创建表单且不写入 `replicas`，接入更新策略、就绪时间、优雅终止、列表刷新和本地化错误反馈。精确代码提交的 78 文件/342 项回归、相关 ESLint/Prettier、包构建和 131 API server dry-run 已执行；完整 TypeScript 仍被 `type-fest` 的 147 条既有解析诊断阻塞。当前 SHA 尚未构建/部署 Console 镜像或执行 Playwright，真实持久化、RBAC、作用域和缓存归 VERIFY。
+- 最新 DEV 交付：`6328e67aa` 完成项目级 StatefulSet 原生双资源创建，复用 Workload 表单生成 StatefulSet 与 Headless Service，支持 Service 端口、更新策略、PVC 模板、调度、元数据、失败反馈和成功刷新；Store 在实际提交前对两项资源全部 dry-run。精确代码提交的 79 文件/352 项回归、定向 ESLint/Prettier、包构建和 131 双资源 API server dry-run 已执行。完整 TypeScript 仍有 1316 条仓库既有诊断，本次 console 生产文件直接诊断为 0。当前 SHA 尚未构建/部署 Console 镜像或执行 Playwright；实际双 POST 存在部分成功边界，真实持久化、恢复路径、RBAC、作用域和缓存归 VERIFY。
 - 当前任务：三类资源已定位普通编辑入口、Action 处理器、Store/API 请求边界、权限键和按资源登记的分区；按 WL-01～WL-04 验收清单补齐字段、作用域、RBAC、缓存和运行时差异。公共实现可以共用，三类资源的差异和验收必须分别记录。当前阶段允许修改业务代码，但不部署，直到 DEV 交付完成。已有实现和限定浏览器观察保留为历史输入。
 - 当前 REA 材料已获项目负责人批准进入 DEV。复核记录见 [workload-rea-review-20261023.md](./workload-rea-review-20261023.md)。REA 当时确认的普通 Workload 配置引用 `useV3action`、Wujie Shadow DOM 和 V3 编辑器桥接已在后续 DEV 提交移除；集群级三类 Workload 列表主入口仍挂载 `/consolev3`，继续作为明确缺口。`module-execution.json` 已记录复核依据和日期。
 - 已建立 [三类资源字段行为矩阵](./workload-field-behavior-matrix-20261023.md)，覆盖公共字段、默认值/校验、清空/保留语义，以及 StatefulSet Service/PVC 模板和 DaemonSet 无副本/更新策略差异。矩阵将待实测项明确列出；字段、API、RBAC、缓存和错误仍未闭环，不改变 REA 门禁。
@@ -14,8 +14,8 @@
 - 已补充 [旧 V3 运行时 REA](./workload-v3-runtime-rea-20261023.md)：在 131 历史镜像上只读复核 StatefulSet 设置分区和 GET 请求，未执行任何资源变更；该镜像不是当前分支 HEAD，只作为行为输入。
 - 已关闭的定向未知：旧源码四个设置分区、StatefulSet Service 差异、Deployment HPA 差异，以及当前制品的普通入口和 Action 定位。DEV 验收清单待关闭：三类资源完整字段/校验、动态 Action/API/Store、RBAC/作用域和错误/缓存行为；REA 已获负责人批准，后续进入 DEV，但不代表上述缺口已完成。
 - 历史取证输入 SHA：`24e87aec244ef265ef14fc3201603e42a1233978`。本轮新增确认：集群级三类入口仍挂载 Wujie/V3，两个未挂载的独立 StatefulSet/DaemonSet Embed 文件 URL 互换（不作为主入口已复现缺陷）；联邦 Deployment/StatefulSet 仍为 Wujie/V3，联邦 DaemonSet 范围未确认；普通 Workload 配置引用仍调用 `useV3action` 并绑定 V3 DOM。上述内容已列为明确缺口或高风险，不把它们当作“没有功能”。
-- 当前精确代码提交的完整回归为 78 个测试文件、342 项通过；普通项目 ConfigReference 已改为原生路由和 Patch 能力，旧桥接测试已删除。整体测试仍不覆盖集群桥接移除、当前 SHA 部署后的浏览器行为、真实 RBAC、namespace 隔离和缓存失效。
-- 当前 DEV 验收清单仍待完成：StatefulSet 双资源创建、集群级三类原生入口，以及未完成的 Action/API/Store/RBAC/缓存和错误路径。原生设置、DaemonSet 原生创建及停止补丁、StatefulSet Service payload/PVC 模板、三类顶层 metadata 和普通项目配置引用桥接移除已完成代码及本地/静态/API dry-run 验证，真实制品验收仍未完成。对应测试设计已加入 `WL-MV-09`、`WL-MV-10`；本轮已获准编码，不代表这些项目已经通过。
+- 当前精确代码提交的完整回归为 79 个测试文件、352 项通过；普通项目 ConfigReference 已改为原生路由和 Patch 能力，旧桥接测试已删除。整体测试仍不覆盖集群桥接移除、当前 SHA 部署后的浏览器行为、真实 RBAC、namespace 隔离和缓存失效。
+- 当前 DEV 验收清单仍待完成：集群级三类原生入口，以及未完成的 Action/API/Store/RBAC/缓存和错误路径。原生设置、StatefulSet/DaemonSet 原生创建、DaemonSet 停止补丁、StatefulSet Service/PVC 模板、三类顶层 metadata 和普通项目配置引用桥接移除已完成代码及本地/静态/API dry-run 验证，真实制品验收仍未完成。StatefulSet 双 POST 的部分成功恢复路径明确保留到 VERIFY。对应测试设计已加入 `WL-MV-09`、`WL-MV-10`；本轮已获准编码，不代表这些项目已经通过。
 - 当前模块的流程文件修复涉及所有后续模块：根目录主计划/规则/门禁脚本原位更新，版本化快照位于 `governance/`；不改公共业务组件。其他模块初始化阶段记录后才能继续，不继承 Workload 的状态。
 - 2026-10-23：在原门禁基础上接入真实 Git pre-commit、中文 commit-msg 和 PR CI。隔离 Git 回归由 18 项增至 32 项，通过；初次新增用例复现 8 项失败。工具测试通过不表示业务阶段放行，PR #2 的完整差异仍需接受阶段检查；部署和浏览器未执行。详见[修复记录补充](./module-process-repair-20261022.md#2026-10-23-执行入口补强)。
 - 工具代码提交 `da38cb87e` 已推送；[Run 39812232782](https://github.com/mysStack/console/actions/runs/39812232782) 的 32 项工具回归成功，阶段检查拒绝 REA 中的历史业务差异，总结果为 failure。`feature/v4-migration` 已配置这两个必需检查并对管理员生效。真实证据见[验证记录](./governance/module-gate-verification-20261023.json)；不改变当前模块 REA 状态。
