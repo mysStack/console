@@ -7,9 +7,8 @@ import WujieReact from 'wujie-react';
 
 import { useEventEmitter } from '@ks-console/shared';
 import { setGlobalConsoleV3LoadCompleted } from '../utils/globals.consoleV3LoadCompleted';
-import { shouldPreloadConsoleV3 } from './wujieNativePreload';
 
-const { setupApp, preloadApp, bus } = WujieReact;
+const { setupApp, bus } = WujieReact;
 
 export function initWujie() {
   setupApp({
@@ -38,20 +37,5 @@ export function initWujie() {
         }
       });
     },
-  });
-
-  if (!shouldPreloadConsoleV3(window.location.pathname)) {
-    return;
-  }
-
-  preloadApp({
-    name: 'consoleV3Actions',
-    props: { actions: true },
-    url: `//${window.location.host}/consolev3/dashboard`,
-  });
-
-  preloadApp({
-    name: 'consolev3',
-    url: `//${window.location.host}/consolev3/dashboard`,
   });
 }
