@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "501c410e9253720700cfbbe5b762876adb7c6f76c377e01516339c456ffc8224"
+        "sha256": "92632505807b56bedd5f27d7a6a2812fbf51017cbd4b3405568954f09db76241"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "0d0bfc3c62b5acb542987a3262fa3c4ebec64589bdfda90a020b2f279524b5bf"
+        "sha256": "563c1f2e3aacadf18c981a73c7c20b93ef90d46e61c781d77f0c34ac72c4ed60"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -502,12 +502,12 @@
   ],
   "verify": {
     "status": "未完成",
-    "reason": "精确制品部署、三类原生路由无 V3 预加载、设置页面、低权限拒绝和第二 namespace 正反隔离已验证；完整 Action、缓存和逐项 V3 等价仍未完成。",
+    "reason": "精确制品部署、三类原生路由无 V3 预加载、设置页面、配置引用保存/取消/失败反馈、Action 菜单与取消、重新创建、DaemonSet 批量停止、低权限拒绝和第二 namespace 正反隔离已验证；批量删除、回退确认写入、伸缩确认结果、完整错误/缓存和逐项 V3 等价仍未完成。",
     "sourceCommit": "45d9f14e53d6a0c1d74011197ade9d5accbcdae9",
     "documents": [
       {
         "path": "docs/v4-migration/workload-131-verify-20261024.md",
-        "sha256": "845d131af0ef5be3768072251a7486b5fc3f200f80eb7d2b79330e6d8097fc8e"
+        "sha256": "55a4c770de5aa2d4e118883b90ca190a349b5557b0d09abccbe11d47cb56db07"
       },
       {
         "path": "docs/v4-migration/evidence/workload-settings-verify-attempt-20261024.json",
@@ -515,11 +515,19 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-v3-preload-verify-20261024.json",
-        "sha256": "1e3e1841c0b9cc6d31817d71c3049d3c148c4040b71aa3598f064c71d155d613"
+        "sha256": "d420d86263e065554ba6179f40f6ea82dcb61bab5bbd57f919bfbdf8df2e1646"
       },
       {
         "path": "docs/v4-migration/evidence/workload-rbac-namespace-verify-20261024.json",
-        "sha256": "25bac3af8aa9f0837cc5f16ba617cf5c6d15b65c2e6d7eb6115104b4cab1d638"
+        "sha256": "6abc544731d2afada6341022e4630782eb1c555b9094f753cd76153cc1913b04"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-config-reference-browser-verify-20261024.json",
+        "sha256": "e1f981c31b0a9e0f52acdad69985a581ec46a7324f71e07cf53fac4b62e424a5"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-action-browser-verify-20261024.json",
+        "sha256": "731e63be4a3d7c8de3c7194d0ef7ad9cb1260e155e46fdff0a50fb486fd04f5a"
       }
     ]
   }

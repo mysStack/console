@@ -1,10 +1,21 @@
 # Workload 131 专项 VERIFY（2026-10-24）
 
+## 当前增量：配置引用与 Action 浏览器复验（2026-10-24）
+
+在精确制品 `24c6afa03849d5d5c7b84fccd1602639b1fd0eb5`、镜像 digest `sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76` 上，使用零 Cookie 新浏览器 context 登录 131，完成三类 Workload 的配置引用和 Action 复验，登录 HTTP 200、认证界面正常，未记录页面错误。
+
+- 配置引用：Deployment、StatefulSet、DaemonSet 均完成 ConfigMap 引用保存、刷新回填、取消不保存、受控 500 错误提示、失败写入不改变资源和恢复；三类保存请求均返回 200，测试值未写入证据。
+- 详情 Action：三类页面均渲染当前实现范围内的编辑信息、回退、YAML、重新创建、删除；Deployment/StatefulSet 还显示自动扩缩，StatefulSet 显示 Service。回退、自动扩缩、重新创建、删除的取消路径已逐项验证。
+- 重新创建：三类资源实际 PATCH 返回 200，`kubesphere.io/restartedAt` 改变并回读成功。
+- DaemonSet 批量停止：选中专用 fixture 后确认，PATCH 返回 200，`non-existing=true` 节点选择补丁生效；随后移除该测试补丁并确认恢复为 1/1 Ready。
+
+证据：[配置引用浏览器复验](./evidence/workload-config-reference-browser-verify-20261024.json)、[Action 浏览器复验](./evidence/workload-action-browser-verify-20261024.json)。批量删除成功路径、回退确认后的实际写入、伸缩确认后的实际结果和完整错误/网络失败矩阵仍未验证，因此本轮不能标记模块验收通过。
+
 ## 当前增量：低权限 RBAC 在精确制品上复验（2026-10-24）
 
 使用专用 viewer 账号 `v4-workload-viewer-20261023` 在当前精确制品上完成三类配置引用页复验。账号可读取当前 `v4-migration-e2e` namespace 的 Deployment、StatefulSet、DaemonSet，三类更新请求均返回 403；回读的 resourceVersion 和 envFrom 未发生变化。`kubectl auth can-i` 同样确认该账号拥有 get、list、watch，不拥有 update，且对 `default` namespace 不具备 get 权限。
 
-本轮证明低权限拒绝路径和当前资源保护有效；尚未建立第二个专用 namespace fixture，因此完整跨 namespace 正反 UI/API 隔离仍不能标记通过。证据：[Workload 低权限与 namespace 复验](./evidence/workload-rbac-namespace-verify-20261024.json)。
+本轮证明低权限拒绝路径和当前资源保护有效；第二 namespace fixture 的 get/list 正反隔离也已完成，第一 namespace 列表不包含第二 namespace 资源，临时 Deployment 已清理、namespace 保留。证据：[Workload 低权限与 namespace 复验](./evidence/workload-rbac-namespace-verify-20261024.json)。
 
 ## 当前增量：全局 V3 预加载关闭，三类原生路由复验通过（2026-10-24）
 

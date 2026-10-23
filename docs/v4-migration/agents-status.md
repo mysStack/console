@@ -1,3 +1,11 @@
+# 当前 Workload VERIFY 进展（2026-10-24）
+
+- 当前负责人：Codex 单会话；分支 `feature/v4-workloads`；Worktree `console-workloads`；无子 Agent。
+- 精确制品：源提交 `24c6afa03849d5d5c7b84fccd1602639b1fd0eb5`，镜像 `feature-v4-workloads-20261024-050150-24c6afa03849`，digest `sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76`，131 Pod imageID 与 digest 一致。
+- 本轮已验证：三类配置引用保存/取消/刷新/受控失败/恢复；详情 Action 菜单和取消；三类重新创建实际 PATCH 及回读；DaemonSet 批量停止及恢复；低权限拒绝和第二 namespace 正反隔离；三类路由无 `/consolev3`、无 `/dist/v3dist` 请求。
+- 尚未闭环：批量删除成功、回退确认后的实际写入、伸缩确认后的实际结果、完整网络/错误矩阵、缓存跨 namespace/user 切换、逐项 V3 功能等价。因此模块仍为 `VERIFY / 未完成`，PR #2 保持 Draft。
+- 证据：[配置引用](./evidence/workload-config-reference-browser-verify-20261024.json)、[Action](./evidence/workload-action-browser-verify-20261024.json)、[低权限与 namespace](./evidence/workload-rbac-namespace-verify-20261024.json)、[无 V3 预加载](./evidence/workload-v3-preload-verify-20261024.json)。
+
 # 当前状态补充（2026-10-24：低权限 RBAC 复验）
 
 - 当前精确制品低权限复验完成：viewer 账号可读三类配置引用页，更新请求分别返回 403，资源版本和 envFrom 保持不变。

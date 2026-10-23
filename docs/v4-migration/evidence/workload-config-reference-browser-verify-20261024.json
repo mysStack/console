@@ -1,0 +1,49 @@
+{
+  "module": "workloads",
+  "sourceCommit": "24c6afa03849d5d5c7b84fccd1602639b1fd0eb5",
+  "image": "ghcr.io/mysstack/ks-console:feature-v4-workloads-20261024-050150-24c6afa03849",
+  "imageDigest": "sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76",
+  "browser": {
+    "freshContext": true,
+    "loginHttp": 200,
+    "authenticatedUI": true,
+    "pageErrors": 0
+  },
+  "fixtures": [
+    {
+      "module": "deployments",
+      "name": "v4-deploy-edit-ef3",
+      "configMapAndSecret": true,
+      "saveStatus": 200,
+      "cancelUnchanged": true,
+      "prefixReloaded": true,
+      "controlled500Feedback": true,
+      "failedWriteUnchanged": true,
+      "restored": true
+    },
+    {
+      "module": "statefulsets",
+      "name": "v4-pvc-sts-7fa",
+      "configMapAndSecret": true,
+      "saveStatus": 200,
+      "cancelUnchanged": true,
+      "prefixReloaded": true,
+      "controlled500Feedback": true,
+      "failedWriteUnchanged": true,
+      "restored": true
+    },
+    {
+      "module": "daemonsets",
+      "name": "v4-stop-ds-7fa",
+      "configMapAndSecret": true,
+      "saveStatus": 200,
+      "cancelUnchanged": true,
+      "prefixReloaded": true,
+      "controlled500Feedback": true,
+      "failedWriteUnchanged": true,
+      "restored": true
+    }
+  ],
+  "secretValuesPrinted": false,
+  "conclusion": "三类 Workload 配置引用的保存、取消、刷新回填、受控 500 错误反馈和恢复均在当前精确制品上完成浏览器验证；测试值未写入证据。"
+}

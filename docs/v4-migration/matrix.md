@@ -1,5 +1,7 @@
 # V4 迁移矩阵
 
+> **2026-10-24 Workload 当前 VERIFY 结果**：精确制品 `24c6afa03849d5d5c7b84fccd1602639b1fd0eb5` 已完成三类原生路由、配置引用、低权限拒绝、第二 namespace 正反隔离、Action 菜单/取消、重新创建和 DaemonSet 批量停止的浏览器复验。批量删除、回退确认写入、伸缩确认结果、完整错误矩阵和逐项 V3 等价仍未闭环，状态保持 `VERIFY / 未完成`，不得进入 PR 合并或标记模块已验收。详见 [131 VERIFY](./workload-131-verify-20261024.md)、[配置引用证据](./evidence/workload-config-reference-browser-verify-20261024.json)、[Action 证据](./evidence/workload-action-browser-verify-20261024.json)。
+
 > 2026-10-24 当前进展：DEV 源提交 `3e1d40eae` 的 400 项本地回归通过；构建提交 `3d255eaf8` 的 CI Run 40000821377 和首次 131 rollout 成功。新 context 登录未通过后已回滚旧镜像；专用测试凭据在旧镜像也被拒绝，当前浏览器 VERIFY 阻塞。三类资源均未整体验收，旧 SHA 结果不继承。详见 [部署与回滚](./workload-131-verify-20261024.md#当前增量部署与登录阻塞0229-上海时间)。
 > 检查日期：2026-10-24
 >
