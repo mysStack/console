@@ -20,7 +20,7 @@
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
-        "sha256": "769fff9a3c4f13b137fff35ee499975a19ef305e405d4520be604a7a85740681"
+        "sha256": "b7ca18bb60993c4db6f0187ec234b217d2950e7114e137bd38fc2e012dd7bc83"
       },
       {
         "path": "docs/v4-migration/workload-kind-capability-matrix.md",
@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "80e3802feb80ca8f62e3a610003e1a6f932583231bc5163de2a69862e690141c"
+        "sha256": "b3a4b1c025e53637d07007350043245073acefab2b7058689c964ad244089f48"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "ab8d111b61aeba79a64b5633695356ddbbf6d30a33a85a8ea4c0bd9c894003fa"
+        "sha256": "b6b93da9e18643e82cb98b753001be98e2eb5f403bbdd04e1a797d48ac91579d"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -84,7 +84,7 @@
       },
       {
         "path": "docs/v4-migration/workload-field-behavior-matrix-20261023.md",
-        "sha256": "d451b09569cd32818c54e151308903ec5d0a208e130c7adc7ee55faaf6eb5da5"
+        "sha256": "c5c860197f6456ca7b36187a938f94e3299b62b3c6d9914ffb8e6ca9f3af849a"
       },
       {
         "path": "docs/v4-migration/workload-action-api-rbac-evidence-20261023.md",
@@ -225,12 +225,12 @@
   },
   "dev": {
     "status": "进行中",
-    "reason": "进行中：原生设置入口、策略、优雅终止、生命周期、安全上下文、Pod 模板注解、宿主时区及 Deployment/StatefulSet Pod 调度已实现；Deployment 创建已补节点选择和顶层 labels/annotations；StatefulSet/DaemonSet 创建、已有资源顶层元数据编辑、StatefulSet Service/PVC、集群入口、完整 Action 和配置引用等仍待补齐；未进入 VERIFY",
-    "sourceCommit": "9cf97481c64aa8932f3afe41414057d978391a49",
+    "reason": "进行中：原生设置入口、策略、优雅终止、生命周期、安全上下文、Pod 模板注解、宿主时区及 Deployment/StatefulSet Pod 调度已实现；Deployment 创建已补节点选择和顶层 labels/annotations；StatefulSet/DaemonSet 创建、已有资源顶层元数据编辑、StatefulSet Service/PVC、DaemonSet 停止补丁已修复；集群入口、完整 Action 和配置引用等仍待补齐；未进入 VERIFY",
+    "sourceCommit": "da741a3893f88885df4698a4ea5d265336fb9692",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
-        "sha256": "e3db1ebc1d6b0968b0d61e6f626a30a62ab94294f5671af0f1586fba2d8ee965"
+        "sha256": "7f0e5ec88d9649f3197a66758adf33c60cd402ab4ca5779fcf95930c7288cdf9"
       },
       {
         "path": "docs/v4-migration/evidence/workload-lifecycle-20261023-api-validation.json",
@@ -379,6 +379,30 @@
       {
         "path": "docs/v4-migration/evidence/workload-timezone-server-validation.cjs",
         "sha256": "a618b9093072cd720bd728d55dd411072aff063ba22e6260158b364deda16726"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-stop-20261023-api-validation.json",
+        "sha256": "e01df351d0a33c0655fd8ee64832223cb8709e93be72ed2c9ce7e747eb1bc7d1"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-stop-20261023-provenance.json",
+        "sha256": "37390c38d10e77ac348f8c42ae91464b7908986db6bfa2024866239bda14d500"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-stop-20261023-rea-summary.json",
+        "sha256": "9ea1cb20cbbe622dc10c9a52a2cf0c561a2e0cd801fa2452df9793fcde358f21"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-stop-20261023-typecheck.json",
+        "sha256": "f3c56df60c883c584d61f412061b9db563c8c45b2e41c1204a7e2b56675be392"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-stop-extract.cjs",
+        "sha256": "b7482efa738304e0153a76362f6d63703a3866ead03f93bae78f288d9e9d0980"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-stop-server-validation.cjs",
+        "sha256": "91d3940a4b1cd4faf46c65150b2d9b2da4e590e917d82cc5bb955add7cce2936"
       }
     ]
   },

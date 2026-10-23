@@ -1,0 +1,27 @@
+{
+  "operation": "analyze_javascript_application",
+  "authority": "shipped-artifact",
+  "confidence": "derived",
+  "parentEvidenceId": "ev_a9ef3c9132c4de8bea7f87976ca26d9039dfbaaf972e162f003172ac342b9725",
+  "summaryEvidenceId": "ev_16ae61dd876bbc85721c5a122b30f03e340eeb2abead0fd2aa9f40984be9bf4c",
+  "inputDigest": "3c22d9c948ec703e89f06ad72e8b9c33ab781484cdeff2a782c899abb4f3d9ac",
+  "selectedFactories": [{ "bundle": "main.558f452048e49db23323.js", "id": 318 }],
+  "statistics": {
+    "relevantFiles": 1,
+    "bytes": 6904,
+    "parsedJavascriptFiles": 1,
+    "parseFailures": 0,
+    "visitedAstNodes": 2058,
+    "findings": 1
+  },
+  "coverage": { "application": "complete", "semantic": "unknown", "semanticUnknowns": 582 },
+  "observations": [
+    "当前制品 main 工厂 318 的 stop 按资源类型分支：DaemonSet PATCH spec.template.spec.nodeSelector.non-existing=true，其他 Workload PATCH spec.replicas=0。",
+    "固定 release-3.4 的 workload Store 具有相同分支，仅作为可读性对照。"
+  ],
+  "limitations": [
+    "只分析固定当前制品的单个定向工厂，不代表完整应用覆盖。",
+    "语义覆盖为 unknown，582 个未知节点保留。",
+    "server dry-run 不证明真实停止、恢复、Pod 调度结果、RBAC、缓存或页面反馈；这些属于 VERIFY。"
+  ]
+}

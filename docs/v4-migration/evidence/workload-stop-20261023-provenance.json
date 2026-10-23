@@ -1,0 +1,14 @@
+{
+  "sourceCommit": "da741a3893f88885df4698a4ea5d265336fb9692",
+  "artifactTree": "1e499d92e11374e26c76f5e13be45251602bd596",
+  "bundle": "packages/bootstrap/assets/v3dist/main.558f452048e49db23323.js",
+  "bundleSha256": "7cfddd4e32fd4a038b917bebbcf78dc8b4a51a48058062fe365bb20c28ad5ad0",
+  "method": "@babel/parser inert literal webpack factory extraction; character offsets; no target execution",
+  "factory": {
+    "id": 318,
+    "start": 1018018,
+    "end": 1024903,
+    "sha256": "3346ca3ba68fdbabfed0ab83ae7f40ac5057cb38e0e14309677db90cf3853099",
+    "analysisFile": "webpack-main-318.js"
+  }
+}

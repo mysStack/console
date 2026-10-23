@@ -7,7 +7,7 @@
 | 模块             | `workloads`                                                                                                                                 |
 | 资源             | Deployment、StatefulSet、DaemonSet                                                                                                          |
 | 当前分支         | `feature/v4-workloads`                                                                                                                      |
-| 当前代码提交     | `9cf97481c64aa8932f3afe41414057d978391a49`                                                                                                  |
+| 当前代码提交     | `da741a3893f88885df4698a4ea5d265336fb9692`                                                                                                  |
 | 集成基线         | `origin/feature/v4-migration` / `3e09afd6a051d4091b3c887462c880eff2ba6754`                                                                  |
 | 旧 V3 参考树     | `origin/release-3.4` / `175710fefeeba6ff295c2c0967b4d45b83563d26`                                                                           |
 | 当前 V4 编辑入口 | `packages/console/src/pages/projects/components/WorkloadCreateModal/WorkloadSettingsModal.tsx`                                              |
@@ -59,7 +59,7 @@
 
 | 能力             | 旧 V3 事实                                                                 | 当前 V4 事实                                                                | 状态         | 必须验证                                                             |
 | ---------------- | -------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------ | -------------------------------------------------------------------- |
-| 无 replicas 控件 | `renderReplicasControl` 对 DaemonSet 直接返回空                            | 设置 Modal 不显示或写入 replicas；Store 停止 mutation 仍需独立修复/验证     | DEV 部分完成 | 列表/详情/批量停止不能发送无效 replicas；确认正确的 DS 停止/恢复语义 |
+| 无 replicas 控件 | `renderReplicasControl` 对 DaemonSet 直接返回空                            | 设置 Modal 不显示或写入 replicas；Store 已按制品改用不可匹配 nodeSelector   | DEV 已实现   | 当前 SHA 真实停止/恢复、原 nodeSelector 恢复和权限/错误路径待 VERIFY |
 | updateStrategy   | DaemonSet 分支提供 maxUnavailable 和 minReadySeconds，不提供 maxSurge 输入 | 设置 Modal 已按 DaemonSet 分支实现并保留未建模字段                          | DEV 已实现   | 数字/百分比类型、默认差异、切换策略和 API 持久化待 VERIFY            |
 | 节点调度         | 旧 UI 快照不渲染 Pod 调度或 nodeSelector 分区                              | 设置 Modal 不显示该区；编辑其他字段时保留 nodeSelector/affinity/tolerations | DEV 保留完成 | 调度失败、页面回读及未来是否提供超出 V3 的编辑能力另行决策           |
 
