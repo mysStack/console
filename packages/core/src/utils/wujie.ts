@@ -7,6 +7,7 @@ import WujieReact from 'wujie-react';
 
 import { useEventEmitter } from '@ks-console/shared';
 import { setGlobalConsoleV3LoadCompleted } from '../utils/globals.consoleV3LoadCompleted';
+import { shouldPreloadConsoleV3 } from './wujieNativePreload';
 
 const { setupApp, preloadApp, bus } = WujieReact;
 
@@ -38,6 +39,10 @@ export function initWujie() {
       });
     },
   });
+
+  if (!shouldPreloadConsoleV3(window.location.pathname)) {
+    return;
+  }
 
   preloadApp({
     name: 'consoleV3Actions',
