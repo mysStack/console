@@ -4,6 +4,11 @@
  */
 
 module.exports = {
+  WORKLOAD_SETTINGS_INVALID:
+    'Estrategia, cantidad o duración no válidas. Use enteros no negativos o porcentajes válidos; maxUnavailable y maxSurge no pueden ser cero a la vez.',
+  WORKLOAD_TERMINATION_GRACE_PERIOD: 'Terminación ordenada del pod',
+  WORKLOAD_TERMINATION_GRACE_SECONDS: 'Período de terminación (segundos)',
+
   WORKLOAD_SETTINGS_CONFLICT:
     'Otra operación actualizó el recurso. Cancela y vuelve a abrir Editar ajustes.',
   WORKLOAD_SETTINGS_SAVE_FAILED:

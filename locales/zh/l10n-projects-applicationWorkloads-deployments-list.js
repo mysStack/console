@@ -4,9 +4,14 @@
  */
 
 module.exports = {
+  WORKLOAD_SETTINGS_INVALID:
+    '更新策略、数量或时间设置无效。请填写非负整数或有效百分比；滚动更新的不可用数量与新增数量不能同时为零。',
+  WORKLOAD_TERMINATION_GRACE_PERIOD: '容器组优雅终止',
+  WORKLOAD_TERMINATION_GRACE_SECONDS: '终止宽限时间（秒）',
+
   WORKLOAD_SETTINGS_CONFLICT: '资源已被其他操作更新，本次设置未保存。请取消并重新打开编辑设置。',
   WORKLOAD_SETTINGS_SAVE_FAILED: '保存失败，设置尚未保存。请检查网络和权限后重试。',
-  WORKLOAD_SETTINGS_LOAD_FAILED: '无法读取最新部署设置，请刷新后重试。',
+  WORKLOAD_SETTINGS_LOAD_FAILED: '无法读取最新工作负载设置，请刷新后重试。',
   VOLUME_MOUNT_PL: '卷挂载',
   WORKLOAD_PRESERVED_VOLUME: '已有 {type} 卷原样保留；此处可编辑其他设置。',
   WORKLOAD_ADD_CONTAINER: '添加工作容器',

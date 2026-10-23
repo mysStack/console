@@ -637,3 +637,214 @@ test('编辑设置允许关闭只读和清空 subPath、envFrom prefix 与 empty
   ]);
   assert.deepEqual(submitted.spec.template.spec.volumes, [{ name: 'cache', emptyDir: {} }]);
 });
+
+// 三类资源共用设置转换，但不能把 Deployment 的 replicas/strategy 写给 STS/DS。
+function settingsFixture(kind: string): any {
+  return {
+    apiVersion: 'apps/v1',
+    kind,
+    metadata: { name: 'native-settings', namespace: 'v4-migration-e2e', resourceVersion: '42' },
+    spec: {
+      ...(kind === 'DaemonSet' ? {} : { replicas: 2 }),
+      selector: { matchLabels: { app: 'native-settings' } },
+      template: {
+        metadata: { labels: { app: 'native-settings' } },
+        spec: { containers: [{ name: 'web', image: 'nginx' }], terminationGracePeriodSeconds: 30 },
+      },
+    },
+  };
+}
+
+test('DaemonSet 编辑容器不引入 replicas，保留更新策略和 resourceVersion', () => {
+  const original = settingsFixture('DaemonSet');
+  original.spec.updateStrategy = {
+    type: 'RollingUpdate',
+    rollingUpdate: { maxUnavailable: 1, maxSurge: 0 },
+  };
+  original.spec.minReadySeconds = 0;
+  const values = parseDeploymentSettings(original);
+  values.containers[0].image = 'nginx:alpine';
+  const submitted = buildDeploymentSettingsResource(original, values);
+  assert.equal('replicas' in submitted.spec, false);
+  assert.equal('strategy' in submitted.spec, false);
+  assert.deepEqual(submitted.spec.updateStrategy, {
+    type: 'RollingUpdate',
+    rollingUpdate: { maxUnavailable: 1, maxSurge: 0 },
+  });
+  assert.equal(submitted.metadata.resourceVersion, '42');
+  assert.equal(submitted.spec.template.spec.containers[0].image, 'nginx:alpine');
+  assert.equal(original.spec.template.spec.containers[0].image, 'nginx');
+});
+
+test('Deployment 更新策略支持数量、百分比及切换 Recreate 时清除 rollingUpdate', () => {
+  const original = settingsFixture('Deployment');
+  original.spec.strategy = {
+    type: 'RollingUpdate',
+    rollingUpdate: { maxUnavailable: '25%', maxSurge: '25%' },
+  };
+  const values = parseDeploymentSettings(original);
+  assert.equal(values.updateStrategy?.type, 'RollingUpdate');
+  values.updateStrategy = { type: 'RollingUpdate', maxUnavailable: '2', maxSurge: '30%' };
+  const submitted = buildDeploymentSettingsResource(original, values);
+  assert.deepEqual(submitted.spec.strategy, {
+    type: 'RollingUpdate',
+    rollingUpdate: { maxUnavailable: 2, maxSurge: '30%' },
+  });
+  assert.equal('updateStrategy' in submitted.spec, false);
+  values.updateStrategy.type = 'Recreate';
+  assert.deepEqual(buildDeploymentSettingsResource(original, values).spec.strategy, {
+    type: 'Recreate',
+  });
+  assert.equal(original.spec.strategy.rollingUpdate.maxUnavailable, '25%');
+});
+
+test('StatefulSet 策略保留 Service、PVC 模板及未编辑的滚动更新字段', () => {
+  const original = settingsFixture('StatefulSet');
+  original.spec.serviceName = 'headless';
+  original.spec.volumeClaimTemplates = [
+    {
+      metadata: { name: 'data' },
+      spec: { accessModes: ['ReadWriteOnce'], resources: { requests: { storage: '1Gi' } } },
+    },
+  ];
+  original.spec.updateStrategy = {
+    type: 'RollingUpdate',
+    rollingUpdate: { partition: 0, maxUnavailable: '10%' },
+  };
+  const values = parseDeploymentSettings(original);
+  assert.equal(values.updateStrategy?.partition, 0);
+  values.updateStrategy = { type: 'RollingUpdate', partition: 1 };
+  const submitted = buildDeploymentSettingsResource(original, values);
+  assert.deepEqual(submitted.spec.updateStrategy, {
+    type: 'RollingUpdate',
+    rollingUpdate: { partition: 1, maxUnavailable: '10%' },
+  });
+  assert.equal(submitted.spec.serviceName, 'headless');
+  assert.deepEqual(submitted.spec.volumeClaimTemplates, original.spec.volumeClaimTemplates);
+  assert.equal('strategy' in submitted.spec, false);
+  values.updateStrategy.type = 'OnDelete';
+  assert.deepEqual(buildDeploymentSettingsResource(original, values).spec.updateStrategy, {
+    type: 'OnDelete',
+  });
+});
+
+test('DaemonSet 策略独立写入 minReadySeconds，并保留 maxSurge', () => {
+  const original = settingsFixture('DaemonSet');
+  original.spec.updateStrategy = {
+    type: 'RollingUpdate',
+    rollingUpdate: { maxUnavailable: 1, maxSurge: 0 },
+  };
+  original.spec.minReadySeconds = 0;
+  const values = parseDeploymentSettings(original);
+  assert.equal(values.updateStrategy?.maxUnavailable, 1);
+  assert.equal(values.minReadySeconds, 0);
+  values.updateStrategy = { type: 'RollingUpdate', maxUnavailable: '20%' };
+  values.minReadySeconds = 5;
+  const submitted = buildDeploymentSettingsResource(original, values);
+  assert.deepEqual(submitted.spec.updateStrategy, {
+    type: 'RollingUpdate',
+    rollingUpdate: { maxUnavailable: '20%', maxSurge: 0 },
+  });
+  assert.equal(submitted.spec.minReadySeconds, 5);
+  assert.equal('replicas' in submitted.spec, false);
+  values.updateStrategy.type = 'OnDelete';
+  assert.deepEqual(buildDeploymentSettingsResource(original, values).spec.updateStrategy, {
+    type: 'OnDelete',
+  });
+});
+
+test('优雅终止允许显式零值，未编辑的 Pod 调度与安全字段完整保留', () => {
+  for (const kind of ['Deployment', 'StatefulSet', 'DaemonSet']) {
+    const original = settingsFixture(kind);
+    original.spec.template.spec.affinity = {
+      nodeAffinity: { preferredDuringSchedulingIgnoredDuringExecution: [] },
+    };
+    original.spec.template.spec.securityContext = { runAsNonRoot: true };
+    const values = parseDeploymentSettings(original);
+    assert.equal(values.terminationGracePeriodSeconds, 30);
+    values.terminationGracePeriodSeconds = 0;
+    const submitted = buildDeploymentSettingsResource(original, values);
+    assert.equal(submitted.spec.template.spec.terminationGracePeriodSeconds, 0);
+    assert.deepEqual(submitted.spec.template.spec.affinity, original.spec.template.spec.affinity);
+    assert.deepEqual(submitted.spec.template.spec.securityContext, { runAsNonRoot: true });
+    assert.equal(original.spec.template.spec.terminationGracePeriodSeconds, 30);
+  }
+});
+
+test('更新策略拒绝错误的资源类型策略、无效数字及无法滚动的零值组合', () => {
+  for (const [kind, patch] of [
+    ['Deployment', { updateStrategy: { type: 'OnDelete' } }],
+    ['StatefulSet', { updateStrategy: { type: 'Recreate' } }],
+    ['DaemonSet', { updateStrategy: { type: 'Recreate' } }],
+    [
+      'Deployment',
+      { updateStrategy: { type: 'RollingUpdate', maxUnavailable: '0', maxSurge: '0%' } },
+    ],
+    [
+      'Deployment',
+      { updateStrategy: { type: 'RollingUpdate', maxUnavailable: '-1', maxSurge: 1 } },
+    ],
+    [
+      'Deployment',
+      { updateStrategy: { type: 'RollingUpdate', maxUnavailable: '101%', maxSurge: 1 } },
+    ],
+    [
+      'Deployment',
+      { updateStrategy: { type: 'RollingUpdate', maxUnavailable: '2.5', maxSurge: 1 } },
+    ],
+    ['Deployment', { updateStrategy: { type: 'RollingUpdate', maxUnavailable: '', maxSurge: 1 } }],
+    ['DaemonSet', { updateStrategy: { type: 'RollingUpdate', maxUnavailable: 0 } }],
+    ['DaemonSet', { minReadySeconds: -1 }],
+    ['DaemonSet', { minReadySeconds: 0.5 }],
+    ['StatefulSet', { updateStrategy: { type: 'RollingUpdate', partition: -1 } }],
+    ['StatefulSet', { updateStrategy: { type: 'RollingUpdate', partition: 0.5 } }],
+    ['StatefulSet', { replicas: -1 }],
+    ['Deployment', { replicas: 1.5 }],
+    ['Deployment', { terminationGracePeriodSeconds: -1 }],
+    ['StatefulSet', { terminationGracePeriodSeconds: 0.5 }],
+  ] as const) {
+    const original = settingsFixture(kind);
+    const values = { ...parseDeploymentSettings(original), ...patch } as any;
+    assert.throws(
+      () => buildDeploymentSettingsResource(original, values),
+      /WORKLOAD_SETTINGS_INVALID/,
+      `${kind}: ${JSON.stringify(patch)}`,
+    );
+    assert.equal(original.metadata.resourceVersion, '42');
+    assert.equal(original.spec.template.spec.terminationGracePeriodSeconds, 30);
+  }
+});
+
+test('只改容器不重写缺省策略；支持显式零副本、零分区和 DS 的 maxSurge 滚动更新', () => {
+  for (const kind of ['Deployment', 'StatefulSet', 'DaemonSet']) {
+    const original = settingsFixture(kind);
+    const values = parseDeploymentSettings(original);
+    const next = buildDeploymentSettingsResource(original, values);
+    assert.deepEqual(next, original);
+  }
+  const original = settingsFixture('DaemonSet');
+  original.spec.updateStrategy = {
+    type: 'RollingUpdate',
+    rollingUpdate: { maxUnavailable: 1, maxSurge: 1 },
+  };
+  const values = parseDeploymentSettings(original);
+  values.updateStrategy.maxUnavailable = '0';
+  assert.deepEqual(
+    buildDeploymentSettingsResource(original, values).spec.updateStrategy.rollingUpdate,
+    { maxUnavailable: 0, maxSurge: 1 },
+  );
+  const sts = settingsFixture('StatefulSet');
+  const stsValues = parseDeploymentSettings(sts);
+  stsValues.replicas = 0;
+  stsValues.updateStrategy.partition = 0;
+  assert.equal(buildDeploymentSettingsResource(sts, stsValues).spec.replicas, 0);
+});
+
+test('StatefulSet 的 PVC 模板可作为容器挂载来源，仍拒绝未定义的卷名', () => {
+  const containers = [
+    { name: 'web', image: 'nginx', volumeMounts: [{ name: 'data', mountPath: '/data' }] },
+  ];
+  assert.equal(validateContainers(containers, [], [], ['data']), undefined);
+  assert.equal(validateContainers(containers, [], [], []), 'WORKLOAD_VOLUME_MOUNT_INVALID');
+  assert.equal(validateContainers(containers, [], [], ['other']), 'WORKLOAD_VOLUME_MOUNT_INVALID');
+});

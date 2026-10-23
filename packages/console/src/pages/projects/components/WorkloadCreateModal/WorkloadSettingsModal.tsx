@@ -8,13 +8,16 @@ import { Form, FormItem, Input, InputNumber, Modal, useForm, useWatch } from '@k
 import { ArrayInput } from '@ks-console/shared';
 import ContainerInput from './ContainerInput';
 import VolumeInput from './VolumeInput';
+import WorkloadUpdateStrategyInput from './WorkloadUpdateStrategyInput';
 import useWorkloadResourceOptions from './useWorkloadResourceOptions';
 import {
   buildDeploymentSettingsResource,
-  DeploymentCreateValues,
+  WorkloadSettingsValues,
+  WorkloadKind,
   parseDeploymentSettings,
   validateContainers,
   validateVolumes,
+  validateWorkloadSettings,
   VolumeValues,
 } from './deployment';
 
@@ -39,13 +42,24 @@ export default function WorkloadSettingsModal({
   onOk,
   onCancel,
 }: Props) {
-  const [form] = useForm<DeploymentCreateValues>();
+  const [form] = useForm<WorkloadSettingsValues>();
+  const kind: WorkloadKind = resource.kind || 'Deployment';
   const volumes = useWatch('volumes', form);
   const resources = useWorkloadResourceOptions(cluster, namespace);
   const initialValues = parseDeploymentSettings(resource);
-  const volumeNames = (volumes || initialValues.volumes || [])
-    .map((volume: VolumeValues) => volume.name)
-    .filter(Boolean);
+  // StatefulSet PVC 模板由控制器按 Pod 创建卷，不存在于 template.spec.volumes。
+  const claimTemplateNames: string[] =
+    kind === 'StatefulSet'
+      ? (resource.spec?.volumeClaimTemplates || [])
+          .map((claim: Record<string, any>) => claim.metadata?.name)
+          .filter(Boolean)
+      : [];
+  const volumeNames = [
+    ...(volumes || initialValues.volumes || [])
+      .map((volume: VolumeValues) => volume.name)
+      .filter(Boolean),
+    ...claimTemplateNames,
+  ];
 
   const validateContainerFields = (
     _rule: unknown,
@@ -56,16 +70,26 @@ export default function WorkloadSettingsModal({
       form.getFieldValue('containers'),
       form.getFieldValue('initContainers'),
       form.getFieldValue('volumes'),
+      claimTemplateNames,
     );
     callback(error ? t(error) : undefined);
   };
 
   const validateVolumeFields = (
     _rule: unknown,
-    value: DeploymentCreateValues['volumes'],
+    value: WorkloadSettingsValues['volumes'],
     callback: (error?: string) => void,
   ) => {
     const error = validateVolumes(value);
+    callback(error ? t(error) : undefined);
+  };
+
+  const validateSettings = (
+    _rule: unknown,
+    _value: unknown,
+    callback: (error?: string) => void,
+  ) => {
+    const error = validateWorkloadSettings(resource, form.getFieldsValue());
     callback(error ? t(error) : undefined);
   };
 
@@ -113,9 +137,29 @@ export default function WorkloadSettingsModal({
         <FormItem name="namespace" label={t('PROJECT')}>
           <Input disabled />
         </FormItem>
-        <FormItem name="replicas" label={t('REPLICAS')} rules={[{ required: true }]}>
-          <InputNumber min={0} precision={0} />
+        {kind !== 'DaemonSet' && (
+          <FormItem
+            name="replicas"
+            label={t('REPLICAS')}
+            rules={[{ required: true }, { validator: validateSettings }]}
+          >
+            <InputNumber min={0} precision={0} />
+          </FormItem>
+        )}
+
+        <h3>{t('UPDATE_STRATEGY')}</h3>
+        <FormItem name="updateStrategy" rules={[{ validator: validateSettings }]}>
+          <WorkloadUpdateStrategyInput kind={kind} />
         </FormItem>
+        {kind === 'DaemonSet' && (
+          <FormItem
+            name="minReadySeconds"
+            label={t('MIN_READY_SECONDS')}
+            rules={[{ required: true }, { validator: validateSettings }]}
+          >
+            <InputNumber min={0} precision={0} />
+          </FormItem>
+        )}
 
         <h3>{t('POD_SETTINGS')}</h3>
         <FormItem
@@ -171,6 +215,14 @@ export default function WorkloadSettingsModal({
           >
             <VolumeInput resourceOptions={resources.options} />
           </ArrayInput>
+        </FormItem>
+        <h3>{t('WORKLOAD_TERMINATION_GRACE_PERIOD')}</h3>
+        <FormItem
+          name="terminationGracePeriodSeconds"
+          label={t('WORKLOAD_TERMINATION_GRACE_SECONDS')}
+          rules={[{ required: true }, { validator: validateSettings }]}
+        >
+          <InputNumber min={0} precision={0} />
         </FormItem>
       </Form>
     </Modal>

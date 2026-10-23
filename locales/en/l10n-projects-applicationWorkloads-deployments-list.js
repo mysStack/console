@@ -4,12 +4,17 @@
  */
 
 module.exports = {
+  WORKLOAD_SETTINGS_INVALID:
+    'Invalid update strategy, count or duration. Use non-negative integers or valid percentages; max unavailable and max surge must not both be zero.',
+  WORKLOAD_TERMINATION_GRACE_PERIOD: 'Pod Graceful Termination',
+  WORKLOAD_TERMINATION_GRACE_SECONDS: 'Termination grace period (seconds)',
+
   WORKLOAD_SETTINGS_CONFLICT:
     'The resource was updated by another operation. Cancel and reopen Edit Settings before saving.',
   WORKLOAD_SETTINGS_SAVE_FAILED:
     'Settings were not saved. Check your network and permissions, then try again.',
   WORKLOAD_SETTINGS_LOAD_FAILED:
-    'Unable to load the latest deployment settings. Refresh and try again.',
+    'Unable to load the latest workload settings. Refresh and try again.',
   VOLUME_MOUNT_PL: 'Volume Mounts',
   WORKLOAD_PRESERVED_VOLUME: 'Existing {type} volume is preserved while editing other settings.',
   WORKLOAD_ADD_CONTAINER: 'Add Container',

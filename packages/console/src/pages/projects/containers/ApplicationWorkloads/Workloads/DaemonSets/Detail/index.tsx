@@ -4,7 +4,7 @@
  */
 
 import { isEmpty, get } from 'lodash';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Loading, notify } from '@kubed/components';
 import { useCacheStore as useStore } from '@ks-console/shared';
@@ -23,9 +23,12 @@ import {
   useCommonActions,
   ClusterAliasName,
   ProjectAliasName,
+  request,
 } from '@ks-console/shared';
 import { useRollbackModal, useBaseInfoModal } from '../../../../../../clusters/hooks/useModal';
 import type { FormattedWorkload } from '@ks-console/shared';
+
+import { WorkloadSettingsModal } from '../../../../../components/WorkloadCreateModal';
 
 const module = 'daemonsets';
 const WORKLOAD_TYPE = 'DAEMONSET';
@@ -43,6 +46,7 @@ const DaemonSetDetail = () => {
   const params = useParams();
   const { workspace, cluster, namespace, name } = params;
   const navigate = useNavigate();
+  const [settingsResource, setSettingsResource] = useState<Record<string, any>>();
 
   const listUrl = useMemo(() => {
     return workspace
@@ -115,6 +119,25 @@ const DaemonSetDetail = () => {
     close: closeRecreateModal,
     isOpen: recreateModalIsOpen,
   } = useDisclosure();
+
+  const {
+    open: openSettingsModal,
+    close: closeSettingsModal,
+    isOpen: settingsModalIsOpen,
+  } = useDisclosure();
+  const {
+    mutate: mutateSettings,
+    isLoading: settingsIsLoading,
+    error: settingsError,
+    reset: resetSettings,
+  } = store.usePutMutation(undefined, {
+    noGetDetail: true,
+    onSuccess: () => {
+      notify.success(t('UPDATE_SUCCESSFUL'));
+      closeSettingsModal();
+      refetch();
+    },
+  });
 
   const { renderRollbackModal, setRollbackVisible } = useRollbackModal<
     FormattedWorkload['_originData']
@@ -251,7 +274,19 @@ const DaemonSetDetail = () => {
         icon: <Icon name="storage" />,
         text: t('EDIT_SETTINGS'),
         action: 'edit',
-        onClick: () => editYaml(detail),
+        onClick: async () => {
+          try {
+            // 保存原始 resourceVersion；并发修改时由 API 返回 409，不能覆盖新版本。
+            const resource = await request.get<Record<string, any>, Record<string, any>>(
+              store.getDetailUrl({ cluster, namespace, name }),
+            );
+            setSettingsResource(resource);
+            resetSettings();
+            openSettingsModal();
+          } catch {
+            notify.error(t('WORKLOAD_SETTINGS_LOAD_FAILED'));
+          }
+        },
       },
       {
         key: 'editYaml',
@@ -329,6 +364,18 @@ const DaemonSetDetail = () => {
       )}
       {renderBaseInfoModal()}
       {renderRollbackModal()}
+      {settingsModalIsOpen && settingsResource && (
+        <WorkloadSettingsModal
+          visible
+          cluster={cluster!}
+          namespace={namespace!}
+          resource={settingsResource}
+          confirmLoading={settingsIsLoading}
+          error={settingsError}
+          onOk={data => mutateSettings({ params: { cluster, namespace, name }, data })}
+          onCancel={closeSettingsModal}
+        />
+      )}
       {recreateModalIsOpen && (
         <RecreateModal
           name={detail?.name}

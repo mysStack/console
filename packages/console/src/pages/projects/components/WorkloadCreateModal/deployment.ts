@@ -81,6 +81,19 @@ export interface DeploymentCreateValues {
   volumes?: VolumeValues[];
 }
 
+export type WorkloadKind = 'Deployment' | 'StatefulSet' | 'DaemonSet';
+
+export interface WorkloadSettingsValues extends DeploymentCreateValues {
+  updateStrategy: {
+    type: 'RollingUpdate' | 'Recreate' | 'OnDelete';
+    maxUnavailable?: number | string;
+    maxSurge?: number | string;
+    partition?: number;
+  };
+  minReadySeconds: number;
+  terminationGracePeriodSeconds: number;
+}
+
 const trim = (value = '') => value.trim();
 const DNS_LABEL = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/;
 const QUANTITY = /^(?:[0-9]+(?:\.[0-9]+)?|\.[0-9]+)(?:m|[EPTGMK]i?|[eE][+-]?[0-9]+)?$/;
@@ -145,6 +158,7 @@ export function validateContainers(
   containers: ContainerCreateValues[] = [],
   initContainers: ContainerCreateValues[] = [],
   volumes: VolumeValues[] = [],
+  claimTemplateNames: string[] = [],
 ): string | undefined {
   if (!containers.length) return 'CONTAINER_EMPTY_DESC';
   const names = new Set<string>();
@@ -201,7 +215,10 @@ export function validateContainers(
       }
     }
     const mountPaths = new Set<string>();
-    const volumeNames = new Set(volumes.map(volume => trim(volume.name)));
+    const volumeNames = new Set([
+      ...volumes.map(volume => trim(volume.name)),
+      ...claimTemplateNames,
+    ]);
     for (const mount of container.volumeMounts || []) {
       const mountPath = trim(mount.mountPath);
       if (
@@ -420,8 +437,10 @@ function parseVolume(volume: Record<string, any>): VolumeValues | undefined {
   return { name: volume.name, type: 'preserved', source: cloneDeep(volume) };
 }
 
-export function parseDeploymentSettings(resource: Record<string, any>): DeploymentCreateValues {
+export function parseDeploymentSettings(resource: Record<string, any>): WorkloadSettingsValues {
   const podSpec = cloneDeep(resource.spec?.template?.spec || {});
+  const kind: WorkloadKind = resource.kind || 'Deployment';
+  const strategy = resource.spec?.[kind === 'Deployment' ? 'strategy' : 'updateStrategy'];
   return {
     name: resource.metadata?.name || '',
     namespace: resource.metadata?.namespace || '',
@@ -431,6 +450,20 @@ export function parseDeploymentSettings(resource: Record<string, any>): Deployme
     containers: (podSpec.containers || []).map(parseContainer),
     initContainers: (podSpec.initContainers || []).map(parseContainer),
     volumes: (podSpec.volumes || []).map(parseVolume).filter(Boolean) as VolumeValues[],
+    updateStrategy: {
+      type: strategy?.type || 'RollingUpdate',
+      ...(kind === 'StatefulSet'
+        ? { partition: strategy?.rollingUpdate?.partition ?? 0 }
+        : {
+            maxUnavailable:
+              strategy?.rollingUpdate?.maxUnavailable ?? (kind === 'DaemonSet' ? 1 : '25%'),
+            ...(kind === 'Deployment'
+              ? { maxSurge: strategy?.rollingUpdate?.maxSurge ?? '25%' }
+              : {}),
+          }),
+    },
+    minReadySeconds: resource.spec?.minReadySeconds ?? 0,
+    terminationGracePeriodSeconds: podSpec.terminationGracePeriodSeconds ?? 30,
   };
 }
 
@@ -588,10 +621,58 @@ function mergeVolumeSettings(originalVolumes: Record<string, any>[] = [], values
   });
 }
 
+export function validateWorkloadSettings(
+  original: Record<string, any>,
+  values: DeploymentCreateValues & Partial<WorkloadSettingsValues>,
+): string | undefined {
+  const kind: WorkloadKind = original.kind || 'Deployment';
+  const isCount = (value: unknown) =>
+    typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= 2147483647;
+  const isIntOrPercent = (value: unknown, maxPercent?: number) => {
+    if (typeof value === 'number') return isCount(value);
+    if (typeof value !== 'string' || !/^\d+%?$/.test(value)) return false;
+    const count = Number(value.replace('%', ''));
+    return (
+      isCount(count) && (!value.endsWith('%') || maxPercent === undefined || count <= maxPercent)
+    );
+  };
+  const isZero = (value: unknown) =>
+    value !== undefined && Number(String(value).replace('%', '')) === 0;
+  if (
+    !['Deployment', 'StatefulSet', 'DaemonSet'].includes(kind) ||
+    (kind !== 'DaemonSet' && !isCount(values.replicas)) ||
+    (values.terminationGracePeriodSeconds !== undefined &&
+      !isCount(values.terminationGracePeriodSeconds)) ||
+    (kind === 'DaemonSet' &&
+      values.minReadySeconds !== undefined &&
+      !isCount(values.minReadySeconds))
+  )
+    return 'WORKLOAD_SETTINGS_INVALID';
+  const strategy = values.updateStrategy;
+  if (!strategy) return undefined;
+  if (!['RollingUpdate', kind === 'Deployment' ? 'Recreate' : 'OnDelete'].includes(strategy.type)) {
+    return 'WORKLOAD_SETTINGS_INVALID';
+  }
+  if (strategy.type !== 'RollingUpdate') return undefined;
+  if (kind === 'StatefulSet')
+    return isCount(strategy.partition) ? undefined : 'WORKLOAD_SETTINGS_INVALID';
+  if (!isIntOrPercent(strategy.maxUnavailable, 100)) return 'WORKLOAD_SETTINGS_INVALID';
+  const maxSurge =
+    kind === 'Deployment'
+      ? strategy.maxSurge
+      : (original.spec?.updateStrategy?.rollingUpdate?.maxSurge ?? 0);
+  if (!isIntOrPercent(maxSurge) || (isZero(strategy.maxUnavailable) && isZero(maxSurge))) {
+    return 'WORKLOAD_SETTINGS_INVALID';
+  }
+  return undefined;
+}
+
 export function buildDeploymentSettingsResource(
   original: Record<string, any>,
-  values: DeploymentCreateValues,
+  values: DeploymentCreateValues & Partial<WorkloadSettingsValues>,
 ) {
+  const validationError = validateWorkloadSettings(original, values);
+  if (validationError) throw new Error(validationError);
   const result = cloneDeep(original);
   delete result.status;
   const originalPodSpec = original.spec?.template?.spec || {};
@@ -608,7 +689,38 @@ export function buildDeploymentSettingsResource(
   if (values.volumes?.length) {
     nextPodSpec.volumes = mergeVolumeSettings(originalPodSpec.volumes, values.volumes);
   } else delete nextPodSpec.volumes;
-  result.spec.replicas = values.replicas;
+  const kind: WorkloadKind = original.kind || 'Deployment';
+  const initial = parseDeploymentSettings(original);
+  if (kind !== 'DaemonSet') result.spec.replicas = values.replicas;
+  if (
+    values.terminationGracePeriodSeconds !== undefined &&
+    values.terminationGracePeriodSeconds !== initial.terminationGracePeriodSeconds
+  ) {
+    nextPodSpec.terminationGracePeriodSeconds = values.terminationGracePeriodSeconds;
+  }
+  if (
+    kind === 'DaemonSet' &&
+    values.minReadySeconds !== undefined &&
+    values.minReadySeconds !== initial.minReadySeconds
+  ) {
+    result.spec.minReadySeconds = values.minReadySeconds;
+  }
+  if (values.updateStrategy && !isEqual(values.updateStrategy, initial.updateStrategy)) {
+    const key = kind === 'Deployment' ? 'strategy' : 'updateStrategy';
+    const { type, maxUnavailable, maxSurge, partition } = values.updateStrategy;
+    const next = { ...result.spec[key], type };
+    if (type === 'RollingUpdate') {
+      next.rollingUpdate = { ...next.rollingUpdate };
+      const asIntOrPercent = (value: number | string | undefined) =>
+        typeof value === 'string' && !value.endsWith('%') ? Number(value) : value;
+      if (kind === 'StatefulSet') next.rollingUpdate.partition = partition;
+      else {
+        next.rollingUpdate.maxUnavailable = asIntOrPercent(maxUnavailable);
+        if (kind === 'Deployment') next.rollingUpdate.maxSurge = asIntOrPercent(maxSurge);
+      }
+    } else delete next.rollingUpdate;
+    result.spec[key] = next;
+  }
   return result;
 }
 
