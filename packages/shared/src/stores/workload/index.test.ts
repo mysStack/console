@@ -31,10 +31,13 @@ function loadStore(
       useMutation: (mutationFn: any, options: any) =>
         new MutationObserver(client, { ...options, mutationFn, retry: false }),
     },
-    '../store': () => ({
+    '../store': ({ module: resourceModule }: any) => ({
       getDetailUrl: ({ name }: any) => name,
       post: (params: any, data: any) =>
-        send(`create:${params.cluster}:${params.namespace}:${data.metadata.name}`),
+        send(
+          `create:${resourceModule}:${params.cluster}:${params.namespace}:${data.metadata.name}:${params.dryRun ? 'dry-run' : 'persist'}`,
+          data,
+        ),
     }),
     '../../utils': { request },
     '../../utils/object.mapper': { [moduleName]: (value: unknown) => value },
@@ -198,8 +201,56 @@ test('native workload create mutation keeps the cluster and namespace scope', as
     data: { metadata: { name: 'native-deployment' } },
   });
 
-  assert.deepEqual(calls, ['create:host:v4-migration-e2e:native-deployment']);
+  assert.deepEqual(calls, ['create:deployments:host:v4-migration-e2e:native-deployment:persist']);
   assert.equal(successes, 1);
+});
+
+test('StatefulSet 双资源创建先全部 dry-run，再持久化 Workload 和 Service', async () => {
+  const calls: string[] = [];
+  const store = loadStore('statefulsets', async url => {
+    calls.push(url);
+    return { status: 'Success' };
+  });
+  await store.useCreateStatefulSetMutation().mutate({
+    params: { cluster: 'host', namespace: 'v4-migration-e2e' },
+    data: {
+      workload: { metadata: { name: 'native-statefulset' } },
+      service: { metadata: { name: 'native-statefulset-ab12' } },
+    },
+  });
+
+  assert.deepEqual(calls, [
+    'create:statefulsets:host:v4-migration-e2e:native-statefulset:dry-run',
+    'create:services:host:v4-migration-e2e:native-statefulset-ab12:dry-run',
+    'create:statefulsets:host:v4-migration-e2e:native-statefulset:persist',
+    'create:services:host:v4-migration-e2e:native-statefulset-ab12:persist',
+  ]);
+});
+
+test('StatefulSet 任一 dry-run 失败时不发送实际创建请求', async () => {
+  const error = new Error('Service invalid');
+  const calls: string[] = [];
+  const store = loadStore('statefulsets', async url => {
+    calls.push(url);
+    if (url.includes('services') && url.endsWith('dry-run')) throw error;
+    return { status: 'Success' };
+  });
+  const mutation = store.useCreateStatefulSetMutation();
+
+  await assert.rejects(
+    mutation.mutate({
+      params: { cluster: 'host', namespace: 'v4-migration-e2e' },
+      data: {
+        workload: { metadata: { name: 'native-statefulset' } },
+        service: { metadata: { name: 'native-statefulset-ab12' } },
+      },
+    }),
+    reason => reason === error,
+  );
+  assert.deepEqual(calls, [
+    'create:statefulsets:host:v4-migration-e2e:native-statefulset:dry-run',
+    'create:services:host:v4-migration-e2e:native-statefulset-ab12:dry-run',
+  ]);
 });
 
 test('native workload create mutation rejects API failures without reporting success', async () => {

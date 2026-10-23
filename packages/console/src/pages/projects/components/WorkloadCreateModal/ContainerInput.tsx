@@ -44,9 +44,11 @@ function stringifyCommaSeparated(value: string[] = []): string {
 function PortInput({
   value = {},
   onChange,
+  withService = false,
 }: {
   value?: ContainerPortValues;
   onChange?: (value: ContainerPortValues) => void;
+  withService?: boolean;
 }) {
   return (
     <div style={{ display: 'flex', gap: 8, width: '100%' }}>
@@ -73,6 +75,24 @@ function PortInput({
           })
         }
       />
+      {withService && (
+        <InputNumber
+          style={{ width: 120, flex: '0 0 120px' }}
+          aria-label={t('SERVICE_PORT')}
+          placeholder={t('SERVICE_PORT')}
+          min={1}
+          max={65535}
+          precision={0}
+          value={value.servicePort}
+          onChange={servicePort =>
+            onChange?.({
+              ...value,
+              servicePort:
+                servicePort == null || servicePort === '' ? undefined : Number(servicePort),
+            })
+          }
+        />
+      )}
       <Select
         style={{ width: 120, flex: '0 0 120px' }}
         aria-label={t('PROTOCOL')}
@@ -359,6 +379,7 @@ interface Props {
   kind: 'CONTAINER' | 'INIT_CONTAINER';
   resourceOptions?: WorkloadResourceOptions;
   volumeNames?: string[];
+  withService?: boolean;
 }
 
 export default function ContainerInput({
@@ -368,6 +389,7 @@ export default function ContainerInput({
   kind,
   resourceOptions = { configMaps: [], secrets: [], persistentVolumeClaims: [] },
   volumeNames = [],
+  withService = false,
 }: Props) {
   const update = (patch: Partial<ContainerCreateValues>) => onChange?.({ ...value, ...patch });
   return (
@@ -441,7 +463,7 @@ export default function ContainerInput({
           checkItemValid={() => true}
           onChange={ports => update({ ports })}
         >
-          <PortInput />
+          <PortInput withService={withService} />
         </ArrayInput>
       </div>
       <div role="group" aria-label={t('ENVIRONMENT_VARIABLE_PL')}>

@@ -15,10 +15,12 @@ import {
   useWatch,
 } from '@kubed/components';
 
-import { ArrayInput, PropertiesInput, workloadStore } from '@ks-console/shared';
+import { ArrayInput, generateId, PropertiesInput, workloadStore } from '@ks-console/shared';
 import {
   buildDaemonSet,
   buildDeployment,
+  buildStatefulSet,
+  buildStatefulSetServiceName,
   checkWorkloadLabelsAvailability,
   WorkloadCreateValues,
   WorkloadKind,
@@ -41,6 +43,7 @@ import NodeSelectorInput from './NodeSelectorInput';
 import PodSchedulingInput from './PodSchedulingInput';
 import useWorkloadTargetOptions from './useWorkloadTargetOptions';
 import WorkloadUpdateStrategyInput from './WorkloadUpdateStrategyInput';
+import PersistentVolumeClaimTemplateInput from './PersistentVolumeClaimTemplateInput';
 
 interface Props {
   visible: boolean;
@@ -70,18 +73,32 @@ function WorkloadCreateModal({
 }: Props): JSX.Element {
   const [form] = useForm<WorkloadCreateValues>();
   const volumes = useWatch('volumes', form);
+  const volumeClaimTemplates = useWatch('volumeClaimTemplates', form);
+  const statefulService = React.useRef({ workloadName: '', serviceName: '' });
   const workload = workloadStore(moduleByKind[kind]);
   const resources = useWorkloadResourceOptions(cluster, namespace);
   const workloadTargets = useWorkloadTargetOptions(kind, cluster, namespace);
 
   const handleSubmit = () => {
     form.validateFields().then(
-      values =>
+      values => {
+        if (kind === 'StatefulSet') {
+          const workloadName = String(values.name || '').trim();
+          if (statefulService.current.workloadName !== workloadName) {
+            statefulService.current = {
+              workloadName,
+              serviceName: buildStatefulSetServiceName(workloadName, generateId(4)),
+            };
+          }
+          onOk(buildStatefulSet({ ...values, namespace }, statefulService.current.serviceName));
+          return;
+        }
         onOk(
           kind === 'DaemonSet'
             ? buildDaemonSet({ ...values, namespace })
             : buildDeployment({ ...values, namespace }),
-        ),
+        );
+      },
       () => {},
     );
   };
@@ -95,6 +112,11 @@ function WorkloadCreateModal({
       form.getFieldValue('containers'),
       form.getFieldValue('initContainers'),
       form.getFieldValue('volumes'),
+      kind === 'StatefulSet'
+        ? (form.getFieldValue('volumeClaimTemplates') || [])
+            .map((claim: { name?: string }) => claim.name)
+            .filter(Boolean)
+        : [],
     );
     callback(error ? t(error) : undefined);
   };
@@ -167,13 +189,18 @@ function WorkloadCreateModal({
 
   const nodeSelectorValidator = (
     _rule: unknown,
-    value: DeploymentCreateValues['nodeSelector'],
+    value: WorkloadCreateValues['nodeSelector'],
     callback: (error?: string) => void,
   ) => {
     callback(validateNodeSelector(value) ? undefined : t('WORKLOAD_NODE_SELECTOR_INVALID'));
   };
 
-  const volumeNames = (volumes || []).map((volume: VolumeValues) => volume.name).filter(Boolean);
+  const volumeNames = [
+    ...(volumes || []).map((volume: VolumeValues) => volume.name),
+    ...(kind === 'StatefulSet'
+      ? (volumeClaimTemplates || []).map((claim: { name?: string }) => claim.name)
+      : []),
+  ].filter((name): name is string => Boolean(name));
 
   const workloadSettingsValidator = (
     _rule: unknown,
@@ -186,7 +213,13 @@ function WorkloadCreateModal({
 
   return (
     <Modal
-      title={t(kind === 'DaemonSet' ? 'CREATE_DAEMONSET' : 'CREATE_DEPLOYMENT')}
+      title={t(
+        kind === 'DaemonSet'
+          ? 'CREATE_DAEMONSET'
+          : kind === 'StatefulSet'
+            ? 'CREATE_STATEFULSET'
+            : 'CREATE_DEPLOYMENT',
+      )}
       width={900}
       visible={visible}
       confirmLoading={confirmLoading}
@@ -202,12 +235,15 @@ function WorkloadCreateModal({
           updateStrategy:
             kind === 'DaemonSet'
               ? { type: 'RollingUpdate', maxUnavailable: '20%' }
-              : { type: 'RollingUpdate', maxUnavailable: '25%', maxSurge: '25%' },
+              : kind === 'StatefulSet'
+                ? { type: 'RollingUpdate', partition: 0 }
+                : { type: 'RollingUpdate', maxUnavailable: '25%', maxSurge: '25%' },
           minReadySeconds: 0,
           terminationGracePeriodSeconds: 30,
           containers: [{ name: '', image: '', imagePullPolicy: 'IfNotPresent' }],
           initContainers: [],
           volumes: [],
+          volumeClaimTemplates: [],
         }}
       >
         <h3>{t('BASIC_INFORMATION')}</h3>
@@ -237,19 +273,21 @@ function WorkloadCreateModal({
           </FormItem>
         )}
 
-        {kind === 'DaemonSet' && (
+        {kind !== 'Deployment' && (
           <>
             <h3>{t('UPDATE_STRATEGY')}</h3>
             <FormItem name="updateStrategy" rules={[{ validator: workloadSettingsValidator }]}>
               <WorkloadUpdateStrategyInput kind={kind} />
             </FormItem>
-            <FormItem
-              name="minReadySeconds"
-              label={t('MIN_READY_SECONDS')}
-              rules={[{ required: true }, { validator: workloadSettingsValidator }]}
-            >
-              <InputNumber min={0} precision={0} />
-            </FormItem>
+            {kind === 'DaemonSet' && (
+              <FormItem
+                name="minReadySeconds"
+                label={t('MIN_READY_SECONDS')}
+                rules={[{ required: true }, { validator: workloadSettingsValidator }]}
+              >
+                <InputNumber min={0} precision={0} />
+              </FormItem>
+            )}
           </>
         )}
 
@@ -279,7 +317,7 @@ function WorkloadCreateModal({
         <FormItem
           name="containers"
           label={t('CONTAINERS')}
-          dependencies={['initContainers', 'volumes']}
+          dependencies={['initContainers', 'volumes', 'volumeClaimTemplates']}
           rules={[{ validator: containersValidator }]}
         >
           <ArrayInput
@@ -291,13 +329,14 @@ function WorkloadCreateModal({
               kind="CONTAINER"
               resourceOptions={resources.options}
               volumeNames={volumeNames}
+              withService={kind === 'StatefulSet'}
             />
           </ArrayInput>
         </FormItem>
         <FormItem
           name="initContainers"
           label={t('INIT_CONTAINER')}
-          dependencies={['containers', 'volumes']}
+          dependencies={['containers', 'volumes', 'volumeClaimTemplates']}
           rules={[{ validator: containersValidator }]}
         >
           <ArrayInput
@@ -329,7 +368,23 @@ function WorkloadCreateModal({
             <VolumeInput resourceOptions={resources.options} />
           </ArrayInput>
         </FormItem>
-        {kind === 'DaemonSet' && (
+        {kind === 'StatefulSet' && (
+          <FormItem
+            name="volumeClaimTemplates"
+            label={t('VOLUME_CLAIM_TEMPLATES')}
+            dependencies={['containers', 'initContainers']}
+            rules={[{ validator: workloadSettingsValidator }]}
+          >
+            <ArrayInput
+              itemType="object"
+              addText={t('ADD_VOLUME_CLAIM_TEMPLATE')}
+              checkItemValid={() => true}
+            >
+              <PersistentVolumeClaimTemplateInput />
+            </ArrayInput>
+          </FormItem>
+        )}
+        {kind !== 'Deployment' && (
           <>
             <h3>{t('WORKLOAD_TERMINATION_GRACE_PERIOD')}</h3>
             <FormItem

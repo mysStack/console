@@ -4,6 +4,8 @@ import test from 'node:test';
 import {
   buildDaemonSet,
   buildDeployment,
+  buildStatefulSet,
+  buildStatefulSetServiceName,
   checkWorkloadLabelsAvailability,
   buildDeploymentSettingsResource,
   parseDeploymentSettings,
@@ -70,6 +72,142 @@ test('buildDaemonSet 支持 OnDelete 并拒绝 Deployment 策略字段', () => {
       }),
     /WORKLOAD_SETTINGS_INVALID/,
   );
+});
+
+test('buildStatefulSet 同时生成有状态副本集和配套 Headless Service', () => {
+  const resources = buildStatefulSet(
+    {
+      name: 'native-db',
+      namespace: 'v4-migration-e2e',
+      replicas: 2,
+      containers: [
+        {
+          name: 'database',
+          image: 'postgres:16',
+          ports: [{ name: 'sql', containerPort: 5432, servicePort: 15432, protocol: 'TCP' }],
+          volumeMounts: [{ name: 'data', mountPath: '/var/lib/postgresql/data' }],
+        },
+      ],
+      workloadLabels: { tier: 'database' },
+      updateStrategy: { type: 'RollingUpdate', partition: 1 },
+      terminationGracePeriodSeconds: 45,
+      volumeClaimTemplates: [
+        {
+          name: 'data',
+          accessModes: ['ReadWriteOnce'],
+          storage: '2Gi',
+          storageClassName: 'local-path',
+        },
+      ],
+    },
+    'native-db-ab12',
+  );
+
+  assert.deepEqual(resources.workload, {
+    apiVersion: 'apps/v1',
+    kind: 'StatefulSet',
+    metadata: {
+      name: 'native-db',
+      namespace: 'v4-migration-e2e',
+      annotations: {},
+      labels: { tier: 'database', app: 'native-db' },
+    },
+    spec: {
+      replicas: 2,
+      selector: { matchLabels: { tier: 'database', app: 'native-db' } },
+      template: {
+        metadata: { labels: { tier: 'database', app: 'native-db' } },
+        spec: {
+          serviceAccountName: 'default',
+          containers: [
+            {
+              name: 'database',
+              image: 'postgres:16',
+              imagePullPolicy: 'IfNotPresent',
+              ports: [{ name: 'sql', containerPort: 5432, protocol: 'TCP' }],
+              volumeMounts: [{ name: 'data', mountPath: '/var/lib/postgresql/data' }],
+            },
+          ],
+          terminationGracePeriodSeconds: 45,
+        },
+      },
+      serviceName: 'native-db-ab12',
+      updateStrategy: { type: 'RollingUpdate', rollingUpdate: { partition: 1 } },
+      volumeClaimTemplates: [
+        {
+          metadata: { name: 'data' },
+          spec: {
+            accessModes: ['ReadWriteOnce'],
+            resources: { requests: { storage: '2Gi' } },
+            storageClassName: 'local-path',
+          },
+        },
+      ],
+    },
+  });
+  assert.deepEqual(resources.service, {
+    apiVersion: 'v1',
+    kind: 'Service',
+    metadata: {
+      name: 'native-db-ab12',
+      namespace: 'v4-migration-e2e',
+      labels: { tier: 'database', app: 'native-db' },
+      annotations: {
+        'kubesphere.io/alias-name': 'native-db',
+        'kubesphere.io/serviceType': 'statefulservice',
+      },
+    },
+    spec: {
+      clusterIP: 'None',
+      sessionAffinity: 'None',
+      selector: { tier: 'database', app: 'native-db' },
+      ports: [{ name: 'sql', protocol: 'TCP', port: 15432, targetPort: 5432 }],
+    },
+  });
+});
+
+test('StatefulSet Service 名称遵循 V3 截断和字母前缀规则', () => {
+  assert.equal(buildStatefulSetServiceName('native-db', 'ab12'), 'native-db-ab12');
+  assert.equal(
+    buildStatefulSetServiceName(`9${'a'.repeat(70)}`, 'xy89'),
+    `s9${'a'.repeat(56)}-xy89`,
+  );
+});
+
+test('buildStatefulSet 拒绝非法 Service 端口且支持 OnDelete', () => {
+  assert.throws(
+    () =>
+      buildStatefulSet(
+        {
+          name: 'invalid-db',
+          namespace: 'v4-migration-e2e',
+          replicas: 1,
+          containers: [
+            {
+              name: 'database',
+              image: 'postgres:16',
+              ports: [{ containerPort: 5432, servicePort: 0 }],
+            },
+          ],
+          updateStrategy: { type: 'RollingUpdate', partition: 0 },
+          terminationGracePeriodSeconds: 30,
+        },
+        'invalid-db-ab12',
+      ),
+    /WORKLOAD_PORT_INVALID/,
+  );
+  const resources = buildStatefulSet(
+    {
+      name: 'on-delete-db',
+      namespace: 'v4-migration-e2e',
+      replicas: 1,
+      containers: [{ name: 'database', image: 'postgres:16' }],
+      updateStrategy: { type: 'OnDelete' },
+      terminationGracePeriodSeconds: 30,
+    },
+    'on-delete-db-ab12',
+  );
+  assert.deepEqual(resources.workload.spec.updateStrategy, { type: 'OnDelete' });
 });
 
 for (const kind of ['Deployment', 'StatefulSet', 'DaemonSet']) {

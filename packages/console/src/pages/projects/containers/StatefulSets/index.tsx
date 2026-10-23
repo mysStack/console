@@ -5,6 +5,7 @@
 
 import React, { useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useDisclosure } from '@kubed/hooks';
 import { Field, notify } from '@kubed/components';
 import WorkloadBanner from '../../../clusters/components/WorkloadBanner';
 import {
@@ -29,6 +30,7 @@ import {
 } from '@ks-console/shared';
 import WorkloadStatus from '../../../../components/WorkloadStatus';
 import WorkLoadAvatar from '../../../clusters/components/workloadAvatar';
+import WorkloadCreateModal from '../../components/WorkloadCreateModal';
 //types
 import { Column, FormattedWorkload } from '@ks-console/shared';
 import { EditYamlConfig, ModalBaseConfig, BatchOptConfig } from '../../../clusters/types/workload';
@@ -43,12 +45,14 @@ const {
   useDeleteDeploymentMutation,
   useBatchDeleteWorkloadMutation,
   useBatchStopDeploymentMutation,
+  useCreateStatefulSetMutation,
 } = workloadStore('statefulsets');
 
 const StatefulSets = () => {
   const module = 'statefulsets';
   const authKey = module;
   const tableRef = useRef<TableRef<FormattedWorkload>>();
+  const createModal = useDisclosure();
   const [batchDeleteConfig, setBatchDeleteConfig] = useState<BatchOptConfig<FormattedWorkload>>();
   const [batchStopConfig, setBatchStopConfig] = useState<BatchOptConfig<FormattedWorkload>>();
 
@@ -134,6 +138,17 @@ const StatefulSets = () => {
     },
   });
 
+  const { mutate: mutateCreate, isLoading: createIsLoading } = useCreateStatefulSetMutation({
+    onSuccess: () => {
+      createModal.close();
+      tableRef.current?.refetch();
+      notify.success(t('CREATE_SUCCESSFUL'));
+    },
+    onError: () => {
+      notify.error(t('CREATE_STATEFULSET_FAILED'));
+    },
+  });
+
   // Table actions
   const renderTableAction = useTableActions({
     authKey,
@@ -147,7 +162,7 @@ const StatefulSets = () => {
           color: 'secondary',
           shadow: true,
         },
-        onClick: () => {},
+        onClick: createModal.open,
       },
     ],
   });
@@ -397,6 +412,12 @@ const StatefulSets = () => {
       data: value,
     });
   };
+  const handleCreate = (data: Record<string, any>) => {
+    mutateCreate({
+      params: { cluster, namespace },
+      data: data as { workload: Record<string, any>; service: Record<string, any> },
+    });
+  };
 
   const url = getResourceUrl({ cluster, namespace });
   return (
@@ -419,6 +440,15 @@ const StatefulSets = () => {
         }}
         batchActions={renderBatchActions()}
         toolbarRight={renderTableAction()}
+      />
+      <WorkloadCreateModal
+        visible={createModal.isOpen}
+        cluster={cluster}
+        namespace={namespace}
+        kind="StatefulSet"
+        confirmLoading={createIsLoading}
+        onOk={handleCreate}
+        onCancel={createModal.close}
       />
       {batchStopConfig?.visible && (
         <StopModal

@@ -22,6 +22,14 @@ export interface CreateWorkloadProps {
   data: Record<string, any>;
 }
 
+export interface CreateStatefulSetProps {
+  params: PathParams;
+  data: {
+    workload: Record<string, any>;
+    service: Record<string, any>;
+  };
+}
+
 export interface DeleteProps extends PathParams {
   annotations?: Record<string, any>;
 }

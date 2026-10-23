@@ -8,6 +8,9 @@ module.exports = {
   // List
   STATEFULSETS_LOW: '有状态副本集',
   STATEFULSETS_PL: '有状态副本集',
+  CREATE_STATEFULSET: '创建有状态副本集',
+  CREATE_STATEFULSET_FAILED: '创建有状态副本集失败。',
+  SERVICE_PORT: '服务端口',
   // List > Create > Basic Information
   // List > Create > Pod Settings > Update Settings > Rolling Update Settings
   PARTITION_ORDINAL_EMPTY: '请设置容器组副本分组序号。',

@@ -18,3 +18,11 @@ test('project StatefulSet list has no V3 list bridge', () => {
     /ConsoleV3ResourceList|wujieUrlPrefix|WujieReact|wujie-react|consolev3/,
   );
 });
+
+test('project StatefulSet list provides native dual-resource creation and visible failure feedback', () => {
+  assert.match(source, /useCreateStatefulSetMutation/);
+  assert.match(source, /WorkloadCreateModal/);
+  assert.match(source, /kind="StatefulSet"/);
+  assert.match(source, /onClick: createModal\.open/);
+  assert.match(source, /notify\.error\(t\('CREATE_STATEFULSET_FAILED'\)\)/);
+});

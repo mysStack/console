@@ -3,6 +3,7 @@ import { cloneDeep, isEqual, omit } from 'lodash';
 export interface ContainerPortValues {
   name?: string;
   containerPort?: number;
+  servicePort?: number;
   protocol?: 'TCP' | 'UDP' | 'SCTP';
 }
 
@@ -167,7 +168,10 @@ export type WorkloadCreateValues = DeploymentCreateValues &
   Partial<
     Pick<
       WorkloadSettingsValues,
-      'updateStrategy' | 'minReadySeconds' | 'terminationGracePeriodSeconds'
+      | 'updateStrategy'
+      | 'minReadySeconds'
+      | 'terminationGracePeriodSeconds'
+      | 'volumeClaimTemplates'
     >
   >;
 
@@ -449,6 +453,10 @@ export function validateContainers(
         !Number.isInteger(port.containerPort) ||
         port.containerPort! < 1 ||
         port.containerPort! > 65535 ||
+        (port.servicePort !== undefined &&
+          (!Number.isInteger(port.servicePort) ||
+            port.servicePort < 1 ||
+            port.servicePort > 65535)) ||
         !['TCP', 'UDP', 'SCTP'].includes(port.protocol || 'TCP') ||
         (portName && (portName.length > 15 || !/^[a-z]([-a-z0-9]*[a-z0-9])?$/.test(portName)))
       ) {
@@ -1558,7 +1566,7 @@ export function buildDaemonSet(values: WorkloadCreateValues) {
   );
   if (validationError) throw new Error(validationError);
 
-  const resource = buildDeployment(normalized);
+  const resource: Record<string, any> = buildDeployment(normalized);
   resource.kind = 'DaemonSet';
   delete resource.spec.replicas;
   delete resource.spec.strategy;
@@ -1575,4 +1583,91 @@ export function buildDaemonSet(values: WorkloadCreateValues) {
   resource.spec.template.spec.terminationGracePeriodSeconds =
     normalized.terminationGracePeriodSeconds;
   return resource;
+}
+
+export function buildStatefulSetServiceName(workloadName: string, suffix: string): string {
+  const name = `${trim(workloadName).slice(0, 57)}-${trim(suffix)}`;
+  return /^[a-z]/.test(name) ? name : `s${name}`;
+}
+
+export function buildStatefulSet(
+  values: WorkloadCreateValues,
+  serviceName: string,
+): { workload: Record<string, any>; service: Record<string, any> } {
+  const normalized: WorkloadCreateValues = {
+    ...values,
+    updateStrategy: values.updateStrategy || { type: 'RollingUpdate', partition: 0 },
+    terminationGracePeriodSeconds: values.terminationGracePeriodSeconds ?? 30,
+    volumeClaimTemplates: values.volumeClaimTemplates || [],
+  };
+  const validationError = validateWorkloadSettings(
+    { kind: 'StatefulSet', spec: {} },
+    normalized as DeploymentCreateValues & Partial<WorkloadSettingsValues>,
+  );
+  if (validationError) throw new Error(validationError);
+  const volumeError = validateVolumes(normalized.volumes);
+  if (volumeError) throw new Error(volumeError);
+  const containerError = validateContainers(
+    normalized.containers,
+    normalized.initContainers,
+    normalized.volumes,
+    normalized.volumeClaimTemplates!.map(template => template.name),
+  );
+  if (containerError) throw new Error(containerError);
+  const normalizedServiceName = trim(serviceName);
+  if (!isDnsLabel(normalizedServiceName)) throw new Error('WORKLOAD_SERVICE_NAME_INVALID');
+
+  const workload: Record<string, any> = buildDeployment(normalized);
+  workload.kind = 'StatefulSet';
+  delete workload.spec.strategy;
+  workload.spec.serviceName = normalizedServiceName;
+  workload.spec.updateStrategy =
+    normalized.updateStrategy!.type === 'RollingUpdate'
+      ? {
+          type: 'RollingUpdate',
+          rollingUpdate: { partition: normalized.updateStrategy!.partition },
+        }
+      : { type: 'OnDelete' };
+  workload.spec.template.spec.terminationGracePeriodSeconds =
+    normalized.terminationGracePeriodSeconds;
+  const volumeClaimTemplates = mergeVolumeClaimTemplates([], normalized.volumeClaimTemplates!);
+  if (volumeClaimTemplates.length) workload.spec.volumeClaimTemplates = volumeClaimTemplates;
+
+  const labels = cloneDeep(workload.spec.template.metadata.labels);
+  const servicePorts = normalized.containers.flatMap(container =>
+    (container.ports || []).flatMap(port =>
+      port.servicePort === undefined
+        ? []
+        : [
+            {
+              ...(trim(port.name) ? { name: trim(port.name) } : {}),
+              protocol: port.protocol || 'TCP',
+              port: port.servicePort,
+              targetPort: port.containerPort,
+            },
+          ],
+    ),
+  );
+  return {
+    workload,
+    service: {
+      apiVersion: 'v1',
+      kind: 'Service',
+      metadata: {
+        name: normalizedServiceName,
+        namespace: trim(values.namespace),
+        labels: cloneDeep(workload.metadata.labels),
+        annotations: {
+          'kubesphere.io/alias-name': trim(values.name),
+          'kubesphere.io/serviceType': 'statefulservice',
+        },
+      },
+      spec: {
+        clusterIP: 'None',
+        sessionAffinity: 'None',
+        selector: omit(labels, 'version'),
+        ports: servicePorts,
+      },
+    },
+  };
 }
