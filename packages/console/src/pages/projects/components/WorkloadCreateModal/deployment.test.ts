@@ -1080,6 +1080,153 @@ test('只改容器不重写缺省策略；支持显式零副本、零分区和 D
   assert.equal(buildDeploymentSettingsResource(sts, stsValues).spec.replicas, 0);
 });
 
+for (const kind of ['Deployment', 'StatefulSet', 'DaemonSet']) {
+  test(`${kind} Pod 安全上下文回填、修改、清空并保留未知字段`, () => {
+    const original = settingsFixture(kind);
+    original.spec.template.spec.securityContext = {
+      runAsNonRoot: true,
+      runAsUser: 1000,
+      runAsGroup: 2000,
+      seLinuxOptions: { level: 's0:c1,c2', type: 'container_t' },
+      seccompProfile: { type: 'RuntimeDefault' },
+      fsGroup: 3000,
+    };
+    const values = parseDeploymentSettings(original);
+    assert.deepEqual(values.podSecurityContext, {
+      runAsNonRoot: true,
+      runAsUser: 1000,
+      runAsGroup: 2000,
+      seLinuxOptions: { level: 's0:c1,c2', type: 'container_t' },
+    });
+    assert.deepEqual(buildDeploymentSettingsResource(original, values), original);
+    values.podSecurityContext!.runAsUser = 1001;
+    let submitted = buildDeploymentSettingsResource(original, values);
+    assert.deepEqual(submitted.spec.template.spec.securityContext, {
+      runAsNonRoot: true,
+      runAsUser: 1001,
+      runAsGroup: 2000,
+      seLinuxOptions: { level: 's0:c1,c2', type: 'container_t' },
+      seccompProfile: { type: 'RuntimeDefault' },
+      fsGroup: 3000,
+    });
+    values.podSecurityContext = undefined;
+    submitted = buildDeploymentSettingsResource(original, values);
+    assert.equal('securityContext' in submitted.spec.template.spec, false);
+    assert.deepEqual(original.spec.template.spec.securityContext.seccompProfile, {
+      type: 'RuntimeDefault',
+    });
+  });
+}
+
+test('容器安全上下文覆盖 V3 字段并在修改时保留未建模字段', () => {
+  const original = settingsFixture('Deployment');
+  original.spec.template.spec.containers[0].securityContext = {
+    privileged: false,
+    allowPrivilegeEscalation: false,
+    readOnlyRootFilesystem: true,
+    runAsNonRoot: true,
+    runAsUser: 1000,
+    runAsGroup: 2000,
+    seLinuxOptions: { user: 'system_u', role: 'system_r', type: 'container_t', level: 's0' },
+    capabilities: { add: ['NET_BIND_SERVICE'], drop: ['ALL'] },
+    seccompProfile: { type: 'RuntimeDefault' },
+  };
+  const values = parseDeploymentSettings(original);
+  assert.deepEqual(values.containers[0].securityContext, {
+    privileged: false,
+    allowPrivilegeEscalation: false,
+    readOnlyRootFilesystem: true,
+    runAsNonRoot: true,
+    runAsUser: 1000,
+    runAsGroup: 2000,
+    seLinuxOptions: { user: 'system_u', role: 'system_r', type: 'container_t', level: 's0' },
+    capabilities: { add: ['NET_BIND_SERVICE'], drop: ['ALL'] },
+  });
+  assert.deepEqual(buildDeploymentSettingsResource(original, values), original);
+  values.containers[0].securityContext!.privileged = true;
+  values.containers[0].securityContext!.capabilities!.add = ['SYS_TIME'];
+  let submitted = buildDeploymentSettingsResource(original, values);
+  assert.deepEqual(submitted.spec.template.spec.containers[0].securityContext, {
+    privileged: true,
+    allowPrivilegeEscalation: false,
+    readOnlyRootFilesystem: true,
+    runAsNonRoot: true,
+    runAsUser: 1000,
+    runAsGroup: 2000,
+    seLinuxOptions: { user: 'system_u', role: 'system_r', type: 'container_t', level: 's0' },
+    capabilities: { add: ['SYS_TIME'], drop: ['ALL'] },
+    seccompProfile: { type: 'RuntimeDefault' },
+  });
+  values.containers[0].securityContext = undefined;
+  submitted = buildDeploymentSettingsResource(original, values);
+  assert.equal('securityContext' in submitted.spec.template.spec.containers[0], false);
+});
+
+test('安全上下文拒绝非整数 UID/GID、非法布尔值和非法 capability', () => {
+  for (const securityContext of [
+    { runAsUser: 1.5 },
+    { runAsGroup: Number.NaN },
+    { privileged: 'yes' },
+    { capabilities: { add: ['net_admin'] } },
+    { capabilities: { drop: [''] } },
+    { seLinuxOptions: { type: 1 } },
+  ]) {
+    assert.equal(
+      validateContainers([
+        { name: 'web', image: 'nginx', securityContext: securityContext as any },
+      ]),
+      'WORKLOAD_SECURITY_CONTEXT_INVALID',
+    );
+  }
+  const original = settingsFixture('StatefulSet');
+  const values = parseDeploymentSettings(original);
+  values.podSecurityContext = { runAsUser: 1.5 } as any;
+  assert.throws(
+    () => buildDeploymentSettingsResource(original, values),
+    /WORKLOAD_SECURITY_CONTEXT_INVALID/,
+  );
+});
+
+test('创建 Deployment 写入 Pod、工作容器和初始化容器安全上下文', () => {
+  const resource = buildDeployment({
+    name: 'security-create',
+    namespace: 'v4-migration-e2e',
+    replicas: 1,
+    podSecurityContext: { runAsNonRoot: true, runAsUser: 1000 },
+    containers: [
+      {
+        name: 'web',
+        image: 'nginx',
+        securityContext: {
+          allowPrivilegeEscalation: false,
+          readOnlyRootFilesystem: true,
+          capabilities: { drop: ['ALL'] },
+        },
+      },
+    ],
+    initContainers: [
+      {
+        name: 'init',
+        image: 'busybox',
+        securityContext: { runAsUser: 1001, seLinuxOptions: { type: 'container_t' } },
+      },
+    ],
+  });
+  assert.deepEqual(resource.spec.template.spec.securityContext, {
+    runAsNonRoot: true,
+    runAsUser: 1000,
+  });
+  assert.deepEqual(resource.spec.template.spec.containers[0].securityContext, {
+    allowPrivilegeEscalation: false,
+    readOnlyRootFilesystem: true,
+    capabilities: { drop: ['ALL'] },
+  });
+  assert.deepEqual(resource.spec.template.spec.initContainers[0].securityContext, {
+    runAsUser: 1001,
+    seLinuxOptions: { type: 'container_t' },
+  });
+});
+
 test('StatefulSet 的 PVC 模板可作为容器挂载来源，仍拒绝未定义的卷名', () => {
   const containers = [
     { name: 'web', image: 'nginx', volumeMounts: [{ name: 'data', mountPath: '/data' }] },

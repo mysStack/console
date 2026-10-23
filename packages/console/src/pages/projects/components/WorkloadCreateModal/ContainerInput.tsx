@@ -15,6 +15,7 @@ import {
   ProbeValues,
   VolumeMountValues,
 } from './deployment';
+import SecurityContextInput from './SecurityContextInput';
 
 export interface WorkloadResourceOptions {
   configMaps: string[];
@@ -499,6 +500,11 @@ export default function ContainerInput({
           ))}
         </div>
       )}
+      <SecurityContextInput
+        kind="container"
+        value={value.securityContext}
+        onChange={securityContext => update({ securityContext })}
+      />
       <div role="group" aria-label={t('RESOURCE_LIMITS')}>
         <h4>{t('RESOURCE_LIMITS')}</h4>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>

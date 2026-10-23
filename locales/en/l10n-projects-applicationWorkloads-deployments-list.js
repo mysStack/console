@@ -29,6 +29,17 @@ module.exports = {
   WORKLOAD_PROBE_INVALID: 'Enter a valid probe type, path, port, and timing values.',
   WORKLOAD_LIFECYCLE_INVALID:
     'Enter a valid lifecycle action, path, port, or command. Regular init containers do not support lifecycle actions.',
+  WORKLOAD_SECURITY_CONTEXT_INVALID:
+    'Enter valid security context booleans, integer user or group IDs, SELinux values, and capability names.',
+  CONTAINER_SECURITY_CONTEXT: 'Container Security Context',
+  POD_SECURITY_CONTEXT: 'Pod Security Context',
+  PRIVILEGED_MODE: 'Privileged Mode',
+  ALLOW_PRIVILEGE_ESCALATION: 'Allow Privilege Escalation',
+  ROOT_DIRECTORY_READONLY: 'Root Directory Read-Only',
+  USER_GROUP: 'User Group',
+  RUN_AS_NON_ROOT: 'Run as Non-root',
+  SELINUX_CONTEXT: 'SELinux Context',
+  CAPABILITIES: 'Capabilities',
   WORKLOAD_RESOURCE_INVALID: 'Enter valid CPU and memory quantities.',
   WORKLOAD_CONFIG_REFERENCE_INVALID: 'Select a valid ConfigMap or Secret.',
   WORKLOAD_VOLUME_INVALID: 'Enter a valid volume name, source, and path.',

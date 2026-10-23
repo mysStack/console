@@ -9,6 +9,7 @@ import { ArrayInput } from '@ks-console/shared';
 import ContainerInput from './ContainerInput';
 import VolumeInput from './VolumeInput';
 import WorkloadUpdateStrategyInput from './WorkloadUpdateStrategyInput';
+import SecurityContextInput from './SecurityContextInput';
 import useWorkloadResourceOptions from './useWorkloadResourceOptions';
 import {
   buildDeploymentSettingsResource,
@@ -162,6 +163,9 @@ export default function WorkloadSettingsModal({
         )}
 
         <h3>{t('POD_SETTINGS')}</h3>
+        <FormItem name="podSecurityContext" rules={[{ validator: validateSettings }]}>
+          <SecurityContextInput kind="pod" />
+        </FormItem>
         <FormItem
           name="containers"
           label={t('CONTAINERS')}

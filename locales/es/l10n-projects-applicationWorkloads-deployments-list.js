@@ -31,6 +31,17 @@ module.exports = {
   WORKLOAD_RESOURCE_INVALID: 'Introduzca cantidades válidas de CPU y memoria.',
   WORKLOAD_LIFECYCLE_INVALID:
     'Introduzca una acción de ciclo de vida, ruta, puerto o comando válido. Los contenedores de inicio normales no admiten estas acciones.',
+  WORKLOAD_SECURITY_CONTEXT_INVALID:
+    'Introduzca valores booleanos, identificadores enteros, valores SELinux y nombres de capacidades válidos.',
+  CONTAINER_SECURITY_CONTEXT: 'Contexto de seguridad del contenedor',
+  POD_SECURITY_CONTEXT: 'Contexto de seguridad de pod',
+  PRIVILEGED_MODE: 'Privilegiado',
+  ALLOW_PRIVILEGE_ESCALATION: 'AllowPrivilegeEscalation',
+  ROOT_DIRECTORY_READONLY: 'ReadOnlyRootFilesystem',
+  USER_GROUP: 'Grupo de usuario',
+  RUN_AS_NON_ROOT: 'Ejecutar como no root',
+  SELINUX_CONTEXT: 'SELinux Context',
+  CAPABILITIES: 'Capabilities',
   WORKLOAD_CONFIG_REFERENCE_INVALID: 'Seleccione un ConfigMap o Secret válido.',
   WORKLOAD_VOLUME_INVALID: 'Introduzca un nombre, un origen y una ruta válidos para el volumen.',
   WORKLOAD_VOLUME_DUPLICATE: 'Los nombres de volumen deben ser únicos.',

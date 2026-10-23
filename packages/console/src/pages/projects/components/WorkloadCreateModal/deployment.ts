@@ -45,6 +45,25 @@ export interface ResourceValues {
   limits?: { cpu?: string; memory?: string };
 }
 
+export interface SecurityContextValues {
+  privileged?: boolean;
+  allowPrivilegeEscalation?: boolean;
+  readOnlyRootFilesystem?: boolean;
+  runAsNonRoot?: boolean;
+  runAsUser?: number;
+  runAsGroup?: number;
+  seLinuxOptions?: {
+    level?: string;
+    role?: string;
+    type?: string;
+    user?: string;
+  };
+  capabilities?: {
+    add?: string[];
+    drop?: string[];
+  };
+}
+
 export interface VolumeMountValues {
   name: string;
   mountPath: string;
@@ -78,6 +97,7 @@ export interface ContainerCreateValues {
   livenessProbe?: ProbeValues;
   startupProbe?: ProbeValues;
   lifecycle?: LifecycleValues;
+  securityContext?: SecurityContextValues;
   resources?: ResourceValues;
   volumeMounts?: VolumeMountValues[];
 }
@@ -91,6 +111,7 @@ export interface DeploymentCreateValues {
   containers: ContainerCreateValues[];
   initContainers?: ContainerCreateValues[];
   volumes?: VolumeValues[];
+  podSecurityContext?: SecurityContextValues;
 }
 
 export type WorkloadKind = 'Deployment' | 'StatefulSet' | 'DaemonSet';
@@ -158,6 +179,38 @@ function validateLifecycleAction(action?: LifecycleActionValues): boolean {
     (action.type !== 'http' ||
       action.scheme === undefined ||
       ['HTTP', 'HTTPS'].includes(action.scheme))
+  );
+}
+
+export function validateSecurityContext(
+  securityContext?: SecurityContextValues,
+  container = true,
+): boolean {
+  if (!securityContext) return true;
+  const booleans = [
+    securityContext.runAsNonRoot,
+    ...(container
+      ? [
+          securityContext.privileged,
+          securityContext.allowPrivilegeEscalation,
+          securityContext.readOnlyRootFilesystem,
+        ]
+      : []),
+  ];
+  if (booleans.some(value => value !== undefined && typeof value !== 'boolean')) return false;
+  if (
+    [securityContext.runAsUser, securityContext.runAsGroup].some(
+      value => value !== undefined && !Number.isInteger(value),
+    )
+  )
+    return false;
+  if (Object.values(securityContext.seLinuxOptions || {}).some(value => typeof value !== 'string'))
+    return false;
+  if (!container && securityContext.capabilities !== undefined) return false;
+  return Object.values(securityContext.capabilities || {}).every(
+    values =>
+      Array.isArray(values) &&
+      values.every(value => typeof value === 'string' && /^(?:[A-Z][A-Z0-9_]*|ALL)$/.test(value)),
   );
 }
 
@@ -230,6 +283,9 @@ export function validateContainers(
       !validateProbe(container.startupProbe)
     ) {
       return 'WORKLOAD_PROBE_INVALID';
+    }
+    if (!validateSecurityContext(container.securityContext)) {
+      return 'WORKLOAD_SECURITY_CONTEXT_INVALID';
     }
     if (
       (initContainers.includes(container) &&
@@ -322,10 +378,41 @@ function buildLifecycleAction(action: LifecycleActionValues): Record<string, any
   ]);
 }
 
+function compactSecurityContext(
+  securityContext?: SecurityContextValues,
+  container = true,
+): SecurityContextValues | undefined {
+  if (!securityContext) return undefined;
+  const result: SecurityContextValues = {};
+  const copy = (field: keyof SecurityContextValues) => {
+    if (securityContext[field] !== undefined) (result as any)[field] = securityContext[field];
+  };
+  if (container) {
+    copy('privileged');
+    copy('allowPrivilegeEscalation');
+    copy('readOnlyRootFilesystem');
+  }
+  copy('runAsNonRoot');
+  copy('runAsUser');
+  copy('runAsGroup');
+  const seLinuxOptions = Object.fromEntries(
+    Object.entries(securityContext.seLinuxOptions || {}).filter(([, value]) => value !== ''),
+  );
+  if (Object.keys(seLinuxOptions).length) result.seLinuxOptions = seLinuxOptions;
+  if (container) {
+    const capabilities = Object.fromEntries(
+      Object.entries(securityContext.capabilities || {}).filter(([, values]) => values?.length),
+    );
+    if (Object.keys(capabilities).length) result.capabilities = capabilities;
+  }
+  return Object.keys(result).length ? result : undefined;
+}
+
 function buildContainer(container: ContainerCreateValues) {
   const command = container.command?.map(trim).filter(Boolean);
   const args = container.args?.map(trim).filter(Boolean);
   const resources = compactResources(container.resources);
+  const securityContext = compactSecurityContext(container.securityContext);
   const lifecycle = Object.fromEntries(
     Object.entries(container.lifecycle || {}).flatMap(([stage, action]) =>
       action ? [[stage, buildLifecycleAction(action)]] : [],
@@ -364,6 +451,7 @@ function buildContainer(container: ContainerCreateValues) {
     ...(container.livenessProbe ? { livenessProbe: buildProbe(container.livenessProbe) } : {}),
     ...(container.startupProbe ? { startupProbe: buildProbe(container.startupProbe) } : {}),
     ...(Object.keys(lifecycle).length ? { lifecycle } : {}),
+    ...(securityContext ? { securityContext } : {}),
     ...(resources ? { resources } : {}),
     ...(container.volumeMounts?.length
       ? {
@@ -454,6 +542,48 @@ function parseLifecycle(lifecycle?: Record<string, any>): LifecycleValues | unde
   );
 }
 
+function parseSecurityContext(
+  securityContext?: Record<string, any>,
+  container = true,
+): SecurityContextValues | undefined {
+  if (!securityContext) return undefined;
+  const result: SecurityContextValues = {};
+  const fields: (keyof SecurityContextValues)[] = [
+    'runAsNonRoot',
+    'runAsUser',
+    'runAsGroup',
+    ...(container
+      ? (['privileged', 'allowPrivilegeEscalation', 'readOnlyRootFilesystem'] as const)
+      : []),
+  ];
+  for (const field of fields) {
+    if (securityContext[field] !== undefined) (result as any)[field] = securityContext[field];
+  }
+  if (securityContext.seLinuxOptions) {
+    result.seLinuxOptions = cloneDeep(
+      Object.fromEntries(
+        ['level', 'role', 'type', 'user'].flatMap(field =>
+          securityContext.seLinuxOptions[field] !== undefined
+            ? [[field, securityContext.seLinuxOptions[field]]]
+            : [],
+        ),
+      ),
+    );
+  }
+  if (container && securityContext.capabilities) {
+    result.capabilities = cloneDeep(
+      Object.fromEntries(
+        ['add', 'drop'].flatMap(field =>
+          securityContext.capabilities[field] !== undefined
+            ? [[field, securityContext.capabilities[field]]]
+            : [],
+        ),
+      ),
+    );
+  }
+  return Object.keys(result).length ? result : undefined;
+}
+
 function parseContainer(container: Record<string, any>): ContainerCreateValues {
   return {
     name: container.name || '',
@@ -480,6 +610,7 @@ function parseContainer(container: Record<string, any>): ContainerCreateValues {
     livenessProbe: parseProbe(container.livenessProbe),
     startupProbe: parseProbe(container.startupProbe),
     lifecycle: parseLifecycle(container.lifecycle),
+    securityContext: parseSecurityContext(container.securityContext),
     resources: container.resources,
     volumeMounts: container.volumeMounts,
   };
@@ -545,6 +676,7 @@ export function parseDeploymentSettings(resource: Record<string, any>): Workload
     },
     minReadySeconds: resource.spec?.minReadySeconds ?? 0,
     terminationGracePeriodSeconds: podSpec.terminationGracePeriodSeconds ?? 30,
+    podSecurityContext: parseSecurityContext(podSpec.securityContext, false),
   };
 }
 
@@ -560,6 +692,7 @@ const EDITABLE_CONTAINER_FIELDS = [
   'livenessProbe',
   'startupProbe',
   'lifecycle',
+  'securityContext',
   'resources',
   'volumeMounts',
 ] as const;
@@ -673,6 +806,43 @@ function mergeContainerSettings(
       if (Object.keys(lifecycle).length) built.lifecycle = lifecycle;
       else delete built.lifecycle;
     }
+    if (!isEqual(value.securityContext, parsed.securityContext) && value.securityContext) {
+      const modeled = compactSecurityContext(value.securityContext) || {};
+      built.securityContext = {
+        ...omit(original.securityContext, [
+          'privileged',
+          'allowPrivilegeEscalation',
+          'readOnlyRootFilesystem',
+          'runAsNonRoot',
+          'runAsUser',
+          'runAsGroup',
+          'seLinuxOptions',
+          'capabilities',
+        ]),
+        ...modeled,
+        ...(modeled.seLinuxOptions
+          ? {
+              seLinuxOptions: {
+                ...omit(original.securityContext?.seLinuxOptions, [
+                  'level',
+                  'role',
+                  'type',
+                  'user',
+                ]),
+                ...modeled.seLinuxOptions,
+              },
+            }
+          : {}),
+        ...(modeled.capabilities
+          ? {
+              capabilities: {
+                ...omit(original.securityContext?.capabilities, ['add', 'drop']),
+                ...modeled.capabilities,
+              },
+            }
+          : {}),
+      };
+    }
     for (const field of EDITABLE_CONTAINER_FIELDS) {
       if (isEqual(value[field], parsed[field])) {
         if (original[field] === undefined) delete built[field];
@@ -748,6 +918,9 @@ export function validateWorkloadSettings(
       !isCount(values.minReadySeconds))
   )
     return 'WORKLOAD_SETTINGS_INVALID';
+  if (!validateSecurityContext(values.podSecurityContext, false)) {
+    return 'WORKLOAD_SECURITY_CONTEXT_INVALID';
+  }
   const strategy = values.updateStrategy;
   if (!strategy) return undefined;
   if (!['RollingUpdate', kind === 'Deployment' ? 'Recreate' : 'OnDelete'].includes(strategy.type)) {
@@ -821,6 +994,33 @@ export function buildDeploymentSettingsResource(
     } else delete next.rollingUpdate;
     result.spec[key] = next;
   }
+  if (!isEqual(values.podSecurityContext, initial.podSecurityContext)) {
+    if (values.podSecurityContext) {
+      const modeled = compactSecurityContext(values.podSecurityContext, false) || {};
+      nextPodSpec.securityContext = {
+        ...omit(originalPodSpec.securityContext, [
+          'runAsNonRoot',
+          'runAsUser',
+          'runAsGroup',
+          'seLinuxOptions',
+        ]),
+        ...modeled,
+        ...(modeled.seLinuxOptions
+          ? {
+              seLinuxOptions: {
+                ...omit(originalPodSpec.securityContext?.seLinuxOptions, [
+                  'level',
+                  'role',
+                  'type',
+                  'user',
+                ]),
+                ...modeled.seLinuxOptions,
+              },
+            }
+          : {}),
+      };
+    } else delete nextPodSpec.securityContext;
+  }
   return result;
 }
 
@@ -853,6 +1053,9 @@ export function buildDeployment(values: DeploymentCreateValues) {
         metadata: { labels },
         spec: {
           serviceAccountName: 'default',
+          ...(compactSecurityContext(values.podSecurityContext, false)
+            ? { securityContext: compactSecurityContext(values.podSecurityContext, false) }
+            : {}),
           containers: values.containers.map(buildContainer),
           ...(values.initContainers?.length
             ? { initContainers: values.initContainers.map(buildContainer) }

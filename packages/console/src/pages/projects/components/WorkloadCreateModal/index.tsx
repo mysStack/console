@@ -21,11 +21,13 @@ import {
   DeploymentCreateValues,
   VolumeValues,
   validateContainers,
+  validateSecurityContext,
   validateVolumes,
 } from './deployment';
 import ContainerInput from './ContainerInput';
 import VolumeInput from './VolumeInput';
 import useWorkloadResourceOptions from './useWorkloadResourceOptions';
+import SecurityContextInput from './SecurityContextInput';
 
 interface Props {
   visible: boolean;
@@ -79,6 +81,17 @@ function WorkloadCreateModal({
     callback(error ? t(error) : undefined);
   };
 
+  const podSecurityContextValidator = (
+    _rule: unknown,
+    value: DeploymentCreateValues['podSecurityContext'],
+    callback: (error?: string) => void,
+  ) => {
+    const error = validateSecurityContext(value, false)
+      ? undefined
+      : t('WORKLOAD_SECURITY_CONTEXT_INVALID');
+    callback(error);
+  };
+
   const volumeNames = (volumes || []).map((volume: VolumeValues) => volume.name).filter(Boolean);
 
   return (
@@ -127,6 +140,9 @@ function WorkloadCreateModal({
         </FormItem>
 
         <h3>{t('POD_SETTINGS')}</h3>
+        <FormItem name="podSecurityContext" rules={[{ validator: podSecurityContextValidator }]}>
+          <SecurityContextInput kind="pod" />
+        </FormItem>
         <FormItem
           name="containers"
           label={t('CONTAINERS')}

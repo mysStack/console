@@ -25,6 +25,17 @@ module.exports = {
   WORKLOAD_PROBE_INVALID: '請填寫合法的健康檢查類型、路徑、連接埠和時間參數。',
   WORKLOAD_LIFECYCLE_INVALID:
     '請填寫合法的生命週期動作、路徑、連接埠或命令；一般初始化容器不支援生命週期動作。',
+  WORKLOAD_SECURITY_CONTEXT_INVALID:
+    '請填寫合法的安全上下文布林值、整數用戶或用戶組 ID、SELinux 值和權能名稱。',
+  CONTAINER_SECURITY_CONTEXT: '容器 Security Context',
+  POD_SECURITY_CONTEXT: '容器組 Security Context',
+  PRIVILEGED_MODE: '特權模式',
+  ALLOW_PRIVILEGE_ESCALATION: '允許擴大特權 (AllowPrivilegeEscalation)',
+  ROOT_DIRECTORY_READONLY: '文件系統 root 唯讀 (ReadOnlyRootFilesystem)',
+  USER_GROUP: '用戶組',
+  RUN_AS_NON_ROOT: '僅允許非 Root 用戶',
+  SELINUX_CONTEXT: 'SELinux 上下文',
+  CAPABILITIES: 'Capabilities',
   WORKLOAD_RESOURCE_INVALID: 'CPU 或記憶體資源值格式不正確。',
   WORKLOAD_CONFIG_REFERENCE_INVALID: '請選擇有效的 ConfigMap 或 Secret。',
   WORKLOAD_VOLUME_INVALID: '請填寫合法的儲存卷名稱、來源和路徑。',

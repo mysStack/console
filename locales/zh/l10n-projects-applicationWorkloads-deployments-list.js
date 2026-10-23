@@ -25,6 +25,17 @@ module.exports = {
   WORKLOAD_PROBE_INVALID: '请填写合法的健康检查类型、路径、端口和时间参数。',
   WORKLOAD_LIFECYCLE_INVALID:
     '请填写合法的生命周期动作、路径、端口或命令；普通初始化容器不支持生命周期动作。',
+  WORKLOAD_SECURITY_CONTEXT_INVALID:
+    '请填写合法的安全上下文布尔值、整数用户或用户组 ID、SELinux 值和权能名称。',
+  CONTAINER_SECURITY_CONTEXT: '容器安全上下文',
+  POD_SECURITY_CONTEXT: '容器组安全上下文',
+  PRIVILEGED_MODE: '特权模式',
+  ALLOW_PRIVILEGE_ESCALATION: '允许特权提升',
+  ROOT_DIRECTORY_READONLY: '根目录只读',
+  USER_GROUP: '用户组',
+  RUN_AS_NON_ROOT: '仅允许非 root 用户运行',
+  SELINUX_CONTEXT: 'SELinux 上下文',
+  CAPABILITIES: '权能',
   WORKLOAD_RESOURCE_INVALID: 'CPU 或内存资源值格式不正确。',
   WORKLOAD_CONFIG_REFERENCE_INVALID: '请选择有效的 ConfigMap 或 Secret。',
   WORKLOAD_VOLUME_INVALID: '请填写合法的存储卷名称、来源和路径。',
