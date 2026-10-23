@@ -119,6 +119,48 @@ test('single delete rejects when related HPA cleanup fails', async () => {
   );
 });
 
+test('StatefulSet 单项删除同时清理原生创建时登记的 Headless Service', async () => {
+  const calls: string[] = [];
+  const store = loadStore('statefulsets', async url => {
+    calls.push(url);
+    return { status: 'Success' };
+  });
+
+  await store.useDeleteDeploymentMutation().mutate({
+    ...item,
+    annotations: { 'kubesphere.io/related-service': 'workload-test-headless' },
+  });
+
+  assert.deepEqual(calls, [
+    'delete:services:host:v4-migration-e2e:workload-test-headless',
+    'workload-test',
+  ]);
+});
+
+test('StatefulSet 批量删除清理登记的 Headless Service，其他资源不误删同名 Service', async () => {
+  for (const resource of ['statefulsets', 'deployments']) {
+    const calls: string[] = [];
+    const store = loadStore(resource, async url => {
+      calls.push(url);
+      return { status: 'Success' };
+    });
+
+    await store.batchDelete([
+      {
+        ...item,
+        annotations: { 'kubesphere.io/related-service': 'workload-test-headless' },
+      },
+    ]);
+
+    assert.deepEqual(
+      calls,
+      resource === 'statefulsets'
+        ? ['workload-test', 'delete:services:host:v4-migration-e2e:workload-test-headless']
+        : ['workload-test'],
+    );
+  }
+});
+
 test('direct batchDelete rejects failures for callers outside the list hooks', async () => {
   const error = new Error('Forbidden');
   const store = loadStore('deployments', async () => {

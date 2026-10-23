@@ -107,6 +107,16 @@ const workloadStore = (module: string) => {
   const { post: postService, delete: deleteService } = baseStore({ module: 'services' });
   const { deleteHpa } = hpaStore;
 
+  const deleteRelatedStatefulSetService = (params: DeleteProps) => {
+    const serviceName = params.annotations?.['kubesphere.io/related-service'];
+    if (module !== 'statefulsets' || !serviceName) return undefined;
+    return deleteService({
+      cluster: params.cluster,
+      namespace: params.namespace,
+      name: serviceName,
+    });
+  };
+
   const del = (params: PathParams, k8sVersion?: string) => {
     return request.delete(getDetailUrl(params, k8sVersion), {
       data: {
@@ -122,6 +132,9 @@ const workloadStore = (module: string) => {
 
     items.map(item => {
       promises.push(del(item, k8sVersion));
+
+      const deleteServiceRequest = deleteRelatedStatefulSetService(item);
+      if (deleteServiceRequest) promises.push(deleteServiceRequest);
 
       const relateHPA = get(item, "annotations['kubesphere.io/relatedHPA']");
 
@@ -201,6 +214,9 @@ const workloadStore = (module: string) => {
             ),
           );
         }
+
+        const deleteServiceRequest = deleteRelatedStatefulSetService(params);
+        if (deleteServiceRequest) reqs.push(deleteServiceRequest);
 
         reqs.push(del(params, k8sVersion));
 

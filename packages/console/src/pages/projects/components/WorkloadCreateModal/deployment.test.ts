@@ -109,7 +109,7 @@ test('buildStatefulSet 同时生成有状态副本集和配套 Headless Service'
     metadata: {
       name: 'native-db',
       namespace: 'v4-migration-e2e',
-      annotations: {},
+      annotations: { 'kubesphere.io/related-service': 'native-db-ab12' },
       labels: { tier: 'database', app: 'native-db' },
     },
     spec: {

@@ -1621,6 +1621,7 @@ export function buildStatefulSet(
   workload.kind = 'StatefulSet';
   delete workload.spec.strategy;
   workload.spec.serviceName = normalizedServiceName;
+  workload.metadata.annotations['kubesphere.io/related-service'] = normalizedServiceName;
   workload.spec.updateStrategy =
     normalized.updateStrategy!.type === 'RollingUpdate'
       ? {
