@@ -4,7 +4,7 @@
   "capability": "deployment-statefulset-daemonset",
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
-  "phase": "VERIFY",
+  "phase": "DEV",
   "rea": {
     "status": "已通过",
     "sourceCommit": "e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0",
@@ -20,7 +20,7 @@
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
-        "sha256": "b7ca18bb60993c4db6f0187ec234b217d2950e7114e137bd38fc2e012dd7bc83"
+        "sha256": "4d11487aa127b56b87c16291917e93226b4cab83322b89bc5277c2027663b8a2"
       },
       {
         "path": "docs/v4-migration/workload-kind-capability-matrix.md",
@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "4790d1a62474805aeadc64ebfd4b8fa1e1ac9af77e9f762254b731b6f56e2696"
+        "sha256": "4bfc3ae117721f58acce0b3c514f62a62b81b4e562ba2b6042a051ee8525e1cc"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "eac6ed9e6c80cce40bcfd7e6a6660c5a7ccbc50164f5f1ee1fc12067e3cf7a80"
+        "sha256": "2f317fd44e4e182d74f09a33f4e320bfb4e6b20ad2350ac37239a01b9ebbe7a5"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -224,8 +224,8 @@
     }
   },
   "dev": {
-    "status": "已完成",
-    "reason": "PVC 创建页本地化缺陷已在 f6b7c689b 修复；TDD 红/绿、81 文件/364 项回归、packages/locales 构建、ESLint、Prettier 与差异检查通过。",
+    "status": "进行中",
+    "reason": "2026-10-24 负责人指出编辑设置版本/能力不符：已完成专项持久化不等于当前 v3dist 交互和功能等价。先对照 131 当前 V3 页面与编译制品补齐 DS-01/DS-04 等缺口；配置引用 RBAC 同时登记待修复。",
     "sourceCommit": "f6b7c689b55b1561d474dcb6dc056a39e2166e51",
     "documents": [
       {
@@ -466,7 +466,7 @@
       },
       {
         "path": "docs/v4-migration/workload-dev-completion-20261023.md",
-        "sha256": "a3c0e9425acb61f25abfab3330fa04c0902ee161e1c35c8eac7613a615b8d468"
+        "sha256": "30af7713d831f3d494e114027d4aad4ac8d5da4d3ee06252fb47702773f924b0"
       }
     ]
   },
@@ -477,8 +477,8 @@
     "WL-04：移除普通 Workload 配置引用的 useV3action、Wujie Shadow DOM 和 V3 编辑器桥接"
   ],
   "verify": {
-    "status": "进行中",
-    "reason": "精确镜像 7fa49aa192d0 已关闭 HPA scope 并通过 DaemonSet 停止/恢复与 StatefulSet PVC 持久化；本地化修复 f6b7c689b 仍需精确镜像、131 rollout、Pod imageID 和 Playwright 页面渲染重验。",
+    "status": "未完成",
+    "reason": "精确镜像 ef3b4f1a8 专项测试保留；当前 V4 为单页长表单，尚未证明当前 V3 分区、容器二级编辑及镜像选择/认证等价。退回 DEV，不以保存成功证明编辑设置完整或版本对齐。",
     "sourceCommit": "f6b7c689b55b1561d474dcb6dc056a39e2166e51",
     "documents": []
   }

@@ -1,0 +1,51 @@
+async (page) => {
+  const base='http://192.168.2.131:30880';
+  const root='/test-workspace/clusters/host/projects/v4-migration-e2e';
+  const fixtures=[['deployments','v4-deploy-edit-ef3'],['statefulsets','v4-pvc-sts-7fa'],['daemonsets','v4-stop-ds-7fa']];
+  const results=[];
+  for(const [module,name] of fixtures) {
+    const api='/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/'+module+'/'+name;
+    await page.goto(base+root+'/'+module+'/'+name+'/resource-status');
+    const read=()=>page.evaluate(async u=>{const r=await fetch(u);if(r.status!==200)throw Error('GET '+r.status);return r.json();},api);
+    const before=await read();
+    const initial=before.spec.template.spec.terminationGracePeriodSeconds;
+    const open=async()=>{
+      await page.getByRole('button',{name:'更多操作',exact:true}).click();
+      await page.getByRole('button',{name:'编辑设置',exact:true}).click();
+      const dialog=page.getByRole('dialog',{name:'编辑设置',exact:true});
+      await dialog.waitFor();
+      if(await dialog.locator('.monaco-editor').count())throw Error('YAML instead of settings');
+      return dialog;
+    };
+    let dialog=await open();
+    const grace=d=>d.getByRole('spinbutton').last();
+    if(Number(await grace(dialog).inputValue())!==initial)throw Error(module+' grace control mismatch');
+    await grace(dialog).fill(String(initial+1));
+    const saved=page.waitForResponse(r=>r.url()===base+api&&r.request().method()==='PUT',{timeout:15000});
+    await dialog.getByRole('button',{name:'确定',exact:true}).click();
+    const r=await saved;
+    if(r.status()!==200)throw Error(module+' PUT '+r.status());
+    await dialog.waitFor({state:'hidden'});
+    const changed=await read();
+    if(changed.spec.template.spec.terminationGracePeriodSeconds!==initial+1)throw Error('PUT not persisted');
+    await page.reload();
+    dialog=await open();
+    if(Number(await grace(dialog).inputValue())!==initial+1)throw Error('settings not refilled');
+    await grace(dialog).fill(String(initial+2));
+    await dialog.getByRole('button',{name:'取消',exact:true}).click();
+    const cancelled=await read();
+    if(cancelled.spec.template.spec.terminationGracePeriodSeconds!==initial+1)throw Error('cancel persisted');
+    dialog=await open();
+    await grace(dialog).fill(String(initial));
+    const restored=page.waitForResponse(r=>r.url()===base+api&&r.request().method()==='PUT',{timeout:15000});
+    await dialog.getByRole('button',{name:'确定',exact:true}).click();
+    if((await restored).status()!==200)throw Error('restore PUT failed');
+    await dialog.waitFor({state:'hidden'});
+    const after=await read();
+    if(after.spec.template.spec.terminationGracePeriodSeconds!==initial)throw Error('restore not persisted');
+    const preserve= d=>({images:d.spec.template.spec.containers.map(c=>c.image),env:d.spec.template.spec.containers.map(c=>c.envFrom||[]),nodeSelector:d.spec.template.spec.nodeSelector||{},pvc:d.spec.volumeClaimTemplates||[]});
+    if(JSON.stringify(preserve(before))!==JSON.stringify(preserve(after)))throw Error(module+' unrelated settings changed');
+    results.push({module,name,nativeSettings:true,putStatus:r.status(),initialGrace:initial,changedGrace:initial+1,reloadRefilled:true,cancelUnchanged:true,restored:true,imagesReferencesNodeSelectorAndPVCsPreserved:true,daemonSetNoReplicas:module==='daemonsets'?!('replicas' in after.spec):null,api});
+  }
+  return {date:new Date().toISOString(),sourceCommit:'ef3b4f1a83c3b708f5a12b35dd178bf358c99b8d',scenarios:results};
+}

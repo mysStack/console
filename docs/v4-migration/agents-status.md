@@ -1,5 +1,16 @@
 # Workload 模块任务状态
 
+## 唯一当前状态（2026-10-24）
+
+- 负责人：当前 Codex 单会话，无子 Agent；能力 `deployment-statefulset-daemonset`。
+- 分支 / Worktree：`feature/v4-workloads` / `console-workloads`；已验证镜像 SHA `ef3b4f1a83c3b708f5a12b35dd178bf358c99b8d`。
+- 当前阶段 `DEV`，REA 已通过；因编辑设置完整能力未对齐当前 V3（分区、镜像选择、GPU、环境引用、端口协议）及低权限引用控件暴露，VERIFY 退回 DEV 修复，未标记已验收。
+- 已完成当前镜像三类原生设置保存/API 持久化/刷新/取消/恢复、ConfigMap 引用保存与受控 500 错误反馈，以及 StatefulSet PVC 本地化复验。Deployment Secret 共存已验证，另外两类未独立验证 Secret 引用。
+- 实际 viewer 点击应用为 PATCH 403，resourceVersion 与引用均未改变；下一项优先补齐当前制品编辑设置差异与原生功能；引用 edit 权限缺陷同时保留，修复后重新部署验证管理员及 viewer。
+- [唯一阶段记录](./module-execution.json)、[本轮真实证据和剩余条件](./workload-131-verify-20261024.md)。完整 RBAC、namespace 和 V3 等价未完成，PR #2 保持 Draft。
+
+## 2026-10-23 历史阶段记录（保留当时结论）
+
 ## 唯一当前状态（2026-10-23 组合批次范围调整）
 
 - 负责人：当前 Codex 单会话，不使用子 Agent。模块/能力：`workloads / deployment-statefulset-daemonset`；资源：Deployment、StatefulSet、DaemonSet。
