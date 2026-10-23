@@ -401,3 +401,17 @@ TDD：对象测试初始 70/73（新增 3 项失败），交互 0/2，语言新�
 结构化证据见 [环境引用本地记录](./evidence/workload-environment-local-20261024.json)。仍在 DEV，尚无当前代码的镜像部署、digest/imageID、Playwright 或真实 RBAC 验收；key 下拉、镜像选择完整交互和三类资源当前 SHA VERIFY 继续处理。历史镜像 `ef3b4f1a8` 不证明本次新增控件通过。
 
 本增量 `corepack yarn build:packages` 退出 0，四个包构建完成，shared 压缩 633/633。构建成功只记为本地检查，不改变 DEV 状态。
+
+## 引用 key 下拉及资源选项作用域（2026-10-24，DEV 增量）
+
+基于 `49967289db1d5191d05fa773c19f6154e6715f1d`，DEV start 检查通过。沿用当前制品工厂 2254 的 key 选择证据，复用 Kubed `AutoComplete`：可从选中资源的键名下拉选择，也保留手工输入以支持预期键或 optional 场景。加载中提示状态，失败显示错误/重试，不静默丢弃已有 key。
+
+新增模块内 `useWorkloadEnvironmentKeys`：使用 React Query，key 包含 cluster、namespace、资源类型和名称；只在作用域完整且选中资源后请求。复用两类 Store 的 detail URL，原始响应立即转换成键名数组后才进入缓存。Secret 原始编码数据仍会经过网络（Kubernetes 没有 key-only API），但绕过会解码的 Secret mapper，不在缓存、界面或日志保存/输出值；与现有配置引用预览的处理边界一致。此前增量不取 Secret 内容的事实保留为历史，本增量明确增加了选中资源的键名读取。
+
+补充回归复现了 `useWorkloadResourceOptions` 在作用域切换后首帧仍返回旧资源名称的问题；为选项绑定 context，返回时核对当前 cluster/namespace，匹配之前不暴露旧名称。创建页、三类设置和镜像凭据选项共用这一修复；不修改其他模块的公共 Hook。
+
+TDD：新键名 Hook 0/2、作用域新增 1 项失败、key 下拉交互新增断言失败；修复后 Hook 2/2、作用域 2/2、交互 2/2。生命周期测试初因缺少新依赖替身出现 MODULE_NOT_FOUND，补齐隔离替身后原有 3/3 通过，不算业务缺陷。完整 `./scripts/test.sh`：87 文件/386 项通过、0 失败。变更生产文件 ESLint 通过。类型、格式、构建及摘要见 [本增量证据](./evidence/workload-environment-keys-local-20261024.json)。
+
+模块保持 DEV。上述本地结果不替代当前 SHA 部署后的实际 key 选择、网络失败、真实权限、namespace 和缓存验收；镜像选择完整交互及三类完整 VERIFY 仍待完成。PR #2 保持 Draft，不合并。
+
+本次 `corepack yarn build:packages` 退出 0，shared 633/633；七个变更源码/测试文件格式检查及差异检查通过。TypeScript 基线/当前同为 1326 项；全文对照有两条原有 6059/6307 诊断被替换，逐行核对只是导入说明增加本次新 Hook，一致的 rootDir/文件清单主错误未变化。没有新的主诊断或变更文件直接诊断，但全项目类型检查仍未通过。131 旧镜像的只读 Playwright 配置探测返回 `globals.config.enableImageSearch=true`，不能把镜像搜索按未启用功能豁免；此探测不算本增量 UI 验收。

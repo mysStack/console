@@ -30,9 +30,11 @@ function loadInput() {
         ? { Input: 'input', InputNumber: 'input-number', Select: 'select', Switch: 'switch' }
         : name === '@ks-console/shared'
           ? { ArrayInput: 'array-input' }
-          : name === './SecurityContextInput'
-            ? { __esModule: true, default: 'security-context-input' }
-            : requireDependency(name),
+          : name === './useWorkloadEnvironmentKeys'
+            ? { __esModule: true, default: () => ({ data: [] }) }
+            : name === './SecurityContextInput'
+              ? { __esModule: true, default: 'security-context-input' }
+              : requireDependency(name),
   });
   return loaded.exports.default;
 }

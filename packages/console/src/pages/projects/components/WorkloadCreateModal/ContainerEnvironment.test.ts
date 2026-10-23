@@ -25,12 +25,23 @@ function loadInputs() {
       globals: { config: { supportGpuType: [] } },
       require: (name: string) =>
         name === '@kubed/components'
-          ? { Input: 'input', InputNumber: 'number', Select: 'select', Switch: 'switch' }
+          ? {
+              Input: 'input',
+              InputNumber: 'number',
+              Select: 'select',
+              Switch: 'switch',
+              AutoComplete: 'autocomplete',
+            }
           : name === '@ks-console/shared'
             ? { ArrayInput: 'array-input' }
-            : name === './SecurityContextInput'
-              ? { __esModule: true, default: 'security-context' }
-              : dependency(name),
+            : name === './useWorkloadEnvironmentKeys'
+              ? {
+                  __esModule: true,
+                  default: () => ({ data: ['item'], isLoading: false, isError: false }),
+                }
+              : name === './SecurityContextInput'
+                ? { __esModule: true, default: 'security-context' }
+                : dependency(name),
     },
   );
   const tree = loaded.exports.default({ kind: 'CONTAINER', resourceOptions: options });
@@ -51,7 +62,7 @@ function nodes(node: any): any[] {
 const normalize = (value: any) => JSON.parse(JSON.stringify(value));
 const options = { configMaps: ['settings'], secrets: ['fixture'], persistentVolumeClaims: [] };
 
-test('环境引用类型切换互斥，Secret 只显示名称/key，不读取或展示 Secret 数据', () => {
+test('环境引用类型切换互斥，Secret 只显示名称和 key，键名可以下拉选择', () => {
   const { EnvironmentInput } = loadInputs();
   let changed: any;
   const value = {
@@ -71,6 +82,12 @@ test('环境引用类型切换互斥，Secret 只显示名称/key，不读取或
   assert.equal(type.props.value, 'secretKeyRef');
   const resource = all.find(node => node.props['aria-label'] === 'WORKLOAD_REFERENCE_RESOURCE');
   assert.deepEqual(normalize(resource.props.options), [{ label: 'fixture', value: 'fixture' }]);
+  const key = all.find(node => node.props['aria-label'] === 'KEY_IN_RESOURCE');
+  assert.equal(key.type, 'autocomplete', '当前 V3 的资源键选择需要下拉建议');
+  assert.deepEqual(normalize(key.props.options), [{ label: 'item', value: 'item' }]);
+  key.props.onChange('other');
+  assert.equal(changed.valueFrom.secretKeyRef.key, 'other');
+  assert.equal(value.valueFrom.secretKeyRef.key, 'item');
   assert.equal(
     all.find(node => node.props['aria-label'] === 'KEY_IN_RESOURCE').props.value,
     'item',

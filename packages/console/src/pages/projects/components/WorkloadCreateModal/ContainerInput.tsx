@@ -5,7 +5,7 @@
 
 import React from 'react';
 import styled from 'styled-components';
-import { Input, InputNumber, Select, Switch } from '@kubed/components';
+import { AutoComplete, Button, Input, InputNumber, Select, Switch } from '@kubed/components';
 import { ArrayInput } from '@ks-console/shared';
 import {
   ContainerCreateValues,
@@ -16,8 +16,10 @@ import {
   VolumeMountValues,
 } from './deployment';
 import SecurityContextInput from './SecurityContextInput';
+import useWorkloadEnvironmentKeys from './useWorkloadEnvironmentKeys';
 
 export interface WorkloadResourceOptions {
+  context?: { cluster: string; namespace: string };
   configMaps: string[];
   secrets: string[];
   imagePullSecrets?: string[];
@@ -131,6 +133,11 @@ function EnvironmentInput({
   const source = value.valueFrom;
   const type = source ? Object.keys(source)[0] : 'literal';
   const reference = source?.configMapKeyRef || source?.secretKeyRef;
+  const resourceKeys = useWorkloadEnvironmentKeys(
+    type === 'configMapKeyRef' ? 'configMap' : type === 'secretKeyRef' ? 'secret' : undefined,
+    reference?.name,
+    resourceOptions.context,
+  );
   const updateSource = (next: NonNullable<EnvironmentValues['valueFrom']>) => {
     const rest = { ...value };
     delete rest.value;
@@ -194,11 +201,12 @@ function EnvironmentInput({
             placeholder={t('WORKLOAD_SELECT_RESOURCE')}
             onChange={name => updateReference({ name: String(name || ''), key: '' })}
           />
-          <Input
+          <AutoComplete
             aria-label={t('KEY_IN_RESOURCE')}
             placeholder={t('KEY_IN_RESOURCE')}
             value={reference.key}
-            onChange={event => updateReference({ key: event.target.value })}
+            options={toOptions(resourceKeys.data || [])}
+            onChange={key => updateReference({ key: String(key || '') })}
           />
           <Switch
             aria-label={t('WORKLOAD_REFERENCE_OPTIONAL')}
@@ -206,6 +214,15 @@ function EnvironmentInput({
             checked={Boolean(reference.optional)}
             onChange={optional => updateReference({ optional })}
           />
+        </div>
+      )}
+      {reference && resourceKeys.isLoading && <div role="status">{t('LOADING')}</div>}
+      {reference && resourceKeys.isError && (
+        <div role="alert">
+          {t('WORKLOAD_RESOURCE_OPTIONS_FAILED')}{' '}
+          <Button variant="text" onClick={() => resourceKeys.refetch()}>
+            {t('RETRY')}
+          </Button>
         </div>
       )}
       {source?.fieldRef && (

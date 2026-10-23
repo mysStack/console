@@ -39,6 +39,7 @@ export default function useWorkloadResourceOptions(cluster: string, namespace: s
       .then(([configMaps, secrets, imagePullSecrets, claims]) => {
         if (!active) return;
         setOptions({
+          context: { cluster, namespace },
           configMaps,
           secrets,
           imagePullSecrets,
@@ -54,5 +55,10 @@ export default function useWorkloadResourceOptions(cluster: string, namespace: s
     };
   }, [cluster, namespace]);
 
-  return { options, isLoading, isError };
+  // 路由作用域变化后的首帧也不能暴露上一个项目的资源名称。
+  const currentOptions =
+    options.context?.cluster === cluster && options.context.namespace === namespace
+      ? options
+      : EMPTY_OPTIONS;
+  return { options: currentOptions, isLoading, isError };
 }
