@@ -1,3 +1,5 @@
+> **2026-10-24 批量删除缺陷复核**：旧精确制品的真实浏览器批量删除发现 StatefulSet 关联 Headless Service 残留，根因是页面 Hook 丢弃 `annotations`。已补充最小修复和回归测试，Workload 阶段退回 `DEV`；新制品尚未完成构建、部署和浏览器复验，批量删除不能标记通过。详见 [批量删除缺陷取证](./evidence/workload-batch-delete-defect-20261024.json)。
+
 > **2026-10-24 回退复验**：Deployment 专用 fixture 已在精确制品上完成回退目标选择、实际 PATCH 200、弹窗关闭和 rollout/Ready 恢复；证据见 [Deployment 回退浏览器复验](./evidence/workload-rollback-browser-verify-20261024.json)。批量删除、伸缩确认、完整错误/缓存和逐项 V3 等价仍未闭环，Workload 保持 `VERIFY / 未完成`。
 
 > **2026-10-24 集群级列表复验**：精确制品 `24c6afa03849d5d5c7b84fccd1602639b1fd0eb5` 的 Deployment、StatefulSet、DaemonSet 集群级原生列表入口已在 131 完成零 Cookie 浏览器登录和渲染复验；专用 fixture、namespace 控件可见，页面错误为 0，未发现 `/consolev3` 或 `/dist/v3dist` 请求。批量删除确认后的成功结果仍未验证，状态继续为 `VERIFY / 未完成`。详见 [集群级列表证据](./evidence/workload-cluster-native-browser-verify-20261024.json)。

@@ -1,3 +1,7 @@
+# 当前状态补充（2026-10-24：批量删除关联资源缺陷）
+
+131 真实浏览器复验发现：旧精确制品执行 StatefulSet 批量删除后，StatefulSet 已删除，但其 Headless Service 残留。根因是页面批量删除参数转换丢弃 `annotations`，与 Store 中已有的关联资源清理逻辑脱节。已补充最小代码修复和参数传递回归测试，Workload 从 `VERIFY` 退回 `DEV`。新制品尚未构建、部署或浏览器复验，不能报告批量删除通过。证据见 [批量删除缺陷取证](./evidence/workload-batch-delete-defect-20261024.json)。
+
 # 当前状态补充（2026-10-24：Deployment 回退实际写入复验）
 
 专用 Deployment `v4-deploy-edit-ef3` 已在当前精确制品上通过浏览器选择回退目标 `#27`，PATCH 返回 200，弹窗关闭，Kubernetes rollout 成功并恢复 1/1 Ready，临时验证注解已移除。证据见 [Deployment 回退浏览器复验](./evidence/workload-rollback-browser-verify-20261024.json)。批量删除成功、伸缩确认、完整错误/缓存和逐项 V3 等价仍未完成，模块继续保持 `VERIFY / 未完成`。

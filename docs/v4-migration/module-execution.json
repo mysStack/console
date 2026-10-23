@@ -4,7 +4,7 @@
   "capability": "deployment-statefulset-daemonset",
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
-  "phase": "VERIFY",
+  "phase": "DEV",
   "rea": {
     "status": "已通过",
     "sourceCommit": "e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0",
@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "fdd7990cce9e17f61935fe50e9a8e327c78bb82c72df4b1a47e3de3c6b952f98"
+        "sha256": "f8b4975eda2c1872443f0c7b2e0198dbc0ffa83a79dc4447dcc2d71e763b051e"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "ede1b237adcc9eb95c894af42a5cda52403b4ca0f10f04813eed56f5729ba31a"
+        "sha256": "d297cf24c8ccb8227bcda61863f935ee75b3f7d523f6770f3fafef7d0a41e83d"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -224,8 +224,8 @@
     }
   },
   "dev": {
-    "status": "已完成",
-    "reason": "已移除共享启动层的全局 preloadApp，仅保留 setupApp 按需注册；针对延迟 V3 CSS 请求的回归测试和本地验证完成。90 个测试文件/401 项通过，build:packages 通过。集群级三类 Workload 列表当前由 ApplicationWorkloads/Workloads 原生 ListPage、Store 和创建弹窗提供；此前将其误判为 Wujie 入口，已由现有 nativeWorkloads 回归测试核实。",
+    "status": "进行中",
+    "reason": "发现旧精确制品的真实浏览器批量删除缺陷：页面 Hook 丢弃资源 annotations，导致 StatefulSet 关联 Headless Service 残留。已补充最小参数传递修复和回归测试；新制品待完成本地验证、CI、131 部署及三类批量删除浏览器复验。",
     "sourceCommit": "45d9f14e53d6a0c1d74011197ade9d5accbcdae9",
     "documents": [
       {
@@ -502,7 +502,7 @@
   ],
   "verify": {
     "status": "未完成",
-    "reason": "精确制品部署、三类项目与集群原生路由列表无 V3 预加载、设置页面、配置引用保存/取消/失败反馈、Action 菜单与取消、Deployment 回退实际写入、重新创建、DaemonSet 批量停止、低权限拒绝、第二 namespace 正反隔离和集群级列表渲染已验证；批量删除成功、伸缩确认结果、完整错误/缓存、跨入口缓存切换和逐项 V3 等价仍未完成。",
+    "reason": "旧精确制品的真实浏览器批量删除发现 StatefulSet 关联 Headless Service 残留；已退回 DEV 修复。批量删除新制品复验、伸缩确认结果、完整错误/缓存、跨入口缓存切换和逐项 V3 等价仍未完成。",
     "sourceCommit": "45d9f14e53d6a0c1d74011197ade9d5accbcdae9",
     "documents": [
       {

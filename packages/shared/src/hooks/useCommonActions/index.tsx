@@ -22,6 +22,7 @@ import type { DeleteConfirmContentProps } from '../../components/Modals/DeleteCo
 import { DeleteConfirmContent } from '../../components/Modals/DeleteConfirm/DeleteConfirm';
 import type { PathParams } from '../../types';
 import { invalidateResourceList } from '../../utils/resourceListInvalidation';
+import { buildDeleteParams } from './deleteParams';
 
 interface BaseInfoProps extends Record<string, any> {
   initialValues?: any;
@@ -165,11 +166,7 @@ const useCommonActions = ({ store, callback = () => {}, params = {} }: CommonAct
     const { type, resource, onOk, onCancel = () => {}, ...rest } = props;
     const items = resource ? resource : Array.isArray(props) ? props : [props];
     const handleOk = async () => {
-      const deleteParams = items.map(item => ({
-        namespace: item.namespace,
-        name: item.name,
-        ...params,
-      }));
+      const deleteParams = buildDeleteParams(items, params);
       await store.batchDelete(deleteParams, k8sVersion);
       notify.success(t('DELETED_SUCCESSFULLY'));
       invalidateResourceList(store?.module);

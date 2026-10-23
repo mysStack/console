@@ -1,3 +1,9 @@
+# 当前增量：批量删除关联资源缺陷，退回 DEV（2026-10-24）
+
+在精确制品 `24c6afa03849d5d5c7b84fccd1602639b1fd0eb5` 上使用浏览器真实执行集群级批量删除，发现 StatefulSet 本体删除后，带 `kubesphere.io/related-service` 标注的 Headless Service 仍然存在。根因是 `packages/shared/src/hooks/useCommonActions/index.tsx` 组装批量删除参数时丢弃了每个资源的 `annotations`，导致 Workload Store 无法执行关联 Service/HPA 清理。证据见 [批量删除缺陷取证](./evidence/workload-batch-delete-defect-20261024.json)。
+
+本轮已补充最小修复：由独立参数转换函数保留 `namespace`、`name` 和 `annotations`，并增加回归测试。模块阶段退回 `DEV`；待新提交完成本地测试、CI 构建、131 精确制品部署及三类资源浏览器批量删除和关联资源清理复验后，才能重新进入 `VERIFY`。旧制品的批量删除结果不继承为新制品通过。
+
 # 当前增量：Deployment 回退实际写入复验（2026-10-24）
 
 在精确制品 `24c6afa03849d5d5c7b84fccd1602639b1fd0eb5` 上，对专用 Deployment `v4-deploy-edit-ef3` 先写入临时模板注解以生成可回退修订，再通过浏览器打开回退弹窗选择 `#27`。实际 PATCH 返回 200，弹窗关闭；Kubernetes 随后成功 rollout，Ready 副本为 1，临时注解已移除，回退动作生成新的修订记录。

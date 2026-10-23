@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-24",
+  "module": "workloads",
+  "stage": "DEV",
+  "artifact": {
+    "sourceCommit": "24c6afa03849d5d5c7b84fccd1602639b1fd0eb5",
+    "image": "feature-v4-workloads-20261024-050150-24c6afa03849",
+    "digest": "sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76"
+  },
+  "finding": "浏览器真实执行集群级批量删除后，StatefulSet 本体已删除，但其由 kubesphere.io/related-service 标注的 Headless Service 未删除。",
+  "fixtures": [
+    {
+      "kind": "StatefulSet",
+      "names": ["v4-batch-sts-1792797406-a", "v4-batch-sts-1792797406-b"],
+      "relatedServicesObservedAfterDelete": [
+        "v4-batch-sts-1792797406-a",
+        "v4-batch-sts-1792797406-b"
+      ]
+    },
+    {
+      "kind": "DaemonSet",
+      "names": ["v4-batch-ds-1792797406-a", "v4-batch-ds-1792797406-b"],
+      "result": "本轮专用资源已清理；该次会话未作为成功证据记录"
+    }
+  ],
+  "rootCause": "packages/shared/src/hooks/useCommonActions/index.tsx 的批量删除参数转换只保留 namespace/name 和公共 params，丢弃了 item.annotations；packages/shared/src/stores/workload/index.ts 的关联 Service/HPA 清理逻辑因此收不到 kubesphere.io/related-service 或 kubesphere.io/relatedHPA。",
+  "scope": "影响通过 useCommonActions 批量删除入口触发的 Workload 关联资源清理；单项 Store 清理逻辑已有回归覆盖，原有测试未覆盖页面 Hook 到 Store 的 annotations 传递。",
+  "disposition": "退回 DEV；补充参数转换单元测试和真实三类资源批量删除浏览器验证。当前旧制品不能标记批量删除通过。"
+}
