@@ -15,7 +15,8 @@
   "setup": {
     "temporaryTemplateAnnotation": "codex.dev/rollback-test=new-revision",
     "purpose": "生成可回退的专用修订记录",
-    "setupChangedBusinessData": false
+    "setupChangedBusinessData": true,
+    "fixtureRestored": true
   },
   "browser": {
     "freshContext": true,
