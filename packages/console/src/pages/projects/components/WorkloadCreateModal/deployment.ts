@@ -5,6 +5,7 @@ export interface ContainerPortValues {
   containerPort?: number;
   servicePort?: number;
   protocol?: 'TCP' | 'UDP' | 'SCTP';
+  applicationProtocol?: 'GRPC' | 'HTTP' | 'HTTP2' | 'HTTPS' | 'TCP' | 'UDP' | 'SCTP';
 }
 
 export interface EnvironmentValues {
@@ -42,8 +43,9 @@ export interface LifecycleValues {
 }
 
 export interface ResourceValues {
-  requests?: { cpu?: string; memory?: string };
-  limits?: { cpu?: string; memory?: string };
+  requests?: { cpu?: string; memory?: string; [key: string]: string | undefined };
+  limits?: { cpu?: string; memory?: string; [key: string]: string | undefined };
+  gpu?: { type?: string; value?: string };
 }
 
 export interface SecurityContextValues {
@@ -114,6 +116,7 @@ export interface ContainerCreateValues {
   name: string;
   originalName?: string;
   image: string;
+  pullSecret?: string;
   imagePullPolicy?: 'Always' | 'IfNotPresent' | 'Never';
   restartPolicy?: 'Always';
   command?: string[];
@@ -286,6 +289,59 @@ function isValidPort(port?: number | string): boolean {
     : Number.isInteger(port) && port! >= 1 && port! <= 65535;
 }
 
+const APPLICATION_PROTOCOLS = ['GRPC', 'HTTP', 'HTTP2', 'HTTPS', 'TCP', 'UDP', 'SCTP'] as const;
+const IMAGE_PULL_SECRET_ANNOTATION = 'kubesphere.io/imagepullsecrets';
+
+function getSupportedGpuTypes(): string[] {
+  const configured = typeof globals === 'undefined' ? [] : globals.config.supportGpuType || [];
+  return configured.length ? configured : ['nvidia.com/gpu'];
+}
+
+function parseImagePullSecretMapping(annotations?: Record<string, any>): Record<string, string> {
+  try {
+    const parsed = JSON.parse(annotations?.[IMAGE_PULL_SECRET_ANNOTATION] || '{}');
+    const entries: [string, string][] = Object.entries(parsed || {}).flatMap(([name, secret]) =>
+      trim(name) && typeof secret === 'string' && trim(secret) ? [[trim(name), trim(secret)]] : [],
+    );
+    return Object.fromEntries(entries);
+  } catch {
+    return {};
+  }
+}
+
+function buildImagePullSecretMapping(containers: ContainerCreateValues[]) {
+  return Object.fromEntries(
+    containers.flatMap(container =>
+      trim(container.name) && trim(container.pullSecret)
+        ? [[trim(container.name), trim(container.pullSecret)]]
+        : [],
+    ),
+  );
+}
+
+function parseApplicationProtocol(
+  port: Record<string, any>,
+): ContainerPortValues['applicationProtocol'] {
+  const prefix = String(port.name || '')
+    .split('-', 1)[0]
+    .toUpperCase();
+  return APPLICATION_PROTOCOLS.includes(prefix as (typeof APPLICATION_PROTOCOLS)[number])
+    ? (prefix as ContainerPortValues['applicationProtocol'])
+    : port.protocol === 'UDP' || port.protocol === 'SCTP'
+      ? port.protocol
+      : 'TCP';
+}
+
+function buildPortName(port: ContainerPortValues): string | undefined {
+  const name = trim(port.name);
+  const applicationProtocol = port.applicationProtocol;
+  if (!applicationProtocol || applicationProtocol === parseApplicationProtocol(port)) {
+    return name || undefined;
+  }
+  const suffix = name.replace(/^(?:grpc|http2?|https|tcp|udp|sctp)-/i, '') || 'port';
+  return `${applicationProtocol.toLowerCase()}-${suffix}`.slice(0, 15);
+}
+
 function validateProbe(probe?: ProbeValues): boolean {
   if (!probe) return true;
   if (probe.type === 'http') {
@@ -448,7 +504,7 @@ export function validateContainers(
       envNames.add(envName);
     }
     for (const port of container.ports || []) {
-      const portName = trim(port.name);
+      const portName = buildPortName(port) || '';
       if (
         !Number.isInteger(port.containerPort) ||
         port.containerPort! < 1 ||
@@ -458,6 +514,10 @@ export function validateContainers(
             port.servicePort < 1 ||
             port.servicePort > 65535)) ||
         !['TCP', 'UDP', 'SCTP'].includes(port.protocol || 'TCP') ||
+        (port.applicationProtocol !== undefined &&
+          !APPLICATION_PROTOCOLS.includes(port.applicationProtocol)) ||
+        (trim(port.name) &&
+          (trim(port.name).length > 15 || !/^[a-z]([-a-z0-9]*[a-z0-9])?$/.test(trim(port.name)))) ||
         (portName && (portName.length > 15 || !/^[a-z]([-a-z0-9]*[a-z0-9])?$/.test(portName)))
       ) {
         return 'WORKLOAD_PORT_INVALID';
@@ -491,6 +551,14 @@ export function validateContainers(
       container.resources?.limits?.memory,
     ];
     if (!quantities.every(isValidQuantity)) return 'WORKLOAD_RESOURCE_INVALID';
+    const gpu = container.resources?.gpu;
+    if (
+      gpu &&
+      ((gpu.type && !isQualifiedName(gpu.type)) ||
+        (gpu.value !== undefined && gpu.value !== '' && !/^[1-9]\d*$/.test(gpu.value)))
+    ) {
+      return 'WORKLOAD_RESOURCE_INVALID';
+    }
     for (const reference of container.envFrom || []) {
       if (!['configMap', 'secret'].includes(reference.kind) || !isDnsLabel(trim(reference.name))) {
         return 'WORKLOAD_CONFIG_REFERENCE_INVALID';
@@ -543,15 +611,20 @@ function buildProbe(probe?: ProbeValues) {
 
 function compactResources(resources?: ResourceValues) {
   if (!resources) return undefined;
-  const compact = (values?: { cpu?: string; memory?: string }) => {
-    const result = {
-      ...(trim(values?.cpu) ? { cpu: trim(values?.cpu) } : {}),
-      ...(trim(values?.memory) ? { memory: trim(values?.memory) } : {}),
-    };
+  const compact = (values?: Record<string, string | undefined>) => {
+    const result = Object.fromEntries(
+      Object.entries(values || {}).flatMap(([key, value]) =>
+        trim(key) && trim(value) ? [[trim(key), trim(value)]] : [],
+      ),
+    );
     return Object.keys(result).length ? result : undefined;
   };
-  const requests = compact(resources.requests);
-  const limits = compact(resources.limits);
+  const gpu =
+    trim(resources.gpu?.type) && trim(resources.gpu?.value)
+      ? { [trim(resources.gpu?.type)]: trim(resources.gpu?.value) }
+      : {};
+  const requests = compact({ ...resources.requests, ...gpu });
+  const limits = compact({ ...resources.limits, ...gpu });
   return requests || limits
     ? { ...(requests ? { requests } : {}), ...(limits ? { limits } : {}) }
     : undefined;
@@ -618,7 +691,7 @@ function buildContainer(container: ContainerCreateValues) {
     ...(container.ports?.length
       ? {
           ports: container.ports.map(port => ({
-            ...(trim(port.name) ? { name: trim(port.name) } : {}),
+            ...(buildPortName(port) ? { name: buildPortName(port) } : {}),
             containerPort: port.containerPort!,
             protocol: port.protocol || 'TCP',
           })),
@@ -911,6 +984,18 @@ function parsePodScheduling(
 }
 
 function parseContainer(container: Record<string, any>): ContainerCreateValues {
+  const resourceKeys = new Set([
+    ...Object.keys(container.resources?.requests || {}),
+    ...Object.keys(container.resources?.limits || {}),
+  ]);
+  const gpuType = getSupportedGpuTypes().find(type => resourceKeys.has(type));
+  const resources = cloneDeep(container.resources || {});
+  if (gpuType) {
+    delete resources.requests?.[gpuType];
+    delete resources.limits?.[gpuType];
+    if (resources.requests && !Object.keys(resources.requests).length) delete resources.requests;
+    if (resources.limits && !Object.keys(resources.limits).length) delete resources.limits;
+  }
   return {
     name: container.name || '',
     originalName: container.name,
@@ -919,7 +1004,10 @@ function parseContainer(container: Record<string, any>): ContainerCreateValues {
     ...(container.restartPolicy ? { restartPolicy: container.restartPolicy } : {}),
     command: container.command,
     args: container.args,
-    ports: container.ports,
+    ports: container.ports?.map((port: Record<string, any>) => ({
+      ...port,
+      applicationProtocol: parseApplicationProtocol(port),
+    })),
     env: container.env
       ?.filter((item: Record<string, any>) => Object.prototype.hasOwnProperty.call(item, 'value'))
       .map((item: Record<string, any>) => ({ name: item.name, value: item.value })),
@@ -937,7 +1025,21 @@ function parseContainer(container: Record<string, any>): ContainerCreateValues {
     startupProbe: parseProbe(container.startupProbe),
     lifecycle: parseLifecycle(container.lifecycle),
     securityContext: parseSecurityContext(container.securityContext),
-    resources: container.resources,
+    resources: {
+      ...resources,
+      ...(gpuType
+        ? {
+            gpu: {
+              type: gpuType,
+              value: String(
+                container.resources?.limits?.[gpuType] ??
+                  container.resources?.requests?.[gpuType] ??
+                  '',
+              ),
+            },
+          }
+        : {}),
+    },
     volumeMounts: container.volumeMounts,
   };
 }
@@ -996,6 +1098,13 @@ export function parseDeploymentSettings(resource: Record<string, any>): Workload
   const kind: WorkloadKind = resource.kind || 'Deployment';
   const podLabels = resource.spec?.template?.metadata?.labels || {};
   const strategy = resource.spec?.[kind === 'Deployment' ? 'strategy' : 'updateStrategy'];
+  const pullSecretsByContainer = parseImagePullSecretMapping(
+    resource.spec?.template?.metadata?.annotations || resource.metadata?.annotations,
+  );
+  const parseWithPullSecret = (container: Record<string, any>) => ({
+    ...parseContainer(container),
+    pullSecret: pullSecretsByContainer[container.name] || '',
+  });
   return {
     name: resource.metadata?.name || '',
     namespace: resource.metadata?.namespace || '',
@@ -1004,8 +1113,8 @@ export function parseDeploymentSettings(resource: Record<string, any>): Workload
     workloadLabels: cloneDeep(resource.metadata?.labels),
     workloadAnnotations: cloneDeep(resource.metadata?.annotations),
     replicas: resource.spec?.replicas ?? 1,
-    containers: (podSpec.containers || []).map(parseContainer),
-    initContainers: (podSpec.initContainers || []).map(parseContainer),
+    containers: (podSpec.containers || []).map(parseWithPullSecret),
+    initContainers: (podSpec.initContainers || []).map(parseWithPullSecret),
     volumes: (podSpec.volumes || []).map(parseVolume).filter(Boolean) as VolumeValues[],
     ...(kind === 'StatefulSet'
       ? {
@@ -1063,6 +1172,7 @@ function mergeContainerSettings(
         container => container.name === (value.originalName || trim(value.name)),
       ) || {};
     const next = { ...original };
+    const parsed = parseContainer(original);
     for (const field of EDITABLE_CONTAINER_FIELDS) delete next[field];
     const built: Record<string, any> = buildContainer(value);
 
@@ -1112,10 +1222,13 @@ function mergeContainerSettings(
     }
 
     if (built.resources || original.resources) {
+      const modeledGpuTypes = new Set(
+        [parsed.resources?.gpu?.type, value.resources?.gpu?.type].filter(Boolean),
+      );
       const mergeResourceGroup = (group: 'requests' | 'limits') => {
         const preserved = Object.fromEntries(
           Object.entries(original.resources?.[group] || {}).filter(
-            ([key]) => key !== 'cpu' && key !== 'memory',
+            ([key]) => key !== 'cpu' && key !== 'memory' && !modeledGpuTypes.has(key),
           ),
         );
         const merged = { ...preserved, ...built.resources?.[group] };
@@ -1143,7 +1256,6 @@ function mergeContainerSettings(
       }));
     }
 
-    const parsed = parseContainer(original);
     if (!isEqual(value.lifecycle, parsed.lifecycle) && value.lifecycle) {
       const lifecycle = cloneDeep(original.lifecycle || {});
       for (const stage of ['postStart', 'preStop'] as const) {
@@ -1357,6 +1469,23 @@ export function buildDeploymentSettingsResource(
   } else {
     delete nextPodSpec.initContainers;
   }
+  const allContainers = [...values.containers, ...(values.initContainers || [])];
+  const pullSecretsByContainer = buildImagePullSecretMapping(allContainers);
+  const originalTemplateAnnotations = original.spec?.template?.metadata?.annotations || {};
+  const originalPullSecretsByContainer = parseImagePullSecretMapping(originalTemplateAnnotations);
+  const pullSecretsChanged = !isEqual(pullSecretsByContainer, originalPullSecretsByContainer);
+  const managedSecretNames = new Set(Object.values(originalPullSecretsByContainer));
+  const preservedPullSecrets = (originalPodSpec.imagePullSecrets || []).filter(
+    (secret: Record<string, any>) => !managedSecretNames.has(secret.name),
+  );
+  const nextPullSecrets = [
+    ...Object.values<string>(pullSecretsByContainer).map(name => ({ name })),
+    ...preservedPullSecrets,
+  ].filter((secret, index, items) => items.findIndex(item => item.name === secret.name) === index);
+  if (pullSecretsChanged) {
+    if (nextPullSecrets.length) nextPodSpec.imagePullSecrets = nextPullSecrets;
+    else delete nextPodSpec.imagePullSecrets;
+  }
   if (values.volumes?.length) {
     nextPodSpec.volumes = mergeVolumeSettings(originalPodSpec.volumes, values.volumes);
   } else delete nextPodSpec.volumes;
@@ -1456,6 +1585,13 @@ export function buildDeploymentSettingsResource(
       delete result.spec.template.metadata.annotations;
     }
   }
+  if (pullSecretsChanged) {
+    result.spec.template.metadata ||= {};
+    result.spec.template.metadata.annotations = {
+      ...(result.spec.template.metadata.annotations || {}),
+      [IMAGE_PULL_SECRET_ANNOTATION]: JSON.stringify(pullSecretsByContainer),
+    };
+  }
   if (kind !== 'DaemonSet' && !isEqual(values.podScheduling, initial.podScheduling)) {
     if (values.podScheduling?.mode === 'preserved') return result;
     const affinity = buildPodSchedulingAffinity(
@@ -1494,6 +1630,11 @@ export function buildDeployment(values: DeploymentCreateValues) {
   const labels = buildWorkloadLabels(name, values.workloadLabels);
   const containers = values.containers.map(buildContainer);
   const initContainers = values.initContainers?.map(buildContainer) || [];
+  const allContainerValues = [...values.containers, ...(values.initContainers || [])];
+  const pullSecretsByContainer = buildImagePullSecretMapping(allContainerValues);
+  const imagePullSecrets = [...new Set(Object.values(pullSecretsByContainer))].map(secretName => ({
+    name: secretName,
+  }));
   const volumes = reconcileHostTimeVolume(
     values.volumes?.map(buildVolume),
     containers,
@@ -1520,8 +1661,17 @@ export function buildDeployment(values: DeploymentCreateValues) {
       template: {
         metadata: {
           labels,
-          ...(values.podAnnotations && Object.keys(values.podAnnotations).length
-            ? { annotations: cloneDeep(values.podAnnotations) }
+          ...(Object.keys(values.podAnnotations || {}).length || imagePullSecrets.length
+            ? {
+                annotations: {
+                  ...cloneDeep(values.podAnnotations || {}),
+                  ...(imagePullSecrets.length
+                    ? {
+                        [IMAGE_PULL_SECRET_ANNOTATION]: JSON.stringify(pullSecretsByContainer),
+                      }
+                    : {}),
+                },
+              }
             : {}),
         },
         spec: {
@@ -1535,6 +1685,7 @@ export function buildDeployment(values: DeploymentCreateValues) {
             : {}),
           containers,
           ...(initContainers.length ? { initContainers } : {}),
+          ...(imagePullSecrets.length ? { imagePullSecrets } : {}),
           ...(volumes.length ? { volumes } : {}),
         },
       },

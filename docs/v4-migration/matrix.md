@@ -7,6 +7,8 @@
 > 基线：`release-4.1.5` / `fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`
 > Workload 当前阶段 `DEV`，REA 已通过；精确镜像 `ef3b4f1a8` 已完成三类设置/配置引用专项浏览器验证及 PVC 本地化复验，发现低权限配置引用编辑控件暴露，实际提交被 API 403 拒绝且资源未改变。负责人进一步指出编辑设置版本/能力未对齐；已确认当前 V3 的分区、二级容器编辑、GPU、镜像选择、环境引用及端口协议与原生长表单存在差异，优先补齐并重新部署复验，三类资源均未整体验收。唯一当前状态见 [module-execution.json](./module-execution.json)，当前结果与未完成项见 [2026-10-24 VERIFY](./workload-131-verify-20261024.md)。
 
+> 2026-10-24 DEV 增量：三类共用容器表单新增镜像凭据元数据选择、GPU 和应用层协议；只关闭本次代码缺口，尚未部署/浏览器验收。分区、环境引用和配置引用 RBAC 仍未闭环，详见 [增量记录](./workload-settings-dev-20261023.md#当前-v3-容器能力补齐2026-10-24dev-增量)。
+
 > 2026-10-23 执行入口补强：接入 Git 阶段检查、中文提交标题和 PR 全量差异检查；32 项隔离 Git 回归通过。此结果仅覆盖工具，不改变下表的功能状态，不代表 Deployment 编辑设置或其他模块已验收。
 
 > 当前组合批次：`deployment-statefulset-daemonset`，包括 Deployment、StatefulSet、DaemonSet；公共实现共用，三类资源分别完成 REA 和 VERIFY。本轮代码与本地验证见 [DEV 记录](./workload-settings-dev-20261023.md)。详见[组合能力边界](./workload-kind-capability-matrix.md)。下表中的既有测试数量和 131 观察均保留原 SHA，不代表本组合批次已验收。Pod、Job、CronJob 留在后续批次。

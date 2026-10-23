@@ -24,6 +24,7 @@ function loadInput() {
     module: loaded,
     exports: loaded.exports,
     t: (key: string) => key,
+    globals: { config: { supportGpuType: ['nvidia.com/gpu'] } },
     require: (name: string) =>
       name === '@kubed/components'
         ? { Input: 'input', InputNumber: 'input-number', Select: 'select', Switch: 'switch' }
@@ -120,4 +121,55 @@ test('生命周期 HTTP 支持 HTTPS 且不显示探针时序，健康检查仍�
     nodes(probe.type(probe.props)).filter(node => node.type === 'input-number').length,
     5,
   );
+});
+
+test('当前 V3 容器能力提供镜像凭据、GPU 和应用层端口协议编辑', () => {
+  const ContainerInput = loadInput();
+  let changed: any;
+  const value = {
+    name: 'web',
+    image: 'private.example/web:v1',
+    ports: [{ name: 'http-web', containerPort: 80, protocol: 'TCP' }],
+  };
+  const tree = ContainerInput({
+    kind: 'CONTAINER',
+    value,
+    resourceOptions: {
+      configMaps: [],
+      secrets: [],
+      imagePullSecrets: ['registry-a'],
+      persistentVolumeClaims: [],
+    },
+    onChange: (next: any) => (changed = next),
+  });
+
+  const pullSecret = nodes(tree).find(
+    node => node.type === 'select' && node.props['aria-label'] === 'IMAGE_REGISTRY_INFORMATION',
+  );
+  assert.ok(pullSecret);
+  pullSecret.props.onChange('registry-a');
+  assert.equal(changed.pullSecret, 'registry-a');
+
+  const gpuType = nodes(tree).find(node => node.props['aria-label'] === 'GPU_TYPE');
+  const gpuLimit = nodes(tree).find(node => node.props['aria-label'] === 'GPU_LIMIT');
+  assert.ok(gpuType);
+  assert.ok(gpuLimit);
+  gpuLimit.props.onChange(2);
+  assert.deepEqual(JSON.parse(JSON.stringify(changed.resources.gpu)), {
+    type: 'nvidia.com/gpu',
+    value: '2',
+  });
+
+  const ports = nodes(tree).find(node => node.props.addText === 'ADD_PORT');
+  const portEditor: any = React.Children.only(ports.props.children);
+  let portChanged: any;
+  const portTree = portEditor.type({
+    ...portEditor.props,
+    value: value.ports[0],
+    onChange: (next: any) => (portChanged = next),
+  });
+  const protocol = nodes(portTree).find(node => node.props['aria-label'] === 'PROTOCOL');
+  protocol.props.onChange('GRPC');
+  assert.equal(portChanged.applicationProtocol, 'GRPC');
+  assert.equal(portChanged.protocol, 'TCP');
 });

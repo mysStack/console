@@ -348,3 +348,18 @@ DaemonSet 的旧 V3 UI 快照没有调度分区，因此当前 V4 不为它虚�
 - [可复现静态校验](./evidence/workload-cluster-native-entry-validation.cjs)绑定精确提交 `d762c005b`，三条原生路由、三类创建、namespace 作用域、空 namespace 请求保护和状态原因渲染 14 项检查通过；结构化结果见 [记录](./evidence/workload-cluster-native-entry-20261023.json)。
 
 本增量仍处于 DEV。没有构建或推送 Console 测试镜像，没有部署 131、rollout、核对 digest/imageID，也没有在当前 SHA 上执行 Playwright。三类集群页面的真实渲染、直达/刷新/返回、namespace 切换、创建/停止/删除、RBAC、缓存和 V3 等价性必须在 VERIFY 逐类验收。其余未完成 Action 继续留在 DEV；PR #2 保持 Draft。
+
+## 当前 V3 容器能力补齐（2026-10-24，DEV 增量）
+
+本轮基于 `6cef32296e23490085bb7aa92f3d83f496993583` 继续修复；当前 V3 的制品和浏览器差异见 [VERIFY 纠偏](./workload-131-verify-20261024.md#负责人指出编辑设置版本能力不符后的纠偏)。旧 `release-3.4` 只用于辅助解释数据路径，不作为当前制品的源码身份声明。
+
+本增量影响 Deployment、StatefulSet、DaemonSet 共用的创建/设置容器输入和对象构造器；Pod、Job、CronJob 未接入本次变更，不继承测试结果。
+
+- 镜像凭据：使用已有 Secret **元数据名称**接口，以当前 cluster/namespace 和 `type=kubernetes.io/dockerconfigjson` 查询；不获取或解码 Secret.data。容器映射写入 Pod 模板注解 `kubesphere.io/imagepullsecrets`，去重凭据写入 `spec.template.spec.imagePullSecrets`，不向 Container 写入伪字段。保留无映射的既有凭据；未改动时保留顺序和注解原文，避免无意义的 Pod 模板更新。
+- GPU：按运行时 `supportGpuType` 提供类型/上限控件，解析现有 requests/limits，修改时写入双方，清空时移除受控 GPU 资源，保留其他扩展资源。未验证真实 GPU 调度，不宣称设备可用。
+- 应用协议：补齐 GRPC/HTTP/HTTP2/HTTPS/TCP/UDP，保留已有 SCTP；应用协议沿用 V3 的端口名称前缀，Kubernetes protocol 使用 TCP/UDP/SCTP。转换后再检查端口名称重复。
+- 复用现有容器组件交互测试，补齐 GPU、镜像凭据和端口协议；对象回归覆盖创建、回填、修改、清空、无操作保持和扩展资源保留。新增资源选项 Hook 测试验证 namespace 参数、注册表类型筛选、元数据接口及卸载后不回写。
+
+测试先行：最初 2 项能力测试失败（缺少 pullSecret/applicationProtocol）；无操作保持和转换后端口重名另有 2 项失败，修复后定向构造测试 70/70、组件交互 3/3、资源选项 1/1。最终 `./scripts/test.sh` 为 82 文件/371 项通过，0 失败；`corepack yarn build:packages` 退出 0，四个包构建完成，shared 压缩 633/633。变更生产文件 ESLint、变更文件 Prettier 与 `git diff --check` 通过。使用相同 TypeScript 配置和 compiler host 读取 HEAD 基线/当前工作区，诊断为 1326→1326，新增诊断与变更文件直接诊断均为 0；全项目 TypeScript 仍未通过。结构化证据见 [本地验证](./evidence/workload-container-settings-local-20261024.json)。
+
+当前保持 DEV，尚未构建/部署本增量的 Console 镜像；原有 `ef3b4f1a8` 镜像不能证明本次修改通过。DS-01 分区/容器二级编辑、DS-07/08 环境变量引用及低权限配置引用控件等仍为后续任务，不声明设置整体等价。PR #2 保持 Draft。

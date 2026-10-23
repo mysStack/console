@@ -5,6 +5,7 @@ import type { WorkloadResourceOptions } from './ContainerInput';
 const EMPTY_OPTIONS: WorkloadResourceOptions = {
   configMaps: [],
   secrets: [],
+  imagePullSecrets: [],
   persistentVolumeClaims: [],
 };
 
@@ -28,13 +29,19 @@ export default function useWorkloadResourceOptions(cluster: string, namespace: s
     Promise.all([
       configMapStore.fetchNameListByK8s({ cluster, namespace }),
       secretStore.fetchNameListByK8s({ cluster, namespace }),
+      secretStore.fetchNameListByK8s({
+        cluster,
+        namespace,
+        fieldSelector: 'type=kubernetes.io/dockerconfigjson',
+      }),
       pvcStore.fetchListByK8s({ cluster, namespace }),
     ])
-      .then(([configMaps, secrets, claims]) => {
+      .then(([configMaps, secrets, imagePullSecrets, claims]) => {
         if (!active) return;
         setOptions({
           configMaps,
           secrets,
+          imagePullSecrets,
           persistentVolumeClaims: (claims || [])
             .map((claim: Record<string, any>) => claim.name)
             .filter(Boolean),

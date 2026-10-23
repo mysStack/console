@@ -20,6 +20,7 @@ import SecurityContextInput from './SecurityContextInput';
 export interface WorkloadResourceOptions {
   configMaps: string[];
   secrets: string[];
+  imagePullSecrets?: string[];
   persistentVolumeClaims: string[];
 }
 
@@ -50,6 +51,9 @@ function PortInput({
   onChange?: (value: ContainerPortValues) => void;
   withService?: boolean;
 }) {
+  const applicationProtocol =
+    value.applicationProtocol ||
+    (value.protocol === 'UDP' || value.protocol === 'SCTP' ? value.protocol : 'TCP');
   return (
     <div style={{ display: 'flex', gap: 8, width: '100%' }}>
       <Input
@@ -96,9 +100,18 @@ function PortInput({
       <Select
         style={{ width: 120, flex: '0 0 120px' }}
         aria-label={t('PROTOCOL')}
-        value={value.protocol || 'TCP'}
-        options={['TCP', 'UDP', 'SCTP'].map(protocol => ({ label: protocol, value: protocol }))}
-        onChange={protocol => onChange?.({ ...value, protocol })}
+        value={applicationProtocol}
+        options={['GRPC', 'HTTP', 'HTTP2', 'HTTPS', 'TCP', 'UDP', 'SCTP'].map(protocol => ({
+          label: protocol,
+          value: protocol,
+        }))}
+        onChange={protocol =>
+          onChange?.({
+            ...value,
+            applicationProtocol: protocol,
+            protocol: ['UDP', 'SCTP'].includes(protocol) ? protocol : 'TCP',
+          })
+        }
       />
     </div>
   );
@@ -387,10 +400,17 @@ export default function ContainerInput({
   onChange,
   index = 0,
   kind,
-  resourceOptions = { configMaps: [], secrets: [], persistentVolumeClaims: [] },
+  resourceOptions = {
+    configMaps: [],
+    secrets: [],
+    imagePullSecrets: [],
+    persistentVolumeClaims: [],
+  },
   volumeNames = [],
   withService = false,
 }: Props) {
+  const gpuTypes: string[] =
+    typeof globals === 'undefined' ? [] : globals.config.supportGpuType || [];
   const update = (patch: Partial<ContainerCreateValues>) => onChange?.({ ...value, ...patch });
   return (
     <div role="group" aria-label={`${t(kind)} ${index + 1}`} style={{ width: '100%', minWidth: 0 }}>
@@ -405,6 +425,19 @@ export default function ContainerInput({
           value={value.name || ''}
           maxLength={63}
           onChange={event => update({ name: event.target.value })}
+        />
+      </ContainerField>
+      <ContainerField>
+        <span>{t('IMAGE_REGISTRY_INFORMATION')}</span>
+        <Select
+          style={{ width: '100%' }}
+          aria-label={t('IMAGE_REGISTRY_INFORMATION')}
+          value={value.pullSecret || ''}
+          options={[
+            { label: t('NONE'), value: '' },
+            ...toOptions(resourceOptions.imagePullSecrets || []),
+          ]}
+          onChange={pullSecret => update({ pullSecret: String(pullSecret || '') })}
         />
       </ContainerField>
       <ContainerField>
@@ -578,6 +611,49 @@ export default function ContainerInput({
             </ContainerField>
           ))}
         </div>
+        {gpuTypes.length > 0 && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <ContainerField>
+              <span>{t('GPU_TYPE')}</span>
+              <Select
+                aria-label={t('GPU_TYPE')}
+                value={value.resources?.gpu?.type || gpuTypes[0] || ''}
+                options={gpuTypes.map((type: string) => ({
+                  label: type,
+                  value: type,
+                }))}
+                onChange={type =>
+                  update({
+                    resources: {
+                      ...value.resources,
+                      gpu: { ...value.resources?.gpu, type: String(type) },
+                    },
+                  })
+                }
+              />
+            </ContainerField>
+            <ContainerField>
+              <span>{t('GPU_LIMIT')}</span>
+              <InputNumber
+                aria-label={t('GPU_LIMIT')}
+                min={0}
+                precision={0}
+                value={value.resources?.gpu?.value ? Number(value.resources.gpu.value) : undefined}
+                onChange={gpuLimit =>
+                  update({
+                    resources: {
+                      ...value.resources,
+                      gpu: {
+                        type: value.resources?.gpu?.type || gpuTypes[0] || '',
+                        value: gpuLimit == null || gpuLimit === '' ? '' : String(gpuLimit),
+                      },
+                    },
+                  })
+                }
+              />
+            </ContainerField>
+          </div>
+        )}
       </div>
       <div role="group" aria-label={t('VOLUME_MOUNT_PL')}>
         <h4>{t('VOLUME_MOUNT_PL')}</h4>

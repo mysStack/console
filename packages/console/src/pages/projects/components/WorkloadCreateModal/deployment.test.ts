@@ -1985,3 +1985,181 @@ test('创建 Deployment 写入亲和模式与节点选择器', () => {
     /WORKLOAD_SCHEDULING_INVALID/,
   );
 });
+
+test('编辑设置原生支持当前 V3 的 GPU 资源与镜像拉取凭据并保留扩展资源', () => {
+  const original: any = {
+    apiVersion: 'apps/v1',
+    kind: 'Deployment',
+    metadata: {
+      name: 'accelerated',
+      namespace: 'v4-migration-e2e',
+      annotations: {
+        'kubesphere.io/imagepullsecrets': JSON.stringify({ web: 'registry-a' }),
+      },
+    },
+    spec: {
+      replicas: 1,
+      template: {
+        metadata: {
+          labels: { app: 'accelerated' },
+          annotations: {
+            'kubesphere.io/imagepullsecrets': JSON.stringify({ web: 'registry-a' }),
+          },
+        },
+        spec: {
+          imagePullSecrets: [{ name: 'registry-a' }, { name: 'shared-registry' }],
+          containers: [
+            {
+              name: 'web',
+              image: 'private.example/web:v1',
+              resources: {
+                requests: { cpu: '100m', 'nvidia.com/gpu': '1', 'example.com/fpga': '2' },
+                limits: { memory: '256Mi', 'nvidia.com/gpu': '1', 'example.com/fpga': '2' },
+              },
+            },
+          ],
+        },
+      },
+    },
+  };
+
+  const values = parseDeploymentSettings(original);
+  assert.equal(values.containers[0].pullSecret, 'registry-a');
+  assert.deepEqual(values.containers[0].resources?.gpu, {
+    type: 'nvidia.com/gpu',
+    value: '1',
+  });
+
+  values.containers[0].pullSecret = 'registry-b';
+  values.containers[0].resources!.gpu = { type: 'nvidia.com/gpu', value: '2' };
+  const submitted = buildDeploymentSettingsResource(original, values);
+  assert.deepEqual(submitted.spec.template.spec.imagePullSecrets, [
+    { name: 'registry-b' },
+    { name: 'shared-registry' },
+  ]);
+  assert.equal(
+    submitted.spec.template.metadata.annotations['kubesphere.io/imagepullsecrets'],
+    JSON.stringify({ web: 'registry-b' }),
+  );
+  assert.equal(
+    submitted.spec.template.spec.containers[0].resources.requests['nvidia.com/gpu'],
+    '2',
+  );
+  assert.equal(submitted.spec.template.spec.containers[0].resources.limits['nvidia.com/gpu'], '2');
+  assert.equal(
+    submitted.spec.template.spec.containers[0].resources.limits['example.com/fpga'],
+    '2',
+  );
+
+  values.containers[0].pullSecret = '';
+  values.containers[0].resources!.gpu = { type: 'nvidia.com/gpu', value: '' };
+  const cleared = buildDeploymentSettingsResource(original, values);
+  assert.deepEqual(cleared.spec.template.spec.imagePullSecrets, [{ name: 'shared-registry' }]);
+  assert.equal(cleared.spec.template.metadata.annotations['kubesphere.io/imagepullsecrets'], '{}');
+  assert.equal(
+    'nvidia.com/gpu' in cleared.spec.template.spec.containers[0].resources.requests,
+    false,
+  );
+  assert.equal(
+    'nvidia.com/gpu' in cleared.spec.template.spec.containers[0].resources.limits,
+    false,
+  );
+  assert.equal(
+    cleared.spec.template.spec.containers[0].resources.requests['example.com/fpga'],
+    '2',
+  );
+});
+
+test('创建工作负载把容器镜像凭据写入 Pod 模板且不写入 Container 字段', () => {
+  const deployment = buildDeployment({
+    name: 'private-image',
+    namespace: 'v4-migration-e2e',
+    replicas: 1,
+    containers: [
+      { name: 'web', image: 'private.example/web:v1', pullSecret: 'registry-a' },
+      { name: 'worker', image: 'private.example/worker:v1', pullSecret: 'registry-a' },
+    ],
+  });
+
+  assert.deepEqual(deployment.spec.template.spec.imagePullSecrets, [{ name: 'registry-a' }]);
+  assert.equal(
+    deployment.spec.template.metadata.annotations['kubesphere.io/imagepullsecrets'],
+    JSON.stringify({ web: 'registry-a', worker: 'registry-a' }),
+  );
+  assert.equal('pullSecret' in deployment.spec.template.spec.containers[0], false);
+});
+
+test('编辑设置把当前 V3 应用协议编码到端口名称但写入 Kubernetes TCP 或 UDP', () => {
+  const original: any = {
+    kind: 'Deployment',
+    metadata: { name: 'protocols', namespace: 'v4-migration-e2e' },
+    spec: {
+      replicas: 1,
+      template: {
+        spec: {
+          containers: [
+            {
+              name: 'web',
+              image: 'nginx',
+              ports: [
+                { name: 'http-web', containerPort: 80, protocol: 'TCP' },
+                { name: 'udp-dns', containerPort: 53, protocol: 'UDP' },
+              ],
+            },
+          ],
+        },
+      },
+    },
+  };
+  const values = parseDeploymentSettings(original);
+  assert.equal(values.containers[0].ports?.[0].applicationProtocol, 'HTTP');
+  assert.equal(values.containers[0].ports?.[1].applicationProtocol, 'UDP');
+  values.containers[0].ports![0].applicationProtocol = 'GRPC';
+  const submitted = buildDeploymentSettingsResource(original, values);
+  assert.deepEqual(submitted.spec.template.spec.containers[0].ports, [
+    { name: 'grpc-web', containerPort: 80, protocol: 'TCP' },
+    { name: 'udp-dns', containerPort: 53, protocol: 'UDP' },
+  ]);
+});
+
+test('只打开设置不修改时保留镜像凭据顺序及模板注解原文', () => {
+  const resource: any = buildDeployment({
+    name: 'private-web',
+    namespace: 'v4-migration-e2e',
+    replicas: 1,
+    containers: [{ name: 'web', image: 'nginx', pullSecret: 'registry-a' }],
+  });
+  resource.spec.template.spec.imagePullSecrets.unshift({ name: 'unmanaged' });
+  resource.spec.template.metadata.annotations['kubesphere.io/imagepullsecrets'] =
+    '{ "web": "registry-a" }';
+  assert.deepEqual(
+    buildDeploymentSettingsResource(resource, parseDeploymentSettings(resource)),
+    resource,
+  );
+});
+
+test('应用协议转换后仍校验真实端口名称唯一性并保留 SCTP', () => {
+  const containers: any[] = [
+    {
+      name: 'web',
+      image: 'nginx',
+      ports: [
+        { name: 'http-api', containerPort: 80, protocol: 'TCP', applicationProtocol: 'GRPC' },
+        { name: 'grpc-api', containerPort: 81, protocol: 'TCP', applicationProtocol: 'GRPC' },
+      ],
+    },
+  ];
+  assert.equal(validateContainers(containers), 'WORKLOAD_PORT_DUPLICATE');
+  const resource: any = buildDeployment({
+    name: 'sctp-app',
+    namespace: 'v4-migration-e2e',
+    replicas: 1,
+    containers: [
+      { name: 'web', image: 'nginx', ports: [{ containerPort: 9000, protocol: 'SCTP' }] },
+    ],
+  });
+  assert.equal(
+    parseDeploymentSettings(resource).containers[0].ports?.[0].applicationProtocol,
+    'SCTP',
+  );
+});
