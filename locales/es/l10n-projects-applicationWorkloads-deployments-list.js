@@ -29,6 +29,8 @@ module.exports = {
   WORKLOAD_PROBE_INVALID:
     'Introduzca un tipo, una ruta, un puerto y tiempos válidos para la sonda.',
   WORKLOAD_RESOURCE_INVALID: 'Introduzca cantidades válidas de CPU y memoria.',
+  WORKLOAD_LIFECYCLE_INVALID:
+    'Introduzca una acción de ciclo de vida, ruta, puerto o comando válido. Los contenedores de inicio normales no admiten estas acciones.',
   WORKLOAD_CONFIG_REFERENCE_INVALID: 'Seleccione un ConfigMap o Secret válido.',
   WORKLOAD_VOLUME_INVALID: 'Introduzca un nombre, un origen y una ruta válidos para el volumen.',
   WORKLOAD_VOLUME_DUPLICATE: 'Los nombres de volumen deben ser únicos.',

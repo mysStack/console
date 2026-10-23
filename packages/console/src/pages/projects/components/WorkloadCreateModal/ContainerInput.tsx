@@ -152,10 +152,12 @@ function ProbeInput({
   label,
   value,
   onChange,
+  handlerOnly = false,
 }: {
   label: string;
   value?: ProbeValues;
   onChange: (value?: ProbeValues) => void;
+  handlerOnly?: boolean;
 }) {
   const enabled = Boolean(value);
   const update = (patch: Partial<ProbeValues>) =>
@@ -170,16 +172,18 @@ function ProbeInput({
           onChange={checked =>
             onChange(
               checked
-                ? {
-                    type: 'http',
-                    path: '/',
-                    port: 80,
-                    initialDelaySeconds: 0,
-                    timeoutSeconds: 1,
-                    periodSeconds: 10,
-                    successThreshold: 1,
-                    failureThreshold: 3,
-                  }
+                ? handlerOnly
+                  ? { type: 'http', path: '/', port: 80 }
+                  : {
+                      type: 'http',
+                      path: '/',
+                      port: 80,
+                      initialDelaySeconds: 0,
+                      timeoutSeconds: 1,
+                      periodSeconds: 10,
+                      successThreshold: 1,
+                      failureThreshold: 3,
+                    }
                 : undefined,
             )
           }
@@ -217,12 +221,23 @@ function ProbeInput({
               }
             />
             {value.type === 'command' ? (
-              <Input
-                aria-label={`${label} ${t('COMMAND')}`}
-                value={stringifyCommaSeparated(value.command)}
-                placeholder="cat,/tmp/ready"
-                onChange={event => update({ command: parseCommaSeparated(event.target.value) })}
-              />
+              handlerOnly ? (
+                <ArrayInput
+                  value={value.command || []}
+                  addText={t('ADD')}
+                  checkItemValid={() => true}
+                  onChange={command => update({ command })}
+                >
+                  <Input aria-label={`${label} ${t('COMMAND')}`} />
+                </ArrayInput>
+              ) : (
+                <Input
+                  aria-label={`${label} ${t('COMMAND')}`}
+                  value={stringifyCommaSeparated(value.command)}
+                  placeholder="cat,/tmp/ready"
+                  onChange={event => update({ command: parseCommaSeparated(event.target.value) })}
+                />
+              )
             ) : value.type === 'http' ? (
               <Input
                 aria-label={`${label} ${t('PATH')}`}
@@ -244,32 +259,47 @@ function ProbeInput({
               />
             )}
           </div>
-          <div
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8, marginTop: 8 }}
-          >
-            {(
-              [
-                ['initialDelaySeconds', 'WORKLOAD_INITIAL_DELAY'],
-                ['timeoutSeconds', 'WORKLOAD_TIMEOUT'],
-                ['periodSeconds', 'WORKLOAD_PERIOD'],
-                ['successThreshold', 'WORKLOAD_SUCCESS_THRESHOLD'],
-                ['failureThreshold', 'WORKLOAD_FAILURE_THRESHOLD'],
-              ] as const
-            ).map(([field, text]) => (
-              <ContainerField key={field}>
-                <span>{t(text)}</span>
-                <InputNumber
-                  style={{ width: '100%' }}
-                  min={field === 'initialDelaySeconds' ? 0 : 1}
-                  precision={0}
-                  value={value[field]}
-                  onChange={number =>
-                    update({ [field]: number == null ? undefined : Number(number) })
-                  }
-                />
-              </ContainerField>
-            ))}
-          </div>
+          {value.type === 'http' && (
+            <Select
+              aria-label={`${label} ${t('PROTOCOL')}`}
+              value={value.scheme || 'HTTP'}
+              options={['HTTP', 'HTTPS'].map(scheme => ({ label: scheme, value: scheme }))}
+              onChange={scheme => update({ scheme })}
+            />
+          )}
+          {!handlerOnly && (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(5, 1fr)',
+                gap: 8,
+                marginTop: 8,
+              }}
+            >
+              {(
+                [
+                  ['initialDelaySeconds', 'WORKLOAD_INITIAL_DELAY'],
+                  ['timeoutSeconds', 'WORKLOAD_TIMEOUT'],
+                  ['periodSeconds', 'WORKLOAD_PERIOD'],
+                  ['successThreshold', 'WORKLOAD_SUCCESS_THRESHOLD'],
+                  ['failureThreshold', 'WORKLOAD_FAILURE_THRESHOLD'],
+                ] as const
+              ).map(([field, text]) => (
+                <ContainerField key={field}>
+                  <span>{t(text)}</span>
+                  <InputNumber
+                    style={{ width: '100%' }}
+                    min={field === 'initialDelaySeconds' ? 0 : 1}
+                    precision={0}
+                    value={value[field]}
+                    onChange={number =>
+                      update({ [field]: number == null ? undefined : Number(number) })
+                    }
+                  />
+                </ContainerField>
+              ))}
+            </div>
+          )}
         </>
       )}
     </div>
@@ -452,6 +482,23 @@ export default function ContainerInput({
           onChange={startupProbe => update({ startupProbe })}
         />
       </div>
+      {(kind === 'CONTAINER' || value.restartPolicy === 'Always') && (
+        <div role="group" aria-label={t('LIFECYCLE_MANAGEMENT')}>
+          <h4>{t('LIFECYCLE_MANAGEMENT')}</h4>
+          {(['postStart', 'preStop'] as const).map(stage => (
+            <ProbeInput
+              key={stage}
+              label={t(stage === 'postStart' ? 'POSTSTART_ACTION' : 'PRESTOP_ACTION')}
+              handlerOnly
+              value={value.lifecycle?.[stage]}
+              onChange={action => {
+                const lifecycle = { ...value.lifecycle, [stage]: action };
+                update({ lifecycle });
+              }}
+            />
+          ))}
+        </div>
+      )}
       <div role="group" aria-label={t('RESOURCE_LIMITS')}>
         <h4>{t('RESOURCE_LIMITS')}</h4>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>

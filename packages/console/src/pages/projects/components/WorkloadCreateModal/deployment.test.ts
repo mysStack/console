@@ -9,6 +9,246 @@ import {
   validateVolumes,
 } from './deployment';
 
+for (const kind of ['Deployment', 'StatefulSet', 'DaemonSet']) {
+  test(`${kind} 生命周期回填、修改和清空保留其他容器字段及未编辑动作`, () => {
+    const original = {
+      apiVersion: 'apps/v1',
+      kind,
+      metadata: { name: 'lifecycle-test', namespace: 'v4-migration-e2e', resourceVersion: '42' },
+      spec: {
+        replicas: 1,
+        template: {
+          spec: {
+            containers: [
+              {
+                name: 'web',
+                image: 'nginx:alpine',
+                securityContext: { runAsNonRoot: true },
+                lifecycle: {
+                  postStart: {
+                    httpGet: {
+                      path: '/warm',
+                      port: 8080,
+                      scheme: 'HTTPS',
+                      host: '127.0.0.1',
+                      httpHeaders: [{ name: 'X-Check', value: 'warm' }],
+                    },
+                  },
+                  preStop: { exec: { command: ['/bin/sh', '-c', 'sleep 2'] } },
+                },
+              },
+            ],
+          },
+        },
+      },
+    };
+    const values = parseDeploymentSettings(original);
+    assert.deepEqual(values.containers[0].lifecycle, {
+      postStart: { type: 'http', path: '/warm', port: 8080, scheme: 'HTTPS' },
+      preStop: { type: 'command', command: ['/bin/sh', '-c', 'sleep 2'] },
+    });
+    assert.deepEqual(
+      buildDeploymentSettingsResource(original, values).spec.template.spec.containers,
+      original.spec.template.spec.containers,
+    );
+    values.containers[0].lifecycle!.postStart!.path = '/ready';
+    let saved = buildDeploymentSettingsResource(original, values);
+    assert.deepEqual(saved.spec.template.spec.containers[0].lifecycle.postStart, {
+      httpGet: {
+        path: '/ready',
+        port: 8080,
+        scheme: 'HTTPS',
+        host: '127.0.0.1',
+        httpHeaders: [{ name: 'X-Check', value: 'warm' }],
+      },
+    });
+    values.containers[0].lifecycle!.postStart = { type: 'command', command: ['echo', 'started'] };
+    saved = buildDeploymentSettingsResource(original, values);
+    assert.deepEqual(saved.spec.template.spec.containers[0].lifecycle.postStart, {
+      exec: { command: ['echo', 'started'] },
+    });
+    assert.deepEqual(
+      saved.spec.template.spec.containers[0].lifecycle.preStop,
+      original.spec.template.spec.containers[0].lifecycle.preStop,
+    );
+    values.containers[0].lifecycle = undefined;
+    saved = buildDeploymentSettingsResource(original, values);
+    assert.equal('lifecycle' in saved.spec.template.spec.containers[0], false);
+    assert.deepEqual(saved.spec.template.spec.containers[0].securityContext, {
+      runAsNonRoot: true,
+    });
+    assert.equal(
+      original.spec.template.spec.containers[0].lifecycle.postStart.httpGet.path,
+      '/warm',
+    );
+    assert.equal(saved.metadata.resourceVersion, '42');
+  });
+}
+
+test('创建时生命周期只写 handler，不写健康检查 timing', () => {
+  const resource = buildDeployment({
+    name: 'lifecycle-create',
+    namespace: 'v4-migration-e2e',
+    replicas: 1,
+    containers: [
+      {
+        name: 'web',
+        image: 'nginx:alpine',
+        lifecycle: {
+          postStart: { type: 'http', path: '/ready', port: 8080, scheme: 'HTTPS' },
+          preStop: { type: 'command', command: ['/bin/sh', '-c', 'sleep 2'] },
+        },
+      },
+    ],
+  });
+  assert.deepEqual(resource.spec.template.spec.containers[0].lifecycle, {
+    postStart: { httpGet: { path: '/ready', port: 8080, scheme: 'HTTPS' } },
+    preStop: { exec: { command: ['/bin/sh', '-c', 'sleep 2'] } },
+  });
+});
+
+test('生命周期拒绝空命令、非法路径和非法端口', () => {
+  for (const action of [
+    { type: 'command', command: [] },
+    { type: 'command', command: ['  '] },
+    { type: 'http', path: 'relative', port: 80 },
+    { type: 'tcp', port: 0 },
+    { type: 'http', path: '/', port: 65536 },
+  ]) {
+    assert.equal(
+      validateContainers([
+        { name: 'web', image: 'nginx:alpine', lifecycle: { preStop: action as any } },
+      ]),
+      'WORKLOAD_LIFECYCLE_INVALID',
+    );
+  }
+  assert.equal(
+    validateContainers([
+      {
+        name: 'web',
+        image: 'nginx:alpine',
+        lifecycle: { postStart: { type: 'http', path: '/', port: 80 } },
+      },
+    ]),
+    undefined,
+  );
+  assert.equal(
+    validateContainers(
+      [{ name: 'web', image: 'nginx:alpine' }],
+      [{ name: 'init', image: 'busybox', lifecycle: { preStop: { type: 'tcp', port: 1234 } } }],
+    ),
+    'WORKLOAD_LIFECYCLE_INVALID',
+  );
+});
+
+test('生命周期 exec 保留空参数和参数首尾空格，拒绝空可执行文件和错误 HTTP 协议', () => {
+  const resource = buildDeployment({
+    name: 'lifecycle-command',
+    namespace: 'v4-migration-e2e',
+    replicas: 1,
+    containers: [
+      {
+        name: 'web',
+        image: 'busybox',
+        lifecycle: { preStop: { type: 'command', command: ['printf', '  keep  ', ''] } },
+      },
+    ],
+  });
+  assert.deepEqual(resource.spec.template.spec.containers[0].lifecycle.preStop.exec.command, [
+    'printf',
+    '  keep  ',
+    '',
+  ]);
+  assert.equal(
+    validateContainers([
+      {
+        name: 'web',
+        image: 'busybox',
+        lifecycle: { preStop: { type: 'command', command: ['  ', 'sleep'] } },
+      },
+    ]),
+    'WORKLOAD_LIFECYCLE_INVALID',
+  );
+  assert.equal(
+    validateContainers([
+      {
+        name: 'web',
+        image: 'busybox',
+        lifecycle: { preStop: { type: 'http', path: '/', port: 80, scheme: 'FTP' as any } },
+      },
+    ]),
+    'WORKLOAD_LIFECYCLE_INVALID',
+  );
+});
+
+test('已存在的 restartable init 容器保留 restartPolicy 并允许编辑生命周期', () => {
+  const original = {
+    kind: 'Deployment',
+    metadata: { name: 'sidecar-life' },
+    spec: {
+      replicas: 1,
+      template: {
+        spec: {
+          containers: [{ name: 'web', image: 'nginx:alpine' }],
+          initContainers: [
+            {
+              name: 'sidecar',
+              image: 'busybox',
+              restartPolicy: 'Always',
+              lifecycle: { preStop: { exec: { command: ['sleep', '2'] } } },
+            },
+          ],
+        },
+      },
+    },
+  };
+  const values = parseDeploymentSettings(original);
+  assert.equal(values.initContainers![0].restartPolicy, 'Always');
+  assert.equal(validateContainers(values.containers, values.initContainers), undefined);
+  values.initContainers![0].lifecycle!.preStop = { type: 'command', command: ['sleep', '3'] };
+  const saved = buildDeploymentSettingsResource(original, values);
+  assert.equal(saved.spec.template.spec.initContainers[0].restartPolicy, 'Always');
+  assert.deepEqual(saved.spec.template.spec.initContainers[0].lifecycle.preStop.exec.command, [
+    'sleep',
+    '3',
+  ]);
+});
+
+test('修改一个生命周期动作时保留另一个未建模的动作，显式清除已建模动作', () => {
+  const original = {
+    kind: 'Deployment',
+    metadata: { name: 'future-life' },
+    spec: {
+      replicas: 1,
+      template: {
+        spec: {
+          containers: [
+            {
+              name: 'web',
+              image: 'nginx:alpine',
+              lifecycle: {
+                postStart: { sleep: { seconds: 2 } },
+                preStop: { exec: { command: ['sleep', '2'] } },
+              },
+            },
+          ],
+        },
+      },
+    },
+  };
+  const values = parseDeploymentSettings(original);
+  values.containers[0].lifecycle!.preStop = { type: 'command', command: ['sleep', '3'] };
+  const changed = buildDeploymentSettingsResource(original, values);
+  assert.deepEqual(changed.spec.template.spec.containers[0].lifecycle.postStart, {
+    sleep: { seconds: 2 },
+  });
+  values.containers[0].lifecycle!.preStop = undefined;
+  assert.deepEqual(
+    buildDeploymentSettingsResource(original, values).spec.template.spec.containers[0].lifecycle,
+    { postStart: { sleep: { seconds: 2 } } },
+  );
+});
+
 test('buildDeployment creates a namespace-scoped apps/v1 deployment', () => {
   const deployment = buildDeployment({
     name: 'native-web',

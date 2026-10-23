@@ -30,6 +30,16 @@ export interface ProbeValues {
   failureThreshold?: number;
 }
 
+export type LifecycleActionValues = Pick<
+  ProbeValues,
+  'type' | 'path' | 'port' | 'scheme' | 'command'
+>;
+
+export interface LifecycleValues {
+  postStart?: LifecycleActionValues;
+  preStop?: LifecycleActionValues;
+}
+
 export interface ResourceValues {
   requests?: { cpu?: string; memory?: string };
   limits?: { cpu?: string; memory?: string };
@@ -58,6 +68,7 @@ export interface ContainerCreateValues {
   originalName?: string;
   image: string;
   imagePullPolicy?: 'Always' | 'IfNotPresent' | 'Never';
+  restartPolicy?: 'Always';
   command?: string[];
   args?: string[];
   ports?: ContainerPortValues[];
@@ -66,6 +77,7 @@ export interface ContainerCreateValues {
   readinessProbe?: ProbeValues;
   livenessProbe?: ProbeValues;
   startupProbe?: ProbeValues;
+  lifecycle?: LifecycleValues;
   resources?: ResourceValues;
   volumeMounts?: VolumeMountValues[];
 }
@@ -130,6 +142,23 @@ function validateProbe(probe?: ProbeValues): boolean {
 
 function isValidQuantity(value?: string): boolean {
   return value == null || value === '' || QUANTITY.test(trim(value));
+}
+
+function validateLifecycleAction(action?: LifecycleActionValues): boolean {
+  if (!action) return true;
+  if (action.type === 'command') {
+    return (
+      Array.isArray(action.command) &&
+      action.command.every(arg => typeof arg === 'string') &&
+      Boolean(action.command[0]?.trim())
+    );
+  }
+  return (
+    validateProbe(action) &&
+    (action.type !== 'http' ||
+      action.scheme === undefined ||
+      ['HTTP', 'HTTPS'].includes(action.scheme))
+  );
 }
 
 export function validateVolumes(volumes: VolumeValues[] = []): string | undefined {
@@ -202,6 +231,15 @@ export function validateContainers(
     ) {
       return 'WORKLOAD_PROBE_INVALID';
     }
+    if (
+      (initContainers.includes(container) &&
+        container.restartPolicy !== 'Always' &&
+        Boolean(container.lifecycle)) ||
+      !validateLifecycleAction(container.lifecycle?.postStart) ||
+      !validateLifecycleAction(container.lifecycle?.preStop)
+    ) {
+      return 'WORKLOAD_LIFECYCLE_INVALID';
+    }
     const quantities = [
       container.resources?.requests?.cpu,
       container.resources?.requests?.memory,
@@ -273,14 +311,31 @@ function compactResources(resources?: ResourceValues) {
     : undefined;
 }
 
+function buildLifecycleAction(action: LifecycleActionValues): Record<string, any> {
+  if (action.type === 'command') return { exec: { command: [...action.command!] } };
+  return omit(buildProbe(action), [
+    'initialDelaySeconds',
+    'timeoutSeconds',
+    'periodSeconds',
+    'successThreshold',
+    'failureThreshold',
+  ]);
+}
+
 function buildContainer(container: ContainerCreateValues) {
   const command = container.command?.map(trim).filter(Boolean);
   const args = container.args?.map(trim).filter(Boolean);
   const resources = compactResources(container.resources);
+  const lifecycle = Object.fromEntries(
+    Object.entries(container.lifecycle || {}).flatMap(([stage, action]) =>
+      action ? [[stage, buildLifecycleAction(action)]] : [],
+    ),
+  );
   return {
     name: trim(container.name),
     image: trim(container.image),
     imagePullPolicy: container.imagePullPolicy || 'IfNotPresent',
+    ...(container.restartPolicy ? { restartPolicy: container.restartPolicy } : {}),
     ...(command?.length ? { command } : {}),
     ...(args?.length ? { args } : {}),
     ...(container.ports?.length
@@ -308,6 +363,7 @@ function buildContainer(container: ContainerCreateValues) {
     ...(container.readinessProbe ? { readinessProbe: buildProbe(container.readinessProbe) } : {}),
     ...(container.livenessProbe ? { livenessProbe: buildProbe(container.livenessProbe) } : {}),
     ...(container.startupProbe ? { startupProbe: buildProbe(container.startupProbe) } : {}),
+    ...(Object.keys(lifecycle).length ? { lifecycle } : {}),
     ...(resources ? { resources } : {}),
     ...(container.volumeMounts?.length
       ? {
@@ -375,12 +431,36 @@ function parseProbe(probe: Record<string, any> | undefined): ProbeValues | undef
   return undefined;
 }
 
+function parseLifecycle(lifecycle?: Record<string, any>): LifecycleValues | undefined {
+  if (!lifecycle) return undefined;
+  return Object.fromEntries(
+    ['postStart', 'preStop'].flatMap(stage => {
+      const action = parseProbe(lifecycle[stage]);
+      return action
+        ? [
+            [
+              stage,
+              omit(action, [
+                'initialDelaySeconds',
+                'timeoutSeconds',
+                'periodSeconds',
+                'successThreshold',
+                'failureThreshold',
+              ]),
+            ],
+          ]
+        : [];
+    }),
+  );
+}
+
 function parseContainer(container: Record<string, any>): ContainerCreateValues {
   return {
     name: container.name || '',
     originalName: container.name,
     image: container.image || '',
     imagePullPolicy: container.imagePullPolicy || 'IfNotPresent',
+    ...(container.restartPolicy ? { restartPolicy: container.restartPolicy } : {}),
     command: container.command,
     args: container.args,
     ports: container.ports,
@@ -399,6 +479,7 @@ function parseContainer(container: Record<string, any>): ContainerCreateValues {
     readinessProbe: parseProbe(container.readinessProbe),
     livenessProbe: parseProbe(container.livenessProbe),
     startupProbe: parseProbe(container.startupProbe),
+    lifecycle: parseLifecycle(container.lifecycle),
     resources: container.resources,
     volumeMounts: container.volumeMounts,
   };
@@ -478,6 +559,7 @@ const EDITABLE_CONTAINER_FIELDS = [
   'readinessProbe',
   'livenessProbe',
   'startupProbe',
+  'lifecycle',
   'resources',
   'volumeMounts',
 ] as const;
@@ -573,6 +655,24 @@ function mergeContainerSettings(
     }
 
     const parsed = parseContainer(original);
+    if (!isEqual(value.lifecycle, parsed.lifecycle) && value.lifecycle) {
+      const lifecycle = cloneDeep(original.lifecycle || {});
+      for (const stage of ['postStart', 'preStop'] as const) {
+        const action = value.lifecycle[stage];
+        if (isEqual(action, parsed.lifecycle?.[stage])) continue;
+        if (!action) {
+          delete lifecycle[stage];
+          continue;
+        }
+        const handler = buildLifecycleAction(action);
+        const key = Object.keys(handler)[0];
+        lifecycle[stage] = {
+          [key]: { ...original.lifecycle?.[stage]?.[key], ...handler[key] },
+        };
+      }
+      if (Object.keys(lifecycle).length) built.lifecycle = lifecycle;
+      else delete built.lifecycle;
+    }
     for (const field of EDITABLE_CONTAINER_FIELDS) {
       if (isEqual(value[field], parsed[field])) {
         if (original[field] === undefined) delete built[field];

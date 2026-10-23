@@ -23,6 +23,8 @@ module.exports = {
   WORKLOAD_PORT_INVALID: '请填写合法端口（1–65535）、协议和端口名称（可选，最长 15 个字符）。',
   WORKLOAD_PORT_DUPLICATE: '容器端口名称在整个容器组中不能重复。',
   WORKLOAD_PROBE_INVALID: '请填写合法的健康检查类型、路径、端口和时间参数。',
+  WORKLOAD_LIFECYCLE_INVALID:
+    '请填写合法的生命周期动作、路径、端口或命令；普通初始化容器不支持生命周期动作。',
   WORKLOAD_RESOURCE_INVALID: 'CPU 或内存资源值格式不正确。',
   WORKLOAD_CONFIG_REFERENCE_INVALID: '请选择有效的 ConfigMap 或 Secret。',
   WORKLOAD_VOLUME_INVALID: '请填写合法的存储卷名称、来源和路径。',

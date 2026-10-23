@@ -23,6 +23,8 @@ module.exports = {
   WORKLOAD_PORT_INVALID: '請填寫合法連接埠（1–65535）、協定和連接埠名稱（選填，最長 15 個字元）。',
   WORKLOAD_PORT_DUPLICATE: '容器連接埠名稱在整個容器群組中不能重複。',
   WORKLOAD_PROBE_INVALID: '請填寫合法的健康檢查類型、路徑、連接埠和時間參數。',
+  WORKLOAD_LIFECYCLE_INVALID:
+    '請填寫合法的生命週期動作、路徑、連接埠或命令；一般初始化容器不支援生命週期動作。',
   WORKLOAD_RESOURCE_INVALID: 'CPU 或記憶體資源值格式不正確。',
   WORKLOAD_CONFIG_REFERENCE_INVALID: '請選擇有效的 ConfigMap 或 Secret。',
   WORKLOAD_VOLUME_INVALID: '請填寫合法的儲存卷名稱、來源和路徑。',

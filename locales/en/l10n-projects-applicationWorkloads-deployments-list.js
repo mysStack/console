@@ -27,6 +27,8 @@ module.exports = {
     'Enter a valid port (1–65535), protocol and optional port name (up to 15 characters).',
   WORKLOAD_PORT_DUPLICATE: 'Port names must be unique across the Pod.',
   WORKLOAD_PROBE_INVALID: 'Enter a valid probe type, path, port, and timing values.',
+  WORKLOAD_LIFECYCLE_INVALID:
+    'Enter a valid lifecycle action, path, port, or command. Regular init containers do not support lifecycle actions.',
   WORKLOAD_RESOURCE_INVALID: 'Enter valid CPU and memory quantities.',
   WORKLOAD_CONFIG_REFERENCE_INVALID: 'Select a valid ConfigMap or Secret.',
   WORKLOAD_VOLUME_INVALID: 'Enter a valid volume name, source, and path.',
