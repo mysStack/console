@@ -1,10 +1,12 @@
 # Workload 模块任务状态
 
-> 2026-10-24 当前进展：DEV 源提交 `3e1d40eae` 已完成设置/容器/镜像/环境引用/权限增量及 400 项本地回归，进入当前代码 VERIFY；新镜像、131 部署与 Playwright 尚未完成，三类资源仍未整体验收。旧 SHA 浏览器证据仅作历史输入。
+> 2026-10-24 当前进展：DEV 源提交 `3e1d40eae` 的 400 项本地回归通过；构建提交 `3d255eaf8` 的 CI Run 40000821377 和首次 131 rollout 成功。新 context 登录未通过后已回滚旧镜像；专用测试凭据在旧镜像也被拒绝，当前浏览器 VERIFY 阻塞。三类资源均未整体验收，旧 SHA 结果不继承。详见 [部署与回滚](./workload-131-verify-20261024.md#当前增量部署与登录阻塞0229-上海时间)。
 
 ## 唯一当前状态（2026-10-24）
 
 - 负责人：当前 Codex 单会话，无子 Agent；能力 `deployment-statefulset-daemonset`。
+- 当前阻塞：新 context 使用本机专用账号在旧镜像登录被拒绝（HTTP 200、业务 400、invalid_grant）；停止重复尝试。当前 `ef3b4f1a8` 旧镜像副本 1/1，登录页 200，认证恢复尚未通过。等待有效测试凭据后重部署同一 `3d255eaf8` 制品。
+- 新制品：tag `feature-v4-workloads-20261024-020955-3d255eaf8506`，digest `sha256:d196181c25f1519f29ccc56b640c914c3b692440bbb0917a43636db925894ce4`；首部署 Pod Ready/imageID 一致后已回滚。
 - 分支 / Worktree：`feature/v4-workloads` / `console-workloads`；已验证镜像 SHA `ef3b4f1a83c3b708f5a12b35dd178bf358c99b8d`。
 - 当前阶段 `VERIFY`，REA 已通过；此前因设置版本差异及引用权限退回 DEV 的条目已补本地实现，源码 `3e1d40eae` 进入新制品验证，未标记已验收。
 - 历史镜像 `ef3b4f1a8` 已完成三类原生设置保存/API 持久化/刷新/取消/恢复、ConfigMap 引用保存与受控 500 错误反馈，以及 StatefulSet PVC 本地化复验。Deployment Secret 共存已验证，另外两类未独立验证 Secret 引用。

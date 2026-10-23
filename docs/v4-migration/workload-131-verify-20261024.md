@@ -1,5 +1,20 @@
 # Workload 131 专项 VERIFY（2026-10-24）
 
+## 当前增量部署与登录阻塞（02:29 上海时间）
+
+本节是当前状态，以下 `ef3b4f1a8` 专项成功结果保留其历史制品边界，不能直接继承给新代码。
+
+- DEV 源提交 `3e1d40eae023cf54905e9c298f1ddd387ab2a98a`；构建提交 `3d255eaf85065d3e156dd7f6b8551e9557b6bcbc`。
+- [CI Run 40000821377](https://github.com/mysStack/console/actions/runs/40000821377) 已成功，检出 SHA 一致；单元测试 89 文件、400 项通过，镜像构建/推送成功。本地 `build:packages`、`build:locales`、定向 ESLint/Prettier、`git diff --check` 通过；全项目 TypeScript 仍有 1326 条诊断，不记为通过。
+- 测试镜像 `ghcr.io/mysstack/ks-console:feature-v4-workloads-20261024-020955-3d255eaf8506`；index digest `sha256:d196181c25f1519f29ccc56b640c914c3b692440bbb0917a43636db925894ce4`。amd64 manifest `sha256:41a78f55cf1bc50afe3132c35c49b416ddcdc1e9b3be7c4a8737b53fed814e60`，两种身份分别记录，不混用。
+- 部署门禁通过后实际更新 131 `kubesphere-system/ks-console`，rollout 成功；Pod `ks-console-585485888-wttmv` Running/Ready，实际 imageID 后缀与上述 index digest 一致。
+- 浏览器使用零初始 Cookie 的新 context。首次登录脚本误用 `input[type=text]`，而页面用户名输入没有该属性，填写阶段超时；按授权要求立即恢复部署前镜像。此处是测试脚本失败，不能声称新镜像发生登录回归。
+- 修正实际 placeholder 选择器及沙箱中不可用的 `URL` 构造调用后，使用 `/home/bruce/.bashrc` 的专用账号在**已回滚旧镜像**登录：HTTP 200，但 JSON `success=false`、业务状态 400、`INCORRECT_USERNAME_OR_PASSWORD`；Console 后端日志匹配 `invalid_grant`。不能只凭 HTTP 200 认定登录通过。停止重复尝试，不输出账号、密码、Cookie 或原始登录响应。
+- 回滚后再次 `rollout status --timeout=30s` 成功，副本 1/1；当前 Pod `ks-console-98567fbfb-sr997` Running/Ready，实际 imageID `ghcr.io/mysstack/ks-console@sha256:d78e6edd76bd691345af0c10e865b1f1d97fabcdf4948e521b12ee50603be9c3`，登录页 HTTP 200。**认证登录恢复未验证通过**，当前运行的是旧 `ef3b4f1a8` 镜像。
+- 当前未执行：新镜像三类设置渲染/保存/取消、镜像搜索正向、环境引用、权限修复、完整 namespace/RBAC 与其他等价性复验。已请求负责人在本机核对专用测试凭据；有效登录恢复后，重跑部署门禁、重新部署同一构建制品并从新 context 验收。尚无证据需要因本次认证拒绝修改 Workload 业务代码。
+
+结构化证据：[当前构建/部署/回滚](./evidence/workload-settings-verify-attempt-20261024.json)。未修改三类 fixture、未清理既有生成物、未合并 PR #2，阶段保持 `VERIFY / 未完成`。
+
 ## 制品身份和范围
 
 - Git SHA：`ef3b4f1a83c3b708f5a12b35dd178bf358c99b8d`；DEV 源提交 `f6b7c689b55b1561d474dcb6dc056a39e2166e51`。

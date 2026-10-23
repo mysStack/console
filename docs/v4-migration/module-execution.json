@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "e47581bc21c5fc8d6b6cde2cf9f0daba4fe3d658ed44c793d95edf4a1ebe49f6"
+        "sha256": "aed7461e7418540a5a77e19ff37959af3810b041acf628fdb3fcc8ffda47dfe5"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "d8db0ec48736419c540adb58a5c8db4a65120eb8906f2ef48e4a1e384ec1389a"
+        "sha256": "3c8a74d94d1cbcb683e7ed53f05a9b38d6bd7fb21f97443b70ec9e38205e1d9b"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -498,8 +498,17 @@
   ],
   "verify": {
     "status": "未完成",
-    "reason": "等待当前 SHA 镜像 CI、131 rollout/imageID、新浏览器登录和三类完整验证；镜像 API 超时须定位并完成正向场景。",
+    "reason": "CI Run 40000821377 与精确镜像首次 rollout/imageID 已通过；登录脚本失败后已回滚，专用账号在旧镜像也被认证拒绝。等待有效凭据，再部署同一制品执行三类完整浏览器验证，未整体验收。",
     "sourceCommit": "3e1d40eae023cf54905e9c298f1ddd387ab2a98a",
-    "documents": []
+    "documents": [
+      {
+        "path": "docs/v4-migration/workload-131-verify-20261024.md",
+        "sha256": "845d131af0ef5be3768072251a7486b5fc3f200f80eb7d2b79330e6d8097fc8e"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-settings-verify-attempt-20261024.json",
+        "sha256": "2edcd47c251a4b5b32e3888d7aea8a41198f3b0d9b4e88b040b157ffa1091ff1"
+      }
+    ]
   }
 }

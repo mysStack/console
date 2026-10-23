@@ -1,0 +1,163 @@
+{
+  "recordedAt": "2026-10-24T02:29:31+08:00",
+  "phase": "VERIFY",
+  "status": "未完成",
+  "artifact": {
+    "sourceCommit": "3d255eaf85065d3e156dd7f6b8551e9557b6bcbc",
+    "codeCommit": "3e1d40eae023cf54905e9c298f1ddd387ab2a98a",
+    "ciRun": 40000821377,
+    "tag": "feature-v4-workloads-20261024-020955-3d255eaf8506",
+    "image": "ghcr.io/mysstack/ks-console:feature-v4-workloads-20261024-020955-3d255eaf8506",
+    "digest": "sha256:d196181c25f1519f29ccc56b640c914c3b692440bbb0917a43636db925894ce4",
+    "pinnedImage": "ghcr.io/mysstack/ks-console:feature-v4-workloads-20261024-020955-3d255eaf8506@sha256:d196181c25f1519f29ccc56b640c914c3b692440bbb0917a43636db925894ce4",
+    "platforms": [
+      {
+        "digest": "sha256:41a78f55cf1bc50afe3132c35c49b416ddcdc1e9b3be7c4a8737b53fed814e60",
+        "platform": {
+          "architecture": "amd64",
+          "os": "linux"
+        }
+      },
+      {
+        "digest": "sha256:8824b1fad7f11535ea048df6085da63236d52b6a5cd6cc9b75e9d2eab0bc4812",
+        "platform": {
+          "architecture": "arm64",
+          "os": "linux"
+        }
+      },
+      {
+        "digest": "sha256:059268b8de3b1e28eee6a07829dd0a4897a741f06d6b53468b6b2d3cb4b79071",
+        "platform": {
+          "architecture": "unknown",
+          "os": "unknown"
+        }
+      },
+      {
+        "digest": "sha256:49b8532aac59139e187ae7d776fdbabfc5fa53a25f494979588f86687509fd9e",
+        "platform": {
+          "architecture": "unknown",
+          "os": "unknown"
+        }
+      }
+    ]
+  },
+  "preDeployment": {
+    "context": "default",
+    "node": "dev01",
+    "nodeIP": "192.168.2.131",
+    "namespace": "kubesphere-system",
+    "deployment": "ks-console",
+    "uid": "d2d51a0f-6a78-4627-88c0-af39d40aa720",
+    "generation": 589,
+    "revision": "539",
+    "replicas": 1,
+    "containers": [
+      {
+        "name": "ks-console",
+        "image": "ghcr.io/mysstack/ks-console:feature-v4-workloads-20261023-184640-ef3b4f1a83c3@sha256:d78e6edd76bd691345af0c10e865b1f1d97fabcdf4948e521b12ee50603be9c3"
+      }
+    ],
+    "pods": [
+      {
+        "name": "ks-console-98567fbfb-f9qkb",
+        "phase": "Running",
+        "containers": [
+          {
+            "name": "ks-console",
+            "ready": true,
+            "imageID": "ghcr.io/mysstack/ks-console@sha256:d78e6edd76bd691345af0c10e865b1f1d97fabcdf4948e521b12ee50603be9c3"
+          }
+        ]
+      }
+    ],
+    "rollback": "仅恢复上述 ks-console 容器 image 与副本数，验证 rollout 和新登录；禁止扩大修改范围"
+  },
+  "firstDeployment": {
+    "gate": "通过",
+    "rollout": "成功",
+    "pod": "ks-console-585485888-wttmv",
+    "phase": "Running",
+    "ready": true,
+    "imageID": "ghcr.io/mysstack/ks-console@sha256:d196181c25f1519f29ccc56b640c914c3b692440bbb0917a43636db925894ce4",
+    "login": "填写阶段选择器超时；未证明新制品登录回归"
+  },
+  "rollback": {
+    "rollout": "成功",
+    "replicas": 1,
+    "currentPods": [
+      {
+        "name": "ks-console-98567fbfb-sr997",
+        "phase": "Running",
+        "containers": [
+          {
+            "name": "ks-console",
+            "ready": true,
+            "imageID": "ghcr.io/mysstack/ks-console@sha256:d78e6edd76bd691345af0c10e865b1f1d97fabcdf4948e521b12ee50603be9c3"
+          }
+        ]
+      }
+    ],
+    "loginPageHttpStatus": 200,
+    "authenticatedLogin": "未通过"
+  },
+  "oldImageLoginProbe": {
+    "context": "独立新 context，初始 Cookie 数为 0",
+    "credentialSource": "/home/bruce/.bashrc 专用测试账号变量；不记录值",
+    "httpStatus": 200,
+    "success": false,
+    "bodyStatus": 400,
+    "knownErrorCode": "INCORRECT_USERNAME_OR_PASSWORD",
+    "backendKnownMarker": "invalid_grant",
+    "conclusion": "认证前置条件阻塞；不能归因于当前 Workload 增量"
+  },
+  "localChecks": {
+    "tests": {
+      "files": 89,
+      "passed": 400,
+      "failed": 0
+    },
+    "buildPackages": "通过，最终源代码构建退出 0",
+    "buildLocales": "通过",
+    "targetedEslint": "通过",
+    "prettier": "通过",
+    "diffCheck": "通过",
+    "typescript": {
+      "status": "未通过",
+      "baselineDiagnostics": 1326,
+      "currentDiagnostics": 1326,
+      "changedProductionFileDirectDiagnostics": 0,
+      "note": "SettingsLayout 两条原有诊断增加 import 解释行；不能用计数相等当作通过"
+    }
+  },
+  "notExecutedOnNewArtifact": [
+    "三类原生设置页面渲染和持久化",
+    "镜像搜索/标签/详情正向运行时",
+    "引用编辑权限修复",
+    "完整 RBAC 与 namespace 正反隔离",
+    "全部字段和 Action 等价性"
+  ],
+  "resourceChanges": {
+    "workloadFixtures": false,
+    "namespaceDeleted": false,
+    "productionChanged": false
+  },
+  "next": "核对本机专用测试账号后重跑部署门禁，部署同一精确制品，零 Cookie context 实际登录并完成三类 VERIFY",
+  "commands": [
+    "./scripts/test.sh",
+    "corepack yarn build:packages",
+    "corepack yarn build:locales",
+    "corepack yarn eslint（限定本次生产文件）",
+    "corepack yarn prettier --check（限定本次文件）",
+    "git diff --check",
+    "python3 /home/bruce/code/ks-develop/scripts/v4-module-gate.py workloads deploy --tag feature-v4-workloads-20261024-020955-3d255eaf8506",
+    "gh run view 40000821377 --repo mysStack/console --json headSha,status,conclusion,url,jobs",
+    "skopeo inspect --raw docker://ghcr.io/mysstack/ks-console:feature-v4-workloads-20261024-020955-3d255eaf8506",
+    "kubectl -n kubesphere-system set image deployment/ks-console ks-console=ghcr.io/mysstack/ks-console:feature-v4-workloads-20261024-020955-3d255eaf8506@sha256:d196181c25f1519f29ccc56b640c914c3b692440bbb0917a43636db925894ce4",
+    "kubectl -n kubesphere-system rollout status deployment/ks-console --timeout=180s",
+    "kubectl -n kubesphere-system set image deployment/ks-console ks-console=ghcr.io/mysstack/ks-console:feature-v4-workloads-20261023-184640-ef3b4f1a83c3@sha256:d78e6edd76bd691345af0c10e865b1f1d97fabcdf4948e521b12ee50603be9c3",
+    "kubectl -n kubesphere-system rollout status deployment/ks-console --timeout=30s",
+    "kubectl -n kubesphere-system get pods -l app=ks-console -o json（仅输出就绪/镜像投影）",
+    "Playwright CLI 新 context 登录（凭据从环境注入，命令回显过滤，不记录填充值）",
+    "curl -s -o /dev/null -w HTTP状态 http://192.168.2.131:30880/login"
+  ]
+}
