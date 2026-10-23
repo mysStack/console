@@ -25,10 +25,14 @@ function useWorkloadServiceModal({ callback }: { params?: any; callback?: any })
           serviceName={detail.spec.serviceName}
           onOk={async (data: Record<string, any>) => {
             const { patch } = serviceStore;
-            await patch(detail, data);
-            notify.success(t('UPDATE_SUCCESSFUL'));
-            modal.close(modalId);
-            callback?.();
+            try {
+              await patch(detail, data);
+              notify.success(t('UPDATE_SUCCESSFUL'));
+              modal.close(modalId);
+              callback?.();
+            } catch {
+              notify.error(t('WORKLOAD_SERVICE_UPDATE_FAILED'));
+            }
           }}
           onCancel={() => modal.close(modalId)}
         />
