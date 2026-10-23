@@ -394,13 +394,13 @@ function WorkloadCreateModal({
         {kind === 'StatefulSet' && (
           <FormItem
             name="volumeClaimTemplates"
-            label={t('VOLUME_CLAIM_TEMPLATES')}
+            label={t('PERSISTENT_VOLUME_CLAIM_TEMPLATE_PL')}
             dependencies={['containers', 'initContainers']}
             rules={[{ validator: workloadSettingsValidator }]}
           >
             <ArrayInput
               itemType="object"
-              addText={t('ADD_VOLUME_CLAIM_TEMPLATE')}
+              addText={t('WORKLOAD_ADD_VOLUME_CLAIM_TEMPLATE')}
               checkItemValid={() => true}
             >
               <PersistentVolumeClaimTemplateInput />

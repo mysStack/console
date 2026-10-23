@@ -110,6 +110,8 @@ module.exports = {
   PVC_TEMPLATE_NAME: 'PVC 模板名稱',
   PERSISTENT_VOLUME_CLAIM_TEMPLATE_PL: '持久卷聲明模板',
   WORKLOAD_ADD_VOLUME_CLAIM_TEMPLATE: '新增持久卷聲明模板',
+  WORKLOAD_VOLUME_CLAIM_INVALID: '請輸入有效的 PVC 模板名稱、容量、存取模式和儲存類別。',
+  WORKLOAD_VOLUME_CLAIM_DUPLICATE: 'PVC 模板名稱不能重複。',
   PVC_OR_TEMPLATE_EMPTY:
     'You have enabled Collect Logs on Volumes. Please add at least one persistent volume, temperary volume, or persistent volume claim template and specify the path of container logs.',
   PVC_EMPTY:

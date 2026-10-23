@@ -121,6 +121,9 @@ module.exports = {
   PVC_TEMPLATE_NAME: 'Nombre de plantilla PVC',
   PERSISTENT_VOLUME_CLAIM_TEMPLATE_PL: 'Plantillas de Persistent Volume Claim',
   WORKLOAD_ADD_VOLUME_CLAIM_TEMPLATE: 'Agregar plantilla PVC',
+  WORKLOAD_VOLUME_CLAIM_INVALID:
+    'Introduzca valores válidos para el nombre, la capacidad, el acceso y la clase del PVC.',
+  WORKLOAD_VOLUME_CLAIM_DUPLICATE: 'Los nombres de las plantillas PVC deben ser únicos.',
   PVC_OR_TEMPLATE_EMPTY:
     'You have enabled Collect Logs on Volumes. Please add at least one persistent volume, temperary volume, or persistent volume claim template and specify the path of container logs.',
   PVC_EMPTY:

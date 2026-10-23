@@ -109,6 +109,8 @@ module.exports = {
   PVC_TEMPLATE_NAME: 'PVC 模板名称',
   PERSISTENT_VOLUME_CLAIM_TEMPLATE_PL: '持久卷声明模板',
   WORKLOAD_ADD_VOLUME_CLAIM_TEMPLATE: '添加持久卷声明模板',
+  WORKLOAD_VOLUME_CLAIM_INVALID: '请输入有效的 PVC 模板名称、容量、访问模式和存储类。',
+  WORKLOAD_VOLUME_CLAIM_DUPLICATE: 'PVC 模板名称不能重复。',
   PVC_OR_TEMPLATE_EMPTY:
     '您已启用收集卷上日志，请添加至少一个持久卷、临时卷或持久卷声明模板并指定容器日志所在的路径。',
   PVC_EMPTY:
