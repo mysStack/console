@@ -4,7 +4,7 @@
   "capability": "deployment-statefulset-daemonset",
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
-  "phase": "DEV",
+  "phase": "VERIFY",
   "rea": {
     "status": "已通过",
     "sourceCommit": "e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0",
@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "4e77f603d99e685471c60e569f02ca44e39b07b5a63b17cd02a2f03ce55dbb89"
+        "sha256": "6a0d296c68a67ca057e3b90c5b895f0536426ed1fc0ca221f3aa7429141d2cca"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "bbcbb343998a1053259ea1ea98b6b1bea6be6e93926eae070198f133816b43af"
+        "sha256": "e6279e2f9774ad72992ac8105dd7fe102831dc901ffa00c80498124208761837"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -224,9 +224,9 @@
     }
   },
   "dev": {
-    "status": "进行中",
-    "reason": "精确镜像 c721dce0491e 的浏览器 VERIFY 发现 StatefulSet 页面批量删除调用 Hook 绕过配套 Service 清理；退回 DEV，先以页面真实调用路径的失败测试修复。",
-    "sourceCommit": "b1ec3593d479ddbb3548e495d77085ccaeb13191",
+    "status": "已完成",
+    "reason": "页面批量删除 Hook 已统一复用 batchDelete，关闭 StatefulSet 配套 Service 与三类资源关联 HPA 的清理绕过；新增失败回归后 27/27、完整回归 81 文件/364 项和包构建通过。",
+    "sourceCommit": "7287c6b82fafe425aeb67d848b8e9bc1f689bd35",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
@@ -466,7 +466,7 @@
       },
       {
         "path": "docs/v4-migration/workload-dev-completion-20261023.md",
-        "sha256": "e2f085191c4fbfa70d678179116592535b03547c69cba50c010f8b06b38506dd"
+        "sha256": "2865e0bc7fcc48117b983f685f98eb8f3ada3a54560953f7f17bde443d723596"
       }
     ]
   },
@@ -477,9 +477,9 @@
     "WL-04：移除普通 Workload 配置引用的 useV3action、Wujie Shadow DOM 和 V3 编辑器桥接"
   ],
   "verify": {
-    "status": "发现缺陷，退回 DEV",
-    "reason": "精确镜像 c721dce0491e 已完成部署、单项 Service 清理、低权限 RBAC 和 namespace 缓存验证；StatefulSet 批量删除仍遗留两个专用 Headless Service，修复和新 SHA 重验前不得通过。",
-    "sourceCommit": "b1ec3593d479ddbb3548e495d77085ccaeb13191",
+    "status": "进行中",
+    "reason": "等待 DEV 源提交 7287c6b82fafe425aeb67d848b8e9bc1f689bd35 的 CI 镜像、131 rollout、Pod imageID 与 StatefulSet 批量 Service 清理重验；c721dce0491e 的 RBAC、namespace 和单项删除证据保留为输入。",
+    "sourceCommit": "7287c6b82fafe425aeb67d848b8e9bc1f689bd35",
     "documents": []
   }
 }

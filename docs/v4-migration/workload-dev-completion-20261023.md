@@ -4,8 +4,8 @@
 
 - 模块：`workloads / deployment-statefulset-daemonset`。
 - 分支 / Worktree：`feature/v4-workloads` / `/home/bruce/code/ks-develop/console-workloads`。
-- DEV 源提交：`b1ec3593d479ddbb3548e495d77085ccaeb13191`。
-- 当前阶段结论：精确镜像 VERIFY 发现 StatefulSet 页面批量删除绕过配套 Service 清理，已退回 DEV；本记录中的上一轮完成结论保留为缺陷发现前状态。
+- DEV 源提交：`7287c6b82fafe425aeb67d848b8e9bc1f689bd35`。
+- 当前阶段结论：页面批量删除 Hook 已复用完整关联资源清理路径，DEV 修复完成并重新进入 VERIFY；本记录不表示新 SHA 部署或浏览器重验已经通过。
 
 ## DEV 验收清单
 
@@ -33,6 +33,8 @@
 首次 VERIFY 在精确 SHA `cc3b04c2a3408538e45bdd81c7e804413e527f2f` 上通过浏览器创建并删除 StatefulSet 后，API 回读发现随机生成的 Headless Service 仍存在。该结果按状态机将模块退回 DEV。提交 `b1ec3593d479ddbb3548e495d77085ccaeb13191` 为原生创建的 StatefulSet 登记 `kubesphere.io/related-service`，单项删除和批量删除仅在 `statefulsets` Store 中清理该登记 Service，Deployment 不响应同名注解。新增测试先复现 3 项失败，实现后转换测试 65/65、Store 测试 26/26、完整回归 81 文件/363 项及包构建通过；遗留测试 Service 已单独删除，namespace 保留。修复后的真实创建/删除仍须部署该精确 SHA 后重新验证。
 
 第二轮 VERIFY 在精确 SHA `c721dce0491e82fc563dee2532a812a548ef9a72` 上确认单项删除会清理配套 Service，但浏览器批量删除两个专用 StatefulSet 后，两个带登记关系的 Headless Service 均残留。代码定位确认页面使用 `useBatchDeleteWorkloadMutation`，而上一轮测试与修复落在直接 `batchDelete`；Hook 仍只执行 Workload 删除。该问题不是环境阻塞，必须退回 DEV，以页面真实调用路径的失败测试和实现修复关闭。
+
+提交 `7287c6b82fafe425aeb67d848b8e9bc1f689bd35` 将 `useBatchDeleteWorkloadMutation` 改为复用 `batchDelete`，同时保留 StatefulSet 配套 Service、三类资源关联 HPA 的清理和完整失败传播。新增测试针对页面实际 Hook，修复前为 26/27、修复后为 27/27；完整回归为 81 文件/364 项通过，包构建完成，变更文件 ESLint、Prettier 与 `git diff --check` 通过。新 SHA 的镜像、rollout、Pod imageID 和批量删除浏览器重验仍属于 VERIFY。
 
 ## VERIFY 必须完成
 
