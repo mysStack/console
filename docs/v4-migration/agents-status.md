@@ -3,10 +3,10 @@
 ## 唯一当前状态（2026-10-23 组合批次范围调整）
 
 - 负责人：当前 Codex 单会话，不使用子 Agent。模块/能力：`workloads / deployment-statefulset-daemonset`；资源：Deployment、StatefulSet、DaemonSet。
-- 分支/Worktree：`feature/v4-workloads` / `console-workloads`；DEV 源提交 `7287c6b82fafe425aeb67d848b8e9bc1f689bd35`。
-- 当前阶段 `DEV`，REA 已通过；精确镜像 `feature-v4-workloads-20261023-173504-740e05d675f8` 已通过 StatefulSet 批量删除及配套 Service 清理，但 Deployment 批量删除关联 HPA 时请求落到 `/clusters/undefined/...` 并返回 400，已再次按状态机退回修复。[阶段记录](./module-execution.json)、[DEV 完成记录](./workload-dev-completion-20261023.md)、[组合能力边界](./workload-kind-capability-matrix.md)和[测试设计](./workload-test-design-20261023.md)为当前依据。
-- 根因已定位为 `batchDelete` 调用 `deleteHpa` 时遗漏 `cluster`；两个 Deployment 已删除，HPA 因 400 留存并由本轮专用清理命令删除。该问题同时暴露原测试只断言 HPA 名称、未验证完整 scope URL。
-- 当前任务：先用失败测试约束 HPA 删除的 cluster/namespace/name，再做最小修复、完整回归和新 SHA 部署重验。已完成的 StatefulSet Service 清理、低权限 RBAC 正反路径和 namespace 缓存隔离证据保留。
+- 分支/Worktree：`feature/v4-workloads` / `console-workloads`；DEV 源提交 `cdc245c0dd5df0668211149ec4487176ea17815a`。
+- 当前阶段 `VERIFY`，REA 已通过，HPA 作用域修复已完成。[阶段记录](./module-execution.json)、[DEV 完成记录](./workload-dev-completion-20261023.md)、[组合能力边界](./workload-kind-capability-matrix.md)和[测试设计](./workload-test-design-20261023.md)为当前依据。
+- 提交 `cdc245c0dd5df0668211149ec4487176ea17815a` 为 `batchDelete` 调用 `deleteHpa` 补齐 `cluster`，并将 Store 回归改为断言 cluster/namespace/name 完整作用域；定向测试 27/27、完整回归 81 文件/364 项、包构建、ESLint、Prettier 和差异检查通过。
+- 当前任务：构建并部署该精确 SHA 镜像，重验 Deployment 页面批量删除及关联 HPA 清理，再完成 DaemonSet 停止/恢复、StatefulSet PVC 模板等剩余真实环境验收。已完成的 StatefulSet Service 清理、低权限 RBAC 正反路径和 namespace 缓存隔离证据保留。
 - 当前 REA 材料已获项目负责人批准进入 DEV。复核记录见 [workload-rea-review-20261023.md](./workload-rea-review-20261023.md)。REA 当时确认的普通 Workload 配置引用 `useV3action`、Wujie Shadow DOM 和 V3 编辑器桥接已在后续 DEV 提交移除；集群级三类 Workload 主路由也已切换原生列表。旧 Embed 文件保留供其他未迁移入口审计，当前 SHA 浏览器验证仍未完成。`module-execution.json` 已记录复核依据和日期。
 - 已建立 [三类资源字段行为矩阵](./workload-field-behavior-matrix-20261023.md)，覆盖公共字段、默认值/校验、清空/保留语义，以及 StatefulSet Service/PVC 模板和 DaemonSet 无副本/更新策略差异。矩阵将待实测项明确列出；字段、API、RBAC、缓存和错误仍未闭环，不改变 REA 门禁。
 - 已建立 [Action、API、权限与缓存静态证据](./workload-action-api-rbac-evidence-20261023.md)，覆盖三类资源详情操作、权限键、项目 URL、HTTP 方法、删除/HPA、版本冲突和缓存失效事实；运行时 RBAC、namespace 隔离、缓存刷新和错误态仍未验证，不改变 REA 门禁。

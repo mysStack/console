@@ -4,7 +4,7 @@
   "capability": "deployment-statefulset-daemonset",
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
-  "phase": "DEV",
+  "phase": "VERIFY",
   "rea": {
     "status": "已通过",
     "sourceCommit": "e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0",
@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "67f0651ce9cdfdfe4bd134b60fff47d25f693c0e67c6c12b9198eeec77420119"
+        "sha256": "1dd7e498917c63a218d7f7fa3522bdbff7946ba92ed4f9db79c2f0e2fc79db2f"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "904e2ac8607bd6b0dffdf535649f8c5069edc3a8774d13bd5423c53be6e25880"
+        "sha256": "5f73cb67e091550420b81e4d634fef1b56289dba80632ada80cd257fcecbef9d"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -224,9 +224,9 @@
     }
   },
   "dev": {
-    "status": "进行中",
-    "reason": "精确镜像 740e05d675f8 的浏览器 VERIFY 通过 StatefulSet 批量 Service 清理，但 Deployment 批量 HPA 清理因缺少 cluster 请求到 /clusters/undefined/ 并返回 400；退回 DEV 修复 scope。",
-    "sourceCommit": "7287c6b82fafe425aeb67d848b8e9bc1f689bd35",
+    "status": "已完成",
+    "reason": "提交 cdc245c0dd5df0668211149ec4487176ea17815a 为关联 HPA 删除补齐 cluster/namespace/name 完整作用域；定向测试 27/27、完整回归 81 文件/364 项、包构建和变更文件检查通过。",
+    "sourceCommit": "cdc245c0dd5df0668211149ec4487176ea17815a",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
@@ -466,7 +466,7 @@
       },
       {
         "path": "docs/v4-migration/workload-dev-completion-20261023.md",
-        "sha256": "fcac68b70ffd21c82918d4a185a05664d1c89386d885a75e6a5161d59552a9ce"
+        "sha256": "2281e072878dddef742642e97b1595b2990b0d5c125c293e35b2bba66a6824ee"
       }
     ]
   },
@@ -477,9 +477,9 @@
     "WL-04：移除普通 Workload 配置引用的 useV3action、Wujie Shadow DOM 和 V3 编辑器桥接"
   ],
   "verify": {
-    "status": "发现缺陷，退回 DEV",
-    "reason": "当前 SHA 已完成 rollout、StatefulSet 批量 Service 清理、RBAC 和 namespace 验证；关联 HPA 删除 scope 错误未关闭，新修复与新 SHA 重验前不得通过。",
-    "sourceCommit": "7287c6b82fafe425aeb67d848b8e9bc1f689bd35",
+    "status": "进行中",
+    "reason": "等待 DEV 源提交 cdc245c0dd5df0668211149ec4487176ea17815a 的 CI 镜像、131 rollout、Pod imageID 与 Deployment 批量删除关联 HPA 浏览器重验；既有 StatefulSet Service、RBAC 和 namespace 证据保留为输入。",
+    "sourceCommit": "cdc245c0dd5df0668211149ec4487176ea17815a",
     "documents": []
   }
 }

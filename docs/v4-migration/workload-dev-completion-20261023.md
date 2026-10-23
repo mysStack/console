@@ -36,7 +36,9 @@
 
 提交 `7287c6b82fafe425aeb67d848b8e9bc1f689bd35` 将 `useBatchDeleteWorkloadMutation` 改为复用 `batchDelete`，同时保留 StatefulSet 配套 Service、三类资源关联 HPA 的清理和完整失败传播。新增测试针对页面实际 Hook，修复前为 26/27、修复后为 27/27；完整回归为 81 文件/364 项通过，包构建完成，变更文件 ESLint、Prettier 与 `git diff --check` 通过。新 SHA 的镜像、rollout、Pod imageID 和批量删除浏览器重验仍属于 VERIFY。
 
-第三轮 VERIFY 在精确镜像 `feature-v4-workloads-20261023-173504-740e05d675f8` 上确认两个 StatefulSet 及两个登记的 Headless Service 均被页面批量删除；随后 Deployment 批量删除关联 HPA 时，浏览器实际请求为 `/clusters/undefined/apis/autoscaling/v2/namespaces/v4-migration-e2e/horizontalpodautoscalers/v4-batch-hpa-740e-a`，返回 400。根因是 `batchDelete` 传入 `deleteHpa` 的参数缺少 `cluster`；必须在 DEV 修复并以新镜像重验。
+第三轮 VERIFY 在精确镜像 `feature-v4-workloads-20261023-173504-740e05d675f8` 上确认两个 StatefulSet 及两个登记的 Headless Service 均被页面批量删除；随后 Deployment 批量删除关联 HPA 时，浏览器实际请求为 `/clusters/undefined/apis/autoscaling/v2/namespaces/v4-migration-e2e/horizontalpodautoscalers/v4-batch-hpa-740e-a`，返回 400。根因是 `batchDelete` 传入 `deleteHpa` 的参数缺少 `cluster`，模块按状态机退回 DEV。
+
+提交 `cdc245c0dd5df0668211149ec4487176ea17815a` 已为关联 HPA 删除补齐 workload 的 `cluster`，并把原来只断言 HPA 名称的测试改为断言 cluster/namespace/name 完整作用域。失败测试在修复前稳定得到 `delete:hpa:undefined:v4-migration-e2e:related-hpa`，修复后定向测试 27/27、完整回归 81 文件/364 项、包构建、ESLint、Prettier 和 `git diff --check` 均通过。模块重新进入 VERIFY；新 SHA 的 CI 镜像、131 rollout、Pod imageID 和浏览器 HPA 清理仍需完成。
 
 ## VERIFY 必须完成
 
