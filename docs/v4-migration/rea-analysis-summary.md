@@ -22,6 +22,8 @@ REA 的 `partial/no-match` 是覆盖限制，不能证明功能不存在，也�
 
 2026-10-23 安全上下文增量继续使用同一固定当前制品 tree，定向分析工厂 1540、1541、2276、2277、2282、2298，确认容器访问控制、UID/GID、SELinux、capabilities 及 Pod 用户/组与 SELinux 的字段边界。分析 Evidence 与局限见 [DEV 记录](./workload-settings-dev-20261023.md#安全上下文原生编辑增量2026-10-23)；该增量用于指导提交 `9e2f4148f`，不改变既有 REA 批准范围，也不替代当前制品 VERIFY。
 
+2026-10-23 Pod 模板注解增量使用同一固定当前制品 tree，定向分析工厂 2306，确认容器设置元数据分区只编辑 `spec.template.metadata.annotations`，使用 `preservedAnnotations` 隐藏保留项。该证据指导提交 `4f2b5fac9`；workload 顶层 labels/annotations 属于另一个旧入口，仍是 DEV 缺口。证据与覆盖限制见 [REA 摘要](./evidence/workload-metadata-20261023-rea-summary.json)。
+
 ## 组合开发边界
 
 Deployment、StatefulSet、DaemonSet 共用一个模块分支和组合能力记录，目的是复用列表、详情、容器/模板编辑、Store、缓存和权限底座。REA、DEV、VERIFY 仍按资源类型展开：Deployment 的结果不能替代 StatefulSet 或 DaemonSet，StatefulSet/DaemonSet 的特殊字段和 Action 不能被公共表单默认覆盖。具体边界和验收拆分见[组合能力边界矩阵](./workload-kind-capability-matrix.md)。

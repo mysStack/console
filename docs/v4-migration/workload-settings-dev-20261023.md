@@ -125,4 +125,23 @@ console 定向重建复用 `scripts/libs/create-rollup-config.js`，分别传入
 
 ### 尚未执行和下一项
 
-本增量没有构建或推送镜像，没有更新 131 的 ks-console，没有 rollout，也没有在当前 SHA 上登录浏览器。服务端 dry-run 只证明请求通过 Kubernetes API 校验，不证明实际 Pod 能运行、安全策略允许、页面可渲染或 RBAC 正确。下一项继续调度和 Pod 模板元数据；时区挂载、StatefulSet Service/PVC 模板、集群原生列表、创建、DaemonSet 停止语义和配置引用仍在 DEV 清单中。
+本增量没有构建或推送镜像，没有更新 131 的 ks-console，没有 rollout，也没有在当前 SHA 上登录浏览器。服务端 dry-run 只证明请求通过 Kubernetes API 校验，不证明实际 Pod 能运行、安全策略允许、页面可渲染或 RBAC 正确。下一项继续调度和 workload 顶层元数据；时区挂载、StatefulSet Service/PVC 模板、集群原生列表、创建、DaemonSet 停止语义和配置引用仍在 DEV 清单中。
+
+## Pod 模板注解原生编辑增量（2026-10-23）
+
+代码提交 `4f2b5fac91539ff4b7e96411897db5dd4e39f6ea` 按当前 `v3dist` 工厂 2306 的定向 REA 补齐 `spec.template.metadata.annotations`，适用于 Deployment 创建及 Deployment、StatefulSet、DaemonSet 原生编辑设置。表单复用 `PropertiesInput`，按运行时配置隐藏 `globals.config.preservedAnnotations`；受控值仍携带这些隐藏项，修改其他注解时不会静默删除保留注解。转换层支持回填、修改、空字符串值和显式清空，模板 labels 原样保留，并校验 Kubernetes qualified name。当前 V3 设置分区没有 Pod 模板 label 输入；旧 `AdvanceSettings/Metadata` 的 workload 顶层 labels/annotations 是另一入口，仍保留在后续 DEV 清单，不能把本增量写成“全部元数据已完成”。
+
+测试先行先取得 5 个转换失败和 1 个组件缺失失败，实现后 `deployment.test.ts` 43/43、`PodAnnotationsInput.test.ts` 1/1 通过。完整 `./scripts/test.sh` 为 **75 个文件、328 项通过、0 失败**；`corepack yarn build:packages` 退出 0；生产文件 ESLint、变更文件 Prettier 与 `git diff --check` 通过。TypeScript 生产源按提交 `31a17890d9206a633206e208e6fc7d9836fa4021` 作基线比较，既有诊断 699、当前 699，本次新增 0、改动文件诊断 0；这不表示全项目 TypeScript 已通过。
+
+131 集群 `v1.31.13+k3s1` 的 `v4-migration-e2e` namespace 对三类资源分别执行 `kubectl create --dry-run=server`，创建值经原生设置改为普通注解、保留注解和空值后均被 API 接受，残留资源为 0。该验证绑定代码提交 `4f2b5fac9`，没有持久化资源。
+
+证据：
+
+- [制品工厂来源](./evidence/workload-metadata-20261023-provenance.json)
+- [REA 摘要](./evidence/workload-metadata-20261023-rea-summary.json)
+- [TypeScript 基线比较](./evidence/workload-metadata-20261023-typecheck.json)
+- [131 服务端 dry-run](./evidence/workload-metadata-20261023-api-validation.json)
+- [可复现工厂提取脚本](./evidence/workload-metadata-extract.cjs)
+- [可复现服务端验证脚本](./evidence/workload-metadata-server-validation.cjs)
+
+本增量没有构建测试镜像、更新 131 的 `ks-console`、rollout 或登录当前 SHA 浏览器。调度、workload 顶层 labels/annotations、时区挂载、StatefulSet Service/PVC 模板、集群原生入口、DaemonSet 停止语义和配置引用仍在 DEV 清单，因此阶段保持 DEV。
