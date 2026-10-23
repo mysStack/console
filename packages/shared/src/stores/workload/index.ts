@@ -234,7 +234,7 @@ const workloadStore = (module: string) => {
       (params: BatchOptProps) => {
         const { data } = params;
 
-        return settleWorkloadRequests(data!.map(p => del(p)));
+        return batchDelete(data!);
       },
       {
         onSuccess,

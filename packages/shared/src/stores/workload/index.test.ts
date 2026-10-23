@@ -161,6 +161,39 @@ test('StatefulSet 批量删除清理登记的 Headless Service，其他资源不
   }
 });
 
+test('页面批量删除 Hook 复用关联资源清理路径', async () => {
+  for (const resource of ['statefulsets', 'deployments']) {
+    const calls: string[] = [];
+    const store = loadStore(resource, async url => {
+      calls.push(url);
+      return { status: 'Success' };
+    });
+
+    await store.useBatchDeleteWorkloadMutation().mutate({
+      data: [
+        {
+          ...item,
+          annotations: {
+            'kubesphere.io/related-service': 'workload-test-headless',
+            'kubesphere.io/relatedHPA': 'related-hpa',
+          },
+        },
+      ],
+    });
+
+    assert.deepEqual(
+      calls,
+      resource === 'statefulsets'
+        ? [
+            'workload-test',
+            'delete:services:host:v4-migration-e2e:workload-test-headless',
+            'related-hpa',
+          ]
+        : ['workload-test', 'related-hpa'],
+    );
+  }
+});
+
 test('direct batchDelete rejects failures for callers outside the list hooks', async () => {
   const error = new Error('Forbidden');
   const store = loadStore('deployments', async () => {
