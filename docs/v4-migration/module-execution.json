@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "32979aae835ab903f797d5b0d56f5a54c6da6bc981b3024635916ee74f95e45f"
+        "sha256": "547d8e489a57b4654c96460dac0e93b68b82d2938082f8c3ad9b2d274cf36a70"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "f1570ff1247c5ce17d37c0099c6a3839cfae899d5864721aabdfe8ed982d4f40"
+        "sha256": "6e2ee92b0dd926037859179ac99b2590682be175230a6e7c60ce1b094f50e509"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -225,12 +225,12 @@
   },
   "dev": {
     "status": "进行中",
-    "reason": "进行中：三类原生设置及顶层元数据、StatefulSet/DaemonSet 原生创建、DaemonSet 停止补丁、StatefulSet PVC 模板/Service payload 已实现，普通项目配置引用已移除 V3 Action/Wujie DOM 桥接；集群级原生入口、完整 Action、双资源部分成功恢复、真实保存、RBAC、缓存和部署后浏览器验收仍待补齐；未进入 VERIFY",
-    "sourceCommit": "6328e67aa3c93234d62150337dd4dd2a0df770ff",
+    "reason": "进行中：三类原生设置及顶层元数据、StatefulSet/DaemonSet 原生创建、集群级三类原生主入口、DaemonSet 停止补丁、StatefulSet PVC 模板/Service payload 已实现，普通项目配置引用已移除 V3 Action/Wujie DOM 桥接；完整 Action、双资源部分成功恢复、真实保存、RBAC、缓存和部署后浏览器验收仍待补齐；未进入 VERIFY",
+    "sourceCommit": "d762c005bdf5b4c48e594a069785f1fa51e86489",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
-        "sha256": "94c7f66f01e99d054e589a138c7990784769888b72220ab9631e8fdc64cd8483"
+        "sha256": "28556e08fd0dadcc296a2e0fc4c511984bea2bb4b6523debbf7d46d7aa141736"
       },
       {
         "path": "docs/v4-migration/evidence/workload-lifecycle-20261023-api-validation.json",
@@ -455,6 +455,14 @@
       {
         "path": "docs/v4-migration/evidence/workload-statefulset-create-20261023-api-validation.json",
         "sha256": "e2de49d576aa55b18778802e3b364b61fb322372f61ed7b6b51e1871e6b8bae7"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-cluster-native-entry-validation.cjs",
+        "sha256": "04c06e6ac9233fd17b53e709395f78a2e3a28fdd8e2f4e0b17708b74ff5a4912"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-cluster-native-entry-20261023.json",
+        "sha256": "820beb6c7778b9950f1589d1eb6f447982e532edc57be0a7cc6f45618173cf1a"
       }
     ]
   },

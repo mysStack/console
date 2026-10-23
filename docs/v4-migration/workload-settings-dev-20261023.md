@@ -5,7 +5,7 @@
 - 模块：`workloads / deployment-statefulset-daemonset`。
 - 分支 / Worktree：`feature/v4-workloads` / `console-workloads`。
 - 负责人批准进入 DEV：`5c24342571419708b6f0c21f3ce9e8f193da0e17`，批准原文见 [REA 复核记录](./workload-rea-review-20261023.md)。
-- 首批功能提交：`0c1d9aadf219fcabf5e6a310722591c9d7bef136`；生命周期增量提交：`da25187d33ca49d21afa0ad748b619e8a2786c64`；安全上下文增量提交：`9e2f4148f2abde58b6eec850612d99dc1ac3f0a8`；当前功能提交：`6328e67aa3c93234d62150337dd4dd2a0df770ff`。
+- 首批功能提交：`0c1d9aadf219fcabf5e6a310722591c9d7bef136`；生命周期增量提交：`da25187d33ca49d21afa0ad748b619e8a2786c64`；安全上下文增量提交：`9e2f4148f2abde58b6eec850612d99dc1ac3f0a8`；当前功能提交：`d762c005bdf5b4c48e594a069785f1fa51e86489`。
 - 阶段仍为 DEV / 进行中；不是三类资源完整验收，也没有进入 VERIFY。
 
 ## 本次实现与保留行为
@@ -50,7 +50,7 @@ console 定向重建复用 `scripts/libs/create-rollup-config.js`，分别传入
 ## 剩余清单
 
 - 三类资源已确认的公共设置和资源特有设置已完成主要代码增量；仍须按字段矩阵关闭未建模高级字段、Action 及错误边界，不能因现有表单可用而关闭 WL-02。
-- 集群级三类列表仍挂载 V3/Wujie；StatefulSet 创建已完成 DEV 代码，但真实持久化与双资源错误恢复尚未闭环，不能直接接路由后宣称完成。
+- 集群级三类主列表已切换到原生路由和组件；StatefulSet 创建已完成 DEV 代码，但当前 SHA 页面、真实持久化与双资源错误恢复尚未闭环，不能据此宣称完成。
 - StatefulSet 与 DaemonSet 原生创建、DaemonSet 停止语义已完成 DEV 代码与本地/API dry-run 验证；真实持久化、双资源部分成功恢复和浏览器行为留待 VERIFY，各类未完成 Action 继续列入 DEV 清单。
 - 普通项目三类配置引用的不可达 V3 Action/DOM 桥接已移除；真实保存、失败、权限、namespace 和缓存行为仍须在 VERIFY 关闭。
 - 真实 RBAC 正反权限、namespace 隔离、缓存失效、API 持久化、保存/取消/冲突及当前制品渲染未完成。
@@ -324,4 +324,27 @@ DaemonSet 的旧 V3 UI 快照没有调度分区，因此当前 V4 不为它虚�
 
 可复现脚本 [workload-statefulset-create-server-validation.cjs](./evidence/workload-statefulset-create-server-validation.cjs) 从精确提交 `6328e67aa` 的构建器生成双资源对象，并在已授权的 `default` context、`https://192.168.2.131:6443`、Kubernetes `v1.31.13+k3s1`、namespace `v4-migration-e2e` 执行两次 `kubectl create --dry-run=server`。Service 和 StatefulSet 均被接受；`serviceName`、Headless Service、selector、15432→5432 端口、partition 0、1Gi `local-path` PVC 模板和 45 秒终止宽限期全部通过结构检查，标签查询残留为 0。结构化结果见 [API 记录](./evidence/workload-statefulset-create-20261023-api-validation.json)。
 
-本增量没有构建或推送 Console 测试镜像，没有更新 131 的 `ks-console`、rollout、核对 digest/imageID 或登录当前 SHA 页面。真实双资源创建/删除、部分成功恢复、RBAC 正反权限、namespace 隔离、缓存刷新、失败/取消、刷新/返回和 V3 功能等价性仍归 VERIFY。集群级三类原生入口及其余未完成 Action 继续留在 DEV；阶段保持 DEV，PR #2 保持 Draft。
+本增量没有构建或推送 Console 测试镜像，没有更新 131 的 `ks-console`、rollout、核对 digest/imageID 或登录当前 SHA 页面。真实双资源创建/删除、部分成功恢复、RBAC 正反权限、namespace 隔离、缓存刷新、失败/取消、刷新/返回和 V3 功能等价性仍归 VERIFY。该提交完成时集群级三类原生入口及其余 Action 仍留在 DEV；后续入口增量见下一节。阶段保持 DEV，PR #2 保持 Draft。
+
+## 集群级三类原生入口（2026-10-23）
+
+代码提交 `d762c005bdf5b4c48e594a069785f1fa51e86489` 将 `/clusters/:cluster/deployments`、`statefulsets`、`daemonsets` 三个主路由从 `WorkLoadList` 的 Wujie/V3 Embed 切换到仓库已有的原生 `ApplicationWorkloads/Workloads` 列表。项目级详情路由保持不变；Jobs、CronJobs、Service、Ingress 等不属于本组合增量的入口未夹带修改。
+
+### 实现与保留行为
+
+1. 三个集群入口共用原生 `ListPage`、Workload Store、namespace 选择器、原生详情链接、编辑基本信息、YAML、重启、停止和删除动作。异常状态由 `StatusReason` 显示，不再渲染字面量 `reason`。
+2. 创建入口复用本批次已完成的三类原生创建能力。集群列表当前选择的 namespace 会预填到弹窗；用户也可以在弹窗中更换项目。最终请求作用域从生成 payload 的 `metadata.namespace` 读取，Deployment/DaemonSet 使用单资源 mutation，StatefulSet 使用双资源 mutation。
+3. namespace 尚未选择时，配置字典、Secret、PVC 和调度目标请求不会按空 namespace 发出；选择变化后按新 namespace 重新加载。标签重复检查依赖 name 和 namespace，空 namespace 时不发送检查请求。
+4. 集群级权限仍使用 `{ cluster }` 进入 Cluster Rule 过滤；实际 Kubernetes API 的 namespace 级授权结果、低权限按钮与服务端 403 一致性留待 VERIFY。
+5. 路由切换没有删除旧 Embed 文件，它们仍可能被其他未迁移入口引用；本增量只证明这三个主路由不再挂载该桥接。
+
+### 实际验证
+
+- 测试先行先取得 3 个失败：主路由仍指向 V3、原生列表没有创建接线、弹窗不支持 namespace 选择。实现后新增 6/6 通过，实际执行列表组件并分别验证 Deployment、StatefulSet、DaemonSet 的 kind、预填 namespace、payload namespace 和 Store 选择。
+- `./scripts/test.sh`：精确功能内容最终为 **80 个文件、358 项通过，0 失败**。
+- `corepack yarn build:packages`：退出 0，appstore、console、core、shared 全部完成，shared 633/633 minify；保留既有循环依赖和 Node 模块警告。
+- 定向 ESLint：0 错误，路由文件保留 4 条改动前已有的长导入行 warning；Prettier 和 `git diff --check` 通过。
+- `corepack yarn tsc -p packages/console/tsconfig.json --noEmit --pretty false`：退出 2，仍为 1316 条仓库既有诊断；本次五个生产文件没有直接诊断。不能记录为完整 TypeScript 通过。
+- [可复现静态校验](./evidence/workload-cluster-native-entry-validation.cjs)绑定精确提交 `d762c005b`，三条原生路由、三类创建、namespace 作用域、空 namespace 请求保护和状态原因渲染 14 项检查通过；结构化结果见 [记录](./evidence/workload-cluster-native-entry-20261023.json)。
+
+本增量仍处于 DEV。没有构建或推送 Console 测试镜像，没有部署 131、rollout、核对 digest/imageID，也没有在当前 SHA 上执行 Playwright。三类集群页面的真实渲染、直达/刷新/返回、namespace 切换、创建/停止/删除、RBAC、缓存和 V3 等价性必须在 VERIFY 逐类验收。其余未完成 Action 继续留在 DEV；PR #2 保持 Draft。
