@@ -15,6 +15,14 @@ export default function useWorkloadResourceOptions(cluster: string, namespace: s
 
   useEffect(() => {
     let active = true;
+    if (!namespace) {
+      setOptions(EMPTY_OPTIONS);
+      setIsLoading(false);
+      setIsError(false);
+      return () => {
+        active = false;
+      };
+    }
     setIsLoading(true);
     setIsError(false);
     Promise.all([

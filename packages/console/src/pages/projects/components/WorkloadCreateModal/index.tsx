@@ -15,7 +15,13 @@ import {
   useWatch,
 } from '@kubed/components';
 
-import { ArrayInput, generateId, PropertiesInput, workloadStore } from '@ks-console/shared';
+import {
+  ArrayInput,
+  generateId,
+  NamespaceSelector,
+  PropertiesInput,
+  workloadStore,
+} from '@ks-console/shared';
 import {
   buildDaemonSet,
   buildDeployment,
@@ -49,6 +55,7 @@ interface Props {
   visible: boolean;
   cluster: string;
   namespace: string;
+  namespaceSelectable?: boolean;
   kind?: WorkloadKind;
   confirmLoading?: boolean;
   onOk: (data: Record<string, any>) => void;
@@ -66,22 +73,25 @@ function WorkloadCreateModal({
   visible,
   cluster,
   namespace,
+  namespaceSelectable = false,
   kind = 'Deployment',
   confirmLoading,
   onOk,
   onCancel,
 }: Props): JSX.Element {
   const [form] = useForm<WorkloadCreateValues>();
+  const watchedNamespace = useWatch('namespace', form) || namespace;
   const volumes = useWatch('volumes', form);
   const volumeClaimTemplates = useWatch('volumeClaimTemplates', form);
   const statefulService = React.useRef({ workloadName: '', serviceName: '' });
   const workload = workloadStore(moduleByKind[kind]);
-  const resources = useWorkloadResourceOptions(cluster, namespace);
-  const workloadTargets = useWorkloadTargetOptions(kind, cluster, namespace);
+  const resources = useWorkloadResourceOptions(cluster, watchedNamespace);
+  const workloadTargets = useWorkloadTargetOptions(kind, cluster, watchedNamespace);
 
   const handleSubmit = () => {
     form.validateFields().then(
       values => {
+        const selectedNamespace = String(values.namespace || namespace).trim();
         if (kind === 'StatefulSet') {
           const workloadName = String(values.name || '').trim();
           if (statefulService.current.workloadName !== workloadName) {
@@ -90,13 +100,18 @@ function WorkloadCreateModal({
               serviceName: buildStatefulSetServiceName(workloadName, generateId(4)),
             };
           }
-          onOk(buildStatefulSet({ ...values, namespace }, statefulService.current.serviceName));
+          onOk(
+            buildStatefulSet(
+              { ...values, namespace: selectedNamespace },
+              statefulService.current.serviceName,
+            ),
+          );
           return;
         }
         onOk(
           kind === 'DaemonSet'
-            ? buildDaemonSet({ ...values, namespace })
-            : buildDeployment({ ...values, namespace }),
+            ? buildDaemonSet({ ...values, namespace: selectedNamespace })
+            : buildDeployment({ ...values, namespace: selectedNamespace }),
         );
       },
       () => {},
@@ -167,13 +182,13 @@ function WorkloadCreateModal({
       return;
     }
     const name = String(form.getFieldValue('name') || '').trim();
-    if (!name || name.length > 253 || !DNS_LABEL.test(name)) {
+    if (!watchedNamespace || !name || name.length > 253 || !DNS_LABEL.test(name)) {
       callback();
       return;
     }
     checkWorkloadLabelsAvailability(workload.checkLabels, {
       cluster,
-      namespace,
+      namespace: watchedNamespace,
       name,
       labels: value,
     }).then(error => callback(error ? t(error) : undefined));
@@ -258,8 +273,16 @@ function WorkloadCreateModal({
         >
           <Input autoFocus />
         </FormItem>
-        <FormItem name="namespace" label={t('PROJECT')}>
-          <Input disabled />
+        <FormItem
+          name="namespace"
+          label={t('PROJECT')}
+          rules={[{ required: true, message: t('PROJECT_EMPTY_DESC') }]}
+        >
+          {namespaceSelectable ? (
+            <NamespaceSelector cluster={cluster} style={{ width: '100%' }} />
+          ) : (
+            <Input disabled />
+          )}
         </FormItem>
         <FormItem name="aliasName" label={t('ALIAS')}>
           <Input maxLength={63} />
@@ -400,7 +423,7 @@ function WorkloadCreateModal({
         <FormItem
           name="workloadLabels"
           label={t('LABEL_PL')}
-          dependencies={['name']}
+          dependencies={['name', 'namespace']}
           rules={[{ validator: workloadLabelsValidator }]}
         >
           <PropertiesInput addText={t('ADD')} />

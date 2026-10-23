@@ -23,7 +23,7 @@ export default function useWorkloadTargetOptions(
 
   useEffect(() => {
     let active = true;
-    if (kind === 'DaemonSet') {
+    if (kind === 'DaemonSet' || !namespace) {
       setOptions([]);
       setIsLoading(false);
       setIsError(false);
