@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-23T05:13:54.988Z",
+  "sourceCommit": "e0dbb45d3f70e799f3441ac515a575af9a50f94f",
+  "server": "https://192.168.2.131:6443",
+  "namespace": "v4-migration-e2e",
+  "mode": "StatefulSet create server dry-run; no resource persisted",
+  "resource": "StatefulSet/v4-pvc-template-dryrun-1792732434729",
+  "accepted": true,
+  "error": "",
+  "responseKind": "StatefulSet",
+  "serviceName": "v4-pvc-template-dryrun-1792732434729",
+  "template": {
+    "name": "data",
+    "accessModes": ["ReadWriteMany"],
+    "storageClassName": "slow.csi.example.com",
+    "storage": "2Gi",
+    "preservedLabel": "yes",
+    "preservedVolumeMode": "Filesystem",
+    "preservedRequest": "1"
+  },
+  "checks": {
+    "statefulSetAccepted": true,
+    "editedAccessMode": true,
+    "editedStorage": true,
+    "preservedMetadata": true,
+    "preservedSpec": true,
+    "preservedRequest": true
+  }
+}

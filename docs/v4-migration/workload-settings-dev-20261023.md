@@ -214,6 +214,22 @@ DaemonSet 的旧 V3 UI 快照没有调度分区，因此当前 V4 不为它虚�
 
 本增量没有构建或推送测试镜像，没有更新 131 的 `ks-console`、rollout、登录当前 SHA 浏览器或启动真实 Pod。HostPath 策略和实际容器时区必须在 VERIFY 用专用测试资源检查。StatefulSet/DaemonSet 创建、已有资源顶层元数据编辑、StatefulSet Service/PVC 模板、集群原生入口、DaemonSet 停止语义、配置引用和完整 Action/RBAC 仍在 DEV 清单，因此阶段保持 DEV。
 
+## StatefulSet PVC 模板设置（2026-10-23）
+
+代码提交 `e0dbb45d3f70e799f3441ac515a575af9a50f94f` 在原生 `WorkloadSettingsModal` 中加入 StatefulSet 专用 PVC 模板列表。表单支持模板名称、访问模式、容量和 StorageClass，名称改动会同步参与容器挂载卷名校验；写回时保留原始模板中未建模的 metadata/spec 字段，删除字段时不伪造 `template.spec.volumes`。普通 Deployment/DaemonSet 不展示该分区。
+
+### 实际验证
+
+| 命令/检查                                                                     | 结果                                                                                                                  | 边界                                                                                                                                            |
+| ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `./scripts/test.sh`                                                           | **77 个文件、346 项通过，0 失败**                                                                                     | 覆盖解析、校验、写回、未建模字段保留和四种内置语言文案；不能替代真实页面渲染                                                                    |
+| `corepack yarn build:packages`                                                | **退出 0，633/633 minify 完成**                                                                                       | 仅为本地包构建，未产生部署制品                                                                                                                  |
+| 变更生产文件 `eslint`、Prettier、`git diff --check`                           | 通过                                                                                                                  | 不能替代部署后验收                                                                                                                              |
+| `tsc --noEmit -p packages/console/tsconfig.json`                              | **未通过，1316 条仓库既有诊断**；本轮三个生产文件无直接错误                                                           | 见 [TypeScript 记录](./evidence/workload-pvc-template-20261023-typecheck.json)，不能报告全项目通过                                              |
+| `node docs/v4-migration/evidence/workload-pvc-template-server-validation.cjs` | **131 `v1.31.13+k3s1` StatefulSet server dry-run 接受**；修改访问模式/容量并保留 label、volumeMode、额外 request 字段 | 不保存资源，不证明真实 Service/PVC 持久化、RBAC、缓存或浏览器渲染；见 [API 记录](./evidence/workload-pvc-template-20261023-api-validation.json) |
+
+本次关闭的是 StatefulSet PVC 模板的 DEV 代码缺口，不关闭 StatefulSet Service 的真实保存、PVC 生成及删除约束，也不关闭当前 SHA 的部署、Playwright、低权限、namespace 隔离和缓存验收。PR #2 继续保持 Draft。
+
 ## DaemonSet 停止语义修复（2026-10-23）
 
 代码提交 `da741a3893f88885df4698a4ea5d265336fb9692` 按当前制品 main 工厂 318 修复共享 Workload Store：DaemonSet 停止 PATCH `spec.template.spec.nodeSelector.non-existing=true`，Deployment/StatefulSet 仍 PATCH `spec.replicas=0`。测试先行复现 DaemonSet 错误副本补丁；实现后 Store 20/20 通过，完整回归 77 文件/344 项通过，包构建和类型基线 691→691 通过。131 专用 DaemonSet 的 merge patch server dry-run 被接受，回读 resourceVersion/nodeSelector 不变，见[API 记录](./evidence/workload-stop-20261023-api-validation.json)。来源和实际 REA 见[来源](./evidence/workload-stop-20261023-provenance.json)与[摘要](./evidence/workload-stop-20261023-rea-summary.json)。本轮没有执行真实停止或恢复，相关调度、原 nodeSelector 恢复、RBAC、错误反馈和缓存必须在 VERIFY 完成。

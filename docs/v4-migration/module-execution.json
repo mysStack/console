@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "b3a4b1c025e53637d07007350043245073acefab2b7058689c964ad244089f48"
+        "sha256": "de0677415b06ae2c87b15c59305b03c53107bd66ee8db38569fd88ee6356c91a"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "b6b93da9e18643e82cb98b753001be98e2eb5f403bbdd04e1a797d48ac91579d"
+        "sha256": "0050489a4cbcc58c6764ae0fdb057c01d75058fb09f85c2f29bbe1670d6116ee"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -225,12 +225,12 @@
   },
   "dev": {
     "status": "进行中",
-    "reason": "进行中：原生设置入口、策略、优雅终止、生命周期、安全上下文、Pod 模板注解、宿主时区及 Deployment/StatefulSet Pod 调度已实现；Deployment 创建已补节点选择和顶层 labels/annotations；StatefulSet/DaemonSet 创建、已有资源顶层元数据编辑、StatefulSet Service/PVC、DaemonSet 停止补丁已修复；集群入口、完整 Action 和配置引用等仍待补齐；未进入 VERIFY",
-    "sourceCommit": "da741a3893f88885df4698a4ea5d265336fb9692",
+    "reason": "进行中：原生设置入口、策略、优雅终止、生命周期、安全上下文、Pod 模板注解、宿主时区、Pod 调度、DaemonSet 停止补丁及 StatefulSet PVC 模板编辑已实现；集群入口、完整 Action、Service/PVC 真实保存、创建、配置引用、RBAC、缓存和部署后浏览器验收仍待补齐；未进入 VERIFY",
+    "sourceCommit": "e0dbb45d3f70e799f3441ac515a575af9a50f94f",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
-        "sha256": "7f0e5ec88d9649f3197a66758adf33c60cd402ab4ca5779fcf95930c7288cdf9"
+        "sha256": "c54572b3c3d7562a709384d144a12e1375ba77bd224e52861cf035d59d9aa135"
       },
       {
         "path": "docs/v4-migration/evidence/workload-lifecycle-20261023-api-validation.json",
@@ -403,6 +403,18 @@
       {
         "path": "docs/v4-migration/evidence/workload-stop-server-validation.cjs",
         "sha256": "91d3940a4b1cd4faf46c65150b2d9b2da4e590e917d82cc5bb955add7cce2936"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-pvc-template-20261023-api-validation.json",
+        "sha256": "3e072f4e7132a110d58515c70139595fcf749f5ef5d6dd4724cda005ab1f5862"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-pvc-template-server-validation.cjs",
+        "sha256": "6a1da903d6d5ff94cff5f8b574389375094152e21f3917b86058026e1d5fe41e"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-pvc-template-20261023-typecheck.json",
+        "sha256": "12e49aa926c940a28c2e994117009a827d483bac3d96300d088246db2dfc86ba"
       }
     ]
   },
