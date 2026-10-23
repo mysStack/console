@@ -4,6 +4,19 @@
  */
 
 module.exports = {
+  WORKLOAD_IMAGE_RETRY: 'Reintentar consulta de imagen',
+  WORKLOAD_IMAGE_SEARCH: 'Buscar imágenes',
+  WORKLOAD_IMAGE_SEARCH_SUBMIT: 'Buscar en el registro',
+  WORKLOAD_IMAGE_RESULTS: 'Resultados de imágenes',
+  WORKLOAD_IMAGE_TAG_PREVIOUS: 'Etiquetas anteriores',
+  WORKLOAD_IMAGE_TAG_NEXT: 'Etiquetas siguientes',
+  WORKLOAD_IMAGE_SEARCH_FAILED: 'La búsqueda falló. Reintente o introduzca la imagen manualmente.',
+  WORKLOAD_IMAGE_LOOKUP_FAILED:
+    'No se pudieron cargar las etiquetas o los detalles. Reintente; la imagen se conserva.',
+  WORKLOAD_IMAGE_REGISTRY_FAILED:
+    'No se pudo leer el registro. Compruebe los permisos o introduzca la dirección completa manualmente.',
+  WORKLOAD_IMAGE_SIZE: 'Tamaño de imagen (bytes)',
+  WORKLOAD_IMAGE_LAYERS: 'Capas de imagen',
   WORKLOAD_SETTINGS_INVALID:
     'Estrategia, cantidad o duración no válidas. Use enteros no negativos o porcentajes válidos; maxUnavailable y maxSurge no pueden ser cero a la vez.',
   WORKLOAD_TERMINATION_GRACE_PERIOD: 'Terminación ordenada del pod',

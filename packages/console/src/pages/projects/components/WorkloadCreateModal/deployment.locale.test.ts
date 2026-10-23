@@ -122,3 +122,27 @@ test('环境引用的类型、字段、资源、divisor、optional 和校验提�
     }
   }
 });
+
+test('原生镜像搜索、分页和失败提示均有四语言文案', () => {
+  for (const language of ['en', 'es', 'tc', 'zh']) {
+    const locale = require(
+      path.join(localeRoot, language, 'l10n-projects-applicationWorkloads-deployments-list.js'),
+    );
+    for (const key of [
+      'WORKLOAD_IMAGE_SEARCH',
+      'WORKLOAD_IMAGE_SEARCH_SUBMIT',
+      'WORKLOAD_IMAGE_RESULTS',
+      'WORKLOAD_IMAGE_TAG_PREVIOUS',
+      'WORKLOAD_IMAGE_TAG_NEXT',
+      'WORKLOAD_IMAGE_SEARCH_FAILED',
+      'WORKLOAD_IMAGE_LOOKUP_FAILED',
+      'WORKLOAD_IMAGE_REGISTRY_FAILED',
+      'WORKLOAD_IMAGE_SIZE',
+      'WORKLOAD_IMAGE_LAYERS',
+      'WORKLOAD_IMAGE_RETRY',
+    ]) {
+      assert.equal(typeof locale[key], 'string', `${language}: ${key}`);
+      assert.notEqual(locale[key], key);
+    }
+  }
+});

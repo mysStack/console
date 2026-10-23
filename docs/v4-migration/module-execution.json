@@ -16,7 +16,7 @@
       },
       {
         "path": "docs/v4-migration/deployment-settings-capability-matrix.md",
-        "sha256": "b8aed5b63dce975fcf2433c35abd1bc191d08d3e3cb25b8edf0f5ae1004301e1"
+        "sha256": "9ea3897737d82db023079f2c96f476ef2fa5bd50d3fc8aafdca88b2135cd4014"
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "5d28a6d5025ba49eca11aae8750d5184003b7052992c2bed11b91618703c0ca3"
+        "sha256": "809f2dfa15ec10a007eaee45a28def29c50afb2ce14f70ae687a04690bf46197"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "8035046f85b9a24c8cdb43fc59f3a7b59e1731eee1ffd3afcbfc85ac7e976c06"
+        "sha256": "89c82cf268941bbb10210e58d33a6ad8351dcdbf42b3f2d4a5c8abae07731be3"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -225,12 +225,12 @@
   },
   "dev": {
     "status": "进行中",
-    "reason": "2026-10-24 已补设置分区/二级编辑、配置引用 edit 权限、valueFrom 编辑删除/optional/key 下拉及资源选项作用域隔离；87 文件/386 项回归通过。启用的镜像搜索/选择仍待补齐；保持 DEV，新代码尚未部署/浏览器验收。",
+    "reason": "2026-10-24 已补当前制品 API 的镜像搜索、标签分页/选择、详情、错误/重试及四语言；89 文件/400 项回归、包/语言构建和相关 ESLint 通过。当前保持 DEV，代码提交后准备交付进入 VERIFY；131 镜像 API 超时及新 SHA 部署/浏览器验收尚未完成。",
     "sourceCommit": "f6b7c689b55b1561d474dcb6dc056a39e2166e51",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
-        "sha256": "a1f0ea300d5b66ebcd7f64b3120d41b5b8b8eaff21c4e42d18758b32ab425245"
+        "sha256": "c6a06b6f66157209958049073324558e8e344a9c2639d99cc4474df1ea98be47"
       },
       {
         "path": "docs/v4-migration/evidence/workload-lifecycle-20261023-api-validation.json",
@@ -483,6 +483,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-environment-keys-local-20261024.json",
         "sha256": "6accd4288eed49925629438e7b9ac99c21b556a461b2cc20171488a99f929d97"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-image-local-20261024.json",
+        "sha256": "2f14e84bca13e9afba67f7204f60522c7e0b598d1d5a03f6eb8823c6f4590540"
       }
     ]
   },

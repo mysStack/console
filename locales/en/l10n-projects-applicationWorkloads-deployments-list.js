@@ -4,6 +4,19 @@
  */
 
 module.exports = {
+  WORKLOAD_IMAGE_RETRY: 'Retry image lookup',
+  WORKLOAD_IMAGE_SEARCH: 'Search images',
+  WORKLOAD_IMAGE_SEARCH_SUBMIT: 'Search image registry',
+  WORKLOAD_IMAGE_RESULTS: 'Image search results',
+  WORKLOAD_IMAGE_TAG_PREVIOUS: 'Previous tags',
+  WORKLOAD_IMAGE_TAG_NEXT: 'Next tags',
+  WORKLOAD_IMAGE_SEARCH_FAILED: 'Image search failed. Retry or enter the image manually.',
+  WORKLOAD_IMAGE_LOOKUP_FAILED:
+    'Unable to load image tags or details. Retry; the entered image is preserved.',
+  WORKLOAD_IMAGE_REGISTRY_FAILED:
+    'Unable to read the selected registry. Check permissions or enter the full image address manually.',
+  WORKLOAD_IMAGE_SIZE: 'Image size (bytes)',
+  WORKLOAD_IMAGE_LAYERS: 'Image layers',
   WORKLOAD_SETTINGS_INVALID:
     'Invalid update strategy, count or duration. Use non-negative integers or valid percentages; max unavailable and max surge must not both be zero.',
   WORKLOAD_TERMINATION_GRACE_PERIOD: 'Pod Graceful Termination',

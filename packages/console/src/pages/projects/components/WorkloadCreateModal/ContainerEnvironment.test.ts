@@ -34,14 +34,16 @@ function loadInputs() {
             }
           : name === '@ks-console/shared'
             ? { ArrayInput: 'array-input' }
-            : name === './useWorkloadEnvironmentKeys'
-              ? {
-                  __esModule: true,
-                  default: () => ({ data: ['item'], isLoading: false, isError: false }),
-                }
-              : name === './SecurityContextInput'
-                ? { __esModule: true, default: 'security-context' }
-                : dependency(name),
+            : name === './WorkloadImageInput'
+              ? { __esModule: true, default: 'workload-image-input' }
+              : name === './useWorkloadEnvironmentKeys'
+                ? {
+                    __esModule: true,
+                    default: () => ({ data: ['item'], isLoading: false, isError: false }),
+                  }
+                : name === './SecurityContextInput'
+                  ? { __esModule: true, default: 'security-context' }
+                  : dependency(name),
     },
   );
   const tree = loaded.exports.default({ kind: 'CONTAINER', resourceOptions: options });

@@ -4,6 +4,18 @@
  */
 
 module.exports = {
+  WORKLOAD_IMAGE_RETRY: '重试镜像查询',
+  WORKLOAD_IMAGE_SEARCH: '搜索镜像',
+  WORKLOAD_IMAGE_SEARCH_SUBMIT: '搜索镜像仓库',
+  WORKLOAD_IMAGE_RESULTS: '镜像搜索结果',
+  WORKLOAD_IMAGE_TAG_PREVIOUS: '上一页标签',
+  WORKLOAD_IMAGE_TAG_NEXT: '下一页标签',
+  WORKLOAD_IMAGE_SEARCH_FAILED: '镜像搜索失败，请重试；仍可手动填写镜像。',
+  WORKLOAD_IMAGE_LOOKUP_FAILED: '无法读取镜像标签或详情，请重试；已填写的镜像将保留。',
+  WORKLOAD_IMAGE_REGISTRY_FAILED:
+    '无法读取所选镜像仓库信息，请检查权限；仍可手动填写完整镜像地址。',
+  WORKLOAD_IMAGE_SIZE: '镜像大小（字节）',
+  WORKLOAD_IMAGE_LAYERS: '镜像层数',
   WORKLOAD_SETTINGS_INVALID:
     '更新策略、数量或时间设置无效。请填写非负整数或有效百分比；滚动更新的不可用数量与新增数量不能同时为零。',
   WORKLOAD_TERMINATION_GRACE_PERIOD: '容器组优雅终止',

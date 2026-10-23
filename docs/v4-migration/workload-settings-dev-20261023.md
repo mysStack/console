@@ -415,3 +415,21 @@ TDD：新键名 Hook 0/2、作用域新增 1 项失败、key 下拉交互新增�
 模块保持 DEV。上述本地结果不替代当前 SHA 部署后的实际 key 选择、网络失败、真实权限、namespace 和缓存验收；镜像选择完整交互及三类完整 VERIFY 仍待完成。PR #2 保持 Draft，不合并。
 
 本次 `corepack yarn build:packages` 退出 0，shared 633/633；七个变更源码/测试文件格式检查及差异检查通过。TypeScript 基线/当前同为 1326 项；全文对照有两条原有 6059/6307 诊断被替换，逐行核对只是导入说明增加本次新 Hook，一致的 rootDir/文件清单主错误未变化。没有新的主诊断或变更文件直接诊断，但全项目类型检查仍未通过。131 旧镜像的只读 Playwright 配置探测返回 `globals.config.enableImageSearch=true`，不能把镜像搜索按未启用功能豁免；此探测不算本增量 UI 验收。
+
+## 当前制品镜像搜索与选择（2026-10-24，DEV 增量）
+
+基于 `38536e40dd656b8a8f0552584095c4adab68ee9e`，本轮在登记的 `feature/v4-workloads` / `console-workloads` 执行 DEV start，远程同 SHA，PR #2 仍为 Open/Draft，目标 `feature/v4-migration`；其他 Worktree、历史和未跟踪产物保留。
+
+定向核对当前 Bundle `1.9ca3a76d71946712055c.js` 的 1040、2265、2266 三个工厂，来源、UTF-16 偏移和哈希见 [提取记录](./evidence/workload-image-provenance-20261024.json)，可用 `node docs/v4-migration/evidence/workload-image-extract.cjs <尚不存在的绝对目录>` 重建。REA 成功分析了三个派生工厂，零解析错误，但语义图为 unknown/2167 项未知；不把静态结果当成运行时通过。见 [REA 摘要](./evidence/workload-image-rea-20261024.json)。首次以不受支持的 `path` 参数调用返回 schema 错误，改为实际 `input_path` 后成功，原始错误保留在摘要。
+
+已确认版本差异：旧 `release-3.4` 的 DockerHub/Harbor 代理方法不是当前制品的方法。当前 1040 工厂使用 namespaced `images`、`repositorytags` 和 `imageconfig`；2266 通过 `q`、Secret 名称搜索，读取 `entries`；2265 提供标签分页、镜像详情及 x509 显式忽略重试。131 直接 V3 页面实际打开“编辑设置 → 容器 → 编辑容器 → 镜像搜索”，搜索 nginx 观察到 `GET /clusters/host/kapis/resources.kubesphere.io/v1alpha3/namespaces/v4-migration-e2e/images?q=nginx`，25 秒内未返回；随后取消编辑，没有保存资源。此前浏览器 API 探测也在 20 秒超时，因此搜索正向环境结果尚未闭环，不能用静态分析替代。
+
+实现为本模块内 V4 React / Kubed / React Query 组件，无新依赖，不修改公共 Store 或服务端。保留手动完整镜像地址和凭据选择，启用搜索时增加搜索结果选择、仓库前缀、标签分页/选择、创建时间/端口/仓库/大小/层数详情、加载/空态/错误及重试。只有用户明确点击才发送 `insecure=true`，更换镜像恢复默认；失败不清空镜像或误报成功。查询 key 包含用户、cluster、namespace、Secret 和查询对象；切换作用域/凭据重新挂载选择器，尚未确认的新输入不显示旧镜像详情。
+
+只读取选中仓库 Secret 的 `.dockerconfigjson` 以提取主机名，不调用 Secret mapper，返回和缓存不保留 auth、用户名、密码或原始 Secret。该原始编码数据会经过网络；这是本增量新增的明确读取边界，先前只取元数据名称的历史记录不改写。搜索和详情 API 只传 Secret 名称，原始后台错误不直接回显。损坏仓库配置显示错误，手动输入继续可用。
+
+TDD：接口初始 0/7、组件 0/4、四语言新增用例失败；实现后通过。补充异常回归先复现同词无法重试和损坏仓库静默禁用，各新增一项失败后修复。最终完整 `./scripts/test.sh` 为 89 文件/400 项通过、0 失败；接口 8 项、控件 5 项和四语言共用例，原有生命周期、环境引用、三类设置与配置引用回归均保留。变更生产文件 ESLint 退出 0、无告警；Impeccable detect 返回空数组。
+
+TypeScript 基线/当前均 1326 条。不是只比较数量：全文差异只有原有 SettingsLayout 的 6059/6307 两条诊断各增加一行本次 `workloadImages.ts` 导入路径，主错误一致、没有删除说明；变更文件直接诊断为零。全项目 TypeScript 检查仍未通过。构建和制品/部署结果以本增量结构化记录为准；本段本地测试不代表三类资源最终验收。
+
+本增量最终 `corepack yarn build:packages` 退出 0，shared 633/633，用时 189.80 秒；`build:locales` 退出 0。源文件与上述检查绑定见 [本地结构化记录](./evidence/workload-image-local-20261024.json)。下一步先提交代码，再按 DEV 交付记录转入当前代码 VERIFY；镜像搜索环境超时和三类新制品浏览器验收继续作为未完成项。

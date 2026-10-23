@@ -17,6 +17,7 @@ import {
 } from './deployment';
 import SecurityContextInput from './SecurityContextInput';
 import useWorkloadEnvironmentKeys from './useWorkloadEnvironmentKeys';
+import WorkloadImageInput from './WorkloadImageInput';
 
 export interface WorkloadResourceOptions {
   context?: { cluster: string; namespace: string };
@@ -595,16 +596,17 @@ export default function ContainerInput({
           onChange={pullSecret => update({ pullSecret: String(pullSecret || '') })}
         />
       </ContainerField>
-      <ContainerField>
-        <span>{t('CONTAINER_IMAGE')}</span>
-        <Input
-          style={{ width: '100%', maxWidth: 'none' }}
-          aria-label={t('CONTAINER_IMAGE')}
-          value={value.image || ''}
-          placeholder="nginx:alpine"
-          onChange={event => update({ image: event.target.value })}
-        />
-      </ContainerField>
+      <WorkloadImageInput
+        key={[
+          resourceOptions.context?.cluster,
+          resourceOptions.context?.namespace,
+          value.pullSecret || '',
+        ].join('/')}
+        value={value.image || ''}
+        secret={value.pullSecret || ''}
+        scope={resourceOptions.context}
+        onChange={image => update({ image })}
+      />
       <ContainerField>
         <span>{t('IMAGE_PULL_POLICY')}</span>
         <Select

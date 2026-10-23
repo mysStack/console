@@ -4,6 +4,18 @@
  */
 
 module.exports = {
+  WORKLOAD_IMAGE_RETRY: '重試映像查詢',
+  WORKLOAD_IMAGE_SEARCH: '搜尋映像',
+  WORKLOAD_IMAGE_SEARCH_SUBMIT: '搜尋映像倉庫',
+  WORKLOAD_IMAGE_RESULTS: '映像搜尋結果',
+  WORKLOAD_IMAGE_TAG_PREVIOUS: '上一頁標籤',
+  WORKLOAD_IMAGE_TAG_NEXT: '下一頁標籤',
+  WORKLOAD_IMAGE_SEARCH_FAILED: '映像搜尋失敗，請重試；仍可手動填寫映像。',
+  WORKLOAD_IMAGE_LOOKUP_FAILED: '無法讀取映像標籤或詳情，請重試；已填寫的映像將保留。',
+  WORKLOAD_IMAGE_REGISTRY_FAILED:
+    '無法讀取所選映像倉庫資訊，請檢查權限；仍可手動填寫完整映像位址。',
+  WORKLOAD_IMAGE_SIZE: '映像大小（位元組）',
+  WORKLOAD_IMAGE_LAYERS: '映像層數',
   WORKLOAD_SETTINGS_INVALID:
     '更新策略、數量或時間設定無效。請填寫非負整數或有效百分比；不可用數量與新增數量不能同時為零。',
   WORKLOAD_TERMINATION_GRACE_PERIOD: '容器組優雅終止',

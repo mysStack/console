@@ -1,0 +1,33 @@
+{
+  "sourceCommit": "38536e40dd656b8a8f0552584095c4adab68ee9e",
+  "artifactTree": "1e499d92e11374e26c76f5e13be45251602bd596",
+  "bundle": "packages/bootstrap/assets/v3dist/1.9ca3a76d71946712055c.js",
+  "bundleSha256": "924556b7889c21dbd450535163cdd63e5a6c92daad2cbdc3ec8514a005d765a3",
+  "method": "Babel inert webpack extraction; UTF-16 character ranges; no target execution",
+  "factories": [
+    {
+      "id": 1040,
+      "start": 499730,
+      "end": 508388,
+      "sha256": "558501e6a4117bbb0104d922cd19986cab9d98b46188611f7a541eb542791050",
+      "analysisFile": "webpack-1040.js",
+      "analysisSha256": "c0273ecd542e7467fd5328d9c56e308b9a1bbc51b8b1a56b2a44aa01171053dc"
+    },
+    {
+      "id": 2265,
+      "start": 1910323,
+      "end": 1920971,
+      "sha256": "3caeb64ff522a1c409891811f9ccca5d61ad424d66eb0508693cfd3e34cc78c8",
+      "analysisFile": "webpack-2265.js",
+      "analysisSha256": "59633b49b7039dd74015c1b404bf40e91e5d3d49ec5b468e96c8ecddd3cbec65"
+    },
+    {
+      "id": 2266,
+      "start": 1920972,
+      "end": 1932480,
+      "sha256": "32fe40475ead77bf0fd06bdfe3d9a39e9cc155631bc7b48d91b760cf8b6eadaa",
+      "analysisFile": "webpack-2266.js",
+      "analysisSha256": "90db7e465c9a886c49979ad25c8769d19b9c3bd4de96a2b63877676d975d702b"
+    }
+  ]
+}
