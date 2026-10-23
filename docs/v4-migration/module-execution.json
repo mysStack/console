@@ -4,7 +4,7 @@
   "capability": "deployment-statefulset-daemonset",
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
-  "phase": "VERIFY",
+  "phase": "DEV",
   "rea": {
     "status": "已通过",
     "sourceCommit": "e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0",
@@ -224,8 +224,8 @@
     }
   },
   "dev": {
-    "status": "已完成",
-    "reason": "三类原生入口、列表、详情、创建、设置、Action/Store 与配置引用替代已完成代码交付；回滚必填和 StatefulSet 双资源创建补偿已闭环；当前 SHA 的真实持久化、RBAC、namespace、缓存和浏览器等价性转入 VERIFY",
+    "status": "进行中",
+    "reason": "VERIFY 浏览器/API 删除验收发现原生 StatefulSet 删除后遗留配套 Headless Service，已按状态机回退 DEV 修复；既有 DEV 交付保留为历史输入，完成修复与本地回归后重新进入 VERIFY。",
     "sourceCommit": "0a44f5706d1a6ba9b266360caa2d4128d8bb08a2",
     "documents": [
       {
@@ -477,8 +477,8 @@
     "WL-04：移除普通 Workload 配置引用的 useV3action、Wujie Shadow DOM 和 V3 编辑器桥接"
   ],
   "verify": {
-    "status": "进行中",
-    "reason": "等待精确 DEV 源提交镜像构建、131 rollout、Pod imageID 核验及三类资源 Playwright/API/RBAC/namespace/缓存与等价性验证",
+    "status": "待重新执行",
+    "reason": "精确 SHA cc3b04c2a3408538e45bdd81c7e804413e527f2f 的构建、部署及三类资源浏览器流程已执行，但 StatefulSet 删除后 Headless Service 遗留；缺陷关闭并部署新 SHA 前不得标记通过。",
     "sourceCommit": "0a44f5706d1a6ba9b266360caa2d4128d8bb08a2",
     "documents": []
   }
