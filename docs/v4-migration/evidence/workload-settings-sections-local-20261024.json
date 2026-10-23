@@ -1,0 +1,96 @@
+{
+  "baseCommit": "b84c265902be90358a18deea320a29c9aa16b4c6",
+  "sourceIdentity": "本地增量文件摘要与包含本证据的 Git 提交绑定；不是部署或浏览器完成证据",
+  "sourceFiles": [
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/ContainerSettingsInput.tsx",
+      "sha256": "dc17e9c7ef4ee06ef6950b14ce7e0531063e02826db3a3a0df91d090615da6b2"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/ContainerSettingsInput.test.ts",
+      "sha256": "8a803a41dc2b1dd7d8917ce0e280695c82ff5dbfee13a83063e6c6bbf2f466cb"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/WorkloadSettingsModal.tsx",
+      "sha256": "e33c74108bdc7bda95fe65b5c732ad72b4596d887adf5aee8eade039d2d25d47"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/WorkloadSettingsModal.test.ts",
+      "sha256": "2f814edc4bef911887f3eec5d45fed9e04d8057c257d8c7b755e4bfb63154af9"
+    }
+  ],
+  "scope": ["Deployment", "StatefulSet", "DaemonSet"],
+  "tdd": {
+    "containerEditor": {
+      "red": 2,
+      "green": 2
+    },
+    "sections": {
+      "red": 2,
+      "green": 2
+    },
+    "behaviors": [
+      "取消丢弃容器草稿，重新打开回填外层原值",
+      "确认前校验容器，合法后才回写外层；外层确认调用原保存链",
+      "未知字段及原名保留",
+      "StatefulSet PVC 模板卷名可挂载",
+      "三类设置字段保持挂载，DaemonSet 不显示普通调度",
+      "侧栏只滚动弹窗分区，不改变路由"
+    ]
+  },
+  "checks": [
+    {
+      "command": "./scripts/test.sh",
+      "exitCode": 0,
+      "files": 84,
+      "passed": 375,
+      "failed": 0
+    },
+    {
+      "command": "corepack yarn eslint packages/console/src/pages/projects/components/WorkloadCreateModal/ContainerSettingsInput.tsx packages/console/src/pages/projects/components/WorkloadCreateModal/WorkloadSettingsModal.tsx",
+      "exitCode": 0
+    },
+    {
+      "command": "corepack yarn prettier --check packages/console/src/pages/projects/components/WorkloadCreateModal/ContainerSettingsInput.tsx packages/console/src/pages/projects/components/WorkloadCreateModal/ContainerSettingsInput.test.ts packages/console/src/pages/projects/components/WorkloadCreateModal/WorkloadSettingsModal.tsx packages/console/src/pages/projects/components/WorkloadCreateModal/WorkloadSettingsModal.test.ts",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0
+    },
+    {
+      "command": "impeccable detect --json packages/console/src/pages/projects/components/WorkloadCreateModal/ContainerSettingsInput.tsx packages/console/src/pages/projects/components/WorkloadCreateModal/WorkloadSettingsModal.tsx",
+      "exitCode": 0,
+      "findings": []
+    },
+    {
+      "command": "corepack yarn build:packages",
+      "exitCode": 0,
+      "sharedMinified": 633
+    }
+  ],
+  "typecheck": {
+    "configuration": "packages/console/tsconfig.json",
+    "method": "TypeScript compiler host 分别读取同一 HEAD 基线和工作区，按文件/编号/消息比较诊断多重集合",
+    "baselineDiagnostics": 1326,
+    "currentDiagnostics": 1326,
+    "introduced": [],
+    "changedFileErrors": [],
+    "fullTypecheckPassed": false
+  },
+  "environment": {
+    "deployedThisIncrement": false,
+    "ciRun": null,
+    "image": null,
+    "digest": null,
+    "podImageID": null,
+    "playwrightOnThisIncrement": "未执行"
+  },
+  "remaining": [
+    "新界面滚动布局及嵌套弹窗焦点/关闭的实际浏览器验收",
+    "当前 SHA 部署后的三类保存、刷新及 API 持久化",
+    "环境变量引用完整编辑",
+    "配置引用低权限控件",
+    "镜像选择完整交互等价"
+  ]
+}

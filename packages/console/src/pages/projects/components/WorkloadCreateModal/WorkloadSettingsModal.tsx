@@ -3,10 +3,19 @@
  * https://github.com/kubesphere/console/blob/master/LICENSE
  */
 
-import React from 'react';
-import { Form, FormItem, Input, InputNumber, Modal, useForm, useWatch } from '@kubed/components';
+import React, { useRef, useState } from 'react';
+import {
+  Button,
+  Form,
+  FormItem,
+  Input,
+  InputNumber,
+  Modal,
+  useForm,
+  useWatch,
+} from '@kubed/components';
 import { ArrayInput, PropertiesInput } from '@ks-console/shared';
-import ContainerInput from './ContainerInput';
+import ContainerSettingsInput from './ContainerSettingsInput';
 import VolumeInput from './VolumeInput';
 import PersistentVolumeClaimTemplateInput from './PersistentVolumeClaimTemplateInput';
 import WorkloadUpdateStrategyInput from './WorkloadUpdateStrategyInput';
@@ -50,6 +59,16 @@ export default function WorkloadSettingsModal({
 }: Props) {
   const [form] = useForm<WorkloadSettingsValues>();
   const kind: WorkloadKind = resource.kind || 'Deployment';
+  const sections = [
+    { id: 'updateStrategy', label: 'UPDATE_STRATEGY' },
+    { id: 'podTemplate', label: 'POD_SETTINGS' },
+    { id: 'volumeSettings', label: 'STORAGE_SETTINGS' },
+    ...(kind !== 'DaemonSet' ? [{ id: 'podMode', label: 'POD_SCHEDULING_RULES' }] : []),
+    { id: 'metadata', label: 'ADD_METADATA' },
+  ];
+  const [activeSection, setActiveSection] = useState('updateStrategy');
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+
   const volumes = useWatch('volumes', form);
   const volumeClaimTemplates = useWatch('volumeClaimTemplates', form);
   const resources = useWorkloadResourceOptions(cluster, namespace);
@@ -125,178 +144,235 @@ export default function WorkloadSettingsModal({
       confirmLoading={confirmLoading}
       onOk={submit}
       onCancel={onCancel}
-      bodyStyle={{ padding: 20, maxHeight: '72vh', overflowY: 'auto' }}
+      bodyStyle={{ padding: 20 }}
     >
-      <Form form={form} initialValues={initialValues}>
-        {!!saveError && (
-          <div
-            role="alert"
-            style={{
-              position: 'sticky',
-              top: 0,
-              zIndex: 1,
-              background: '#fff',
-              color: '#ca2621',
-              padding: 12,
-              marginBottom: 16,
-            }}
-          >
-            {t(
-              (saveError as { response?: { status?: number } }).response?.status === 409
-                ? 'WORKLOAD_SETTINGS_CONFLICT'
-                : 'WORKLOAD_SETTINGS_SAVE_FAILED',
-            )}
-          </div>
-        )}
-        <FormItem name="name" label={t('NAME')}>
-          <Input disabled />
-        </FormItem>
-        <FormItem name="namespace" label={t('PROJECT')}>
-          <Input disabled />
-        </FormItem>
-        {kind !== 'DaemonSet' && (
-          <FormItem
-            name="replicas"
-            label={t('REPLICAS')}
-            rules={[{ required: true }, { validator: validateSettings }]}
-          >
-            <InputNumber min={0} precision={0} />
-          </FormItem>
-        )}
-
-        <h3>{t('UPDATE_STRATEGY')}</h3>
-        <FormItem name="updateStrategy" rules={[{ validator: validateSettings }]}>
-          <WorkloadUpdateStrategyInput kind={kind} />
-        </FormItem>
-        {kind === 'DaemonSet' && (
-          <FormItem
-            name="minReadySeconds"
-            label={t('MIN_READY_SECONDS')}
-            rules={[{ required: true }, { validator: validateSettings }]}
-          >
-            <InputNumber min={0} precision={0} />
-          </FormItem>
-        )}
-
-        <h3>{t('POD_SETTINGS')}</h3>
-        <FormItem name="podSecurityContext" rules={[{ validator: validateSettings }]}>
-          <SecurityContextInput kind="pod" />
-        </FormItem>
-        {kind !== 'DaemonSet' && (
-          <>
-            <h3>{t('POD_SCHEDULING_RULES')}</h3>
-            {workloadTargets.isLoading && <div role="status">{t('LOADING')}</div>}
-            {workloadTargets.isError && (
-              <div role="alert">{t('WORKLOAD_TARGET_OPTIONS_FAILED')}</div>
-            )}
-            <FormItem name="podScheduling" rules={[{ validator: validateSettings }]}>
-              <PodSchedulingInput targets={workloadTargets.options} />
-            </FormItem>
-          </>
-        )}
-        <FormItem
-          name="containers"
-          label={t('CONTAINERS')}
-          dependencies={['initContainers', 'volumes']}
-          rules={[{ validator: validateContainerFields }]}
-        >
-          <ArrayInput
-            itemType="object"
-            addText={t('WORKLOAD_ADD_CONTAINER')}
-            checkItemValid={() => true}
-          >
-            <ContainerInput
-              kind="CONTAINER"
-              resourceOptions={resources.options}
-              volumeNames={volumeNames}
-            />
-          </ArrayInput>
-        </FormItem>
-        <FormItem
-          name="initContainers"
-          label={t('INIT_CONTAINER')}
-          dependencies={['containers', 'volumes']}
-          rules={[{ validator: validateContainerFields }]}
-        >
-          <ArrayInput
-            itemType="object"
-            addText={t('WORKLOAD_ADD_INIT_CONTAINER')}
-            checkItemValid={() => true}
-          >
-            <ContainerInput
-              kind="INIT_CONTAINER"
-              resourceOptions={resources.options}
-              volumeNames={volumeNames}
-            />
-          </ArrayInput>
-        </FormItem>
-
-        <h3>{t('STORAGE_SETTINGS')}</h3>
-        {resources.isLoading && <div role="status">{t('LOADING')}</div>}
-        {resources.isError && <div role="alert">{t('WORKLOAD_RESOURCE_OPTIONS_FAILED')}</div>}
-        <FormItem
-          name="volumes"
-          label={t('VOLUME_PL')}
-          dependencies={['containers', 'initContainers']}
-          rules={[{ validator: validateVolumeFields }]}
-        >
-          <ArrayInput
-            itemType="object"
-            addText={t('WORKLOAD_ADD_VOLUME')}
-            checkItemValid={() => true}
-          >
-            <VolumeInput resourceOptions={resources.options} />
-          </ArrayInput>
-        </FormItem>
-        {kind === 'StatefulSet' && (
-          <FormItem
-            name="volumeClaimTemplates"
-            label={t('PERSISTENT_VOLUME_CLAIM_TEMPLATE_PL')}
-            rules={[{ validator: validateVolumeClaimTemplateFields }]}
-          >
-            <ArrayInput
-              itemType="object"
-              addText={t('WORKLOAD_ADD_VOLUME_CLAIM_TEMPLATE')}
-              checkItemValid={(
-                item: NonNullable<WorkloadSettingsValues['volumeClaimTemplates']>[number],
-              ) => Boolean(item?.name && item?.storage && item?.accessModes?.length)}
+      <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
+        <nav aria-label={t('EDIT_SETTINGS')} style={{ width: 160, flexShrink: 0 }}>
+          {sections.map(section => (
+            <Button
+              key={section.id}
+              variant="text"
+              aria-current={activeSection === section.id ? 'location' : undefined}
+              style={{
+                display: 'block',
+                width: '100%',
+                textAlign: 'left',
+                marginBottom: 8,
+                fontWeight: activeSection === section.id ? 600 : 400,
+              }}
+              onClick={() => {
+                setActiveSection(section.id);
+                sectionRefs.current[section.id]?.scrollIntoView({ block: 'start' });
+              }}
             >
-              <PersistentVolumeClaimTemplateInput />
-            </ArrayInput>
-          </FormItem>
-        )}
-        <h3>{t('WORKLOAD_TERMINATION_GRACE_PERIOD')}</h3>
-        <FormItem
-          name="terminationGracePeriodSeconds"
-          label={t('WORKLOAD_TERMINATION_GRACE_SECONDS')}
-          rules={[{ required: true }, { validator: validateSettings }]}
-        >
-          <InputNumber min={0} precision={0} />
-        </FormItem>
-        <h3>{t('ADD_METADATA')}</h3>
-        <FormItem
-          name="workloadLabels"
-          label={t('LABEL_PL')}
-          rules={[{ validator: validateSettings }]}
-        >
-          <PropertiesInput hiddenKeys={['app']} addText={t('ADD')} />
-        </FormItem>
-        <FormItem
-          name="workloadAnnotations"
-          label={t('ANNOTATION_PL')}
-          rules={[{ validator: validateSettings }]}
-        >
-          <PodAnnotationsInput />
-        </FormItem>
-        <h3>{t('POD_TEMPLATE_METADATA')}</h3>
-        <FormItem
-          name="podAnnotations"
-          label={t('ANNOTATION_PL')}
-          rules={[{ validator: validateSettings }]}
-        >
-          <PodAnnotationsInput />
-        </FormItem>
-      </Form>
+              {t(section.label)}
+            </Button>
+          ))}
+        </nav>
+        <div style={{ flex: 1, minWidth: 0, maxHeight: '68vh', overflowY: 'auto' }}>
+          <Form form={form} initialValues={initialValues}>
+            {!!saveError && (
+              <div
+                role="alert"
+                style={{
+                  position: 'sticky',
+                  top: 0,
+                  zIndex: 1,
+                  background: '#fff',
+                  color: '#ca2621',
+                  padding: 12,
+                  marginBottom: 16,
+                }}
+              >
+                {t(
+                  (saveError as { response?: { status?: number } }).response?.status === 409
+                    ? 'WORKLOAD_SETTINGS_CONFLICT'
+                    : 'WORKLOAD_SETTINGS_SAVE_FAILED',
+                )}
+              </div>
+            )}
+            <FormItem name="name" label={t('NAME')}>
+              <Input disabled />
+            </FormItem>
+            <FormItem name="namespace" label={t('PROJECT')}>
+              <Input disabled />
+            </FormItem>
+            {kind !== 'DaemonSet' && (
+              <FormItem
+                name="replicas"
+                label={t('REPLICAS')}
+                rules={[{ required: true }, { validator: validateSettings }]}
+              >
+                <InputNumber min={0} precision={0} />
+              </FormItem>
+            )}
+
+            <section
+              aria-label={t('UPDATE_STRATEGY')}
+              ref={node => {
+                sectionRefs.current.updateStrategy = node;
+              }}
+            >
+              <h3>{t('UPDATE_STRATEGY')}</h3>
+              <FormItem name="updateStrategy" rules={[{ validator: validateSettings }]}>
+                <WorkloadUpdateStrategyInput kind={kind} />
+              </FormItem>
+              {kind === 'DaemonSet' && (
+                <FormItem
+                  name="minReadySeconds"
+                  label={t('MIN_READY_SECONDS')}
+                  rules={[{ required: true }, { validator: validateSettings }]}
+                >
+                  <InputNumber min={0} precision={0} />
+                </FormItem>
+              )}
+            </section>
+            <section
+              aria-label={t('POD_SETTINGS')}
+              ref={node => {
+                sectionRefs.current.podTemplate = node;
+              }}
+            >
+              <h3>{t('POD_SETTINGS')}</h3>
+              <FormItem name="podSecurityContext" rules={[{ validator: validateSettings }]}>
+                <SecurityContextInput kind="pod" />
+              </FormItem>
+              <FormItem
+                name="containers"
+                label={t('CONTAINERS')}
+                dependencies={['initContainers', 'volumes']}
+                rules={[{ validator: validateContainerFields }]}
+              >
+                <ArrayInput
+                  itemType="object"
+                  addText={t('WORKLOAD_ADD_CONTAINER')}
+                  checkItemValid={() => true}
+                >
+                  <ContainerSettingsInput
+                    kind="CONTAINER"
+                    resourceOptions={resources.options}
+                    volumeNames={volumeNames}
+                  />
+                </ArrayInput>
+              </FormItem>
+              <FormItem
+                name="initContainers"
+                label={t('INIT_CONTAINER')}
+                dependencies={['containers', 'volumes']}
+                rules={[{ validator: validateContainerFields }]}
+              >
+                <ArrayInput
+                  itemType="object"
+                  addText={t('WORKLOAD_ADD_INIT_CONTAINER')}
+                  checkItemValid={() => true}
+                >
+                  <ContainerSettingsInput
+                    kind="INIT_CONTAINER"
+                    resourceOptions={resources.options}
+                    volumeNames={volumeNames}
+                  />
+                </ArrayInput>
+              </FormItem>
+            </section>
+            <section
+              aria-label={t('STORAGE_SETTINGS')}
+              ref={node => {
+                sectionRefs.current.volumeSettings = node;
+              }}
+            >
+              <h3>{t('STORAGE_SETTINGS')}</h3>
+              {resources.isLoading && <div role="status">{t('LOADING')}</div>}
+              {resources.isError && <div role="alert">{t('WORKLOAD_RESOURCE_OPTIONS_FAILED')}</div>}
+              <FormItem
+                name="volumes"
+                label={t('VOLUME_PL')}
+                dependencies={['containers', 'initContainers']}
+                rules={[{ validator: validateVolumeFields }]}
+              >
+                <ArrayInput
+                  itemType="object"
+                  addText={t('WORKLOAD_ADD_VOLUME')}
+                  checkItemValid={() => true}
+                >
+                  <VolumeInput resourceOptions={resources.options} />
+                </ArrayInput>
+              </FormItem>
+              {kind === 'StatefulSet' && (
+                <FormItem
+                  name="volumeClaimTemplates"
+                  label={t('PERSISTENT_VOLUME_CLAIM_TEMPLATE_PL')}
+                  rules={[{ validator: validateVolumeClaimTemplateFields }]}
+                >
+                  <ArrayInput
+                    itemType="object"
+                    addText={t('WORKLOAD_ADD_VOLUME_CLAIM_TEMPLATE')}
+                    checkItemValid={(
+                      item: NonNullable<WorkloadSettingsValues['volumeClaimTemplates']>[number],
+                    ) => Boolean(item?.name && item?.storage && item?.accessModes?.length)}
+                  >
+                    <PersistentVolumeClaimTemplateInput />
+                  </ArrayInput>
+                </FormItem>
+              )}
+            </section>
+            {kind !== 'DaemonSet' && (
+              <section
+                aria-label={t('POD_SCHEDULING_RULES')}
+                ref={node => {
+                  sectionRefs.current.podMode = node;
+                }}
+              >
+                <h3>{t('POD_SCHEDULING_RULES')}</h3>
+                {workloadTargets.isLoading && <div role="status">{t('LOADING')}</div>}
+                {workloadTargets.isError && (
+                  <div role="alert">{t('WORKLOAD_TARGET_OPTIONS_FAILED')}</div>
+                )}
+                <FormItem name="podScheduling" rules={[{ validator: validateSettings }]}>
+                  <PodSchedulingInput targets={workloadTargets.options} />
+                </FormItem>
+              </section>
+            )}
+            <section
+              aria-label={t('ADD_METADATA')}
+              ref={node => {
+                sectionRefs.current.metadata = node;
+              }}
+            >
+              <h3>{t('WORKLOAD_TERMINATION_GRACE_PERIOD')}</h3>
+              <FormItem
+                name="terminationGracePeriodSeconds"
+                label={t('WORKLOAD_TERMINATION_GRACE_SECONDS')}
+                rules={[{ required: true }, { validator: validateSettings }]}
+              >
+                <InputNumber min={0} precision={0} />
+              </FormItem>
+              <h3>{t('ADD_METADATA')}</h3>
+              <FormItem
+                name="workloadLabels"
+                label={t('LABEL_PL')}
+                rules={[{ validator: validateSettings }]}
+              >
+                <PropertiesInput hiddenKeys={['app']} addText={t('ADD')} />
+              </FormItem>
+              <FormItem
+                name="workloadAnnotations"
+                label={t('ANNOTATION_PL')}
+                rules={[{ validator: validateSettings }]}
+              >
+                <PodAnnotationsInput />
+              </FormItem>
+              <h3>{t('POD_TEMPLATE_METADATA')}</h3>
+              <FormItem
+                name="podAnnotations"
+                label={t('ANNOTATION_PL')}
+                rules={[{ validator: validateSettings }]}
+              >
+                <PodAnnotationsInput />
+              </FormItem>
+            </section>
+          </Form>
+        </div>
+      </div>
     </Modal>
   );
 }

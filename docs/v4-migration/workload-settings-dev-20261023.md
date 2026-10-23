@@ -363,3 +363,15 @@ DaemonSet 的旧 V3 UI 快照没有调度分区，因此当前 V4 不为它虚�
 测试先行：最初 2 项能力测试失败（缺少 pullSecret/applicationProtocol）；无操作保持和转换后端口重名另有 2 项失败，修复后定向构造测试 70/70、组件交互 3/3、资源选项 1/1。最终 `./scripts/test.sh` 为 82 文件/371 项通过，0 失败；`corepack yarn build:packages` 退出 0，四个包构建完成，shared 压缩 633/633。变更生产文件 ESLint、变更文件 Prettier 与 `git diff --check` 通过。使用相同 TypeScript 配置和 compiler host 读取 HEAD 基线/当前工作区，诊断为 1326→1326，新增诊断与变更文件直接诊断均为 0；全项目 TypeScript 仍未通过。结构化证据见 [本地验证](./evidence/workload-container-settings-local-20261024.json)。
 
 当前保持 DEV，尚未构建/部署本增量的 Console 镜像；原有 `ef3b4f1a8` 镜像不能证明本次修改通过。DS-01 分区/容器二级编辑、DS-07/08 环境变量引用及低权限配置引用控件等仍为后续任务，不声明设置整体等价。PR #2 保持 Draft。
+
+## 设置分区与容器二级编辑（2026-10-24，DEV 增量）
+
+基于 `b84c265902be90358a18deea320a29c9aa16b4c6`，在登记的 Workload 分支继续处理 DS-01；开工前 DEV start 身份/阶段检查已通过。当前 V3 侧栏与二级容器编辑的直接证据沿用前述当前制品/真实页面，不以旧源码决定 UI。变更仅影响三类资源共用的 `WorkloadSettingsModal`，不改变创建页的容器交互或公共基础组件。
+
+- 设置侧栏按更新策略、容器组、存储、调度、元数据组织，使用弹窗内 refs 滚动，不写浏览器 hash/路由。全部字段保留挂载，切换导航不丢弃表单值。DaemonSet 不显示普通调度分区；StatefulSet 保留 PVC 模板。
+- 容器及初始化容器使用原生摘要和二级编辑弹窗，复用现有 `ContainerInput` 全部控件。编辑草稿深拷贝；取消不回写，重新打开读取外层原值；局部确认先校验容器，再写外层草稿，只有外层确认才调用既有保存链。未知字段及 originalName 保留。
+- 二级校验识别 StatefulSet 卷模板名，外层仍负责跨容器名称和完整卷关联校验，没有增加新 API 或 V3/Wujie 依赖。
+
+TDD 首次两个编辑器用例因缺少组件失败，另两个设置用例因缺少侧栏/二级入口失败；实现后四项通过。完整 `./scripts/test.sh`：84 文件、375 项通过、0 失败。变更生产文件 ESLint、四个源码/测试文件 Prettier、`git diff --check` 通过；UI detector 未返回静态问题。TypeScript compiler host 对照基线/当前同为 1326 项诊断，新诊断 0，变更文件直接诊断 0；全项目 TypeScript 未通过。
+
+`corepack yarn build:packages` 退出 0，四个包构建完成，shared 压缩 633/633。本地构建与文件摘要见 [本增量证据](./evidence/workload-settings-sections-local-20261024.json)。本增量仍为 DEV，尚无对应 CI 镜像、digest、131 rollout、Pod imageID 或新界面的 Playwright 验收。滚动布局、嵌套弹窗焦点/关闭、刷新/API 持久化仍需部署后验证。DS-07/08 环境引用、配置引用低权限控件及镜像选择完整交互仍未闭环，三类资源均不标记已验收。PR #2 保持 Draft。

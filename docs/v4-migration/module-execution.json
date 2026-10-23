@@ -16,7 +16,7 @@
       },
       {
         "path": "docs/v4-migration/deployment-settings-capability-matrix.md",
-        "sha256": "5f1668fd7287c50297f0aa4edab230614e94ab0f8dceed2d12b5d2caa6ae4e8f"
+        "sha256": "45d5ddb7501bf40a01b2ecdedddd6a3f6b8bcd278f24a06d7713b5216a70d196"
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "d8f041176b5013048b3ac7d3b4b4ef6f903202084deb836f49674180cb864341"
+        "sha256": "1f554093f954110c40189794eb01cf8ee47a76007f6077e0b91c98e3f7c41357"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "74ff363d13b3df0f0cd10e477f68c834d14545338a3d00517d3cf61bd3416dcc"
+        "sha256": "2fb2c2c61599a8612bc13325f6d587c5b2b5f10d83bfc4188911a2f9f2981c13"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -225,12 +225,12 @@
   },
   "dev": {
     "status": "进行中",
-    "reason": "2026-10-24 编辑设置等价纠偏：已补镜像凭据元数据选择/GPU/应用层协议及回归；仍需完成设置分区、变量引用和低权限配置引用缺陷。保持 DEV，尚无本增量镜像部署或浏览器验收。",
+    "reason": "2026-10-24 编辑设置等价纠偏：已补镜像凭据/GPU/协议、设置分区与容器二级编辑及本地回归；仍需变量引用与配置引用低权限修复。保持 DEV，本增量尚无部署或浏览器验收。",
     "sourceCommit": "f6b7c689b55b1561d474dcb6dc056a39e2166e51",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
-        "sha256": "b741c5c961697716ccdcc2a14ed5a36ce7d1c111712a52ea85a2d0a9b7a10f85"
+        "sha256": "7409d7e24aba9dd98db3bc9375ad2ea0b520e5fc7996b017ca3973126847618a"
       },
       {
         "path": "docs/v4-migration/evidence/workload-lifecycle-20261023-api-validation.json",
@@ -467,6 +467,10 @@
       {
         "path": "docs/v4-migration/workload-dev-completion-20261023.md",
         "sha256": "30af7713d831f3d494e114027d4aad4ac8d5da4d3ee06252fb47702773f924b0"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-settings-sections-local-20261024.json",
+        "sha256": "bce5b8034c42f077394e35b044ab3ebbff0b8864d2f564ec2a53aa112f55d214"
       }
     ]
   },
@@ -478,7 +482,7 @@
   ],
   "verify": {
     "status": "未完成",
-    "reason": "精确镜像 ef3b4f1a8 专项测试保留；当前 V4 为单页长表单，尚未证明当前 V3 分区、容器二级编辑及镜像选择/认证等价。退回 DEV，不以保存成功证明编辑设置完整或版本对齐。",
+    "reason": "精确镜像 ef3b4f1a8 历史专项证据保留；新代码设置分区和容器编辑尚未部署验收，变量引用与配置引用权限等仍未闭环。保持 DEV，不以历史保存成功证明当前能力等价。",
     "sourceCommit": "f6b7c689b55b1561d474dcb6dc056a39e2166e51",
     "documents": []
   }
