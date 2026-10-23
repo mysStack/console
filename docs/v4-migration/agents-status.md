@@ -1,3 +1,10 @@
+# 当前状态补充（2026-10-24：全局 V3 预加载验证通过）
+
+- 精确源提交 `24c6afa03849d5d5c7b84fccd1602639b1fd0eb5`、CI Run `40023514250`、镜像 tag `feature-v4-workloads-20261024-050150-24c6afa03849`、digest `sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76` 已完成 131 rollout，Pod Ready/imageID 一致。
+- 零 Cookie 浏览器登录成功；三类原生 Workload 列表/详情直达、刷新、返回、namespace API 作用域和设置界面通过，Network 未发现 `/consolev3` 或 `/dist/v3dist` 请求，页面错误为 0。
+- 当前结论：本轮共享启动层 V3 全局预加载缺口已关闭；Workload 仍保持 `VERIFY / 未完成`，全部 Action、低权限 RBAC、缓存失效和逐项 V3 等价性仍需继续验证。
+- 证据：[当前 Workload V3 预加载关闭验证](./evidence/workload-v3-preload-verify-20261024.json)。
+
 # 当前状态补充（2026-10-24：全局预加载已移除，进入 VERIFY）
 
 - DEV 修复提交：`45d9f14e5d0d3a8a6d1f6e3b17f395a30c5adf87`；移除 `packages/core/src/utils/wujie.ts` 的全局 `preloadApp()`，保留 `setupApp()` 按需注册。

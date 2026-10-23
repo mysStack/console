@@ -1,5 +1,13 @@
 # Workload 131 专项 VERIFY（2026-10-24）
 
+## 当前增量：全局 V3 预加载关闭，三类原生路由复验通过（2026-10-24）
+
+精确制品 `24c6afa03849d5d5c7b84fccd1602639b1fd0eb5` 已在 131 完成部署。Deployment、StatefulSet、DaemonSet 均在零 Cookie 新 context 中登录成功，列表/详情直达、刷新、浏览器返回、专用 namespace API 作用域和设置页面渲染通过；三类页面 Network 均未观察到 `/consolev3` 或 `/dist/v3dist` 请求，页面错误为 0。
+
+三类编辑设置均完成当前实现范围内的保存、刷新回填、外层取消、草稿丢弃、容器二级确认不提前写 API、镜像搜索入口显示和恢复。Deployment 恢复先收到预期的并发 `409`，随后使用非破坏性合并回写恢复成功；该结果记录为并发保护路径通过。
+
+制品与部署证据：[当前 Workload V3 预加载关闭验证](./evidence/workload-v3-preload-verify-20261024.json)。本轮关闭的是共享启动层全局预加载缺口，不代表三类 Workload 的全部 Action、完整低权限 RBAC、缓存失效和逐项 V3 等价性已经验收。
+
 ## 当前增量：首次预加载修复未闭环，退回 DEV（2026-10-24）
 
 对 `88b587f947ca9da929821eb372331eb8785db2ed` 精确制品的复验发现：登录后的 dashboard 预加载可能在首次进入 Deployment 页面时延迟完成，仍产生 `/dist/v3dist/main.*.css` 请求。此前按当前 `pathname` 跳过预加载的修复只覆盖了进入 Workload 路由后的调用，不能覆盖登录后初始 dashboard 的异步请求。

@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "aed7461e7418540a5a77e19ff37959af3810b041acf628fdb3fcc8ffda47dfe5"
+        "sha256": "08ec5bf6b5002b2fdf1622630fd972f1768f4a90d48ac5ebb6862090db89a3bc"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "adf1d631baa620d5a6ef544f49118cbb955d8e21039339b4a5319f674f436c62"
+        "sha256": "5a58ceb660fce6a6b314eb260777c1247a3493a4bb760952accdbcd43b2dc461"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -502,7 +502,7 @@
   ],
   "verify": {
     "status": "未完成",
-    "reason": "第二次修复已完成 DEV；等待 CI 构建和精确部署后，用零 Cookie 浏览器复验三类原生 Workload 页面、登录后首次导航、设置保存与 namespace 作用域，并确认 Network 无 /consolev3 或 /dist/v3dist 请求。",
+    "reason": "精确制品已完成 rollout、Pod Ready/imageID、零 Cookie 登录、三类路由/namespace 作用域和设置页面浏览器复验；三类路由 Network 未发现 /consolev3 或 /dist/v3dist，当前仅关闭全局预加载缺口，完整模块验收仍未完成。",
     "sourceCommit": "45d9f14e53d6a0c1d74011197ade9d5accbcdae9",
     "documents": [
       {
@@ -512,6 +512,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-settings-verify-attempt-20261024.json",
         "sha256": "2edcd47c251a4b5b32e3888d7aea8a41198f3b0d9b4e88b040b157ffa1091ff1"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-v3-preload-verify-20261024.json",
+        "sha256": "1e3e1841c0b9cc6d31817d71c3049d3c148c4040b71aa3598f064c71d155d613"
       }
     ]
   }
