@@ -35,6 +35,13 @@ module.exports = {
     'Introduzca valores booleanos, identificadores enteros, valores SELinux y nombres de capacidades válidos.',
   WORKLOAD_ANNOTATIONS_INVALID:
     'Introduzca nombres de anotación de Kubernetes y valores de texto válidos.',
+  WORKLOAD_SCHEDULING_INVALID:
+    'Complete cada regla de programación del Pod y seleccione un destino válido.',
+  WORKLOAD_SCHEDULING_PRESERVED: 'Conservar la programación avanzada existente',
+  WORKLOAD_NODE_SELECTOR_INVALID:
+    'Introduzca claves y valores válidos para el selector de nodos de Kubernetes.',
+  WORKLOAD_TARGET_OPTIONS_FAILED:
+    'No se pudieron cargar los destinos. Compruebe el proyecto e inténtelo de nuevo.',
   CONTAINER_SECURITY_CONTEXT: 'Contexto de seguridad del contenedor',
   POD_SECURITY_CONTEXT: 'Contexto de seguridad de pod',
   PRIVILEGED_MODE: 'Privilegiado',

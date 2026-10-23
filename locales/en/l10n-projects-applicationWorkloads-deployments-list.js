@@ -32,6 +32,11 @@ module.exports = {
   WORKLOAD_SECURITY_CONTEXT_INVALID:
     'Enter valid security context booleans, integer user or group IDs, SELinux values, and capability names.',
   WORKLOAD_ANNOTATIONS_INVALID: 'Enter valid Kubernetes annotation names and text values.',
+  WORKLOAD_SCHEDULING_INVALID: 'Complete every Pod scheduling rule and select a valid target.',
+  WORKLOAD_SCHEDULING_PRESERVED: 'Keep existing advanced scheduling',
+  WORKLOAD_NODE_SELECTOR_INVALID: 'Enter valid Kubernetes node selector keys and values.',
+  WORKLOAD_TARGET_OPTIONS_FAILED:
+    'Unable to load workload targets. Check the namespace and try again.',
   CONTAINER_SECURITY_CONTEXT: 'Container Security Context',
   POD_SECURITY_CONTEXT: 'Pod Security Context',
   PRIVILEGED_MODE: 'Privileged Mode',

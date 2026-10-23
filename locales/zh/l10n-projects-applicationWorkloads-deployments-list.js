@@ -28,6 +28,10 @@ module.exports = {
   WORKLOAD_SECURITY_CONTEXT_INVALID:
     '请填写合法的安全上下文布尔值、整数用户或用户组 ID、SELinux 值和权能名称。',
   WORKLOAD_ANNOTATIONS_INVALID: '请填写合法的 Kubernetes 注解名称和文本值。',
+  WORKLOAD_SCHEDULING_INVALID: '请补全每条容器组调度规则并选择有效目标。',
+  WORKLOAD_SCHEDULING_PRESERVED: '保留已有高级调度配置',
+  WORKLOAD_NODE_SELECTOR_INVALID: '请填写合法的 Kubernetes 节点选择器键和值。',
+  WORKLOAD_TARGET_OPTIONS_FAILED: '无法加载工作负载目标，请检查项目后重试。',
   CONTAINER_SECURITY_CONTEXT: '容器安全上下文',
   POD_SECURITY_CONTEXT: '容器组安全上下文',
   PRIVILEGED_MODE: '特权模式',

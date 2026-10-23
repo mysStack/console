@@ -11,7 +11,9 @@ import VolumeInput from './VolumeInput';
 import WorkloadUpdateStrategyInput from './WorkloadUpdateStrategyInput';
 import SecurityContextInput from './SecurityContextInput';
 import PodAnnotationsInput from './PodAnnotationsInput';
+import PodSchedulingInput from './PodSchedulingInput';
 import useWorkloadResourceOptions from './useWorkloadResourceOptions';
+import useWorkloadTargetOptions from './useWorkloadTargetOptions';
 import {
   buildDeploymentSettingsResource,
   WorkloadSettingsValues,
@@ -48,6 +50,7 @@ export default function WorkloadSettingsModal({
   const kind: WorkloadKind = resource.kind || 'Deployment';
   const volumes = useWatch('volumes', form);
   const resources = useWorkloadResourceOptions(cluster, namespace);
+  const workloadTargets = useWorkloadTargetOptions(kind, cluster, namespace);
   const initialValues = parseDeploymentSettings(resource);
   // StatefulSet PVC 模板由控制器按 Pod 创建卷，不存在于 template.spec.volumes。
   const claimTemplateNames: string[] =
@@ -167,6 +170,18 @@ export default function WorkloadSettingsModal({
         <FormItem name="podSecurityContext" rules={[{ validator: validateSettings }]}>
           <SecurityContextInput kind="pod" />
         </FormItem>
+        {kind !== 'DaemonSet' && (
+          <>
+            <h3>{t('POD_SCHEDULING_RULES')}</h3>
+            {workloadTargets.isLoading && <div role="status">{t('LOADING')}</div>}
+            {workloadTargets.isError && (
+              <div role="alert">{t('WORKLOAD_TARGET_OPTIONS_FAILED')}</div>
+            )}
+            <FormItem name="podScheduling" rules={[{ validator: validateSettings }]}>
+              <PodSchedulingInput targets={workloadTargets.options} />
+            </FormItem>
+          </>
+        )}
         <FormItem
           name="containers"
           label={t('CONTAINERS')}

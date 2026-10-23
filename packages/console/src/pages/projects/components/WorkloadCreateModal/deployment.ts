@@ -64,6 +64,26 @@ export interface SecurityContextValues {
   };
 }
 
+export type PodSchedulingMode =
+  | 'default'
+  | 'decentralized'
+  | 'aggregation'
+  | 'custom'
+  | 'preserved';
+
+export interface PodSchedulingRuleValues {
+  policy?: 'podAffinity' | 'podAntiAffinity';
+  type?:
+    | 'preferredDuringSchedulingIgnoredDuringExecution'
+    | 'requiredDuringSchedulingIgnoredDuringExecution';
+  target?: string;
+}
+
+export interface PodSchedulingValues {
+  mode: PodSchedulingMode;
+  rules?: PodSchedulingRuleValues[];
+}
+
 export interface VolumeMountValues {
   name: string;
   mountPath: string;
@@ -113,6 +133,8 @@ export interface DeploymentCreateValues {
   volumes?: VolumeValues[];
   podSecurityContext?: SecurityContextValues;
   podAnnotations?: Record<string, string>;
+  podScheduling?: PodSchedulingValues;
+  nodeSelector?: Record<string, string>;
 }
 
 export type WorkloadKind = 'Deployment' | 'StatefulSet' | 'DaemonSet';
@@ -138,6 +160,22 @@ function isDnsLabel(value: string): boolean {
 
 const QUALIFIED_NAME = /^[A-Za-z0-9](?:[-_.A-Za-z0-9]*[A-Za-z0-9])?$/;
 
+function isQualifiedName(value: string): boolean {
+  const parts = value.split('/');
+  if (parts.length > 2) return false;
+  const name = parts.at(-1) || '';
+  if (name.length > 63 || !QUALIFIED_NAME.test(name)) return false;
+  if (parts.length === 1) return true;
+  const prefix = parts[0];
+  return (
+    prefix.length > 0 && prefix.length <= 253 && prefix.split('.').every(part => isDnsLabel(part))
+  );
+}
+
+function isLabelValue(value: string): boolean {
+  return value === '' || (value.length <= 63 && QUALIFIED_NAME.test(value));
+}
+
 export function validatePodAnnotations(annotations?: Record<string, string>): boolean {
   if (annotations === undefined) return true;
   if (annotations === null || Array.isArray(annotations) || typeof annotations !== 'object') {
@@ -145,16 +183,44 @@ export function validatePodAnnotations(annotations?: Record<string, string>): bo
   }
   return Object.entries(annotations).every(([key, value]) => {
     if (typeof value !== 'string') return false;
-    const parts = key.split('/');
-    if (parts.length > 2) return false;
-    const name = parts.at(-1) || '';
-    if (name.length > 63 || !QUALIFIED_NAME.test(name)) return false;
-    if (parts.length === 1) return true;
-    const prefix = parts[0];
-    return (
-      prefix.length > 0 && prefix.length <= 253 && prefix.split('.').every(part => isDnsLabel(part))
-    );
+    return isQualifiedName(key);
   });
+}
+
+export function validateNodeSelector(nodeSelector?: Record<string, string>): boolean {
+  if (nodeSelector === undefined) return true;
+  if (nodeSelector === null || Array.isArray(nodeSelector) || typeof nodeSelector !== 'object') {
+    return false;
+  }
+  return Object.entries(nodeSelector).every(
+    ([key, value]) => typeof value === 'string' && isQualifiedName(key) && isLabelValue(value),
+  );
+}
+
+export function validatePodScheduling(scheduling?: PodSchedulingValues): boolean {
+  if (!scheduling) return true;
+  if (
+    !['default', 'decentralized', 'aggregation', 'custom', 'preserved'].includes(scheduling.mode)
+  ) {
+    return false;
+  }
+  if (scheduling.mode !== 'custom') return true;
+  const rules = scheduling.rules || [];
+  const policies = rules.map(rule => rule.policy);
+  return Boolean(
+    policies.length &&
+      new Set(policies).size === policies.length &&
+      rules.every(
+        rule =>
+          ['podAffinity', 'podAntiAffinity'].includes(rule.policy || '') &&
+          [
+            'preferredDuringSchedulingIgnoredDuringExecution',
+            'requiredDuringSchedulingIgnoredDuringExecution',
+          ].includes(rule.type || '') &&
+          isLabelValue(rule.target || '') &&
+          Boolean(rule.target),
+      ),
+  );
 }
 
 function isValidPort(port?: number | string): boolean {
@@ -606,6 +672,103 @@ function parseSecurityContext(
   return Object.keys(result).length ? result : undefined;
 }
 
+function buildPreferredPodAffinity(labels: Record<string, string>) {
+  return {
+    preferredDuringSchedulingIgnoredDuringExecution: [
+      {
+        weight: 100,
+        podAffinityTerm: {
+          labelSelector: { matchLabels: cloneDeep(labels) },
+          topologyKey: 'kubernetes.io/hostname',
+        },
+      },
+    ],
+  };
+}
+
+function buildPodSchedulingAffinity(
+  scheduling: PodSchedulingValues | undefined,
+  labels: Record<string, string>,
+): Record<string, any> | undefined {
+  if (!scheduling || ['default', 'preserved'].includes(scheduling.mode)) return undefined;
+  if (scheduling.mode === 'decentralized') {
+    return { podAntiAffinity: buildPreferredPodAffinity(labels) };
+  }
+  if (scheduling.mode === 'aggregation') {
+    return { podAffinity: buildPreferredPodAffinity(labels) };
+  }
+  const affinity: Record<string, any> = {};
+  for (const rule of scheduling.rules || []) {
+    const expression = {
+      labelSelector: {
+        matchExpressions: [{ key: 'app', operator: 'In', values: [rule.target] }],
+      },
+      topologyKey: 'kubernetes.io/hostname',
+    };
+    affinity[rule.policy!] =
+      rule.type === 'preferredDuringSchedulingIgnoredDuringExecution'
+        ? {
+            preferredDuringSchedulingIgnoredDuringExecution: [
+              { weight: 100, podAffinityTerm: expression },
+            ],
+          }
+        : { requiredDuringSchedulingIgnoredDuringExecution: [expression] };
+  }
+  return affinity;
+}
+
+function parsePodScheduling(
+  affinity: Record<string, any> | undefined,
+  labels: Record<string, string>,
+): PodSchedulingValues {
+  if (!affinity || !Object.keys(affinity).length) return { mode: 'default' };
+  if (isEqual(affinity, { podAntiAffinity: buildPreferredPodAffinity(labels) })) {
+    return { mode: 'decentralized' };
+  }
+  if (isEqual(affinity, { podAffinity: buildPreferredPodAffinity(labels) })) {
+    return { mode: 'aggregation' };
+  }
+  const rules: PodSchedulingRuleValues[] = [];
+  for (const [policy, config] of Object.entries(affinity)) {
+    if (!['podAffinity', 'podAntiAffinity'].includes(policy)) return { mode: 'preserved' };
+    const types = Object.keys(config || {});
+    if (
+      types.length !== 1 ||
+      ![
+        'preferredDuringSchedulingIgnoredDuringExecution',
+        'requiredDuringSchedulingIgnoredDuringExecution',
+      ].includes(types[0])
+    ) {
+      return { mode: 'preserved' };
+    }
+    const type = types[0] as PodSchedulingRuleValues['type'];
+    const entries = config[type!] || [];
+    if (!Array.isArray(entries) || entries.length !== 1) return { mode: 'preserved' };
+    const target =
+      type === 'preferredDuringSchedulingIgnoredDuringExecution'
+        ? entries[0]?.podAffinityTerm?.labelSelector?.matchExpressions?.[0]?.values?.[0]
+        : entries[0]?.labelSelector?.matchExpressions?.[0]?.values?.[0];
+    if (!target || !isLabelValue(target)) return { mode: 'preserved' };
+    const expectedTerm = {
+      labelSelector: {
+        matchExpressions: [{ key: 'app', operator: 'In', values: [target] }],
+      },
+      topologyKey: 'kubernetes.io/hostname',
+    };
+    const expectedConfig =
+      type === 'preferredDuringSchedulingIgnoredDuringExecution'
+        ? {
+            preferredDuringSchedulingIgnoredDuringExecution: [
+              { weight: 100, podAffinityTerm: expectedTerm },
+            ],
+          }
+        : { requiredDuringSchedulingIgnoredDuringExecution: [expectedTerm] };
+    if (!isEqual(config, expectedConfig)) return { mode: 'preserved' };
+    rules.push({ policy: policy as PodSchedulingRuleValues['policy'], type, target });
+  }
+  return rules.length ? { mode: 'custom', rules } : { mode: 'preserved' };
+}
+
 function parseContainer(container: Record<string, any>): ContainerCreateValues {
   return {
     name: container.name || '',
@@ -674,6 +837,7 @@ function parseVolume(volume: Record<string, any>): VolumeValues | undefined {
 export function parseDeploymentSettings(resource: Record<string, any>): WorkloadSettingsValues {
   const podSpec = cloneDeep(resource.spec?.template?.spec || {});
   const kind: WorkloadKind = resource.kind || 'Deployment';
+  const podLabels = resource.spec?.template?.metadata?.labels || {};
   const strategy = resource.spec?.[kind === 'Deployment' ? 'strategy' : 'updateStrategy'];
   return {
     name: resource.metadata?.name || '',
@@ -685,6 +849,9 @@ export function parseDeploymentSettings(resource: Record<string, any>): Workload
     initContainers: (podSpec.initContainers || []).map(parseContainer),
     volumes: (podSpec.volumes || []).map(parseVolume).filter(Boolean) as VolumeValues[],
     podAnnotations: cloneDeep(resource.spec?.template?.metadata?.annotations),
+    ...(kind !== 'DaemonSet'
+      ? { podScheduling: parsePodScheduling(podSpec.affinity, podLabels) }
+      : {}),
     updateStrategy: {
       type: strategy?.type || 'RollingUpdate',
       ...(kind === 'StatefulSet'
@@ -945,6 +1112,10 @@ export function validateWorkloadSettings(
     return 'WORKLOAD_SECURITY_CONTEXT_INVALID';
   }
   if (!validatePodAnnotations(values.podAnnotations)) return 'WORKLOAD_ANNOTATIONS_INVALID';
+  if (kind === 'DaemonSet' && values.podScheduling !== undefined) {
+    return 'WORKLOAD_SCHEDULING_INVALID';
+  }
+  if (!validatePodScheduling(values.podScheduling)) return 'WORKLOAD_SCHEDULING_INVALID';
   const strategy = values.updateStrategy;
   if (!strategy) return undefined;
   if (!['RollingUpdate', kind === 'Deployment' ? 'Recreate' : 'OnDelete'].includes(strategy.type)) {
@@ -1052,12 +1223,27 @@ export function buildDeploymentSettingsResource(
       delete result.spec.template.metadata.annotations;
     }
   }
+  if (kind !== 'DaemonSet' && !isEqual(values.podScheduling, initial.podScheduling)) {
+    if (values.podScheduling?.mode === 'preserved') return result;
+    const affinity = buildPodSchedulingAffinity(
+      values.podScheduling,
+      result.spec.template.metadata?.labels || {},
+    );
+    if (affinity && Object.keys(affinity).length) nextPodSpec.affinity = affinity;
+    else delete nextPodSpec.affinity;
+  }
   return result;
 }
 
 export function buildDeployment(values: DeploymentCreateValues) {
   if (!validatePodAnnotations(values.podAnnotations)) {
     throw new Error('WORKLOAD_ANNOTATIONS_INVALID');
+  }
+  if (!validatePodScheduling(values.podScheduling) || values.podScheduling?.mode === 'preserved') {
+    throw new Error('WORKLOAD_SCHEDULING_INVALID');
+  }
+  if (!validateNodeSelector(values.nodeSelector)) {
+    throw new Error('WORKLOAD_NODE_SELECTOR_INVALID');
   }
   const name = trim(values.name);
   const aliasName = trim(values.aliasName);
@@ -1070,6 +1256,8 @@ export function buildDeployment(values: DeploymentCreateValues) {
 
   if (aliasName) annotations['kubesphere.io/alias-name'] = aliasName;
   if (description) annotations['kubesphere.io/description'] = description;
+
+  const affinity = buildPodSchedulingAffinity(values.podScheduling, labels);
 
   return {
     apiVersion: 'apps/v1',
@@ -1094,6 +1282,10 @@ export function buildDeployment(values: DeploymentCreateValues) {
           serviceAccountName: 'default',
           ...(compactSecurityContext(values.podSecurityContext, false)
             ? { securityContext: compactSecurityContext(values.podSecurityContext, false) }
+            : {}),
+          ...(affinity ? { affinity } : {}),
+          ...(values.nodeSelector && Object.keys(values.nodeSelector).length
+            ? { nodeSelector: cloneDeep(values.nodeSelector) }
             : {}),
           containers: values.containers.map(buildContainer),
           ...(values.initContainers?.length

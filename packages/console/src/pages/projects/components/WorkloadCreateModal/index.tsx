@@ -21,7 +21,9 @@ import {
   DeploymentCreateValues,
   VolumeValues,
   validateContainers,
+  validateNodeSelector,
   validatePodAnnotations,
+  validatePodScheduling,
   validateSecurityContext,
   validateVolumes,
 } from './deployment';
@@ -30,6 +32,9 @@ import VolumeInput from './VolumeInput';
 import useWorkloadResourceOptions from './useWorkloadResourceOptions';
 import SecurityContextInput from './SecurityContextInput';
 import PodAnnotationsInput from './PodAnnotationsInput';
+import NodeSelectorInput from './NodeSelectorInput';
+import PodSchedulingInput from './PodSchedulingInput';
+import useWorkloadTargetOptions from './useWorkloadTargetOptions';
 
 interface Props {
   visible: boolean;
@@ -53,6 +58,7 @@ function WorkloadCreateModal({
   const [form] = useForm<DeploymentCreateValues>();
   const volumes = useWatch('volumes', form);
   const resources = useWorkloadResourceOptions(cluster, namespace);
+  const workloadTargets = useWorkloadTargetOptions('Deployment', cluster, namespace);
 
   const handleSubmit = () => {
     form.validateFields().then(
@@ -100,6 +106,22 @@ function WorkloadCreateModal({
     callback: (error?: string) => void,
   ) => {
     callback(validatePodAnnotations(value) ? undefined : t('WORKLOAD_ANNOTATIONS_INVALID'));
+  };
+
+  const podSchedulingValidator = (
+    _rule: unknown,
+    value: DeploymentCreateValues['podScheduling'],
+    callback: (error?: string) => void,
+  ) => {
+    callback(validatePodScheduling(value) ? undefined : t('WORKLOAD_SCHEDULING_INVALID'));
+  };
+
+  const nodeSelectorValidator = (
+    _rule: unknown,
+    value: DeploymentCreateValues['nodeSelector'],
+    callback: (error?: string) => void,
+  ) => {
+    callback(validateNodeSelector(value) ? undefined : t('WORKLOAD_NODE_SELECTOR_INVALID'));
   };
 
   const volumeNames = (volumes || []).map((volume: VolumeValues) => volume.name).filter(Boolean);
@@ -152,6 +174,19 @@ function WorkloadCreateModal({
         <h3>{t('POD_SETTINGS')}</h3>
         <FormItem name="podSecurityContext" rules={[{ validator: podSecurityContextValidator }]}>
           <SecurityContextInput kind="pod" />
+        </FormItem>
+        <h3>{t('POD_SCHEDULING_RULES')}</h3>
+        {workloadTargets.isLoading && <div role="status">{t('LOADING')}</div>}
+        {workloadTargets.isError && <div role="alert">{t('WORKLOAD_TARGET_OPTIONS_FAILED')}</div>}
+        <FormItem name="podScheduling" rules={[{ validator: podSchedulingValidator }]}>
+          <PodSchedulingInput targets={workloadTargets.options} />
+        </FormItem>
+        <FormItem
+          name="nodeSelector"
+          label={t('SELECT_NODES')}
+          rules={[{ validator: nodeSelectorValidator }]}
+        >
+          <NodeSelectorInput />
         </FormItem>
         <FormItem
           name="containers"

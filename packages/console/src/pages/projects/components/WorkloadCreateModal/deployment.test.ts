@@ -5,7 +5,9 @@ import {
   buildDeployment,
   buildDeploymentSettingsResource,
   parseDeploymentSettings,
+  validateNodeSelector,
   validatePodAnnotations,
+  validatePodScheduling,
   validateContainers,
   validateVolumes,
 } from './deployment';
@@ -1002,6 +1004,7 @@ test('优雅终止允许显式零值，未编辑的 Pod 调度与安全字段完
     };
     original.spec.template.spec.securityContext = { runAsNonRoot: true };
     const values = parseDeploymentSettings(original);
+    if (kind !== 'DaemonSet') assert.equal(values.podScheduling?.mode, 'preserved');
     assert.equal(values.terminationGracePeriodSeconds, 30);
     values.terminationGracePeriodSeconds = 0;
     const submitted = buildDeploymentSettingsResource(original, values);
@@ -1319,5 +1322,177 @@ test('创建 Deployment 将 Pod 模板注解写入模板元数据', () => {
         containers: [{ name: 'web', image: 'nginx' }],
       }),
     /WORKLOAD_ANNOTATIONS_INVALID/,
+  );
+});
+
+for (const [kind, expectedMode] of [
+  ['Deployment', 'decentralized'],
+  ['StatefulSet', 'aggregation'],
+] as const) {
+  test(`${kind} Pod 调度模式支持回填、切换和显式清空`, () => {
+    const original = settingsFixture(kind);
+    const policy = expectedMode === 'decentralized' ? 'podAntiAffinity' : 'podAffinity';
+    original.spec.template.spec.affinity = {
+      [policy]: {
+        preferredDuringSchedulingIgnoredDuringExecution: [
+          {
+            weight: 100,
+            podAffinityTerm: {
+              labelSelector: { matchLabels: { app: 'native-settings' } },
+              topologyKey: 'kubernetes.io/hostname',
+            },
+          },
+        ],
+      },
+    };
+    const values = parseDeploymentSettings(original);
+    assert.equal(values.podScheduling?.mode, expectedMode);
+    assert.deepEqual(buildDeploymentSettingsResource(original, values), original);
+
+    values.podScheduling = { mode: 'default' };
+    let submitted = buildDeploymentSettingsResource(original, values);
+    assert.equal('affinity' in submitted.spec.template.spec, false);
+
+    values.podScheduling = { mode: expectedMode };
+    submitted = buildDeploymentSettingsResource(original, values);
+    assert.deepEqual(submitted.spec.template.spec.affinity, original.spec.template.spec.affinity);
+  });
+}
+
+test('DaemonSet 不显示旧 V3 调度分区且编辑其他字段时完整保留 affinity', () => {
+  const original = settingsFixture('DaemonSet');
+  original.spec.template.spec.affinity = {
+    nodeAffinity: {
+      requiredDuringSchedulingIgnoredDuringExecution: {
+        nodeSelectorTerms: [{ matchExpressions: [{ key: 'zone', operator: 'Exists' }] }],
+      },
+    },
+  };
+  const values = parseDeploymentSettings(original);
+  assert.equal(values.podScheduling, undefined);
+  values.containers[0].image = 'nginx:alpine';
+  const submitted = buildDeploymentSettingsResource(original, values);
+  assert.deepEqual(submitted.spec.template.spec.affinity, original.spec.template.spec.affinity);
+});
+
+test('自定义 Pod 亲和与反亲和规则按 V3 结构回填和写入', () => {
+  const original = settingsFixture('Deployment');
+  original.spec.template.spec.affinity = {
+    podAffinity: {
+      requiredDuringSchedulingIgnoredDuringExecution: [
+        {
+          labelSelector: {
+            matchExpressions: [{ key: 'app', operator: 'In', values: ['api'] }],
+          },
+          topologyKey: 'kubernetes.io/hostname',
+        },
+      ],
+    },
+    podAntiAffinity: {
+      preferredDuringSchedulingIgnoredDuringExecution: [
+        {
+          weight: 100,
+          podAffinityTerm: {
+            labelSelector: {
+              matchExpressions: [{ key: 'app', operator: 'In', values: ['worker'] }],
+            },
+            topologyKey: 'kubernetes.io/hostname',
+          },
+        },
+      ],
+    },
+  };
+  const values = parseDeploymentSettings(original);
+  assert.deepEqual(values.podScheduling, {
+    mode: 'custom',
+    rules: [
+      {
+        policy: 'podAffinity',
+        type: 'requiredDuringSchedulingIgnoredDuringExecution',
+        target: 'api',
+      },
+      {
+        policy: 'podAntiAffinity',
+        type: 'preferredDuringSchedulingIgnoredDuringExecution',
+        target: 'worker',
+      },
+    ],
+  });
+  values.podScheduling!.rules![1].target = 'jobs';
+  const submitted = buildDeploymentSettingsResource(original, values);
+  assert.deepEqual(
+    submitted.spec.template.spec.affinity.podAntiAffinity
+      .preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector
+      .matchExpressions[0].values,
+    ['jobs'],
+  );
+});
+
+test('Pod 调度和节点选择拒绝不完整规则及非法 Kubernetes label', () => {
+  assert.equal(validatePodScheduling({ mode: 'default' }), true);
+  assert.equal(validatePodScheduling({ mode: 'custom', rules: [] }), false);
+  assert.equal(
+    validatePodScheduling({
+      mode: 'custom',
+      rules: [
+        {
+          policy: 'podAffinity',
+          type: 'requiredDuringSchedulingIgnoredDuringExecution',
+          target: 'api',
+        },
+        {
+          policy: 'podAffinity',
+          type: 'preferredDuringSchedulingIgnoredDuringExecution',
+          target: 'worker',
+        },
+      ],
+    }),
+    false,
+  );
+  assert.equal(
+    validatePodScheduling({
+      mode: 'custom',
+      rules: [
+        {
+          policy: 'podAffinity',
+          type: 'requiredDuringSchedulingIgnoredDuringExecution',
+          target: 'API service',
+        },
+      ],
+    }),
+    false,
+  );
+  assert.equal(validateNodeSelector({ 'node-role.kubernetes.io/worker': '' }), true);
+  assert.equal(validateNodeSelector({ '/worker': 'yes' }), false);
+  assert.equal(validateNodeSelector({ zone: 'a'.repeat(64) }), false);
+});
+
+test('创建 Deployment 写入亲和模式与节点选择器', () => {
+  const resource = buildDeployment({
+    name: 'scheduling-create',
+    namespace: 'v4-migration-e2e',
+    replicas: 1,
+    podScheduling: { mode: 'decentralized' },
+    nodeSelector: { 'node-role.kubernetes.io/worker': '' },
+    containers: [{ name: 'web', image: 'nginx' }],
+  });
+  assert.deepEqual(resource.spec.template.spec.nodeSelector, {
+    'node-role.kubernetes.io/worker': '',
+  });
+  assert.deepEqual(
+    resource.spec.template.spec.affinity.podAntiAffinity
+      .preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels,
+    { app: 'scheduling-create' },
+  );
+  assert.throws(
+    () =>
+      buildDeployment({
+        name: 'scheduling-invalid',
+        namespace: 'v4-migration-e2e',
+        replicas: 1,
+        podScheduling: { mode: 'custom', rules: [] },
+        containers: [{ name: 'web', image: 'nginx' }],
+      }),
+    /WORKLOAD_SCHEDULING_INVALID/,
   );
 });
