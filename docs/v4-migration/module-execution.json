@@ -16,11 +16,11 @@
       },
       {
         "path": "docs/v4-migration/deployment-settings-capability-matrix.md",
-        "sha256": "71a09ed59a3958f8b7997d69f4954eb34a9f247ae7515a25d7312b451b29f324"
+        "sha256": "066921a3dad8594d5df5d8b68da1f52fa337b423b2e7d4804bc35d1b5637e312"
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
-        "sha256": "3a4c77315a6df1745af583053d66e79414964cd03334870e223fde10537afe37"
+        "sha256": "4a5bb3b462dd091000d70b82519c04987c3e079b5aa9a57a5cf6dfdaeeb985bc"
       },
       {
         "path": "docs/v4-migration/workload-kind-capability-matrix.md",
@@ -48,15 +48,15 @@
       },
       {
         "path": "docs/v4-migration/workload-v3-field-equivalence-20261023.md",
-        "sha256": "d21f9ac86b8d0cbc66f0fd333865afd7045664e5abdc0d18742bd3c54a1a45f8"
+        "sha256": "00613a8795aa93ec424ef02353746e2feebb42a9ec028268b835c00aee004410"
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "411fa16fe09447f5fd86165aa5654cdab3d7a3bb471bffc831e9045d3a54fda2"
+        "sha256": "c9dd2a3cf33485c84df3d4656b59ce413bd2fb8681e706d6d4522e08d998ee51"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "a156bd24109502f50af14137036fd1ddf222ee7974ce2d40b875eba0b94866ef"
+        "sha256": "33e75579cc68459d7f41f47e9d0d05e5d7daf0a81cbf19d11b9fed3803a32ec1"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -84,7 +84,7 @@
       },
       {
         "path": "docs/v4-migration/workload-field-behavior-matrix-20261023.md",
-        "sha256": "f5a444aca35a70a12f98cded62a8c7234111411cd19576bf6250ff36e5ad20f2"
+        "sha256": "54c086ca331d026672d07eaf60c2f56fb37a2e2cbff6cd3a2ff9ce4cc3f48a8c"
       },
       {
         "path": "docs/v4-migration/workload-action-api-rbac-evidence-20261023.md",
@@ -225,12 +225,12 @@
   },
   "dev": {
     "status": "进行中",
-    "reason": "进行中：原生设置入口、策略、优雅终止及生命周期已实现并有本地/服务端 dry-run 证据；安全、调度、元数据、集群入口、创建、Action 和配置引用等仍待补齐；未进入 VERIFY",
-    "sourceCommit": "da25187d33ca49d21afa0ad748b619e8a2786c64",
+    "reason": "进行中：原生设置入口、策略、优雅终止、生命周期及 Pod/容器安全上下文已实现并有本地/服务端 dry-run 证据；调度、元数据、集群入口、创建、Action 和配置引用等仍待补齐；未进入 VERIFY",
+    "sourceCommit": "9e2f4148f2abde58b6eec850612d99dc1ac3f0a8",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
-        "sha256": "ac3287c0e68969baef6429fdf025a3e5f35044f6559cd239c92a1fb7016f6e53"
+        "sha256": "dd12611c48bd5be5dccfec46779405ca5f897a2a7143c88d6fcfccf727335caa"
       },
       {
         "path": "docs/v4-migration/evidence/workload-lifecycle-20261023-api-validation.json",
@@ -259,6 +259,30 @@
       {
         "path": "docs/v4-migration/evidence/workload-lifecycle-server-validation.cjs",
         "sha256": "798420690cbb4c95e894735e9e55e94ecb76e77e151f6c4111b1dcbda8465155"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-security-20261023-api-validation.json",
+        "sha256": "243939a8d899076175b721c3626277664b5acb307af63160ac9713434d692ac3"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-security-20261023-provenance.json",
+        "sha256": "3a12951c8ce206ec8ac51f32508fcd7c37816534dfff3f55fc1ea538dd59813f"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-security-20261023-rea-summary.json",
+        "sha256": "999c05e159ba3bd5508dd928902367ff0427acd3f59b9ee33ab9fb4e6faaded2"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-security-20261023-typecheck.json",
+        "sha256": "8fa61d7879d43926785ad84401194d565b15c526d49614f0ebfe7567ac16ecf5"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-security-extract.cjs",
+        "sha256": "fcc6f2ceaaef6501ebf60c0b0a7a6246541eae6d5dcd0eea230052ffb3045554"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-security-server-validation.cjs",
+        "sha256": "ce2871c285c4428a6d4197051e7f152ca415902df05cbdf8419be221b7226dec"
       }
     ]
   },

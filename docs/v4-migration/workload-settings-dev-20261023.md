@@ -5,7 +5,7 @@
 - 模块：`workloads / deployment-statefulset-daemonset`。
 - 分支 / Worktree：`feature/v4-workloads` / `console-workloads`。
 - 负责人批准进入 DEV：`5c24342571419708b6f0c21f3ce9e8f193da0e17`，批准原文见 [REA 复核记录](./workload-rea-review-20261023.md)。
-- 首批功能提交：`0c1d9aadf219fcabf5e6a310722591c9d7bef136`；生命周期增量提交：`da25187d33ca49d21afa0ad748b619e8a2786c64`。
+- 首批功能提交：`0c1d9aadf219fcabf5e6a310722591c9d7bef136`；生命周期增量提交：`da25187d33ca49d21afa0ad748b619e8a2786c64`；安全上下文增量提交：`9e2f4148f2abde58b6eec850612d99dc1ac3f0a8`。
 - 阶段仍为 DEV / 进行中；不是三类资源完整验收，也没有进入 VERIFY。
 
 ## 本次实现与保留行为
@@ -49,7 +49,7 @@ console 定向重建复用 `scripts/libs/create-rollup-config.js`，分别传入
 
 ## 剩余清单
 
-- 三类资源完整设置：调度、Pod 元数据、安全及高级容器字段、StatefulSet Service/PVC 模板编辑等仍须按原矩阵补齐，不能因本轮接入设置入口而关闭 WL-02。
+- 三类资源完整设置：调度、Pod 元数据、时区及其他高级容器字段、StatefulSet Service/PVC 模板编辑等仍须按原矩阵补齐，不能因本轮接入设置入口而关闭 WL-02。
 - 集群级三类列表仍挂载 V3/Wujie。现有候选原生列表还含创建空回调，不能直接接路由后宣称完成。
 - StatefulSet、DaemonSet 创建和各类 Action 仍需继续补齐；DaemonSet 停止语义尚未修复。
 - 配置引用的 V3 Action/DOM 桥接尚未移除；WL-04 保留。
@@ -92,4 +92,37 @@ console 定向重建复用 `scripts/libs/create-rollup-config.js`，分别传入
 
 ### 尚未执行和下一项
 
-本轮没有构建测试镜像、更新 ks-console、rollout 或在新制品上运行 Playwright；没有执行真实 hook、资源持久化、RBAC、namespace 切换或缓存验收。服务端 dry-run 没有保存资源，标签查询确认残留为 0。131 仍运行旧镜像，部署身份见 [环境记录](./evidence/workload-lifecycle-20261023-environment.json)。下一项按原清单继续原生设置中的安全上下文、调度及元数据；集群原生列表、创建、DaemonSet 停止语义和配置引用仍未关闭，不能声明三类资源已验收。
+本轮没有构建测试镜像、更新 ks-console、rollout 或在新制品上运行 Playwright；没有执行真实 hook、资源持久化、RBAC、namespace 切换或缓存验收。服务端 dry-run 没有保存资源，标签查询确认残留为 0。131 仍运行旧镜像，部署身份见 [环境记录](./evidence/workload-lifecycle-20261023-environment.json)。下一项按原清单继续原生设置中的调度及元数据；集群原生列表、创建、DaemonSet 停止语义和配置引用仍未关闭，不能声明三类资源已验收。
+
+## 安全上下文原生编辑增量（2026-10-23）
+
+本增量代码提交为 `9e2f4148f2abde58b6eec850612d99dc1ac3f0a8`，阶段仍为 DEV。它关闭 DS-12 的代码实现缺口，但当前 SHA 的真实持久化、RBAC 和浏览器场景仍属于 VERIFY，不能据此标记三类资源已验收。
+
+### 当前制品依据
+
+- 从固定 V3 tree `1e499d92e11374e26c76f5e13be45251602bd596` 惰性提取工厂 1540、1541、2276、2277、2282、2298。当前制品确认容器分区包含访问控制、用户/用户组、SELinux 和 capabilities；Pod 分区包含用户/用户组及 SELinux。
+- 本轮实际调用 REA 分析六个派生 JS，6/6 解析成功、无解析失败。完整分析 Evidence 为 `ev_858febe6f3b01fdf0a3b239369d8c3da0193fc4b25fa3c4a7dfd934e3d5e2604`，摘要为 `ev_735b35ebd67592f92ce10c3d4229fe12d79e3a629fdc24c06af4983f810fbd8b`。应用范围内覆盖 complete，语义覆盖仍为 unknown，保留 743 项语义未知；不把定向工厂分析写成整个 V3 已恢复。
+- [重建脚本](./evidence/workload-security-extract.cjs)、[来源偏移与摘要](./evidence/workload-security-20261023-provenance.json)和[REA 摘要](./evidence/workload-security-20261023-rea-summary.json)可以复核当前 bundle、偏移与 SHA-256；分析没有执行目标 bundle。旧 `release-3.4` 仅用于交叉核对结构，不作为当前制品源码来源。
+
+### 实现与保留行为
+
+1. Deployment 创建和三类资源设置共用 `SecurityContextInput`。容器级支持 privileged、allowPrivilegeEscalation、readOnlyRootFilesystem、runAsNonRoot、runAsUser/runAsGroup、SELinux 四字段及 capabilities add/drop；Pod 级只暴露当前 V3 已确认的用户/组和 SELinux 字段。
+2. 三类资源分别解析和写回 `spec.template.spec.securityContext`，工作容器与初始化容器分别写回各自 `securityContext`。普通 init 与 restartable init 都按 Kubernetes 容器安全上下文处理，不复用生命周期限制。
+3. 未编辑时保留原始对象；修改已建模字段时保留 seccompProfile、fsGroup 等未建模字段；显式关闭安全上下文时清除对应对象。空 SELinux 字段和空 capability 列表不生成无意义字段。
+4. 校验拒绝非布尔访问控制、非整数 UID/GID、非字符串 SELinux 值和非法 capability 名称。现有原生表单、容器、生命周期、卷和更新策略行为继续回归。
+
+### 实际验证
+
+| 命令                                                                      | 结果与边界                                                                                                                                                                       |
+| ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `esno .../deployment.test.ts`                                             | 新增用例先出现 5 个失败；当前 38/38。覆盖三类 Pod 上下文、容器上下文、未知字段保留、显式清空、非法值和创建 payload                                                               |
+| `esno .../SecurityContextInput.test.ts`                                   | 文件不存在时 2/2 失败；实现后 2/2，通过实际组件分支和回调，不替代浏览器渲染                                                                                                      |
+| `./scripts/test.sh`                                                       | 首次因既有生命周期 VM 测试未模拟新组件导致 2 项失败；修复隔离边界后最终 **74 个文件、322 项通过，0 失败**                                                                        |
+| `corepack yarn build:packages`                                            | 成功，appstore/console/core/shared 全部构建完成                                                                                                                                  |
+| 变更生产文件 ESLint、全部变更 Prettier、`git diff --check`                | 通过                                                                                                                                                                             |
+| TypeScript compiler API 基线对照                                          | 基线 `0a17b2e27` 699 项、当前 699 项、新增 0、变更生产文件直接错误 0；项目类型检查仍未全通过，见[记录](./evidence/workload-security-20261023-typecheck.json)                     |
+| `node docs/v4-migration/evidence/workload-security-server-validation.cjs` | 绑定代码提交 `9e2f4148f`，Deployment、StatefulSet、DaemonSet 的 131 服务端 dry-run 均接受；没有保存资源，见[API 记录](./evidence/workload-security-20261023-api-validation.json) |
+
+### 尚未执行和下一项
+
+本增量没有构建或推送镜像，没有更新 131 的 ks-console，没有 rollout，也没有在当前 SHA 上登录浏览器。服务端 dry-run 只证明请求通过 Kubernetes API 校验，不证明实际 Pod 能运行、安全策略允许、页面可渲染或 RBAC 正确。下一项继续调度和 Pod 模板元数据；时区挂载、StatefulSet Service/PVC 模板、集群原生列表、创建、DaemonSet 停止语义和配置引用仍在 DEV 清单中。

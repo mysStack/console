@@ -30,7 +30,7 @@
 | DS-09 | CPU、内存及其他资源/设备              | CPU/内存 requests/limits 已有                                 | 未闭环；不能假定 V3 支持或不支持 GPU 等       | 单位、上下限、清空、扩展资源保留/编辑                            |
 | DS-10 | 存活、就绪、启动探针                  | HTTP/TCP/command 部分表单                                     | 未闭环                                        | 处理器、阈值、HTTP headers、命名端口、关闭/切换                  |
 | DS-11 | 生命周期钩子和终止行为                | 无完整原生编辑表单                                            | 未闭环                                        | postStart/preStop、终止宽限期及失败反馈                          |
-| DS-12 | 容器/Pod 安全上下文                   | 无完整原生编辑表单                                            | 未闭环                                        | 用户/权限/capabilities 等实际 V3 支持项                          |
+| DS-12 | 容器/Pod 安全上下文                   | 已实现 V3 字段的原生创建/编辑、保留/清空与校验                | DEV 已实现，待当前制品 VERIFY                 | UID/GID、SELinux、访问控制、capabilities；真实 RBAC/持久化待验收 |
 | DS-13 | 卷类型和资源选择                      | PVC/emptyDir/hostPath/ConfigMap/Secret 部分表单；其他主要保留 | 未闭环                                        | V3 全部来源、资源权限、错误态、类型切换、删除引用                |
 | DS-14 | 挂载、子路径、只读和 key 选择         | mountPath/subPath/readOnly 部分表单                           | 未闭环                                        | 多容器挂载、key/path/mode、冲突、subPathExpr 等实际支持项        |
 | DS-15 | 节点选择、调度、亲和性、污点容忍      | 无完整原生编辑表单                                            | 未闭环                                        | 默认/自定义/必选偏好、约束冲突、切换和清空                       |

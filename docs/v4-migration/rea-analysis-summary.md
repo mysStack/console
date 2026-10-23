@@ -8,7 +8,7 @@
 | 模块/当前能力     | Workload / Deployment、StatefulSet、DaemonSet 组合批次                                                                                                                                                                                                                   |
 | Worktree/分支     | `console-workloads` / `feature/v4-workloads`                                                                                                                                                                                                                             |
 | 当前阶段/REA 结论 | `DEV` / REA 已通过（项目负责人已批准进入 DEV；未闭环项转入 DEV/VERIFY 验收清单）                                                                                                                                                                                         |
-| 事实输入提交      | 本轮制品定位 `e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0`；当前功能提交 `da25187d3`；业务代码输入以当前分支 HEAD 为准                                                                                                                                                      |
+| 事实输入提交      | 本轮制品定位 `e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0`；当前功能提交 `9e2f4148f`；业务代码输入以当前分支 HEAD 为准                                                                                                                                                      |
 | 观察              | 已有原生简化表单和有限部署后测试；当前 V3 编辑行为尚未逐项还原                                                                                                                                                                                                           |
 | 推断              | 表单覆盖不足，不能凭现有 V4 测试证明当前 V3 等价；具体缺失须由制品和真实 V3 行为确认                                                                                                                                                                                     |
 | 制品/REA 证据     | [REA 复核及完整 Evidence ID](./workload-settings-rea-20261022.md)；[Action/API/权限与缓存静态证据](./workload-action-api-rbac-evidence-20261023.md)；[旧 V3 运行时补证](./workload-v3-runtime-rea-20261023.md)；V3 Git tree 绑定在阶段记录中，不能与 REA 目录摘要混用    |
@@ -19,6 +19,8 @@
 | 下一步            | 进入 DEV，按 WL-01～WL-04 验收清单先补失败测试，再实现三类资源原生入口、字段、Action/API/权限/缓存/错误和配置引用；完成 DEV 前不构建、不部署                                                                                                                             |
 
 REA 的 `partial/no-match` 是覆盖限制，不能证明功能不存在，也不是所有模块必须停止的理由。当前受限的是尚未证明的 Workload 组合批次；无关模块仍遵循自己的证据和门禁。无需恢复全部原始 TSX，只需要公共行为和三类资源差异的证据足以指导完整 V4 重构。
+
+2026-10-23 安全上下文增量继续使用同一固定当前制品 tree，定向分析工厂 1540、1541、2276、2277、2282、2298，确认容器访问控制、UID/GID、SELinux、capabilities 及 Pod 用户/组与 SELinux 的字段边界。分析 Evidence 与局限见 [DEV 记录](./workload-settings-dev-20261023.md#安全上下文原生编辑增量2026-10-23)；该增量用于指导提交 `9e2f4148f`，不改变既有 REA 批准范围，也不替代当前制品 VERIFY。
 
 ## 组合开发边界
 
