@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-24",
+  "environment": {
+    "baseUrl": "http://192.168.2.131:30880",
+    "sourceCommit": "24c6afa03849d5d5c7b84fccd1602639b1fd0eb5",
+    "imageTag": "feature-v4-workloads-20261024-050150-24c6afa03849",
+    "imageDigest": "sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76",
+    "podImageId": "ghcr.io/mysstack/ks-console@sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76"
+  },
+  "fixture": {
+    "namespace": "v4-migration-e2e",
+    "kind": "Deployment",
+    "name": "v4-deploy-edit-ef3"
+  },
+  "setup": {
+    "temporaryTemplateAnnotation": "codex.dev/rollback-test=new-revision",
+    "purpose": "生成可回退的专用修订记录",
+    "setupChangedBusinessData": false
+  },
+  "browser": {
+    "freshContext": true,
+    "loginHttp": 200,
+    "authenticatedUI": true,
+    "route": "/test-workspace/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/resource-status",
+    "targetRevision": "#27",
+    "patchStatus": 200,
+    "dialogClosed": true,
+    "pageErrorsObserved": 8,
+    "pageErrorsScope": "浏览器控制台存在既有页面错误计数；未因本次回退判定为通过，接口和页面状态按独立断言记录。"
+  },
+  "kubernetes": {
+    "rolloutStatus": "successfully rolled out",
+    "postRollbackRevision": "29",
+    "temporaryTemplateAnnotationPresent": false,
+    "readyReplicas": 1,
+    "image": "nginx:alpine"
+  },
+  "result": "通过：回退目标版本选择、实际 PATCH 200、弹窗关闭、回退生成新修订并恢复 Ready 已验证。"
+}

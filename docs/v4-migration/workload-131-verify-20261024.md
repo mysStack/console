@@ -1,3 +1,9 @@
+# 当前增量：Deployment 回退实际写入复验（2026-10-24）
+
+在精确制品 `24c6afa03849d5d5c7b84fccd1602639b1fd0eb5` 上，对专用 Deployment `v4-deploy-edit-ef3` 先写入临时模板注解以生成可回退修订，再通过浏览器打开回退弹窗选择 `#27`。实际 PATCH 返回 200，弹窗关闭；Kubernetes 随后成功 rollout，Ready 副本为 1，临时注解已移除，回退动作生成新的修订记录。
+
+证据：[Deployment 回退浏览器复验](./evidence/workload-rollback-browser-verify-20261024.json)。本证据仅覆盖 Deployment 回退写入和恢复，不代表 StatefulSet/DaemonSet 具备同一回退入口，也不关闭批量删除、伸缩确认、完整错误/缓存和逐项 V3 等价缺口。
+
 # 当前增量：集群级三类原生列表浏览器复验（2026-10-24）
 
 在精确制品 `24c6afa03849d5d5c7b84fccd1602639b1fd0eb5`、镜像 digest `sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76` 上，使用零 Cookie 新浏览器 context 登录 131，访问 `/clusters/host/deployments`、`/clusters/host/statefulsets` 和 `/clusters/host/daemonsets`。三类页面的专用 fixture 均可见，namespace 控件渲染，登录 HTTP 200、认证界面正常，页面错误为 0，Network 未发现 `/consolev3` 或 `/dist/v3dist` 请求。

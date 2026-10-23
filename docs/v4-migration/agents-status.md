@@ -1,3 +1,7 @@
+# 当前状态补充（2026-10-24：Deployment 回退实际写入复验）
+
+专用 Deployment `v4-deploy-edit-ef3` 已在当前精确制品上通过浏览器选择回退目标 `#27`，PATCH 返回 200，弹窗关闭，Kubernetes rollout 成功并恢复 1/1 Ready，临时验证注解已移除。证据见 [Deployment 回退浏览器复验](./evidence/workload-rollback-browser-verify-20261024.json)。批量删除成功、伸缩确认、完整错误/缓存和逐项 V3 等价仍未完成，模块继续保持 `VERIFY / 未完成`。
+
 # 当前状态补充（2026-10-24：集群级原生列表浏览器复验）
 
 精确制品 `24c6afa03849d5d5c7b84fccd1602639b1fd0eb5` 在 131 的 `/clusters/host/deployments`、`/clusters/host/statefulsets`、`/clusters/host/daemonsets` 均完成零 Cookie 登录和页面复验：专用 fixture 可见、namespace 控件可见、页面错误为 0，未出现 `/consolev3` 或 `/dist/v3dist` 请求。证据见 [集群级原生列表浏览器复验](./evidence/workload-cluster-native-browser-verify-20261024.json)。批量删除确认后的成功结果仍未验证，Workload 继续保持 `VERIFY / 未完成`。
