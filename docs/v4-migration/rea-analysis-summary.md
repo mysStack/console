@@ -7,7 +7,7 @@
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 模块/当前能力     | Workload / Deployment、StatefulSet、DaemonSet 组合批次                                                                                                                                                                                                                   |
 | Worktree/分支     | `console-workloads` / `feature/v4-workloads`                                                                                                                                                                                                                             |
-| 当前阶段/REA 结论 | `REA` / 分析中                                                                                                                                                                                                                                                           |
+| 当前阶段/REA 结论 | `DEV` / REA 已通过（项目负责人已批准进入 DEV；未闭环项转入 DEV/VERIFY 验收清单）                                                                                                                                                                                         |
 | 事实输入提交      | 本轮制品定位 `e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0`；当前记录提交 `2c3ee6c0f`；业务代码输入以当前分支 HEAD 为准                                                                                                                                                      |
 | 观察              | 已有原生简化表单和有限部署后测试；当前 V3 编辑行为尚未逐项还原                                                                                                                                                                                                           |
 | 推断              | 表单覆盖不足，不能凭现有 V4 测试证明当前 V3 等价；具体缺失须由制品和真实 V3 行为确认                                                                                                                                                                                     |
@@ -15,8 +15,8 @@
 | 行为和字段清单    | [组合能力边界](./workload-kind-capability-matrix.md)、[编辑设置能力矩阵](./deployment-settings-capability-matrix.md)、[旧源码对照](./workload-settings-source-evidence-20261024.md)；三类资源均未标记为已还原、[字段级对照](./workload-v3-field-equivalence-20261023.md) |
 | 未知及影响        | 三类资源的入口/分区、完整字段、Action/API/Store、RBAC/作用域、错误态和缓存尚未闭环，影响功能完整性、权限和数据保留；配置引用仍有 V3 Action/Wujie 桥接                                                                                                                    |
 | 关闭条件          | 公共行为和三类资源差异均有可追溯制品定位、运行时对照、V4 替代与差异；所有高风险已关闭或经复核明确隔离                                                                                                                                                                    |
-| 复核人/日期/依据  | 尚无本能力正式签署，不填造；阶段记录中的 `review` 为 `null`                                                                                                                                                                                                              |
-| 下一步            | 沿已定位表单子组件和 Store 展开字段/校验/API，再以真实 V3 页面校准；不重复全量 REA，不提前编码或部署                                                                                                                                                                     |
+| 复核人/日期/依据  | 项目负责人（用户明确批准）/ 2026-10-23 / [Workload REA 复核结论](./workload-rea-review-20261023.md#5-门禁动作)                                                                                                                                                           |
+| 下一步            | 进入 DEV，按 WL-01～WL-04 验收清单先补失败测试，再实现三类资源原生入口、字段、Action/API/权限/缓存/错误和配置引用；完成 DEV 前不构建、不部署                                                                                                                             |
 
 REA 的 `partial/no-match` 是覆盖限制，不能证明功能不存在，也不是所有模块必须停止的理由。当前受限的是尚未证明的 Workload 组合批次；无关模块仍遵循自己的证据和门禁。无需恢复全部原始 TSX，只需要公共行为和三类资源差异的证据足以指导完整 V4 重构。
 
@@ -38,16 +38,16 @@ Deployment、StatefulSet、DaemonSet 共用一个模块分支和组合能力记�
 
 2026-10-23 策略专项补证输入 `45f104b6e18215bb6b4f273e1dd16da30107188a`：当前制品三个工厂完成惰性提取和实际 REA，三类旧 V3 更新策略生成的 PUT 已在浏览器拦截，模拟 409 后取消，API 回读无变化。已区分已有值与缺省值、Deployment 数字转换与 DaemonSet 字符串，以及 StatefulSet 初始化拼写和 DaemonSet 默认不一致。详见[字段补证](./workload-v3-field-equivalence-20261023.md#当前编译制品的策略调度及优雅终止补证)、[来源偏移](./evidence/workload-strategy-20261023-provenance.json)、[REA 摘要](./evidence/workload-strategy-20261023-rea-summary.json)及[运行时摘录](./evidence/workload-strategy-20261023-runtime.json)。这不是实际服务端冲突/持久化测试，不晋级当前阶段。
 
-2026-10-23 UI 分区复核：只读遍历旧 V3 Deployment、StatefulSet、DaemonSet 设置弹窗的所有已挂载分区，确认更新策略、容器/容器组、普通卷、调度和终止分区的资源差异；结果见[结构化快照](./evidence/workload-settings-ui-20261023.json)。同时补齐当前 V4 Store/API/Action 静态矩阵，明确 DaemonSet 停止误用 `spec.replicas=0`、StatefulSet Service/PVC 模板及缓存失效仍待 DEV/VERIFY 处理。当前 REA 仍为“分析中”，未写入复核签署。
+2026-10-23 UI 分区复核：只读遍历旧 V3 Deployment、StatefulSet、DaemonSet 设置弹窗的所有已挂载分区，确认更新策略、容器/容器组、普通卷、调度和终止分区的资源差异；结果见[结构化快照](./evidence/workload-settings-ui-20261023.json)。同时补齐当前 V4 Store/API/Action 静态矩阵，明确 DaemonSet 停止误用 `spec.replicas=0`、StatefulSet Service/PVC 模板及缓存失效仍待 DEV/VERIFY 处理。该条属于历史取证记录；当前 REA 已获负责人批准进入 DEV。
 
-2026-10-23 REA 材料复核结论见[Workload 组合批次 REA 复核结论](./workload-rea-review-20261023.md)：当前材料不足以放行，继续保持“分析中，待负责人复核”。本次把配置引用的 V3 Action/Wujie 依赖和集群级 Workload 列表的 Wujie/V3 主入口从“未知”校准为已确认实现缺口，同时保留字段、RBAC、作用域、缓存、错误和三类资源逐项等价的未闭环状态；不进入 DEV。
+2026-10-23 REA 材料复核结论见[Workload 组合批次 REA 复核结论](./workload-rea-review-20261023.md)：项目负责人已批准进入 DEV，批准范围是按已确认缺口开始编码；配置引用的 V3 Action/Wujie 依赖、集群级 Workload 列表的 Wujie/V3 主入口、字段/校验、RBAC/作用域、缓存/错误和三类资源逐项等价均转为 DEV/VERIFY 验收清单，不得在 DEV 中直接视为已完成。
 
 2026-10-23 字段行为矩阵见[Workload 三类资源字段行为矩阵](./workload-field-behavior-matrix-20261023.md)：逐项绑定旧 V3 的字段分区、默认值/校验、当前 V4 解析与写回逻辑，单独列出 StatefulSet 的 Service/PVC 模板和 DaemonSet 的无副本/更新策略差异。该矩阵把“已定位事实”和“待实测行为”分开，扩大 DEV 输入但不关闭高风险项。
 
-2026-10-23 Action/API/权限补证见[静态证据矩阵](./workload-action-api-rbac-evidence-20261023.md)：确认三类详情页的权限键、操作差异、请求方法和作用域构造，明确 DaemonSet 停止语义、集群级 Wujie/V3 列表、配置引用桥接以及按资源类型失效缓存的限制。该补证仍未提供当前 SHA 的运行时 RBAC、隔离、缓存和错误态证据，不能放行 DEV。
+2026-10-23 Action/API/权限补证见[静态证据矩阵](./workload-action-api-rbac-evidence-20261023.md)：确认三类详情页的权限键、操作差异、请求方法和作用域构造，明确 DaemonSet 停止语义、集群级 Wujie/V3 列表、配置引用桥接以及按资源类型失效缓存的限制。该补证作为 DEV 实现输入，当前 SHA 的运行时 RBAC、隔离、缓存和错误态证据仍需在 DEV/VERIFY 阶段完成。
 
 2026-10-23 REA 阶段测试见[测试证据](./workload-rea-test-evidence-20261023.md)：`./scripts/test.sh` 的 70 个测试文件、287 个断言全部通过；另有 15 个 Workload 定向测试文件、106 个断言通过。测试覆盖当前源码的解析、Store、权限参数、错误传播和 V3 桥接协作；不覆盖当前 SHA 构建部署后的浏览器、真实 RBAC、跨 namespace 隔离或完整三类资源等价，因此不改变 REA 门禁。
 
-2026-10-23 旧 V3 运行时补证见[运行时记录](./workload-v3-runtime-rea-20261023.md)：在固定历史镜像 `feature-v4-workloads-20261022-215739-27aaeced74e8` 上只读观察 StatefulSet 设置弹窗和 GET 请求，确认更新策略、容器、优雅终止、存储、调度五个分区及 partition `0`。该镜像不是当前分支 HEAD，证据用于校准 V3 行为，不作为当前 VERIFY。
+2026-10-23 旧 V3 运行时补证见[运行时记录](./workload-v3-runtime-rea-20261023.md)：在固定历史镜像 `feature-v4-workloads-20261022-215739-27aaeced74e8` 上只读观察 Deployment、StatefulSet、DaemonSet 设置弹窗和 GET 请求，确认资源特有分区及字段。该镜像不是当前分支 HEAD，证据用于校准 V3 行为，不作为当前 VERIFY；当前 SHA 的构建、部署和 Playwright 验收仍待执行。
 
-同时纠正集群列表判定：活跃入口是 V4 Banner/Tab + Wujie 内 V3 列表；独立 STS/DS Embed 文件的 URL 互换没有在该主入口复现。REA 证据应明确当前行为与拟开发行为；当前 SHA 的最终构建部署验收属于 VERIFY，不作为 REA 完成前的循环前置条件。当前完整 REA 仍未闭环。
+同时纠正集群列表判定：活跃入口是 V4 Banner/Tab + Wujie 内 V3 列表；独立 STS/DS Embed 文件的 URL 互换没有在该主入口复现。当前阶段已获准进入 DEV；当前 SHA 的最终构建部署验收属于 VERIFY，不能用历史镜像证据替代。

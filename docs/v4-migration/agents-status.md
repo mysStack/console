@@ -4,17 +4,17 @@
 
 - 负责人：当前 Codex 单会话，不使用子 Agent。模块/能力：`workloads / deployment-statefulset-daemonset`；资源：Deployment、StatefulSet、DaemonSet。
 - 分支/Worktree：`feature/v4-workloads` / `console-workloads`；代码输入 `36ae2216167ae27561c05e37e5157df0da322de8`。
-- 当前阶段 `REA`，结论“分析中”。[阶段记录](./module-execution.json)、[组合能力边界](./workload-kind-capability-matrix.md)、[REA 索引](./rea-analysis-summary.md)为当前依据；Deployment 专项矩阵是组合批次的输入之一。
-- 当前任务：三类资源已定位普通编辑入口、Action 处理器、Store/API 请求边界、权限键和按资源登记的分区；继续关闭字段、作用域、RBAC、缓存和运行时差异。公共实现可以共用，三类资源的差异和验收必须分别记录。不修改业务表单，不部署。已有实现和限定浏览器观察保留为历史输入。
-- 当前 REA 材料复核结论：不足以放行 DEV，继续“分析中，待负责人复核”。复核记录见 [workload-rea-review-20261023.md](./workload-rea-review-20261023.md)。本次确认普通 Workload 配置引用仍依赖 `useV3action`、Wujie Shadow DOM 和 V3 编辑器实例，集群级三类 Workload 列表主入口仍挂载 `/consolev3`；这两项是明确的 DEV 缺口，不再作为未知行为豁免。`module-execution.json` 的 `rea.review` 继续为 `null`。
+- 当前阶段 `DEV`，REA 结论“已通过”。[阶段记录](./module-execution.json)、[组合能力边界](./workload-kind-capability-matrix.md)、[REA 索引](./rea-analysis-summary.md)为当前依据；Deployment 专项矩阵是组合批次的输入之一。
+- 当前任务：三类资源已定位普通编辑入口、Action 处理器、Store/API 请求边界、权限键和按资源登记的分区；按 WL-01～WL-04 验收清单补齐字段、作用域、RBAC、缓存和运行时差异。公共实现可以共用，三类资源的差异和验收必须分别记录。当前阶段允许修改业务代码，但不部署，直到 DEV 交付完成。已有实现和限定浏览器观察保留为历史输入。
+- 当前 REA 材料已获项目负责人批准进入 DEV。复核记录见 [workload-rea-review-20261023.md](./workload-rea-review-20261023.md)。本次确认普通 Workload 配置引用仍依赖 `useV3action`、Wujie Shadow DOM 和 V3 编辑器实例，集群级三类 Workload 列表主入口仍挂载 `/consolev3`；这些是明确的 DEV 验收缺口，不得当作已完成。`module-execution.json` 已记录复核依据和日期。
 - 已建立 [三类资源字段行为矩阵](./workload-field-behavior-matrix-20261023.md)，覆盖公共字段、默认值/校验、清空/保留语义，以及 StatefulSet Service/PVC 模板和 DaemonSet 无副本/更新策略差异。矩阵将待实测项明确列出；字段、API、RBAC、缓存和错误仍未闭环，不改变 REA 门禁。
 - 已建立 [Action、API、权限与缓存静态证据](./workload-action-api-rbac-evidence-20261023.md)，覆盖三类资源详情操作、权限键、项目 URL、HTTP 方法、删除/HPA、版本冲突和缓存失效事实；运行时 RBAC、namespace 隔离、缓存刷新和错误态仍未验证，不改变 REA 门禁。
 - 已执行 [REA 阶段测试](./workload-rea-test-evidence-20261023.md)：`./scripts/test.sh` 的 70 个测试文件、287 个断言全部通过，另有 15 个 Workload 定向测试文件、106 个断言通过；其中配置引用测试验证的是当前 V3/Wujie 桥接协作，不能解释为 V3 依赖已移除。未执行当前 SHA 构建、部署和 Playwright VERIFY。
 - 已补充 [旧 V3 运行时 REA](./workload-v3-runtime-rea-20261023.md)：在 131 历史镜像上只读复核 StatefulSet 设置分区和 GET 请求，未执行任何资源变更；该镜像不是当前分支 HEAD，只作为行为输入。
-- 已关闭的定向未知：旧源码四个设置分区、StatefulSet Service 差异、Deployment HPA 差异，以及当前制品的普通入口和 Action 定位。待关闭：三类资源完整字段/校验、动态 Action/API/Store、RBAC/作用域和错误/缓存行为。尚无正式 REA 复核签署，不自动进入 DEV。
+- 已关闭的定向未知：旧源码四个设置分区、StatefulSet Service 差异、Deployment HPA 差异，以及当前制品的普通入口和 Action 定位。DEV 验收清单待关闭：三类资源完整字段/校验、动态 Action/API/Store、RBAC/作用域和错误/缓存行为；REA 已获负责人批准，后续进入 DEV，但不代表上述缺口已完成。
 - 历史取证输入 SHA：`24e87aec244ef265ef14fc3201603e42a1233978`。本轮新增确认：集群级三类入口仍挂载 Wujie/V3，两个未挂载的独立 StatefulSet/DaemonSet Embed 文件 URL 互换（不作为主入口已复现缺陷）；联邦 Deployment/StatefulSet 仍为 Wujie/V3，联邦 DaemonSet 范围未确认；普通 Workload 配置引用仍调用 `useV3action` 并绑定 V3 DOM。上述内容已列为明确缺口或高风险，不把它们当作“没有功能”。
 - 当前既有回归中，项目级详情/列表、Workload Store 和 ConfigReference 的 9 个测试文件共 62 个断言通过；其中 ConfigReference 的 35 个断言验证的是当前 V3/Wujie 桥接、Shadow DOM 锚点和原生 Patch 协作行为，不能被解释为已移除 V3 Action。整体测试只覆盖静态入口和部分请求错误传播，不覆盖集群桥接移除、配置引用 V3 Action 移除、三类资源高级字段或当前 SHA 部署后的浏览器行为。
-- 当前 DEV 前置仍未满足：StatefulSet/DaemonSet 原生设置、DaemonSet 停止语义、StatefulSet Service/PVC 模板、完整字段保留/清空、集群级作用域和配置引用桥接均未闭环。对应测试设计已加入 `WL-MV-09`、`WL-MV-10`，不修改业务代码。
+- 当前 DEV 验收清单仍待完成：StatefulSet/DaemonSet 原生设置、DaemonSet 停止语义、StatefulSet Service/PVC 模板、完整字段保留/清空、集群级作用域和配置引用桥接。对应测试设计已加入 `WL-MV-09`、`WL-MV-10`；本轮已获准编码，不代表这些项目已经通过。
 - 当前模块的流程文件修复涉及所有后续模块：根目录主计划/规则/门禁脚本原位更新，版本化快照位于 `governance/`；不改公共业务组件。其他模块初始化阶段记录后才能继续，不继承 Workload 的状态。
 - 2026-10-23：在原门禁基础上接入真实 Git pre-commit、中文 commit-msg 和 PR CI。隔离 Git 回归由 18 项增至 32 项，通过；初次新增用例复现 8 项失败。工具测试通过不表示业务阶段放行，PR #2 的完整差异仍需接受阶段检查；部署和浏览器未执行。详见[修复记录补充](./module-process-repair-20261022.md#2026-10-23-执行入口补强)。
 - 工具代码提交 `da38cb87e` 已推送；[Run 39812232782](https://github.com/mysStack/console/actions/runs/39812232782) 的 32 项工具回归成功，阶段检查拒绝 REA 中的历史业务差异，总结果为 failure。`feature/v4-migration` 已配置这两个必需检查并对管理员生效。真实证据见[验证记录](./governance/module-gate-verification-20261023.json)；不改变当前模块 REA 状态。
@@ -24,7 +24,7 @@
 - 本轮实际取证：普通详情工厂 1216/1221/1402、Action 3595、Modal/分区 3601/3602；确认 STS/DS 原生“编辑设置”当前仍调用 YAML。13 个派生工厂已执行 REA；解析成功不表示语义完整，字段/API/RBAC/运行时维度保持未完成。证据和下一项见[组合矩阵](./workload-kind-capability-matrix.md)。文档调整提交 `e67b95ccd` 的 [Run 39818401407](https://github.com/mysStack/console/actions/runs/39818401407) 工具回归 32 项成功，阶段检查因 REA 完整 PR 差异含历史业务代码而失败；不放行 PR。
 
 - 2026-10-24：通过固定 `origin/release-3.4` 补齐三类资源的设置分区和资源特有 Action 对照；当前 V4 仅 Deployment 接入简化设置 Modal，STS/DS 编辑设置仍调用 YAML。详见[旧源码与当前实现对照](./workload-settings-source-evidence-20261024.md)。此项只关闭结构未知，不代表 REA 通过。
-- 2026-10-23：完成 Workload Store/API 的定向静态取证，绑定三类资源的作用域 URL、Deployment 原生设置 PUT、其他 PATCH、Background 删除、关联 HPA 和 StatefulSet Service PATCH；同时确认当前代码没有统一的 mutation 后 React Query 失效机制，DaemonSet 停止语义与旧源码不同，必须进入后续独立验证。详见[Store/API 取证](./workload-settings-source-evidence-20261024.md#storeapi作用域和缓存的定向取证2026-10-23)。本轮只补证据，不修改业务代码、不部署，阶段仍为 REA/分析中。
+- 2026-10-23：完成 Workload Store/API 的定向静态取证，绑定三类资源的作用域 URL、Deployment 原生设置 PUT、其他 PATCH、Background 删除、关联 HPA 和 StatefulSet Service PATCH；同时确认当前代码没有统一的 mutation 后 React Query 失效机制，DaemonSet 停止语义与旧源码不同，必须进入后续独立验证。详见[Store/API 取证](./workload-settings-source-evidence-20261024.md#storeapi作用域和缓存的定向取证2026-10-23)。本轮只补证据，不修改业务代码、不部署；该条是历史取证记录，当前阶段已按负责人批准进入 DEV。
 - 2026-10-23：使用 `/home/bruce/.bashrc` 专用测试账号在 131 完成限定浏览器 REA。确认项目列表和三类详情页可渲染；Deployment“编辑设置”打开原生表单，StatefulSet 和 DaemonSet 的同名入口均实际打开“编辑 YAML”。当前部署镜像仍是旧 SHA，证据只用于 REA 校准，不计为当前分支 VERIFY。详见[运行时 REA](./workload-runtime-rea-20261023.md)。
 - 2026-10-23：依据测试准入规则完成三类 Workload 的分层测试设计，复用现有表单、Store、作用域和配置引用回归资产，登记 API/Service Guard、稳定 UI、草稿流程和人工探索的 MVTests。131 已取得 admin 浏览器会话并完成限定 REA 页面观察，但当前部署制品不是当前分支 SHA，VERIFY 前置条件仍未满足；本文件只约束后续验证，不放行 DEV。详见[测试设计](./workload-test-design-20261023.md)和[运行时 REA](./workload-runtime-rea-20261023.md)。
 
@@ -32,7 +32,7 @@
 
 - 复核范围：`module-execution.json`、组合能力矩阵、字段级 V3/V4 对照、Store/API 静态取证、运行时 REA、测试设计及当前 PR 门禁结果。
 - 结论：当前材料支持“已定位主要入口、部分字段和请求边界”，不支持“Deployment、StatefulSet、DaemonSet 已完成 REA”。三类资源的完整字段/默认值/校验、资源特有 Action、RBAC 与作用域、缓存失效、错误/取消路径和 V4 替代边界仍未闭环。当前 SHA 部署后浏览器行为属于后续 VERIFY，不能要求开发前已有最终实现的验收。
-- 当前阶段保持 `REA`，REA 结论保持“分析中”；没有正式复核签署，不进入 `DEV`，不部署。该结论不是对功能不存在的判断，也不是对历史代码的否定。
+- 当前阶段已从 `REA` 进入 `DEV`，REA 结论为“已通过”；本次批准只解除编码门禁，不代表功能已完成，不部署 131，直到 DEV 交付完成并进入 VERIFY。该结论不是对功能不存在的判断，也不是对历史代码的否定。
 - 不属于本轮 REA 结论的历史事实：已有单元测试、旧 SHA 131 浏览器记录和旧镜像结果只能作为输入，不能替代当前 SHA 的模块阶段证据；ConfigReference 当前测试还验证了 V3/Wujie 桥接的存在，不能作为桥接已移除的证明。
 - 本轮使用 131 现有浏览器会话补充了集群级入口和旧 V3 设置页面证据：三个集群入口可渲染对应资源的 V3 嵌入列表（V4 仅为 Banner/Tab 外壳），但资源链接仍指向 `/consolev3`，并实际加载 `/dist/v3dist/*`；旧 V3 页面观察到 Deployment、StatefulSet、DaemonSet 各自的更新策略、容器/存储/调度/优雅终止等分区及资源差异。当前部署镜像为旧 SHA，证据只用于 REA 校准，不改变当前阶段或放行结论。详见[运行时 REA](./workload-runtime-rea-20261023.md#2026-10-23-集群级入口和旧-v3-设置复核)。
 
@@ -40,7 +40,7 @@
 - 依据固定 `origin/release-3.4` 的行级复核补齐了旧 V3 的 Service 初始化、DaemonSet 无副本控件、Pod 安全/调度/宽限期/元数据分区、普通卷与 StatefulSet PVC 模板的关系。该证据关闭静态结构未知，不关闭当前 V4 字段写回、RBAC、缓存或浏览器等价性。
 - 通过 Playwright 只读遍历 131 旧 V3 三类设置弹窗的全部 `data-name` 分区，已归档输入路径、已有值和资源差异；没有提交保存请求。结构化结果见[旧 V3 UI 快照](./evidence/workload-settings-ui-20261023.json)，不能替代当前 SHA VERIFY。
 - 同一输入 SHA 的 PR #2 [Run 39859664115](https://github.com/mysStack/console/actions/runs/39859664115) 工具回归成功，阶段/范围检查失败；PR 仍为 Open/Draft，不合并。仅记录真实结果，不为消除红灯改写历史。
-- 本次复核结论：继续 REA，优先补齐容器/卷的保留与清空、StatefulSet Service/PVC 模板、DaemonSet Action 语义和低权限/缓存边界；已知实现缺口属于后续 DEV，最终部署浏览器验收属于 VERIFY，不混用阶段要求。
+- 本次复核结论：REA 已获准进入 DEV，优先补齐容器/卷的保留与清空、StatefulSet Service/PVC 模板、DaemonSet Action 语义和低权限/缓存边界；已知实现缺口属于 DEV，最终部署浏览器验收属于 VERIFY，不混用阶段要求。
 
 ## 2026-10-22 编辑设置 REA 纠偏
 

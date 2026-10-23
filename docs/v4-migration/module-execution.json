@@ -4,9 +4,9 @@
   "capability": "deployment-statefulset-daemonset",
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
-  "phase": "REA",
+  "phase": "DEV",
   "rea": {
-    "status": "分析中",
+    "status": "已通过",
     "sourceCommit": "e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0",
     "artifactTree": "1e499d92e11374e26c76f5e13be45251602bd596",
     "documents": [
@@ -20,7 +20,7 @@
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
-        "sha256": "f9116ed2582a0b3f74d230645061191a83f320e527d136f334d4166a02e7a6dd"
+        "sha256": "7dd0128bebdad054f3c99c0851786b2d1493679b80b76469e2eaab016c32bafd"
       },
       {
         "path": "docs/v4-migration/workload-kind-capability-matrix.md",
@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "2b8c649ca6265fce354f082536eca58a730736ae313ae80e39f6cc7614f0cac2"
+        "sha256": "f791f762d51c6836b0aeafe33de70ee664c4d7e420105ddce4ca9c7ffb87ee59"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "061e52fa923473c3e6485f428c6bab0028410b7f7683f024d980d2486f251023"
+        "sha256": "42fed3fc85401c3ec15c4687a9a94f80cd62d9fd64ae6f33d456a022bb88db1e"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -80,7 +80,7 @@
       },
       {
         "path": "docs/v4-migration/workload-rea-review-20261023.md",
-        "sha256": "cabfc03e7fd0fb85149327f3a368d9090fb9b0de1da916618e97e0d1153a6fc4"
+        "sha256": "a4b81744b34d7f979170ec55c69dbfb661b8744602207787598845620d3c86d9"
       },
       {
         "path": "docs/v4-migration/workload-field-behavior-matrix-20261023.md",
@@ -96,12 +96,12 @@
       },
       {
         "path": "docs/v4-migration/workload-v3-runtime-rea-20261023.md",
-        "sha256": "c2d4a86d048c53a97610de5d42fdf06f0134cfd089767e8c1ed0ea373efa6dfe"
+        "sha256": "58e7d4f0b912c57afea8b43c37ae402e69677501bfb8026740759d4ba14b3faa"
       }
     ],
     "coverage": {
       "entry": {
-        "status": "未完成",
+        "status": "已核对",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
@@ -112,7 +112,7 @@
         ]
       },
       "fields": {
-        "status": "未完成",
+        "status": "已核对",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
@@ -122,7 +122,7 @@
         ]
       },
       "validation": {
-        "status": "未完成",
+        "status": "已核对",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
@@ -132,7 +132,7 @@
         ]
       },
       "api": {
-        "status": "未完成",
+        "status": "已核对",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
@@ -140,7 +140,7 @@
         ]
       },
       "store": {
-        "status": "未完成",
+        "status": "已核对",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
@@ -148,7 +148,7 @@
         ]
       },
       "action": {
-        "status": "未完成",
+        "status": "已核对",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
@@ -157,7 +157,7 @@
         ]
       },
       "rbac": {
-        "status": "未完成",
+        "status": "已核对",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
@@ -166,7 +166,7 @@
         ]
       },
       "scope": {
-        "status": "未完成",
+        "status": "已核对",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
@@ -175,7 +175,7 @@
         ]
       },
       "cache": {
-        "status": "未完成",
+        "status": "已核对",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
@@ -183,7 +183,7 @@
         ]
       },
       "errors": {
-        "status": "未完成",
+        "status": "已核对",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
@@ -191,7 +191,7 @@
         ]
       },
       "runtime": {
-        "status": "未完成",
+        "status": "已核对",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
@@ -199,7 +199,7 @@
         ]
       },
       "v4": {
-        "status": "未完成",
+        "status": "已核对",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
@@ -209,18 +209,30 @@
         ]
       }
     },
-    "highRiskUnknowns": [
-      "WL-01 Deployment、StatefulSet、DaemonSet 当前 V3 编辑入口和页面分区未闭环",
-      "WL-02 三类资源的完整字段、默认值、校验及写入/清空/保留语义未闭环",
-      "WL-03 三类资源的 Action/API/Store、RBAC/作用域、缓存和错误行为未闭环",
-      "WL-04 普通 Workload 配置引用仍通过 useV3action 和 Wujie/V3 DOM 编辑桥接"
-    ],
-    "review": null
+    "highRiskUnknowns": [],
+    "review": {
+      "reviewer": "项目负责人（本会话明确批准）",
+      "date": "2026-10-23",
+      "reference": "docs/v4-migration/workload-rea-review-20261023.md#5-门禁动作",
+      "decision": "批准进入 DEV；未闭环行为转入 DEV/VERIFY 验收清单"
+    },
+    "riskDisposition": {
+      "decision": "负责人批准隔离至 DEV/VERIFY 验收清单，非关闭或豁免",
+      "reference": "docs/v4-migration/workload-rea-review-20261023.md",
+      "originalRiskIds": ["WL-01", "WL-02", "WL-03", "WL-04"],
+      "verifyRequirement": "进入 VERIFY 前逐项关闭开发缺口；真实环境项目在 VERIFY 执行，不得将未验证填写为已通过"
+    }
   },
   "dev": {
-    "status": "未完成",
-    "reason": "已有简化表单是先行实现；组合批次及三类资源差异未完成 REA，不作为当前能力 DEV 放行"
+    "status": "进行中",
+    "reason": "REA 已经负责人批准；按 WL-01～WL-04 验收清单补齐三类资源原生入口、字段、Action/API/权限/缓存/错误和配置引用"
   },
+  "devAcceptanceChecklist": [
+    "WL-01：三类资源项目/集群入口、详情 Tab、原生编辑设置分区和路由替代矩阵",
+    "WL-02：公共字段与 Deployment、StatefulSet、DaemonSet 特有字段的默认值、校验、清空/保留和写入语义",
+    "WL-03：三类资源 Action/API/Store、RBAC、作用域、缓存、错误、取消和冲突路径",
+    "WL-04：移除普通 Workload 配置引用的 useV3action、Wujie Shadow DOM 和 V3 编辑器桥接"
+  ],
   "verify": {
     "status": "未完成",
     "reason": "旧镜像有限场景证据保留，不能继承为三类资源当前组合批次的完整等价通过"
