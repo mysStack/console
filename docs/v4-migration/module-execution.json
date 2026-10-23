@@ -4,7 +4,7 @@
   "capability": "deployment-statefulset-daemonset",
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
-  "phase": "VERIFY",
+  "phase": "DEV",
   "rea": {
     "status": "已通过",
     "sourceCommit": "e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0",
@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "1dd7e498917c63a218d7f7fa3522bdbff7946ba92ed4f9db79c2f0e2fc79db2f"
+        "sha256": "b646570ab2ca719f1ce7d32b65ae285e027513adcc6db63644cd26f7a1c50694"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "5f73cb67e091550420b81e4d634fef1b56289dba80632ada80cd257fcecbef9d"
+        "sha256": "dadb09dece09524b17ffee1daa56a983b208fa8e053dfd89abea2bcf6a2efc79"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -224,8 +224,8 @@
     }
   },
   "dev": {
-    "status": "已完成",
-    "reason": "提交 cdc245c0dd5df0668211149ec4487176ea17815a 为关联 HPA 删除补齐 cluster/namespace/name 完整作用域；定向测试 27/27、完整回归 81 文件/364 项、包构建和变更文件检查通过。",
+    "status": "进行中",
+    "reason": "精确镜像 7fa49aa192d0 已通过 HPA 作用域、DaemonSet 停止/恢复和 StatefulSet PVC 持久化，但浏览器发现 PVC 创建区标题、添加按钮和校验键未翻译；退回 DEV 修复本地化。",
     "sourceCommit": "cdc245c0dd5df0668211149ec4487176ea17815a",
     "documents": [
       {
@@ -466,7 +466,7 @@
       },
       {
         "path": "docs/v4-migration/workload-dev-completion-20261023.md",
-        "sha256": "2281e072878dddef742642e97b1595b2990b0d5c125c293e35b2bba66a6824ee"
+        "sha256": "3aca87c7ba9caea76e82a45b01d183d13b600a477eb45be6d9578a6e282b6de7"
       }
     ]
   },
@@ -477,8 +477,8 @@
     "WL-04：移除普通 Workload 配置引用的 useV3action、Wujie Shadow DOM 和 V3 编辑器桥接"
   ],
   "verify": {
-    "status": "进行中",
-    "reason": "等待 DEV 源提交 cdc245c0dd5df0668211149ec4487176ea17815a 的 CI 镜像、131 rollout、Pod imageID 与 Deployment 批量删除关联 HPA 浏览器重验；既有 StatefulSet Service、RBAC 和 namespace 证据保留为输入。",
+    "status": "发现缺陷，退回 DEV",
+    "reason": "精确镜像 7fa49aa192d0 已关闭 HPA scope 并通过 DaemonSet 停止/恢复与 StatefulSet PVC 持久化；PVC 创建页本地化缺陷未关闭，新修复与新 SHA 浏览器渲染重验前不得通过。",
     "sourceCommit": "cdc245c0dd5df0668211149ec4487176ea17815a",
     "documents": []
   }
