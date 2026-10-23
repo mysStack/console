@@ -20,7 +20,7 @@
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
-        "sha256": "74f4c4cc3090860ac015c8daa05abc81390a6925ad9ec081394378cb5528a6aa"
+        "sha256": "3a4c77315a6df1745af583053d66e79414964cd03334870e223fde10537afe37"
       },
       {
         "path": "docs/v4-migration/workload-kind-capability-matrix.md",
@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "04c93f2aed232b451a3858f603aaafe0fb25658b62504e61467fcaf8a44147fa"
+        "sha256": "411fa16fe09447f5fd86165aa5654cdab3d7a3bb471bffc831e9045d3a54fda2"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "f9d93f9d7986b0fcd7dc5f251d7c857c4eeec3885c2856a9f45255e4fae151c6"
+        "sha256": "a156bd24109502f50af14137036fd1ddf222ee7974ce2d40b875eba0b94866ef"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -225,12 +225,40 @@
   },
   "dev": {
     "status": "进行中",
-    "reason": "开发中：原生设置入口、更新策略与优雅终止首批已实现；完整设置、集群入口、创建、Action 与配置引用仍待补齐；未进入 VERIFY",
-    "sourceCommit": "0c1d9aadf219fcabf5e6a310722591c9d7bef136",
+    "reason": "进行中：原生设置入口、策略、优雅终止及生命周期已实现并有本地/服务端 dry-run 证据；安全、调度、元数据、集群入口、创建、Action 和配置引用等仍待补齐；未进入 VERIFY",
+    "sourceCommit": "da25187d33ca49d21afa0ad748b619e8a2786c64",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
-        "sha256": "e0d0c9b080e25b506b37d9e9ac430bcbbf090c114688015c13545aedf9ab72ef"
+        "sha256": "ac3287c0e68969baef6429fdf025a3e5f35044f6559cd239c92a1fb7016f6e53"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-lifecycle-20261023-api-validation.json",
+        "sha256": "915d971c8528936d4f0b9144c82ea6b28ce96564a376dc5d3f65ba1165bf14d4"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-lifecycle-20261023-environment.json",
+        "sha256": "dd9603b9be368904534399e4475efffe5d555e96cb7d5e09444a784a476e0620"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-lifecycle-20261023-provenance.json",
+        "sha256": "14ab034dc7845a8bf8cdc879823453c0bb5914c23ab57497a612cc2d411ee5f3"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-lifecycle-20261023-rea-summary.json",
+        "sha256": "9b92c341a61aa56b3a58f11c1dbaa38184d7c91526efe905e032d8001a4a3d5f"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-lifecycle-20261023-typecheck.json",
+        "sha256": "99140249468594cbf294ff4761dbc687eeeda81b77d89d909be641d6452f3653"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-lifecycle-extract.cjs",
+        "sha256": "527b6c58f12930942c171715b68ba5c3717aa023a9e11a0a3eb98fe43a622e31"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-lifecycle-server-validation.cjs",
+        "sha256": "798420690cbb4c95e894735e9e55e94ecb76e77e151f6c4111b1dcbda8465155"
       }
     ]
   },

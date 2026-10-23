@@ -5,7 +5,7 @@
 - 模块：`workloads / deployment-statefulset-daemonset`。
 - 分支 / Worktree：`feature/v4-workloads` / `console-workloads`。
 - 负责人批准进入 DEV：`5c24342571419708b6f0c21f3ce9e8f193da0e17`，批准原文见 [REA 复核记录](./workload-rea-review-20261023.md)。
-- 本轮功能提交：`0c1d9aadf219fcabf5e6a310722591c9d7bef136`。
+- 首批功能提交：`0c1d9aadf219fcabf5e6a310722591c9d7bef136`；生命周期增量提交：`da25187d33ca49d21afa0ad748b619e8a2786c64`。
 - 阶段仍为 DEV / 进行中；不是三类资源完整验收，也没有进入 VERIFY。
 
 ## 本次实现与保留行为
@@ -55,3 +55,41 @@ console 定向重建复用 `scripts/libs/create-rollup-config.js`，分别传入
 - 配置引用的 V3 Action/DOM 桥接尚未移除；WL-04 保留。
 - 真实 RBAC 正反权限、namespace 隔离、缓存失效、API 持久化、保存/取消/冲突及当前制品渲染未完成。
 - 三类资源分别完成 DEV 后，再按门禁构建当前 SHA 镜像、部署 131 并执行 Playwright；PR #2 保持 Draft，不自动合并。
+
+## 生命周期原生编辑增量（2026-10-23）
+
+本增量代码提交为 `da25187d33ca49d21afa0ad748b619e8a2786c64`，阶段仍为 DEV。没有关闭 WL-01～WL-04，也没有将 dry-run 当作部署或端到端验收。
+
+### 当前制品与 API 依据
+
+- 在同一固定 V3 tree `1e499d92e11374e26c76f5e13be45251602bd596` 中，惰性提取工厂 2287（生命周期分区）、1536（动作摘要/编辑/删除）和 2257（HTTP/命令/TCP 分派）。工厂 2287 明确编辑 `lifecycle.postStart/preStop` 并使用 `deleteNoObject`；2257 在 `componentType=life` 时不渲染健康检查时序，切换类型时删除其他 handler。
+- 本轮实际调用 REA，解析三个派生 JS，无解析失败；完整分析引用 `ev_fddf27a4e4fee49236f8d471b63d47d6b2762baba91544460cd7315af5b2a89b`，见 [REA 摘要](./evidence/workload-lifecycle-20261023-rea-summary.json)。应用关系仍为 partial、语义为 unknown、676 项语义未知；摘要不是整个 V3 的完整逆向证明。
+- [来源偏移和 SHA-256](./evidence/workload-lifecycle-20261023-provenance.json)及[重建脚本](./evidence/workload-lifecycle-extract.cjs)可重建三个工厂；本轮重建的偏移和摘要与已归档记录一致。没有执行目标 bundle。
+- 131 为 Kubernetes `v1.31.13+k3s1`。`kubectl explain pod.spec.initContainers` 的概括文案不能覆盖 sidecar 例外；对应 [Kubernetes v1.31.13 校验实现](https://github.com/kubernetes/kubernetes/blob/v1.31.13/pkg/apis/core/validation/validation.go#L3513)明确允许 `restartPolicy=Always` 的 init 容器使用生命周期，普通 init 禁止。本轮 API dry-run 正反校验也已确认该差异。
+
+### 实现与保留行为
+
+1. 三类原生设置共用的 `ContainerInput` 增加启动后和终止前动作。HTTP 支持 HTTP/HTTPS、路径和端口；TCP 支持端口；命令采用已有 ArrayInput 逐项输入，保留逗号、空参数和首尾空格，不用逗号拆分 shell 参数。
+2. 生命周期只写 handler，不写健康检查 timing；健康检查的五个时序输入保持，原有探针回归保留。协议选择同时供原有 HTTP 探针复用。
+3. 明确删除动作时清除对应字段；未改动作、HTTP host/headers、其他容器设置、原始对象和 resourceVersion 保留；修改某个已建模动作时，不会删除其他未建模动作。
+4. 普通初始化容器不新增无效的生命周期输入，并在校验阶段拒绝；已存在的 restartable init 保留 `restartPolicy=Always`，可以回填和修改生命周期。没有增加 sidecar 类型切换或改变其他初始化容器行为。
+5. 共享影响仅为 Workload 创建/设置组件，适用于 Deployment、StatefulSet、DaemonSet；没有修改公共 Store、RBAC 或其他模块。Deployment 创建和三类设置均纳入回归。
+
+### 实际命令与结果
+
+| 命令                                                                       | 结果与边界                                                                                                                                                                                                   |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `esno .../WorkloadCreateModal/deployment.test.ts`                          | 从原 24 项增加到 32 项，全部通过；新增行为先复现失败，再实现。覆盖三类资源生命周期回填、修改、删除、未知字段保留、非法动作、参数保真和 sidecar 差异                                                          |
+| `esno .../WorkloadCreateModal/ContainerLifecycle.test.ts`                  | 2/2；执行实际组件分支和回调，只替换浏览器控件边界；不能替代真实页面渲染                                                                                                                                      |
+| `./scripts/test.sh`                                                        | 最终 73 个文件、314 项通过，0 失败                                                                                                                                                                           |
+| `corepack yarn build:packages`                                             | 成功；最后的参数输入和 sidecar 调整后，按仓库 Rollup 配置额外重建 console ES/CJS，均成功；既有循环依赖警告保留                                                                                               |
+| `eslint ContainerInput.tsx deployment.ts`                                  | 通过；曾发现 parseProbe 定义顺序错误，调整后通过，没有禁用规则                                                                                                                                               |
+| Prettier、`git diff --check`、`git diff --cached --check`                  | 通过；不代表功能验收                                                                                                                                                                                         |
+| TypeScript compiler API 基线对照                                           | 禁用 emit/composite/incremental 的同配置诊断：基线 699 项、当前 699 项、新增 0、变更生产文件直接错误 0；项目类型检查仍未全通过，见 [对照和源文件摘要](./evidence/workload-lifecycle-20261023-typecheck.json) |
+| `node docs/v4-migration/evidence/workload-lifecycle-server-validation.cjs` | 三类实际生成资源的 131 服务端 dry-run 均接受；普通 init 无 Always 时按预期拒绝；见 [API 记录](./evidence/workload-lifecycle-20261023-api-validation.json)                                                    |
+
+可复现的定向分析命令：`node docs/v4-migration/evidence/workload-lifecycle-extract.cjs /tmp/<尚不存在的绝对目录>`，然后将该目录的三个 `webpack-*.js` 交给 REA 的 `analyze_javascript_application`。目录摘要含输入元数据，重建时应核对原 bundle/tree 和工厂 SHA-256，不把新分析目录摘要当作整个 v3dist 的 tree。
+
+### 尚未执行和下一项
+
+本轮没有构建测试镜像、更新 ks-console、rollout 或在新制品上运行 Playwright；没有执行真实 hook、资源持久化、RBAC、namespace 切换或缓存验收。服务端 dry-run 没有保存资源，标签查询确认残留为 0。131 仍运行旧镜像，部署身份见 [环境记录](./evidence/workload-lifecycle-20261023-environment.json)。下一项按原清单继续原生设置中的安全上下文、调度及元数据；集群原生列表、创建、DaemonSet 停止语义和配置引用仍未关闭，不能声明三类资源已验收。

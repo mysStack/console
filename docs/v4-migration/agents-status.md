@@ -3,9 +3,9 @@
 ## 唯一当前状态（2026-10-23 组合批次范围调整）
 
 - 负责人：当前 Codex 单会话，不使用子 Agent。模块/能力：`workloads / deployment-statefulset-daemonset`；资源：Deployment、StatefulSet、DaemonSet。
-- 分支/Worktree：`feature/v4-workloads` / `console-workloads`；当前功能提交 `0c1d9aadf219fcabf5e6a310722591c9d7bef136`。
+- 分支/Worktree：`feature/v4-workloads` / `console-workloads`；当前功能提交 `da25187d33ca49d21afa0ad748b619e8a2786c64`。
 - 当前阶段 `DEV`，REA 结论“已通过”。[阶段记录](./module-execution.json)、[组合能力边界](./workload-kind-capability-matrix.md)、[REA 索引](./rea-analysis-summary.md)为当前依据；Deployment 专项矩阵是组合批次的输入之一。
-- 最新 DEV 交付：`0c1d9aadf` 已接入 STS/DS 原生设置，补充三类更新策略、优雅终止和 STS PVC 挂载校验；72 个文件、304 项本地回归通过，包构建和相关 ESLint 通过。全项目 TypeScript 仍有既有诊断；本次基线对照新增诊断 0。当前 SHA 未部署、未做 Playwright，不能标记已验收。见 [DEV 记录](./workload-settings-dev-20261023.md)。
+- 最新 DEV 交付：`da25187d3` 补齐生命周期原生编辑、HTTP/HTTPS/TCP/命令、删除/保留及普通 init/sidecar 差异；73 文件/314 项回归通过，包构建及最后 console ES/CJS 构建成功，相关 ESLint 通过。131 三类 API dry-run 接受，普通 init 反例拒绝，未保存资源。类型对照无新增诊断，但全项目类型检查仍有既有问题；未部署新 SHA、未做 Playwright，不标记验收。见 [DEV 记录](./workload-settings-dev-20261023.md#生命周期原生编辑增量2026-10-23)。
 - 当前任务：三类资源已定位普通编辑入口、Action 处理器、Store/API 请求边界、权限键和按资源登记的分区；按 WL-01～WL-04 验收清单补齐字段、作用域、RBAC、缓存和运行时差异。公共实现可以共用，三类资源的差异和验收必须分别记录。当前阶段允许修改业务代码，但不部署，直到 DEV 交付完成。已有实现和限定浏览器观察保留为历史输入。
 - 当前 REA 材料已获项目负责人批准进入 DEV。复核记录见 [workload-rea-review-20261023.md](./workload-rea-review-20261023.md)。本次确认普通 Workload 配置引用仍依赖 `useV3action`、Wujie Shadow DOM 和 V3 编辑器实例，集群级三类 Workload 列表主入口仍挂载 `/consolev3`；这些是明确的 DEV 验收缺口，不得当作已完成。`module-execution.json` 已记录复核依据和日期。
 - 已建立 [三类资源字段行为矩阵](./workload-field-behavior-matrix-20261023.md)，覆盖公共字段、默认值/校验、清空/保留语义，以及 StatefulSet Service/PVC 模板和 DaemonSet 无副本/更新策略差异。矩阵将待实测项明确列出；字段、API、RBAC、缓存和错误仍未闭环，不改变 REA 门禁。
