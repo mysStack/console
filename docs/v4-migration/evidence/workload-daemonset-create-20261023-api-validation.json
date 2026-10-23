@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-23T06:35:34.870Z",
+  "sourceCommit": "35ca7fb7968821606ae581ef7ccc3758908b8c6f",
+  "uncommittedSourceFiles": [],
+  "server": "https://192.168.2.131:6443",
+  "version": "v1.31.13+k3s1",
+  "namespace": "v4-migration-e2e",
+  "mode": "server dry-run; no resource persisted",
+  "result": "daemonset.apps/v4-native-ds-dryrun-1792737331694",
+  "error": "",
+  "residualResources": [],
+  "resourceSummary": {
+    "apiVersion": "apps/v1",
+    "kind": "DaemonSet",
+    "name": "v4-native-ds-dryrun-1792737331694",
+    "hasReplicas": false,
+    "updateStrategy": {
+      "type": "RollingUpdate",
+      "rollingUpdate": {
+        "maxUnavailable": "20%"
+      }
+    },
+    "minReadySeconds": 3,
+    "terminationGracePeriodSeconds": 15
+  },
+  "checks": {
+    "accepted": true,
+    "isDaemonSet": true,
+    "replicasAbsent": true,
+    "strategyPreserved": true,
+    "minReadySecondsPreserved": true,
+    "terminationPreserved": true,
+    "namespacePreserved": true,
+    "noResourcePersisted": true,
+    "exactCommittedSource": true
+  }
+}

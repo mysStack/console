@@ -5,7 +5,7 @@
 - 模块：`workloads / deployment-statefulset-daemonset`。
 - 分支 / Worktree：`feature/v4-workloads` / `console-workloads`。
 - 负责人批准进入 DEV：`5c24342571419708b6f0c21f3ce9e8f193da0e17`，批准原文见 [REA 复核记录](./workload-rea-review-20261023.md)。
-- 首批功能提交：`0c1d9aadf219fcabf5e6a310722591c9d7bef136`；生命周期增量提交：`da25187d33ca49d21afa0ad748b619e8a2786c64`；安全上下文增量提交：`9e2f4148f2abde58b6eec850612d99dc1ac3f0a8`；当前功能提交：`da741a3893f88885df4698a4ea5d265336fb9692`。
+- 首批功能提交：`0c1d9aadf219fcabf5e6a310722591c9d7bef136`；生命周期增量提交：`da25187d33ca49d21afa0ad748b619e8a2786c64`；安全上下文增量提交：`9e2f4148f2abde58b6eec850612d99dc1ac3f0a8`；当前功能提交：`35ca7fb7968821606ae581ef7ccc3758908b8c6f`。
 - 阶段仍为 DEV / 进行中；不是三类资源完整验收，也没有进入 VERIFY。
 
 ## 本次实现与保留行为
@@ -16,7 +16,7 @@
 4. StatefulSet 容器挂载校验同时识别 `volumeClaimTemplates` 的隐式卷名，不把这些模板伪造进 `template.spec.volumes`；未定义的卷名仍拒绝。
 5. 保存使用原始 resourceVersion，`noGetDetail: true`；成功后刷新详情，读取失败显示错误，保存失败和 409 继续由原生 Modal 展示，不自动覆盖并发版本。
 
-本次共享范围只在 Workload 编辑组件内：Deployment、StatefulSet、DaemonSet 共用转换和校验；创建表单仍使用原有 `DeploymentCreateValues` 和默认行为。未修改跨模块的通用 Store、缓存或 RBAC 底座。后续若需改这些底座，须先登记影响和回归范围。
+本次共享范围只在 Workload 编辑和创建组件内：Deployment、StatefulSet、DaemonSet 共用转换和校验；创建表单现已按资源类型支持 Deployment 和 DaemonSet，StatefulSet 的双资源创建仍待实现。未修改跨模块的通用 Store、缓存或 RBAC 底座。后续若需改这些底座，须先登记影响和回归范围。
 
 ## 实际执行与结果
 
@@ -49,10 +49,10 @@ console 定向重建复用 `scripts/libs/create-rollup-config.js`，分别传入
 
 ## 剩余清单
 
-- 三类资源完整设置：调度、Pod 元数据、时区及其他高级容器字段、StatefulSet Service/PVC 模板编辑等仍须按原矩阵补齐，不能因本轮接入设置入口而关闭 WL-02。
-- 集群级三类列表仍挂载 V3/Wujie。现有候选原生列表还含创建空回调，不能直接接路由后宣称完成。
-- StatefulSet、DaemonSet 创建和各类 Action 仍需继续补齐；DaemonSet 停止语义尚未修复。
-- 配置引用的 V3 Action/DOM 桥接尚未移除；WL-04 保留。
+- 三类资源已确认的公共设置和资源特有设置已完成主要代码增量；仍须按字段矩阵关闭未建模高级字段、Action 及错误边界，不能因现有表单可用而关闭 WL-02。
+- 集群级三类列表仍挂载 V3/Wujie；StatefulSet 创建尚未闭环，不能直接接路由后宣称完成。
+- StatefulSet 创建和各类未完成 Action 仍需继续补齐；DaemonSet 原生创建和停止语义已完成 DEV 代码与本地/API dry-run 验证，真实持久化和浏览器行为留待 VERIFY。
+- 普通项目三类配置引用的不可达 V3 Action/DOM 桥接已移除；真实保存、失败、权限、namespace 和缓存行为仍须在 VERIFY 关闭。
 - 真实 RBAC 正反权限、namespace 隔离、缓存失效、API 持久化、保存/取消/冲突及当前制品渲染未完成。
 - 三类资源分别完成 DEV 后，再按门禁构建当前 SHA 镜像、部署 131 并执行 Playwright；PR #2 保持 Draft，不自动合并。
 
@@ -280,3 +280,21 @@ DaemonSet 的旧 V3 UI 快照没有调度分区，因此当前 V4 不为它虚�
 ## DaemonSet 停止语义修复（2026-10-23）
 
 代码提交 `da741a3893f88885df4698a4ea5d265336fb9692` 按当前制品 main 工厂 318 修复共享 Workload Store：DaemonSet 停止 PATCH `spec.template.spec.nodeSelector.non-existing=true`，Deployment/StatefulSet 仍 PATCH `spec.replicas=0`。测试先行复现 DaemonSet 错误副本补丁；实现后 Store 20/20 通过，完整回归 77 文件/344 项通过，包构建和类型基线 691→691 通过。131 专用 DaemonSet 的 merge patch server dry-run 被接受，回读 resourceVersion/nodeSelector 不变，见[API 记录](./evidence/workload-stop-20261023-api-validation.json)。来源和实际 REA 见[来源](./evidence/workload-stop-20261023-provenance.json)与[摘要](./evidence/workload-stop-20261023-rea-summary.json)。本轮没有执行真实停止或恢复，相关调度、原 nodeSelector 恢复、RBAC、错误反馈和缓存必须在 VERIFY 完成。
+
+## DaemonSet 原生创建（2026-10-23）
+
+代码提交 `35ca7fb7968821606ae581ef7ccc3758908b8c6f` 将项目级 DaemonSet 列表接入原生创建。创建表单按 `kind` 复用 Deployment 已有的容器、卷、环境变量、安全上下文、时区、Pod 模板注解和顶层元数据能力，并按 DaemonSet 资源边界隐藏副本数和旧 V3 未提供的 Pod 调度分区。生成对象为 `apps/v1 DaemonSet`，不写入 `spec.replicas`，支持 `RollingUpdate/OnDelete`、`maxUnavailable`、`minReadySeconds` 和优雅终止时间。提交使用当前 cluster/namespace 的 DaemonSet Store，成功后刷新列表并关闭弹窗，失败时显示四种内置语言的资源专用错误文案并保留表单。
+
+### 实际验证
+
+| 命令/检查                                                                                                                  | 结果                                                                                                                                                   | 边界                                                                                         |
+| -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| `esno .../WorkloadCreateModal/deployment.test.ts`、`index.test.ts`、`daemonset.locale.test.ts`、`DaemonSets/index.test.ts` | 测试先行先复现 `buildDaemonSet`、按资源类型表单、列表接线和文案缺失；实现后分别 **62/62、5/5、4/4、3/3 通过**                                          | 覆盖对象转换、资源差异、页面提交/刷新/错误接线和多语言键；不证明真实浏览器控件渲染           |
+| `./scripts/test.sh`                                                                                                        | 精确代码提交 `35ca7fb79`：**78 个文件、342 项通过、0 失败**                                                                                            | 仓库现有测试范围                                                                             |
+| 变更生产文件 ESLint                                                                                                        | **0 错误**；保留 DaemonSet 页面一条既有 `max-len` 警告                                                                                                 | 该长路由在本次提交前已存在                                                                   |
+| 变更文件 Prettier、`git diff --check`                                                                                      | **通过**                                                                                                                                               | 格式检查不能替代功能验收                                                                     |
+| `corepack yarn build:packages`                                                                                             | **退出 0，633/633 minify 完成**                                                                                                                        | 仅为本地包构建，未构建或推送 Console 镜像                                                    |
+| `tsc --noEmit -p packages/console/tsconfig.json`                                                                           | **未通过**：依赖 `type-fest` 产生 147 条既有解析诊断；本次 WorkloadCreateModal/DaemonSets 文件匹配 0 条                                                | 不报告全项目 TypeScript 通过                                                                 |
+| `node docs/v4-migration/evidence/workload-daemonset-create-server-validation.cjs`                                          | 绑定精确源码提交 `35ca7fb79`；131 `v1.31.13+k3s1` 接受生成的 DaemonSet server dry-run，无 `replicas`，策略、就绪时间和优雅终止字段检查通过，残留资源 0 | 不保存资源；见 [API 记录](./evidence/workload-daemonset-create-20261023-api-validation.json) |
+
+本次关闭项目级 DaemonSet 原生创建的 DEV 代码缺口。当前 SHA 尚未构建 Console 镜像、部署 131、执行 rollout 或登录已部署制品做 Playwright；真实创建/删除、API 持久化、RBAC 正反权限、namespace 隔离、缓存刷新、失败/取消路径和 V3 功能等价性仍归 VERIFY。下一项是 StatefulSet 原生创建：必须在提交实际对象前先对 StatefulSet 和配套 Headless Service 执行双资源服务端 dry-run，并处理双资源创建的错误边界。集群级三类入口在创建和 Action 等价性关闭前不切换。阶段保持 DEV，PR #2 保持 Draft。
