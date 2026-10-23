@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "92632505807b56bedd5f27d7a6a2812fbf51017cbd4b3405568954f09db76241"
+        "sha256": "7024f79d2ab7dcaeafffd9c14fbc5c423231280ebf7a5dab2bb4e29cf3764c5b"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "563c1f2e3aacadf18c981a73c7c20b93ef90d46e61c781d77f0c34ac72c4ed60"
+        "sha256": "7452f05deba4f7e28d9b2a6bcd4bb61b9caa4938f52c516720fd36106c55f90b"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -502,12 +502,12 @@
   ],
   "verify": {
     "status": "未完成",
-    "reason": "精确制品部署、三类原生路由无 V3 预加载、设置页面、配置引用保存/取消/失败反馈、Action 菜单与取消、重新创建、DaemonSet 批量停止、低权限拒绝和第二 namespace 正反隔离已验证；批量删除、回退确认写入、伸缩确认结果、完整错误/缓存和逐项 V3 等价仍未完成。",
+    "reason": "精确制品部署、三类项目与集群原生路由列表无 V3 预加载、设置页面、配置引用保存/取消/失败反馈、Action 菜单与取消、重新创建、DaemonSet 批量停止、低权限拒绝、第二 namespace 正反隔离和集群级列表渲染已验证；批量删除成功、回退确认写入、伸缩确认结果、完整错误/缓存、跨入口缓存切换和逐项 V3 等价仍未完成。",
     "sourceCommit": "45d9f14e53d6a0c1d74011197ade9d5accbcdae9",
     "documents": [
       {
         "path": "docs/v4-migration/workload-131-verify-20261024.md",
-        "sha256": "55a4c770de5aa2d4e118883b90ca190a349b5557b0d09abccbe11d47cb56db07"
+        "sha256": "a18a9ee9903fb88ad4ca46d77dd2485e663f8fb657382d9f72aa21e0bdc828df"
       },
       {
         "path": "docs/v4-migration/evidence/workload-settings-verify-attempt-20261024.json",
@@ -528,6 +528,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-action-browser-verify-20261024.json",
         "sha256": "731e63be4a3d7c8de3c7194d0ef7ad9cb1260e155e46fdff0a50fb486fd04f5a"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-cluster-native-browser-verify-20261024.json",
+        "sha256": "fad316377f35398ed600bcf69474f39bfceba3289ee2e57ad0bc580e70aebcdc"
       }
     ]
   }

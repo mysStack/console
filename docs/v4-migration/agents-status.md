@@ -1,3 +1,7 @@
+# 当前状态补充（2026-10-24：集群级原生列表浏览器复验）
+
+精确制品 `24c6afa03849d5d5c7b84fccd1602639b1fd0eb5` 在 131 的 `/clusters/host/deployments`、`/clusters/host/statefulsets`、`/clusters/host/daemonsets` 均完成零 Cookie 登录和页面复验：专用 fixture 可见、namespace 控件可见、页面错误为 0，未出现 `/consolev3` 或 `/dist/v3dist` 请求。证据见 [集群级原生列表浏览器复验](./evidence/workload-cluster-native-browser-verify-20261024.json)。批量删除确认后的成功结果仍未验证，Workload 继续保持 `VERIFY / 未完成`。
+
 # 当前 Workload VERIFY 进展（2026-10-24）
 
 - 当前负责人：Codex 单会话；分支 `feature/v4-workloads`；Worktree `console-workloads`；无子 Agent。

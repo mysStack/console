@@ -1,3 +1,5 @@
+> **2026-10-24 集群级列表复验**：精确制品 `24c6afa03849d5d5c7b84fccd1602639b1fd0eb5` 的 Deployment、StatefulSet、DaemonSet 集群级原生列表入口已在 131 完成零 Cookie 浏览器登录和渲染复验；专用 fixture、namespace 控件可见，页面错误为 0，未发现 `/consolev3` 或 `/dist/v3dist` 请求。批量删除确认后的成功结果仍未验证，状态继续为 `VERIFY / 未完成`。详见 [集群级列表证据](./evidence/workload-cluster-native-browser-verify-20261024.json)。
+
 # V4 迁移矩阵
 
 > **2026-10-24 Workload 当前 VERIFY 结果**：精确制品 `24c6afa03849d5d5c7b84fccd1602639b1fd0eb5` 已完成三类原生路由、配置引用、低权限拒绝、第二 namespace 正反隔离、Action 菜单/取消、重新创建和 DaemonSet 批量停止的浏览器复验。批量删除、回退确认写入、伸缩确认结果、完整错误矩阵和逐项 V3 等价仍未闭环，状态保持 `VERIFY / 未完成`，不得进入 PR 合并或标记模块已验收。详见 [131 VERIFY](./workload-131-verify-20261024.md)、[配置引用证据](./evidence/workload-config-reference-browser-verify-20261024.json)、[Action 证据](./evidence/workload-action-browser-verify-20261024.json)。

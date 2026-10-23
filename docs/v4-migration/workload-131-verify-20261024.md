@@ -1,3 +1,9 @@
+# 当前增量：集群级三类原生列表浏览器复验（2026-10-24）
+
+在精确制品 `24c6afa03849d5d5c7b84fccd1602639b1fd0eb5`、镜像 digest `sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76` 上，使用零 Cookie 新浏览器 context 登录 131，访问 `/clusters/host/deployments`、`/clusters/host/statefulsets` 和 `/clusters/host/daemonsets`。三类页面的专用 fixture 均可见，namespace 控件渲染，登录 HTTP 200、认证界面正常，页面错误为 0，Network 未发现 `/consolev3` 或 `/dist/v3dist` 请求。
+
+本轮只证明集群级原生列表入口的页面渲染和基础作用域控件；不扩大为批量删除、完整 Action、缓存、RBAC 或逐项 V3 等价通过。证据：[集群级原生列表浏览器复验](./evidence/workload-cluster-native-browser-verify-20261024.json)。批量删除专用 fixture 已清理；该路径的确认弹窗要求输入资源名称，后续浏览器会话异常关闭，成功删除仍未验证。
+
 # Workload 131 专项 VERIFY（2026-10-24）
 
 ## 当前增量：配置引用与 Action 浏览器复验（2026-10-24）

@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-24",
+  "environment": {
+    "baseUrl": "http://192.168.2.131:30880",
+    "sourceCommit": "24c6afa03849d5d5c7b84fccd1602639b1fd0eb5",
+    "imageTag": "feature-v4-workloads-20261024-050150-24c6afa03849",
+    "imageDigest": "sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76",
+    "podImageId": "ghcr.io/mysstack/ks-console@sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76"
+  },
+  "browser": {
+    "freshContext": true,
+    "loginHttp": 200,
+    "authenticatedUI": true,
+    "pageErrors": 0,
+    "legacyRequests": []
+  },
+  "results": [
+    {
+      "module": "deployments",
+      "path": "/clusters/host/deployments",
+      "fixtureVisible": true,
+      "namespaceVisible": true,
+      "namespaceControlCount": 16,
+      "status": "通过"
+    },
+    {
+      "module": "statefulsets",
+      "path": "/clusters/host/statefulsets",
+      "fixtureVisible": true,
+      "namespaceVisible": true,
+      "namespaceControlCount": 16,
+      "status": "通过"
+    },
+    {
+      "module": "daemonsets",
+      "path": "/clusters/host/daemonsets",
+      "fixtureVisible": true,
+      "namespaceVisible": true,
+      "namespaceControlCount": 12,
+      "status": "通过"
+    }
+  ],
+  "scope": "本证据仅覆盖集群级三类原生列表入口的登录、渲染、专用 fixture 可见性、namespace 控件和 V3 请求排除；不覆盖批量删除成功、全部 Action、完整 RBAC、缓存或逐项 V3 等价。"
+}
