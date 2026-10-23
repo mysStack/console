@@ -17,11 +17,11 @@
 在精确制品 `24c6afa03849d5d5c7b84fccd1602639b1fd0eb5`、镜像 digest `sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76` 上，使用零 Cookie 新浏览器 context 登录 131，完成三类 Workload 的配置引用和 Action 复验，登录 HTTP 200、认证界面正常，未记录页面错误。
 
 - 配置引用：Deployment、StatefulSet、DaemonSet 均完成 ConfigMap 引用保存、刷新回填、取消不保存、受控 500 错误提示、失败写入不改变资源和恢复；三类保存请求均返回 200，测试值未写入证据。
-- 详情 Action：三类页面均渲染当前实现范围内的编辑信息、回退、YAML、重新创建、删除；Deployment/StatefulSet 还显示自动扩缩，StatefulSet 显示 Service。回退、自动扩缩、重新创建、删除的取消路径已逐项验证。
+- 详情 Action：三类页面均渲染当前实现范围内的编辑信息、回退、YAML、重新创建、删除；Deployment/StatefulSet 还显示自动扩缩，StatefulSet 显示 Service。回退、自动扩缩、重新创建、删除的取消路径已逐项验证；Deployment 回退确认后的实际写入另有独立证据。
 - 重新创建：三类资源实际 PATCH 返回 200，`kubesphere.io/restartedAt` 改变并回读成功。
 - DaemonSet 批量停止：选中专用 fixture 后确认，PATCH 返回 200，`non-existing=true` 节点选择补丁生效；随后移除该测试补丁并确认恢复为 1/1 Ready。
 
-证据：[配置引用浏览器复验](./evidence/workload-config-reference-browser-verify-20261024.json)、[Action 浏览器复验](./evidence/workload-action-browser-verify-20261024.json)。批量删除成功路径、回退确认后的实际写入、伸缩确认后的实际结果和完整错误/网络失败矩阵仍未验证，因此本轮不能标记模块验收通过。
+证据：[配置引用浏览器复验](./evidence/workload-config-reference-browser-verify-20261024.json)、[Action 浏览器复验](./evidence/workload-action-browser-verify-20261024.json)。批量删除成功路径、伸缩确认后的实际 HPA/副本结果和完整错误/网络失败矩阵仍未验证；批量删除与伸缩确认时浏览器会话异常关闭，专用资源已清理，不能将其记为通过。因此本轮不能标记模块验收通过。
 
 ## 当前增量：低权限 RBAC 在精确制品上复验（2026-10-24）
 

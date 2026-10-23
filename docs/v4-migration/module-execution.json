@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "6c5308bfae675361edb46ec06e5a94a87ae2cffb35aef8e4f718ecda92adc2a4"
+        "sha256": "fdd7990cce9e17f61935fe50e9a8e327c78bb82c72df4b1a47e3de3c6b952f98"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "80c804431b6047347dc2b2ba9f4aec0f1a0a2028def763ebb4eebd5ba6810b50"
+        "sha256": "ede1b237adcc9eb95c894af42a5cda52403b4ca0f10f04813eed56f5729ba31a"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -507,7 +507,7 @@
     "documents": [
       {
         "path": "docs/v4-migration/workload-131-verify-20261024.md",
-        "sha256": "aa12a00fea93aa8ce057fc1c6cd793f10d9d7d99bd5457e3a3b72a3b4925900d"
+        "sha256": "c1c252427d0e8dfad309e7c51cb65ac14422528ab53568f5b7ab753534fdb20e"
       },
       {
         "path": "docs/v4-migration/evidence/workload-settings-verify-attempt-20261024.json",
@@ -527,7 +527,7 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-action-browser-verify-20261024.json",
-        "sha256": "731e63be4a3d7c8de3c7194d0ef7ad9cb1260e155e46fdff0a50fb486fd04f5a"
+        "sha256": "7579d21c5e8526779380278fca4375e44247017e0eedf61cff775aab9016b7ef"
       },
       {
         "path": "docs/v4-migration/evidence/workload-cluster-native-browser-verify-20261024.json",

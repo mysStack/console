@@ -22,7 +22,11 @@
         "删除"
       ],
       "cancelled": ["回退", "编辑自动扩缩", "重新创建", "删除"],
-      "restart": { "patchStatus": 200, "annotationChanged": true, "refetched": true }
+      "restart": {
+        "patchStatus": 200,
+        "annotationChanged": true,
+        "refetched": true
+      }
     },
     {
       "module": "statefulsets",
@@ -38,7 +42,11 @@
         "删除"
       ],
       "cancelled": ["回退", "编辑自动扩缩", "重新创建", "删除"],
-      "restart": { "patchStatus": 200, "annotationChanged": true, "refetched": true }
+      "restart": {
+        "patchStatus": 200,
+        "annotationChanged": true,
+        "refetched": true
+      }
     },
     {
       "module": "daemonsets",
@@ -53,14 +61,26 @@
         "restoreStatus": 200,
         "restoreReady": "1/1"
       },
-      "restart": { "patchStatus": 200, "annotationChanged": true, "refetched": true }
+      "restart": {
+        "patchStatus": 200,
+        "annotationChanged": true,
+        "refetched": true
+      }
     }
   ],
   "unverified": [
-    "批量删除成功路径",
-    "回退确认后的实际写入和目标版本结果",
-    "伸缩确认后的实际 HPA/副本结果",
+    "批量删除成功路径：确认提交时 Playwright 会话异常关闭，未将删除请求或成功结果记为通过；专用资源已用 kubectl 清理",
+    "伸缩确认后的实际 HPA/副本结果：确认提交时 Playwright 会话异常关闭，未观察到 HPA 创建，未将其记为通过",
     "完整错误、网络失败和取消组合矩阵"
   ],
-  "conclusion": "三类详情 Action 菜单渲染与取消路径通过；三类重新创建实际 PATCH 200 并回读 restartedAt；DaemonSet 批量停止实际 PATCH 200、恢复后 Ready。完整 Action 矩阵仍未闭环。"
+  "conclusion": "三类详情 Action 菜单渲染与取消路径通过；三类重新创建实际 PATCH 200 并回读 restartedAt；DaemonSet 批量停止实际 PATCH 200、恢复后 Ready；Deployment 回退目标选择、PATCH 200、rollout 和 Ready 恢复已通过。批量删除和伸缩确认仍未闭环。",
+  "rollback": {
+    "fixture": "v4-deploy-edit-ef3",
+    "targetRevision": "#27",
+    "patchStatus": 200,
+    "dialogClosed": true,
+    "rollout": "successfully rolled out",
+    "ready": "1/1",
+    "temporaryFixtureAnnotationRestored": true
+  }
 }
