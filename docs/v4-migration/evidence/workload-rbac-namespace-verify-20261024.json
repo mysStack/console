@@ -1,0 +1,47 @@
+{
+  "module": "workloads",
+  "sourceCommit": "24c6afa03849d5d5c7b84fccd1602639b1fd0eb5",
+  "account": "v4-workload-viewer-20261023",
+  "secretsPrinted": false,
+  "browser": {
+    "freshContext": true,
+    "initialCookies": 0,
+    "loginHttp": 200,
+    "authenticatedUI": true,
+    "configReferencePanelVisible": {
+      "deployments": true,
+      "statefulsets": true,
+      "daemonsets": true
+    }
+  },
+  "rbac": {
+    "role": "kubesphere:iam:viewer",
+    "verbs": ["get", "list", "watch"],
+    "positiveGet": {
+      "namespace": "v4-migration-e2e",
+      "status": 200
+    },
+    "negativeUpdate": {
+      "deployments": 403,
+      "statefulsets": 403,
+      "daemonsets": 403
+    },
+    "unchanged": {
+      "deployments": true,
+      "statefulsets": true,
+      "daemonsets": true
+    },
+    "resourceVersions": {
+      "deployments": "136249933",
+      "statefulsets": "136250126",
+      "daemonsets": "136250867"
+    },
+    "namespaceUpdatePermission": "no",
+    "otherNamespaceGetPermission": "no"
+  },
+  "namespace": {
+    "positiveNamespace": "v4-migration-e2e",
+    "otherNamespaceFixture": "未建立第二测试 namespace；正向列表作用域已验证，跨 namespace 负向 UI/API 仍未闭环"
+  },
+  "conclusion": "低权限账号在当前精确制品上可读三类配置引用页，更新请求均收到 403 且资源版本/envFrom 未改变；完整 namespace 正反隔离仍待专用第二 namespace fixture。"
+}

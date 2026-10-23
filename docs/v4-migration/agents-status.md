@@ -1,3 +1,10 @@
+# 当前状态补充（2026-10-24：低权限 RBAC 复验）
+
+- 当前精确制品低权限复验完成：viewer 账号可读三类配置引用页，更新请求分别返回 403，资源版本和 envFrom 保持不变。
+- Kubernetes 授权事实：`v4-migration-e2e` namespace 的 get/list/watch 为允许，update 为拒绝；`default` namespace get 为拒绝。
+- 尚未关闭：第二 namespace fixture 尚未建立，因此跨 namespace 正反隔离仍为部分验证；完整 Action、缓存失效和逐项 V3 等价仍未完成。
+- 证据：[Workload 低权限与 namespace 复验](./evidence/workload-rbac-namespace-verify-20261024.json)。
+
 # 当前状态补充（2026-10-24：全局 V3 预加载验证通过）
 
 - 精确源提交 `24c6afa03849d5d5c7b84fccd1602639b1fd0eb5`、CI Run `40023514250`、镜像 tag `feature-v4-workloads-20261024-050150-24c6afa03849`、digest `sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76` 已完成 131 rollout，Pod Ready/imageID 一致。

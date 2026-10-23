@@ -1,5 +1,11 @@
 # Workload 131 专项 VERIFY（2026-10-24）
 
+## 当前增量：低权限 RBAC 在精确制品上复验（2026-10-24）
+
+使用专用 viewer 账号 `v4-workload-viewer-20261023` 在当前精确制品上完成三类配置引用页复验。账号可读取当前 `v4-migration-e2e` namespace 的 Deployment、StatefulSet、DaemonSet，三类更新请求均返回 403；回读的 resourceVersion 和 envFrom 未发生变化。`kubectl auth can-i` 同样确认该账号拥有 get、list、watch，不拥有 update，且对 `default` namespace 不具备 get 权限。
+
+本轮证明低权限拒绝路径和当前资源保护有效；尚未建立第二个专用 namespace fixture，因此完整跨 namespace 正反 UI/API 隔离仍不能标记通过。证据：[Workload 低权限与 namespace 复验](./evidence/workload-rbac-namespace-verify-20261024.json)。
+
 ## 当前增量：全局 V3 预加载关闭，三类原生路由复验通过（2026-10-24）
 
 精确制品 `24c6afa03849d5d5c7b84fccd1602639b1fd0eb5` 已在 131 完成部署。Deployment、StatefulSet、DaemonSet 均在零 Cookie 新 context 中登录成功，列表/详情直达、刷新、浏览器返回、专用 namespace API 作用域和设置页面渲染通过；三类页面 Network 均未观察到 `/consolev3` 或 `/dist/v3dist` 请求，页面错误为 0。

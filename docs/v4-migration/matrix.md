@@ -14,6 +14,8 @@
 
 > 2026-10-24 当前 VERIFY：精确源提交 `24c6afa03849d5d5c7b84fccd1602639b1fd0eb5` 已部署到 131；三类原生 Workload 路由在零 Cookie 浏览器中完成登录、直达/刷新/返回、namespace API 作用域和设置页面复验，Network 未发现 `/consolev3` 或 `/dist/v3dist`。当前只关闭共享启动层全局 V3 预加载缺口，三类资源仍未整体验收。详见 [当前 VERIFY 证据](./evidence/workload-v3-preload-verify-20261024.json)。
 
+> 2026-10-24 低权限复验：viewer 账号在当前精确制品上可读三类配置引用，更新均返回 403 且资源未改变；`default` namespace 无 get 权限。由于尚未建立第二 namespace fixture，跨 namespace 正反隔离暂记为部分验证。详见 [低权限与 namespace 证据](./evidence/workload-rbac-namespace-verify-20261024.json)。
+
 > 当前组合批次：`deployment-statefulset-daemonset`，包括 Deployment、StatefulSet、DaemonSet；公共实现共用，三类资源分别完成 REA 和 VERIFY。本轮代码与本地验证见 [DEV 记录](./workload-settings-dev-20261023.md)。详见[组合能力边界](./workload-kind-capability-matrix.md)。下表中的既有测试数量和 131 观察均保留原 SHA，不代表本组合批次已验收。Pod、Job、CronJob 留在后续批次。
 
 本分支不维护 ConfigMap/Secret/ServiceAccount 等其他模块的最新状态；这些行保留为历史输入，应回到对应模块分支核对，不据此否定既有验收成果。

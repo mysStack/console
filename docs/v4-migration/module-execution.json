@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "08ec5bf6b5002b2fdf1622630fd972f1768f4a90d48ac5ebb6862090db89a3bc"
+        "sha256": "5ecd4c9a69af82a09531d938b5f4d23edd235269835a81e6f1dda8c88a1697ee"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "5a58ceb660fce6a6b314eb260777c1247a3493a4bb760952accdbcd43b2dc461"
+        "sha256": "f52f48e990d55067906818958a2cc1beda0c6c02861ba9629719674e1b48363d"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -502,7 +502,7 @@
   ],
   "verify": {
     "status": "未完成",
-    "reason": "精确制品已完成 rollout、Pod Ready/imageID、零 Cookie 登录、三类路由/namespace 作用域和设置页面浏览器复验；三类路由 Network 未发现 /consolev3 或 /dist/v3dist，当前仅关闭全局预加载缺口，完整模块验收仍未完成。",
+    "reason": "精确制品部署、三类原生路由无 V3 预加载、设置页面和低权限拒绝路径已验证；跨 namespace 正反 fixture、完整 Action、缓存和逐项 V3 等价仍未完成。",
     "sourceCommit": "45d9f14e53d6a0c1d74011197ade9d5accbcdae9",
     "documents": [
       {
@@ -516,6 +516,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-v3-preload-verify-20261024.json",
         "sha256": "1e3e1841c0b9cc6d31817d71c3049d3c148c4040b71aa3598f064c71d155d613"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-rbac-namespace-verify-20261024.json",
+        "sha256": "788f3c0f41d7cd26fed80c2619d67125eb33fc3b6dca4c5765f653a8c6d947e7"
       }
     ]
   }
