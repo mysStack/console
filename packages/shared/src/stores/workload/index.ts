@@ -104,7 +104,7 @@ const workloadStore = (module: string) => {
     mapper,
   });
   const { getDetailUrl, getPath, patch, post } = BaseStore;
-  const { post: postService } = baseStore({ module: 'services' });
+  const { post: postService, delete: deleteService } = baseStore({ module: 'services' });
   const { deleteHpa } = hpaStore;
 
   const del = (params: PathParams, k8sVersion?: string) => {
@@ -168,7 +168,14 @@ const workloadStore = (module: string) => {
           post(dryRunParams, data.workload),
           postService(dryRunParams, data.service),
         ]);
-        return Promise.all([post(params, data.workload), postService(params, data.service)]);
+        const serviceResult = await postService(params, data.service);
+        try {
+          const workloadResult = await post(params, data.workload);
+          return [workloadResult, serviceResult];
+        } catch (error) {
+          await deleteService({ ...params, name: data.service.metadata.name });
+          throw error;
+        }
       },
       { onSuccess: options?.onSuccess, onError: options?.onError },
     );

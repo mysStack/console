@@ -33,11 +33,15 @@ function loadStore(
     },
     '../store': ({ module: resourceModule }: any) => ({
       getDetailUrl: ({ name }: any) => name,
-      post: (params: any, data: any) =>
-        send(
-          `create:${resourceModule}:${params.cluster}:${params.namespace}:${data.metadata.name}:${params.dryRun ? 'dry-run' : 'persist'}`,
-          data,
-        ),
+      post: (params: any, data: any) => {
+        const scope = `${params.cluster}:${params.namespace}:${data.metadata.name}`;
+        const mode = params.dryRun ? 'dry-run' : 'persist';
+        return send(`create:${resourceModule}:${scope}:${mode}`, data);
+      },
+      delete: (params: any) => {
+        const scope = `${params.cluster}:${params.namespace}:${params.name}`;
+        return send(`delete:${resourceModule}:${scope}`);
+      },
     }),
     '../../utils': { request },
     '../../utils/object.mapper': { [moduleName]: (value: unknown) => value },
@@ -205,7 +209,7 @@ test('native workload create mutation keeps the cluster and namespace scope', as
   assert.equal(successes, 1);
 });
 
-test('StatefulSet 双资源创建先全部 dry-run，再持久化 Workload 和 Service', async () => {
+test('StatefulSet 双资源创建先全部 dry-run，再依次持久化 Service 和 Workload', async () => {
   const calls: string[] = [];
   const store = loadStore('statefulsets', async url => {
     calls.push(url);
@@ -222,8 +226,8 @@ test('StatefulSet 双资源创建先全部 dry-run，再持久化 Workload 和 S
   assert.deepEqual(calls, [
     'create:statefulsets:host:v4-migration-e2e:native-statefulset:dry-run',
     'create:services:host:v4-migration-e2e:native-statefulset-ab12:dry-run',
-    'create:statefulsets:host:v4-migration-e2e:native-statefulset:persist',
     'create:services:host:v4-migration-e2e:native-statefulset-ab12:persist',
+    'create:statefulsets:host:v4-migration-e2e:native-statefulset:persist',
   ]);
 });
 
@@ -250,6 +254,61 @@ test('StatefulSet 任一 dry-run 失败时不发送实际创建请求', async ()
   assert.deepEqual(calls, [
     'create:statefulsets:host:v4-migration-e2e:native-statefulset:dry-run',
     'create:services:host:v4-migration-e2e:native-statefulset-ab12:dry-run',
+  ]);
+});
+
+test('StatefulSet 实际 Service 创建失败时不创建 Workload', async () => {
+  const error = new Error('Service create failed');
+  const calls: string[] = [];
+  const store = loadStore('statefulsets', async url => {
+    calls.push(url);
+    if (url === 'create:services:host:v4-migration-e2e:native-statefulset-ab12:persist') {
+      throw error;
+    }
+    return { status: 'Success' };
+  });
+
+  await assert.rejects(
+    store.useCreateStatefulSetMutation().mutate({
+      params: { cluster: 'host', namespace: 'v4-migration-e2e' },
+      data: {
+        workload: { metadata: { name: 'native-statefulset' } },
+        service: { metadata: { name: 'native-statefulset-ab12' } },
+      },
+    }),
+    reason => reason === error,
+  );
+  assert.equal(
+    calls.includes('create:statefulsets:host:v4-migration-e2e:native-statefulset:persist'),
+    false,
+  );
+});
+
+test('StatefulSet 实际 Workload 创建失败时回收本轮已创建的 Service', async () => {
+  const error = new Error('StatefulSet create failed');
+  const calls: string[] = [];
+  const store = loadStore('statefulsets', async url => {
+    calls.push(url);
+    if (url === 'create:statefulsets:host:v4-migration-e2e:native-statefulset:persist') {
+      throw error;
+    }
+    return { status: 'Success' };
+  });
+
+  await assert.rejects(
+    store.useCreateStatefulSetMutation().mutate({
+      params: { cluster: 'host', namespace: 'v4-migration-e2e' },
+      data: {
+        workload: { metadata: { name: 'native-statefulset' } },
+        service: { metadata: { name: 'native-statefulset-ab12' } },
+      },
+    }),
+    reason => reason === error,
+  );
+  assert.deepEqual(calls.slice(-3), [
+    'create:services:host:v4-migration-e2e:native-statefulset-ab12:persist',
+    'create:statefulsets:host:v4-migration-e2e:native-statefulset:persist',
+    'delete:services:host:v4-migration-e2e:native-statefulset-ab12',
   ]);
 });
 
