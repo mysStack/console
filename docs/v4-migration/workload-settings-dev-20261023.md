@@ -230,6 +230,21 @@ DaemonSet 的旧 V3 UI 快照没有调度分区，因此当前 V4 不为它虚�
 
 本次关闭的是 StatefulSet PVC 模板的 DEV 代码缺口，不关闭 StatefulSet Service 的真实保存、PVC 生成及删除约束，也不关闭当前 SHA 的部署、Playwright、低权限、namespace 隔离和缓存验收。PR #2 继续保持 Draft。
 
+## StatefulSet Service 保存边界（2026-10-23）
+
+代码提交 `f32b13391b7fb537a46a96ff37a52b53a5360904` 保留详情页已有的 StatefulSet Headless Service 原生编辑入口，并将表单占位值转换为 Kubernetes Service payload：Headless 写入 `clusterIP=None`，VirtualIP 清除占位值，保存时使用最新读取到的 `metadata.resourceVersion`。保存失败会保留弹窗并显示失败提示，不再把失败误报为成功或静默关闭。
+
+### 实际验证
+
+| 命令/检查                                                                | 结果                                                                                                                                    | 边界                                                                                                                             |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `./scripts/test.sh`                                                      | **78 个文件、348 项通过，0 失败**                                                                                                       | 新增 Service payload 的 Headless/VirtualIP/资源版本回归；不能替代真实浏览器操作                                                  |
+| `corepack yarn eslint ...StatefulSetServiceModal...`                     | 0 错误，保留 1 个既有 `useEffect` 依赖警告                                                                                              | 警告来自原有详情读取逻辑，不是本次新增错误                                                                                       |
+| `corepack yarn build:packages`                                           | **退出 0，633/633 minify 完成**                                                                                                         | 仅为本地包构建，未产生部署制品                                                                                                   |
+| `node docs/v4-migration/evidence/workload-service-server-validation.cjs` | **131 `v1.31.13+k3s1` Service PATCH server dry-run 接受**；Headless `clusterIP=None` 和端口修改均被 API 接受，回读 resourceVersion 不变 | 不保存资源，不证明真实页面保存、RBAC、409/403、缓存刷新；见 [API 记录](./evidence/workload-service-20261023-api-validation.json) |
+
+本次关闭的是 Service payload 和错误反馈的 DEV 缺口；StatefulSet Service 的真实 UI 保存、取消、并发冲突、低权限拒绝、保存后详情刷新，以及 PVC 实际生成和完整浏览器验收仍未完成。当前阶段保持 DEV，PR #2 保持 Draft。
+
 ## DaemonSet 停止语义修复（2026-10-23）
 
 代码提交 `da741a3893f88885df4698a4ea5d265336fb9692` 按当前制品 main 工厂 318 修复共享 Workload Store：DaemonSet 停止 PATCH `spec.template.spec.nodeSelector.non-existing=true`，Deployment/StatefulSet 仍 PATCH `spec.replicas=0`。测试先行复现 DaemonSet 错误副本补丁；实现后 Store 20/20 通过，完整回归 77 文件/344 项通过，包构建和类型基线 691→691 通过。131 专用 DaemonSet 的 merge patch server dry-run 被接受，回读 resourceVersion/nodeSelector 不变，见[API 记录](./evidence/workload-stop-20261023-api-validation.json)。来源和实际 REA 见[来源](./evidence/workload-stop-20261023-provenance.json)与[摘要](./evidence/workload-stop-20261023-rea-summary.json)。本轮没有执行真实停止或恢复，相关调度、原 nodeSelector 恢复、RBAC、错误反馈和缓存必须在 VERIFY 完成。

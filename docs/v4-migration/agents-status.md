@@ -3,9 +3,9 @@
 ## 唯一当前状态（2026-10-23 组合批次范围调整）
 
 - 负责人：当前 Codex 单会话，不使用子 Agent。模块/能力：`workloads / deployment-statefulset-daemonset`；资源：Deployment、StatefulSet、DaemonSet。
-- 分支/Worktree：`feature/v4-workloads` / `console-workloads`；当前功能提交 `e0dbb45d3f70e799f3441ac515a575af9a50f94f`。
+- 分支/Worktree：`feature/v4-workloads` / `console-workloads`；当前功能提交 `f32b13391b7fb537a46a96ff37a52b53a5360904`。
 - 当前阶段 `DEV`，REA 结论“已通过”。[阶段记录](./module-execution.json)、[组合能力边界](./workload-kind-capability-matrix.md)、[REA 索引](./rea-analysis-summary.md)为当前依据；Deployment 专项矩阵是组合批次的输入之一。
-- 最新 DEV 交付：`e0dbb45d3` 补齐 StatefulSet PVC 模板设置表单和资源写回，支持名称、访问模式、容量、StorageClass，保留未建模 metadata/spec 字段；131 StatefulSet 创建 server dry-run 接受，确认修改字段和保留字段。当前 77 文件/346 项回归、ESLint、包构建通过；全项目 TypeScript 仍有 1316 条既有诊断，浏览器部署和真实持久化待 VERIFY。
+- 最新 DEV 交付：`f32b13391` 补齐 StatefulSet Service 原生编辑的 payload 单元测试和保存失败错误提示；Headless Service 的 `clusterIP=None`、端口修改和 resourceVersion 通过 131 server dry-run，资源未持久化。此前 PVC 模板编辑仍在当前代码中。当前 78 文件/348 项回归、ESLint、包构建通过；全项目 TypeScript 仍有 1316 条既有诊断，浏览器部署和真实持久化待 VERIFY。
 - 当前任务：三类资源已定位普通编辑入口、Action 处理器、Store/API 请求边界、权限键和按资源登记的分区；按 WL-01～WL-04 验收清单补齐字段、作用域、RBAC、缓存和运行时差异。公共实现可以共用，三类资源的差异和验收必须分别记录。当前阶段允许修改业务代码，但不部署，直到 DEV 交付完成。已有实现和限定浏览器观察保留为历史输入。
 - 当前 REA 材料已获项目负责人批准进入 DEV。复核记录见 [workload-rea-review-20261023.md](./workload-rea-review-20261023.md)。本次确认普通 Workload 配置引用仍依赖 `useV3action`、Wujie Shadow DOM 和 V3 编辑器实例，集群级三类 Workload 列表主入口仍挂载 `/consolev3`；这些是明确的 DEV 验收缺口，不得当作已完成。`module-execution.json` 已记录复核依据和日期。
 - 已建立 [三类资源字段行为矩阵](./workload-field-behavior-matrix-20261023.md)，覆盖公共字段、默认值/校验、清空/保留语义，以及 StatefulSet Service/PVC 模板和 DaemonSet 无副本/更新策略差异。矩阵将待实测项明确列出；字段、API、RBAC、缓存和错误仍未闭环，不改变 REA 门禁。

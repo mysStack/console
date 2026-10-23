@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "de0677415b06ae2c87b15c59305b03c53107bd66ee8db38569fd88ee6356c91a"
+        "sha256": "a729cf752ff675664b52c62912c4a9938b420a87fb53851e2142454f662ced98"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "0050489a4cbcc58c6764ae0fdb057c01d75058fb09f85c2f29bbe1670d6116ee"
+        "sha256": "92564c0235eb152b8c693b54e3122902f73b8fac80238004bd0d224a0b738000"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -225,12 +225,12 @@
   },
   "dev": {
     "status": "进行中",
-    "reason": "进行中：原生设置入口、策略、优雅终止、生命周期、安全上下文、Pod 模板注解、宿主时区、Pod 调度、DaemonSet 停止补丁及 StatefulSet PVC 模板编辑已实现；集群入口、完整 Action、Service/PVC 真实保存、创建、配置引用、RBAC、缓存和部署后浏览器验收仍待补齐；未进入 VERIFY",
-    "sourceCommit": "e0dbb45d3f70e799f3441ac515a575af9a50f94f",
+    "reason": "进行中：原生设置入口、策略、优雅终止、生命周期、安全上下文、Pod 模板注解、宿主时区、Pod 调度、DaemonSet 停止补丁、StatefulSet PVC 模板编辑及 StatefulSet Service payload/错误反馈已实现；集群入口、完整 Action、Service/PVC 真实保存、创建、配置引用、RBAC、缓存和部署后浏览器验收仍待补齐；未进入 VERIFY",
+    "sourceCommit": "f32b13391184d798fb6a119d2837d58d15ed5e03",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
-        "sha256": "c54572b3c3d7562a709384d144a12e1375ba77bd224e52861cf035d59d9aa135"
+        "sha256": "3173c16d3502e254f631e6895599f77875aefe4d92f5ab27ed316075bb69a0c4"
       },
       {
         "path": "docs/v4-migration/evidence/workload-lifecycle-20261023-api-validation.json",
@@ -415,6 +415,14 @@
       {
         "path": "docs/v4-migration/evidence/workload-pvc-template-20261023-typecheck.json",
         "sha256": "12e49aa926c940a28c2e994117009a827d483bac3d96300d088246db2dfc86ba"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-service-20261023-api-validation.json",
+        "sha256": "620e837503612266a081d1ee12340b869869d46e2bfb5473797dbd4c6daa5a08"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-service-server-validation.cjs",
+        "sha256": "1787498c3ac87a6508404d010c7b80d41134dc192107ce0106fede9f0f076a94"
       }
     ]
   },
