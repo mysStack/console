@@ -18,3 +18,13 @@
 ## 阶段结论
 
 本次 DEV 代码与本地/CI 检查完成，进入 VERIFY。部署前仍必须执行模块门禁 `deploy --tag`，并用该 Run 生成的精确镜像在 131 完成 rollout、Pod Ready/imageID 和零初始 Cookie 浏览器 Network 验收。
+
+## 第二次修复：移除全局预加载（2026-10-24）
+
+- 代码提交：`45d9f14e5`。
+- 删除 `preloadApp()` 调用和仅为该调用服务的路径判断；保留两个 `setupApp()` 注册，使旧 V3 入口在实际组件挂载时按需加载。
+- `./scripts/test.sh`：90 个测试文件、401 项通过、0 失败。
+- `corepack yarn build:packages`：通过。
+- `git diff --check`：通过。
+
+该修复等待重新构建制品和 131 浏览器 Network 复验；只有新制品确认三类 Workload 页面和登录后导航不再请求 V3 资源，才能关闭本缺口。

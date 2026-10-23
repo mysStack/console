@@ -1,3 +1,10 @@
+# 当前状态补充（2026-10-24：全局预加载已移除，进入 VERIFY）
+
+- DEV 修复提交：`45d9f14e5d0d3a8a6d1f6e3b17f395a30c5adf87`；移除 `packages/core/src/utils/wujie.ts` 的全局 `preloadApp()`，保留 `setupApp()` 按需注册。
+- 本地验证：90 个测试文件、401 项通过；`corepack yarn build:packages` 和 `git diff --check` 通过。
+- 当前阶段：`VERIFY`。下一步构建并部署新制品，确认登录后首次进入三类 Workload 页面不再产生 `/consolev3` 或 `/dist/v3dist` 请求。
+- 其他完整验收项（全部 Action、低权限 RBAC、缓存、V3 逐项等价）仍未关闭；PR #2 保持 Draft。
+
 # 当前状态补充（2026-10-24：首次预加载修复未闭环，退回 DEV）
 
 - 131 精确制品 `88b587f947ca9da929821eb372331eb8785db2ed` 的浏览器复验确认：三类原生页面和编辑设置均可用，但登录后 dashboard 的延迟 V3 资源请求仍可能在首次 Workload 导航期间出现；此前“只按当前 pathname 跳过”不足以关闭运行时问题。
