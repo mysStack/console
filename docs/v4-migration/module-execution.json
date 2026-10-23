@@ -4,7 +4,7 @@
   "capability": "deployment-statefulset-daemonset",
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
-  "phase": "VERIFY",
+  "phase": "DEV",
   "rea": {
     "status": "已通过",
     "sourceCommit": "e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0",
@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "6a0d296c68a67ca057e3b90c5b895f0536426ed1fc0ca221f3aa7429141d2cca"
+        "sha256": "67f0651ce9cdfdfe4bd134b60fff47d25f693c0e67c6c12b9198eeec77420119"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "e6279e2f9774ad72992ac8105dd7fe102831dc901ffa00c80498124208761837"
+        "sha256": "904e2ac8607bd6b0dffdf535649f8c5069edc3a8774d13bd5423c53be6e25880"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -224,8 +224,8 @@
     }
   },
   "dev": {
-    "status": "已完成",
-    "reason": "页面批量删除 Hook 已统一复用 batchDelete，关闭 StatefulSet 配套 Service 与三类资源关联 HPA 的清理绕过；新增失败回归后 27/27、完整回归 81 文件/364 项和包构建通过。",
+    "status": "进行中",
+    "reason": "精确镜像 740e05d675f8 的浏览器 VERIFY 通过 StatefulSet 批量 Service 清理，但 Deployment 批量 HPA 清理因缺少 cluster 请求到 /clusters/undefined/ 并返回 400；退回 DEV 修复 scope。",
     "sourceCommit": "7287c6b82fafe425aeb67d848b8e9bc1f689bd35",
     "documents": [
       {
@@ -466,7 +466,7 @@
       },
       {
         "path": "docs/v4-migration/workload-dev-completion-20261023.md",
-        "sha256": "2865e0bc7fcc48117b983f685f98eb8f3ada3a54560953f7f17bde443d723596"
+        "sha256": "fcac68b70ffd21c82918d4a185a05664d1c89386d885a75e6a5161d59552a9ce"
       }
     ]
   },
@@ -477,8 +477,8 @@
     "WL-04：移除普通 Workload 配置引用的 useV3action、Wujie Shadow DOM 和 V3 编辑器桥接"
   ],
   "verify": {
-    "status": "进行中",
-    "reason": "等待 DEV 源提交 7287c6b82fafe425aeb67d848b8e9bc1f689bd35 的 CI 镜像、131 rollout、Pod imageID 与 StatefulSet 批量 Service 清理重验；c721dce0491e 的 RBAC、namespace 和单项删除证据保留为输入。",
+    "status": "发现缺陷，退回 DEV",
+    "reason": "当前 SHA 已完成 rollout、StatefulSet 批量 Service 清理、RBAC 和 namespace 验证；关联 HPA 删除 scope 错误未关闭，新修复与新 SHA 重验前不得通过。",
     "sourceCommit": "7287c6b82fafe425aeb67d848b8e9bc1f689bd35",
     "documents": []
   }
