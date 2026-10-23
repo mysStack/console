@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { Form, FormItem, Input, InputNumber, Modal, useForm, useWatch } from '@kubed/components';
-import { ArrayInput } from '@ks-console/shared';
+import { ArrayInput, PropertiesInput } from '@ks-console/shared';
 import ContainerInput from './ContainerInput';
 import VolumeInput from './VolumeInput';
 import PersistentVolumeClaimTemplateInput from './PersistentVolumeClaimTemplateInput';
@@ -274,6 +274,21 @@ export default function WorkloadSettingsModal({
           <InputNumber min={0} precision={0} />
         </FormItem>
         <h3>{t('ADD_METADATA')}</h3>
+        <FormItem
+          name="workloadLabels"
+          label={t('LABEL_PL')}
+          rules={[{ validator: validateSettings }]}
+        >
+          <PropertiesInput hiddenKeys={['app']} addText={t('ADD')} />
+        </FormItem>
+        <FormItem
+          name="workloadAnnotations"
+          label={t('ANNOTATION_PL')}
+          rules={[{ validator: validateSettings }]}
+        >
+          <PodAnnotationsInput />
+        </FormItem>
+        <h3>{t('POD_TEMPLATE_METADATA')}</h3>
         <FormItem
           name="podAnnotations"
           label={t('ANNOTATION_PL')}

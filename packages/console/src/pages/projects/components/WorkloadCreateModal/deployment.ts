@@ -985,6 +985,8 @@ export function parseDeploymentSettings(resource: Record<string, any>): Workload
     namespace: resource.metadata?.namespace || '',
     aliasName: resource.metadata?.annotations?.['kubesphere.io/alias-name'] || '',
     description: resource.metadata?.annotations?.['kubesphere.io/description'] || '',
+    workloadLabels: cloneDeep(resource.metadata?.labels),
+    workloadAnnotations: cloneDeep(resource.metadata?.annotations),
     replicas: resource.spec?.replicas ?? 1,
     containers: (podSpec.containers || []).map(parseContainer),
     initContainers: (podSpec.initContainers || []).map(parseContainer),
@@ -1288,6 +1290,10 @@ export function validateWorkloadSettings(
   if (!validateSecurityContext(values.podSecurityContext, false)) {
     return 'WORKLOAD_SECURITY_CONTEXT_INVALID';
   }
+  if (!validateWorkloadLabels(values.workloadLabels)) return 'WORKLOAD_LABELS_INVALID';
+  if (!validatePodAnnotations(values.workloadAnnotations)) {
+    return 'WORKLOAD_ANNOTATIONS_INVALID';
+  }
   if (!validatePodAnnotations(values.podAnnotations)) return 'WORKLOAD_ANNOTATIONS_INVALID';
   if (kind === 'DaemonSet' && values.podScheduling !== undefined) {
     return 'WORKLOAD_SCHEDULING_INVALID';
@@ -1348,6 +1354,16 @@ export function buildDeploymentSettingsResource(
   else delete nextPodSpec.volumes;
   const kind: WorkloadKind = original.kind || 'Deployment';
   const initial = parseDeploymentSettings(original);
+  if (!isEqual(values.workloadLabels, initial.workloadLabels)) {
+    if (values.workloadLabels && Object.keys(values.workloadLabels).length) {
+      result.metadata.labels = cloneDeep(values.workloadLabels);
+    } else delete result.metadata.labels;
+  }
+  if (!isEqual(values.workloadAnnotations, initial.workloadAnnotations)) {
+    if (values.workloadAnnotations && Object.keys(values.workloadAnnotations).length) {
+      result.metadata.annotations = cloneDeep(values.workloadAnnotations);
+    } else delete result.metadata.annotations;
+  }
   if (
     kind === 'StatefulSet' &&
     values.volumeClaimTemplates !== undefined &&

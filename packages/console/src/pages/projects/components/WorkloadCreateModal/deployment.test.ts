@@ -15,6 +15,8 @@ import {
   validateVolumeClaimTemplates,
 } from './deployment';
 
+const cloneTestResource = <T>(value: T): T => structuredClone(value);
+
 for (const kind of ['Deployment', 'StatefulSet', 'DaemonSet']) {
   test(`${kind} 生命周期回填、修改和清空保留其他容器字段及未编辑动作`, () => {
     const original = {
@@ -1467,13 +1469,66 @@ test('StatefulSet 的 PVC 模板可作为容器挂载来源，仍拒绝未定义
 });
 
 for (const kind of ['Deployment', 'StatefulSet', 'DaemonSet']) {
+  test(`${kind} Workload 顶层元数据支持回填、修改和清空且不改变 selector 与 Pod 模板`, () => {
+    const original = settingsFixture(kind);
+    original.metadata.labels = {
+      app: 'native-settings',
+      'example.com/editable': 'before',
+    };
+    original.metadata.annotations = {
+      'kubesphere.io/creator': 'admin',
+      'example.com/editable': 'before',
+    };
+    original.spec.selector = { matchLabels: { app: 'native-settings' } };
+    original.spec.template.metadata.annotations = { 'example.com/pod': 'kept' };
+    const before = cloneTestResource(original);
+    const values = parseDeploymentSettings(original);
+
+    assert.deepEqual(values.workloadLabels, original.metadata.labels);
+    assert.deepEqual(values.workloadAnnotations, original.metadata.annotations);
+    assert.deepEqual(buildDeploymentSettingsResource(original, values), before);
+
+    values.workloadLabels = {
+      ...values.workloadLabels,
+      'example.com/editable': 'after',
+      'example.com/new': '',
+    };
+    values.workloadAnnotations = {
+      ...values.workloadAnnotations,
+      'example.com/editable': 'after',
+      'example.com/new': '',
+    };
+    let submitted = buildDeploymentSettingsResource(original, values);
+    assert.deepEqual(submitted.metadata.labels, {
+      app: 'native-settings',
+      'example.com/editable': 'after',
+      'example.com/new': '',
+    });
+    assert.deepEqual(submitted.metadata.annotations, {
+      'kubesphere.io/creator': 'admin',
+      'example.com/editable': 'after',
+      'example.com/new': '',
+    });
+    assert.deepEqual(submitted.spec.selector, original.spec.selector);
+    assert.deepEqual(submitted.spec.template.metadata, original.spec.template.metadata);
+
+    values.workloadLabels = {};
+    values.workloadAnnotations = {};
+    submitted = buildDeploymentSettingsResource(original, values);
+    assert.equal('labels' in submitted.metadata, false);
+    assert.equal('annotations' in submitted.metadata, false);
+    assert.deepEqual(submitted.spec.selector, original.spec.selector);
+    assert.deepEqual(submitted.spec.template.metadata, original.spec.template.metadata);
+    assert.deepEqual(original, before);
+  });
+
   test(`${kind} Pod 模板注解支持回填、修改和清空且不改变模板标签`, () => {
     const original = settingsFixture(kind);
     original.spec.template.metadata.annotations = {
       'example.com/editable': 'before',
       'kubesphere.io/restartedAt': '2026-10-23T00:00:00Z',
     };
-    const before = structuredClone(original);
+    const before = cloneTestResource(original);
     const values = parseDeploymentSettings(original);
 
     assert.deepEqual(values.podAnnotations, original.spec.template.metadata.annotations);
@@ -1518,6 +1573,21 @@ test('Pod 模板注解校验 Kubernetes qualified name 并允许空值', () => {
   ]) {
     assert.equal(validatePodAnnotations(annotations as any), false);
   }
+});
+
+test('已有 Workload 顶层元数据拒绝非法 label 和 annotation', () => {
+  const original = settingsFixture('StatefulSet');
+  const values = parseDeploymentSettings(original);
+
+  values.workloadLabels = { 'invalid key': 'value' };
+  assert.throws(() => buildDeploymentSettingsResource(original, values), /WORKLOAD_LABELS_INVALID/);
+
+  values.workloadLabels = { 'example.com/key': 'value' };
+  values.workloadAnnotations = { '/invalid': 'value' };
+  assert.throws(
+    () => buildDeploymentSettingsResource(original, values),
+    /WORKLOAD_ANNOTATIONS_INVALID/,
+  );
 });
 
 test('创建 Deployment 将 Pod 模板注解写入模板元数据', () => {

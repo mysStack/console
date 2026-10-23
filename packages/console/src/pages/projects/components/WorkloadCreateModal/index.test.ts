@@ -3,6 +3,10 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 
 const source = readFileSync(__filename.replace(/[^/]+$/, 'index.tsx'), 'utf8');
+const settingsSource = readFileSync(
+  __filename.replace(/[^/]+$/, 'WorkloadSettingsModal.tsx'),
+  'utf8',
+);
 
 test('Deployment 副本数使用 Kubed 支持的整数输入组件', () => {
   assert.match(source, /InputNumber/);
@@ -21,4 +25,11 @@ test('Deployment 创建表单区分工作负载元数据和 Pod 模板注解并�
   assert.match(source, /name="podAnnotations"/);
   assert.match(source, /checkLabels/);
   assert.match(source, /checkWorkloadLabelsAvailability/);
+});
+
+test('三类 Workload 设置表单区分工作负载元数据和 Pod 模板注解', () => {
+  assert.match(settingsSource, /name="workloadLabels"/);
+  assert.match(settingsSource, /name="workloadAnnotations"/);
+  assert.match(settingsSource, /name="podAnnotations"/);
+  assert.match(settingsSource, /hiddenKeys=\{\['app'\]\}/);
 });
