@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-23T06:14:30.044Z",
+  "sourceCommit": "59e2fc1158b291f90abf8122984eb24d48536456",
+  "scope": "Deployment, StatefulSet, DaemonSet project config-reference routes",
+  "productionFiles": [
+    "ConfigReferenceInline.tsx",
+    "ConfigReferencePage.tsx",
+    "ConfigReferencePanel.tsx",
+    "ConfigReferencePreview.tsx",
+    "ConfigReferenceSummary.tsx",
+    "draft.ts",
+    "envFrom.ts",
+    "fileMount.ts",
+    "nativeEdit.ts",
+    "path.ts",
+    "preview.ts",
+    "reloader.ts",
+    "resourceOptions.ts",
+    "styles.ts",
+    "summary.ts",
+    "types.ts",
+    "useReferencePreviews.ts",
+    "workload.ts"
+  ],
+  "forbiddenMatches": [],
+  "removedFiles": [
+    {
+      "file": "entry.tsx",
+      "present": false
+    },
+    {
+      "file": "bridge.ts",
+      "present": false
+    },
+    {
+      "file": "bridge.test.ts",
+      "present": false
+    }
+  ],
+  "routes": [
+    {
+      "module": "deployments",
+      "path": "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/Deployments/Detail/routes.tsx",
+      "hasNativeRoute": true,
+      "hasNativePage": true,
+      "hasLegacyBridge": false
+    },
+    {
+      "module": "statefulsets",
+      "path": "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/StatefulSets/Detail/routes.tsx",
+      "hasNativeRoute": true,
+      "hasNativePage": true,
+      "hasLegacyBridge": false
+    },
+    {
+      "module": "daemonsets",
+      "path": "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/DaemonSets/Detail/routes.tsx",
+      "hasNativeRoute": true,
+      "hasNativePage": true,
+      "hasLegacyBridge": false
+    }
+  ],
+  "checks": {
+    "noForbiddenRuntimeDependency": true,
+    "legacyBridgeFilesRemoved": true,
+    "allNativeRoutes": true
+  }
+}

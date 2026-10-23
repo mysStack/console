@@ -261,6 +261,22 @@ DaemonSet 的旧 V3 UI 快照没有调度分区，因此当前 V4 不为它虚�
 
 本次关闭三类已有资源顶层 metadata 的 DEV 代码缺口。当前 SHA 尚未构建 Console 镜像、部署 131 或执行 Playwright；低权限拒绝、namespace 隔离、保存后刷新、冲突/网络错误和 V3 页面等价性仍归 VERIFY。当前阶段保持 DEV，PR #2 保持 Draft。
 
+## 配置引用移除 V3/Wujie 桥接（2026-10-23）
+
+代码提交 `59e2fc1158b291f90abf8122984eb24d48536456` 删除已经被三类原生 `config-reference` 路由替代、且没有生产导入方的 `entry.tsx` 和 `bridge.ts`。原桥接通过 `useV3action`、Wujie Shadow DOM 和 `workload.template.edit` 打开 V3 编辑器；当前 Deployment、StatefulSet、DaemonSet 详情均直接渲染 `ConfigReferencePage`，使用 V4 Workload Store、ConfigMap/Secret Store 和 JSON Patch 保存。删除的是不可达的旧桥接实现，不删除原生配置引用页面、摘要、预览、草稿转换或 Patch 能力。
+
+### 实际验证
+
+| 命令/检查                                                                         | 结果                                                               | 边界                                                                                                           |
+| --------------------------------------------------------------------------------- | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| 测试先行 `entry.test.ts`                                                          | 删除前因生产代码仍命中 V3/Wujie 依赖而失败；删除后 **2/2 通过**    | 同时检查三类详情路由均挂载对应的 `ConfigReferencePage`                                                         |
+| `./scripts/test.sh`                                                               | **77 个文件、334 项通过，0 失败**                                  | 相比上一增量删除 20 项仅验证旧 V3 DOM 桥接的测试，新增 1 项原生路由/依赖回归；功能转换、预览和保存测试继续保留 |
+| 变更文件 ESLint、Prettier、`git diff --check`                                     | **通过，0 错误**                                                   | 静态质量检查                                                                                                   |
+| `corepack yarn build:packages`                                                    | **退出 0，633/633 minify 完成**                                    | 证明删除文件没有生产导入；未构建 Console 镜像                                                                  |
+| `node docs/v4-migration/evidence/workload-config-reference-native-validation.cjs` | 三类原生路由均存在，旧桥接文件均不存在，生产代码禁用依赖命中数为 0 | 只读静态证据；见 [验证记录](./evidence/workload-config-reference-native-20261023.json)                         |
+
+本次关闭普通项目三类 Workload 配置引用的 V3 Action/Wujie DOM 依赖代码缺口。真实保存、取消、409/403、网络失败、低权限、namespace 隔离、缓存刷新及当前 SHA 浏览器 Network 仍归 VERIFY；集群级 Workload 列表的 Wujie 入口是另一项 DEV 缺口。当前阶段保持 DEV，PR #2 保持 Draft。
+
 ## DaemonSet 停止语义修复（2026-10-23）
 
 代码提交 `da741a3893f88885df4698a4ea5d265336fb9692` 按当前制品 main 工厂 318 修复共享 Workload Store：DaemonSet 停止 PATCH `spec.template.spec.nodeSelector.non-existing=true`，Deployment/StatefulSet 仍 PATCH `spec.replicas=0`。测试先行复现 DaemonSet 错误副本补丁；实现后 Store 20/20 通过，完整回归 77 文件/344 项通过，包构建和类型基线 691→691 通过。131 专用 DaemonSet 的 merge patch server dry-run 被接受，回读 resourceVersion/nodeSelector 不变，见[API 记录](./evidence/workload-stop-20261023-api-validation.json)。来源和实际 REA 见[来源](./evidence/workload-stop-20261023-provenance.json)与[摘要](./evidence/workload-stop-20261023-rea-summary.json)。本轮没有执行真实停止或恢复，相关调度、原 nodeSelector 恢复、RBAC、错误反馈和缓存必须在 VERIFY 完成。
