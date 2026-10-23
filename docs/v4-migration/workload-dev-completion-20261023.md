@@ -4,8 +4,8 @@
 
 - 模块：`workloads / deployment-statefulset-daemonset`。
 - 分支 / Worktree：`feature/v4-workloads` / `/home/bruce/code/ks-develop/console-workloads`。
-- DEV 源提交：`7287c6b82fafe425aeb67d848b8e9bc1f689bd35`。
-- 当前阶段结论：新镜像已关闭 StatefulSet 批量 Service 遗留，但暴露关联 HPA 删除缺少 cluster 的 400，已再次退回 DEV。
+- DEV 源提交：`f6b7c689b55b1561d474dcb6dc056a39e2166e51`。
+- 当前阶段结论：PVC 创建页本地化缺陷已完成最小修复和本地验证，模块重新进入 VERIFY；新 SHA 镜像、131 rollout、Pod imageID 和浏览器渲染仍待验证。
 
 ## DEV 验收清单
 
@@ -22,7 +22,7 @@
 
 | 检查                           | 结果                                                                                 |
 | ------------------------------ | ------------------------------------------------------------------------------------ |
-| `./scripts/test.sh`            | 81 个测试文件、363 项通过，0 失败                                                    |
+| `./scripts/test.sh`            | 81 个测试文件、364 项通过，0 失败                                                    |
 | `corepack yarn build:packages` | 通过；四个 package 构建完成，shared 压缩 633/633                                     |
 | 变更文件 ESLint                | 0 错误、0 警告                                                                       |
 | Prettier、`git diff --check`   | 通过                                                                                 |
@@ -43,6 +43,8 @@
 第四轮 VERIFY 使用 CI Run `39935964057` 的精确镜像 `feature-v4-workloads-20261023-180140-7fa49aa192d0`，多架构 digest `sha256:650b83db249c7bc6e18dca66a3075c76594a911b69d095162b83618de5aa1c15`，131 rollout 后 Pod imageID 与之完全一致。浏览器批量删除两个专用 Deployment 时，两条 Deployment 和两条 HPA DELETE 均命中 `/clusters/host/`、返回 200，API 标签回读无残留。专用 DaemonSet 从 1/1/1 停止为 0/0/0，PATCH 保留原 `kubernetes.io/os=linux` 并追加 `non-existing=true`；移除专用停止键后恢复 1/1/1。原生创建页成功写入 StatefulSet 的 `data/16Mi/nfs-csi` PVC 模板和 `/data` 挂载，生成 PVC 状态 Bound。
 
 同一浏览器流程稳定复现 StatefulSet 创建页将 PVC 区标题、添加按钮及校验错误直接显示为 `VOLUME_CLAIM_TEMPLATES`、`ADD_VOLUME_CLAIM_TEMPLATE` 和 `WORKLOAD_VOLUME_CLAIM_INVALID`。功能持久化通过不能覆盖页面本地化缺陷；模块再次退回 DEV，先以失败测试约束创建页复用已有本地化键并补齐校验文案，再以新 SHA 镜像重验页面渲染。
+
+提交 `f6b7c689b55b1561d474dcb6dc056a39e2166e51` 将创建页标题和添加按钮切换到已有的 `PERSISTENT_VOLUME_CLAIM_TEMPLATE_PL`、`WORKLOAD_ADD_VOLUME_CLAIM_TEMPLATE`，并为四种内置语言补齐 `WORKLOAD_VOLUME_CLAIM_INVALID` 和 `WORKLOAD_VOLUME_CLAIM_DUPLICATE`。测试先在旧实现上稳定失败，修复后定向测试和完整回归 81 文件/364 项通过；packages/locales 构建、ESLint、Prettier 和 `git diff --check` 通过。模块重新进入 VERIFY，新 SHA 精确镜像的页面渲染仍须用 Playwright 验证。
 
 ## VERIFY 必须完成
 

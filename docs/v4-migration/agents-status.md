@@ -3,10 +3,10 @@
 ## 唯一当前状态（2026-10-23 组合批次范围调整）
 
 - 负责人：当前 Codex 单会话，不使用子 Agent。模块/能力：`workloads / deployment-statefulset-daemonset`；资源：Deployment、StatefulSet、DaemonSet。
-- 分支/Worktree：`feature/v4-workloads` / `console-workloads`；DEV 源提交 `cdc245c0dd5df0668211149ec4487176ea17815a`。
-- 当前阶段 `DEV`，REA 已通过；精确镜像 `feature-v4-workloads-20261023-180140-7fa49aa192d0` 已关闭 HPA 作用域缺陷并完成 DaemonSet 停止/恢复、StatefulSet PVC 模板持久化，但 StatefulSet 创建页出现未翻译的 PVC 标题、按钮和校验键，已按状态机退回修复。[阶段记录](./module-execution.json)、[DEV 完成记录](./workload-dev-completion-20261023.md)、[组合能力边界](./workload-kind-capability-matrix.md)和[测试设计](./workload-test-design-20261023.md)为当前依据。
+- 分支/Worktree：`feature/v4-workloads` / `console-workloads`；DEV 源提交 `f6b7c689b55b1561d474dcb6dc056a39e2166e51`。
+- 当前阶段 `VERIFY`，REA 已通过、DEV 本地修复已完成；StatefulSet 创建页已复用本地化 PVC 标题和添加按钮，并补齐四种内置语言的 PVC 校验文案。精确镜像构建、131 rollout、Pod imageID 与新 SHA 浏览器渲染重验仍待执行。[阶段记录](./module-execution.json)、[DEV 完成记录](./workload-dev-completion-20261023.md)、[组合能力边界](./workload-kind-capability-matrix.md)和[测试设计](./workload-test-design-20261023.md)为当前依据。
 - Deployment 页面批量删除两个专用资源时，Deployment 与 HPA 的四个 DELETE 均使用 `/clusters/host/` 并返回 200，API 回读无残留。DaemonSet 停止 PATCH 200，保留原 `kubernetes.io/os=linux` 并追加 `non-existing=true`，调度数降至 0；移除专用停止键后恢复 1/1/1。StatefulSet 从原生创建页写入 `data/16Mi/nfs-csi` 模板和 `/data` 挂载，PVC 实际 Bound。
-- 当前任务：用失败测试约束 PVC 创建页只使用已本地化键并补齐四种语言校验文案，做最小修复后重新完成回归、构建和精确 SHA 浏览器渲染验证。已完成的 HPA、DaemonSet、PVC API 持久化、StatefulSet Service 清理、低权限 RBAC 和 namespace 证据保留。
+- 当前任务：构建并部署 `f6b7c689b` 对应精确镜像，在新 Pod 上用 Playwright 重验 PVC 标题、添加按钮与校验错误不再显示原始键。TDD 红/绿、81 文件/364 项回归、packages/locales 构建、ESLint、Prettier 与差异检查已通过。已完成的 HPA、DaemonSet、PVC API 持久化、StatefulSet Service 清理、低权限 RBAC 和 namespace 证据保留。
 - 当前 REA 材料已获项目负责人批准进入 DEV。复核记录见 [workload-rea-review-20261023.md](./workload-rea-review-20261023.md)。REA 当时确认的普通 Workload 配置引用 `useV3action`、Wujie Shadow DOM 和 V3 编辑器桥接已在后续 DEV 提交移除；集群级三类 Workload 主路由也已切换原生列表。旧 Embed 文件保留供其他未迁移入口审计，当前 SHA 浏览器验证仍未完成。`module-execution.json` 已记录复核依据和日期。
 - 已建立 [三类资源字段行为矩阵](./workload-field-behavior-matrix-20261023.md)，覆盖公共字段、默认值/校验、清空/保留语义，以及 StatefulSet Service/PVC 模板和 DaemonSet 无副本/更新策略差异。矩阵将待实测项明确列出；字段、API、RBAC、缓存和错误仍未闭环，不改变 REA 门禁。
 - 已建立 [Action、API、权限与缓存静态证据](./workload-action-api-rbac-evidence-20261023.md)，覆盖三类资源详情操作、权限键、项目 URL、HTTP 方法、删除/HPA、版本冲突和缓存失效事实；运行时 RBAC、namespace 隔离、缓存刷新和错误态仍未验证，不改变 REA 门禁。
