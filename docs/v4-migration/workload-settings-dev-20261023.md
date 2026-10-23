@@ -5,8 +5,8 @@
 - 模块：`workloads / deployment-statefulset-daemonset`。
 - 分支 / Worktree：`feature/v4-workloads` / `console-workloads`。
 - 负责人批准进入 DEV：`5c24342571419708b6f0c21f3ce9e8f193da0e17`，批准原文见 [REA 复核记录](./workload-rea-review-20261023.md)。
-- 首批功能提交：`0c1d9aadf219fcabf5e6a310722591c9d7bef136`；生命周期增量提交：`da25187d33ca49d21afa0ad748b619e8a2786c64`；安全上下文增量提交：`9e2f4148f2abde58b6eec850612d99dc1ac3f0a8`；当前功能提交：`d762c005bdf5b4c48e594a069785f1fa51e86489`。
-- 阶段仍为 DEV / 进行中；不是三类资源完整验收，也没有进入 VERIFY。
+- 首批功能提交：`0c1d9aadf219fcabf5e6a310722591c9d7bef136`；生命周期增量提交：`da25187d33ca49d21afa0ad748b619e8a2786c64`；安全上下文增量提交：`9e2f4148f2abde58b6eec850612d99dc1ac3f0a8`；DEV 源提交：`0a44f5706d1a6ba9b266360caa2d4128d8bb08a2`。
+- DEV 已完成并进入 VERIFY；三类资源仍须完成当前 SHA 的部署后验收，尚未进入 PR 阶段。
 
 ## 本次实现与保留行为
 

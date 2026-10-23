@@ -4,7 +4,7 @@
   "capability": "deployment-statefulset-daemonset",
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
-  "phase": "DEV",
+  "phase": "VERIFY",
   "rea": {
     "status": "已通过",
     "sourceCommit": "e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0",
@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "547d8e489a57b4654c96460dac0e93b68b82d2938082f8c3ad9b2d274cf36a70"
+        "sha256": "ef9667d0583a9029152f0339a516c7abf382bdf585f9961dee3a4a1cc6279e63"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "6e2ee92b0dd926037859179ac99b2590682be175230a6e7c60ce1b094f50e509"
+        "sha256": "5b78bfbe242f270f50934399e6c18ddc1e3213ac55dd4b925f42b0eab7a93e10"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -224,13 +224,13 @@
     }
   },
   "dev": {
-    "status": "进行中",
-    "reason": "进行中：三类原生设置及顶层元数据、StatefulSet/DaemonSet 原生创建、集群级三类原生主入口、DaemonSet 停止补丁、StatefulSet PVC 模板/Service payload 已实现，普通项目配置引用已移除 V3 Action/Wujie DOM 桥接；完整 Action、双资源部分成功恢复、真实保存、RBAC、缓存和部署后浏览器验收仍待补齐；未进入 VERIFY",
-    "sourceCommit": "d762c005bdf5b4c48e594a069785f1fa51e86489",
+    "status": "已完成",
+    "reason": "三类原生入口、列表、详情、创建、设置、Action/Store 与配置引用替代已完成代码交付；回滚必填和 StatefulSet 双资源创建补偿已闭环；当前 SHA 的真实持久化、RBAC、namespace、缓存和浏览器等价性转入 VERIFY",
+    "sourceCommit": "0a44f5706d1a6ba9b266360caa2d4128d8bb08a2",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
-        "sha256": "28556e08fd0dadcc296a2e0fc4c511984bea2bb4b6523debbf7d46d7aa141736"
+        "sha256": "cd8bb9ad7331333eb3d94d002122dfec9b9c017c837e82765d2ea11ba9c8763a"
       },
       {
         "path": "docs/v4-migration/evidence/workload-lifecycle-20261023-api-validation.json",
@@ -463,6 +463,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-cluster-native-entry-20261023.json",
         "sha256": "820beb6c7778b9950f1589d1eb6f447982e532edc57be0a7cc6f45618173cf1a"
+      },
+      {
+        "path": "docs/v4-migration/workload-dev-completion-20261023.md",
+        "sha256": "52e5e0d57fc700b4877ff260e919d69911e7b7191a5b5ebbb912b6def0403713"
       }
     ]
   },
@@ -473,7 +477,9 @@
     "WL-04：移除普通 Workload 配置引用的 useV3action、Wujie Shadow DOM 和 V3 编辑器桥接"
   ],
   "verify": {
-    "status": "未完成",
-    "reason": "旧镜像有限场景证据保留，不能继承为三类资源当前组合批次的完整等价通过"
+    "status": "进行中",
+    "reason": "等待精确 DEV 源提交镜像构建、131 rollout、Pod imageID 核验及三类资源 Playwright/API/RBAC/namespace/缓存与等价性验证",
+    "sourceCommit": "0a44f5706d1a6ba9b266360caa2d4128d8bb08a2",
+    "documents": []
   }
 }
