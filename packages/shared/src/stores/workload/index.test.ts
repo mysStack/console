@@ -17,11 +17,15 @@ setLogger({ log: console.log, warn: console.warn, error: () => {} });
 
 function loadStore(
   moduleName: string,
-  send: (url: string) => Promise<unknown> = async () => ({ status: 'Success' }),
+  send: (url: string, data?: unknown) => Promise<unknown> = async () => ({ status: 'Success' }),
 ) {
   const client = new QueryClient();
   const module = { exports: {} as any };
-  const request = { delete: send, patch: send, post: send };
+  const request = {
+    delete: send,
+    patch: (url: string, data: unknown) => send(url, data),
+    post: send,
+  };
   const dependencies: Record<string, unknown> = {
     'react-query': {
       useMutation: (mutationFn: any, options: any) =>
@@ -161,6 +165,22 @@ test('empty batches finish successfully without sending requests', async () => {
     const mutation = store[hook]();
     await mutation.mutate({ data: [] });
     assert.equal(mutation.getCurrentResult().isSuccess, true);
+  }
+});
+
+test('停止操作按资源类型生成副本或 DaemonSet 节点选择补丁', async () => {
+  for (const [resource, expected] of [
+    ['deployments', { spec: { replicas: 0 } }],
+    ['statefulsets', { spec: { replicas: 0 } }],
+    ['daemonsets', { spec: { template: { spec: { nodeSelector: { 'non-existing': 'true' } } } } }],
+  ] as const) {
+    const calls: Array<{ url: string; data: unknown }> = [];
+    const store = loadStore(resource, async (url, data) => {
+      calls.push({ url, data });
+      return { status: 'Success' };
+    });
+    await store.useBatchStopDeploymentMutation().mutate({ data: [item] });
+    assert.deepEqual(JSON.parse(JSON.stringify(calls)), [{ url: item.name, data: expected }]);
   }
 });
 

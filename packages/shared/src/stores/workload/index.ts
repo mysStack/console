@@ -204,11 +204,16 @@ const workloadStore = (module: string) => {
   };
 
   const stopDeployment = (params: PathParams) => {
-    const patchFiled = {
-      spec: {
-        replicas: 0,
-      },
-    };
+    const patchFiled =
+      module === 'daemonsets'
+        ? {
+            spec: {
+              template: {
+                spec: { nodeSelector: { 'non-existing': 'true' } },
+              },
+            },
+          }
+        : { spec: { replicas: 0 } };
     return request.patch(getDetailUrl(params), patchFiled);
   };
   const useBatchStopDeploymentMutation = (options?: SuccessProps) => {
