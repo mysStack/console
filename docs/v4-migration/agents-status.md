@@ -1,3 +1,10 @@
+# 当前状态补充（2026-10-24：V3 预加载修复进入 VERIFY）
+
+- DEV 已完成：`fbf84fa223b43c8b48ac407fbcf4c35a0580f2ab`，新增路由判断与回归测试；90 个测试文件、402 项通过，`corepack yarn build:packages` 通过。
+- CI Run `40018472891` 成功，镜像 tag `feature-v4-workloads-20261024-042200-fbf84fa223b4`，digest `sha256:1ca3e9ab0172099ebfab5adeb30eeedad72da9aee91ab3dab6d4c7b407152aa2`。
+- 当前阶段已回到 `VERIFY`，下一步仅部署该精确制品并复验三类原生 Workload 路由不再请求 `/consolev3` 或 `/dist/v3dist`，同时重跑必要的页面渲染和行为检查。
+- 完整设置、RBAC、namespace 隔离、缓存、全部 Action 和 V3 等价性仍未整体验收；PR #2 继续保持 Draft。
+
 # 当前状态补充（2026-10-24：V3 预加载缺口）
 
 - 当前模块：`workloads`，分支 `feature/v4-workloads`，Worktree `console-workloads`；单 Codex 顺序执行，无子 Agent。
