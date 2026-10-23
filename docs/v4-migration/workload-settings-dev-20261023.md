@@ -5,7 +5,7 @@
 - 模块：`workloads / deployment-statefulset-daemonset`。
 - 分支 / Worktree：`feature/v4-workloads` / `console-workloads`。
 - 负责人批准进入 DEV：`5c24342571419708b6f0c21f3ce9e8f193da0e17`，批准原文见 [REA 复核记录](./workload-rea-review-20261023.md)。
-- 首批功能提交：`0c1d9aadf219fcabf5e6a310722591c9d7bef136`；生命周期增量提交：`da25187d33ca49d21afa0ad748b619e8a2786c64`；安全上下文增量提交：`9e2f4148f2abde58b6eec850612d99dc1ac3f0a8`；当前功能提交：`86ce8b4abdb4a27b8b6bd35e55406d238eb56383`。
+- 首批功能提交：`0c1d9aadf219fcabf5e6a310722591c9d7bef136`；生命周期增量提交：`da25187d33ca49d21afa0ad748b619e8a2786c64`；安全上下文增量提交：`9e2f4148f2abde58b6eec850612d99dc1ac3f0a8`；当前功能提交：`9cf97481c64aa8932f3afe41414057d978391a49`。
 - 阶段仍为 DEV / 进行中；不是三类资源完整验收，也没有进入 VERIFY。
 
 ## 本次实现与保留行为
@@ -191,3 +191,25 @@ DaemonSet 的旧 V3 UI 快照没有调度分区，因此当前 V4 不为它虚�
 | `node docs/v4-migration/evidence/workload-top-metadata-server-validation.cjs`                   | 131 `v1.31.13+k3s1` 接受 Deployment server dry-run；5 项字段检查通过，残留资源 0  | 不保存资源；见[API 记录](./evidence/workload-top-metadata-20261023-api-validation.json)  |
 
 本增量没有构建或推送测试镜像，没有更新 131 的 `ks-console`、rollout 或登录当前 SHA 浏览器。StatefulSet/DaemonSet 创建、已有资源顶层元数据编辑、时区、StatefulSet Service/PVC 模板、集群原生入口、DaemonSet 停止语义、配置引用和完整 Action/RBAC 仍在 DEV 清单，因此阶段保持 DEV。
+
+## 宿主时区同步增量（2026-10-23）
+
+代码提交 `9cf97481c64aa8932f3afe41414057d978391a49` 依据当前 `v3dist` 工厂 933/2285 的定向 REA，在普通容器和初始化容器表单补齐“同步宿主机时区”开关。启用时写入 `name=host-time`、`mountPath=/etc/localtime`、`readOnly=true`；任一普通或初始化容器保留该挂载时，Pod 模板自动维护 `host-time` HostPath 卷。全部容器关闭后只删除名称和路径均匹配的系统卷，其他卷、挂载顺序和未知字段保持不变。三类原生设置共用该转换，Deployment 创建同时接入。
+
+### REA 与可复现来源
+
+- 固定制品 tree：`1e499d92e11374e26c76f5e13be45251602bd596`。工厂 2285 负责容器开关及挂载，工厂 933 在普通/初始化容器合并后维护系统卷。
+- 实际 REA：parent `ev_6cb9459efa2f4ace1cbe93ed88e3948933873e8e268dc8bf6113ead43d8bab8f`，summary `ev_d25ffd82edf028b2d2cb795a6ea57a7d2652f42aa24797092e49038aac3dd1b9`，输入摘要 `d9813d3d7d97d94fbab7352e20a4d4be1f520f2411ede21133b8152243b132de`。语义覆盖为 unknown，1414 个未知节点保留。
+- 可复现命令：`node docs/v4-migration/evidence/workload-timezone-extract.cjs /tmp/<尚不存在的绝对目录>`；来源偏移与哈希见[来源记录](./evidence/workload-timezone-20261023-provenance.json)，覆盖限制见[REA 摘要](./evidence/workload-timezone-20261023-rea-summary.json)。
+
+### 实际验证
+
+| 命令/检查                                                                                                | 结果                                                                                                             | 边界                                                                                 |
+| -------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `esno .../WorkloadCreateModal/deployment.test.ts`、`esno .../WorkloadCreateModal/ContainerInput.test.ts` | 测试先行复现 3 个失败；实现后 54/54 与 3/3 通过                                                                  | 覆盖创建、回填、任一启用/全部关闭及表单接线                                          |
+| `./scripts/test.sh`                                                                                      | 精确代码提交 `9cf97481c`：77 个文件、343 项通过、0 失败                                                          | 仓库现有测试范围                                                                     |
+| `corepack yarn build:packages`                                                                           | 精确代码提交 `9cf97481c`：退出 0，633/633 minify 完成                                                            | 未构建或推送 Console 镜像                                                            |
+| TypeScript 生产源基线比较                                                                                | 基线 `6367c5b03f5053fec48d6d0b730346c67b96b34f` 691，当前 691，新增 0、改动文件 0                                | 全项目既有诊断仍存在；见[记录](./evidence/workload-timezone-20261023-typecheck.json) |
+| `node docs/v4-migration/evidence/workload-timezone-server-validation.cjs`                                | 131 `v1.31.13+k3s1` 的 Deployment、StatefulSet、DaemonSet server dry-run 均接受；卷/只读挂载检查通过，残留资源 0 | 不保存资源；见[API 记录](./evidence/workload-timezone-20261023-api-validation.json)  |
+
+本增量没有构建或推送测试镜像，没有更新 131 的 `ks-console`、rollout、登录当前 SHA 浏览器或启动真实 Pod。HostPath 策略和实际容器时区必须在 VERIFY 用专用测试资源检查。StatefulSet/DaemonSet 创建、已有资源顶层元数据编辑、StatefulSet Service/PVC 模板、集群原生入口、DaemonSet 停止语义、配置引用和完整 Action/RBAC 仍在 DEV 清单，因此阶段保持 DEV。
