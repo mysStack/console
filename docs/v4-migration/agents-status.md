@@ -1,3 +1,9 @@
+# 当前状态补充（2026-10-24：首次预加载修复未闭环，退回 DEV）
+
+- 131 精确制品 `88b587f947ca9da929821eb372331eb8785db2ed` 的浏览器复验确认：三类原生页面和编辑设置均可用，但登录后 dashboard 的延迟 V3 资源请求仍可能在首次 Workload 导航期间出现；此前“只按当前 pathname 跳过”不足以关闭运行时问题。
+- 根因仍是 `packages/core/src/utils/wujie.ts` 中共享初始化层调用 `preloadApp()`；下一步移除全局预加载，仅保留 `setupApp()`，让仍需兼容的旧入口按需挂载。
+- 阶段从 `VERIFY` 退回 `DEV`；代码修复完成、测试、重新构建和部署前不再沿用 `88b` 的通过结论。
+
 # 当前状态补充（2026-10-24：V3 预加载修复进入 VERIFY）
 
 - DEV 已完成：`fbf84fa223b43c8b48ac407fbcf4c35a0580f2ab`，新增路由判断与回归测试；90 个测试文件、402 项通过，`corepack yarn build:packages` 通过。

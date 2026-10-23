@@ -1,5 +1,11 @@
 # Workload 131 专项 VERIFY（2026-10-24）
 
+## 当前增量：首次预加载修复未闭环，退回 DEV（2026-10-24）
+
+对 `88b587f947ca9da929821eb372331eb8785db2ed` 精确制品的复验发现：登录后的 dashboard 预加载可能在首次进入 Deployment 页面时延迟完成，仍产生 `/dist/v3dist/main.*.css` 请求。此前按当前 `pathname` 跳过预加载的修复只覆盖了进入 Workload 路由后的调用，不能覆盖登录后初始 dashboard 的异步请求。
+
+该事实已写入阶段记录，模块从 VERIFY 退回 DEV。下一次修复将移除共享初始化层的全局 `preloadApp()`，保留 `setupApp()`，然后重新执行本地测试、构建、CI、部署和三类页面 Network 验证。
+
 ## 当前增量：原生 Workload 路由仍触发 V3 预加载（2026-10-24）
 
 在精确制品 `8220090837bf9fe1e924578cc3bfc9e3115608ac` 对应的 131 部署上，使用零初始 Cookie 的新浏览器 context 登录，并逐一访问 Deployment、StatefulSet、DaemonSet 专用详情路由。三类页面均渲染了原生 V4 设置界面，直达、刷新、返回和 namespace API 作用域检查通过；但 Network 仍观察到 `/consolev3/dashboard` 以及 `/dist/v3dist/*` 请求。

@@ -4,7 +4,7 @@
   "capability": "deployment-statefulset-daemonset",
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
-  "phase": "VERIFY",
+  "phase": "DEV",
   "rea": {
     "status": "已通过",
     "sourceCommit": "e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0",
@@ -56,7 +56,7 @@
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "3a8d288a8ac9320af455000ffce7ea981023674902d6bd76fec55ef6c80e400e"
+        "sha256": "12eb941ae1feaa370332a8a85344527034b8869d6734e068709665b353745ef1"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -224,8 +224,8 @@
     }
   },
   "dev": {
-    "status": "已完成",
-    "reason": "已完成共享启动层 V3 预加载缺口的最小修复；原生 Workload 路径跳过预加载，旧路径保留现有预加载；本地 90 个测试文件/402 项通过、build:packages 通过、CI Run 40018472891 成功。",
+    "status": "进行中",
+    "reason": "VERIFY 发现仅按当前路径跳过预加载仍会在登录后 dashboard 入口触发延迟的 V3 CSS 请求；根因仍为共享初始化层的无条件 preloadApp。DEV 需要移除全局预加载并保留 setupApp 按需挂载，再重新构建部署验证。",
     "sourceCommit": "fbf84fa223b43c8b48ac407fbcf4c35a0580f2ab",
     "documents": [
       {
@@ -501,8 +501,8 @@
     "WL-04：移除普通 Workload 配置引用的 useV3action、Wujie Shadow DOM 和 V3 编辑器桥接"
   ],
   "verify": {
-    "status": "未完成",
-    "reason": "V3 预加载缺口已修复并完成 DEV；等待按部署门禁部署精确镜像，完成 rollout、Pod imageID、零 Cookie 登录和三类路由 Network 复验。此前 822009083 的 V3 请求证据保留为修复前基线。",
+    "status": "已暂停（发现修复仍不完整）",
+    "reason": "精确制品基础浏览器和设置验证通过，但 Network 在登录后进入原生 Workload 前仍观察到一条延迟的 /dist/v3dist CSS 请求；当前修复未闭环，已退回 DEV。",
     "sourceCommit": "fbf84fa223b43c8b48ac407fbcf4c35a0580f2ab",
     "documents": [
       {
