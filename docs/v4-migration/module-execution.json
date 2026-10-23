@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "a729cf752ff675664b52c62912c4a9938b420a87fb53851e2142454f662ced98"
+        "sha256": "e408eb4df67cd9ea9f80bdcca300ca49f77cbac515fa4ff204485402cda04e7d"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "92564c0235eb152b8c693b54e3122902f73b8fac80238004bd0d224a0b738000"
+        "sha256": "59b04b33d94f6147a0750259802f5133a02295438c49c412487efbaf5f438d57"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -225,12 +225,12 @@
   },
   "dev": {
     "status": "进行中",
-    "reason": "进行中：原生设置入口、策略、优雅终止、生命周期、安全上下文、Pod 模板注解、宿主时区、Pod 调度、DaemonSet 停止补丁、StatefulSet PVC 模板编辑及 StatefulSet Service payload/错误反馈已实现；集群入口、完整 Action、Service/PVC 真实保存、创建、配置引用、RBAC、缓存和部署后浏览器验收仍待补齐；未进入 VERIFY",
-    "sourceCommit": "f32b13391184d798fb6a119d2837d58d15ed5e03",
+    "reason": "进行中：原生设置入口、策略、优雅终止、生命周期、安全上下文、Pod 模板注解、宿主时区、Pod 调度、顶层元数据、DaemonSet 停止补丁、StatefulSet PVC 模板编辑及 StatefulSet Service payload/错误反馈已实现；集群入口、完整 Action、Service/PVC 真实保存、StatefulSet/DaemonSet 创建、配置引用、RBAC、缓存和部署后浏览器验收仍待补齐；未进入 VERIFY",
+    "sourceCommit": "30c5d0e7446d55e03f295b7a5753bde645c15c30",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
-        "sha256": "3173c16d3502e254f631e6895599f77875aefe4d92f5ab27ed316075bb69a0c4"
+        "sha256": "4f102b01aa1f9485a2f148e7354d6b77d900c0e201485197c65990fe643e1e2d"
       },
       {
         "path": "docs/v4-migration/evidence/workload-lifecycle-20261023-api-validation.json",
@@ -423,6 +423,14 @@
       {
         "path": "docs/v4-migration/evidence/workload-service-server-validation.cjs",
         "sha256": "1787498c3ac87a6508404d010c7b80d41134dc192107ce0106fede9f0f076a94"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-existing-top-metadata-20261023-api-validation.json",
+        "sha256": "cd0cfa34a18212fa5ed91ca124723b4a5985693ca3cc1168db0deff419277fa3"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-existing-top-metadata-server-validation.cjs",
+        "sha256": "85bbc2e2c41df369a18a54f8058c4478fed58c95bd2f91552b6cfbacf2831103"
       }
     ]
   },

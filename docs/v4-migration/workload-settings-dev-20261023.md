@@ -245,6 +245,22 @@ DaemonSet 的旧 V3 UI 快照没有调度分区，因此当前 V4 不为它虚�
 
 本次关闭的是 Service payload 和错误反馈的 DEV 缺口；StatefulSet Service 的真实 UI 保存、取消、并发冲突、低权限拒绝、保存后详情刷新，以及 PVC 实际生成和完整浏览器验收仍未完成。当前阶段保持 DEV，PR #2 保持 Draft。
 
+## 三类 Workload 顶层元数据编辑（2026-10-23）
+
+代码提交 `30c5d0e7446d55e03f295b7a5753bde645c15c30` 将 Deployment 创建阶段已经实现的 Workload 顶层 metadata 能力接入三类资源的原生设置表单。Deployment、StatefulSet、DaemonSet 均可回填、修改和清空 `metadata.labels` 与 `metadata.annotations`；系统 `app` 标签在表单中隐藏并随受控值保留，KubeSphere 保留注解继续由运行时配置隐藏。顶层 metadata 与 `spec.selector`、Pod 模板 metadata 分开写回，修改顶层值不会重写不可变 selector 或 Pod 模板。
+
+### 实际验证
+
+| 命令/检查                                                                              | 结果                                                                                                                                    | 边界                                                                                                                                          |
+| -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| 定向 `deployment.test.ts`、`index.test.ts`                                             | **60/60、4/4 通过**                                                                                                                     | 覆盖三类资源回填、修改、清空、非法键拒绝、selector/Pod 模板隔离和表单接线                                                                     |
+| `./scripts/test.sh`                                                                    | **78 个文件、353 项通过，0 失败**                                                                                                       | 仓库现有测试范围；不证明浏览器组件行为                                                                                                        |
+| 变更文件 ESLint、Prettier、`git diff --check`                                          | **通过，0 错误**                                                                                                                        | 静态质量检查                                                                                                                                  |
+| `corepack yarn build:packages`                                                         | **退出 0，633/633 minify 完成**                                                                                                         | 仅为本地包构建，未构建 Console 镜像                                                                                                           |
+| `node docs/v4-migration/evidence/workload-existing-top-metadata-server-validation.cjs` | **131 `v1.31.13+k3s1` 三类资源 server dry-run 均接受**；系统字段保留、普通字段更新、空值、selector/Pod 模板不变检查全部通过，残留资源 0 | 不保存资源，不证明真实页面持久化、RBAC、缓存或并发冲突；见 [API 记录](./evidence/workload-existing-top-metadata-20261023-api-validation.json) |
+
+本次关闭三类已有资源顶层 metadata 的 DEV 代码缺口。当前 SHA 尚未构建 Console 镜像、部署 131 或执行 Playwright；低权限拒绝、namespace 隔离、保存后刷新、冲突/网络错误和 V3 页面等价性仍归 VERIFY。当前阶段保持 DEV，PR #2 保持 Draft。
+
 ## DaemonSet 停止语义修复（2026-10-23）
 
 代码提交 `da741a3893f88885df4698a4ea5d265336fb9692` 按当前制品 main 工厂 318 修复共享 Workload Store：DaemonSet 停止 PATCH `spec.template.spec.nodeSelector.non-existing=true`，Deployment/StatefulSet 仍 PATCH `spec.replicas=0`。测试先行复现 DaemonSet 错误副本补丁；实现后 Store 20/20 通过，完整回归 77 文件/344 项通过，包构建和类型基线 691→691 通过。131 专用 DaemonSet 的 merge patch server dry-run 被接受，回读 resourceVersion/nodeSelector 不变，见[API 记录](./evidence/workload-stop-20261023-api-validation.json)。来源和实际 REA 见[来源](./evidence/workload-stop-20261023-provenance.json)与[摘要](./evidence/workload-stop-20261023-rea-summary.json)。本轮没有执行真实停止或恢复，相关调度、原 nodeSelector 恢复、RBAC、错误反馈和缓存必须在 VERIFY 完成。
