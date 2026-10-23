@@ -4,7 +4,7 @@
   "capability": "deployment-statefulset-daemonset",
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
-  "phase": "DEV",
+  "phase": "VERIFY",
   "rea": {
     "status": "已通过",
     "sourceCommit": "e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0",
@@ -16,7 +16,7 @@
       },
       {
         "path": "docs/v4-migration/deployment-settings-capability-matrix.md",
-        "sha256": "9ea3897737d82db023079f2c96f476ef2fa5bd50d3fc8aafdca88b2135cd4014"
+        "sha256": "1ccb02088258570232897e8ad032115102bf1e0b94280afe23387f21f82cef2f"
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "809f2dfa15ec10a007eaee45a28def29c50afb2ce14f70ae687a04690bf46197"
+        "sha256": "e47581bc21c5fc8d6b6cde2cf9f0daba4fe3d658ed44c793d95edf4a1ebe49f6"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "89c82cf268941bbb10210e58d33a6ad8351dcdbf42b3f2d4a5c8abae07731be3"
+        "sha256": "d8db0ec48736419c540adb58a5c8db4a65120eb8906f2ef48e4a1e384ec1389a"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -224,9 +224,9 @@
     }
   },
   "dev": {
-    "status": "进行中",
-    "reason": "2026-10-24 已补当前制品 API 的镜像搜索、标签分页/选择、详情、错误/重试及四语言；89 文件/400 项回归、包/语言构建和相关 ESLint 通过。当前保持 DEV，代码提交后准备交付进入 VERIFY；131 镜像 API 超时及新 SHA 部署/浏览器验收尚未完成。",
-    "sourceCommit": "f6b7c689b55b1561d474dcb6dc056a39e2166e51",
+    "status": "已完成",
+    "reason": "当前制品设置与权限差异已有原生实现，89 文件/400 项回归及本地构建/检查完成；以 sourceCommit 和本地证据绑定。进入 VERIFY，未宣称环境验收通过。",
+    "sourceCommit": "3e1d40eae023cf54905e9c298f1ddd387ab2a98a",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
@@ -466,7 +466,7 @@
       },
       {
         "path": "docs/v4-migration/workload-dev-completion-20261023.md",
-        "sha256": "30af7713d831f3d494e114027d4aad4ac8d5da4d3ee06252fb47702773f924b0"
+        "sha256": "8a2c84a7404e4e72689bc0eceebd655921506a01af6df41b428f18e3aef3926e"
       },
       {
         "path": "docs/v4-migration/evidence/workload-settings-sections-local-20261024.json",
@@ -498,8 +498,8 @@
   ],
   "verify": {
     "status": "未完成",
-    "reason": "精确镜像 ef3b4f1a8 历史专项证据保留；新代码设置分区和容器编辑尚未部署验收，变量引用与配置引用权限等仍未闭环。保持 DEV，不以历史保存成功证明当前能力等价。",
-    "sourceCommit": "f6b7c689b55b1561d474dcb6dc056a39e2166e51",
+    "reason": "等待当前 SHA 镜像 CI、131 rollout/imageID、新浏览器登录和三类完整验证；镜像 API 超时须定位并完成正向场景。",
+    "sourceCommit": "3e1d40eae023cf54905e9c298f1ddd387ab2a98a",
     "documents": []
   }
 }

@@ -1,6 +1,6 @@
 # Workload 编辑设置能力对照清单（Deployment 详细输入）
 
-> 当前组合能力：`workloads / deployment-statefulset-daemonset`；本表重点记录 Deployment 编辑设置输入；当前阶段 `DEV`，REA 已获负责人批准；下方早期盘点表保留为历史输入，未闭环项继续跟踪。StatefulSet、DaemonSet 的差异以[组合能力边界矩阵](./workload-kind-capability-matrix.md)为准。
+> 当前组合能力：`workloads / deployment-statefulset-daemonset`；本表重点记录 Deployment 编辑设置输入；当前阶段 `VERIFY`，REA 已获负责人批准；下方早期盘点表保留为历史输入，未闭环项继续跟踪。StatefulSet、DaemonSet 的差异以[组合能力边界矩阵](./workload-kind-capability-matrix.md)为准。
 > 代码输入：`36ae2216167ae27561c05e37e5157df0da322de8`；分析复核输入：`87df0e024ea93333a2352fc92907007b86f5e33b`。
 > 本表是防遗漏清单，尚不是完成的 V3 行为还原。候选项来自旧源码、现有 V4 和 Kubernetes 配置概念，必须由当前制品及真实 V3 行为确认；不能把所有 Kubernetes 字段自动当作 V3 已有 UI 能力，也不能因当前简化表单没有实现就省略。
 
