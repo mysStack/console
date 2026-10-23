@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  buildDaemonSet,
   buildDeployment,
   checkWorkloadLabelsAvailability,
   buildDeploymentSettingsResource,
@@ -16,6 +17,60 @@ import {
 } from './deployment';
 
 const cloneTestResource = <T>(value: T): T => structuredClone(value);
+
+test('buildDaemonSet 创建无 replicas 的原生 DaemonSet 并保留资源特有策略', () => {
+  const daemonSet = buildDaemonSet({
+    name: 'native-agent',
+    namespace: 'v4-migration-e2e',
+    replicas: 9,
+    containers: [{ name: 'agent', image: 'busybox:1.36' }],
+    updateStrategy: { type: 'RollingUpdate', maxUnavailable: '20%' },
+    minReadySeconds: 3,
+    terminationGracePeriodSeconds: 15,
+    nodeSelector: { 'kubernetes.io/os': 'linux' },
+  });
+
+  assert.equal(daemonSet.apiVersion, 'apps/v1');
+  assert.equal(daemonSet.kind, 'DaemonSet');
+  assert.equal(daemonSet.metadata.name, 'native-agent');
+  assert.equal('replicas' in daemonSet.spec, false);
+  assert.deepEqual(daemonSet.spec.updateStrategy, {
+    type: 'RollingUpdate',
+    rollingUpdate: { maxUnavailable: '20%' },
+  });
+  assert.equal(daemonSet.spec.minReadySeconds, 3);
+  assert.equal(daemonSet.spec.template.spec.terminationGracePeriodSeconds, 15);
+  assert.deepEqual(daemonSet.spec.template.spec.nodeSelector, {
+    'kubernetes.io/os': 'linux',
+  });
+});
+
+test('buildDaemonSet 支持 OnDelete 并拒绝 Deployment 策略字段', () => {
+  const daemonSet = buildDaemonSet({
+    name: 'native-agent',
+    namespace: 'v4-migration-e2e',
+    replicas: 1,
+    containers: [{ name: 'agent', image: 'busybox:1.36' }],
+    updateStrategy: { type: 'OnDelete' },
+    minReadySeconds: 0,
+    terminationGracePeriodSeconds: 30,
+  });
+  assert.deepEqual(daemonSet.spec.updateStrategy, { type: 'OnDelete' });
+
+  assert.throws(
+    () =>
+      buildDaemonSet({
+        name: 'invalid-agent',
+        namespace: 'v4-migration-e2e',
+        replicas: 1,
+        containers: [{ name: 'agent', image: 'busybox:1.36' }],
+        updateStrategy: { type: 'Recreate' },
+        minReadySeconds: 0,
+        terminationGracePeriodSeconds: 30,
+      }),
+    /WORKLOAD_SETTINGS_INVALID/,
+  );
+});
 
 for (const kind of ['Deployment', 'StatefulSet', 'DaemonSet']) {
   test(`${kind} 生命周期回填、修改和清空保留其他容器字段及未编辑动作`, () => {

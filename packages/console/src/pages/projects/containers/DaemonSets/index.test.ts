@@ -18,3 +18,11 @@ test('project DaemonSet list has no V3 list bridge', () => {
     /ConsoleV3ResourceList|wujieUrlPrefix|WujieReact|wujie-react|consolev3/,
   );
 });
+
+test('project DaemonSet list provides native creation and visible failure feedback', () => {
+  assert.match(source, /useCreateWorkloadMutation/);
+  assert.match(source, /WorkloadCreateModal/);
+  assert.match(source, /kind="DaemonSet"/);
+  assert.match(source, /onClick: createModal\.open/);
+  assert.match(source, /notify\.error\(t\('CREATE_DAEMONSET_FAILED'\)\)/);
+});

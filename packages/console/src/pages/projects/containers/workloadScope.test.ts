@@ -100,7 +100,7 @@ function inspectList(directory: string) {
 for (const resource of ['Deployments', 'StatefulSets', 'DaemonSets']) {
   test(`${resource} successful mutations refresh the current list`, () => {
     const { mutationCallbacks, getRefreshCount } = inspectList(resource);
-    const expectedCallbackCount = resource === 'Deployments' ? 7 : 6;
+    const expectedCallbackCount = resource === 'StatefulSets' ? 6 : 7;
     assert.equal(mutationCallbacks.length, expectedCallbackCount);
     for (const onSuccess of mutationCallbacks) {
       const before = getRefreshCount();

@@ -27,6 +27,15 @@ test('Deployment 创建表单区分工作负载元数据和 Pod 模板注解并�
   assert.match(source, /checkWorkloadLabelsAvailability/);
 });
 
+test('创建表单按资源类型渲染 DaemonSet 字段并调用对应构建器', () => {
+  assert.match(source, /kind\?: WorkloadKind/);
+  assert.match(source, /buildDaemonSet/);
+  assert.match(source, /kind !== 'DaemonSet'[\s\S]*name="replicas"/);
+  assert.match(source, /kind === 'DaemonSet'[\s\S]*name="updateStrategy"/);
+  assert.match(source, /name="minReadySeconds"/);
+  assert.match(source, /name="terminationGracePeriodSeconds"/);
+});
+
 test('三类 Workload 设置表单区分工作负载元数据和 Pod 模板注解', () => {
   assert.match(settingsSource, /name="workloadLabels"/);
   assert.match(settingsSource, /name="workloadAnnotations"/);

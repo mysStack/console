@@ -4,6 +4,8 @@
  */
 
 module.exports = {
+  CREATE_DAEMONSET: '建立守護進程集',
+  CREATE_DAEMONSET_FAILED: '建立守護進程集失敗。',
   // Banner
   // List
   // List > Create > Basic Information

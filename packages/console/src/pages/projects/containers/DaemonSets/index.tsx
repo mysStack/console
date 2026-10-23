@@ -5,6 +5,7 @@
 
 import React, { useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useDisclosure } from '@kubed/hooks';
 import { Field, notify } from '@kubed/components';
 import WorkloadBanner from '../../../clusters/components/WorkloadBanner';
 import {
@@ -29,6 +30,7 @@ import {
 } from '@ks-console/shared';
 import WorkloadStatus from '../../../../components/WorkloadStatus';
 import WorkLoadAvatar from '../../../clusters/components/workloadAvatar';
+import WorkloadCreateModal from '../../components/WorkloadCreateModal';
 //types
 import { Column, FormattedWorkload } from '@ks-console/shared';
 import { EditYamlConfig, ModalBaseConfig, BatchOptConfig } from '../../../clusters/types/workload';
@@ -43,12 +45,14 @@ const {
   useDeleteDeploymentMutation,
   useBatchDeleteWorkloadMutation,
   useBatchStopDeploymentMutation,
+  useCreateWorkloadMutation,
 } = workloadStore('daemonsets');
 
 const DaemonSets = () => {
   const module = 'daemonsets';
   const authKey = module;
   const tableRef = useRef<TableRef<FormattedWorkload>>();
+  const createModal = useDisclosure();
   const [batchDeleteConfig, setBatchDeleteConfig] = useState<BatchOptConfig<FormattedWorkload>>();
   const [batchStopConfig, setBatchStopConfig] = useState<BatchOptConfig<FormattedWorkload>>();
 
@@ -134,6 +138,17 @@ const DaemonSets = () => {
     },
   });
 
+  const { mutate: mutateCreate, isLoading: createIsLoading } = useCreateWorkloadMutation({
+    onSuccess: () => {
+      createModal.close();
+      tableRef.current?.refetch();
+      notify.success(t('CREATE_SUCCESSFUL'));
+    },
+    onError: () => {
+      notify.error(t('CREATE_DAEMONSET_FAILED'));
+    },
+  });
+
   // Table actions
   const renderTableAction = useTableActions({
     authKey,
@@ -147,7 +162,7 @@ const DaemonSets = () => {
           color: 'secondary',
           shadow: true,
         },
-        onClick: () => {},
+        onClick: createModal.open,
       },
     ],
   });
@@ -397,6 +412,12 @@ const DaemonSets = () => {
       data: value,
     });
   };
+  const handleCreate = (data: Record<string, any>) => {
+    mutateCreate({
+      params: { cluster, namespace },
+      data,
+    });
+  };
 
   const url = getResourceUrl({ cluster, namespace });
   return (
@@ -420,6 +441,17 @@ const DaemonSets = () => {
         batchActions={renderBatchActions()}
         toolbarRight={renderTableAction()}
       />
+      {createModal.isOpen && (
+        <WorkloadCreateModal
+          visible
+          kind="DaemonSet"
+          cluster={cluster!}
+          namespace={namespace}
+          confirmLoading={createIsLoading}
+          onOk={handleCreate}
+          onCancel={createModal.close}
+        />
+      )}
       {baseConfig?.visible && (
         <EditBaseInfoModal
           visible={baseConfig.visible}

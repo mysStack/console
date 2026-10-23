@@ -4,6 +4,8 @@
  */
 
 module.exports = {
+  CREATE_DAEMONSET: '创建守护进程集',
+  CREATE_DAEMONSET_FAILED: '创建守护进程集失败。',
   // Banner
   // List
   // List > Create > Basic Information

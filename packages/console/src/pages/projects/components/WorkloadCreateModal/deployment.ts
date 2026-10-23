@@ -163,6 +163,14 @@ export interface WorkloadSettingsValues extends DeploymentCreateValues {
   volumeClaimTemplates?: PersistentVolumeClaimTemplateValues[];
 }
 
+export type WorkloadCreateValues = DeploymentCreateValues &
+  Partial<
+    Pick<
+      WorkloadSettingsValues,
+      'updateStrategy' | 'minReadySeconds' | 'terminationGracePeriodSeconds'
+    >
+  >;
+
 const trim = (value = '') => value.trim();
 const DNS_LABEL = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/;
 const QUANTITY = /^(?:[0-9]+(?:\.[0-9]+)?|\.[0-9]+)(?:m|[EPTGMK]i?|[eE][+-]?[0-9]+)?$/;
@@ -1531,4 +1539,40 @@ export function buildDeployment(values: DeploymentCreateValues) {
       },
     },
   };
+}
+
+export function buildDaemonSet(values: WorkloadCreateValues) {
+  const normalized: WorkloadCreateValues = {
+    ...values,
+    updateStrategy: values.updateStrategy || {
+      type: 'RollingUpdate',
+      maxUnavailable: '20%',
+    },
+    minReadySeconds: values.minReadySeconds ?? 0,
+    terminationGracePeriodSeconds: values.terminationGracePeriodSeconds ?? 30,
+    podScheduling: undefined,
+  };
+  const validationError = validateWorkloadSettings(
+    { kind: 'DaemonSet', spec: {} },
+    normalized as DeploymentCreateValues & Partial<WorkloadSettingsValues>,
+  );
+  if (validationError) throw new Error(validationError);
+
+  const resource = buildDeployment(normalized);
+  resource.kind = 'DaemonSet';
+  delete resource.spec.replicas;
+  delete resource.spec.strategy;
+  resource.spec.minReadySeconds = normalized.minReadySeconds;
+  resource.spec.updateStrategy =
+    normalized.updateStrategy!.type === 'RollingUpdate'
+      ? {
+          type: 'RollingUpdate',
+          rollingUpdate: {
+            maxUnavailable: normalized.updateStrategy!.maxUnavailable,
+          },
+        }
+      : { type: 'OnDelete' };
+  resource.spec.template.spec.terminationGracePeriodSeconds =
+    normalized.terminationGracePeriodSeconds;
+  return resource;
 }

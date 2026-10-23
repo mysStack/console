@@ -17,9 +17,11 @@ import {
 
 import { ArrayInput, PropertiesInput, workloadStore } from '@ks-console/shared';
 import {
+  buildDaemonSet,
   buildDeployment,
   checkWorkloadLabelsAvailability,
-  DeploymentCreateValues,
+  WorkloadCreateValues,
+  WorkloadKind,
   VolumeValues,
   validateContainers,
   validateNodeSelector,
@@ -27,6 +29,7 @@ import {
   validatePodScheduling,
   validateSecurityContext,
   validateVolumes,
+  validateWorkloadSettings,
   validateWorkloadLabels,
 } from './deployment';
 import ContainerInput from './ContainerInput';
@@ -37,35 +40,48 @@ import PodAnnotationsInput from './PodAnnotationsInput';
 import NodeSelectorInput from './NodeSelectorInput';
 import PodSchedulingInput from './PodSchedulingInput';
 import useWorkloadTargetOptions from './useWorkloadTargetOptions';
+import WorkloadUpdateStrategyInput from './WorkloadUpdateStrategyInput';
 
 interface Props {
   visible: boolean;
   cluster: string;
   namespace: string;
+  kind?: WorkloadKind;
   confirmLoading?: boolean;
   onOk: (data: Record<string, any>) => void;
   onCancel: () => void;
 }
 
 const DNS_LABEL = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/;
-const deploymentStore = workloadStore('deployments');
+const moduleByKind: Record<WorkloadKind, string> = {
+  Deployment: 'deployments',
+  StatefulSet: 'statefulsets',
+  DaemonSet: 'daemonsets',
+};
 
 function WorkloadCreateModal({
   visible,
   cluster,
   namespace,
+  kind = 'Deployment',
   confirmLoading,
   onOk,
   onCancel,
 }: Props): JSX.Element {
-  const [form] = useForm<DeploymentCreateValues>();
+  const [form] = useForm<WorkloadCreateValues>();
   const volumes = useWatch('volumes', form);
+  const workload = workloadStore(moduleByKind[kind]);
   const resources = useWorkloadResourceOptions(cluster, namespace);
-  const workloadTargets = useWorkloadTargetOptions('Deployment', cluster, namespace);
+  const workloadTargets = useWorkloadTargetOptions(kind, cluster, namespace);
 
   const handleSubmit = () => {
     form.validateFields().then(
-      values => onOk(buildDeployment({ ...values, namespace })),
+      values =>
+        onOk(
+          kind === 'DaemonSet'
+            ? buildDaemonSet({ ...values, namespace })
+            : buildDeployment({ ...values, namespace }),
+        ),
       () => {},
     );
   };
@@ -85,7 +101,7 @@ function WorkloadCreateModal({
 
   const volumesValidator = (
     _rule: unknown,
-    value: DeploymentCreateValues['volumes'],
+    value: WorkloadCreateValues['volumes'],
     callback: (error?: string) => void,
   ) => {
     const error = validateVolumes(value);
@@ -94,7 +110,7 @@ function WorkloadCreateModal({
 
   const podSecurityContextValidator = (
     _rule: unknown,
-    value: DeploymentCreateValues['podSecurityContext'],
+    value: WorkloadCreateValues['podSecurityContext'],
     callback: (error?: string) => void,
   ) => {
     const error = validateSecurityContext(value, false)
@@ -105,7 +121,7 @@ function WorkloadCreateModal({
 
   const podAnnotationsValidator = (
     _rule: unknown,
-    value: DeploymentCreateValues['podAnnotations'],
+    value: WorkloadCreateValues['podAnnotations'],
     callback: (error?: string) => void,
   ) => {
     callback(validatePodAnnotations(value) ? undefined : t('WORKLOAD_ANNOTATIONS_INVALID'));
@@ -113,7 +129,7 @@ function WorkloadCreateModal({
 
   const workloadAnnotationsValidator = (
     _rule: unknown,
-    value: DeploymentCreateValues['workloadAnnotations'],
+    value: WorkloadCreateValues['workloadAnnotations'],
     callback: (error?: string) => void,
   ) => {
     callback(validatePodAnnotations(value) ? undefined : t('WORKLOAD_ANNOTATIONS_INVALID'));
@@ -121,7 +137,7 @@ function WorkloadCreateModal({
 
   const workloadLabelsValidator = (
     _rule: unknown,
-    value: DeploymentCreateValues['workloadLabels'],
+    value: WorkloadCreateValues['workloadLabels'],
     callback: (error?: string) => void,
   ) => {
     if (!validateWorkloadLabels(value)) {
@@ -133,7 +149,7 @@ function WorkloadCreateModal({
       callback();
       return;
     }
-    checkWorkloadLabelsAvailability(deploymentStore.checkLabels, {
+    checkWorkloadLabelsAvailability(workload.checkLabels, {
       cluster,
       namespace,
       name,
@@ -143,7 +159,7 @@ function WorkloadCreateModal({
 
   const podSchedulingValidator = (
     _rule: unknown,
-    value: DeploymentCreateValues['podScheduling'],
+    value: WorkloadCreateValues['podScheduling'],
     callback: (error?: string) => void,
   ) => {
     callback(validatePodScheduling(value) ? undefined : t('WORKLOAD_SCHEDULING_INVALID'));
@@ -159,9 +175,18 @@ function WorkloadCreateModal({
 
   const volumeNames = (volumes || []).map((volume: VolumeValues) => volume.name).filter(Boolean);
 
+  const workloadSettingsValidator = (
+    _rule: unknown,
+    _value: unknown,
+    callback: (error?: string) => void,
+  ) => {
+    const error = validateWorkloadSettings({ kind, spec: {} }, form.getFieldsValue());
+    callback(error ? t(error) : undefined);
+  };
+
   return (
     <Modal
-      title={t('CREATE_DEPLOYMENT')}
+      title={t(kind === 'DaemonSet' ? 'CREATE_DAEMONSET' : 'CREATE_DEPLOYMENT')}
       width={900}
       visible={visible}
       confirmLoading={confirmLoading}
@@ -174,6 +199,12 @@ function WorkloadCreateModal({
         initialValues={{
           namespace,
           replicas: 1,
+          updateStrategy:
+            kind === 'DaemonSet'
+              ? { type: 'RollingUpdate', maxUnavailable: '20%' }
+              : { type: 'RollingUpdate', maxUnavailable: '25%', maxSurge: '25%' },
+          minReadySeconds: 0,
+          terminationGracePeriodSeconds: 30,
           containers: [{ name: '', image: '', imagePullPolicy: 'IfNotPresent' }],
           initContainers: [],
           volumes: [],
@@ -200,20 +231,44 @@ function WorkloadCreateModal({
         <FormItem name="description" label={t('DESCRIPTION')}>
           <Textarea maxLength={256} />
         </FormItem>
-        <FormItem name="replicas" label={t('REPLICAS')} rules={[{ required: true }]}>
-          <InputNumber min={0} precision={0} />
-        </FormItem>
+        {kind !== 'DaemonSet' && (
+          <FormItem name="replicas" label={t('REPLICAS')} rules={[{ required: true }]}>
+            <InputNumber min={0} precision={0} />
+          </FormItem>
+        )}
+
+        {kind === 'DaemonSet' && (
+          <>
+            <h3>{t('UPDATE_STRATEGY')}</h3>
+            <FormItem name="updateStrategy" rules={[{ validator: workloadSettingsValidator }]}>
+              <WorkloadUpdateStrategyInput kind={kind} />
+            </FormItem>
+            <FormItem
+              name="minReadySeconds"
+              label={t('MIN_READY_SECONDS')}
+              rules={[{ required: true }, { validator: workloadSettingsValidator }]}
+            >
+              <InputNumber min={0} precision={0} />
+            </FormItem>
+          </>
+        )}
 
         <h3>{t('POD_SETTINGS')}</h3>
         <FormItem name="podSecurityContext" rules={[{ validator: podSecurityContextValidator }]}>
           <SecurityContextInput kind="pod" />
         </FormItem>
-        <h3>{t('POD_SCHEDULING_RULES')}</h3>
-        {workloadTargets.isLoading && <div role="status">{t('LOADING')}</div>}
-        {workloadTargets.isError && <div role="alert">{t('WORKLOAD_TARGET_OPTIONS_FAILED')}</div>}
-        <FormItem name="podScheduling" rules={[{ validator: podSchedulingValidator }]}>
-          <PodSchedulingInput targets={workloadTargets.options} />
-        </FormItem>
+        {kind !== 'DaemonSet' && (
+          <>
+            <h3>{t('POD_SCHEDULING_RULES')}</h3>
+            {workloadTargets.isLoading && <div role="status">{t('LOADING')}</div>}
+            {workloadTargets.isError && (
+              <div role="alert">{t('WORKLOAD_TARGET_OPTIONS_FAILED')}</div>
+            )}
+            <FormItem name="podScheduling" rules={[{ validator: podSchedulingValidator }]}>
+              <PodSchedulingInput targets={workloadTargets.options} />
+            </FormItem>
+          </>
+        )}
         <FormItem
           name="nodeSelector"
           label={t('SELECT_NODES')}
@@ -274,6 +329,18 @@ function WorkloadCreateModal({
             <VolumeInput resourceOptions={resources.options} />
           </ArrayInput>
         </FormItem>
+        {kind === 'DaemonSet' && (
+          <>
+            <h3>{t('WORKLOAD_TERMINATION_GRACE_PERIOD')}</h3>
+            <FormItem
+              name="terminationGracePeriodSeconds"
+              label={t('WORKLOAD_TERMINATION_GRACE_SECONDS')}
+              rules={[{ required: true }, { validator: workloadSettingsValidator }]}
+            >
+              <InputNumber min={0} precision={0} />
+            </FormItem>
+          </>
+        )}
         <h3>{t('ADD_METADATA')}</h3>
         <FormItem
           name="workloadLabels"
