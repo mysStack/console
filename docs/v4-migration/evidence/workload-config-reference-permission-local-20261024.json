@@ -1,0 +1,80 @@
+{
+  "baseCommit": "dd2e51c6df936499c8a69e2f896ca3ced1da3ab8",
+  "sourceIdentity": "文件 SHA256 与包含本记录的 Git 提交绑定，不证明已部署或 RBAC 验收",
+  "sourceFiles": [
+    {
+      "path": "packages/console/src/pages/projects/components/ConfigReference/ConfigReferencePanel.tsx",
+      "sha256": "e6b22e81faa30204f5716982152def6ef968c1d66f03c9987160e1cda3bb2528"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/ConfigReference/ConfigReferencePanel.test.ts",
+      "sha256": "57b35d126c2a1120857474ceebd1de3a9a4f7d0c085a34d056be3822f37017c9"
+    }
+  ],
+  "scope": ["Deployment", "StatefulSet", "DaemonSet"],
+  "cause": "独立原生配置引用页未使用详情 Action 的当前项目/资源 edit 权限判断",
+  "tdd": {
+    "red": 2,
+    "green": 2,
+    "cases": [
+      "只读控件禁用且程序调用保存不写入",
+      "只读容器切换与预览保留",
+      "管理员保留原 JSON Patch",
+      "三类 module 与 namespace 切换分别判断"
+    ],
+    "permissionDependency": "单元用例使用依赖替身，不能替代真实 RBAC 验证"
+  },
+  "checks": [
+    {
+      "command": "./scripts/test.sh",
+      "exitCode": 0,
+      "files": 85,
+      "passed": 377,
+      "failed": 0
+    },
+    {
+      "command": "corepack yarn eslint packages/console/src/pages/projects/components/ConfigReference/ConfigReferencePanel.tsx",
+      "exitCode": 0
+    },
+    {
+      "command": "corepack yarn prettier --check packages/console/src/pages/projects/components/ConfigReference/ConfigReferencePanel.tsx packages/console/src/pages/projects/components/ConfigReference/ConfigReferencePanel.test.ts",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0
+    },
+    {
+      "command": "impeccable detect --json packages/console/src/pages/projects/components/ConfigReference/ConfigReferencePanel.tsx",
+      "exitCode": 0,
+      "findings": []
+    },
+    {
+      "command": "corepack yarn build:packages",
+      "exitCode": 0,
+      "sharedMinified": 633
+    }
+  ],
+  "typecheck": {
+    "configuration": "packages/console/tsconfig.json",
+    "baselineDiagnostics": 1326,
+    "currentDiagnostics": 1326,
+    "introduced": [],
+    "changedFileErrors": [],
+    "fullTypecheckPassed": false
+  },
+  "environment": {
+    "deployedThisIncrement": false,
+    "ciRun": null,
+    "image": null,
+    "digest": null,
+    "podImageID": null,
+    "playwrightOnThisIncrement": "未执行"
+  },
+  "remaining": [
+    "当前 SHA 部署后管理员与真实 viewer 逐类复验",
+    "设置分区及二级容器编辑浏览器验收",
+    "环境变量引用完整编辑",
+    "镜像选择完整交互等价"
+  ]
+}

@@ -375,3 +375,15 @@ DaemonSet 的旧 V3 UI 快照没有调度分区，因此当前 V4 不为它虚�
 TDD 首次两个编辑器用例因缺少组件失败，另两个设置用例因缺少侧栏/二级入口失败；实现后四项通过。完整 `./scripts/test.sh`：84 文件、375 项通过、0 失败。变更生产文件 ESLint、四个源码/测试文件 Prettier、`git diff --check` 通过；UI detector 未返回静态问题。TypeScript compiler host 对照基线/当前同为 1326 项诊断，新诊断 0，变更文件直接诊断 0；全项目 TypeScript 未通过。
 
 `corepack yarn build:packages` 退出 0，四个包构建完成，shared 压缩 633/633。本地构建与文件摘要见 [本增量证据](./evidence/workload-settings-sections-local-20261024.json)。本增量仍为 DEV，尚无对应 CI 镜像、digest、131 rollout、Pod imageID 或新界面的 Playwright 验收。滚动布局、嵌套弹窗焦点/关闭、刷新/API 持久化仍需部署后验证。DS-07/08 环境引用、配置引用低权限控件及镜像选择完整交互仍未闭环，三类资源均不标记已验收。PR #2 保持 Draft。
+
+## 配置引用低权限控件修复（2026-10-24，DEV 增量）
+
+基于 `dd2e51c6df936499c8a69e2f896ca3ced1da3ab8`，开工前 DEV start 检查通过。既有 `ef3b4f1a8` 浏览器证据已确认 viewer 可操作配置引用控件，但 PATCH 返回 403 且服务端资源未变。根因是 `ConfigReferencePanel` 没有像详情 Action 一样调用当前资源的权限过滤，既非 Kubernetes 授权放宽，也非独立扩展故障。
+
+复用现有 `hasPermission({ cluster, project: namespace, module, action: 'edit' })`，Deployment/StatefulSet/DaemonSet 按各自 module 判断。无 edit 权限时禁用添加、删除、类型/资源/前缀、自动重载和保存，并在 save 函数拦截；容器切换、返回、现有引用及预览仍可用。有权限用户保留原 JSON Patch URL、content-type、成功 refetch 和错误反馈链。变更只在 Workload 配置引用页面，不修改公共权限算法或其他模块。
+
+新增两项组件用例先失败，修复后覆盖三类资源的只读控件、程序触发保存不写入、切换容器查看 Secret 引用、有权限保存以及 namespace 改变后重新限制。权限函数在单元用例中作为依赖替身，不能当作真实 RBAC 通过；实际测试账号仍需在当前 SHA 镜像部署后通过 Playwright 验证。局部修复不改变 DEV 状态或 PR #2 Draft。
+
+本次完整回归 `./scripts/test.sh` 为 85 文件/377 项通过、0 失败，追加的按钮禁用断言定向 2/2 通过；变更生产文件 ESLint、源码/测试格式检查与 `git diff --check` 通过。TypeScript 基线/当前诊断同为 1326，新诊断及变更文件直接诊断均为 0，全项目类型检查仍未通过。
+
+`corepack yarn build:packages` 退出 0，四个包构建完成，shared 压缩 633/633；结构化本地证据见 [权限修复记录](./evidence/workload-config-reference-permission-local-20261024.json)。本增量无新 CI 镜像、digest、Pod imageID 或部署后的 Playwright 结果。

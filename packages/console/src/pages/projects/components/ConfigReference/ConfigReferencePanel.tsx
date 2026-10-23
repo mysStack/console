@@ -1,7 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useMutation } from 'react-query';
 import { Button, Card, Input, Loading, Select, Switch, notify } from '@kubed/components';
-import { configMapStore, request, secretStore, workloadStore } from '@ks-console/shared';
+import {
+  configMapStore,
+  hasPermission,
+  request,
+  secretStore,
+  workloadStore,
+} from '@ks-console/shared';
 
 import { findDuplicateReferences, parseEnvFrom } from './envFrom';
 import { readReloaderPolicy } from './reloader';
@@ -45,6 +51,7 @@ export default function ConfigReferencePanel({
   onBack,
 }: Props) {
   const store = storeByModule[module];
+  const canEdit = hasPermission({ cluster, project: namespace, module, action: 'edit' });
   const emptyOption = { label: t('CONFIG_REFERENCE_SELECT_RESOURCE'), value: '' };
   const detailQuery = store.useGetDetail({ cluster, namespace, name });
   const [configMaps, setConfigMaps] = useState<NameOption[]>([]);
@@ -151,6 +158,7 @@ export default function ConfigReferencePanel({
     setReferences(current => [...current, { kind: 'configMap', name: '', prefix: '' }]);
 
   const save = () => {
+    if (!canEdit) return;
     setSaveError(null);
     if (duplicateIndexes.length) {
       notify.error(t('CONFIG_REFERENCE_DUPLICATE'));
@@ -201,7 +209,7 @@ export default function ConfigReferencePanel({
             {t('CONFIG_REFERENCE_SECRET_NOTICE')}
           </p>
         </div>
-        <Button type="button" onClick={addReference} disabled={resourceLoading}>
+        <Button type="button" onClick={addReference} disabled={!canEdit || resourceLoading}>
           {t('CONFIG_REFERENCE_ADD')}
         </Button>
       </div>
@@ -251,6 +259,7 @@ export default function ConfigReferencePanel({
               >
                 <Select
                   aria-label={t('CONFIG_REFERENCE_ARIA_KIND', { index: index + 1 })}
+                  disabled={!canEdit}
                   value={reference.kind}
                   options={[
                     { label: 'ConfigMap', value: 'configMap' },
@@ -268,6 +277,7 @@ export default function ConfigReferencePanel({
                 />
                 <Select
                   aria-label={t('CONFIG_REFERENCE_ARIA_RESOURCE', { index: index + 1 })}
+                  disabled={!canEdit}
                   value={reference.name}
                   options={resourceOptions}
                   loading={resourceLoading}
@@ -281,6 +291,7 @@ export default function ConfigReferencePanel({
                 />
                 <Input
                   aria-label={t('CONFIG_REFERENCE_ARIA_PREFIX', { index: index + 1 })}
+                  disabled={!canEdit}
                   value={reference.prefix || ''}
                   placeholder={t('CONFIG_REFERENCE_PREFIX_PLACEHOLDER')}
                   onChange={event =>
@@ -293,6 +304,7 @@ export default function ConfigReferencePanel({
                 />
                 <Button
                   type="button"
+                  disabled={!canEdit}
                   onClick={() => setReferences(current => current.filter((_, i) => i !== index))}
                 >
                   删除
@@ -329,6 +341,7 @@ export default function ConfigReferencePanel({
           </div>
           <Switch
             variant="button"
+            disabled={!canEdit}
             label={t(reloaderEnabled ? 'CONFIG_REFERENCE_ENABLED' : 'CONFIG_REFERENCE_DISABLED')}
             checked={reloaderEnabled}
             onChange={checked => setReloaderEnabled(checked)}
@@ -340,7 +353,13 @@ export default function ConfigReferencePanel({
         <Button type="button" onClick={onBack}>
           {t('CONFIG_REFERENCE_CANCEL')}
         </Button>
-        <Button type="button" color="primary" loading={saveMutation.isLoading} onClick={save}>
+        <Button
+          type="button"
+          color="primary"
+          disabled={!canEdit}
+          loading={saveMutation.isLoading}
+          onClick={save}
+        >
           {t('CONFIG_REFERENCE_SAVE')}
         </Button>
       </div>

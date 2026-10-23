@@ -16,7 +16,7 @@
       },
       {
         "path": "docs/v4-migration/deployment-settings-capability-matrix.md",
-        "sha256": "45d5ddb7501bf40a01b2ecdedddd6a3f6b8bcd278f24a06d7713b5216a70d196"
+        "sha256": "3694bcac13a9ce340540fb0d8657bc9a11561bf4be2abc919e1a3a630e36d386"
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "1f554093f954110c40189794eb01cf8ee47a76007f6077e0b91c98e3f7c41357"
+        "sha256": "5bf0a8596f2429267156d4e089a62af9319e02398af5305d1b484f28a7304e99"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "2fb2c2c61599a8612bc13325f6d587c5b2b5f10d83bfc4188911a2f9f2981c13"
+        "sha256": "daa554561028d919c92fee82787d32d3b1e44d99887a8d0eefdab2def7edc166"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -225,12 +225,12 @@
   },
   "dev": {
     "status": "进行中",
-    "reason": "2026-10-24 编辑设置等价纠偏：已补镜像凭据/GPU/协议、设置分区与容器二级编辑及本地回归；仍需变量引用与配置引用低权限修复。保持 DEV，本增量尚无部署或浏览器验收。",
+    "reason": "2026-10-24 已补镜像凭据/GPU/协议、设置分区/二级编辑、配置引用 edit 权限与本地回归；环境变量引用及完整交互仍待补齐。保持 DEV，新代码尚未部署/浏览器验收。",
     "sourceCommit": "f6b7c689b55b1561d474dcb6dc056a39e2166e51",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
-        "sha256": "7409d7e24aba9dd98db3bc9375ad2ea0b520e5fc7996b017ca3973126847618a"
+        "sha256": "e1edd3892fa944b8f32aea22c75c7e8d4ba6835d566cc868de65c9feaff1cc4f"
       },
       {
         "path": "docs/v4-migration/evidence/workload-lifecycle-20261023-api-validation.json",
@@ -471,6 +471,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-settings-sections-local-20261024.json",
         "sha256": "bce5b8034c42f077394e35b044ab3ebbff0b8864d2f564ec2a53aa112f55d214"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-config-reference-permission-local-20261024.json",
+        "sha256": "3a26f609d3109b64617d0fef82c3d191eb5cdffbeb0ffec588d650ef3b11eb4d"
       }
     ]
   },
