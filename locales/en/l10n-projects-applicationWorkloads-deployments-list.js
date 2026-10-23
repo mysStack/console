@@ -32,6 +32,9 @@ module.exports = {
   WORKLOAD_SECURITY_CONTEXT_INVALID:
     'Enter valid security context booleans, integer user or group IDs, SELinux values, and capability names.',
   WORKLOAD_ANNOTATIONS_INVALID: 'Enter valid Kubernetes annotation names and text values.',
+  WORKLOAD_LABELS_INVALID: 'Enter valid Kubernetes label names and values.',
+  WORKLOAD_LABEL_CHECK_FAILED: 'Unable to check duplicate labels. Check the project and retry.',
+  POD_TEMPLATE_METADATA: 'Pod Template Metadata',
   WORKLOAD_SCHEDULING_INVALID: 'Complete every Pod scheduling rule and select a valid target.',
   WORKLOAD_SCHEDULING_PRESERVED: 'Keep existing advanced scheduling',
   WORKLOAD_NODE_SELECTOR_INVALID: 'Enter valid Kubernetes node selector keys and values.',

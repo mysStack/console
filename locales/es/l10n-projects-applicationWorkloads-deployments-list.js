@@ -35,6 +35,10 @@ module.exports = {
     'Introduzca valores booleanos, identificadores enteros, valores SELinux y nombres de capacidades válidos.',
   WORKLOAD_ANNOTATIONS_INVALID:
     'Introduzca nombres de anotación de Kubernetes y valores de texto válidos.',
+  WORKLOAD_LABELS_INVALID: 'Introduzca nombres y valores de etiquetas de Kubernetes válidos.',
+  WORKLOAD_LABEL_CHECK_FAILED:
+    'No se pudieron comprobar las etiquetas duplicadas. Compruebe el proyecto e inténtelo de nuevo.',
+  POD_TEMPLATE_METADATA: 'Metadatos de la plantilla de pod',
   WORKLOAD_SCHEDULING_INVALID:
     'Complete cada regla de programación del Pod y seleccione un destino válido.',
   WORKLOAD_SCHEDULING_PRESERVED: 'Conservar la programación avanzada existente',

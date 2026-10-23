@@ -132,6 +132,8 @@ export interface DeploymentCreateValues {
   initContainers?: ContainerCreateValues[];
   volumes?: VolumeValues[];
   podSecurityContext?: SecurityContextValues;
+  workloadLabels?: Record<string, string>;
+  workloadAnnotations?: Record<string, string>;
   podAnnotations?: Record<string, string>;
   podScheduling?: PodSchedulingValues;
   nodeSelector?: Record<string, string>;
@@ -185,6 +187,34 @@ export function validatePodAnnotations(annotations?: Record<string, string>): bo
     if (typeof value !== 'string') return false;
     return isQualifiedName(key);
   });
+}
+
+export function validateWorkloadLabels(labels?: Record<string, string>): boolean {
+  if (labels === undefined) return true;
+  if (labels === null || Array.isArray(labels) || typeof labels !== 'object') return false;
+  return Object.entries(labels).every(
+    ([key, value]) => typeof value === 'string' && isQualifiedName(key) && isLabelValue(value),
+  );
+}
+
+export function buildWorkloadLabels(name: string, labels?: Record<string, string>) {
+  return { ...cloneDeep(labels || {}), app: trim(name).slice(0, 63) };
+}
+
+export async function checkWorkloadLabelsAvailability(
+  checkLabels: (params: Record<string, any>) => Promise<{ exist?: boolean }>,
+  params: { cluster: string; namespace: string; name: string; labels?: Record<string, string> },
+): Promise<string | undefined> {
+  try {
+    const result = await checkLabels({
+      cluster: params.cluster,
+      namespace: params.namespace,
+      labels: buildWorkloadLabels(params.name, params.labels),
+    });
+    return result.exist ? 'DUPLICATE_LABELS' : undefined;
+  } catch {
+    return 'WORKLOAD_LABEL_CHECK_FAILED';
+  }
 }
 
 export function validateNodeSelector(nodeSelector?: Record<string, string>): boolean {
@@ -1236,6 +1266,12 @@ export function buildDeploymentSettingsResource(
 }
 
 export function buildDeployment(values: DeploymentCreateValues) {
+  if (!validateWorkloadLabels(values.workloadLabels)) {
+    throw new Error('WORKLOAD_LABELS_INVALID');
+  }
+  if (!validatePodAnnotations(values.workloadAnnotations)) {
+    throw new Error('WORKLOAD_ANNOTATIONS_INVALID');
+  }
   if (!validatePodAnnotations(values.podAnnotations)) {
     throw new Error('WORKLOAD_ANNOTATIONS_INVALID');
   }
@@ -1248,11 +1284,11 @@ export function buildDeployment(values: DeploymentCreateValues) {
   const name = trim(values.name);
   const aliasName = trim(values.aliasName);
   const description = trim(values.description);
-  const annotations: Record<string, string> = {};
+  const annotations: Record<string, string> = cloneDeep(values.workloadAnnotations || {});
   // The current v3dist BaseInfo handler mirrors this label into the selector
   // and pod template. Keep that behavior until the application filter is
   // migrated separately.
-  const labels = { app: name.slice(0, 63) };
+  const labels = buildWorkloadLabels(name, values.workloadLabels);
 
   if (aliasName) annotations['kubesphere.io/alias-name'] = aliasName;
   if (description) annotations['kubesphere.io/description'] = description;

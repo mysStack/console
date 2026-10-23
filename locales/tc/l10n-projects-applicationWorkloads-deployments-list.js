@@ -28,6 +28,9 @@ module.exports = {
   WORKLOAD_SECURITY_CONTEXT_INVALID:
     '請填寫合法的安全上下文布林值、整數用戶或用戶組 ID、SELinux 值和權能名稱。',
   WORKLOAD_ANNOTATIONS_INVALID: '請填寫合法的 Kubernetes 註解名稱和文字值。',
+  WORKLOAD_LABELS_INVALID: '請填寫合法的 Kubernetes 標籤名稱和值。',
+  WORKLOAD_LABEL_CHECK_FAILED: '無法檢查標籤是否重複，請檢查項目後重試。',
+  POD_TEMPLATE_METADATA: '容器組範本中繼資料',
   WORKLOAD_SCHEDULING_INVALID: '請補全每條容器組調度規則並選擇有效目標。',
   WORKLOAD_SCHEDULING_PRESERVED: '保留已有進階調度設定',
   WORKLOAD_NODE_SELECTOR_INVALID: '請填寫合法的 Kubernetes 節點選擇器鍵和值。',

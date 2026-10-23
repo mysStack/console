@@ -3,11 +3,13 @@ import test from 'node:test';
 
 import {
   buildDeployment,
+  checkWorkloadLabelsAvailability,
   buildDeploymentSettingsResource,
   parseDeploymentSettings,
   validateNodeSelector,
   validatePodAnnotations,
   validatePodScheduling,
+  validateWorkloadLabels,
   validateContainers,
   validateVolumes,
 } from './deployment';
@@ -305,6 +307,93 @@ test('buildDeployment trims input and omits empty optional annotations', () => {
   assert.equal(deployment.spec.replicas, 0);
   assert.equal(deployment.spec.template.spec.containers[0].name, 'web');
   assert.equal(deployment.spec.template.spec.containers[0].image, 'nginx:alpine');
+});
+
+test('创建 Deployment 同步工作负载标签、选择器、Pod 标签和顶层注解', () => {
+  const deployment = buildDeployment({
+    name: 'native-metadata',
+    namespace: 'v4-migration-e2e',
+    aliasName: '系统别名',
+    replicas: 1,
+    workloadLabels: {
+      app: 'cannot-override-name',
+      tier: 'frontend',
+      'example.com/track': '',
+    },
+    workloadAnnotations: {
+      'example.com/owner': 'migration',
+      'kubesphere.io/alias-name': 'cannot-override-alias',
+    },
+    containers: [{ name: 'web', image: 'nginx:alpine' }],
+  });
+
+  const labels = {
+    app: 'native-metadata',
+    tier: 'frontend',
+    'example.com/track': '',
+  };
+  assert.deepEqual(deployment.metadata.labels, labels);
+  assert.deepEqual(deployment.spec.selector.matchLabels, labels);
+  assert.deepEqual(deployment.spec.template.metadata.labels, labels);
+  assert.deepEqual(deployment.metadata.annotations, {
+    'example.com/owner': 'migration',
+    'kubesphere.io/alias-name': '系统别名',
+  });
+});
+
+test('工作负载标签和顶层注解拒绝非法 Kubernetes 元数据', () => {
+  assert.equal(validateWorkloadLabels({ tier: 'frontend', 'example.com/track': '' }), true);
+  assert.equal(validateWorkloadLabels({ '/tier': 'frontend' }), false);
+  assert.equal(validateWorkloadLabels({ tier: 'a'.repeat(64) }), false);
+  assert.throws(
+    () =>
+      buildDeployment({
+        name: 'invalid-metadata',
+        namespace: 'v4-migration-e2e',
+        replicas: 1,
+        workloadAnnotations: { '/owner': 'migration' },
+        containers: [{ name: 'web', image: 'nginx:alpine' }],
+      }),
+    /WORKLOAD_ANNOTATIONS_INVALID/,
+  );
+});
+
+test('工作负载标签重复检查绑定当前 cluster/namespace 并区分重复与请求失败', async () => {
+  let requested: Record<string, any> | undefined;
+  const duplicate = await checkWorkloadLabelsAvailability(
+    async params => {
+      requested = params;
+      return { exist: true };
+    },
+    {
+      cluster: 'host',
+      namespace: 'v4-migration-e2e',
+      name: 'native-metadata',
+      labels: { tier: 'frontend' },
+    },
+  );
+  assert.equal(duplicate, 'DUPLICATE_LABELS');
+  assert.deepEqual(requested, {
+    cluster: 'host',
+    namespace: 'v4-migration-e2e',
+    labels: { tier: 'frontend', app: 'native-metadata' },
+  });
+  assert.equal(
+    await checkWorkloadLabelsAvailability(async () => ({ exist: false }), {
+      cluster: 'host',
+      namespace: 'v4-migration-e2e',
+      name: 'native-metadata',
+    }),
+    undefined,
+  );
+  assert.equal(
+    await checkWorkloadLabelsAvailability(async () => Promise.reject(new Error('network')), {
+      cluster: 'host',
+      namespace: 'v4-migration-e2e',
+      name: 'native-metadata',
+    }),
+    'WORKLOAD_LABEL_CHECK_FAILED',
+  );
 });
 
 test('创建多个工作容器和初始化容器，分别保留端口和环境变量', () => {

@@ -14,3 +14,11 @@ test('工作容器与初始化容器变化时重新执行跨容器校验', () =>
   assert.match(source, /name="containers"[\s\S]*dependencies=\{\['initContainers', 'volumes'\]\}/);
   assert.match(source, /name="initContainers"[\s\S]*dependencies=\{\['containers', 'volumes'\]\}/);
 });
+
+test('Deployment 创建表单区分工作负载元数据和 Pod 模板注解并检查标签重复', () => {
+  assert.match(source, /name="workloadLabels"/);
+  assert.match(source, /name="workloadAnnotations"/);
+  assert.match(source, /name="podAnnotations"/);
+  assert.match(source, /checkLabels/);
+  assert.match(source, /checkWorkloadLabelsAvailability/);
+});

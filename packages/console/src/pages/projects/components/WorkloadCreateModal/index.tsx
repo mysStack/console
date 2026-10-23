@@ -15,9 +15,10 @@ import {
   useWatch,
 } from '@kubed/components';
 
-import { ArrayInput } from '@ks-console/shared';
+import { ArrayInput, PropertiesInput, workloadStore } from '@ks-console/shared';
 import {
   buildDeployment,
+  checkWorkloadLabelsAvailability,
   DeploymentCreateValues,
   VolumeValues,
   validateContainers,
@@ -26,6 +27,7 @@ import {
   validatePodScheduling,
   validateSecurityContext,
   validateVolumes,
+  validateWorkloadLabels,
 } from './deployment';
 import ContainerInput from './ContainerInput';
 import VolumeInput from './VolumeInput';
@@ -46,6 +48,7 @@ interface Props {
 }
 
 const DNS_LABEL = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/;
+const deploymentStore = workloadStore('deployments');
 
 function WorkloadCreateModal({
   visible,
@@ -106,6 +109,36 @@ function WorkloadCreateModal({
     callback: (error?: string) => void,
   ) => {
     callback(validatePodAnnotations(value) ? undefined : t('WORKLOAD_ANNOTATIONS_INVALID'));
+  };
+
+  const workloadAnnotationsValidator = (
+    _rule: unknown,
+    value: DeploymentCreateValues['workloadAnnotations'],
+    callback: (error?: string) => void,
+  ) => {
+    callback(validatePodAnnotations(value) ? undefined : t('WORKLOAD_ANNOTATIONS_INVALID'));
+  };
+
+  const workloadLabelsValidator = (
+    _rule: unknown,
+    value: DeploymentCreateValues['workloadLabels'],
+    callback: (error?: string) => void,
+  ) => {
+    if (!validateWorkloadLabels(value)) {
+      callback(t('WORKLOAD_LABELS_INVALID'));
+      return;
+    }
+    const name = String(form.getFieldValue('name') || '').trim();
+    if (!name || name.length > 253 || !DNS_LABEL.test(name)) {
+      callback();
+      return;
+    }
+    checkWorkloadLabelsAvailability(deploymentStore.checkLabels, {
+      cluster,
+      namespace,
+      name,
+      labels: value,
+    }).then(error => callback(error ? t(error) : undefined));
   };
 
   const podSchedulingValidator = (
@@ -242,6 +275,22 @@ function WorkloadCreateModal({
           </ArrayInput>
         </FormItem>
         <h3>{t('ADD_METADATA')}</h3>
+        <FormItem
+          name="workloadLabels"
+          label={t('LABEL_PL')}
+          dependencies={['name']}
+          rules={[{ validator: workloadLabelsValidator }]}
+        >
+          <PropertiesInput addText={t('ADD')} />
+        </FormItem>
+        <FormItem
+          name="workloadAnnotations"
+          label={t('ANNOTATION_PL')}
+          rules={[{ validator: workloadAnnotationsValidator }]}
+        >
+          <PodAnnotationsInput />
+        </FormItem>
+        <h3>{t('POD_TEMPLATE_METADATA')}</h3>
         <FormItem
           name="podAnnotations"
           label={t('ANNOTATION_PL')}
