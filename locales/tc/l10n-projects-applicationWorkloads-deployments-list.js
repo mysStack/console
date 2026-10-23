@@ -107,6 +107,9 @@ module.exports = {
   AVAILABLE: '閒置',
   IN_USER: '使用中',
   ACCESS_MODE_SCAP: '訪問模式',
+  PVC_TEMPLATE_NAME: 'PVC 模板名稱',
+  PERSISTENT_VOLUME_CLAIM_TEMPLATE_PL: '持久卷聲明模板',
+  WORKLOAD_ADD_VOLUME_CLAIM_TEMPLATE: '新增持久卷聲明模板',
   PVC_OR_TEMPLATE_EMPTY:
     'You have enabled Collect Logs on Volumes. Please add at least one persistent volume, temperary volume, or persistent volume claim template and specify the path of container logs.',
   PVC_EMPTY:

@@ -102,6 +102,13 @@ export interface VolumeValues {
   hostPathType?: string;
 }
 
+export interface PersistentVolumeClaimTemplateValues {
+  name: string;
+  accessModes: string[];
+  storage: string;
+  storageClassName?: string;
+}
+
 export interface ContainerCreateValues {
   name: string;
   originalName?: string;
@@ -153,6 +160,7 @@ export interface WorkloadSettingsValues extends DeploymentCreateValues {
   };
   minReadySeconds: number;
   terminationGracePeriodSeconds: number;
+  volumeClaimTemplates?: PersistentVolumeClaimTemplateValues[];
 }
 
 const trim = (value = '') => value.trim();
@@ -161,6 +169,10 @@ const QUANTITY = /^(?:[0-9]+(?:\.[0-9]+)?|\.[0-9]+)(?:m|[EPTGMK]i?|[eE][+-]?[0-9
 
 function isDnsLabel(value: string): boolean {
   return value.length <= 63 && DNS_LABEL.test(value);
+}
+
+function isDnsSubdomain(value: string): boolean {
+  return value.length <= 253 && value.split('.').every(part => isDnsLabel(part));
 }
 
 const QUALIFIED_NAME = /^[A-Za-z0-9](?:[-_.A-Za-z0-9]*[A-Za-z0-9])?$/;
@@ -286,6 +298,15 @@ function isValidQuantity(value?: string): boolean {
   return value == null || value === '' || QUANTITY.test(trim(value));
 }
 
+function isPositiveQuantity(value?: string): boolean {
+  const normalized = trim(value);
+  return (
+    isValidQuantity(normalized) &&
+    Boolean(normalized) &&
+    !/^0+(?:\.0+)?(?:m|[EPTGMK]i?|[eE][+-]?[0-9]+)?$/.test(normalized)
+  );
+}
+
 function validateLifecycleAction(action?: LifecycleActionValues): boolean {
   if (!action) return true;
   if (action.type === 'command') {
@@ -353,6 +374,36 @@ export function validateVolumes(volumes: VolumeValues[] = []): string | undefine
     }
     if (volume.type === 'emptyDir' && !isValidQuantity(volume.sizeLimit)) {
       return 'WORKLOAD_VOLUME_INVALID';
+    }
+  }
+}
+
+export function validateVolumeClaimTemplates(
+  templates: PersistentVolumeClaimTemplateValues[] = [],
+): string | undefined {
+  const names = new Set<string>();
+  const accessModes = new Set([
+    'ReadWriteOnce',
+    'ReadOnlyMany',
+    'ReadWriteMany',
+    'ReadWriteOncePod',
+  ]);
+  for (const template of templates) {
+    const name = trim(template.name);
+    if (!isDnsLabel(name) || names.has(name)) {
+      return names.has(name) ? 'WORKLOAD_VOLUME_CLAIM_DUPLICATE' : 'WORKLOAD_VOLUME_CLAIM_INVALID';
+    }
+    names.add(name);
+    if (
+      !Array.isArray(template.accessModes) ||
+      !template.accessModes.length ||
+      template.accessModes.some(mode => !accessModes.has(mode)) ||
+      !isPositiveQuantity(template.storage) ||
+      (template.storageClassName !== undefined &&
+        template.storageClassName !== '' &&
+        !isDnsSubdomain(trim(template.storageClassName)))
+    ) {
+      return 'WORKLOAD_VOLUME_CLAIM_INVALID';
     }
   }
 }
@@ -911,6 +962,19 @@ function parseVolume(volume: Record<string, any>): VolumeValues | undefined {
   return { name: volume.name, type: 'preserved', source: cloneDeep(volume) };
 }
 
+function parseVolumeClaimTemplate(
+  template: Record<string, any>,
+): PersistentVolumeClaimTemplateValues {
+  return {
+    name: template.metadata?.name || '',
+    accessModes: cloneDeep(template.spec?.accessModes || []),
+    storage: template.spec?.resources?.requests?.storage || '',
+    ...(template.spec?.storageClassName
+      ? { storageClassName: template.spec.storageClassName }
+      : {}),
+  };
+}
+
 export function parseDeploymentSettings(resource: Record<string, any>): WorkloadSettingsValues {
   const podSpec = cloneDeep(resource.spec?.template?.spec || {});
   const kind: WorkloadKind = resource.kind || 'Deployment';
@@ -925,6 +989,13 @@ export function parseDeploymentSettings(resource: Record<string, any>): Workload
     containers: (podSpec.containers || []).map(parseContainer),
     initContainers: (podSpec.initContainers || []).map(parseContainer),
     volumes: (podSpec.volumes || []).map(parseVolume).filter(Boolean) as VolumeValues[],
+    ...(kind === 'StatefulSet'
+      ? {
+          volumeClaimTemplates: (resource.spec?.volumeClaimTemplates || []).map(
+            parseVolumeClaimTemplate,
+          ),
+        }
+      : {}),
     podAnnotations: cloneDeep(resource.spec?.template?.metadata?.annotations),
     ...(kind !== 'DaemonSet'
       ? { podScheduling: parsePodScheduling(podSpec.affinity, podLabels) }
@@ -1158,6 +1229,35 @@ function mergeVolumeSettings(originalVolumes: Record<string, any>[] = [], values
   });
 }
 
+function mergeVolumeClaimTemplates(
+  originalTemplates: Record<string, any>[] = [],
+  values: PersistentVolumeClaimTemplateValues[],
+) {
+  return values.map((value, index) => {
+    const name = trim(value.name);
+    const original =
+      originalTemplates.find(template => template.metadata?.name === name) ||
+      originalTemplates[index] ||
+      {};
+    const next = cloneDeep(original);
+    next.metadata = { ...(original.metadata || {}), name };
+    next.spec = {
+      ...(original.spec || {}),
+      accessModes: cloneDeep(value.accessModes),
+      resources: {
+        ...(original.spec?.resources || {}),
+        requests: {
+          ...(original.spec?.resources?.requests || {}),
+          storage: trim(value.storage),
+        },
+      },
+    };
+    if (trim(value.storageClassName)) next.spec.storageClassName = trim(value.storageClassName);
+    else delete next.spec.storageClassName;
+    return next;
+  });
+}
+
 export function validateWorkloadSettings(
   original: Record<string, any>,
   values: DeploymentCreateValues & Partial<WorkloadSettingsValues>,
@@ -1193,6 +1293,10 @@ export function validateWorkloadSettings(
     return 'WORKLOAD_SCHEDULING_INVALID';
   }
   if (!validatePodScheduling(values.podScheduling)) return 'WORKLOAD_SCHEDULING_INVALID';
+  if (kind === 'StatefulSet' && values.volumeClaimTemplates !== undefined) {
+    const volumeClaimError = validateVolumeClaimTemplates(values.volumeClaimTemplates);
+    if (volumeClaimError) return volumeClaimError;
+  }
   const strategy = values.updateStrategy;
   if (!strategy) return undefined;
   if (!['RollingUpdate', kind === 'Deployment' ? 'Recreate' : 'OnDelete'].includes(strategy.type)) {
@@ -1244,6 +1348,18 @@ export function buildDeploymentSettingsResource(
   else delete nextPodSpec.volumes;
   const kind: WorkloadKind = original.kind || 'Deployment';
   const initial = parseDeploymentSettings(original);
+  if (
+    kind === 'StatefulSet' &&
+    values.volumeClaimTemplates !== undefined &&
+    !isEqual(values.volumeClaimTemplates, initial.volumeClaimTemplates)
+  ) {
+    const templates = mergeVolumeClaimTemplates(
+      original.spec?.volumeClaimTemplates,
+      values.volumeClaimTemplates,
+    );
+    if (templates.length) result.spec.volumeClaimTemplates = templates;
+    else delete result.spec.volumeClaimTemplates;
+  }
   if (kind !== 'DaemonSet') result.spec.replicas = values.replicas;
   if (
     values.terminationGracePeriodSeconds !== undefined &&

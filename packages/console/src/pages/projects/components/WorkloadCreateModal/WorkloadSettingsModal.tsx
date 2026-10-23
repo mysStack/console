@@ -8,6 +8,7 @@ import { Form, FormItem, Input, InputNumber, Modal, useForm, useWatch } from '@k
 import { ArrayInput } from '@ks-console/shared';
 import ContainerInput from './ContainerInput';
 import VolumeInput from './VolumeInput';
+import PersistentVolumeClaimTemplateInput from './PersistentVolumeClaimTemplateInput';
 import WorkloadUpdateStrategyInput from './WorkloadUpdateStrategyInput';
 import SecurityContextInput from './SecurityContextInput';
 import PodAnnotationsInput from './PodAnnotationsInput';
@@ -21,6 +22,7 @@ import {
   parseDeploymentSettings,
   validateContainers,
   validateVolumes,
+  validateVolumeClaimTemplates,
   validateWorkloadSettings,
   VolumeValues,
 } from './deployment';
@@ -49,14 +51,15 @@ export default function WorkloadSettingsModal({
   const [form] = useForm<WorkloadSettingsValues>();
   const kind: WorkloadKind = resource.kind || 'Deployment';
   const volumes = useWatch('volumes', form);
+  const volumeClaimTemplates = useWatch('volumeClaimTemplates', form);
   const resources = useWorkloadResourceOptions(cluster, namespace);
   const workloadTargets = useWorkloadTargetOptions(kind, cluster, namespace);
   const initialValues = parseDeploymentSettings(resource);
   // StatefulSet PVC 模板由控制器按 Pod 创建卷，不存在于 template.spec.volumes。
   const claimTemplateNames: string[] =
     kind === 'StatefulSet'
-      ? (resource.spec?.volumeClaimTemplates || [])
-          .map((claim: Record<string, any>) => claim.metadata?.name)
+      ? (volumeClaimTemplates || initialValues.volumeClaimTemplates || [])
+          .map(claim => claim.name)
           .filter(Boolean)
       : [];
   const volumeNames = [
@@ -86,6 +89,15 @@ export default function WorkloadSettingsModal({
     callback: (error?: string) => void,
   ) => {
     const error = validateVolumes(value);
+    callback(error ? t(error) : undefined);
+  };
+
+  const validateVolumeClaimTemplateFields = (
+    _rule: unknown,
+    value: WorkloadSettingsValues['volumeClaimTemplates'],
+    callback: (error?: string) => void,
+  ) => {
+    const error = validateVolumeClaimTemplates(value);
     callback(error ? t(error) : undefined);
   };
 
@@ -236,6 +248,23 @@ export default function WorkloadSettingsModal({
             <VolumeInput resourceOptions={resources.options} />
           </ArrayInput>
         </FormItem>
+        {kind === 'StatefulSet' && (
+          <FormItem
+            name="volumeClaimTemplates"
+            label={t('PERSISTENT_VOLUME_CLAIM_TEMPLATE_PL')}
+            rules={[{ validator: validateVolumeClaimTemplateFields }]}
+          >
+            <ArrayInput
+              itemType="object"
+              addText={t('WORKLOAD_ADD_VOLUME_CLAIM_TEMPLATE')}
+              checkItemValid={(
+                item: NonNullable<WorkloadSettingsValues['volumeClaimTemplates']>[number],
+              ) => Boolean(item?.name && item?.storage && item?.accessModes?.length)}
+            >
+              <PersistentVolumeClaimTemplateInput />
+            </ArrayInput>
+          </FormItem>
+        )}
         <h3>{t('WORKLOAD_TERMINATION_GRACE_PERIOD')}</h3>
         <FormItem
           name="terminationGracePeriodSeconds"

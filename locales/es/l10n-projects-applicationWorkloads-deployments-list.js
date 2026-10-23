@@ -118,6 +118,9 @@ module.exports = {
   AVAILABLE: 'En desuso',
   IN_USER: 'En uso',
   ACCESS_MODE_SCAP: 'Modo de acceso admitido',
+  PVC_TEMPLATE_NAME: 'Nombre de plantilla PVC',
+  PERSISTENT_VOLUME_CLAIM_TEMPLATE_PL: 'Plantillas de Persistent Volume Claim',
+  WORKLOAD_ADD_VOLUME_CLAIM_TEMPLATE: 'Agregar plantilla PVC',
   PVC_OR_TEMPLATE_EMPTY:
     'You have enabled Collect Logs on Volumes. Please add at least one persistent volume, temperary volume, or persistent volume claim template and specify the path of container logs.',
   PVC_EMPTY:

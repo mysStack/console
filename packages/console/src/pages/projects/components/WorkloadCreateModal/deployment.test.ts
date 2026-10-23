@@ -12,6 +12,7 @@ import {
   validateWorkloadLabels,
   validateContainers,
   validateVolumes,
+  validateVolumeClaimTemplates,
 } from './deployment';
 
 for (const kind of ['Deployment', 'StatefulSet', 'DaemonSet']) {
@@ -1131,6 +1132,69 @@ test('StatefulSet 策略保留 Service、PVC 模板及未编辑的滚动更新�
   assert.deepEqual(buildDeploymentSettingsResource(original, values).spec.updateStrategy, {
     type: 'OnDelete',
   });
+});
+
+test('StatefulSet 回填并保存 PVC 模板的可编辑字段，同时保留未建模字段', () => {
+  const original = settingsFixture('StatefulSet');
+  original.spec.volumeClaimTemplates = [
+    {
+      metadata: { name: 'data', labels: { 'example.com/keep': 'yes' } },
+      spec: {
+        accessModes: ['ReadWriteOnce'],
+        storageClassName: 'fast.csi.example.com',
+        volumeMode: 'Filesystem',
+        resources: { requests: { storage: '1Gi', 'example.com/keep': '1' } },
+      },
+    },
+  ];
+  const values = parseDeploymentSettings(original);
+  assert.deepEqual(values.volumeClaimTemplates, [
+    {
+      name: 'data',
+      accessModes: ['ReadWriteOnce'],
+      storageClassName: 'fast.csi.example.com',
+      storage: '1Gi',
+    },
+  ]);
+  values.volumeClaimTemplates![0] = {
+    name: 'data',
+    accessModes: ['ReadWriteMany'],
+    storageClassName: 'slow.csi.example.com',
+    storage: '2Gi',
+  };
+  const submitted = buildDeploymentSettingsResource(original, values);
+  assert.deepEqual(submitted.spec.volumeClaimTemplates, [
+    {
+      metadata: { name: 'data', labels: { 'example.com/keep': 'yes' } },
+      spec: {
+        accessModes: ['ReadWriteMany'],
+        storageClassName: 'slow.csi.example.com',
+        volumeMode: 'Filesystem',
+        resources: { requests: { storage: '2Gi', 'example.com/keep': '1' } },
+      },
+    },
+  ]);
+});
+
+test('StatefulSet PVC 模板校验名称、访问模式、容量和重复项', () => {
+  const valid = [{ name: 'data', accessModes: ['ReadWriteOnce'], storage: '1Gi' }];
+  assert.equal(validateVolumeClaimTemplates(valid), undefined);
+  assert.equal(
+    validateVolumeClaimTemplates([{ ...valid[0], name: 'Bad_Name' }]),
+    'WORKLOAD_VOLUME_CLAIM_INVALID',
+  );
+  assert.equal(
+    validateVolumeClaimTemplates([{ ...valid[0], accessModes: [] }]),
+    'WORKLOAD_VOLUME_CLAIM_INVALID',
+  );
+  assert.equal(
+    validateVolumeClaimTemplates([{ ...valid[0], storage: '0Gi' }]),
+    'WORKLOAD_VOLUME_CLAIM_INVALID',
+  );
+  assert.equal(
+    validateVolumeClaimTemplates([valid[0], { ...valid[0] }]),
+    'WORKLOAD_VOLUME_CLAIM_DUPLICATE',
+  );
 });
 
 test('DaemonSet 策略独立写入 minReadySeconds，并保留 maxSurge', () => {
