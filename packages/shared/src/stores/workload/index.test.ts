@@ -46,7 +46,10 @@ function loadStore(
     '../../utils': { request },
     '../../utils/object.mapper': { [moduleName]: (value: unknown) => value },
     '../volume': {},
-    './hpa': { deleteHpa: ({ name }: any) => send(name) },
+    './hpa': {
+      deleteHpa: ({ cluster, namespace, name }: any) =>
+        send(`delete:hpa:${cluster}:${namespace}:${name}`),
+    },
   };
   runInNewContext(source, {
     module,
@@ -109,7 +112,7 @@ for (const resource of ['deployments', 'statefulsets', 'daemonsets']) {
 test('single delete rejects when related HPA cleanup fails', async () => {
   const error = new Error('HPA forbidden');
   const store = loadStore('deployments', async name => {
-    if (name === 'related-hpa') throw error;
+    if (name === 'delete:hpa:host:v4-migration-e2e:related-hpa') throw error;
     return { status: 'Success' };
   });
   const mutation = store.useDeleteDeploymentMutation();
@@ -187,9 +190,9 @@ test('页面批量删除 Hook 复用关联资源清理路径', async () => {
         ? [
             'workload-test',
             'delete:services:host:v4-migration-e2e:workload-test-headless',
-            'related-hpa',
+            'delete:hpa:host:v4-migration-e2e:related-hpa',
           ]
-        : ['workload-test', 'related-hpa'],
+        : ['workload-test', 'delete:hpa:host:v4-migration-e2e:related-hpa'],
     );
   }
 });
@@ -205,7 +208,7 @@ test('direct batchDelete rejects failures for callers outside the list hooks', a
 test('direct batchDelete rejects related HPA cleanup failures', async () => {
   const error = new Error('HPA forbidden');
   const store = loadStore('deployments', async name => {
-    if (name === 'related-hpa') throw error;
+    if (name === 'delete:hpa:host:v4-migration-e2e:related-hpa') throw error;
     return { status: 'Success' };
   });
   await assert.rejects(

@@ -139,7 +139,9 @@ const workloadStore = (module: string) => {
       const relateHPA = get(item, "annotations['kubesphere.io/relatedHPA']");
 
       if (relateHPA) {
-        promises.push(deleteHpa({ name: relateHPA, namespace: item.namespace }));
+        promises.push(
+          deleteHpa({ name: relateHPA, cluster: item.cluster, namespace: item.namespace }),
+        );
       }
     });
 
