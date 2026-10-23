@@ -699,6 +699,79 @@ test('创建 Deployment 时生成 PVC、临时卷、HostPath 和配置资源卷�
   ]);
 });
 
+test('创建工作负载时按容器宿主时区开关补齐只读挂载和 host-time 卷', () => {
+  const deployment = buildDeployment({
+    name: 'timezone-web',
+    namespace: 'v4-migration-e2e',
+    replicas: 1,
+    containers: [
+      {
+        name: 'web',
+        image: 'nginx',
+        volumeMounts: [{ name: 'host-time', mountPath: '/etc/localtime', readOnly: true }],
+      },
+    ],
+  });
+
+  assert.deepEqual(deployment.spec.template.spec.containers[0].volumeMounts, [
+    { name: 'host-time', mountPath: '/etc/localtime', readOnly: true },
+  ]);
+  assert.deepEqual(deployment.spec.template.spec.volumes, [
+    { name: 'host-time', hostPath: { path: '/etc/localtime', type: '' } },
+  ]);
+});
+
+test('编辑宿主时区挂载时隐藏系统卷，并按全部容器状态增删 host-time 卷', () => {
+  const original: any = {
+    apiVersion: 'apps/v1',
+    kind: 'StatefulSet',
+    metadata: { name: 'timezone-sts', namespace: 'v4-migration-e2e', resourceVersion: '42' },
+    spec: {
+      replicas: 1,
+      serviceName: 'timezone-sts',
+      selector: { matchLabels: { app: 'timezone-sts' } },
+      template: {
+        metadata: { labels: { app: 'timezone-sts' } },
+        spec: {
+          containers: [
+            {
+              name: 'web',
+              image: 'nginx',
+              volumeMounts: [{ name: 'host-time', mountPath: '/etc/localtime', readOnly: true }],
+            },
+            {
+              name: 'sidecar',
+              image: 'busybox',
+              volumeMounts: [{ name: 'host-time', mountPath: '/etc/localtime', readOnly: true }],
+            },
+          ],
+          volumes: [
+            { name: 'host-time', hostPath: { path: '/etc/localtime', type: '' } },
+            { name: 'data', emptyDir: {} },
+          ],
+        },
+      },
+      updateStrategy: { type: 'RollingUpdate', rollingUpdate: { partition: 0 } },
+    },
+  };
+
+  const values = parseDeploymentSettings(original);
+  assert.deepEqual(
+    values.volumes?.map(volume => volume.name),
+    ['data'],
+  );
+  const unchanged = buildDeploymentSettingsResource(original, values);
+  assert.deepEqual(unchanged.spec.template.spec.volumes, original.spec.template.spec.volumes);
+
+  values.containers[0].volumeMounts = [];
+  const oneEnabled = buildDeploymentSettingsResource(original, values);
+  assert.deepEqual(oneEnabled.spec.template.spec.volumes, original.spec.template.spec.volumes);
+
+  values.containers[1].volumeMounts = [];
+  const disabled = buildDeploymentSettingsResource(original, values);
+  assert.deepEqual(disabled.spec.template.spec.volumes, [{ name: 'data', emptyDir: {} }]);
+});
+
 test('高级容器设置校验拒绝无效探针、资源、配置引用和挂载', () => {
   const base = { name: 'web', image: 'nginx' };
   assert.equal(

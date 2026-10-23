@@ -505,6 +505,29 @@ export default function ContainerInput({
         value={value.securityContext}
         onChange={securityContext => update({ securityContext })}
       />
+      <div role="group" aria-label={t('SYNC_HOST_TIMEZONE')}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Switch
+            aria-label={t('SYNC_HOST_TIMEZONE')}
+            checked={(value.volumeMounts || []).some(mount => mount.mountPath === '/etc/localtime')}
+            onChange={checked => {
+              const volumeMounts = (value.volumeMounts || []).filter(
+                mount => mount.mountPath !== '/etc/localtime',
+              );
+              update({
+                volumeMounts: checked
+                  ? [
+                      ...volumeMounts,
+                      { name: 'host-time', mountPath: '/etc/localtime', readOnly: true },
+                    ]
+                  : volumeMounts,
+              });
+            }}
+          />
+          <strong>{t('SYNC_HOST_TIMEZONE')}</strong>
+        </div>
+        <div>{t('SYNC_HOST_TIMEZONE_DESC')}</div>
+      </div>
       <div role="group" aria-label={t('RESOURCE_LIMITS')}>
         <h4>{t('RESOURCE_LIMITS')}</h4>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>

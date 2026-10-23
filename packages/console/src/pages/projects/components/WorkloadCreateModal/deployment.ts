@@ -122,6 +122,9 @@ export interface ContainerCreateValues {
   volumeMounts?: VolumeMountValues[];
 }
 
+const HOST_TIME_VOLUME_NAME = 'host-time';
+const HOST_TIME_MOUNT_PATH = '/etc/localtime';
+
 export interface DeploymentCreateValues {
   name: string;
   namespace: string;
@@ -433,8 +436,10 @@ export function validateContainers(
     ]);
     for (const mount of container.volumeMounts || []) {
       const mountPath = trim(mount.mountPath);
+      const isManagedHostTimeMount =
+        trim(mount.name) === HOST_TIME_VOLUME_NAME && mountPath === HOST_TIME_MOUNT_PATH;
       if (
-        !volumeNames.has(trim(mount.name)) ||
+        (!volumeNames.has(trim(mount.name)) && !isManagedHostTimeMount) ||
         !mountPath.startsWith('/') ||
         mountPaths.has(mountPath)
       ) {
@@ -608,6 +613,45 @@ function buildVolume(volume: VolumeValues) {
       ...(trim(volume.sizeLimit) ? { sizeLimit: trim(volume.sizeLimit) } : {}),
     },
   };
+}
+
+function reconcileHostTimeVolume(
+  volumes: Record<string, any>[] = [],
+  containers: Record<string, any>[] = [],
+  initContainers: Record<string, any>[] = [],
+  originalVolumes: Record<string, any>[] = [],
+) {
+  const next = cloneDeep(volumes);
+  const enabled = [...containers, ...initContainers].some(container =>
+    (container.volumeMounts || []).some(
+      (mount: Record<string, any>) => mount.mountPath === HOST_TIME_MOUNT_PATH,
+    ),
+  );
+  if (enabled) {
+    if (!next.some(volume => volume.name === HOST_TIME_VOLUME_NAME)) {
+      const originalIndex = originalVolumes.findIndex(
+        volume =>
+          volume.name === HOST_TIME_VOLUME_NAME && volume.hostPath?.path === HOST_TIME_MOUNT_PATH,
+      );
+      const volume =
+        originalIndex >= 0
+          ? cloneDeep(originalVolumes[originalIndex])
+          : {
+              name: HOST_TIME_VOLUME_NAME,
+              hostPath: { path: HOST_TIME_MOUNT_PATH, type: '' },
+            };
+      next.splice(
+        Math.min(originalIndex < 0 ? next.length : originalIndex, next.length),
+        0,
+        volume,
+      );
+    }
+    return next;
+  }
+  return next.filter(
+    volume =>
+      !(volume.name === HOST_TIME_VOLUME_NAME && volume.hostPath?.path === HOST_TIME_MOUNT_PATH),
+  );
 }
 
 function parseProbe(probe: Record<string, any> | undefined): ProbeValues | undefined {
@@ -832,6 +876,9 @@ function parseContainer(container: Record<string, any>): ContainerCreateValues {
 }
 
 function parseVolume(volume: Record<string, any>): VolumeValues | undefined {
+  if (volume.name === HOST_TIME_VOLUME_NAME && volume.hostPath?.path === HOST_TIME_MOUNT_PATH) {
+    return undefined;
+  }
   if (volume.persistentVolumeClaim) {
     return {
       name: volume.name,
@@ -1187,6 +1234,14 @@ export function buildDeploymentSettingsResource(
   if (values.volumes?.length) {
     nextPodSpec.volumes = mergeVolumeSettings(originalPodSpec.volumes, values.volumes);
   } else delete nextPodSpec.volumes;
+  const reconciledVolumes = reconcileHostTimeVolume(
+    nextPodSpec.volumes,
+    nextPodSpec.containers,
+    nextPodSpec.initContainers,
+    originalPodSpec.volumes,
+  );
+  if (reconciledVolumes.length) nextPodSpec.volumes = reconciledVolumes;
+  else delete nextPodSpec.volumes;
   const kind: WorkloadKind = original.kind || 'Deployment';
   const initial = parseDeploymentSettings(original);
   if (kind !== 'DaemonSet') result.spec.replicas = values.replicas;
@@ -1289,6 +1344,13 @@ export function buildDeployment(values: DeploymentCreateValues) {
   // and pod template. Keep that behavior until the application filter is
   // migrated separately.
   const labels = buildWorkloadLabels(name, values.workloadLabels);
+  const containers = values.containers.map(buildContainer);
+  const initContainers = values.initContainers?.map(buildContainer) || [];
+  const volumes = reconcileHostTimeVolume(
+    values.volumes?.map(buildVolume),
+    containers,
+    initContainers,
+  );
 
   if (aliasName) annotations['kubesphere.io/alias-name'] = aliasName;
   if (description) annotations['kubesphere.io/description'] = description;
@@ -1323,11 +1385,9 @@ export function buildDeployment(values: DeploymentCreateValues) {
           ...(values.nodeSelector && Object.keys(values.nodeSelector).length
             ? { nodeSelector: cloneDeep(values.nodeSelector) }
             : {}),
-          containers: values.containers.map(buildContainer),
-          ...(values.initContainers?.length
-            ? { initContainers: values.initContainers.map(buildContainer) }
-            : {}),
-          ...(values.volumes?.length ? { volumes: values.volumes.map(buildVolume) } : {}),
+          containers,
+          ...(initContainers.length ? { initContainers } : {}),
+          ...(volumes.length ? { volumes } : {}),
         },
       },
       strategy: {
