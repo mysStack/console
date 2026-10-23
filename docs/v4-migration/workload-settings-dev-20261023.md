@@ -145,3 +145,24 @@ console 定向重建复用 `scripts/libs/create-rollup-config.js`，分别传入
 - [可复现服务端验证脚本](./evidence/workload-metadata-server-validation.cjs)
 
 本增量没有构建测试镜像、更新 131 的 `ks-console`、rollout 或登录当前 SHA 浏览器。调度、workload 顶层 labels/annotations、时区挂载、StatefulSet Service/PVC 模板、集群原生入口、DaemonSet 停止语义和配置引用仍在 DEV 清单，因此阶段保持 DEV。
+
+## Pod 调度与节点选择增量（2026-10-23）
+
+代码提交 `7db1a9353ea42ce2e4a8898bd4cf8110ac2d97a9` 依据当前 `v3dist` 工厂 1530、2440、2583 的定向 REA，实现 Deployment 和 StatefulSet 设置中的默认、分散、聚合、自定义 Pod 亲和/反亲和规则。分散和聚合分别生成权重 100、拓扑键 `kubernetes.io/hostname` 的 preferred `podAntiAffinity` 和 `podAffinity`；自定义规则要求唯一 policy、required/preferred 类型及当前 cluster/namespace 内同类工作负载目标。Deployment 创建同时支持 Pod 调度和 `spec.template.spec.nodeSelector`，节点选择键和值按 Kubernetes qualified name/label value 校验。
+
+DaemonSet 的旧 V3 UI 快照没有调度分区，因此当前 V4 不为它虚构该入口，并在编辑其他字段时完整保留原有 `affinity`。Deployment/StatefulSet 遇到 nodeAffinity、多个同策略规则、额外 selector 条件等无法由旧 V3 单规则模型安全表达的配置时，显示“保留已有高级调度配置”；未主动切换时不重写原对象。`tolerations` 未由本次当前制品工厂闭环，仍按未建模字段保留并留在 DEV 清单。
+
+测试先行先取得 `deployment.test.ts` 5 项失败及两个组件缺失失败；实现后转换测试 49/49、`PodSchedulingInput.test.ts` 1/1、`NodeSelectorInput.test.ts` 1/1 通过。精确提交 `7db1a9353` 的完整 `./scripts/test.sh` 为 **77 个文件、336 项通过、0 失败**；`corepack yarn build:packages` 退出 0；生产文件 ESLint、变更文件 Prettier 与 `git diff --check` 通过。TypeScript 生产源按上一提交 `6d49487a97ee94ee582cfc445e7e165bf4bcd3e4` 作同配置基线比较，既有诊断 691、当前 691，本次新增 0、改动文件诊断 0；全项目既有类型诊断仍未关闭。
+
+131 集群 `v1.31.13+k3s1` 的 `v4-migration-e2e` namespace 对 Deployment 分散调度和节点选择、StatefulSet 自定义亲和/反亲和、DaemonSet 既有 nodeAffinity 保留分别执行 `kubectl create --dry-run=server`，三类资源均被 API 接受，残留资源为 0。验证绑定代码提交 `7db1a9353`，没有持久化资源。
+
+证据：
+
+- [制品工厂来源](./evidence/workload-scheduling-20261023-provenance.json)
+- [REA 摘要](./evidence/workload-scheduling-20261023-rea-summary.json)
+- [TypeScript 基线比较](./evidence/workload-scheduling-20261023-typecheck.json)
+- [131 服务端 dry-run](./evidence/workload-scheduling-20261023-api-validation.json)
+- [可复现工厂提取脚本](./evidence/workload-scheduling-extract.cjs)
+- [可复现服务端验证脚本](./evidence/workload-scheduling-server-validation.cjs)
+
+本增量没有构建或推送测试镜像，没有更新 131 的 `ks-console`、rollout 或登录当前 SHA 浏览器。workload 顶层 labels/annotations、时区挂载、StatefulSet Service/PVC 模板、集群原生入口、DaemonSet 停止语义、配置引用和完整 Action/RBAC 仍在 DEV 清单，因此阶段保持 DEV。

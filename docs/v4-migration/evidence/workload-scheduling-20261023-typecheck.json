@@ -1,0 +1,41 @@
+{
+  "baselineCommit": "6d49487a97ee94ee582cfc445e7e165bf4bcd3e4",
+  "method": "TypeScript compiler API; production sources only; current dependencies/config; baseline tracked console source overlaid from Git; new production inputs absent from baseline; diagnostics compared by file/code/line; emit/composite/incremental disabled",
+  "baselineDiagnostics": 691,
+  "currentDiagnostics": 691,
+  "introduced": [],
+  "changedFileErrors": [],
+  "newProductionFiles": [
+    "packages/console/src/pages/projects/components/WorkloadCreateModal/NodeSelectorInput.tsx",
+    "packages/console/src/pages/projects/components/WorkloadCreateModal/PodSchedulingInput.tsx",
+    "packages/console/src/pages/projects/components/WorkloadCreateModal/useWorkloadTargetOptions.ts"
+  ],
+  "sources": [
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/NodeSelectorInput.tsx",
+      "sha256": "b2c2aed6ba308818437bd94a88c977f7c96ccf8ae86fe48651b26a957fb7dc61"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/PodSchedulingInput.tsx",
+      "sha256": "dd9a0582e672907f73274beddd974b375b2eaaea5483dada87265e844d368f05"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/WorkloadSettingsModal.tsx",
+      "sha256": "a6c2621afedcbd31a6d7d85e3da83ac905fda11d1736b62825851fa528933229"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/deployment.ts",
+      "sha256": "5803fc87e6a55a0129a809e197df9669dda2b269d6cdabd80af22c7e4a1c535d"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/index.tsx",
+      "sha256": "e8dc06a8f9f5584438d839a09574c69d0fc853695bfee8cf3d8c0f0a6445c721"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/useWorkloadTargetOptions.ts",
+      "sha256": "e7348d2a8fd38102051ba4495525c4a7721afaf3ff7205c3d97905e20d99b1d3"
+    }
+  ],
+  "sourceCommit": "7db1a9353ea42ce2e4a8898bd4cf8110ac2d97a9",
+  "statement": "项目类型检查仍有既有诊断；基线差异检查不能替代全项目 TypeScript 通过"
+}

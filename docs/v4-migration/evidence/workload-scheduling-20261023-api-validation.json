@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-23T03:51:07.058Z",
+  "sourceCommit": "7db1a9353ea42ce2e4a8898bd4cf8110ac2d97a9",
+  "uncommittedSourceFiles": [],
+  "server": "https://192.168.2.131:6443",
+  "version": "v1.31.13+k3s1",
+  "namespace": "v4-migration-e2e",
+  "mode": "server dry-run; no resource persisted",
+  "residualResources": [],
+  "results": [
+    {
+      "kind": "Deployment",
+      "expected": "accepted",
+      "passed": true,
+      "result": "deployment.apps/v4-scheduling-dryrun-deployment-1792727465280",
+      "error": "",
+      "affinityPolicies": ["podAntiAffinity"],
+      "nodeSelector": {
+        "kubernetes.io/os": "linux"
+      }
+    },
+    {
+      "kind": "StatefulSet",
+      "expected": "accepted",
+      "passed": true,
+      "result": "statefulset.apps/v4-scheduling-dryrun-statefulset-1792727465280",
+      "error": "",
+      "affinityPolicies": ["podAffinity", "podAntiAffinity"],
+      "nodeSelector": null
+    },
+    {
+      "kind": "DaemonSet",
+      "expected": "accepted",
+      "passed": true,
+      "result": "daemonset.apps/v4-scheduling-dryrun-daemonset-1792727465280",
+      "error": "",
+      "affinityPolicies": ["nodeAffinity"],
+      "nodeSelector": null
+    }
+  ]
+}

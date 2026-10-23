@@ -8,7 +8,7 @@
 | 模块/当前能力     | Workload / Deployment、StatefulSet、DaemonSet 组合批次                                                                                                                                                                                                                   |
 | Worktree/分支     | `console-workloads` / `feature/v4-workloads`                                                                                                                                                                                                                             |
 | 当前阶段/REA 结论 | `DEV` / REA 已通过（项目负责人已批准进入 DEV；未闭环项转入 DEV/VERIFY 验收清单）                                                                                                                                                                                         |
-| 事实输入提交      | 本轮制品定位 `e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0`；当前功能提交 `9e2f4148f`；业务代码输入以当前分支 HEAD 为准                                                                                                                                                      |
+| 事实输入提交      | 本轮制品定位 `e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0`；当前功能提交 `7db1a9353`；业务代码输入以当前分支 HEAD 为准                                                                                                                                                      |
 | 观察              | 已有原生简化表单和有限部署后测试；当前 V3 编辑行为尚未逐项还原                                                                                                                                                                                                           |
 | 推断              | 表单覆盖不足，不能凭现有 V4 测试证明当前 V3 等价；具体缺失须由制品和真实 V3 行为确认                                                                                                                                                                                     |
 | 制品/REA 证据     | [REA 复核及完整 Evidence ID](./workload-settings-rea-20261022.md)；[Action/API/权限与缓存静态证据](./workload-action-api-rbac-evidence-20261023.md)；[旧 V3 运行时补证](./workload-v3-runtime-rea-20261023.md)；V3 Git tree 绑定在阶段记录中，不能与 REA 目录摘要混用    |
@@ -53,6 +53,8 @@ Deployment、StatefulSet、DaemonSet 共用一个模块分支和组合能力记�
 2026-10-23 REA 阶段测试见[测试证据](./workload-rea-test-evidence-20261023.md)：`./scripts/test.sh` 的 70 个测试文件、287 个断言全部通过；另有 15 个 Workload 定向测试文件、106 个断言通过。测试覆盖当前源码的解析、Store、权限参数、错误传播和 V3 桥接协作；不覆盖当前 SHA 构建部署后的浏览器、真实 RBAC、跨 namespace 隔离或完整三类资源等价，因此不改变 REA 门禁。
 
 2026-10-23 旧 V3 运行时补证见[运行时记录](./workload-v3-runtime-rea-20261023.md)：在固定历史镜像 `feature-v4-workloads-20261022-215739-27aaeced74e8` 上只读观察 Deployment、StatefulSet、DaemonSet 设置弹窗和 GET 请求，确认资源特有分区及字段。该镜像不是当前分支 HEAD，证据用于校准 V3 行为，不作为当前 VERIFY；当前 SHA 的构建、部署和 Playwright 验收仍待执行。
+
+2026-10-23 调度定向补证使用当前 `v3dist` 工厂 1530/2440/2583，确认 Deployment/StatefulSet 的默认、分散、聚合、自定义 Pod 调度结构，以及非联邦创建路径 `spec.template.spec.nodeSelector`；旧 V3 UI 快照同时确认 DaemonSet 不显示该调度分区。来源、偏移、工厂哈希和 REA 限制见[来源记录](./evidence/workload-scheduling-20261023-provenance.json)与[摘要](./evidence/workload-scheduling-20261023-rea-summary.json)。该证据只指导提交 `7db1a9353` 的 DEV 实现，不证明运行时调度、RBAC 或浏览器等价；无法安全建模的 affinity 保留原对象，tolerations 继续列为未知。
 
 同时纠正集群列表判定：活跃入口是 V4 Banner/Tab + Wujie 内 V3 列表；独立 STS/DS Embed 文件的 URL 互换没有在该主入口复现。当前阶段已获准进入 DEV；当前 SHA 的最终构建部署验收属于 VERIFY，不能用历史镜像证据替代。
 
