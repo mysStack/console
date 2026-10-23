@@ -202,15 +202,15 @@ export function buildWorkloadLabels(name: string, labels?: Record<string, string
 }
 
 export async function checkWorkloadLabelsAvailability(
-  checkLabels: (params: Record<string, any>) => Promise<{ exist?: boolean }>,
+  checkLabels: (params: Record<string, any>) => Promise<unknown>,
   params: { cluster: string; namespace: string; name: string; labels?: Record<string, string> },
 ): Promise<string | undefined> {
   try {
-    const result = await checkLabels({
+    const result = (await checkLabels({
       cluster: params.cluster,
       namespace: params.namespace,
       labels: buildWorkloadLabels(params.name, params.labels),
-    });
+    })) as { exist?: boolean };
     return result.exist ? 'DUPLICATE_LABELS' : undefined;
   } catch {
     return 'WORKLOAD_LABEL_CHECK_FAILED';
