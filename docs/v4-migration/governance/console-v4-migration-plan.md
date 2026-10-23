@@ -12,7 +12,7 @@
 >
 > 测试环境：`192.168.2.131:30880`（仅经授权后部署）
 
-> **当前执行口径（2026-10-23）：** 本文第 3～8 节为有效规则，下方日期记录为历史事实，不能据此恢复旧的全局 P0 阻塞策略或倒推模块 REA 已通过。Workload 使用 `feature/v4-workloads` / `console-workloads`；当前范围调整为 Deployment、StatefulSet、DaemonSet 的组合批次，阶段为 `REA`、状态为“分析中”。公共列表、详情、容器/模板编辑、作用域、缓存和错误处理可以共用实现；三类资源的入口、字段差异、Action、RBAC 和验收结果必须分别记录，一类资源通过不代表另外两类通过。既有原生实现及浏览器场景保留为先行证据，未完成组合批次的 V3 行为对照前不继续该能力的 DEV/VERIFY。其他模块状态以其分支内经核对的记录为准，不复制本分支旧表格的进度。
+> **当前执行口径（2026-10-23）：** 本文第 3～8 节为有效规则，下方日期记录为历史事实，不能据此恢复旧的全局 P0 阻塞策略或倒推模块 REA 已通过。Workload 使用 `feature/v4-workloads` / `console-workloads`；当前范围调整为 Deployment、StatefulSet、DaemonSet 的组合批次，阶段为 `DEV`、REA 状态为“已通过（负责人批准进入 DEV）”。公共列表、详情、容器/模板编辑、作用域、缓存和错误处理可以共用实现；三类资源的入口、字段差异、Action、RBAC 和验收结果必须分别记录，一类资源通过不代表另外两类通过。既有原生实现及浏览器场景保留为先行证据，2026-10-23 负责人明确批准“按已确认缺口开始编码，保留未闭环项为 DEV 验收清单”。WL-01～WL-04 保留为 DEV/VERIFY 必须逐项关闭的事项；本次批准不证明完整等价、不授权跳过 VERIFY。其他模块状态以其分支内经核对的记录为准，不复制本分支旧表格的进度。
 
 ### 历史执行与策略调整记录（不作为当前阶段授权）
 
@@ -99,7 +99,7 @@ release-4.2.0                 全量验收通过后再创建的发布分支（�
 
 ### 3.3 执行入口补强（2026-10-23 负责人授权）
 
-复用现有模块门禁，接入 Git `pre-commit`、中文标题 `commit-msg` 和 PR CI；不新增业务阶段、不重做全量 REA。当前 Workload 处于 `deployment-statefulset-daemonset / REA / 分析中`。
+复用现有模块门禁，接入 Git `pre-commit`、中文标题 `commit-msg` 和 PR CI；不新增业务阶段、不重做全量 REA。本节补强时 Workload 处于 `deployment-statefulset-daemonset / REA / 分析中`；现已按负责人批准进入 DEV，唯一当前状态见模块阶段记录。
 
 本次治理修复可通过记录通道修改 `.husky/pre-commit`、`.husky/commit-msg` 和 `.github/workflows/v4-module-gate.yml`，以及既有 `docs/v4-migration/` 治理脚本、测试和记录；这是明确列举的工具路径，不授权业务代码、其他工作流或部署。后续各模块复用同一套入口，不复制另一套阶段判断。
 

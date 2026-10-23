@@ -20,7 +20,7 @@
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
-        "sha256": "7dd0128bebdad054f3c99c0851786b2d1493679b80b76469e2eaab016c32bafd"
+        "sha256": "74f4c4cc3090860ac015c8daa05abc81390a6925ad9ec081394378cb5528a6aa"
       },
       {
         "path": "docs/v4-migration/workload-kind-capability-matrix.md",
@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "f791f762d51c6836b0aeafe33de70ee664c4d7e420105ddce4ca9c7ffb87ee59"
+        "sha256": "04c93f2aed232b451a3858f603aaafe0fb25658b62504e61467fcaf8a44147fa"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "42fed3fc85401c3ec15c4687a9a94f80cd62d9fd64ae6f33d456a022bb88db1e"
+        "sha256": "f9d93f9d7986b0fcd7dc5f251d7c857c4eeec3885c2856a9f45255e4fae151c6"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -225,7 +225,14 @@
   },
   "dev": {
     "status": "进行中",
-    "reason": "REA 已经负责人批准；按 WL-01～WL-04 验收清单补齐三类资源原生入口、字段、Action/API/权限/缓存/错误和配置引用"
+    "reason": "开发中：原生设置入口、更新策略与优雅终止首批已实现；完整设置、集群入口、创建、Action 与配置引用仍待补齐；未进入 VERIFY",
+    "sourceCommit": "0c1d9aadf219fcabf5e6a310722591c9d7bef136",
+    "documents": [
+      {
+        "path": "docs/v4-migration/workload-settings-dev-20261023.md",
+        "sha256": "e0d0c9b080e25b506b37d9e9ac430bcbbf090c114688015c13545aedf9ab72ef"
+      }
+    ]
   },
   "devAcceptanceChecklist": [
     "WL-01：三类资源项目/集群入口、详情 Tab、原生编辑设置分区和路由替代矩阵",
