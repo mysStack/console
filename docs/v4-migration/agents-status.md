@@ -2,7 +2,7 @@
 
 - 当前精确制品低权限复验完成：viewer 账号可读三类配置引用页，更新请求分别返回 403，资源版本和 envFrom 保持不变。
 - Kubernetes 授权事实：`v4-migration-e2e` namespace 的 get/list/watch 为允许，update 为拒绝；`default` namespace get 为拒绝。
-- 尚未关闭：第二 namespace fixture 尚未建立，因此跨 namespace 正反隔离仍为部分验证；完整 Action、缓存失效和逐项 V3 等价仍未完成。
+- 第二 namespace fixture 已完成正反隔离复验：viewer 对第二 namespace 的 get/list 均拒绝，第一 namespace 列表只返回本 namespace 资源；临时 Deployment 已清理、namespace 保留。完整 Action、缓存失效和逐项 V3 等价仍未完成。
 - 证据：[Workload 低权限与 namespace 复验](./evidence/workload-rbac-namespace-verify-20261024.json)。
 
 # 当前状态补充（2026-10-24：全局 V3 预加载验证通过）

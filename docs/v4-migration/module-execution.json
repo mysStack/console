@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "5ecd4c9a69af82a09531d938b5f4d23edd235269835a81e6f1dda8c88a1697ee"
+        "sha256": "501c410e9253720700cfbbe5b762876adb7c6f76c377e01516339c456ffc8224"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "f52f48e990d55067906818958a2cc1beda0c6c02861ba9629719674e1b48363d"
+        "sha256": "0d0bfc3c62b5acb542987a3262fa3c4ebec64589bdfda90a020b2f279524b5bf"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -502,7 +502,7 @@
   ],
   "verify": {
     "status": "未完成",
-    "reason": "精确制品部署、三类原生路由无 V3 预加载、设置页面和低权限拒绝路径已验证；跨 namespace 正反 fixture、完整 Action、缓存和逐项 V3 等价仍未完成。",
+    "reason": "精确制品部署、三类原生路由无 V3 预加载、设置页面、低权限拒绝和第二 namespace 正反隔离已验证；完整 Action、缓存和逐项 V3 等价仍未完成。",
     "sourceCommit": "45d9f14e53d6a0c1d74011197ade9d5accbcdae9",
     "documents": [
       {
@@ -519,7 +519,7 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-rbac-namespace-verify-20261024.json",
-        "sha256": "788f3c0f41d7cd26fed80c2619d67125eb33fc3b6dca4c5765f653a8c6d947e7"
+        "sha256": "25bac3af8aa9f0837cc5f16ba617cf5c6d15b65c2e6d7eb6115104b4cab1d638"
       }
     ]
   }
