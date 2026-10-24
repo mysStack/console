@@ -252,3 +252,9 @@
 - 当前 V4 已在 131 真实浏览器中打开 Deployment、StatefulSet、DaemonSet 三类配置引用页面，页面和只读请求均正常；ConfigMap/Secret 引用名称、前缀、生成环境变量摘要正常渲染，页面不展示 Secret 值。
 - 本轮只完成读取和渲染检查，没有应用引用、没有修改资源。写回、缓存、RBAC、文件挂载、prefix、多容器、Reloader 和逐项 V3 等价仍未验证。
 - 证据见 [`配置引用原生页面 REA`](./evidence/workload-config-reference-rea-browser-20261024.json)。模块继续保持 `REA / 分析中，待复核`。
+
+# 当前状态补充（2026-10-24：Deployment 元数据页对照）
+
+- 对照基线和当前 V4 的 Deployment 元数据页后确认：两边均显示相同标签和 `deployment.kubernetes.io/revision`、`kubectl.kubernetes.io/last-applied-configuration` 注解。
+- 因此，当前 V4 编辑设置首屏展示 last-applied 注解属于信息组织差异，不再作为资源元数据来源不一致记录；是否在编辑设置中折叠仍需产品确认。
+- 证据见 [`Deployment 元数据页对照`](./evidence/workload-metadata-browser-20261024.json)。字段写回、权限和错误路径未关闭，模块仍为 `REA / 分析中，待复核`。

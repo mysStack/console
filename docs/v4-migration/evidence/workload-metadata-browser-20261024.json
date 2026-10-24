@@ -1,0 +1,40 @@
+{
+  "record": "Deployment 元数据页基线与 V4 浏览器对照",
+  "date": "2026-10-24",
+  "workspaceHead": "6c6ed43a62195d61bcff390b20f2384bf09aa10b",
+  "operator": "Codex 单会话",
+  "environment": {
+    "namespace": "v4-migration-e2e",
+    "resource": "Deployment/v4-deploy-edit-ef3",
+    "baselineOrigin": "http://192.168.2.131:30881",
+    "currentV4Origin": "http://192.168.2.131:30880",
+    "currentV4ImageTag": "feature-v4-workloads-20261024-091102-31b6d88fc7e8",
+    "currentV4PodImageID": "sha256:2956710cd7ef2fbda79ff7a0a9695dac466336bd08248784d5afdfb577b951d3"
+  },
+  "paths": {
+    "baseline": "/consolev3/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/metadata",
+    "currentV4": "/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/metadata"
+  },
+  "browserResult": {
+    "baselineHttp": 200,
+    "currentV4Http": 200,
+    "baselineLabels": ["v4-migration-test"],
+    "currentV4Labels": ["v4-migration-test"],
+    "baselineAnnotations": [
+      "deployment.kubernetes.io/revision",
+      "kubectl.kubernetes.io/last-applied-configuration"
+    ],
+    "currentV4Annotations": [
+      "deployment.kubernetes.io/revision",
+      "kubectl.kubernetes.io/last-applied-configuration"
+    ],
+    "lastAppliedConfiguration": "两边元数据页面均显示同一测试 Deployment 的 kubectl.kubernetes.io/last-applied-configuration；证据不重复记录 JSON 全文。",
+    "comparison": "当前 V4 编辑设置首屏展示该注解，而基线编辑设置首屏不展示；但基线元数据 Tab 同样展示该注解，因此这是 Modal 信息组织差异，不是当前资源元数据来源差异。"
+  },
+  "limits": [
+    "本轮只对比元数据页面渲染，没有修改标签或注解。",
+    "本轮没有验证清空、保留、非法值、保存回读和低权限权限控制。",
+    "当前 V4 workspace HEAD 只有 REA 文档提交，浏览器仍使用已有 31b6d88fc7e8 制品。"
+  ],
+  "result": "确认基线和当前 V4 都展示相同资源元数据；将 last-applied 注解从“可能的数据差异”降级为“编辑设置 Modal 信息组织差异”，继续保留字段保存和敏感信息规则验证。"
+}

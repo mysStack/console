@@ -230,3 +230,16 @@ rg -n 'editConfigTemplate|editYaml|WorkloadSettingsModal' \
 - 当前 V4 有原生配置引用路由，而 `release-4.1.5` 基线详情页没有同名原生 Tab。该差异不能直接写成功能缺失，必须继续把旧 V3 环境变量/引用能力与当前 V4 的资源引用、文件挂载、prefix、多容器和 Reloader 行为逐项映射。
 
 本轮关闭了“当前 V4 配置引用页面是否能渲染并读取资源”的未知项，但没有关闭写回、缓存、RBAC、错误态和完整 V3 等价。REA 仍为 **分析中，待负责人复核**。
+
+## Deployment 元数据页对照结果（2026-10-24）
+
+为确认编辑设置首屏展示 `kubectl.kubernetes.io/last-applied-configuration` 是否属于当前 V4 额外读取，本轮又对照了同一 Deployment 的元数据页：
+
+- 基线 `/consolev3/.../metadata` 与当前 V4 `/.../metadata` 均返回 HTTP 200；
+- 两边均显示标签 `v4-migration-test`；
+- 两边均显示 `deployment.kubernetes.io/revision` 和 `kubectl.kubernetes.io/last-applied-configuration`；
+- 两边读取的是同一测试资源的元数据，未发现当前 V4 额外引入该注解的数据来源差异。
+
+因此，前一条“last-applied 注解展示风险”需要修正为：**资源元数据来源已经对齐，差异主要在当前 V4 将它放进编辑设置首屏，基线将它放在元数据 Tab。** 是否在编辑设置中隐藏或折叠仍属于产品交互决策，但不能据此判定当前 V4 数据错误。
+
+证据见 [`evidence/workload-metadata-browser-20261024.json`](./evidence/workload-metadata-browser-20261024.json)。字段保存、清空/保留、权限和错误路径仍未验证。

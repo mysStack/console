@@ -70,14 +70,14 @@
     "different": [
       "基线使用单分区视图，V4 首屏连续展示多个分区",
       "V4 首屏直接展示副本数量、元数据和终止宽限时间",
-      "当前 V4 页面读取并展示了 kubectl.kubernetes.io/last-applied-configuration 注解的完整 JSON 文本，本轮未判断该展示是否符合产品要求，也未修改该注解"
+      "当前 V4 编辑设置首屏展示 kubectl.kubernetes.io/last-applied-configuration 的完整 JSON；后续元数据页对照确认基线元数据 Tab 也展示同一注解，因此这是 Modal 信息组织差异，不是资源元数据来源差异。"
     ],
     "reaMeaning": "当前 V4 的 Deployment 设置 Modal 是原生表单重构，不是旧 V3 布局复刻。功能等价必须按字段、默认值、校验、清空/保留、写回和敏感信息展示规则逐项验证。"
   },
   "limits": [
     "本轮只读打开 Modal，没有执行保存、取消后的回读、冲突、403、404、网络失败或缓存验证。",
     "本轮使用 131 已部署的 31b6d88fc7e8 制品；workspace 当前 HEAD 只包含 REA 文档提交，没有重新构建或部署。",
-    "本轮未判定 V4 公开完整 last-applied 注解为缺陷，只将其列为需要负责人确认的 REA 风险。"
+    "当前 V4 页面完整展示 last-applied 注解的编辑设置首屏布局与基线不同，但基线元数据 Tab 同样展示该资源注解；仍需验证编辑表单是否应隐藏或折叠该内容。"
   ],
   "result": "Deployment 编辑设置的布局和字段差异已取得真实浏览器证据；功能等价、元数据展示规则和写回行为仍未闭环，REA 不放行 DEV。"
 }
