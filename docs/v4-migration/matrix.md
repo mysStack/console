@@ -180,7 +180,7 @@
 ## 当前增量（2026-10-24：Action/API 静态记录纠偏）
 
 - 已修正旧静态证据中关于 StatefulSet/DaemonSet 编辑设置仍调用 YAML 的过时描述；当前三个项目级详情页均打开原生 `WorkloadSettingsModal`，YAML 是独立 Action。
-- 已修正配置引用桥接描述：当前 ConfigReference 生产入口的静态测试未发现 `useV3action`、Wujie 或 `consolev3` 调用；集群级三类 Workload 主路由也已由静态测试确认使用原生列表。全局 V3 预加载及其他集群级 Embed 入口仍单独保留为未关闭项。
+- 已修正配置引用桥接描述：当前 ConfigReference 生产入口的静态测试未发现 `useV3action`、Wujie 或 `consolev3` 调用；集群级三类 Workload 主路由也已由静态测试确认使用原生列表。当前源码的全局 `preloadApp()` 已移除，但部署后 Network 复验尚未绑定当前 HEAD；其他集群级 Embed 入口仍单独保留为未关闭项。
 - 该纠偏只更新证据口径，不关闭运行时字段、API、RBAC、缓存、错误和完整 V3 等价风险。模块继续保持 `REA / 分析中，待复核`。
 
 ## 当前增量（2026-10-24：131 登录边界核对）
@@ -193,4 +193,4 @@
 
 - 当前 HEAD `d78cab185f66beaebe16c03c3b3a09518c748cc8` 上执行 `nativeWorkloads.test.ts`，6 项全部通过。
 - 已验证集群级 Deployment、StatefulSet、DaemonSet 主路由引用原生 Workload 列表，保留 namespace 选择，并按所选 namespace 调用对应创建 Store。
-- 该结果只关闭集群级三类 Workload 主路由的静态未知项；全局 V3 预加载、其他集群级 Embed、当前制品浏览器、RBAC、缓存、错误和逐项 V3 等价仍未验证。证据见 [`workload-cluster-native-static-tests-20261024.json`](./evidence/workload-cluster-native-static-tests-20261024.json)，模块继续保持 `REA / 分析中，待复核`。
+- 该结果只关闭集群级三类 Workload 主路由的静态未知项；当前源码 `wujie.ts` 已无 `preloadApp()` 调用，但当前 HEAD 尚未完成本轮部署后的 Network 复验；其他集群级 Embed、当前制品浏览器、RBAC、缓存、错误和逐项 V3 等价仍未验证。证据见 [`workload-cluster-native-static-tests-20261024.json`](./evidence/workload-cluster-native-static-tests-20261024.json)，模块继续保持 `REA / 分析中，待复核`。

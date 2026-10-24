@@ -53,11 +53,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "b716af1e67a36efe24912542de64fb0c0b79dd4a3b69ccbc558d24cf0bc623f3"
+        "sha256": "48b3cc0293ef5649d6274cc32e48763256af2bfefb6311c5d242aa9934295a9d"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "ac2c0f3ce7ac1c9322cd1b340f6f9dd742ab4306beb4449d78290c666041a9dc"
+        "sha256": "0bd40c23c4b467e99507f1bef5aefd704df0768fee402fcea8770cb110c19857"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -89,7 +89,7 @@
       },
       {
         "path": "docs/v4-migration/workload-action-api-rbac-evidence-20261023.md",
-        "sha256": "f327c893f230c5d562ae96b3634b708a88e143f7670e77351b8d07180a0ec60e"
+        "sha256": "ce2c994b883d12e25da95490030f161554c91f1d8861fcddbeb13c3ee13e1677"
       },
       {
         "path": "docs/v4-migration/workload-rea-test-evidence-20261023.md",
@@ -113,7 +113,7 @@
       },
       {
         "path": "docs/v4-migration/workload-rea-review-20261024.md",
-        "sha256": "eff07dcfe2e725d5609a80db51400911cc34fed2c1ea032c2075f36f9e07032d"
+        "sha256": "2c1850740108633881078a15e7b9468f1348572ad318bc90dbb7aa61716af95b"
       },
       {
         "path": "docs/v4-migration/evidence/workload-v415-baseline-browser-20261024.json",

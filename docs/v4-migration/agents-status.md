@@ -287,7 +287,7 @@
 ## 2026-10-24 Action/API 静态记录纠偏
 
 - 复核并修正旧 Action/API/RBAC 文档中的过时结论：当前 Deployment、StatefulSet、DaemonSet 项目详情均通过原始资源读取打开原生 `WorkloadSettingsModal`，YAML 是独立 Action。
-- 当前 ConfigReference 生产入口静态测试未发现 `useV3action`、Wujie 或 `consolev3` 调用；集群级 Workload Embed 仍有旧 V3/Wujie 依赖，不能合并判断。
+- 当前 ConfigReference 生产入口静态测试未发现 `useV3action`、Wujie 或 `consolev3` 调用；集群级三类 Workload 主路由已切换原生，其他集群级 Embed 和全局 Wujie 按需注册仍不能合并判断。
 - 本次只修正 REA 记录，没有修改业务代码；三类资源的运行时字段、API 写回、RBAC、缓存、错误和逐项 V3 等价仍未验证，模块保持 `REA / 分析中，待复核`。
 
 ## 2026-10-24 131 浏览器登录边界核对
@@ -300,4 +300,4 @@
 
 - 当前 HEAD `d78cab185f66beaebe16c03c3b3a09518c748cc8` 上执行 `packages/console/src/pages/clusters/containers/ApplicationWorkloads/nativeWorkloads.test.ts`，6 项全部通过。
 - 测试确认集群级 Deployment、StatefulSet、DaemonSet 主路由已使用原生列表，保留 namespace 选择，并按所选 namespace 使用对应 Store 创建资源。
-- 该结果只证明源码主路由静态行为；全局 V3 预加载、其他集群级 Embed、当前制品浏览器、RBAC、缓存、错误和逐项 V3 等价仍未闭环。模块保持 `REA / 分析中，待复核`。证据见 [`evidence/workload-cluster-native-static-tests-20261024.json`](./evidence/workload-cluster-native-static-tests-20261024.json)。
+- 该结果只证明源码主路由静态行为；当前源码 `wujie.ts` 已无 `preloadApp()` 调用，但当前 HEAD 尚未完成本轮部署后的 Network 复验；其他集群级 Embed、当前制品浏览器、RBAC、缓存、错误和逐项 V3 等价仍未闭环。模块保持 `REA / 分析中，待复核`。证据见 [`evidence/workload-cluster-native-static-tests-20261024.json`](./evidence/workload-cluster-native-static-tests-20261024.json)。
