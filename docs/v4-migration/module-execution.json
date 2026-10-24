@@ -5,7 +5,7 @@
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-  "phase": "DEV",
+  "phase": "VERIFY",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -121,7 +121,7 @@
       },
       {
         "path": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-        "sha256": "968607d6617cc0e87412fe0a21d5f1d8ded706038b10faf57aabb3291b194c3d"
+        "sha256": "b7fcbfaa22a9eaf548e15cb310b1a58a37338949de0797389d12293280435823"
       },
       {
         "path": "docs/v4-migration/evidence/workload-kind-detail-browser-20261024.json",
@@ -324,8 +324,8 @@
     "coverageNotes": "已核对表示当前版本主基线和证据入口已覆盖该维度，不表示运行时验证或功能等价已经通过；运行时缺口转入 DEV/VERIFY 验收清单。"
   },
   "dev": {
-    "status": "进行中",
-    "reason": "已完成编辑设置弹窗宽度对齐的 TDD 增量；19 个 WorkloadCreateModal 测试、全量 91 个测试文件/403 个断言和 build:packages 已通过。Tab 内容切换、完整布局、镜像部署与浏览器验收继续处理。",
+    "status": "已完成",
+    "reason": "编辑设置弹窗宽度对齐的 TDD 增量已完成；19 个 WorkloadCreateModal 测试、全量 91 个测试文件/403 个断言和 build:packages 已通过。当前代码提交进入新制品 VERIFY；Tab 内容切换和完整布局仍作为 VERIFY 对照项。",
     "sourceCommit": "1be276245c359a7181d4515b0a053c03e178160f",
     "documents": [
       {
@@ -602,7 +602,7 @@
       },
       {
         "path": "docs/v4-migration/workload-settings-style-dev-20261025.md",
-        "sha256": "f787194046eb5833894442b96c78103a9741416c936040d676e9a9aa1df77ef1"
+        "sha256": "22d0881e18e8db1ad066289187372722bccf6d9a38ced2e87faeb02b715e4ded"
       }
     ],
     "ciRun": "40100018686",
@@ -617,9 +617,9 @@
     "WL-04：移除普通 Workload 配置引用的 useV3action、Wujie Shadow DOM 和 V3 编辑器桥接"
   ],
   "verify": {
-    "status": "待重测",
-    "reason": "上一轮制品已完成构建、推送、131 rollout、Pod imageID/digest 核对及部分 Playwright 复验；本轮基线复核发现编辑设置弹窗的布局和分区交互差异，修复后必须以新的代码 SHA 重新构建、部署并执行 Playwright。低权限正反、缓存、错误路径和逐项等价仍未闭环。",
-    "sourceCommit": "54b863b2ccd611bab088d39bcbebc8b4e9f68500",
+    "status": "进行中",
+    "reason": "宽度对齐增量已完成本地 DEV 检查，待当前分支新 SHA 构建并部署到 131 后重新执行三类资源的浏览器验收。Tab 内容切换、完整布局、低权限正反、缓存、错误路径和逐项等价仍未闭环。",
+    "sourceCommit": "1be276245c359a7181d4515b0a053c03e178160f",
     "documents": [
       {
         "path": "docs/v4-migration/workload-131-verify-20261024.md",
@@ -723,11 +723,11 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-release415-source-runtime-rea-20261025.json",
-        "sha256": "e76c27f4aa28cb70ff1b68434009260568214fad92b6d44b0712c2aee240b3d6"
+        "sha256": "2d000cfd16511083b7df2fd49dd66dec3b6fabdb5179af06ec697eb26bf8adba"
       },
       {
         "path": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-        "sha256": "968607d6617cc0e87412fe0a21d5f1d8ded706038b10faf57aabb3291b194c3d"
+        "sha256": "b7fcbfaa22a9eaf548e15cb310b1a58a37338949de0797389d12293280435823"
       }
     ],
     "ciRun": "40100881163",
