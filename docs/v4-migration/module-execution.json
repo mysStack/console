@@ -5,7 +5,7 @@
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-  "phase": "DEV",
+  "phase": "VERIFY",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -324,8 +324,8 @@
     "coverageNotes": "已核对表示当前版本主基线和证据入口已覆盖该维度，不表示运行时验证或功能等价已经通过；运行时缺口转入 DEV/VERIFY 验收清单。"
   },
   "dev": {
-    "status": "进行中",
-    "reason": "负责人已批准以 release-4.1.5 完整前端源码和同版本已部署页面为主基线开展 V4 重建；v3dist用于制品校准，旧V3仅作补充；未闭环项保留在DEV/VERIFY验收清单。",
+    "status": "已完成",
+    "reason": "当前分支的 Workload 原生实现已完成本地单元/组件测试、全量测试和 packages 构建；CI 已按 feature-v4-workloads-上海时间-commit 短 SHA 生成并发布镜像，进入当前制品的 131 部署与浏览器 VERIFY。",
     "sourceCommit": "7e27d506c6fb387e758f9288375416b2ed1cd499",
     "documents": [
       {
@@ -600,7 +600,11 @@
         "path": "docs/v4-migration/workload-settings-dev-20261024-grace-period.md",
         "sha256": "bd420130b0ea67bfde02abc36e61fedbaf462930a8a6531f53226b23b15b586e"
       }
-    ]
+    ],
+    "ciRun": "40100018686",
+    "ciStatus": "Unit tests 与 Build and publish ks-console 均成功",
+    "imageTag": "feature-v4-workloads-20261024-215402-54e4f4a2da49",
+    "imageDigest": "sha256:3c3c3fdca41d9f39c10caffe9ca4e273cc9095dae9b217a9a9ab92bd0c1a04b3"
   },
   "devAcceptanceChecklist": [
     "WL-01：三类资源项目/集群入口、详情 Tab、原生编辑设置分区和路由替代矩阵",
@@ -609,9 +613,9 @@
     "WL-04：移除普通 Workload 配置引用的 useV3action、Wujie Shadow DOM 和 V3 编辑器桥接"
   ],
   "verify": {
-    "status": "待重新执行",
-    "reason": "DEV完成后，必须对当前模块分支实际构建制品重新执行 131 rollout、Pod imageID/digest、登录和 Playwright 验收；历史证据不能继承为当前 VERIFY 通过。",
-    "sourceCommit": "baf43d95d1cc80ae6d95b283a5c796d47b9a02ae",
+    "status": "进行中",
+    "reason": "正在把当前 HEAD 对应镜像部署到 kubesphere-system/ks-console（NodePort 30880），随后使用 Playwright 验收 Deployment、StatefulSet、DaemonSet 的原生列表、详情、编辑设置、路由、作用域和错误路径；未完成浏览器验收前不标记模块通过。",
+    "sourceCommit": "54e4f4a2da49e46f6d975f4ed7032a845fc66d96",
     "documents": [
       {
         "path": "docs/v4-migration/workload-131-verify-20261024.md",
