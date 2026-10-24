@@ -165,6 +165,7 @@ const workloadStore = (module: string) => {
     const onSuccess = options?.onSuccess;
     return useMutation(({ params, data }: DeploymentPatchProps) => patch(params, data), {
       onSuccess,
+      onError: options?.onError,
     });
   };
 

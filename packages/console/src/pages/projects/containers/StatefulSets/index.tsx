@@ -114,6 +114,9 @@ const StatefulSets = () => {
         editResource: null,
       });
     },
+    onError: () => {
+      notify.error(t('WORKLOAD_SETTINGS_SAVE_FAILED'));
+    },
   });
 
   const { mutate: mutateRecreateOpt, isLoading: recreateIsLoading } = useUpdateDeploymentMutation({
@@ -353,14 +356,18 @@ const StatefulSets = () => {
 
   // table item action
   const handleUpdateYaml = (value: string) => {
-    mutateUpdateYamlOpt({
-      params: {
-        cluster,
-        name: editYamlConfig.editResource?.name,
-        namespace: editYamlConfig.editResource?.namespace,
-      },
-      data: yaml.load(value),
-    });
+    try {
+      mutateUpdateYamlOpt({
+        params: {
+          cluster,
+          name: editYamlConfig.editResource?.name,
+          namespace: editYamlConfig.editResource?.namespace,
+        },
+        data: yaml.loadStrict(value),
+      });
+    } catch (error) {
+      notify.error(t('WORKLOAD_SETTINGS_SAVE_FAILED'));
+    }
   };
   const handleRecreateCancel = () => {
     setRecreateConfig({

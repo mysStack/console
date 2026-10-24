@@ -26,3 +26,11 @@ test('project StatefulSet list provides native dual-resource creation and visibl
   assert.match(source, /onClick: createModal\.open/);
   assert.match(source, /notify\.error\(t\('CREATE_STATEFULSET_FAILED'\)\)/);
 });
+
+test('project StatefulSet YAML update validates input and reports save failures', () => {
+  assert.match(source, /data: yaml\.loadStrict\(value\)/);
+  assert.match(
+    source,
+    /onError: \(\) => \{\s*notify\.error\(t\('WORKLOAD_SETTINGS_SAVE_FAILED'\)\)/s,
+  );
+});

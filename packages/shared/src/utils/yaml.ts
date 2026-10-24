@@ -29,6 +29,14 @@ function load(value: unknown): any {
   return value;
 }
 
+function loadStrict(value: unknown): any {
+  if (isObject(value)) {
+    return value;
+  }
+
+  return yaml.load(value as string);
+}
+
 function loadAll(value: string) {
   const objs: any[] = [];
 
@@ -61,5 +69,6 @@ export function objectToYaml(formTemplate: any) {
 export default {
   getValue,
   load,
+  loadStrict,
   loadAll,
 };

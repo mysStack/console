@@ -27,3 +27,11 @@ test('project Deployment list opens the native create form and submits through t
   assert.match(source, /onError:/);
   assert.match(source, /notify\.error\(t\('CREATE_DEPLOYMENT_FAILED'\)\)/);
 });
+
+test('project Deployment YAML update validates input and reports save failures', () => {
+  assert.match(source, /data: yaml\.loadStrict\(value\)/);
+  assert.match(
+    source,
+    /onError: \(\) => \{\s*notify\.error\(t\('WORKLOAD_SETTINGS_SAVE_FAILED'\)\)/s,
+  );
+});

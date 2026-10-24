@@ -26,3 +26,11 @@ test('project DaemonSet list provides native creation and visible failure feedba
   assert.match(source, /onClick: createModal\.open/);
   assert.match(source, /notify\.error\(t\('CREATE_DAEMONSET_FAILED'\)\)/);
 });
+
+test('project DaemonSet YAML update validates input and reports save failures', () => {
+  assert.match(source, /data: yaml\.loadStrict\(value\)/);
+  assert.match(
+    source,
+    /onError: \(\) => \{\s*notify\.error\(t\('WORKLOAD_SETTINGS_SAVE_FAILED'\)\)/s,
+  );
+});
