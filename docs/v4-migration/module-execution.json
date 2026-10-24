@@ -326,7 +326,7 @@
   "dev": {
     "status": "进行中",
     "reason": "对照 release-4.1.5 已确认当前 V4 编辑设置将所有分区同时渲染，而基线按左侧分区只显示当前内容。已补充分区可见性回归测试并完成最小原生实现；定向测试、全量 91 个测试文件/404 个断言和 build:packages 已通过，当前代码待提交后重新构建和部署。",
-    "sourceCommit": "33e9520898248b2fbf1f2dd2721ef6b13e93bb80",
+    "sourceCommit": "5f5a7df73bba12951e2b73e83be489743a5b07c2",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
@@ -603,6 +603,10 @@
       {
         "path": "docs/v4-migration/workload-settings-style-dev-20261025.md",
         "sha256": "22d0881e18e8db1ad066289187372722bccf6d9a38ced2e87faeb02b715e4ded"
+      },
+      {
+        "path": "docs/v4-migration/workload-settings-tabs-dev-20261025.md",
+        "sha256": "57631e774bfc03529677c888101abeac4aae00c66f94ab849c644ce9cd98997a"
       }
     ],
     "ciRun": null,
