@@ -53,11 +53,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "877c316f097bf24d53283a241f523ec7420edbd7a47f03dae1fea5b9d0a6e6c6"
+        "sha256": "de4f5fa30603dab1ec9d84174f0c90e8d038cb377c18fe8b0f241924283c5674"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "6be9ab1e3c27a66af88b78e0d542c5759857b2caa389bbe27e7f1d24a50e0fcf"
+        "sha256": "01b7c186ce39721b99f863c2c6f2c448c2134ff7dfa9f00703e8b52616258645"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -113,7 +113,7 @@
       },
       {
         "path": "docs/v4-migration/workload-rea-review-20261024.md",
-        "sha256": "18c24ef4227e0dd2817ea848597d7060b65fe1dd67d34f61a8325b8f22312970"
+        "sha256": "390a0bc9d9804b4aa95c26b6ead37b7cb8835f2f76c9da6cd7a1c5670802e572"
       },
       {
         "path": "docs/v4-migration/evidence/workload-v415-baseline-browser-20261024.json",
@@ -267,7 +267,7 @@
     "lastReview": {
       "date": "2026-10-24",
       "record": "docs/v4-migration/workload-rea-review-20261024.md",
-      "head": "6e1a145a1bbda5f597bcbe3d8b19bc05bff623be",
+      "head": "ffc2b27e785dff7518c5db7e5fb667e416080139",
       "conclusion": "已补充 StatefulSet/DaemonSet 详情页真实浏览器对照和读请求证据；当前三个资源类型的字段保存、RBAC、缓存、错误和完整 V3 等价仍未闭环，REA 分析中，待负责人复核。"
     }
   },
