@@ -53,11 +53,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "6444a275ddd38fe15ff84e351c58fe78f135adc729a8c9f22f6ec556b179d736"
+        "sha256": "02f5e568685c60c512e4056e3aeb41c1f4e71ec4f71b6a88b2f4c29f0fe2d075"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "e684184e708a301cc0f2a83fbd7c80307009e4ec283ac98be2daaf29308a58e5"
+        "sha256": "2f62bc414daa9684e6d9a2849746c18aa3226e87eb0315e4549ef3b962f485ff"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -121,7 +121,7 @@
       },
       {
         "path": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-        "sha256": "770d8ca83369ae9a35ee514ad71b43b42bdad18f546ed2d609006a47d4702f95"
+        "sha256": "c8fcfd57f35b41562a80453e01766798b9a4b72b95f36414f752a84aa9f14309"
       },
       {
         "path": "docs/v4-migration/evidence/workload-kind-detail-browser-20261024.json",
@@ -622,8 +622,8 @@
   ],
   "verify": {
     "status": "进行中",
-    "reason": "分区显示修复已完成 DEV，当前阶段重新进入 VERIFY。必须针对阶段记录提交后的新 SHA 重新构建、部署，并在 131 已部署制品上用 Playwright 点击三类资源的每个分区，确认只显示当前内容。此前宽度制品的浏览器结果不替代本次验收。",
-    "sourceCommit": "",
+    "reason": "按 release-4.1.5 同版本源码和已部署页面确认编辑设置分区行为后，当前阶段制品已完成 CI、131 rollout、Pod imageID 和三类资源分区点击验收；每次只显示当前分区。低权限、缓存、错误矩阵和逐项 V3 功能等价仍需继续验证。",
+    "sourceCommit": "4b363c688f1e784acb68fe32117756f03bb55bd2",
     "documents": [
       {
         "path": "docs/v4-migration/workload-131-verify-20261024.md",
@@ -663,11 +663,11 @@
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "e684184e708a301cc0f2a83fbd7c80307009e4ec283ac98be2daaf29308a58e5"
+        "sha256": "2f62bc414daa9684e6d9a2849746c18aa3226e87eb0315e4549ef3b962f485ff"
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "6444a275ddd38fe15ff84e351c58fe78f135adc729a8c9f22f6ec556b179d736"
+        "sha256": "02f5e568685c60c512e4056e3aeb41c1f4e71ec4f71b6a88b2f4c29f0fe2d075"
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
@@ -699,7 +699,7 @@
       },
       {
         "path": "docs/v4-migration/workload-current-head-verify-20261024.md",
-        "sha256": "c801e6257a89d7306a8eed71a66cd58755e15a158d5d67ff4f94559abae51850"
+        "sha256": "0a3a4c100d3ce0078951b0eb32647ab40bcd75d423538af003d9b058a291f2b4"
       },
       {
         "path": "docs/v4-migration/evidence/workload-daemonset-stop-recovery-verify-20261025.json",
@@ -731,24 +731,43 @@
       },
       {
         "path": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-        "sha256": "770d8ca83369ae9a35ee514ad71b43b42bdad18f546ed2d609006a47d4702f95"
+        "sha256": "c8fcfd57f35b41562a80453e01766798b9a4b72b95f36414f752a84aa9f14309"
       },
       {
         "path": "docs/v4-migration/evidence/workload-settings-width-verify-20261025.json",
         "sha256": "c29a8688633f166a050c42c9e7abeb314ca2622df1abe8abc427021b3d88a482"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-settings-tabs-verify-20261025.json",
+        "sha256": "328121bb47cae84b89d29d0931e45aa8b82d40751927a3138816e59bce490b8c"
+      },
+      {
+        "path": "docs/v4-migration/workload-settings-tabs-dev-20261025.md",
+        "sha256": "57631e774bfc03529677c888101abeac4aae00c66f94ab849c644ce9cd98997a"
       }
     ],
-    "ciRun": null,
-    "ciStatus": "等待当前阶段 SHA 的 CI 构建",
-    "imageTag": null,
-    "imageDigest": null,
-    "rollout": null,
+    "ciRun": 40127350345,
+    "ciStatus": "success",
+    "imageTag": "feature-v4-workloads-20261025-035514-4b363c688f1e",
+    "imageDigest": "sha256:143572eea79151a40036f0d371f847346acdf39e592c584fd8a37ff6e39ac392",
+    "rollout": {
+      "context": "default",
+      "namespace": "kubesphere-system",
+      "deployment": "ks-console",
+      "nodePort": 30880,
+      "generation": 604,
+      "status": "成功",
+      "replicas": "1/1",
+      "pod": "ks-console-64b9d8f7d8-2tbmk",
+      "podReady": true,
+      "podImageID": "ghcr.io/mysstack/ks-console@sha256:143572eea79151a40036f0d371f847346acdf39e592c584fd8a37ff6e39ac392"
+    },
     "browserVerification": {
-      "status": "待当前阶段制品验证",
-      "evidence": "docs/v4-migration/workload-settings-tabs-dev-20261025.md",
+      "status": "部分完成",
+      "evidence": "docs/v4-migration/evidence/workload-settings-tabs-verify-20261025.json",
       "report": "docs/v4-migration/workload-current-head-verify-20261024.md",
-      "freshLogin": "待部署后确认；不继承旧会话结论",
-      "authenticatedSessionChecks": "待当前阶段制品重新执行",
+      "freshLogin": "未建立新的零 Cookie 登录会话；不继承旧会话结论",
+      "authenticatedSessionChecks": "当前制品已验证 Deployment、StatefulSet、DaemonSet 编辑设置分区切换、当前面板唯一可见、资源差异字段和取消路径；页面仍有已登记扩展初始化错误",
       "moduleAcceptance": "未完成"
     },
     "lastEvidenceUpdate": "2026-10-25"

@@ -1,6 +1,22 @@
 # Workload 当前制品 VERIFY 记录（2026-10-24，最新增量 2026-10-25）
 
-> **最新增量优先**：2026-10-25 已对提交 `2b0c2c6de2dddddc825b4606897e0362e299cad0` 对应制品完成重新构建、部署和 Playwright 验收。宽度修复证据见 [`workload-settings-width-verify-20261025.json`](./evidence/workload-settings-width-verify-20261025.json)。本文较早章节中的 `54b863b2ccd`、旧镜像和旧弹窗宽度只保留为历史记录，不能覆盖最新增量结论。
+> **最新增量优先**：2026-10-25 已对提交 `4b363c688f1e784acb68fe32117756f03bb55bd2` 对应制品完成重新构建、部署和 Playwright 验收。分区切换证据见 [`workload-settings-tabs-verify-20261025.json`](./evidence/workload-settings-tabs-verify-20261025.json)。本文更早章节中的旧 SHA、旧镜像和旧布局观察只保留为历史记录，不能覆盖最新增量结论。
+
+## 2026-10-25 当前 SHA 分区切换 VERIFY
+
+| 项目        | 结果                                                                                                  |
+| ----------- | ----------------------------------------------------------------------------------------------------- |
+| 分支 / 提交 | `feature/v4-workloads` / `4b363c688f1e784acb68fe32117756f03bb55bd2`                                   |
+| CI          | Run `40127350345`；Unit tests、Build and publish ks-console 均成功                                    |
+| 镜像        | `ghcr.io/mysstack/ks-console:feature-v4-workloads-20261025-035514-4b363c688f1e`                       |
+| 镜像 digest | `sha256:143572eea79151a40036f0d371f847346acdf39e592c584fd8a37ff6e39ac392`                             |
+| 131 rollout | `kubesphere-system/ks-console` 成功，Deployment generation `604`，副本 `1/1` Ready                    |
+| Pod imageID | `ghcr.io/mysstack/ks-console@sha256:143572eea79151a40036f0d371f847346acdf39e592c584fd8a37ff6e39ac392` |
+| Playwright  | 使用已有认证会话验证三类资源的分区切换和取消路径                                                      |
+
+本轮在当前 30880 制品上验证：Deployment 的 6 个分区、StatefulSet 的 6 个分区、DaemonSet 的 5 个分区均可点击切换；每次只有当前 `tabpanel` 可见，其余分区隐藏。三个资源的编辑设置弹窗宽度均为 `1162px`。StatefulSet 的副本分组序号和 PVC 模板、DaemonSet 的最大不可用容器组数量和最短就绪运行时长均保持可见。未提交资源修改，只使用“取消”关闭弹窗。
+
+本轮仍使用既有认证会话，未建立新的零 Cookie 登录会话；页面仍有已登记的扩展初始化错误，因此不记录为控制台零错误。低权限浏览器正反、缓存失效、完整字段和逐项 V3 功能等价、错误/取消完整矩阵仍未关闭。Workload 继续保持 `VERIFY / 进行中`，不进入 PR 验收。
 
 ## 2026-10-25 当前 SHA 宽度修复 VERIFY
 

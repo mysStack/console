@@ -1,0 +1,189 @@
+{
+  "title": "Workload 当前制品编辑设置分区切换验收",
+  "date": "2026-10-25",
+  "phase": "VERIFY",
+  "source": {
+    "branch": "feature/v4-workloads",
+    "commit": "4b363c688f1e784acb68fe32117756f03bb55bd2",
+    "ciRun": 40127350345,
+    "ciUrl": "https://github.com/mysStack/console/actions/runs/40127350345",
+    "imageTag": "feature-v4-workloads-20261025-035514-4b363c688f1e",
+    "imageDigest": "sha256:143572eea79151a40036f0d371f847346acdf39e592c584fd8a37ff6e39ac392"
+  },
+  "deployment": {
+    "context": "default",
+    "namespace": "kubesphere-system",
+    "deployment": "ks-console",
+    "nodePort": 30880,
+    "generation": 604,
+    "rollout": "成功",
+    "replicas": "1/1",
+    "pod": "ks-console-64b9d8f7d8-2tbmk",
+    "podReady": true,
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:143572eea79151a40036f0d371f847346acdf39e592c584fd8a37ff6e39ac392"
+  },
+  "browser": {
+    "tool": "Playwright CLI",
+    "session": "workload-rea-current",
+    "baseUrl": "http://192.168.2.131:30880",
+    "authentication": "使用已有认证会话；本轮未建立新的零 Cookie 登录会话",
+    "mutations": "仅打开编辑设置并点击分区，使用取消关闭；未提交资源修改",
+    "consoleErrors": "页面仍有已登记的扩展初始化错误；不作为本轮 Workload 分区功能通过条件，也不记为零错误"
+  },
+  "resources": [
+    {
+      "kind": "Deployment",
+      "name": "v4-deploy-edit-ef3",
+      "path": "/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/resource-status",
+      "tabs": [
+        "更新策略",
+        "容器组设置",
+        "存储设置",
+        "容器组调度规则",
+        "容器组优雅终止",
+        "添加元数据"
+      ],
+      "checks": [
+        {
+          "tab": "更新策略",
+          "active": "更新策略",
+          "visiblePanels": ["更新策略"],
+          "hiddenPanels": 5
+        },
+        {
+          "tab": "容器组设置",
+          "active": "容器组设置",
+          "visiblePanels": ["容器组设置"],
+          "hiddenPanels": 5
+        },
+        {
+          "tab": "存储设置",
+          "active": "存储设置",
+          "visiblePanels": ["存储设置"],
+          "hiddenPanels": 5
+        },
+        {
+          "tab": "容器组调度规则",
+          "active": "容器组调度规则",
+          "visiblePanels": ["容器组调度规则"],
+          "hiddenPanels": 5
+        },
+        {
+          "tab": "容器组优雅终止",
+          "active": "容器组优雅终止",
+          "visiblePanels": ["容器组优雅终止"],
+          "hiddenPanels": 5
+        },
+        {
+          "tab": "添加元数据",
+          "active": "添加元数据",
+          "visiblePanels": ["添加元数据"],
+          "hiddenPanels": 5
+        }
+      ],
+      "modalWidthPx": 1162,
+      "result": "分区切换通过；每次只渲染当前分区内容"
+    },
+    {
+      "kind": "StatefulSet",
+      "name": "v4-watch-sts-20261022-01",
+      "path": "/clusters/host/projects/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01/resource-status",
+      "tabs": [
+        "更新策略",
+        "容器组设置",
+        "存储设置",
+        "容器组调度规则",
+        "容器组优雅终止",
+        "添加元数据"
+      ],
+      "checks": [
+        {
+          "tab": "更新策略",
+          "active": "更新策略",
+          "visiblePanels": ["更新策略"],
+          "hiddenPanels": 5
+        },
+        {
+          "tab": "存储设置",
+          "active": "存储设置",
+          "visiblePanels": ["存储设置"],
+          "hiddenPanels": 5
+        },
+        {
+          "tab": "容器组调度规则",
+          "active": "容器组调度规则",
+          "visiblePanels": ["容器组调度规则"],
+          "hiddenPanels": 5
+        },
+        {
+          "tab": "容器组优雅终止",
+          "active": "容器组优雅终止",
+          "visiblePanels": ["容器组优雅终止"],
+          "hiddenPanels": 5
+        },
+        {
+          "tab": "添加元数据",
+          "active": "添加元数据",
+          "visiblePanels": ["添加元数据"],
+          "hiddenPanels": 5
+        }
+      ],
+      "modalWidthPx": 1162,
+      "resourceSpecificFields": ["副本分组序号", "持久卷声明模板"],
+      "result": "分区切换通过；资源专属字段仍可见"
+    },
+    {
+      "kind": "DaemonSet",
+      "name": "v4-stop-ds-7fa",
+      "path": "/clusters/host/projects/v4-migration-e2e/daemonsets/v4-stop-ds-7fa/resource-status",
+      "tabs": ["更新策略", "容器组设置", "存储设置", "容器组优雅终止", "添加元数据"],
+      "checks": [
+        {
+          "tab": "更新策略",
+          "active": "更新策略",
+          "visiblePanels": ["更新策略"],
+          "hiddenPanels": 4
+        },
+        {
+          "tab": "容器组设置",
+          "active": "容器组设置",
+          "visiblePanels": ["容器组设置"],
+          "hiddenPanels": 4
+        },
+        {
+          "tab": "存储设置",
+          "active": "存储设置",
+          "visiblePanels": ["存储设置"],
+          "hiddenPanels": 4
+        },
+        {
+          "tab": "容器组优雅终止",
+          "active": "容器组优雅终止",
+          "visiblePanels": ["容器组优雅终止"],
+          "hiddenPanels": 4
+        },
+        {
+          "tab": "添加元数据",
+          "active": "添加元数据",
+          "visiblePanels": ["添加元数据"],
+          "hiddenPanels": 4
+        }
+      ],
+      "modalWidthPx": 1162,
+      "resourceSpecificFields": ["最大不可用容器组数量", "容器组就绪最短运行时长（s）"],
+      "result": "分区切换通过；未显示不适用的副本数和调度分区"
+    }
+  ],
+  "conclusion": {
+    "closed": ["当前制品编辑设置分区显示差异", "三类资源分区切换的当前内容可见性"],
+    "remaining": [
+      "低权限浏览器正反路径",
+      "完整字段和 V3 功能逐项等价",
+      "缓存失效",
+      "错误/取消完整矩阵",
+      "新零 Cookie 登录链路"
+    ],
+    "moduleStatus": "VERIFY / 进行中",
+    "prStatus": "不进入 PR 验收"
+  }
+}

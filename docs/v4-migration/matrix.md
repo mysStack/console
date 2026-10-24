@@ -1,6 +1,6 @@
 # 当前 Workload 执行路线（2026-10-25）
 
-> **最新状态（当前制品 VERIFY）**：`release-4.1.5` 对照发现的分区显示差异已完成 DEV 修复，代码提交 `5f5a7df73`，定向测试、全量测试和 `build:packages` 通过。当前阶段已重新进入 `VERIFY / 进行中`，必须以当前阶段 SHA 的新制品重新完成 CI、131 rollout 和 Playwright 分区点击验收；此前宽度制品结果不能替代本次验收。详见[分区显示 DEV 记录](./workload-settings-tabs-dev-20261025.md)及当前实施计划。
+> **最新状态（当前制品 VERIFY）**：`release-4.1.5` 对照发现的分区显示差异已完成 DEV 修复。提交 `4b363c688f1e784acb68fe32117756f03bb55bd2` 对应 CI、镜像、131 rollout 和 Pod imageID 已核对；已认证 Playwright 会话完成 Deployment、StatefulSet、DaemonSet 的分区点击验收，每次只显示当前分区。当前仍为 `VERIFY / 进行中`，低权限、缓存、错误矩阵和逐项功能等价尚未闭环。证据见[分区切换验收](./evidence/workload-settings-tabs-verify-20261025.json)。
 
 > REA 主基线为 `release-4.1.5` 完整前端源码和同版本已部署页面 `192.168.2.131:30881`；同版本 `v3dist` 仅作发布制品校准；`origin/release-3.4` 仅作当前版本无法解释时的历史补充。未闭环的字段、Action、RBAC、缓存、错误和逐项等价性保留在 VERIFY 验收清单，不能标记为已验收。
 
