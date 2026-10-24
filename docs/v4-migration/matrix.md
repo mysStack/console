@@ -1,8 +1,10 @@
 # 当前 Workload 执行路线（2026-10-25）
 
-> **最新状态（2026-10-25，重新进入 VERIFY）**：提交 `e066ddac4` 已完成非法 YAML 严格解析、页面错误反馈和 API mutation 错误回调修复；本地测试与 `build:packages` 已通过。当前提交尚未重新构建镜像、部署到 131 或进行浏览器验收，必须完成这些步骤后才能关闭该缺陷。
+> **最新状态（2026-10-25，再次退回 DEV）**：提交 `e066ddac4` 的修复制品已经完成构建、部署和浏览器复验，但非法 YAML 仍以字符串发起 PUT 并返回 400。页面显示 API 错误，但客户端没有在请求前阻止非法内容；该缺陷未闭环，已再次退回 `DEV / 进行中`。
 
 > **退回 DEV 的缺陷记录**：在提交 `4b363c688f1e784acb68fe32117756f03bb55bd2` 制品上发现非法 YAML 会发起 PUT 并返回 400，但页面没有可见错误反馈。该缺陷已记录并完成 DEV 修复，证据见[非法 YAML 缺陷取证](./evidence/workload-yaml-validation-defect-20261025.json)和[DEV 修复记录](./workload-yaml-validation-dev-20261025.md)。
+
+> **首次修复回归**：提交 `2676f00d054e11f6b8569e6f9b889e1cefbfba88` 的部署制品仍发送非法 YAML 字符串；证据见[首次修复回归](./evidence/workload-yaml-validation-regression-20261025.json)。
 
 > **上一个 VERIFY 结果**：`release-4.1.5` 对照发现的分区显示差异已完成 DEV 修复。提交 `4b363c688f1e784acb68fe32117756f03bb55bd2` 对应 CI、镜像、131 rollout 和 Pod imageID 已核对；已认证 Playwright 会话完成 Deployment、StatefulSet、DaemonSet 的分区点击验收，每次只显示当前分区。该结果仅作为退回 DEV 前的历史 VERIFY 证据，不能覆盖当前缺陷状态。证据见[分区切换验收](./evidence/workload-settings-tabs-verify-20261025.json)。
 

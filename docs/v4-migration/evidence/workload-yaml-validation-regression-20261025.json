@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-25",
+  "module": "workloads",
+  "phase": "VERIFY -> DEV",
+  "sourceCommit": "2676f00d054e11f6b8569e6f9b889e1cefbfba88",
+  "artifact": {
+    "imageTag": "feature-v4-workloads-20261025-054831-2676f00d054e",
+    "imageDigest": "sha256:44cc6e8a48d1c720e4791fdbba3480a4dbae16bd3c9201e82d401fdf4647c920",
+    "pod": "ks-console-5f8c884f5c-dxzjz",
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:44cc6e8a48d1c720e4791fdbba3480a4dbae16bd3c9201e82d401fdf4647c920",
+    "rollout": "kubesphere-system/ks-console generation 605, 1/1 Ready"
+  },
+  "browser": {
+    "session": "workload-rea-fresh",
+    "resource": "v4-migration-e2e/v4-deploy-edit-ef3",
+    "input": "kind: Deployment\\nmetadata:\\n  name: v4-deploy-edit-ef3\\n  namespace: v4-migration-e2e\\nspec: [",
+    "modalAfterSubmit": "仍保持打开",
+    "visibleFeedback": "显示 BadRequest 及 API 错误详情",
+    "resourceState": "Deployment 保持 1/1"
+  },
+  "request": {
+    "method": "PUT",
+    "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+    "status": 400,
+    "requestBodyType": "string",
+    "requestBody": "kind: Deployment\\nmetadata:\\n  name: v4-deploy-edit-ef3\\n  namespace: v4-migration-e2e\\nspec: ["
+  },
+  "conclusion": {
+    "status": "修复未闭环",
+    "reason": "e066ddac4 的客户端严格解析修复已进入部署制品，但非法 YAML 仍作为字符串发送到 API；当前验证不能关闭该缺陷。",
+    "next": "重新退回 DEV，确保字符串和 String 对象都先解析，且解析结果必须为 Kubernetes 对象；完成后重新构建、部署并验证不产生 PUT。"
+  }
+}

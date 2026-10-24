@@ -34,8 +34,14 @@ git diff --check                                                                
 
 修复提交为 `e066ddac4`，提交标题为 `修复(Workload)：阻止非法 YAML 提交并反馈错误`。
 
-## 5. 阶段处理
+## 5. 首次修复的部署后复验
 
-该缺陷属于 VERIFY 中发现的功能正确性问题，已按模块门禁退回 `DEV / 进行中`。修复提交后必须重新执行测试、构建、CI、131 rollout、Pod 镜像身份核对和部署后 Playwright 验收，旧制品的 VERIFY 证据不能替代新制品验证。
+提交 `e066ddac4` 随记录提交 `2676f00d0` 构建并部署到 131 后，使用新的浏览器会话再次提交同一非法 YAML。当前制品仍向 Deployment API 发起 `PUT`，请求体类型为字符串，返回 `400`；弹窗保持打开并显示 `BadRequest`，但客户端没有在 API 请求前阻止非法内容。Pod 镜像身份和资源 `1/1` 正常。
 
-本次 DEV 已完成。当前进入 `VERIFY / 进行中` 前，尚未重新构建镜像、部署 131 或执行修复后浏览器验收；旧制品的非法 YAML 失败证据只用于证明缺陷，不代表修复通过。
+证据见 [`workload-yaml-validation-regression-20261025.json`](./evidence/workload-yaml-validation-regression-20261025.json)。该结果证明首次修复没有闭环，不能标记 VERIFY 通过。
+
+## 6. 阶段处理
+
+该缺陷属于 VERIFY 中发现的功能正确性问题，首次修复未闭环，已再次按模块门禁退回 `DEV / 进行中`。下一次修复必须重新执行测试、构建、CI、131 rollout、Pod 镜像身份核对和部署后 Playwright 验收，旧制品的 VERIFY 证据不能替代新制品验证。
+
+在新的 DEV 修复完成前，模块保持 `DEV / 进行中`，不进入 P1/P2 或 PR 验收。

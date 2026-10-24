@@ -1,7 +1,7 @@
 # 当前 Workload 执行状态（2026-10-25）
 
-- 当前阶段：`VERIFY / 进行中`。非法 YAML 缺陷已在 DEV 修复，代码提交为 `e066ddac4`；当前提交尚未重新构建、部署或进行浏览器验收。
-- 上一轮验证制品：代码提交 `4b363c688f1e784acb68fe32117756f03bb55bd2`；CI Run `40127350345`；镜像 `feature-v4-workloads-20261025-035514-4b363c688f1e`；digest `sha256:143572eea79151a40036f0d371f847346acdf39e592c584fd8a37ff6e39ac392`；131 rollout 和 Pod imageID 核对成功，Pod `ks-console-64b9d8f7d8-2tbmk` 为 `1/1` Ready。以下上一轮浏览器结果仅作为退回 DEV 前历史证据。
+- 当前阶段：`DEV / 进行中`。首次修复提交 `e066ddac4` 部署后仍向 API 发送非法 YAML 字符串，已按门禁再次退回 DEV；不进入 PR 验收。
+- 上一轮验证制品：代码提交 `2676f00d054e11f6b8569e6f9b889e1cefbfba88`；CI Run `40135662495`；镜像 `feature-v4-workloads-20261025-054831-2676f00d054e`；digest `sha256:44cc6e8a48d1c720e4791fdbba3480a4dbae16bd3c9201e82d401fdf4647c920`；131 rollout 和 Pod imageID 核对成功，Pod `ks-console-5f8c884f5c-dxzjz` 为 `1/1` Ready。以下浏览器结果仅作为退回 DEV 的回归证据。
 - 当前浏览器结果：已认证会话在当前制品上完成 Deployment、StatefulSet、DaemonSet 的编辑设置分区切换复验；每次只显示当前分区，弹窗宽度均为 `1162px`，取消路径通过。低权限正反、缓存、错误和逐项等价性仍未闭环。
 - 本轮已从 `/home/bruce/.bashrc` 加载测试账号环境变量并尝试新的零 Cookie 登录，但页面返回通用登录失败提示，未建立新认证会话；分区验收继续使用已有认证会话。页面仍有已登记的扩展初始化错误，不记录为控制台零错误。结构化证据见 [`workload-settings-tabs-verify-20261025.json`](./evidence/workload-settings-tabs-verify-20261025.json)。
 - 当前制品已补做低权限浏览器复验：临时 viewer 新零 Cookie 登录成功，Deployment、StatefulSet、DaemonSet 详情均为只读，编辑/删除入口未显示；配置引用页可读但添加、删除和应用控件禁用。临时用户和绑定已清理。第二 namespace 项目路由返回页面未找到，未把它单独记为完整隔离通过。证据见 [`workload-rbac-current-head-verify-20261025.json`](./evidence/workload-rbac-current-head-verify-20261025.json)。
@@ -13,7 +13,7 @@
 - 当前制品已补齐 StatefulSet 与 DaemonSet YAML 测试字段添加、浏览器回读和清除；StatefulSet 保持 1/1，DaemonSet 保持 1/1，测试字段均无 API 残留。非法 YAML、冲突、权限、网络失败和完整 V3 等价仍未完成。证据见 [`workload-yaml-resource-kinds-verify-20261025.json`](./evidence/workload-yaml-resource-kinds-verify-20261025.json)。
 - 当前主基线：`release-4.1.5` 完整前端源码及同版本已部署页面 `192.168.2.131:30881`；源码定位实现，页面核对真实渲染、交互、Network、错误和权限。
 - 制品校准：同版本 `v3dist` tree `1e499d92e11374e26c76f5e13be45251602bd596`；旧 V3 参考 `origin/release-3.4` / `175710fefeeba6ff295c2c0967b4d45b83563d26` 仅在当前版本无法解释时补充使用。
-- 开发路线：REA 输入已经完成当前版本绑定；YAML 校验缺陷的 DEV 修复已经完成。下一步必须以 `e066ddac4` 重新构建、部署并回到 VERIFY，旧制品结果不能继承。
+- 开发路线：REA 输入已经完成当前版本绑定；YAML 校验缺陷首次修复未闭环，当前再次处于 DEV。必须完成新的解析边界修复，再重新构建、部署并回到 VERIFY，旧制品结果不能继承。
 - 下方历史状态不能覆盖上述当前状态。
 
 # 当前状态补充（2026-10-25：分区显示修复重新进入 VERIFY）

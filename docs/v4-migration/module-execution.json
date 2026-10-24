@@ -5,8 +5,8 @@
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-  "phase": "VERIFY",
-  "phaseReason": "DEV 已完成非法 YAML 严格解析和错误反馈修复；必须以当前提交重新构建、部署到 131 并完成 Playwright 验收。",
+  "phase": "DEV",
+  "phaseReason": "首次修复制品的浏览器复验仍向 API 发送非法 YAML 字符串；已再次按门禁退回 DEV，需修复字符串解析边界后重新验证。",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "99855e7aa2871078faa0a2abac665d5cdb9f5b13260e43ac40bd90b3d85ab3d2"
+        "sha256": "84ca6d6fe31275cc0967e34f271d6d0f337757569c80b2447b745a5d694b2f48"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "9fa8580fdbc7b2584f31735b3f65cdf1573c6448ba20c7e0e0a39edd17625805"
+        "sha256": "ec2b07e17f81d77534e365fda5f8c9f682a56d028cba5ea3a348c09b07551d23"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -325,8 +325,8 @@
     "coverageNotes": "已核对表示当前版本主基线和证据入口已覆盖该维度，不表示运行时验证或功能等价已经通过；运行时缺口转入 DEV/VERIFY 验收清单。"
   },
   "dev": {
-    "status": "已完成",
-    "reason": "已修复非法 YAML 提交缺陷：增加严格解析、三类页面解析失败提示，并透传更新 mutation 的 API 错误；定向测试、全量测试、相关 ESLint 和 build:packages 已通过。",
+    "status": "进行中",
+    "reason": "首次严格解析修复已完成本地测试并部署验证，但非法 YAML 仍作为字符串发起 PUT；正在修复字符串对象和解析结果边界。",
     "sourceCommit": "e066ddac4cc6fea5ba62c1c7696177843b6ca132",
     "documents": [
       {
@@ -611,11 +611,15 @@
       },
       {
         "path": "docs/v4-migration/workload-yaml-validation-dev-20261025.md",
-        "sha256": "1a90ba6724d9f6a24fd38d4fc2505db0ed7e4bb99c8c9256c0c64f7207c287f0"
+        "sha256": "6dc523958197f193df5db5309b4eeaf1484a2a783948424db566abecf69105cd"
       },
       {
         "path": "docs/v4-migration/evidence/workload-yaml-validation-defect-20261025.json",
         "sha256": "0811be4c7077b38f20f1a0a2d2fc6a7fc062a6e19a37937e27f1ec33e2b49e43"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-yaml-validation-regression-20261025.json",
+        "sha256": "819588b07b7b95ce9d72d81b63d182a4a1938228552709066be1d85e7936d6ea"
       }
     ],
     "ciRun": "",
@@ -630,21 +634,21 @@
     "WL-04：移除普通 Workload 配置引用的 useV3action、Wujie Shadow DOM 和 V3 编辑器桥接"
   ],
   "verify": {
-    "status": "进行中",
-    "reason": "DEV 修复已完成，尚未为当前提交重新构建、部署或执行浏览器验收；旧制品证据不能继承。",
+    "status": "已退回 DEV，待修复后重新 VERIFY",
+    "reason": "首次修复制品已通过 rollout，但非法 YAML 仍发送 PUT；当前 VERIFY 结果未通过，等待第二次 DEV 修复。",
     "sourceCommit": "e066ddac4cc6fea5ba62c1c7696177843b6ca132",
     "documents": [],
     "ciRun": "",
-    "ciStatus": "待重新构建和部署",
+    "ciStatus": "待第二次 DEV 修复后重新构建",
     "imageTag": "",
     "imageDigest": "",
     "rollout": {},
     "browserVerification": {
-      "status": "待重新验证",
-      "evidence": "",
-      "report": "docs/v4-migration/workload-current-head-verify-20261024.md",
-      "freshLogin": "待在当前制品重新验证；不记录凭据",
-      "authenticatedSessionChecks": "待在当前制品重新验证",
+      "status": "未通过，已退回 DEV",
+      "evidence": "docs/v4-migration/evidence/workload-yaml-validation-regression-20261025.json",
+      "report": "docs/v4-migration/workload-yaml-validation-dev-20261025.md",
+      "freshLogin": "当前认证会话已完成回归验证；不记录凭据",
+      "authenticatedSessionChecks": "非法 YAML 仍产生 PUT，资源保持 1/1",
       "moduleAcceptance": "未完成"
     },
     "lastEvidenceUpdate": "2026-10-25"
