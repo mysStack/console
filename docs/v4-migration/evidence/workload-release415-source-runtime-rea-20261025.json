@@ -121,6 +121,84 @@
     ],
     "status": "REA补充证据已完成；当前模块仍为 VERIFY 进行中"
   },
+  "resourceComparisons": {
+    "StatefulSet": {
+      "fixture": "v4-watch-sts-20261022-01",
+      "release415": {
+        "url": "http://192.168.2.131:30881/consolev3/clusters/host/projects/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01/resource-status",
+        "moreActions": ["回退", "编辑服务", "编辑设置", "编辑 YAML", "重新创建", "删除"],
+        "settingsNavigation": ["更新策略", "容器", "容器组优雅终止", "存储", "容器组调度规则"],
+        "initialFields": {
+          "updateStrategy": "滚动更新（推荐）",
+          "partition": 0,
+          "confirmButton": "disabled until a change is made"
+        }
+      },
+      "currentV4": {
+        "url": "http://192.168.2.131:30880/clusters/host/projects/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01/resource-status",
+        "moreActions": [
+          "回退",
+          "编辑自动扩缩",
+          "编辑服务",
+          "编辑设置",
+          "编辑 YAML",
+          "重新创建",
+          "删除"
+        ],
+        "settingsNavigation": [
+          "更新策略",
+          "容器组设置",
+          "存储设置",
+          "容器组调度规则",
+          "容器组优雅终止",
+          "添加元数据"
+        ],
+        "initialFields": {
+          "replicas": 1,
+          "updateStrategy": "滚动更新（推荐）",
+          "partition": 0,
+          "persistentVolumeClaimTemplateSection": "visible",
+          "confirmButton": "enabled for the loaded form"
+        }
+      },
+      "confirmedDifference": "StatefulSet 的分区序号、持久卷声明模板和编辑服务入口均已在 release 页面观察到；V4 页面保留这些资源差异并以原生设置区呈现。"
+    },
+    "DaemonSet": {
+      "fixture": "v4-stop-ds-7fa",
+      "release415": {
+        "url": "http://192.168.2.131:30881/consolev3/clusters/host/projects/v4-migration-e2e/daemonsets/v4-stop-ds-7fa/resource-status",
+        "moreActions": ["回退", "编辑设置", "编辑 YAML", "重新创建", "删除"],
+        "settingsNavigation": ["更新策略", "容器组", "存储", "容器组优雅终止"],
+        "initialFields": {
+          "updateStrategy": "滚动更新（推荐）",
+          "maxUnavailable": "1",
+          "minReadySeconds": 0,
+          "replicasEditor": "not present",
+          "confirmButton": "disabled until a change is made"
+        }
+      },
+      "currentV4": {
+        "url": "http://192.168.2.131:30880/clusters/host/projects/v4-migration-e2e/daemonsets/v4-stop-ds-7fa/resource-status",
+        "moreActions": ["回退", "编辑设置", "编辑 YAML", "重新创建", "删除"],
+        "settingsNavigation": [
+          "更新策略",
+          "容器组设置",
+          "存储设置",
+          "容器组优雅终止",
+          "添加元数据"
+        ],
+        "initialFields": {
+          "updateStrategy": "滚动更新（推荐）",
+          "maxUnavailable": "1",
+          "minReadySeconds": 0,
+          "replicasEditor": "not present",
+          "containerSections": ["容器", "初始化容器"],
+          "confirmButton": "enabled for the loaded form"
+        }
+      },
+      "confirmedDifference": "DaemonSet 的无副本编辑特征和最大不可用/最短就绪字段在两套页面均已观察到；V4 增加原生容器、元数据和配置引用能力。"
+    }
+  },
   "limitations": [
     "The REA static run analyzed 61 selected source files and did not execute the JavaScript bundle.",
     "Playwright DOM snapshots establish observed rendered structure and labels but do not by themselves prove pixel equality or complete keyboard/accessibility equivalence.",

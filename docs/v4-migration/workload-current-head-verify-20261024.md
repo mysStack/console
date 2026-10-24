@@ -53,6 +53,8 @@
 - release-4.1.5 Deployment 详情源码仍包含 `useV3action` 和 `renderV3Modal`；当前 V4 详情源码改用 `WorkloadSettingsModal`、`usePutMutation` 和原生路由/API。该差异证明 V4 需要按 release 行为重建，不能把 V3 Action 当作实现方案。
 - 30881 的 release 页面编辑设置显示五个分区导航：更新策略、容器、存储、容器组调度规则、容器组优雅终止；初始更新策略为滚动更新，最大不可用和最大多余容器组数量均为 `25%`。
 - 30880 的当前 V4 页面在同一 Deployment 和 namespace 上返回 200，显示原生设置导航、名称/项目/副本数量、容器与初始化容器、Pod 安全上下文、存储、调度、优雅终止和元数据；同时保留 `25%` 更新策略默认值，并增加配置引用 Tab 和自动扩缩入口。
+- StatefulSet 对照已补齐：release-4.1.5 显示编辑服务、分区序号和持久卷相关设置；当前 V4 保留分区序号，并显示持久卷声明模板、原生容器和元数据设置，编辑服务仍在 Action 菜单中。
+- DaemonSet 对照已补齐：两套页面都没有副本数编辑，均显示最大不可用容器组数量和最短就绪运行时长；当前 V4 额外以原生容器组设置和元数据分区呈现。DaemonSet 的停止语义仍按单独运行时证据核对，不能由表单字段对照替代。
 - 以上证据已经可以直接指导字段、布局、样式、Action、API 和错误态矩阵；不能据此宣称三类资源已经逐项等价。详细身份和差异见 [`evidence/workload-release415-source-runtime-rea-20261025.json`](./evidence/workload-release415-source-runtime-rea-20261025.json)。
 
 ### 低权限浏览器结果
