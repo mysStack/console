@@ -8,8 +8,8 @@
 
 # 当前状态补充（2026-10-24：重新绑定输入后的 REA 复核）
 
-- 当前 HEAD：`9456fd8ebcf4adaa70da729266c6c786f7a52227`；本次提交只包含 REA 记录和矩阵校正，已推送到 `origin/feature/v4-workloads`。
-- 新增[Workload 组合批次 REA 复核记录](./workload-rea-review-20261024.md)：纠正了当前源码事实，确认 Deployment、StatefulSet、DaemonSet 三个详情页均打开原生 `WorkloadSettingsModal`，YAML 为独立 Action；同时重新登记资源差异和未验证项。
+- 当前文档 HEAD：`6f981c332416195fea7f3bb8c08566a5c7c18d61`；最新提交只包含 REA 记录和矩阵校正，已推送到 `origin/feature/v4-workloads`。
+- 新增[Workload 组合批次 REA 复核记录](./workload-rea-review-20261024.md)：纠正了当前源码事实，确认 Deployment、StatefulSet、DaemonSet 三个详情页均打开原生 `WorkloadSettingsModal`，YAML 为独立 Action；本轮又补充了 StatefulSet/DaemonSet 详情页的真实浏览器对照和读请求证据，同时重新登记资源差异和未验证项。
 - 当前门禁仍为 `REA / 分析中，待复核`。历史 DEV、VERIFY、镜像和浏览器结果不继承为当前阶段通过；本轮没有修改业务代码、构建、部署或执行模块验收。
 - 当前待复核项：当前 SHA 的完整字段保存、配置引用、DaemonSet 停止语义、RBAC 正反权限、namespace 缓存隔离、错误/取消路径、集群级 V3/Wujie 边界和三类逐项 V3 等价性。
 
@@ -219,3 +219,12 @@
 - 当时记录状态：专用分支已建立，已逐项归集历史 Workload 代码和必要共享依赖；PR #1 的既有混合历史未改写，Workload 后续以独立分支和独立 PR 评审。
 - 主计划的模块独立分支规则优先于此前将整个开发持续放在 ConfigMap/Secret 分支的执行记录，详见[纠正记录](./workload-branch-realignment-20261022.md)。
 - 本分支尚未执行应用构建、部署或浏览器验收；旧分支单元测试、CI 和浏览器记录保留其原始版本，不直接继承通过结论。
+
+# 当前状态补充（2026-10-24：StatefulSet/DaemonSet 详情页运行时 REA 对照）
+
+- 当前负责人：Codex 单会话；分支 `feature/v4-workloads`；Worktree `/home/bruce/code/ks-develop/console-workloads`；未启动子 Agent。
+- 本轮实际 HEAD：`6f981c332416195fea7f3bb8c08566a5c7c18d61`；只新增 REA 证据和记录，没有修改业务代码、没有构建和部署。
+- 使用 131 同一集群 `host`、同一 namespace `v4-migration-e2e` 和已授权测试账号，对照 `release-4.1.5` 基线 `30881` 与当前 V4 `30880`，打开两个 StatefulSet 和两个 DaemonSet 详情页。四个资源的两套页面均 HTTP 200，页面均显示 `1/1` 和 Running Pod。
+- 直接观察：StatefulSet 两边都有编辑服务、编辑设置、编辑 YAML、重新创建、删除；DaemonSet 两边都有编辑设置、编辑 YAML、重新创建、删除。当前 V4 三类页面均提供原生“配置引用”Tab，四类页面均未发现 `wujie-app`。
+- 当前 V4 DaemonSet 资源、Pod、HPA 和监控读取请求返回 200；基线 DaemonSet 资源和 Pod 读取请求返回 200。证据见 [`StatefulSet/DaemonSet 详情页浏览器对照`](./evidence/workload-kind-detail-browser-20261024.json)，截图只保留在本地 `.playwright-cli/`。
+- 未完成：表单字段保存回读、StatefulSet Service/PVC、DaemonSet 停止恢复、完整 Action、低权限 RBAC、namespace 缓存、错误路径和逐项 V3 等价。模块仍为 `REA / 分析中，待复核`，不进入 DEV。

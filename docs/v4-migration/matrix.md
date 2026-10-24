@@ -123,3 +123,10 @@
 
 2026-10-23 VERIFY 结果与缺陷：精确镜像 `feature-v4-workloads-20261023-180140-7fa49aa192d0` 上，Deployment 批量删除关联 HPA 的完整 cluster 作用域和四个 200 响应通过；DaemonSet 停止、原节点选择保留及恢复通过；StatefulSet 原生创建页已持久化 PVC 模板、挂载并生成 Bound PVC。浏览器同时稳定复现 PVC 区标题、添加按钮和校验键未翻译，模块退回 DEV 修复本地化后再验证页面渲染。
 2026-10-23 DEV 修复 `f6b7c689b`：StatefulSet 创建页改用现有 PVC 标题和添加按钮本地化键，并补齐中、英、西、繁四种语言的无效/重复模板校验文案。新增源码约束测试先红后绿；完整回归 81 文件/364 项、packages/locales 构建、ESLint、Prettier 与 `git diff --check` 通过。模块重新进入 VERIFY，等待该 SHA 精确镜像的页面渲染重验。
+
+## 当前增量（2026-10-24：StatefulSet/DaemonSet 详情页 REA 对照）
+
+- 当前文档提交以 `feature/v4-workloads` 实际 HEAD 为准；本轮新增证据见 [`StatefulSet/DaemonSet 详情页浏览器对照`](./evidence/workload-kind-detail-browser-20261024.json)。
+- 真实浏览器已打开两个 StatefulSet 和两个 DaemonSet 的基线 `30881`、V4 `30880` 详情页；四个资源的两套详情路由均返回 200，页面均渲染资源状态和 `1/1` Pod。
+- StatefulSet 两边均显示编辑服务、编辑设置、YAML、重新创建、删除等入口；DaemonSet 两边均显示编辑设置、YAML、重新创建、删除。当前 V4 三类详情页增加原生“配置引用”Tab。
+- 本轮只完成入口、Tab、页面渲染和部分读请求证据，没有执行写操作；Service/PVC、停止恢复、RBAC、缓存、错误路径和完整 V3 等价继续保持未验证。模块仍为 `REA / 分析中，待复核`，不进入 DEV。

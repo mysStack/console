@@ -152,3 +152,28 @@ rg -n 'editConfigTemplate|editYaml|WorkloadSettingsModal' \
 该部署只提供当前 `release-4.1.5` 制品的 REA 对照输入，不能直接视为 V4 VERIFY 通过。Deployment、StatefulSet、DaemonSet 的详情、编辑设置、字段默认值、校验、配置引用、错误态和完整 Action 对比仍需继续采集。
 
 本轮又使用同一集群、同一 namespace、同一 Deployment `v4-deploy-edit-ef3` 完成详情页对比，证据见 [`evidence/workload-v415-baseline-browser-20261024.json`](./evidence/workload-v415-baseline-browser-20261024.json)。`release-4.1.5` 详情页显示“编辑设置、编辑 YAML、重新创建、删除”等入口；当前 V4 详情页显示原生“配置引用”Tab，操作菜单尚未展开。两边详情请求均返回 200，当前采集未发现 `wujie-app` 元素。该结果只关闭了 Deployment 详情入口的部分 REA 未知项，不能推断编辑表单、StatefulSet、DaemonSet、RBAC 或缓存已经等价。
+
+## StatefulSet 与 DaemonSet 详情页运行时对照（2026-10-24）
+
+本轮在同一集群、同一 namespace、同一组测试账号下，分别打开 `release-4.1.5` 基线 `30881` 和当前 V4 `30880` 的两个 StatefulSet、两个 DaemonSet 详情页。结构化记录见 [`evidence/workload-kind-detail-browser-20261024.json`](./evidence/workload-kind-detail-browser-20261024.json)，页面截图仅保存在本地 `.playwright-cli/`。
+
+### 已取得的直接证据
+
+- `StatefulSet/v4-pvc-sts-7fa`、`StatefulSet/v4-watch-sts-20261022-01`、`DaemonSet/v4-stop-ds-7fa` 和 `DaemonSet/v4-watch-ds-20261022-01` 的基线和 V4 详情路由均返回 HTTP 200，页面均渲染出项目、资源状态、Pod 列表和 `1/1` 状态。
+- StatefulSet 基线菜单包含“回退、编辑服务、编辑设置、编辑 YAML、重新创建、删除”；当前 V4 菜单在该 fixture 上还显示“编辑自动扩缩”。这项差异需要结合资源是否存在 HPA、权限和当前 V4 的 Action 规则继续确认，不能直接判定为功能缺失或新增正确。
+- DaemonSet 两边菜单均包含“回退、编辑设置、编辑 YAML、重新创建、删除”，没有显示 Service 编辑；当前 V4 的详情页额外提供“配置引用”Tab。
+- 基线详情页的 Tab 为“资源状态、修改记录、元数据、环境变量、事件”；当前 V4 增加“配置引用”Tab。四类页面均未发现 `wujie-app` 元素。
+- 当前 V4 DaemonSet 的实际读请求中，资源 GET、Pod 列表、HPA 查询和监控查询均返回 200；基线 DaemonSet 的资源 GET 与 Pod 列表也返回 200。请求均绑定 `host/v4-migration-e2e/<resource>`，未观察到跨 namespace 的资源路径。
+- 本轮只读打开页面和读取请求，没有执行编辑、删除、伸缩、停止或恢复，因此不能把页面入口证据写成行为等价通过。
+
+### 对 REA 缺口的影响
+
+本轮关闭了 StatefulSet、DaemonSet 详情入口和基础渲染的运行时未知项，并补充了三类资源的页面 Action/Tab 差异。以下项目仍保持未验证：
+
+- StatefulSet 的 Service、Headless Service、PVC 模板、partition/OnDelete 和保存回读；
+- DaemonSet 的停止/恢复、更新策略、节点调度和保存回读；
+- 三类资源设置表单的完整字段、清空/保留语义、409/403/404/网络失败和取消路径；
+- 低权限 RBAC、namespace 切换后的缓存隔离、跨用户/集群作用域和全部 V3 功能逐项等价；
+- HPA Action 的显示条件、空对象/权限拒绝时的错误呈现。
+
+因此当前模块仍为 **REA / 分析中，待负责人复核**，本记录不授权进入 DEV，也不将历史 DEV、旧镜像或旧 VERIFY 记录继承为当前通过。
