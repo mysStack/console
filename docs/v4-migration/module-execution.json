@@ -5,8 +5,8 @@
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-  "phase": "VERIFY",
-  "phaseReason": "详情页通用 YAML 严格解析已完成当前制品的 CI、131 rollout、Pod imageID 和浏览器验证；非法 YAML 拦截及三类合法 YAML 保存已通过。模块仍需完成低权限、缓存、错误矩阵、全部 Action 和逐项 V3 等价性验收。",
+  "phase": "DEV",
+  "phaseReason": "当前制品发现三类详情页直达不存在资源时 API 404 但页面为空白 Loading；已退回 DEV，待修复 403/404/网络错误状态。",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "8bbd08f8b0d4f4961b965b6129db1867aa98a0c8c8532fbc96467808fec53fbf"
+        "sha256": "bea227354ead13cfc7696a85f1c1642c595443205bbef81a7fa3d3a008673495"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "4b79cd4887c287dda96e81f3f24d60bcdba73b44ab48bf20fe377e48268c1255"
+        "sha256": "3abc8041f91bacde70c6aa5450d60cea659b09c2f8639a66e0b016ab9295864b"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -122,7 +122,7 @@
       },
       {
         "path": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-        "sha256": "0e727f97529b0b4116e2732a9cba6803bf2740e84ed9250f48408f792fde8a5e"
+        "sha256": "5a26d4106043b125c3eda06b92714964ad009a24b8b6349c2e138bd49d9dc203"
       },
       {
         "path": "docs/v4-migration/evidence/workload-kind-detail-browser-20261024.json",
@@ -325,8 +325,8 @@
     "coverageNotes": "已核对表示当前版本主基线和证据入口已覆盖该维度，不表示运行时验证或功能等价已经通过；运行时缺口转入 DEV/VERIFY 验收清单。"
   },
   "dev": {
-    "status": "已完成",
-    "reason": "修复 useCommonActions 详情页通用 YAML 编辑路径：使用 yaml.loadStrict 严格解析，解析或 API 异常时显示保存失败提示并保持弹窗打开；本地全量测试、相关 ESLint、build:packages 和 diff 检查通过。",
+    "status": "进行中",
+    "reason": "YAML 缺陷已完成当前制品验证；新增三类详情页 404 错误反馈缺陷，需补充错误路由/状态和测试后重新 VERIFY。",
     "sourceCommit": "8ae475a52dfc5fe45e78742e53e2dc9f6e050483",
     "documents": [
       {
@@ -628,12 +628,16 @@
       {
         "path": "docs/v4-migration/evidence/workload-yaml-validation-common-action-dev-20261025.json",
         "sha256": "a5d80a6b959c4dd5ee083cf068b30f99f6aeac954e60db91ba3300260b068b47"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-detail-404-verify-20261025.json",
+        "sha256": "e6453e4c79d84154ef7f7877e0ee4fd83cb5708bff3586496c7e15a2c453da07"
       }
     ],
-    "ciRun": "",
-    "ciStatus": "本地验证和构建通过，待当前提交 CI",
-    "imageTag": "",
-    "imageDigest": ""
+    "ciRun": "40141436939",
+    "ciStatus": "当前 YAML 修复制品验证发现详情 404 渲染缺陷，已退回 DEV",
+    "imageTag": "feature-v4-workloads-20261025-070905-e3f30033272c",
+    "imageDigest": "sha256:0bc1da00a76788dad689ca50eace99649f845cbc1dcf204fae1452331dd00f06"
   },
   "devAcceptanceChecklist": [
     "WL-01：三类资源项目/集群入口、详情 Tab、原生编辑设置分区和路由替代矩阵",
@@ -642,36 +646,22 @@
     "WL-04：移除普通 Workload 配置引用的 useV3action、Wujie Shadow DOM 和 V3 编辑器桥接"
   ],
   "verify": {
-    "status": "进行中",
-    "reason": "详情页 YAML 缺陷已在当前制品完成部署后验证；本阶段继续核对低权限、缓存、错误矩阵、全部 Action 和逐项 V3 等价性，完成前不进入 PR。",
+    "status": "已退回 DEV，待错误状态修复后重新 VERIFY",
+    "reason": "当前制品直达不存在资源返回 404 后详情页为空白 Loading；修复后必须重新 CI、部署和浏览器验证。",
     "sourceCommit": "8ae475a52dfc5fe45e78742e53e2dc9f6e050483",
-    "documents": [
-      {
-        "path": "docs/v4-migration/evidence/workload-yaml-validation-common-action-verify-20261025.json",
-        "sha256": "e8da8de75a6b93f431b06fb1e3c45fd45868530ddbbe09cb1b1783ef877af7b5"
-      }
-    ],
-    "ciRun": "40141436939",
-    "ciStatus": "success；已构建并发布当前提交对应多架构镜像",
-    "imageTag": "feature-v4-workloads-20261025-070905-e3f30033272c",
-    "imageDigest": "sha256:0bc1da00a76788dad689ca50eace99649f845cbc1dcf204fae1452331dd00f06",
-    "rollout": {
-      "namespace": "kubesphere-system",
-      "deployment": "ks-console",
-      "generation": 607,
-      "status": "success",
-      "pod": "ks-console-ff8b6b7cc-2g4tq",
-      "ready": "1/1",
-      "restarts": 0,
-      "podImageID": "ghcr.io/mysstack/ks-console@sha256:0bc1da00a76788dad689ca50eace99649f845cbc1dcf204fae1452331dd00f06"
-    },
+    "documents": [],
+    "ciRun": "",
+    "ciStatus": "待 DEV 修复后重新 CI",
+    "imageTag": "",
+    "imageDigest": "",
+    "rollout": {},
     "browserVerification": {
-      "status": "当前缺陷通过，模块 VERIFY 进行中",
-      "evidence": "docs/v4-migration/evidence/workload-yaml-validation-common-action-verify-20261025.json",
-      "report": "docs/v4-migration/workload-yaml-validation-dev-20261025.md",
-      "freshLogin": "已使用新 Playwright 会话加载已认证状态完成验证；不记录凭据",
-      "authenticatedSessionChecks": "详情页非法 YAML 提交后弹窗保持打开，显示保存失败，目标资源 PUT 请求数为 0",
-      "moduleAcceptance": "未完成；YAML 项已通过，仍需低权限、缓存、错误矩阵、全部 Action 和逐项 V3 等价性验收"
+      "status": "未通过，已退回 DEV",
+      "evidence": "docs/v4-migration/evidence/workload-detail-404-verify-20261025.json",
+      "report": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
+      "freshLogin": "已使用已认证 Playwright 会话完成当前制品验证；不记录凭据",
+      "authenticatedSessionChecks": "不存在 Deployment GET 返回 404，页面详情区域为空白 Loading，没有 404 反馈",
+      "moduleAcceptance": "未完成"
     },
     "lastEvidenceUpdate": "2026-10-25"
   },

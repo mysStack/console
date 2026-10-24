@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-25",
+  "module": "workloads",
+  "phase": "VERIFY -> DEV",
+  "sourceCommit": "35087d79c4883f4c369537c380136c125e33f502",
+  "artifact": {
+    "imageTag": "feature-v4-workloads-20261025-070905-e3f30033272c",
+    "imageDigest": "sha256:0bc1da00a76788dad689ca50eace99649f845cbc1dcf204fae1452331dd00f06",
+    "pod": "ks-console-ff8b6b7cc-2g4tq",
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:0bc1da00a76788dad689ca50eace99649f845cbc1dcf204fae1452331dd00f06"
+  },
+  "browser": {
+    "session": "workload-verify-fixed-20261025",
+    "url": "http://192.168.2.131:30880/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-missing-ef3/resource-status",
+    "authenticatedRole": "platform-admin",
+    "request": {
+      "method": "GET",
+      "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-missing-ef3",
+      "status": 404
+    },
+    "renderedState": "页面仅保留工具箱，工作负载详情区域为空，没有 404 页面、错误提示或返回入口",
+    "consoleErrors": "页面仍有已登记的扩展初始化错误；本证据只记录详情页 404 渲染缺陷"
+  },
+  "sourceRootCause": {
+    "files": [
+      "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/Deployments/Detail/index.tsx",
+      "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/StatefulSets/Detail/index.tsx",
+      "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/DaemonSets/Detail/index.tsx"
+    ],
+    "behavior": "三类详情页在 isLoading || isError 时统一渲染 Loading；请求失败后 isError 保持 true，因此 404 被表现为空白加载态"
+  },
+  "conclusion": "当前制品的 Workload 详情 404 错误反馈未通过，已退回 DEV；需要分别处理 403、404 和其他网络/API 错误，并补充三类资源测试。"
+}
