@@ -1,0 +1,89 @@
+{
+  "record": "Workload 配置引用静态 REA 测试取证",
+  "date": "2026-10-24",
+  "workspaceHead": "ca18a3958437bea6357de57abcc04af9fff6d4d0",
+  "phase": "REA",
+  "operator": "Codex 单会话",
+  "commandTemplate": "./node_modules/.bin/esno <test-file>",
+  "scope": "ConfigReference 组件的引用解析、预览、写回草稿、文件挂载、Reloader、原生编辑和原生路由静态行为",
+  "results": [
+    {
+      "file": "packages/console/src/pages/projects/components/ConfigReference/ConfigReferencePanel.test.ts",
+      "tests": 2,
+      "passed": 2,
+      "failed": 0
+    },
+    {
+      "file": "packages/console/src/pages/projects/components/ConfigReference/preview.test.ts",
+      "tests": 12,
+      "passed": 12,
+      "failed": 0
+    },
+    {
+      "file": "packages/console/src/pages/projects/components/ConfigReference/workload.test.ts",
+      "tests": 8,
+      "passed": 8,
+      "failed": 0
+    },
+    {
+      "file": "packages/console/src/pages/projects/components/ConfigReference/resourceOptions.test.ts",
+      "tests": 1,
+      "passed": 1,
+      "failed": 0
+    },
+    {
+      "file": "packages/console/src/pages/projects/components/ConfigReference/envFrom.test.ts",
+      "tests": 5,
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "file": "packages/console/src/pages/projects/components/ConfigReference/fileMount.test.ts",
+      "tests": 19,
+      "passed": 19,
+      "failed": 0
+    },
+    {
+      "file": "packages/console/src/pages/projects/components/ConfigReference/reloader.test.ts",
+      "tests": 2,
+      "passed": 2,
+      "failed": 0
+    },
+    {
+      "file": "packages/console/src/pages/projects/components/ConfigReference/nativeEdit.test.ts",
+      "tests": 7,
+      "passed": 7,
+      "failed": 0
+    },
+    {
+      "file": "packages/console/src/pages/projects/components/ConfigReference/summary.test.ts",
+      "tests": 5,
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "file": "packages/console/src/pages/projects/components/ConfigReference/entry.test.ts",
+      "tests": 2,
+      "passed": 2,
+      "failed": 0
+    },
+    {
+      "file": "packages/console/src/pages/projects/components/ConfigReference/draft.test.ts",
+      "tests": 12,
+      "passed": 12,
+      "failed": 0
+    }
+  ],
+  "summary": {
+    "files": 11,
+    "tests": 75,
+    "passed": 75,
+    "failed": 0
+  },
+  "coverageMeaning": [
+    "验证 ConfigMap/Secret 引用解析、前缀和键名预览、环境变量摘要、文件挂载双层写回、Reloader 注解、原生编辑提交防重复和错误重试等当前源码行为。",
+    "entry.test.ts 仅证明配置引用生产入口使用原生路由，并对该入口的生产代码进行 V3/Wujie 引用约束；不能推断仓库其他 Workload 入口已完成移除。",
+    "静态测试不能替代 131 当前分支制品上的浏览器写回、Kubernetes API 回读、低权限 RBAC、namespace 缓存隔离、错误路径和完整 V3 功能等价验证。"
+  ],
+  "result": "11 个配置引用相关静态测试文件、75 项测试全部通过；作为 REA 输入保留，模块仍处于分析中，待负责人复核。"
+}

@@ -164,3 +164,9 @@
 
 - Deployment 配置引用页的“查看”只显示 ConfigMap 键名 `APP_MODE` 和 Secret 键名 `TOKEN`，不显示 Secret 值，没有产生写请求。
 - 该结果补充了脱敏和摘要渲染证据，但不等同于应用引用保存通过。证据见 [`配置引用 REA 浏览器记录`](./evidence/workload-config-reference-rea-browser-20261024.json)。
+
+## 当前增量（2026-10-24：配置引用静态测试）
+
+- 当前 HEAD `ca18a3958437bea6357de57abcc04af9fff6d4d0` 上，ConfigReference 目录 11 个现有测试文件共 75 项全部通过。
+- 测试覆盖引用解析、前缀和键名预览、环境变量摘要、文件挂载双层写回、Reloader 注解、原生编辑提交防重复、错误重试和原生路由约束。
+- 该结果仅作为 REA 静态输入，不能替代当前分支制品的浏览器写回、API 回读、RBAC、namespace 缓存、错误路径和完整 V3 等价验证。证据见 [`evidence/workload-config-reference-static-tests-20261024.json`](./evidence/workload-config-reference-static-tests-20261024.json)，模块继续保持 `REA / 分析中，待复核`。

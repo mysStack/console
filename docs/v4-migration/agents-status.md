@@ -263,3 +263,10 @@
 
 - Deployment 配置引用页中只读点击两个“查看”后，ConfigMap 仅显示键名 `APP_MODE`，Secret 仅显示键名 `TOKEN`，没有显示 Secret 值，也没有发出写请求。
 - 该结果补强了配置引用脱敏证据；应用引用保存、回读、权限和缓存仍未验证，模块继续保持 `REA / 分析中，待复核`。
+
+## 2026-10-24 配置引用静态测试补证
+
+- 在 `feature/v4-workloads` 当前 HEAD `ca18a3958437bea6357de57abcc04af9fff6d4d0` 上执行 ConfigReference 目录 11 个现有测试文件，共 75 项全部通过。
+- 本次只补充静态 REA 证据，没有修改业务代码、构建、部署或把模块阶段推进到 DEV。证据见 [`evidence/workload-config-reference-static-tests-20261024.json`](./evidence/workload-config-reference-static-tests-20261024.json)。
+- 已验证：引用解析、prefix/键名预览、环境变量摘要、ConfigMap/Secret 文件挂载写回、Reloader 注解、原生编辑提交防重复、错误重试和配置引用路由约束。
+- 未验证：当前分支制品浏览器写回与回读、低权限 RBAC、namespace 缓存隔离、错误路径和逐项 V3 功能等价。模块仍为 `REA / 分析中，待复核`。

@@ -254,3 +254,9 @@ rg -n 'editConfigTemplate|editYaml|WorkloadSettingsModal' \
 - 没有产生写请求，也没有点击“应用引用”。
 
 该结果进一步确认当前 V4 的“查看”只展示环境变量键名摘要。证据已补充到 [`evidence/workload-config-reference-rea-browser-20261024.json`](./evidence/workload-config-reference-rea-browser-20261024.json)。
+
+## 配置引用静态测试取证（2026-10-24）
+
+在当前工作区 HEAD `ca18a3958437bea6357de57abcc04af9fff6d4d0` 上，逐个执行 ConfigReference 目录下 11 个现有测试文件，合计 75 项全部通过。测试覆盖引用解析、前缀和键名预览、环境变量摘要、ConfigMap/Secret 文件挂载双层写回、Reloader 注解、原生编辑提交防重复、错误重试和原生配置引用路由约束。
+
+结构化结果见 [`evidence/workload-config-reference-static-tests-20261024.json`](./evidence/workload-config-reference-static-tests-20261024.json)。该结果只证明当前源码静态行为，不能替代 131 当前分支制品上的浏览器写回、Kubernetes API 回读、低权限 RBAC、namespace 缓存隔离、错误路径和逐项 V3 功能等价验证。配置引用模块继续保持 **REA / 分析中，待复核**。
