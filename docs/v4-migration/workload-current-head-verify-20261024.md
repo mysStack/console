@@ -18,6 +18,12 @@
 
 本轮从 `/home/bruce/.bashrc` 加载测试账号环境变量并尝试新的零 Cookie 登录，页面返回通用登录失败提示，未进入 Console；账号信息未写入证据。分区验收继续使用已有认证会话。页面仍有已登记的扩展初始化错误，因此不记录为控制台零错误。低权限浏览器正反、缓存失效、完整字段和逐项 V3 功能等价、错误/取消完整矩阵仍未关闭。Workload 继续保持 `VERIFY / 进行中`，不进入 PR 验收。
 
+## 2026-10-25 当前 SHA 低权限浏览器复验
+
+本轮在当前 4b363c688f1e 制品上创建临时低权限用户，绑定 `test-workspace` 的 `test-workspace-viewer` 和 `v4-migration-e2e` 的项目 `viewer` 角色。新零 Cookie Playwright 会话登录成功，进入三个 Workload 详情页后均只能读取资源，编辑信息、更多操作、编辑设置和删除入口均未显示。配置引用页可以读取，添加引用、引用选择、删除和应用控件均为禁用，Secret 值没有展示。
+
+第二 namespace 的项目路由返回“页面未找到”，本轮不把它单独认定为完整的第二 namespace UI 正反隔离通过，继续引用已有 Kubernetes API 隔离证据。临时用户及其 WorkspaceRoleBinding、项目 RoleBinding 已清理。结构化证据见 [`workload-rbac-current-head-verify-20261025.json`](./evidence/workload-rbac-current-head-verify-20261025.json)。本轮关闭了当前 SHA 的低权限登录、三类详情只读和配置引用控件可见性样本，完整 403/404/409/422、缓存切换和逐项 V3 等价仍未关闭。
+
 ## 2026-10-25 当前 SHA 宽度修复 VERIFY
 
 | 项目        | 结果                                                                                                  |

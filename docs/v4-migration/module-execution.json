@@ -53,11 +53,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "02f5e568685c60c512e4056e3aeb41c1f4e71ec4f71b6a88b2f4c29f0fe2d075"
+        "sha256": "b973033b2483515ee3ef77901b4615afad14591d8f8bd7479b93042d65310c08"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "824eda232dff2afa8fbaaa22b59b245092a8edfddeed7bf928ed65ead1cd053b"
+        "sha256": "df9c4ce1425625aaae6777fd996eade81ed327409601b7b5ec632f32c3c85b25"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -121,7 +121,7 @@
       },
       {
         "path": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-        "sha256": "c8fcfd57f35b41562a80453e01766798b9a4b72b95f36414f752a84aa9f14309"
+        "sha256": "27c2e678772f3826a313384b3b23bfa457f0a71218064f000ce77b1715564763"
       },
       {
         "path": "docs/v4-migration/evidence/workload-kind-detail-browser-20261024.json",
@@ -663,11 +663,11 @@
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "824eda232dff2afa8fbaaa22b59b245092a8edfddeed7bf928ed65ead1cd053b"
+        "sha256": "df9c4ce1425625aaae6777fd996eade81ed327409601b7b5ec632f32c3c85b25"
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "02f5e568685c60c512e4056e3aeb41c1f4e71ec4f71b6a88b2f4c29f0fe2d075"
+        "sha256": "b973033b2483515ee3ef77901b4615afad14591d8f8bd7479b93042d65310c08"
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
@@ -699,7 +699,7 @@
       },
       {
         "path": "docs/v4-migration/workload-current-head-verify-20261024.md",
-        "sha256": "5c9a4d1424031c8ea1c41e258a2d0493f5d793ef4b2bca086f5360fa742f97c7"
+        "sha256": "50bb02c4dffdd38c961670b88862a1d63d7d23a85e4a191378b86ea764e6b1c4"
       },
       {
         "path": "docs/v4-migration/evidence/workload-daemonset-stop-recovery-verify-20261025.json",
@@ -731,7 +731,7 @@
       },
       {
         "path": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-        "sha256": "c8fcfd57f35b41562a80453e01766798b9a4b72b95f36414f752a84aa9f14309"
+        "sha256": "27c2e678772f3826a313384b3b23bfa457f0a71218064f000ce77b1715564763"
       },
       {
         "path": "docs/v4-migration/evidence/workload-settings-width-verify-20261025.json",
@@ -744,6 +744,10 @@
       {
         "path": "docs/v4-migration/workload-settings-tabs-dev-20261025.md",
         "sha256": "57631e774bfc03529677c888101abeac4aae00c66f94ab849c644ce9cd98997a"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-rbac-current-head-verify-20261025.json",
+        "sha256": "a64d9f66b379a13dcfc9a45baad7f5f9b40913df7b9615f5078182793f37cf1c"
       }
     ],
     "ciRun": 40127350345,
@@ -764,10 +768,10 @@
     },
     "browserVerification": {
       "status": "部分完成",
-      "evidence": "docs/v4-migration/evidence/workload-settings-tabs-verify-20261025.json",
+      "evidence": "docs/v4-migration/evidence/workload-settings-tabs-verify-20261025.json; docs/v4-migration/evidence/workload-rbac-current-head-verify-20261025.json",
       "report": "docs/v4-migration/workload-current-head-verify-20261024.md",
       "freshLogin": "已执行新的零 Cookie 登录尝试，页面返回通用登录失败提示，未建立认证会话；不继承旧会话结论",
-      "authenticatedSessionChecks": "当前制品已验证 Deployment、StatefulSet、DaemonSet 编辑设置分区切换、当前面板唯一可见、资源差异字段和取消路径；页面仍有已登记扩展初始化错误",
+      "authenticatedSessionChecks": "当前制品已验证 Deployment、StatefulSet、DaemonSet 编辑设置分区切换、当前面板唯一可见、资源差异字段和取消路径；临时 viewer 新零 Cookie 登录成功，三类详情只读、配置引用写控件隐藏或禁用；页面仍有已登记扩展初始化错误",
       "moduleAcceptance": "未完成"
     },
     "lastEvidenceUpdate": "2026-10-25"
