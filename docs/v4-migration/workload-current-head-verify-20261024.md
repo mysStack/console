@@ -35,6 +35,7 @@
 - 配置引用页面原生显示 ConfigMap/Secret 名称、前缀和键名，Secret 值不出现在页面；相关 API 请求返回 200。
 - StatefulSet `v4-watch-sts-20261022-01` 的“编辑服务”页面在当前制品上完成一次保持原值的确认操作，namespace 作用域 PATCH 返回 200，随后 StatefulSet 回读返回 200，Kubernetes Service 的 Headless、端口和 selector 保持一致；证据见 [`evidence/workload-statefulset-service-verify-20261025.json`](./evidence/workload-statefulset-service-verify-20261025.json)。
 - Deployment `v4-deploy-edit-ef3` 的“编辑设置”页面在当前制品上完成一次保持原值的确认操作，namespace 作用域 PUT 返回 200，随后 Deployment 回读返回 200，Deployment 保持 `1/1` Ready 并完成 rollout；证据见 [`evidence/workload-deployment-settings-verify-20261025.json`](./evidence/workload-deployment-settings-verify-20261025.json)。
+- DaemonSet `v4-stop-ds-7fa` 的“编辑设置”页面在当前制品上完成一次保持原值的确认操作，namespace 作用域 PUT 返回 200，随后 DaemonSet 回读返回 200，保持 `1/1` Ready 并完成 rollout；页面未显示副本数量编辑，现有 nodeSelector 保持不变；证据见 [`evidence/workload-daemonset-settings-verify-20261025.json`](./evidence/workload-daemonset-settings-verify-20261025.json)。
 - 本轮 Workload 页面请求未发现 `/consolev3`、`/dist/v3dist` 或 Wujie 入口请求。
 - 列表、详情、编辑设置和配置引用完成 DOM 快照，编辑设置完成截图检查。
 
