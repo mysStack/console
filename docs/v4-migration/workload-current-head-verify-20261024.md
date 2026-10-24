@@ -28,6 +28,10 @@
 
 在同一当前制品的管理员会话中复验了三类详情的 Action 菜单：Deployment 显示回退、自动扩缩、编辑设置、编辑 YAML、重新创建和删除；StatefulSet 额外显示编辑服务；DaemonSet 不显示副本数、自动扩缩和编辑服务入口。Deployment 的自动扩缩和 YAML 弹窗、StatefulSet 的编辑服务弹窗均能打开并使用取消关闭，未提交资源修改。该记录只关闭入口渲染和资源差异样本，不代表这些 Action 的成功、失败、冲突、网络和 RBAC 组合全部通过。结构化证据见 [`workload-action-surface-verify-20261025.json`](./evidence/workload-action-surface-verify-20261025.json)。
 
+## 2026-10-25 当前 SHA namespace 正反隔离复验
+
+为避免 Workspace 级 viewer 权限覆盖项目边界，本轮使用只绑定 `v4-migration-e2e` 项目 viewer 的临时账号。允许 namespace 的 Deployment 详情可读且写入口隐藏；未授权的 `v4-migration-e2e-isolation` Deployment 详情直接跳转 `/errors/403`，资源内容不可见。测试期间临时给第二 namespace 添加的 Workspace 标签、Deployment、用户和 RoleBinding 均已清理或恢复，namespace 本身保留。结构化证据见 [`workload-namespace-isolation-current-head-verify-20261025.json`](./evidence/workload-namespace-isolation-current-head-verify-20261025.json)。列表路由的低权限缓存切换、刷新和返回组合仍未关闭。
+
 ## 2026-10-25 当前 SHA 宽度修复 VERIFY
 
 | 项目        | 结果                                                                                                  |

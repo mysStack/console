@@ -53,11 +53,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "157cbd1126b8a7680a408e300cc8efc3694d959e7d2475bc1a6494ef441d246d"
+        "sha256": "c7c6ad7fc0cef7ba6fe6fb96f97b556ab1b3a59ddf7e295722af6da24c4b655e"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "071a94c10a85ee8b79cca37268e29405ccae4e84415db4d9503f8284859ad24e"
+        "sha256": "7086d7b16cec62afcc4a68146047d151cbba88998a7a96e1709c61ca0ed1bbe5"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -663,11 +663,11 @@
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "071a94c10a85ee8b79cca37268e29405ccae4e84415db4d9503f8284859ad24e"
+        "sha256": "7086d7b16cec62afcc4a68146047d151cbba88998a7a96e1709c61ca0ed1bbe5"
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "157cbd1126b8a7680a408e300cc8efc3694d959e7d2475bc1a6494ef441d246d"
+        "sha256": "c7c6ad7fc0cef7ba6fe6fb96f97b556ab1b3a59ddf7e295722af6da24c4b655e"
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
@@ -699,7 +699,7 @@
       },
       {
         "path": "docs/v4-migration/workload-current-head-verify-20261024.md",
-        "sha256": "330c2b408fabfb4d84243b89cc1557b0eed05c215876cf123a6606649c3cf7d2"
+        "sha256": "08e8d1c5333f866b92f0c386cbfda0c266043fb554289b8e5875ebff9e3a6680"
       },
       {
         "path": "docs/v4-migration/evidence/workload-daemonset-stop-recovery-verify-20261025.json",
@@ -752,6 +752,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-action-surface-verify-20261025.json",
         "sha256": "7005540842c7557c11f9182a8200d2514a4bf7393461c8ad0397801ad55036c3"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-namespace-isolation-current-head-verify-20261025.json",
+        "sha256": "937ca64ba67c570eff84766b53d927f3de2b468e8c461333f866ad8ce488c89f"
       }
     ],
     "ciRun": 40127350345,
@@ -772,10 +776,10 @@
     },
     "browserVerification": {
       "status": "部分完成",
-      "evidence": "docs/v4-migration/evidence/workload-settings-tabs-verify-20261025.json; docs/v4-migration/evidence/workload-rbac-current-head-verify-20261025.json; docs/v4-migration/evidence/workload-action-surface-verify-20261025.json",
+      "evidence": "docs/v4-migration/evidence/workload-settings-tabs-verify-20261025.json; docs/v4-migration/evidence/workload-rbac-current-head-verify-20261025.json; docs/v4-migration/evidence/workload-action-surface-verify-20261025.json; docs/v4-migration/evidence/workload-namespace-isolation-current-head-verify-20261025.json",
       "report": "docs/v4-migration/workload-current-head-verify-20261024.md",
       "freshLogin": "管理员环境变量登录尝试失败；随后创建并清理临时 viewer 账号，新的零 Cookie viewer 登录成功；不记录任何密码",
-      "authenticatedSessionChecks": "当前制品已验证 Deployment、StatefulSet、DaemonSet 编辑设置分区切换、当前面板唯一可见、资源差异字段、取消路径和 Action 入口；临时 viewer 三类详情只读、配置引用写控件隐藏或禁用；页面仍有已登记扩展初始化错误",
+      "authenticatedSessionChecks": "当前制品已验证 Deployment、StatefulSet、DaemonSet 编辑设置分区切换、当前面板唯一可见、资源差异字段、取消路径、Action 入口和项目级 namespace 正反直达；项目 viewer 访问未授权 namespace 返回 403；页面仍有已登记扩展初始化错误",
       "moduleAcceptance": "未完成"
     },
     "lastEvidenceUpdate": "2026-10-25"
