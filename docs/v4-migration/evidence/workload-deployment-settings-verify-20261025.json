@@ -1,0 +1,57 @@
+{
+  "schema": "v4-workload-deployment-settings-verify",
+  "date": "2026-10-25",
+  "source": {
+    "branch": "feature/v4-workloads",
+    "commit": "54b863b2ccd611bab088d39bcbebc8b4e9f68500",
+    "artifactTag": "feature-v4-workloads-20261024-220602-54b863b2ccd6",
+    "artifactDigest": "sha256:53299da2a0add86f3c08208b8ed9728d39af31ae5c0ba7b315283dc5bfdc675a"
+  },
+  "browser": {
+    "tool": "Playwright CLI",
+    "session": "workload-rea-current",
+    "origin": "http://192.168.2.131:30880",
+    "route": "/test-workspace/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/resource-status",
+    "resource": "Deployment/v4-deploy-edit-ef3",
+    "action": "编辑设置",
+    "renderedSections": [
+      "更新策略",
+      "容器组设置",
+      "存储设置",
+      "容器组调度规则",
+      "容器组优雅终止",
+      "添加元数据"
+    ],
+    "result": "通过：保持当前字段值点击确定，namespace 作用域 PUT 返回 200，随后 Deployment 回读返回 200",
+    "request": {
+      "method": "PUT",
+      "url": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+      "status": 200
+    },
+    "followUp": {
+      "method": "GET",
+      "url": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+      "status": 200
+    },
+    "consoleErrors": "存在既有扩展初始化错误；按负责人决定暂不纳入 Workload 验收"
+  },
+  "kubernetes": {
+    "context": "default",
+    "namespace": "v4-migration-e2e",
+    "deployment": "v4-deploy-edit-ef3",
+    "rollout": "成功",
+    "readyReplicas": 1,
+    "updatedReplicas": 1,
+    "availableReplicas": 1,
+    "generation": 31,
+    "specReplicas": 1,
+    "specSha256": "b74a2447f7ceb3636e60b2083aa14462c74cd5f2da8fdd45b05bed7f80115cb5"
+  },
+  "mutation": {
+    "authorized": true,
+    "testResourceOnly": true,
+    "changedBusinessValue": false,
+    "cleanup": "未删除测试资源"
+  },
+  "conclusion": "Deployment 编辑设置的当前制品保存回读和 rollout 成功路径已取得浏览器与 Kubernetes 证据；字段清空/保留、409/403/404、网络失败、低权限拒绝和缓存刷新仍未全部闭环。"
+}
