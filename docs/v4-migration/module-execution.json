@@ -53,11 +53,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "640249023fc28f1788646c2f267c5f4a676221a4a7e274b656f7789eb38b14af"
+        "sha256": "877c316f097bf24d53283a241f523ec7420edbd7a47f03dae1fea5b9d0a6e6c6"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "a946be36572cbac6b3dbc7d9b8ed5e3f3051ffa6816ea59e0b10807e7be7e380"
+        "sha256": "bd59998838223a81d53df4cdd452cb8220248abdb2b5732ef8447f291ff0b502"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -113,7 +113,7 @@
       },
       {
         "path": "docs/v4-migration/workload-rea-review-20261024.md",
-        "sha256": "b24a4a52724af0ddcc518f1864e0232417b74b75f8de45ad252b735f39c8ce8f"
+        "sha256": "18c24ef4227e0dd2817ea848597d7060b65fe1dd67d34f61a8325b8f22312970"
       },
       {
         "path": "docs/v4-migration/evidence/workload-v415-baseline-browser-20261024.json",
@@ -126,6 +126,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-kind-detail-browser-20261024.json",
         "sha256": "d170463833dff5143566e988151cd46905e5d61e7169b2a761dc3cfd87d3534a"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-settings-modal-browser-20261024.json",
+        "sha256": "7566c5d02052eb17aa023d271d73679a738ff337a7fba2b8da135a721200c5b5"
       }
     ],
     "coverage": {

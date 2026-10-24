@@ -1,0 +1,74 @@
+{
+  "record": "StatefulSet 编辑设置 Modal 基线与 V4 浏览器样式对照",
+  "date": "2026-10-24",
+  "operator": "Codex 单会话",
+  "branch": "feature/v4-workloads",
+  "sourceHead": "0d16f4deb0fd8c39a4a751a15df3763645acf5cf",
+  "environment": {
+    "namespace": "v4-migration-e2e",
+    "resource": "StatefulSet/v4-pvc-sts-7fa",
+    "baseline": "http://192.168.2.131:30881/consolev3/clusters/host/projects/v4-migration-e2e/statefulsets/v4-pvc-sts-7fa/resource-status",
+    "currentV4": "http://192.168.2.131:30880/clusters/host/projects/v4-migration-e2e/statefulsets/v4-pvc-sts-7fa/resource-status"
+  },
+  "steps": [
+    "从两个入口登录后直达同一 StatefulSet 详情页",
+    "在两个页面打开更多操作并进入编辑设置",
+    "只读观察 Modal 的导航、字段、默认值、按钮和页面截图",
+    "未修改字段、未点击确定、未发出写请求"
+  ],
+  "baseline": {
+    "http": 200,
+    "dialogTitle": "编辑设置",
+    "navigation": ["更新策略", "容器", "容器组优雅终止", "存储", "容器组调度规则"],
+    "initialSection": "更新策略",
+    "visibleFields": ["滚动更新（推荐）", "容器组副本分组序号", "滚动更新设置说明"],
+    "buttons": ["取消", "确定（初始禁用）"],
+    "layout": "独立大 Modal；左侧为分段导航，右侧一次显示当前分区；页面底部固定取消/确定操作区。",
+    "screenshot": ".playwright-cli/page-2026-10-24T10-27-32-969Z.png"
+  },
+  "currentV4": {
+    "http": 200,
+    "dialogTitle": "编辑设置",
+    "navigation": ["更新策略", "容器组设置", "存储设置", "容器组调度规则", "添加元数据"],
+    "initialSection": "更新策略",
+    "visibleFields": [
+      "名称（禁用）",
+      "项目（禁用）",
+      "副本数量",
+      "更新策略",
+      "容器组副本分组序号",
+      "容器组安全上下文",
+      "容器",
+      "初始化容器",
+      "卷",
+      "持久卷声明模板",
+      "容器组调度规则",
+      "终止宽限时间（秒）",
+      "标签",
+      "注解",
+      "容器组模板元数据"
+    ],
+    "buttons": ["取消", "确定"],
+    "layout": "V4 原生 Modal；左侧为分段导航，右侧在同一可滚动表单中连续展示多个资源设置分区；底部固定取消/确定操作区。",
+    "screenshot": ".playwright-cli/page-2026-10-24T10-25-19-776Z.png"
+  },
+  "comparison": {
+    "same": [
+      "两边均通过详情页的编辑设置 Action 打开编辑设置 Modal",
+      "均包含更新策略、容器、存储、调度、取消和确定等功能边界",
+      "均显示 StatefulSet 的副本分组序号和滚动更新语义"
+    ],
+    "different": [
+      "导航文案和分区命名不同：基线使用容器/存储/优雅终止，V4 使用容器组设置/存储设置/添加元数据",
+      "基线按导航一次显示单一分区；V4 首屏连续展示多分区并通过外层滚动承载长表单",
+      "V4 首屏直接展示副本数量、PVC 模板、终止宽限时间和元数据，基线首屏不展示这些字段"
+    ],
+    "reaMeaning": "当前 V4 并非旧 V3 Modal 的像素或分区布局复刻，而是同一功能边界下的原生表单重构。是否满足项目要求不能由样式相似度直接判定，必须继续按字段、默认值、校验、清空/保留、保存回读和 V3 功能等价逐项验收。"
+  },
+  "limits": [
+    "本轮只读打开 Modal，没有验证任一字段的写入、取消、错误、冲突或缓存行为。",
+    "本轮只对 StatefulSet 进行了 Modal 结构对照；Deployment、DaemonSet 的 Modal 字段差异仍需分别验证。",
+    "旧 V3 页面使用 release-4.1.5 制品；旧源码 release-3.4 仅作为结构/字段/样式参考。"
+  ],
+  "result": "发现并记录当前 V4 与 release-4.1.5 基线的 Modal 布局和分区差异；该差异进入 REA 功能等价与样式审查清单，不直接判定为缺陷，也不授权进入 DEV。"
+}

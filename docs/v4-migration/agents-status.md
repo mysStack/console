@@ -228,3 +228,9 @@
 - 直接观察：StatefulSet 两边都有编辑服务、编辑设置、编辑 YAML、重新创建、删除；DaemonSet 两边都有编辑设置、编辑 YAML、重新创建、删除。当前 V4 三类页面均提供原生“配置引用”Tab，四类页面均未发现 `wujie-app`。
 - 当前 V4 DaemonSet 资源、Pod、HPA 和监控读取请求返回 200；基线 DaemonSet 资源和 Pod 读取请求返回 200。证据见 [`StatefulSet/DaemonSet 详情页浏览器对照`](./evidence/workload-kind-detail-browser-20261024.json)，截图只保留在本地 `.playwright-cli/`。
 - 未完成：表单字段保存回读、StatefulSet Service/PVC、DaemonSet 停止恢复、完整 Action、低权限 RBAC、namespace 缓存、错误路径和逐项 V3 等价。模块仍为 `REA / 分析中，待复核`，不进入 DEV。
+
+# 当前状态补充（2026-10-24：编辑设置 Modal 样式差异已登记）
+
+- 在 `v4-pvc-sts-7fa` 上完成基线 `30881` 与 V4 `30880` 的真实浏览器 Modal 对照。两边都能打开“编辑设置”，但基线是分区切换式 Modal，V4 是连续可滚动原生表单；导航命名、首屏字段范围和可见分区不同。
+- 该结果说明当前 V4 采用功能边界重构，不能把布局差异直接写成“样式已等价”，也不能把打开 Modal 写成编辑行为已通过。字段默认值、校验、清空/保留、保存回读、Deployment/DaemonSet 差异仍需复核。
+- 证据见 [`编辑设置 Modal 对照`](./evidence/workload-settings-modal-browser-20261024.json)，截图仅保留本地 `.playwright-cli/`。当前阶段保持 `REA / 分析中，待复核`，本轮未修改业务代码。
