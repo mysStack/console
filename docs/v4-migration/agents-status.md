@@ -2,7 +2,7 @@
 
 - 当前 HEAD `31b6d88fc7e87707776c094aee12f1cdcb02604b` 的 CI Run `40048500939`、镜像 `feature-v4-workloads-20261024-091102-31b6d88fc7e8`、digest `sha256:2956710cd7ef2fbda79ff7a0a9695dac466336bd08248784d5afdfb577b951d3` 与 131 Pod imageID 一致，rollout/Ready 通过。
 - 使用已有认证态在当前制品重新打开三类详情的“编辑设置”：Deployment、StatefulSet、DaemonSet 均打开原生 `WorkloadSettingsModal`，StatefulSet 显示 PVC 与调度分区，DaemonSet 不显示副本数/调度分区，YAML 是独立 Action。三类资源均实际执行终止宽限期 `30 → 31 → 30`，页面保存后 Kubernetes API 回读一致。该结果关闭“当前版本仍将编辑设置跳转 YAML”的入口缺口，并补齐一个当前制品的保存回读场景。
-- 当前登录为已有会话，新浏览器登录仍未验证；页面 Console error 为 Deployment 8、StatefulSet 10、DaemonSet 8，错误归因、保存持久化、完整字段等价、RBAC、缓存和错误矩阵仍未完成。结构化证据见[当前 HEAD 原生设置复验](./evidence/workload-native-settings-current-head-20261024.json)。
+- 当前设置页面使用已有会话；另起零 Cookie 新 context 登录当前制品仍失败，页面显示账号或密码错误，未进入工作负载页面。页面 Console error 为 Deployment 8、StatefulSet 10、DaemonSet 8，错误归因、完整字段等价、RBAC、缓存和错误矩阵仍未完成。结构化证据见[当前 HEAD 原生设置复验](./evidence/workload-native-settings-current-head-20261024.json)。
 - 当前阶段仍为 `VERIFY / 未完成`。
 
 # 当前状态补充（2026-10-24：当前 HEAD 制品拉取失败并回滚）

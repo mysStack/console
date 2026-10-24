@@ -17,8 +17,8 @@
   },
   "browser": {
     "baseUrl": "http://192.168.2.131:30880",
-    "session": "已有认证态；当前制品新登录未执行",
-    "login": "未验证",
+    "session": "已有认证态；另起零 Cookie 新 context 执行登录",
+    "login": "失败：页面显示 Incorrect username or password；未进入工作负载页面",
     "consoleErrors": {
       "deployment": 8,
       "statefulSet": 10,
