@@ -1,8 +1,16 @@
-# 当前增量：批量删除修复已构建，待 131 部署复验（2026-10-24）
+# 当前增量：新制品登录失败，已回滚（2026-10-24）
+
+批量删除修复制品 `766db6764e052ade7236da411fedc435303d1cc8` 已通过部署门禁并部署到 131，CI Run `40042970738`、镜像 `feature-v4-workloads-20261024-080405-766db6764e05`、digest `sha256:32a8c980510d13e63e6e47cbe7d52c29f64ad728b8fd19c190e6ac4e499f2dd4` 与 Pod imageID 一致，rollout 和 Pod Ready 通过。
+
+使用新浏览器 context 和专用测试账号登录时，登录页返回 `Incorrect username or password`，未进入 Workload 页面，因此没有执行或记录批量删除浏览器结果。按部署验证规则已停止本轮验证，并恢复到部署前精确制品 `24c6afa03849d5d5c7b84fccd1602639b1fd0eb5` / digest `sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76`；回滚 rollout、Pod Ready 和实际 imageID 通过。证据见 [批量删除制品部署与登录证据](./evidence/workload-batch-delete-deploy-login-20261024.json)。
+
+登录失败尚不能归因于本次代码变更或测试账号状态，批量删除修复仍需在可登录条件恢复后，用同一精确制品重新部署并完成三类资源及 StatefulSet 关联 Service 的浏览器复验。模块继续保持 `VERIFY / 未完成`。
+
+# 历史记录：批量删除修复已构建（后续已部署并因登录失败回滚）（2026-10-24）
 
 批量删除参数修复已提交于 `9a5bd5cdc22ec7877c33773ca1ba8562a463bcd6`。本地 `./scripts/test.sh` 通过 91 个测试文件、402 项测试，`corepack yarn build:packages` 通过；CI Run `40042145365` 成功，精确制品为 `feature-v4-workloads-20261024-075502-9a5bd5cdc22e`，镜像 digest 为 `sha256:cb4e48ff69f11fe829586f5134c0de24831895a46f558f2fdf9f85a1a19861f0`。
 
-当前尚未将该新制品部署到 131，StatefulSet 关联 Service、Deployment/StatefulSet/DaemonSet 批量删除成功路径仍未在新制品上复验；模块保持 `VERIFY / 未完成`。部署前须通过模块 `deploy` 门禁，部署后使用浏览器逐项确认本体和关联资源清理结果。
+该段记录形成时尚未将该新制品部署到 131；随后已完成一次精确部署，但因浏览器登录失败按规则回滚。StatefulSet 关联 Service、Deployment/StatefulSet/DaemonSet 批量删除成功路径仍未在可登录的新制品上复验；模块保持 `VERIFY / 未完成`。
 
 # 当前增量：批量删除关联资源缺陷，退回 DEV（2026-10-24）
 

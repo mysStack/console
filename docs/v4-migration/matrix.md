@@ -1,8 +1,10 @@
-# 当前增量：批量删除修复已构建，待 131 部署复验（2026-10-24）
+> **2026-10-24 登录阻塞**：批量删除修复制品完成 131 部署和身份核对，但专用测试账号登录返回 `Incorrect username or password`，未进入浏览器验证；已回滚到部署前精确制品，Workload 保持 `VERIFY / 未完成`。登录失败原因尚未归因，不能将批量删除修复标记为通过。详见 [部署与登录证据](./evidence/workload-batch-delete-deploy-login-20261024.json)。
+
+# 历史记录：批量删除修复已构建（后续已部署并因登录失败回滚）（2026-10-24）
 
 批量删除参数修复已提交于 `9a5bd5cdc22ec7877c33773ca1ba8562a463bcd6`。本地 `./scripts/test.sh` 通过 91 个测试文件、402 项测试，`corepack yarn build:packages` 通过；CI Run `40042145365` 成功，精确制品为 `feature-v4-workloads-20261024-075502-9a5bd5cdc22e`，镜像 digest 为 `sha256:cb4e48ff69f11fe829586f5134c0de24831895a46f558f2fdf9f85a1a19861f0`。
 
-当前尚未将该新制品部署到 131，StatefulSet 关联 Service、Deployment/StatefulSet/DaemonSet 批量删除成功路径仍未在新制品上复验；模块保持 `VERIFY / 未完成`。部署前须通过模块 `deploy` 门禁，部署后使用浏览器逐项确认本体和关联资源清理结果。
+该段记录形成时尚未将该新制品部署到 131；随后已完成一次精确部署，但因浏览器登录失败按规则回滚。StatefulSet 关联 Service、Deployment/StatefulSet/DaemonSet 批量删除成功路径仍未在可登录的新制品上复验；模块保持 `VERIFY / 未完成`。
 
 > **2026-10-24 批量删除缺陷复核**：旧精确制品的真实浏览器批量删除发现 StatefulSet 关联 Headless Service 残留，根因是页面 Hook 丢弃 `annotations`。已补充最小修复和回归测试，Workload 阶段退回 `DEV`；新制品尚未完成构建、部署和浏览器复验，批量删除不能标记通过。详见 [批量删除缺陷取证](./evidence/workload-batch-delete-defect-20261024.json)。
 

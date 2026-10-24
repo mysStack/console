@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-24",
+  "module": "workloads",
+  "stage": "VERIFY",
+  "sourceCommit": "766db6764e052ade7236da411fedc435303d1cc8",
+  "ciRun": "40042970738",
+  "imageTag": "feature-v4-workloads-20261024-080405-766db6764e05",
+  "imageDigest": "sha256:32a8c980510d13e63e6e47cbe7d52c29f64ad728b8fd19c190e6ac4e499f2dd4",
+  "deployment": {
+    "target": "131 / kubesphere-system/ks-console",
+    "rollout": "成功",
+    "podReady": true,
+    "podImageId": "ghcr.io/mysstack/ks-console@sha256:32a8c980510d13e63e6e47cbe7d52c29f64ad728b8fd19c190e6ac4e499f2dd4"
+  },
+  "browser": {
+    "newContext": "workload-batch-20261024",
+    "login": "未通过",
+    "result": "登录页返回 Incorrect username or password；未进入 Workload 页面，未执行批量删除操作。",
+    "credentialOutput": "未写入证据；不记录用户名、密码、Token、Cookie 或原始响应。"
+  },
+  "rollback": {
+    "performed": true,
+    "image": "ghcr.io/mysstack/ks-console:feature-v4-workloads-20261024-050150-24c6afa03849@sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76",
+    "rollout": "成功",
+    "podReady": true,
+    "podImageId": "ghcr.io/mysstack/ks-console@sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76"
+  },
+  "conclusion": "部署和 Pod 身份链路通过；新制品浏览器登录失败，按规则停止模块验证并回滚。登录失败原因尚未归因于代码或测试账号，批量删除修复不能标记为浏览器通过。"
+}

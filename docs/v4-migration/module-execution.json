@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "b4512c525a0c75b437a15ade2a1678892c2cea4c710f7a8a58fbd80db1ae8e54"
+        "sha256": "75b2e47d8892bc71398ffcbaec1d935fc4ecfa3670e355e1840776d669912c9b"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "0123ab805d1c12296ac0e1c516bc7b51906722f28d06e4eb92d7a48c2f009128"
+        "sha256": "3b953e1f7cc0aa93495ab7fa0f796f60f6dd9e0916e4a1bdfcdc0f39fe424a18"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -506,12 +506,12 @@
   ],
   "verify": {
     "status": "未完成",
-    "reason": "新制品 9a5bd5cdc22e 已完成本地测试、构建和 CI 镜像生成，尚未部署到 131；批量删除本体及 StatefulSet 关联 Service 清理的浏览器复验、伸缩确认结果、完整错误/缓存、跨入口缓存切换和逐项 V3 等价仍未完成。",
-    "sourceCommit": "45d9f14e53d6a0c1d74011197ade9d5accbcdae9",
+    "reason": "批量删除修复制品已完成 131 rollout、Pod Ready 和镜像身份核对；新浏览器 context 登录返回 Incorrect username or password，未进入 Workload 页面，按规则停止并回滚到部署前精确制品。登录失败原因、三类批量删除成功路径、StatefulSet 关联 Service 清理、伸缩确认结果、完整错误/缓存、跨入口缓存切换和逐项 V3 等价仍未完成。",
+    "sourceCommit": "766db6764e052ade7236da411fedc435303d1cc8",
     "documents": [
       {
         "path": "docs/v4-migration/workload-131-verify-20261024.md",
-        "sha256": "000e97e15f2c24e3599214a8e58a1c7514baa9489f9e2005ab122e7028bada99"
+        "sha256": "03b6e046585d39c5d090a47036de6c36df7b3055b4f313d6d6f4cab58c02a03e"
       },
       {
         "path": "docs/v4-migration/evidence/workload-settings-verify-attempt-20261024.json",
@@ -540,6 +540,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-rollback-browser-verify-20261024.json",
         "sha256": "a6465937113e294f7be5ae53114f02d25faec843d78503ff43e9e6182b3f1609"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-batch-delete-deploy-login-20261024.json",
+        "sha256": "83f6d4d844c030c394c2a4cee564ca29fd7d883698775ae45c6fd8eabb75896a"
       }
     ]
   }
