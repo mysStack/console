@@ -277,9 +277,9 @@ rg -n 'editConfigTemplate|editYaml|WorkloadSettingsModal' \
 
 本轮先用只读方式核对测试环境：Kubernetes context 为 `default`，API Server 为 `192.168.2.131:6443`；当前 V4 `ks-console` 使用 NodePort `30880`，`release-4.1.5` 对比前端 `ks-console-v415-rea` 使用 NodePort `30881`，两个 Deployment 均为 `1/1 Ready`。
 
-浏览器测试账号从 `/home/bruce/.bashrc` 加载 `KS_TEST_USERNAME` 和 `KS_TEST_PASSWORD`，变量均存在；读取 `/home/bruce/.bashrc` 后确认 `KS_TEST_USERNAME` 没有值，`KS_TEST_PASSWORD` 已导出；当前 IAM User 列表中的已列出用户均为 `Active`，但无法用空用户名完成认证。在基线 `30881` 的新浏览器登录页提交后仍返回 `Incorrect username or password`，未进入 Workload 页面，也没有执行任何资源写操作。
+浏览器测试账号从 `/home/bruce/.bashrc` 加载 `KS_TEST_USERNAME` 和 `KS_TEST_PASSWORD`。复核后确认 `KS_TEST_USERNAME` 在 shell 中有值，但该行没有 `export`；`KS_TEST_PASSWORD` 已导出。因此直接启动浏览器子进程时用户名不会进入子进程环境，原登录失败记录不能解释为账号无效。
 
-结构化记录见 [`evidence/workload-browser-login-rea-20261024.json`](./evidence/workload-browser-login-rea-20261024.json)。该结果确认登录阻塞边界，并发现 `/home/bruce/.bashrc` 中测试用户名为空；这属于测试账号配置问题，不能归因于 V4 前端，也不能替代当前制品浏览器验收。模块继续保持 **REA / 分析中，待复核**。
+补充验证在同一交互 shell 中显式导出已有用户名变量后进行：131 V4 NodePort `30880` 的新浏览器上下文从 `/login` 登录并进入 `/dashboard`，页面显示 `platform-admin`。该次没有执行资源写操作，使用的部署制品是源提交 `31b6d88fc7e87707776c094aee12f1cdcb02604b`，不是当前工作区 HEAD。结构化记录见 [`evidence/workload-browser-login-exported-shell-20261024.json`](./evidence/workload-browser-login-exported-shell-20261024.json)；原始未导出环境尝试仍保留在 [`evidence/workload-browser-login-rea-20261024.json`](./evidence/workload-browser-login-rea-20261024.json)。登录链路已恢复，当前制品 Workload 浏览器验收仍需在当前 SHA 重新构建部署后执行。模块继续保持 **REA / 分析中，待复核**。
 
 ## 集群级原生入口静态测试补证（2026-10-24）
 

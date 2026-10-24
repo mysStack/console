@@ -290,11 +290,17 @@
 - 当前 ConfigReference 生产入口静态测试未发现 `useV3action`、Wujie 或 `consolev3` 调用；集群级三类 Workload 主路由已切换原生，其他集群级 Embed 和全局 Wujie 按需注册仍不能合并判断。
 - 本次只修正 REA 记录，没有修改业务代码；三类资源的运行时字段、API 写回、RBAC、缓存、错误和逐项 V3 等价仍未验证，模块保持 `REA / 分析中，待复核`。
 
-## 2026-10-24 131 浏览器登录边界核对
+## 历史尝试（2026-10-24：131 浏览器登录边界核对）
 
 - 只读确认 `default` context、131 API Server、V4 `30880`、V3 对比前端 `30881` 和两个前端 Deployment 的 `1/1 Ready` 状态。
-- 浏览器登录读取 `/home/bruce/.bashrc` 中的 `KS_TEST_USERNAME`、`KS_TEST_PASSWORD`；实际读取后用户名变量为空、密码变量已导出，当前 IAM 用户均为 `Active`，提交登录后页面仍返回 `Incorrect username or password`。
-- 本轮没有修改集群用户、密码、角色或任何测试资源，也没有进入 Workload 页面；用户名变量为空，登录问题继续作为当前浏览器验收阻塞边界记录。证据见 [`evidence/workload-browser-login-rea-20261024.json`](./evidence/workload-browser-login-rea-20261024.json)。模块仍为 `REA / 分析中，待复核`。
+- 浏览器登录读取 `/home/bruce/.bashrc` 中的 `KS_TEST_USERNAME`、`KS_TEST_PASSWORD`；原尝试未将未 export 的用户名传入浏览器子进程，页面返回 `Incorrect username or password`。
+- 本轮没有修改集群用户、密码、角色或任何测试资源，也没有进入 Workload 页面；原始证据见 [`evidence/workload-browser-login-rea-20261024.json`](./evidence/workload-browser-login-rea-20261024.json)，不能据此判断账号无效。
+
+## 2026-10-24 131 浏览器登录环境变量继承补正
+
+- 复核确认 `.bashrc` 中 `KS_TEST_USERNAME` 在 shell 中有值但未 export，`KS_TEST_PASSWORD` 已 export；浏览器启动前在同一 shell 显式 export 已有用户名变量后，V4 `30880` 新浏览器上下文成功登录并进入 `/dashboard`，用户角色为 `platform-admin`。
+- 本次仅验证登录链路，没有执行资源写操作；实际部署制品源提交为 `31b6d88fc7e87707776c094aee12f1cdcb02604b`，不是当前工作区 HEAD。证据见 [`evidence/workload-browser-login-exported-shell-20261024.json`](./evidence/workload-browser-login-exported-shell-20261024.json)。
+- 登录配置阻塞已解除；当前 HEAD 的构建、部署、Workload 页面浏览器验收、RBAC、缓存、错误和逐项 V3 等价仍未闭环，模块继续保持 `REA / 分析中，待复核`。
 
 ## 2026-10-24 集群级三类 Workload 原生入口补证
 

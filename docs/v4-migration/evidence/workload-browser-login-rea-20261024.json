@@ -16,7 +16,9 @@
     "source": "/home/bruce/.bashrc",
     "variables": ["KS_TEST_USERNAME", "KS_TEST_PASSWORD"],
     "usernameAssignmentPresent": true,
-    "usernameValuePresentAfterSource": false,
+    "usernameShellValuePresentAfterSource": true,
+    "usernameExportedAfterSource": false,
+    "usernameValuePresentInChildEnvironmentAfterSource": false,
     "passwordExportedAfterSource": true,
     "valuesRecorded": false
   },
@@ -25,7 +27,7 @@
     "configuredUserResourceFound": false,
     "configuredUsernameMatchesIamUser": false,
     "iamUserCount": 5,
-    "availableUserStates": "all listed IAM users are Active; the sourced username is empty, so it cannot match an IAM user",
+    "availableUserStates": "all listed IAM users are Active; the shell username assignment was not exported to the child browser process",
     "writeOperations": false
   },
   "browserAttempt": {
@@ -37,5 +39,5 @@
     "resourceWrites": false,
     "evidenceAdded": false
   },
-  "conclusion": "读取 /home/bruce/.bashrc 后，KS_TEST_USERNAME 没有值，KS_TEST_PASSWORD 已导出；浏览器认证失败具有外部账号配置阻塞特征，不能归因于前端功能，也不能继续当前制品的浏览器 VERIFY。"
+  "conclusion": "读取 /home/bruce/.bashrc 后，KS_TEST_USERNAME 在 shell 中有值但没有 export，KS_TEST_PASSWORD 已导出；本记录中的失败尝试未把用户名传给浏览器子进程，不能据此判断账号无效。补充的显式 export 登录成功记录见 workload-browser-login-exported-shell-20261024.json。"
 }

@@ -183,11 +183,17 @@
 - 已修正配置引用桥接描述：当前 ConfigReference 生产入口的静态测试未发现 `useV3action`、Wujie 或 `consolev3` 调用；集群级三类 Workload 主路由也已由静态测试确认使用原生列表。当前源码的全局 `preloadApp()` 已移除，但部署后 Network 复验尚未绑定当前 HEAD；其他集群级 Embed 入口仍单独保留为未关闭项。
 - 该纠偏只更新证据口径，不关闭运行时字段、API、RBAC、缓存、错误和完整 V3 等价风险。模块继续保持 `REA / 分析中，待复核`。
 
-## 当前增量（2026-10-24：131 登录边界核对）
+## 历史尝试（2026-10-24：131 登录边界核对）
 
 - 只读核对确认 context `default`、API Server `192.168.2.131:6443`、V4 NodePort `30880` 和 `release-4.1.5` 对比 NodePort `30881` 均可达，两个前端 Deployment 均 `1/1 Ready`。
-- 浏览器登录读取 `/home/bruce/.bashrc` 中的 `KS_TEST_USERNAME`、`KS_TEST_PASSWORD`；实际读取后 `KS_TEST_USERNAME` 为空、密码变量已导出，当前 IAM 用户均为 `Active`，新浏览器上下文登录仍返回 `Incorrect username or password`。
-- 本轮没有进入 Workload 页面，没有写请求，也没有把登录失败归因于前端功能；测试用户名为空，当前制品浏览器 VERIFY 仍未完成。模块继续保持 `REA / 分析中，待复核`。证据见 [`workload-browser-login-rea-20261024.json`](./evidence/workload-browser-login-rea-20261024.json)。
+- 浏览器登录读取 `/home/bruce/.bashrc` 中的 `KS_TEST_USERNAME`、`KS_TEST_PASSWORD`；原尝试只继承子进程环境，未把未 export 的用户名传入浏览器，登录返回 `Incorrect username or password`。
+- 本记录没有进入 Workload 页面，没有写请求；不能将该次失败归因于前端功能或账号无效。原始证据见 [`workload-browser-login-rea-20261024.json`](./evidence/workload-browser-login-rea-20261024.json)。
+
+## 当前增量（2026-10-24：131 登录环境变量继承补正）
+
+- 复核确认 `/home/bruce/.bashrc` 中 `KS_TEST_USERNAME` 已赋值但未 `export`，`KS_TEST_PASSWORD` 已导出；在浏览器启动前显式导出已有 shell 变量后，新浏览器上下文成功从 `/login` 进入 V4 `/dashboard`，显示 `platform-admin`。
+- 本次使用 131 当前已部署制品源提交 `31b6d88fc7e87707776c094aee12f1cdcb02604b`、镜像 digest `sha256:2956710cd7ef2fbda79ff7a0a9695dac466336bd08248784d5afdfb577b951d3`，仅验证登录链路，没有执行资源写操作。该结果不能替代当前 HEAD 的构建、部署和 Workload 浏览器验收。
+- 登录阻塞已解除；模块仍保持 `REA / 分析中，待复核`。证据见 [`workload-browser-login-exported-shell-20261024.json`](./evidence/workload-browser-login-exported-shell-20261024.json)。
 
 ## 当前增量（2026-10-24：集群级原生入口静态测试）
 
