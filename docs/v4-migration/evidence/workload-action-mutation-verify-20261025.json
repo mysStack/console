@@ -76,5 +76,17 @@
     ],
     "postCheck": "两次 PUT 后 API 回读和 rollout 均成功，最终 spec.replicas=1、ready=1/1，测试资源恢复原状态"
   },
+  "deploymentRollback": {
+    "kind": "Deployment",
+    "name": "v4-deploy-edit-ef3",
+    "namespace": "v4-migration-e2e",
+    "browser": "详情页更多操作→回退，选择目标修改记录 #30 并确认",
+    "request": {
+      "method": "PATCH",
+      "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+      "status": 200
+    },
+    "postCheck": "rollout 成功，最终副本为 1/1，资源标签和镜像保持测试基线，回退产生新的 revision"
+  },
   "conclusion": "当前部署制品已完成三类 Workload 的删除正向浏览器与 API 验证，并完成 Deployment 副本伸缩；失败/取消/权限路径仍需逐项完成。"
 }
