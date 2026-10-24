@@ -1,5 +1,7 @@
 # Workload 分支 REA 分析索引
 
+> **2026-10-24 输入源纠偏：** 当前制品 REA 的唯一固定源码基线是 `release-4.1.5` / `fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`，读取该基线中的 `v3dist`。`feature/v4-workloads` 只承载 V4 开发，不能作为当前 V3 制品 REA 源。旧 V3 可读源码应使用 `release-3.1.4` 作为参考；此前 `origin/release-3.4` 对照材料降为历史输入，不能替代 `release-3.1.4`，也不能支撑当前 REA 通过。当前模块阶段已退回 `REA / 分析中，待复核`。
+
 > **2026-10-24 入口与制品状态校准**：历史运行时 REA 中“StatefulSet、DaemonSet 的编辑设置仍打开 YAML”只适用于当时的旧制品快照。当前源码提交 `31b6d88fc7e8` 的制品已在 131 Ready；已有认证态复验确认三类入口均打开原生 `WorkloadSettingsModal`，YAML 是独立 Action，并完成终止宽限期 `30 → 31 → 30` 保存与 API 回读。零 Cookie 新 context 登录仍失败，完整字段、RBAC、缓存、错误和逐项 V3 等价仍未闭环。详见[当前制品原生设置证据](./evidence/workload-native-settings-current-head-20261024.json)。
 
 > 当前状态以 [module-execution.json](./module-execution.json) 为准。
@@ -10,7 +12,7 @@
 | 模块/当前能力     | Workload / Deployment、StatefulSet、DaemonSet 组合批次                                                                                                                                                                                                                   |
 | Worktree/分支     | `console-workloads` / `feature/v4-workloads`                                                                                                                                                                                                                             |
 | 当前阶段/REA 结论 | `DEV` / REA 已通过（项目负责人已批准进入 DEV；未闭环项转入 DEV/VERIFY 验收清单）                                                                                                                                                                                         |
-| 事实输入提交      | 本轮制品定位 `e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0`；已验证镜像提交 `ef3b4f1a8`；业务代码输入以当前分支 HEAD 为准                                                                                                                                                    |
+| 事实输入提交      | 本轮制品定位 `fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`；已验证镜像提交 `ef3b4f1a8`；业务代码输入以当前分支 HEAD 为准                                                                                                                                                    |
 | 观察              | 已有原生简化表单和有限部署后测试；当前 V3 编辑行为尚未逐项还原                                                                                                                                                                                                           |
 | 推断              | 表单覆盖不足，不能凭现有 V4 测试证明当前 V3 等价；具体缺失须由制品和真实 V3 行为确认                                                                                                                                                                                     |
 | 制品/REA 证据     | [REA 复核及完整 Evidence ID](./workload-settings-rea-20261022.md)；[Action/API/权限与缓存静态证据](./workload-action-api-rbac-evidence-20261023.md)；[旧 V3 运行时补证](./workload-v3-runtime-rea-20261023.md)；V3 Git tree 绑定在阶段记录中，不能与 REA 目录摘要混用    |

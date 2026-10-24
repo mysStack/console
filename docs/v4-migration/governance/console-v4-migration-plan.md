@@ -2,6 +2,8 @@
 
 > 状态：恢复模块级执行（全局 P0 风险持续跟踪；ConfigMap、Secret、ServiceAccount 按模块 REA → DEV → VERIFY → PR 推进），实际分支和提交以 GitHub 核验结果为准
 >
+> **2026-10-24 Workload REA 输入纠偏：** 当前制品的逆向目标固定为 `release-4.1.5` 的 `packages/bootstrap/assets/v3dist`，不能使用正在开发的模块分支提交作为 REA 源。`release-3.1.4` 是旧 V3 可读源码参考，只用于解释历史结构、字段和样式，不能当作当前制品来源证明。此前将 `feature/v4-workloads` 提交或 `origin/release-3.4` 作为当前对照的记录均降为历史输入，必须重新绑定和复核后才能进入 DEV/VERIFY。
+>
 > 仓库：`mysStack/console`
 >
 > 已发布稳定基线：`release-4.1.5`

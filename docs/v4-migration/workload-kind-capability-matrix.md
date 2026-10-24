@@ -1,6 +1,8 @@
 # Workload 组合开发能力边界矩阵
 
-> **2026-10-24 状态校准**：本文保留组合批次的 REA 防遗漏矩阵；其中历史段落的“阶段：REA”“REA 未完成”只表示该段记录生成时的状态，不是当前门禁状态。当前阶段以 `module-execution.json` 为准：REA 已通过、DEV 已完成、VERIFY 未完成。当前制品的原生设置入口和终止宽限期保存回读已有 131 证据，但完整字段、权限、缓存、错误和逐项 V3 等价仍待验证。
+> **2026-10-24 输入源纠偏：** 本文已有的 `origin/release-3.4` 行级对照仅作为历史材料保留，不能替代项目指定的 `release-3.1.4` 旧 V3 源码参考。当前编译制品的 REA 必须从 `release-4.1.5` 固定基线读取；在新旧两类输入重新绑定并复核前，本矩阵不关闭 REA 门禁。
+
+> **2026-10-24 状态校准**：本文保留组合批次的 REA 防遗漏矩阵；其中历史段落的“阶段：REA”“REA 未完成”只表示该段记录生成时的状态，不是当前门禁状态。当前阶段以 `module-execution.json` 为准：REA 已退回“分析中，待复核”，此前 DEV/VERIFY 记录不能继承为当前通过。当前制品的原生设置入口和终止宽限期保存回读已有历史证据，但完整字段、权限、缓存、错误和逐项 V3 等价仍待重新核对。
 
 > **入口描述校准（2026-10-24）**：本文后续历史段落中的“StatefulSet、DaemonSet 编辑设置仍调用 `editYaml`”是 2026-10-23 旧制品 REA 快照。当前分支源码和 131 旧精确制品复验均显示两个资源的 `editConfigTemplate` 打开原生 `WorkloadSettingsModal`，YAML 由独立 `editYaml` Action 提供。当前 HEAD 新制品尚未在 131 Ready，完整设置字段、保存、权限和 V3 等价仍未验收；详见[旧制品原生设置证据](./evidence/workload-native-settings-old-artifact-20261024.json)。
 
@@ -59,7 +61,7 @@ Deployment 详细候选字段和行为见[编辑设置能力矩阵](./deployment
 
 ## 2026-10-23 定向制品证据：普通资源编辑入口与分区
 
-输入提交 `e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0`；V3 tree 未变。通过惰性 AST 定位当前编译制品的 Webpack 工厂，提取 13 个工厂供 REA 静态分析，未执行制品。数字模块 ID 只用于本制品定位，不视为跨版本标识或原始源码。
+输入提交 `fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`；V3 tree 未变。通过惰性 AST 定位当前编译制品的 Webpack 工厂，提取 13 个工厂供 REA 静态分析，未执行制品。数字模块 ID 只用于本制品定位，不视为跨版本标识或原始源码。
 
 [偏移及摘要清单](./evidence/workload-edit-factories-20261023-provenance.json)记录原 bundle SHA-256、UTF-16/UTF-8 字节范围、工厂摘要和括号包装规则；[REA 原始摘要](./evidence/workload-edit-factories-20261023-summary.json)保留完整限制。父 Evidence：`ev_89e567e2ff36e72e827b17a09891d2400e902abafca83aab123de5e1585b2906`。13 个 JavaScript 文件均解析成功，无解析失败；此派生输入的 application=complete 只表示选定输入已遍历，semantic=unknown、2940 semantic unknowns，不代表 Workload 行为完整。
 
