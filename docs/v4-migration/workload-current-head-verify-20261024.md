@@ -14,6 +14,12 @@
 
 本轮关闭了 Deployment 自动扩缩的一个成功保存、API 持久化和浏览器回读样本；不代表完整 HPA 错误/冲突/权限矩阵或其他 Workload Action 已验收，模块继续保持 `VERIFY / 进行中`。
 
+## 2026-10-25 Deployment YAML 保存、回读与清理 VERIFY
+
+在同一当前制品和专用 Deployment 上，通过浏览器 YAML 编辑器加入测试 annotation `v4-migration-test/yaml-verify=20261025`，保存后 Kubernetes API 回读一致；重新打开 YAML 编辑器确认页面内容包含该 annotation。随后通过浏览器清除该 annotation 并使用当前弹窗的确定按钮保存，API 确认 annotation 已删除，Deployment 始终保持 `replicas=1/readyReplicas=1`，没有 HPA 测试资源残留。结构化证据见 [`workload-yaml-save-readback-verify-20261025.json`](./evidence/workload-yaml-save-readback-verify-20261025.json)。
+
+本轮关闭了 Deployment YAML 的一次字段添加、回读和字段清除样本；StatefulSet/DaemonSet YAML、非法 YAML、冲突、权限和网络失败路径仍未闭环，模块继续保持 `VERIFY / 进行中`。
+
 ## 2026-10-25 当前 SHA 分区切换 VERIFY
 
 | 项目        | 结果                                                                                                  |
