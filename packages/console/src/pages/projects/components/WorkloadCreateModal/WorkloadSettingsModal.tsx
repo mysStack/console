@@ -64,6 +64,7 @@ export default function WorkloadSettingsModal({
     { id: 'podTemplate', label: 'POD_SETTINGS' },
     { id: 'volumeSettings', label: 'STORAGE_SETTINGS' },
     ...(kind !== 'DaemonSet' ? [{ id: 'podMode', label: 'POD_SCHEDULING_RULES' }] : []),
+    { id: 'podGracePeriod', label: 'WORKLOAD_TERMINATION_GRACE_PERIOD' },
     { id: 'metadata', label: 'ADD_METADATA' },
   ];
   const [activeSection, setActiveSection] = useState('updateStrategy');
@@ -333,9 +334,9 @@ export default function WorkloadSettingsModal({
               </section>
             )}
             <section
-              aria-label={t('ADD_METADATA')}
+              aria-label={t('WORKLOAD_TERMINATION_GRACE_PERIOD')}
               ref={node => {
-                sectionRefs.current.metadata = node;
+                sectionRefs.current.podGracePeriod = node;
               }}
             >
               <h3>{t('WORKLOAD_TERMINATION_GRACE_PERIOD')}</h3>
@@ -346,6 +347,13 @@ export default function WorkloadSettingsModal({
               >
                 <InputNumber min={0} precision={0} />
               </FormItem>
+            </section>
+            <section
+              aria-label={t('ADD_METADATA')}
+              ref={node => {
+                sectionRefs.current.metadata = node;
+              }}
+            >
               <h3>{t('ADD_METADATA')}</h3>
               <FormItem
                 name="workloadLabels"

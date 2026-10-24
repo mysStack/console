@@ -94,8 +94,19 @@ test('三类设置均提供分区导航，字段保留挂载并区分 DaemonSet 
       all.find(node => node.type === 'nav'),
       `${kind} 缺少设置分区导航`,
     );
+    assert.ok(
+      all.find(
+        node =>
+          node.type === 'button' && node.props.children === 'WORKLOAD_TERMINATION_GRACE_PERIOD',
+      ),
+      `${kind} 缺少独立的容器组优雅终止导航`,
+    );
     const sections = all.filter(node => node.type === 'section');
     assert.ok(sections.length >= 3);
+    assert.ok(
+      sections.find(node => node.props['aria-label'] === 'WORKLOAD_TERMINATION_GRACE_PERIOD'),
+      `${kind} 缺少独立的容器组优雅终止分区`,
+    );
     assert.ok(
       all.find(node => node.type === 'ContainerSettingsInput'),
       '容器使用二级编辑入口',
