@@ -1,6 +1,8 @@
 # 当前 Workload 执行路线（2026-10-25）
 
-> **最新状态（当前制品 VERIFY）**：`release-4.1.5` 对照发现的分区显示差异已完成 DEV 修复。提交 `4b363c688f1e784acb68fe32117756f03bb55bd2` 对应 CI、镜像、131 rollout 和 Pod imageID 已核对；已认证 Playwright 会话完成 Deployment、StatefulSet、DaemonSet 的分区点击验收，每次只显示当前分区。当前仍为 `VERIFY / 进行中`，低权限、缓存、错误矩阵和逐项功能等价尚未闭环。证据见[分区切换验收](./evidence/workload-settings-tabs-verify-20261025.json)。
+> **最新状态（2026-10-25，退回 DEV）**：在提交 `4b363c688f1e784acb68fe32117756f03bb55bd2` 制品上发现非法 YAML 会发起 PUT 并返回 400，但页面没有可见错误反馈。该功能正确性缺陷已按门禁退回 `DEV / 进行中`；完成严格解析和错误反馈修复后，必须重新构建、部署并用 Playwright 验收。证据见[非法 YAML 缺陷取证](./evidence/workload-yaml-validation-defect-20261025.json)和[DEV 修复记录](./workload-yaml-validation-dev-20261025.md)。
+
+> **上一个 VERIFY 结果**：`release-4.1.5` 对照发现的分区显示差异已完成 DEV 修复。提交 `4b363c688f1e784acb68fe32117756f03bb55bd2` 对应 CI、镜像、131 rollout 和 Pod imageID 已核对；已认证 Playwright 会话完成 Deployment、StatefulSet、DaemonSet 的分区点击验收，每次只显示当前分区。该结果仅作为退回 DEV 前的历史 VERIFY 证据，不能覆盖当前缺陷状态。证据见[分区切换验收](./evidence/workload-settings-tabs-verify-20261025.json)。
 
 > **低权限增量（当前制品）**：已用临时 viewer 完成新的零 Cookie 登录和三类详情只读复验；编辑、更多操作、删除及配置引用写控件均隐藏或禁用。第二 namespace 项目路由返回页面未找到，完整跨 namespace UI 正反仍待 API 与缓存矩阵继续闭环。证据见[低权限浏览器复验](./evidence/workload-rbac-current-head-verify-20261025.json)。
 

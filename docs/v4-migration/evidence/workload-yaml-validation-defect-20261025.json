@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-25",
+  "module": "workloads",
+  "phase": "VERIFY -> DEV",
+  "sourceCommit": "4b363c688f1e784acb68fe32117756f03bb55bd2",
+  "artifact": {
+    "url": "http://192.168.2.131:30880",
+    "imageDigest": "sha256:143572eea79151a40036f0d371f847346acdf39e592c584fd8a37ff6e39ac392",
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:143572eea79151a40036f0d371f847346acdf39e592c584fd8a37ff6e39ac392"
+  },
+  "resource": {
+    "kind": "Deployment",
+    "namespace": "v4-migration-e2e",
+    "name": "v4-deploy-edit-ef3",
+    "replicas": "1/1"
+  },
+  "steps": [
+    "通过当前制品的原生 YAML 编辑器提交语法错误内容",
+    "浏览器保持 YAML 弹窗打开，但页面未显示可见错误提示或 role=alert",
+    "Network 记录 PUT 返回 400 Bad Request，Kubernetes 对象未改变",
+    "未记录任何账号、密码、Token 或 Secret 明文"
+  ],
+  "request": {
+    "method": "PUT",
+    "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+    "status": 400,
+    "message": "the object provided is unrecognized (must be of type Deployment): couldn't get version/kind; json parse error"
+  },
+  "sourceFindings": [
+    "packages/shared/src/utils/yaml.ts 的 load 会吞掉 js-yaml 解析异常并返回原始字符串",
+    "三类项目 Workload 列表的 YAML handler 使用 yaml.load，未在解析失败时阻止提交",
+    "useUpdateDeploymentMutation 未向 useMutation 传递 onError，API 失败没有统一错误反馈"
+  ],
+  "disposition": {
+    "status": "已确认缺陷，退回 DEV",
+    "requiredFix": "使用严格 YAML 解析阻止非法内容提交，并为三类 YAML 更新补充 API 错误反馈",
+    "verificationRequired": "修复后必须重新构建、部署到 131，并用 Playwright 验证非法 YAML 不发起 PUT、页面保留编辑态且显示错误；再验证合法 YAML 保存回读"
+  }
+}
