@@ -53,11 +53,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "0a97ac7a5eddf5385d16d85e21bfa8db5e113faa4729ba454db7e84995f5badd"
+        "sha256": "a841aadb95908faf1d93538def085a2c516c7f173d7c0a9473c9bb79dacd7979"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "0aba2775ba15f1cc47e577894d19c5d0ba535defcd2d4929736cfb948b374fc4"
+        "sha256": "75c57588322989d3ef45542cc0ae837a9666db5e0fdd131fc0e291ef2a4dd704"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -121,7 +121,7 @@
       },
       {
         "path": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-        "sha256": "3fc09f21d8a8f2f0eac57fe4e7951d53d7129fff4fa31e36bbc40d82df7ad831"
+        "sha256": "4c63d4b20aebbd76319ebf36a950e1eeed529e8c43beb82c3d84becb21e18e22"
       },
       {
         "path": "docs/v4-migration/evidence/workload-kind-detail-browser-20261024.json",
@@ -614,8 +614,8 @@
   ],
   "verify": {
     "status": "进行中",
-    "reason": "正在把当前 HEAD 对应镜像部署到 kubesphere-system/ks-console（NodePort 30880），随后使用 Playwright 验收 Deployment、StatefulSet、DaemonSet 的原生列表、详情、编辑设置、路由、作用域和错误路径；未完成浏览器验收前不标记模块通过。",
-    "sourceCommit": "54e4f4a2da49e46f6d975f4ed7032a845fc66d96",
+    "reason": "当前制品已完成构建、推送、131 rollout、Pod imageID/digest 核对及部分 Playwright 复验；新 Cookie 登录、完整 Action、低权限正反、缓存、错误路径和逐项等价仍未闭环，保持 VERIFY 进行中。",
+    "sourceCommit": "54b863b2ccd611bab088d39bcbebc8b4e9f68500",
     "documents": [
       {
         "path": "docs/v4-migration/workload-131-verify-20261024.md",
@@ -655,11 +655,11 @@
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "0aba2775ba15f1cc47e577894d19c5d0ba535defcd2d4929736cfb948b374fc4"
+        "sha256": "75c57588322989d3ef45542cc0ae837a9666db5e0fdd131fc0e291ef2a4dd704"
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "0a97ac7a5eddf5385d16d85e21bfa8db5e113faa4729ba454db7e84995f5badd"
+        "sha256": "a841aadb95908faf1d93538def085a2c516c7f173d7c0a9473c9bb79dacd7979"
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
@@ -684,8 +684,38 @@
       {
         "path": "docs/v4-migration/evidence/workload-grace-period-build-20261024.json",
         "sha256": "751862ab32a936a8c16aebe2e37702f30bd6cb0157ac66f330c3c95070301f44"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-current-head-verify-20261024.json",
+        "sha256": "334caf8ccb89a3288843d764a8d45164f7457c5142878fb9428cfed872681fe8"
+      },
+      {
+        "path": "docs/v4-migration/workload-current-head-verify-20261024.md",
+        "sha256": "185cfcf44266428bd1d6ccf46cf8d99cdffe756d4a63b729dc8ec9d8ccffb48f"
       }
-    ]
+    ],
+    "ciRun": "40100881163",
+    "ciStatus": "Unit tests 与 Build and publish ks-console 均成功；本地 packages 构建和全量测试通过",
+    "imageTag": "feature-v4-workloads-20261024-220602-54b863b2ccd6",
+    "imageDigest": "sha256:53299da2a0add86f3c08208b8ed9728d39af31ae5c0ba7b315283dc5bfdc675a",
+    "rollout": {
+      "context": "default",
+      "namespace": "kubesphere-system",
+      "deployment": "ks-console",
+      "nodePort": 30880,
+      "status": "成功",
+      "replicas": "1/1",
+      "pod": "ks-console-7c987bf54b-4gjkz",
+      "podImageID": "ghcr.io/mysstack/ks-console@sha256:53299da2a0add86f3c08208b8ed9728d39af31ae5c0ba7b315283dc5bfdc675a"
+    },
+    "browserVerification": {
+      "status": "部分完成",
+      "evidence": "docs/v4-migration/evidence/workload-current-head-verify-20261024.json",
+      "report": "docs/v4-migration/workload-current-head-verify-20261024.md",
+      "freshLogin": "未通过",
+      "authenticatedSessionChecks": "通过（页面和请求复验）",
+      "moduleAcceptance": "未完成"
+    }
   },
   "routeAdjustment": {
     "date": "2026-10-24",

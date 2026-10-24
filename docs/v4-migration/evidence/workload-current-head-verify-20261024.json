@@ -1,0 +1,65 @@
+{
+  "schema": "v4-workload-current-head-verify",
+  "date": "2026-10-24",
+  "module": "workloads",
+  "resources": ["Deployment", "StatefulSet", "DaemonSet"],
+  "source": {
+    "branch": "feature/v4-workloads",
+    "commit": "54b863b2ccd611bab088d39bcbebc8b4e9f68500",
+    "ciRun": "40100881163",
+    "ciResult": "success",
+    "unitTests": "success",
+    "buildJob": "success"
+  },
+  "artifact": {
+    "repository": "ghcr.io/mysstack/ks-console",
+    "tag": "feature-v4-workloads-20261024-220602-54b863b2ccd6",
+    "digest": "sha256:53299da2a0add86f3c08208b8ed9728d39af31ae5c0ba7b315283dc5bfdc675a"
+  },
+  "deployment": {
+    "context": "default",
+    "namespace": "kubesphere-system",
+    "deployment": "ks-console",
+    "nodePort": 30880,
+    "rollout": "success",
+    "replicas": "1/1",
+    "pod": "ks-console-7c987bf54b-4gjkz",
+    "podReady": true,
+    "podImage": "ghcr.io/mysstack/ks-console:feature-v4-workloads-20261024-220602-54b863b2ccd6",
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:53299da2a0add86f3c08208b8ed9728d39af31ae5c0ba7b315283dc5bfdc675a"
+  },
+  "browser": {
+    "tool": "Playwright CLI",
+    "session": "workload-rea-current",
+    "origin": "http://192.168.2.131:30880",
+    "freshLogin": {
+      "status": "未通过",
+      "observation": "按 /home/bruce/.bashrc 环境变量进行零 Cookie 登录尝试，登录接口返回业务错误；未将该尝试标记为当前制品登录通过。"
+    },
+    "authenticatedSession": {
+      "status": "通过",
+      "observation": "复用已建立的 30880 测试会话，在 rollout 后重新加载页面，账号角色显示为 platform-admin。"
+    },
+    "checks": {
+      "projectDeploymentList": "通过：v4-migration-e2e 只显示该 namespace 的 Deployment",
+      "projectStatefulSetList": "通过：v4-migration-e2e 只显示该 namespace 的 StatefulSet",
+      "projectDaemonSetList": "通过：v4-migration-e2e 只显示该 namespace 的 DaemonSet",
+      "clusterDeploymentList": "通过：/clusters/host/deployments 渲染集群级列表，并显示全部项目筛选入口",
+      "deploymentDetail": "通过：直达 / 刷新 / 详情页渲染",
+      "statefulSetDetail": "通过：直达 / 刷新 / 详情页渲染",
+      "daemonSetDetail": "通过：直达 / 刷新 / 详情页渲染",
+      "deploymentSettings": "通过：原生编辑设置弹窗，更新策略、容器组设置、存储、调度、优雅终止和元数据分区可见；取消路径通过",
+      "daemonSetSettings": "通过：原生编辑设置弹窗，未出现副本数编辑，DaemonSet 专属更新策略和就绪时间可见；取消路径通过",
+      "configReference": "通过：原生配置引用页面显示 ConfigMap/Secret 资源名称、前缀和键名，不显示 Secret 值",
+      "network": "通过：本轮 Workload 页面请求未发现 /consolev3、/dist/v3dist 或 Wujie 入口请求",
+      "pageRendering": "通过：列表、详情、设置弹窗和配置引用页面均完成 DOM 快照；设置弹窗完成截图检查"
+    }
+  },
+  "notClosed": [
+    "新 Cookie 登录链路仍未通过，当前浏览器行为证据使用 rollout 前已认证的 30880 会话复验。",
+    "Deployment/StatefulSet/DaemonSet 的完整 Action 矩阵、真实保存/删除/回滚/重启/伸缩和错误/冲突路径仍未全部闭环。",
+    "低权限 RBAC、完整 namespace 正反隔离和缓存失效需要在当前 HEAD 制品上重新执行，历史证据不继承。",
+    "扩展初始化错误仍按负责人决定暂不纳入本模块验收。"
+  ],
+  "conclusion": "当前 HEAD 已完成构建、推送、部署、rollout、Pod digest 核对和已认证浏览器页面复验；Workload 模块保持 VERIFY 进行中，不能标记为已验收或进入 PR。"
+}

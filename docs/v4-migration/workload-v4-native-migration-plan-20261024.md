@@ -1,5 +1,7 @@
 # Workload V4 原生化迁移实施计划
 
+> **当前状态（2026-10-24）：** `VERIFY / 进行中`。当前制品已完成构建、部署、rollout 和部分 Playwright 复验；新 Cookie 登录、完整 Action、低权限正反、缓存、错误路径和逐项等价仍未闭环，不得进入 PR。
+
 > **给执行者：** 必须按任务顺序执行。REA 未完成负责人复核前，不得修改业务代码；进入 DEV 后每个任务都要先补充或复用测试，再修改实现。
 
 **目标：** 在 `feature/v4-workloads` 独立 Worktree 中完成 Deployment、StatefulSet、DaemonSet 的 V4 原生列表、详情、编辑设置和运维操作，并通过本地检查、131 部署、浏览器验收和独立 Draft PR。
