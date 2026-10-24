@@ -37,8 +37,13 @@ git diff --name-only release-4.1.5..HEAD -- packages/bootstrap/assets/v3dist
 - 当前 131 仍运行旧的 `31b6d88fc7e8` 镜像；本次纠偏前构建的新镜像没有部署。
 
 当前工作区没有可直接核验的 `release-3.1.4` 分支或独立旧 V3 源码目录；现有
-`origin/release-3.4` 不能冒充该输入。旧源码的确切 commit、路径和许可证需要在
-重新进行旧源码对照前补齐。未补齐前，不把旧源码字段或样式对照写成已完成。
+`origin/release-3.4` 不能冒充该输入。根据项目负责人提供的远程仓库
+`https://github.com/mysStack/kse-console-v3` 进行只读核验，当前可见分支为
+`main`、`feature/app-env-from`、`feature/v3-artifact-decouple`、`release-4.1.5`，
+可见标签为 `v3.0.0-mystack.1` 至 `v3.0.0-mystack.6`，远程 API 对
+`release-3.1.4` 返回 `404 Not Found`。因此该地址目前仍不能提供指定的旧源码引用。
+旧源码的确切 commit、实际分支或其他镜像位置及许可证需要在重新进行旧源码对照前补齐。
+未补齐前，不把旧源码字段或样式对照写成已完成。
 
 ## 样式逆向边界
 
