@@ -28,7 +28,12 @@
     "baseUrl": "http://192.168.2.131:30880",
     "authentication": "使用已有认证会话；本轮未建立新的零 Cookie 登录会话",
     "mutations": "仅打开编辑设置并点击分区，使用取消关闭；未提交资源修改",
-    "consoleErrors": "页面仍有已登记的扩展初始化错误；不作为本轮 Workload 分区功能通过条件，也不记为零错误"
+    "consoleErrors": "页面仍有已登记的扩展初始化错误；不作为本轮 Workload 分区功能通过条件，也不记为零错误",
+    "freshLogin": {
+      "status": "失败",
+      "method": "从 /home/bruce/.bashrc 加载测试账号环境变量后，在新的零 Cookie Playwright 会话提交登录",
+      "result": "页面返回通用登录失败提示，未进入 Console；账号信息未写入证据"
+    }
   },
   "resources": [
     {

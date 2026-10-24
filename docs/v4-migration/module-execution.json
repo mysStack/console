@@ -57,7 +57,7 @@
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "2f62bc414daa9684e6d9a2849746c18aa3226e87eb0315e4549ef3b962f485ff"
+        "sha256": "824eda232dff2afa8fbaaa22b59b245092a8edfddeed7bf928ed65ead1cd053b"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -663,7 +663,7 @@
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "2f62bc414daa9684e6d9a2849746c18aa3226e87eb0315e4549ef3b962f485ff"
+        "sha256": "824eda232dff2afa8fbaaa22b59b245092a8edfddeed7bf928ed65ead1cd053b"
       },
       {
         "path": "docs/v4-migration/matrix.md",
@@ -699,7 +699,7 @@
       },
       {
         "path": "docs/v4-migration/workload-current-head-verify-20261024.md",
-        "sha256": "b26d66f7ac9b3c62f67022dd2b7a7c9f60a442cc8ed5ccc149028d6efcdd89b4"
+        "sha256": "5c9a4d1424031c8ea1c41e258a2d0493f5d793ef4b2bca086f5360fa742f97c7"
       },
       {
         "path": "docs/v4-migration/evidence/workload-daemonset-stop-recovery-verify-20261025.json",
@@ -739,7 +739,7 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-settings-tabs-verify-20261025.json",
-        "sha256": "2b315af10dbe8fee530ec1b6b866ce65ddbb927f36fa4863c1eacd573fd1f390"
+        "sha256": "ab09cf69cd3ee5db08e0e15eef8440c389da1386779d4935ec64938fe9bef84d"
       },
       {
         "path": "docs/v4-migration/workload-settings-tabs-dev-20261025.md",
@@ -766,7 +766,7 @@
       "status": "部分完成",
       "evidence": "docs/v4-migration/evidence/workload-settings-tabs-verify-20261025.json",
       "report": "docs/v4-migration/workload-current-head-verify-20261024.md",
-      "freshLogin": "未建立新的零 Cookie 登录会话；不继承旧会话结论",
+      "freshLogin": "已执行新的零 Cookie 登录尝试，页面返回通用登录失败提示，未建立认证会话；不继承旧会话结论",
       "authenticatedSessionChecks": "当前制品已验证 Deployment、StatefulSet、DaemonSet 编辑设置分区切换、当前面板唯一可见、资源差异字段和取消路径；页面仍有已登记扩展初始化错误",
       "moduleAcceptance": "未完成"
     },
