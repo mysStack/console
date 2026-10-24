@@ -36,6 +36,7 @@
 - StatefulSet `v4-watch-sts-20261022-01` 完成服务和设置保存回读验证：编辑服务保持原值确认时 namespace 作用域 PATCH 返回 200；编辑设置临时修改测试标签后 PUT、回读 200，再恢复原值并回读 200；StatefulSet 保持 `1/1`，Service 的 Headless、端口和 selector 保持一致；证据见 [`evidence/workload-statefulset-service-verify-20261025.json`](./evidence/workload-statefulset-service-verify-20261025.json)。
 - Deployment `v4-deploy-edit-ef3` 的“编辑设置”页面在当前制品上完成保存回读验证：临时修改测试标签、通过 namespace 作用域 PUT 保存并回读 200，再恢复原值并回读 200；Deployment 全程保持 `1/1` Ready 并完成 rollout；证据见 [`evidence/workload-deployment-settings-verify-20261025.json`](./evidence/workload-deployment-settings-verify-20261025.json)。
 - DaemonSet `v4-stop-ds-7fa` 完成设置保存回读验证：临时修改测试标签、通过 namespace 作用域 PUT 保存并回读 200，再恢复原值并回读 200；DaemonSet 全程保持 `1/1` Ready 并完成 rollout，页面未显示副本数量编辑，现有 nodeSelector 保持不变；证据见 [`evidence/workload-daemonset-settings-verify-20261025.json`](./evidence/workload-daemonset-settings-verify-20261025.json)。
+- DaemonSet 停止成功路径已在当前制品补测：项目列表选择 `v4-stop-ds-7fa` 后点击“停止”，namespace 作用域 PATCH 返回 200，`non-existing=true` 后状态为 `0/0`，页面显示“已停止”。停止状态下未发现原生“恢复”入口，使用已授权的测试资源补丁移除该临时 selector 后 rollout 成功并恢复 `1/1`；当前页面随后显示“运行中 (1/1)”。这只关闭停止成功和测试资源恢复，不关闭原生停止/恢复完整闭环；证据见 [`evidence/workload-daemonset-stop-recovery-verify-20261025.json`](./evidence/workload-daemonset-stop-recovery-verify-20261025.json)。
 - 本轮 Workload 页面请求未发现 `/consolev3`、`/dist/v3dist` 或 Wujie 入口请求。
 - 列表、详情、编辑设置和配置引用完成 DOM 快照，编辑设置完成截图检查。
 
@@ -54,6 +55,7 @@
 
 - 当前制品的新 Cookie 登录链路未通过，必须重新建立可复现的专用测试会话后，才能完成完整浏览器验收。
 - Deployment、StatefulSet、DaemonSet 的全部 Action 矩阵，以及保存、删除、回滚、重启、伸缩、冲突和网络错误路径尚未在本轮当前制品全部闭环。
+- DaemonSet 停止后的浏览器恢复入口尚未证明；当前恢复依赖已授权测试资源的 API 补丁，需在 DEV/VERIFY 中决定是否补齐原生恢复 Action。
 - 低权限 RBAC、完整 namespace 正反隔离和缓存失效需要在当前制品上重新执行；历史证据不继承。
 - 扩展初始化错误仍按负责人决定暂不纳入 Workload 模块验收，但不能写成控制台零错误。
 

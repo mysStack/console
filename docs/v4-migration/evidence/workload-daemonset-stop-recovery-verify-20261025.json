@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-25",
+  "module": "workloads",
+  "resource": {
+    "kind": "DaemonSet",
+    "name": "v4-stop-ds-7fa",
+    "namespace": "v4-migration-e2e"
+  },
+  "currentArtifact": {
+    "sourceCommit": "54b863b2ccd611bab088d39bcbebc8b4e9f68500",
+    "image": "ghcr.io/mysstack/ks-console:feature-v4-workloads-20261024-220602-54b863b2ccd6",
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:53299da2a0add86f3c08208b8ed9728d39af31ae5c0ba7b315283dc5bfdc675a"
+  },
+  "stop": {
+    "browserUrl": "http://192.168.2.131:30880/test-workspace/clusters/host/projects/v4-migration-e2e/daemonsets",
+    "action": "项目级列表选择 DaemonSet 后点击停止，并输入资源名确认",
+    "request": {
+      "method": "PATCH",
+      "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/daemonsets/v4-stop-ds-7fa",
+      "status": 200
+    },
+    "after": {
+      "nodeSelector": {
+        "kubernetes.io/os": "linux",
+        "non-existing": "true"
+      },
+      "ready": "0/0",
+      "pageState": "已停止 (0/0)"
+    }
+  },
+  "recovery": {
+    "uiAction": "未发现停止状态下的恢复入口；列表工具栏仍显示停止",
+    "authorizedFixtureRestore": {
+      "method": "kubectl patch",
+      "operation": "移除 spec.template.spec.nodeSelector.non-existing，保留 kubernetes.io/os=linux",
+      "rollout": "成功",
+      "ready": "1/1"
+    },
+    "after": {
+      "nodeSelector": {
+        "kubernetes.io/os": "linux"
+      },
+      "ready": "1/1",
+      "pageState": "运行中 (1/1)"
+    }
+  },
+  "conclusion": "停止成功路径已在当前部署制品中验证；测试资源已恢复。当前浏览器未证明停止后的原生恢复入口，停止/恢复完整闭环仍未通过。"
+}
