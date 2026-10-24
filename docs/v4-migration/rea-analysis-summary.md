@@ -11,7 +11,7 @@
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 模块/当前能力     | Workload / Deployment、StatefulSet、DaemonSet 组合批次                                                                                                                                                                                                                   |
 | Worktree/分支     | `console-workloads` / `feature/v4-workloads`                                                                                                                                                                                                                             |
-| 当前阶段/REA 结论 | `DEV` / REA 已通过（项目负责人已批准进入 DEV；未闭环项转入 DEV/VERIFY 验收清单）                                                                                                                                                                                         |
+| 当前阶段/REA 结论 | `REA` / 分析中，待复核；此前批准因输入源绑定错误退回，不继承历史 DEV/VERIFY 结论                                                                                                                                                                                         |
 | 事实输入提交      | 本轮制品定位 `fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`；已验证镜像提交 `ef3b4f1a8`；业务代码输入以当前分支 HEAD 为准                                                                                                                                                    |
 | 观察              | 已有原生简化表单和有限部署后测试；当前 V3 编辑行为尚未逐项还原                                                                                                                                                                                                           |
 | 推断              | 表单覆盖不足，不能凭现有 V4 测试证明当前 V3 等价；具体缺失须由制品和真实 V3 行为确认                                                                                                                                                                                     |
@@ -19,8 +19,8 @@
 | 行为和字段清单    | [组合能力边界](./workload-kind-capability-matrix.md)、[编辑设置能力矩阵](./deployment-settings-capability-matrix.md)、[旧源码对照](./workload-settings-source-evidence-20261024.md)；三类资源均未标记为已还原、[字段级对照](./workload-v3-field-equivalence-20261023.md) |
 | 未知及影响        | 原生入口和配置引用桥接移除已完成 DEV；当前浏览器发现引用面板低权限控件暴露，退回 DEV 修复。完整权限/namespace/缓存与功能等价继续 VERIFY，不重做全量 REA。                                                                                                                |
 | 关闭条件          | 公共行为和三类资源差异均有可追溯制品定位、运行时对照、V4 替代与差异；所有高风险已关闭或经复核明确隔离                                                                                                                                                                    |
-| 复核人/日期/依据  | 项目负责人（用户明确批准）/ 2026-10-23 / [Workload REA 复核结论](./workload-rea-review-20261023.md#5-门禁动作)                                                                                                                                                           |
-| 下一步            | 优先对照当前 v3dist 和真实设置页补齐分区、镜像认证、GPU、环境引用和端口语义；配置引用权限缺陷保留，修复后完成新 SHA 部署与浏览器验收。                                                                                                                                   |
+| 复核人/日期/依据  | 当前无新签署；历史复核仅保留为失效记录 / 2026-10-24 纠偏记录                                                                                                                                                                                                             |
+| 下一步            | 固定 release-4.1.5 制品重做 Workload 字段与样式 REA；补齐 release-3.1.4 旧源码位置后再提交复核，未复核前不进入 DEV/VERIFY。                                                                                                                                              |
 
 REA 的 `partial/no-match` 是覆盖限制，不能证明功能不存在，也不是所有模块必须停止的理由。当前受限的是尚未证明的 Workload 组合批次；无关模块仍遵循自己的证据和门禁。无需恢复全部原始 TSX，只需要公共行为和三类资源差异的证据足以指导完整 V4 重构。
 
@@ -71,3 +71,17 @@ Deployment、StatefulSet、DaemonSet 共用一个模块分支和组合能力记�
 2026-10-23 宿主时区定向补证使用固定当前制品工厂 933/2285，确认容器开关写入 `host-time:/etc/localtime` 只读挂载，并在普通/初始化容器合并后维护 `/etc/localtime` HostPath 卷。来源、偏移及工厂哈希见[来源记录](./evidence/workload-timezone-20261023-provenance.json)，实际 REA Evidence 与限制见[摘要](./evidence/workload-timezone-20261023-rea-summary.json)。该证据指导提交 `da741a389` 的三类设置及 Deployment 创建实现；页面渲染、实际 Pod 时区、RBAC 和持久化留待 VERIFY。
 
 2026-10-23 停止语义定向补证定位当前制品 main 工厂 318：DaemonSet 使用 `nodeSelector.non-existing=true`，其他 Workload 使用 `replicas=0`。来源见[记录](./evidence/workload-stop-20261023-provenance.json)，REA Evidence 与限制见[摘要](./evidence/workload-stop-20261023-rea-summary.json)；指导提交 `da741a389`，真实停止/恢复留待 VERIFY。
+
+## 2026-10-24 固定基线样式资产补证
+
+本轮已将当前制品样式输入重新绑定到 `release-4.1.5` 的 `v3dist`，对应提交为
+`fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`，目录树为
+`1e499d92e11374e26c76f5e13be45251602bd596`。对 manifest 中的 CSS 资产记录了路径、字节数
+和 SHA-256，同时确认字体使用 hashed 的 Roboto `ttf/woff/woff2` 资源。完整清单见
+[固定基线样式 REA 证据](./evidence/workload-style-rea-20261024.json)。
+
+该证据只确认编译制品中的静态样式资源可以作为重建输入，不能替代旧源码、真实 V3
+Workload 设置页 DOM、计算样式、截图、交互状态和 Network 证据，也不能证明 V4 视觉或
+功能等价。`release-3.1.4` 的确切本地路径或远程仓库仍待补齐；`origin/release-3.4`
+不得代替它。当前模块仍为 `REA / 分析中，待复核`，已有代码、镜像和浏览器记录均不
+继承为本轮通过。

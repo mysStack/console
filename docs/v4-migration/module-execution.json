@@ -101,6 +101,10 @@
       {
         "path": "docs/v4-migration/workload-rea-source-correction-20261024.md",
         "sha256": "92f5025214af125cac32a0488f18967c9356d2a6fcf0f3e5667fdcc07c6cb73d"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-style-rea-20261024.json",
+        "sha256": "360e56b3b71ccc4368a3090949eb7a20e6ed52610298e0cd03a1c88a9eaf5865"
       }
     ],
     "coverage": {
