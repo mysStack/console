@@ -134,9 +134,9 @@
 
 ### 低权限浏览器结果
 
-- 当前没有可复现的低权限账号登录凭据。先前已认证会话不能替代低权限账号的零 Cookie 登录；本轮未把管理员会话或历史结果标记为低权限通过。
-- 因此当前制品的低权限 Deployment 读取、编辑拒绝、删除拒绝、StatefulSet Service 拒绝和 403/404 组合路径仍未完成。
-- Kubernetes `auth can-i` 的静态结果不能替代浏览器登录后的 Console 权限结果；取得专用 viewer 会话后需要在当前 30880 制品上重新执行并记录。
+当前制品已经使用临时项目 viewer 完成一次新的零 Cookie 登录。该账号可读取 `v4-migration-e2e` 中的三类 Workload 详情和配置引用页面，编辑、更多操作、删除以及配置引用写控件未显示或处于禁用状态；未授权 namespace 直达详情返回 `/errors/403`。临时用户、RoleBinding 和第二 namespace 的临时 Workspace 标签均已清理或恢复，具体证据见 [`workload-rbac-current-head-verify-20261025.json`](./evidence/workload-rbac-current-head-verify-20261025.json) 和 [`workload-namespace-isolation-current-head-verify-20261025.json`](./evidence/workload-namespace-isolation-current-head-verify-20261025.json)。
+
+低权限集群级列表本身返回 403，符合项目 viewer 未授予集群级列表权限的预期；因此不能把管理员的集群列表缓存切换结果扩展为低权限通过。低权限列表切换、详情返回组合、全部拒绝路径和完整 403/404/409/422 矩阵仍需继续补证。
 
 ### 低权限配置引用复验
 
@@ -144,14 +144,14 @@
 
 ### 尚未闭环的场景
 
-- 当前制品的新 Cookie 登录链路未通过，低权限浏览器会话尚未建立，完整 RBAC 正反路径不能验收。
-- Deployment、StatefulSet、DaemonSet 仍需按 release-4.1.5 页面逐项完成设置字段、样式、校验、取消和错误态对照；当前只完成了 Deployment 的直接对照样本。
-- 当前制品仍需补齐 HPA/YAML、重启及适用 Action 的逐项浏览器结果，并完成 StatefulSet、DaemonSet 的同基线运行时对照。
-- 完整 namespace 正反隔离和缓存失效仍需在当前制品上补齐；历史证据不继承。
+- 三类资源的 HPA（适用于 Deployment）和 YAML 成功保存、回读、清除样本已补齐；StatefulSet/DaemonSet 不适用 HPA，YAML 异常、冲突、权限和网络失败路径仍未完成。
+- Deployment、StatefulSet、DaemonSet 仍需按 release-4.1.5 页面逐项完成剩余字段、样式、校验、取消和错误态对照；当前成功保存样本不能代表全部字段等价。
+- 重启、适用 Action 的完整成功/失败/取消/冲突矩阵以及低权限拒绝路径仍需继续补证。
+- 管理员 namespace 列表切换和刷新已补一组 Deployment 样本；低权限列表、StatefulSet/DaemonSet 列表、详情返回和完整用户/namespace 缓存组合仍未闭环。
 - 扩展初始化错误仍按负责人决定暂不纳入 Workload 模块验收，但不能写成控制台零错误。
 
 ## 4. 阶段结论
 
-当前制品已完成构建、推送、部署、rollout、Pod digest 核对和部分浏览器页面复验。由于本轮基线对照确认编辑设置弹窗存在布局和分区交互差异，模块阶段已回到 `DEV / 进行中`；修复后的新 SHA 必须重新完成构建、部署和浏览器 VERIFY。本记录不批准模块进入 PR，不标记 Deployment、StatefulSet 或 DaemonSet 已验收。
+当前制品已完成构建、推送、部署、rollout、Pod digest 核对，以及三类 Workload 的部分浏览器 VERIFY。编辑设置分区修复、低权限详情/隔离、管理员列表缓存、Deployment HPA、三类 YAML 成功保存与清除均已有当前制品证据；剩余字段等价、异常矩阵、完整 RBAC/缓存组合和 V3 逐项等价仍未闭环。模块保持 `VERIFY / 进行中`，不进入 PR，不标记 Deployment、StatefulSet 或 DaemonSet 已验收。
 
 结构化证据：[workload-current-head-verify-20261024.json](./evidence/workload-current-head-verify-20261024.json)。
