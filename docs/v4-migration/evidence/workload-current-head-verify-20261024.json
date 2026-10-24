@@ -64,7 +64,30 @@
     "新 Cookie 登录链路仍未通过，当前浏览器行为证据使用 rollout 前已认证的 30880 会话复验。",
     "Deployment/StatefulSet/DaemonSet 的完整 Action 矩阵、真实保存/删除/回滚/重启/伸缩和错误/冲突路径仍未全部闭环。",
     "低权限 RBAC、完整 namespace 正反隔离和缓存失效需要在当前 HEAD 制品上重新执行，历史证据不继承。",
-    "扩展初始化错误仍按负责人决定暂不纳入本模块验收。"
+    "扩展初始化错误仍按负责人决定暂不纳入本模块验收。",
+    "低权限 RBAC 已完成 Kubernetes 授权矩阵核对，但该账号当前制品的浏览器登录和 UI 拒绝态尚未闭环。"
   ],
-  "conclusion": "当前 HEAD 已完成构建、推送、部署、rollout、Pod digest 核对和已认证浏览器页面复验；Workload 模块保持 VERIFY 进行中，不能标记为已验收或进入 PR。"
+  "conclusion": "当前 HEAD 已完成构建、推送、部署、rollout、Pod digest 核对和已认证浏览器页面复验；Workload 模块保持 VERIFY 进行中，不能标记为已验收或进入 PR。",
+  "rbac": {
+    "status": "部分完成",
+    "source": "kubectl auth can-i 对 v4-workload-viewer-20261023 的授权矩阵",
+    "namespace": "v4-migration-e2e",
+    "read": {
+      "deployments": "允许",
+      "statefulsets": "允许",
+      "daemonsets": "允许",
+      "configmaps": "允许",
+      "secrets": "允许"
+    },
+    "write": {
+      "create": "拒绝",
+      "update": "拒绝",
+      "patch": "拒绝",
+      "delete": "拒绝"
+    },
+    "crossNamespace": {
+      "default.deployments.list": "拒绝"
+    },
+    "notEquivalentTo": "尚未完成该账号在当前制品上的浏览器登录、页面拒绝态和 API 403 UI 反馈复验"
+  }
 }
