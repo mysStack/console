@@ -224,9 +224,9 @@
     }
   },
   "dev": {
-    "status": "开发中",
-    "reason": "2026-10-24 截图与固定 V3 制品复核发现编辑设置分区缺口：V3 对 Deployment、StatefulSet、DaemonSet 均有独立 POD_GRACE_PERIOD 分区；当前 V4 将 terminationGracePeriodSeconds 放在添加元数据中，未提供独立导航。先补失败测试和原生分区，再重新完成三类资源的本地检查、构建、部署和浏览器 VERIFY。此前 9a5bd5cdc 的批量删除修复记录保留为历史 DEV 交付。",
-    "sourceCommit": "9a5bd5cdc22ec7877c33773ca1ba8562a463bcd6",
+    "status": "已完成",
+    "reason": "修复编辑设置分区缺口：依据固定 V3 制品确认 Deployment、StatefulSet、DaemonSet 均需独立 POD_GRACE_PERIOD；当前 V4 已将 terminationGracePeriodSeconds 移入独立容器组优雅终止分区。提交 5c2525681615804dc284221e2e1434d05d655213 完成测试先行、定向测试、全仓库 ./scripts/test.sh（91 文件/402 项）和 corepack yarn build:packages；真实 131 部署与 Playwright VERIFY 尚待执行。",
+    "sourceCommit": "5c2525681615804dc284221e2e1434d05d655213",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
@@ -495,6 +495,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-batch-delete-defect-20261024.json",
         "sha256": "c80069ff002faa6405fe91ee790a3dd9a1efd03ae68c1f9250c877327d1433e7"
+      },
+      {
+        "path": "docs/v4-migration/workload-settings-dev-20261024-grace-period.md",
+        "sha256": "bd420130b0ea67bfde02abc36e61fedbaf462930a8a6531f53226b23b15b586e"
       }
     ]
   },
