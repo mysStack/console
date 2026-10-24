@@ -2,6 +2,12 @@
 
 > **最新增量优先**：2026-10-25 已对提交 `4b363c688f1e784acb68fe32117756f03bb55bd2` 对应制品完成重新构建、部署和 Playwright 验收。分区切换证据见 [`workload-settings-tabs-verify-20261025.json`](./evidence/workload-settings-tabs-verify-20261025.json)。本文更早章节中的旧 SHA、旧镜像和旧布局观察只保留为历史记录，不能覆盖最新增量结论。
 
+## 2026-10-25 集群级 namespace 切换与刷新缓存复验
+
+在当前 131 制品的集群级 Deployment 列表中，使用已认证管理员会话依次选择 `v4-migration-e2e`、`dev-biz`、再切回 `v4-migration-e2e`，列表分别只显示当前 namespace 的资源：第一 namespace 显示 `v4-deploy-edit-ef3`、`v4-watch-20261022-02` 两条，`dev-biz` 显示五条业务 Deployment，切回后恢复为前两条。对 `v4-migration-e2e` 点击刷新后仍保持两条当前 namespace 资源，没有观察到前一 namespace 的列表残留。结构化证据见 [`workload-cluster-namespace-cache-verify-20261025.json`](./evidence/workload-cluster-namespace-cache-verify-20261025.json)。
+
+本轮关闭了管理员列表视角下的 namespace 切换与刷新样本，不能替代低权限账号、StatefulSet/DaemonSet 列表、详情页返回和完整用户/namespace 缓存组合验证；模块继续保持 `VERIFY / 进行中`。
+
 ## 2026-10-25 当前 SHA 分区切换 VERIFY
 
 | 项目        | 结果                                                                                                  |
