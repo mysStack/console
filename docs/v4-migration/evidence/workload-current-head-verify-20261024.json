@@ -46,13 +46,14 @@
       "projectDaemonSetList": "通过：v4-migration-e2e 只显示该 namespace 的 DaemonSet",
       "clusterDeploymentList": "通过：/clusters/host/deployments 渲染集群级列表，并显示全部项目筛选入口",
       "deploymentDetail": "通过：直达 / 刷新 / 详情页渲染",
-      "statefulSetDetail": "本轮未复验；历史证据不继承为当前制品通过",
+      "statefulSetDetail": "通过：项目列表进入 StatefulSet 详情，直达页面渲染，资源状态显示 1/1，页面请求返回 200",
       "daemonSetDetail": "通过：直达 / 刷新 / 详情页渲染",
       "deploymentSettings": "通过：原生编辑设置弹窗，更新策略、容器组设置、存储、调度、优雅终止和元数据分区可见；取消路径通过",
       "daemonSetSettings": "通过：原生编辑设置弹窗，未出现副本数编辑，DaemonSet 专属更新策略和就绪时间可见；取消路径通过",
       "configReference": "通过：原生配置引用页面显示 ConfigMap/Secret 资源名称、前缀和键名，不显示 Secret 值",
-      "network": "通过：本轮 Workload 页面请求未发现 /consolev3、/dist/v3dist 或 Wujie 入口请求",
-      "pageRendering": "通过：列表、详情、设置弹窗和配置引用页面均完成 DOM 快照；设置弹窗完成截图检查"
+      "network": "通过：本轮 Workload 页面请求返回 200，未发现 /consolev3、/dist/v3dist 或 Wujie 入口请求",
+      "pageRendering": "通过：列表、详情、设置弹窗和配置引用页面均完成 DOM 快照；设置弹窗完成截图检查",
+      "statefulSetSettings": "通过：原生编辑设置弹窗，副本数量、更新策略/分组序号、容器组、PVC 模板、调度、优雅终止和元数据分区可见；取消路径通过"
     }
   },
   "notClosed": [
