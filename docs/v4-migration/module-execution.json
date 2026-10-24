@@ -57,7 +57,7 @@
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "bd59998838223a81d53df4cdd452cb8220248abdb2b5732ef8447f291ff0b502"
+        "sha256": "6c0222e0a90e09c9cc5f3dd8ba55dad2187494bfd2560fa0112e0f33a2ea02ad"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -263,7 +263,7 @@
     "lastReview": {
       "date": "2026-10-24",
       "record": "docs/v4-migration/workload-rea-review-20261024.md",
-      "head": "6f981c332416195fea7f3bb8c08566a5c7c18d61",
+      "head": "970e81e6fdb841a550d5f6af1c73b016bda50176",
       "conclusion": "已补充 StatefulSet/DaemonSet 详情页真实浏览器对照和读请求证据；当前三个资源类型的字段保存、RBAC、缓存、错误和完整 V3 等价仍未闭环，REA 分析中，待负责人复核。"
     }
   },
