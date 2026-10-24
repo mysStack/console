@@ -125,3 +125,28 @@ rg -n 'editConfigTemplate|editYaml|WorkloadSettingsModal' \
 | REA 状态          | **分析中，待负责人复核**                              |
 
 本记录只完成 REA 证据纠偏和缺口收敛，不授权直接进入 DEV。下一步应由负责人复核本记录和现有矩阵；确认进入 DEV 后，优先处理配置引用原生闭环、DaemonSet 停止语义、三类设置保存/缓存/RBAC 以及集群级 V3/Wujie 入口。
+
+## `release-4.1.5` 集群基线对比环境
+
+为避免本地开发服务与集群页面的运行环境差异，已将当前制品基线部署到 131 集群的 `kubesphere-system` 命名空间。该 Deployment 使用独立名称和 Service，只增加一个对比入口，不修改现有 V4 `ks-console` Deployment、Service 或配置。
+
+| 项目             | 基线对比环境                                                                  | 现有 V4 环境                                                              |
+| ---------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| 命名空间         | `kubesphere-system`                                                           | `kubesphere-system`                                                       |
+| Deployment       | `ks-console-v415-rea`                                                         | `ks-console`                                                              |
+| Service          | `ks-console-v415-rea`                                                         | `ks-console`                                                              |
+| NodePort         | `30881`                                                                       | `30880`                                                                   |
+| 镜像             | `release-4.1.5-20261024-155944-fc1253c`                                       | `feature-v4-workloads-20261024-091102-31b6d88fc7e8`                       |
+| 实际 Pod imageID | `sha256:2595b31de4dc01ae67b72b97b857ef40cd1c1ec2a0d406cada177982f380f455`     | `sha256:2956710cd7ef2fbda79ff7a0a9695dac466336bd08248784d5afdfb577b951d3` |
+| 浏览器入口       | `http://192.168.2.131:30881`                                                  | `http://192.168.2.131:30880`                                              |
+| rollout          | `generation=2`、`observedGeneration=2`、`ready=1`、`updated=1`、`available=1` | 现有 Pod 保持 Ready                                                       |
+
+浏览器使用同一测试账号分别登录两个入口，基线页面和 V4 页面均可以打开。当前已取得的直接对比结果如下：
+
+| 页面               | `release-4.1.5` 基线                                                 | 当前 V4                                                   |
+| ------------------ | -------------------------------------------------------------------- | --------------------------------------------------------- |
+| 集群 Workload 入口 | `/consolev3/clusters/host/deployments`                               | `/clusters/host/deployments`                              |
+| 页面行为           | 旧 V3 Workload 列表，显示“编辑信息、编辑 YAML、重新创建、删除”等操作 | V4 原生 Workload 列表，显示项目、状态、创建入口和资源数据 |
+| 请求边界           | 通过 `consolev3` 入口加载旧页面和资源请求                            | 通过当前 V4 路由和 `resources.kubesphere.io` API 加载列表 |
+
+该部署只提供当前 `release-4.1.5` 制品的 REA 对照输入，不能直接视为 V4 VERIFY 通过。Deployment、StatefulSet、DaemonSet 的详情、编辑设置、字段默认值、校验、配置引用、错误态和完整 Action 对比仍需继续采集。
