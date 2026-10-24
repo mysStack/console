@@ -126,7 +126,7 @@ const useCommonActions = ({ store, callback = () => {}, params = {} }: CommonAct
     if (!initialValues) initialValues = props;
     if (!onOk) {
       onOk = async (data: any) => {
-        await store.put({ ...initialValues, ...params }, yaml.load(data), false, k8sVersion);
+        await store.put({ ...initialValues, ...params }, yaml.loadStrict(data), false, k8sVersion);
         notify.success(t('UPDATE_SUCCESSFUL'));
         invalidateResourceList(store?.module);
         callback('editYaml');
@@ -154,10 +154,15 @@ const useCommonActions = ({ store, callback = () => {}, params = {} }: CommonAct
       bodyStyle: { padding: '20px', height: bodyHeight },
       onAsyncOk: async () => {
         if (!onOk) return;
-        // @ts-ignore
-        const newYaml = codeEditorRef.current?.getValue();
-        await onOk(newYaml, initialValues);
-        return true;
+        try {
+          // @ts-ignore
+          const newYaml = codeEditorRef.current?.getValue();
+          await onOk(newYaml, initialValues);
+          return true;
+        } catch (error) {
+          notify.error(t('WORKLOAD_SETTINGS_SAVE_FAILED'));
+          return false;
+        }
       },
     });
   };
