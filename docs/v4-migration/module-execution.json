@@ -325,8 +325,8 @@
   },
   "dev": {
     "status": "进行中",
-    "reason": "已有 Workload 原生实现完成过本地测试、构建和一次 131 部署；本轮基于 release-4.1.5 页面复核发现编辑设置弹窗的宽度、布局和分区交互仍有差异，先回到 DEV 补齐布局回归测试并修复，再重新构建和 VERIFY。",
-    "sourceCommit": "7e27d506c6fb387e758f9288375416b2ed1cd499",
+    "reason": "已完成编辑设置弹窗宽度对齐的 TDD 增量；19 个 WorkloadCreateModal 测试、全量 91 个测试文件/403 个断言和 build:packages 已通过。Tab 内容切换、完整布局、镜像部署与浏览器验收继续处理。",
+    "sourceCommit": "1be276245c359a7181d4515b0a053c03e178160f",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
@@ -599,6 +599,10 @@
       {
         "path": "docs/v4-migration/workload-settings-dev-20261024-grace-period.md",
         "sha256": "bd420130b0ea67bfde02abc36e61fedbaf462930a8a6531f53226b23b15b586e"
+      },
+      {
+        "path": "docs/v4-migration/workload-settings-style-dev-20261025.md",
+        "sha256": "f787194046eb5833894442b96c78103a9741416c936040d676e9a9aa1df77ef1"
       }
     ],
     "ciRun": "40100018686",
