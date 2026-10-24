@@ -4,7 +4,7 @@
 
 **目标：** 在 `feature/v4-workloads` 独立 Worktree 中完成 Deployment、StatefulSet、DaemonSet 的 V4 原生列表、详情、编辑设置和运维操作，并通过本地检查、131 部署、浏览器验收和独立 Draft PR。
 
-**架构：** `release-4.1.5` / `v3dist` 是当前制品行为基线，负责确认真实页面、字段、Action、请求和样式；`origin/release-3.4` 只解释旧源码中的字段关系和历史交互。V4 继续使用 React、React Router、React Query、Workload Store 和 Kubed UI，三类资源共享公共底座，但每类资源分别记录字段、Action、RBAC、缓存、错误和浏览器结果。
+**架构：** `release-4.1.5` 完整前端源码与同版本已部署页面是当前行为和样式主基线：源码用于定位实现，页面用于确认真实渲染、交互、请求和错误；`release-4.1.5` / `v3dist` 用于发布制品校准；`origin/release-3.4` 只解释当前版本无法说明的历史字段关系和交互。V4 继续使用 React、React Router、React Query、Workload Store 和 Kubed UI，三类资源共享公共底座，但每类资源分别记录字段、Action、RBAC、缓存、错误和浏览器结果。
 
 **技术栈：** React、TypeScript、React Router、React Query、Kubernetes API、Kubed UI、Jest/仓库测试脚本、Playwright、GitHub Actions、131 K3s。
 
@@ -52,7 +52,7 @@ python3 /home/bruce/code/ks-develop/scripts/v4-module-gate.py workloads start
 git diff --check
 ```
 
-**完成条件：** 三类资源的字段、Action、API、Store、RBAC、作用域、缓存、错误/取消和 V4 对应实现都有证据引用；未知项均有影响和关闭方式；高风险未知项仍保留为未关闭。
+**完成条件：** 三类资源的字段、Action、API、Store、RBAC、作用域、缓存、错误/取消和 V4 对应实现都有证据引用；未知项均有影响和关闭方式。REA 只确认主基线、证据覆盖和开发边界；运行时持久化、权限、缓存和逐项等价验证保留在 DEV/VERIFY 验收清单。
 
 ### 任务 2：REA 门禁复核与 DEV 准入
 
@@ -75,9 +75,9 @@ git diff --check
 **门禁命令：**
 
 ```bash
-python3 /home/bruce/code/ks-develop/scripts/v4-module-gate.py workloads commit --phase REA --records-only
+python3 /home/bruce/code/ks-develop/scripts/v4-module-gate.py workloads commit --phase DEV
 git diff --check
-git commit -m "docs(Workload): 完善REA复核材料"
+git commit -m "文档(Workload): 完善REA复核材料"
 git push origin feature/v4-workloads
 ```
 

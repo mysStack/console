@@ -1,6 +1,6 @@
 # 当前 Workload 执行路线（2026-10-24）
 
-> 当前阶段：`REA / 分析中，待复核`。当前制品 REA 固定使用 `release-4.1.5` 的 `v3dist`；旧 V3 结构、字段和样式参考固定使用 `origin/release-3.4` / `175710fefeeba6ff295c2c0967b4d45b83563d26`。此前 DEV、VERIFY、镜像和浏览器记录均保留为历史输入，不能继承为当前通过。完成 REA 复核后，按 `DEV → VERIFY → PR` 顺序推进。
+> 当前阶段：`DEV / 已复核并批准进入 DEV`。REA 主基线为 `release-4.1.5` 完整前端源码和同版本已部署页面 `192.168.2.131:30881`；同版本 `v3dist` 仅作发布制品校准；`origin/release-3.4` 仅作当前版本无法解释时的历史补充。未闭环的字段、Action、RBAC、缓存、错误和逐项等价性转入 DEV/VERIFY 验收清单，不能标记为已验收。
 
 > 本页下方旧日期段落保留为历史证据；最新阶段只以 `module-execution.json` 为准。
 

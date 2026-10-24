@@ -4,9 +4,9 @@
 
 > **当前执行版本：** 具体任务拆分、文件边界、测试顺序和部署验收以 [`workload-v4-native-migration-plan-20261024.md`](./workload-v4-native-migration-plan-20261024.md) 为准。本文件保留模块路线和完成标准；两者冲突时先停止编码并修正文档。
 
-**目标：** 在固定 `release-4.1.5` `v3dist` 制品证据的基础上，使用已核验的 `origin/release-3.4` 旧 V3 源码作为结构、字段和样式参考，完成 Deployment、StatefulSet、DaemonSet 的 V4 原生化迁移，并通过 131 部署和浏览器验收。
+**目标：** 以 `release-4.1.5` 完整前端源码和同版本已部署页面为主基线，使用 `v3dist` 校准实际发布制品，必要时以已核验的 `origin/release-3.4` 旧 V3 源码补充历史行为，完成 Deployment、StatefulSet、DaemonSet 的 V4 原生化迁移，并通过 131 部署和浏览器验收。
 
-**架构：** `release-4.1.5` 的 `v3dist` 负责证明当前发布制品中的真实入口、字段、静态资源和运行时行为；`origin/release-3.4` 只负责解释旧 V3 的组件结构、字段关系和历史交互。V4 实现继续复用现有 React、React Router、React Query、Workload Store、Kubed UI 和共享资源组件，不复制 V3 代码或样式。三类资源共用底座，但分别保留字段、Action、RBAC、缓存和浏览器验收结果。
+**架构：** `release-4.1.5` 源码负责定位当前版本的入口、组件、样式、Store/API、Action 和权限边界；已部署的 `release-4.1.5` 前端负责验证真实渲染、交互、Network、错误和权限表现；同版本 `v3dist` 只用于源码与已发布行为不一致时的制品校准；`origin/release-3.4` 仅解释当前版本无法说明的历史结构。V4 实现继续复用现有 React、React Router、React Query、Workload Store、Kubed UI 和共享资源组件，不复制编译产物、V3/Wujie DOM 或旧实现。三类资源共用底座，但分别保留字段、Action、RBAC、缓存和浏览器验收结果。
 
 **技术栈：** React、TypeScript、React Router、React Query、Kubed UI、Kubernetes API、仓库测试脚本、Playwright、GitHub Actions、131 K3s 测试环境。
 
@@ -19,7 +19,7 @@
 - 当前制品 REA 基线：`release-4.1.5` / `fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`，`v3dist` tree 为 `1e499d92e11374e26c76f5e13be45251602bd596`。
 - 旧 V3 可读参考：`origin/release-3.4` / `175710fefeeba6ff295c2c0967b4d45b83563d26`，许可证为 AGPL-3.0；该引用不代表当前 `v3dist` 的构建来源。
 - `release-3.1.4` 在当前本地和已核验远程中不存在，不再作为本轮硬性输入；缺失事实保留在风险记录中。
-- 当前阶段为 `REA / 分析中，待复核`。REA 阶段只允许取证和记录，不允许业务编码、构建部署或 VERIFY。
+- 当前阶段为 `DEV / 已复核并批准进入 DEV`。REA 输入已绑定到 `release-4.1.5` 完整源码和同版本部署页面；未闭环功能转入 DEV/VERIFY 验收清单。业务代码仍须按本文件任务顺序和门禁执行。
 - 不修改 `release-4.1.5`、`feature/v4-migration`，不强推、不改写已有历史，不自动合并 PR #2。
 - 不删除功能、不隐藏菜单、不保留 V3 弹窗作为迁移结果，不新增 V3/Wujie 运行时依赖。
 - UI 或路由改动必须执行本地测试、构建、部署 131、rollout、Pod imageID/digest 核对和新浏览器上下文 Playwright 验收。
