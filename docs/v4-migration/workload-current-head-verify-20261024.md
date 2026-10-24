@@ -42,12 +42,24 @@
 - 本轮 Workload 页面请求未发现 `/consolev3`、`/dist/v3dist` 或 Wujie 入口请求。
 - 列表、详情、编辑设置和配置引用完成 DOM 快照，编辑设置完成截图检查。
 
+### release-4.1.5 源码与已部署页面的直接 REA 对照
+
+本轮按修订后的基线重新取证：`release-4.1.5` 完整源码 commit
+`fc1253cbedd5ade51a6c87bfff4e1f3b38536a84` 和 131 上的
+`ks-console-v415-rea:30881` 是当前版本主参照；`origin/release-3.4` 只保留为当前版本无法解释时的历史补充。
+没有把旧 V3 源码或旧 V3 弹窗直接复制进 V4。
+
+- REA 对 release 源码树建立了完整制品身份，针对 Workload 入口、详情、路由、设置和公共组件选择 61 个源文件分析；REA Evidence 为 `ev_b69ce3fcb45e1f5e7680d64bafd0616db65e80df033fa9f6a4c1948b3236f0b`，制品摘要为 `b7101ae6614a28bc12f447385b83eadc76dcc867e5b45e292fcbde1d13aee8f0`。未选中的源码和未执行的 bundle 关系仍按未知项处理。
+- release-4.1.5 Deployment 详情源码仍包含 `useV3action` 和 `renderV3Modal`；当前 V4 详情源码改用 `WorkloadSettingsModal`、`usePutMutation` 和原生路由/API。该差异证明 V4 需要按 release 行为重建，不能把 V3 Action 当作实现方案。
+- 30881 的 release 页面编辑设置显示五个分区导航：更新策略、容器、存储、容器组调度规则、容器组优雅终止；初始更新策略为滚动更新，最大不可用和最大多余容器组数量均为 `25%`。
+- 30880 的当前 V4 页面在同一 Deployment 和 namespace 上返回 200，显示原生设置导航、名称/项目/副本数量、容器与初始化容器、Pod 安全上下文、存储、调度、优雅终止和元数据；同时保留 `25%` 更新策略默认值，并增加配置引用 Tab 和自动扩缩入口。
+- 以上证据已经可以直接指导字段、布局、样式、Action、API 和错误态矩阵；不能据此宣称三类资源已经逐项等价。详细身份和差异见 [`evidence/workload-release415-source-runtime-rea-20261025.json`](./evidence/workload-release415-source-runtime-rea-20261025.json)。
+
 ### 低权限浏览器结果
 
-- 专用低权限账号在当前制品上完成全新登录。
-- 进入 `v4-migration-e2e` 项目 Deployment 列表返回 200，资源列表可见，页面未显示创建入口。
-- 直接访问 ConfigMap 页面返回 403；这与 Kubernetes `auth can-i` 对 ConfigMap 的读权限结果不一致，说明 Console 权限键或 KubeSphere role template 仍需定位。
-- 该结果只证明一条 Workload 读路径和一条拒绝路径，不能替代完整低权限 RBAC、配置引用和三类资源操作矩阵。
+- 当前没有可复现的低权限账号登录凭据。先前已认证会话不能替代低权限账号的零 Cookie 登录；本轮未把管理员会话或历史结果标记为低权限通过。
+- 因此当前制品的低权限 Deployment 读取、编辑拒绝、删除拒绝、StatefulSet Service 拒绝和 403/404 组合路径仍未完成。
+- Kubernetes `auth can-i` 的静态结果不能替代浏览器登录后的 Console 权限结果；取得专用 viewer 会话后需要在当前 30880 制品上重新执行并记录。
 
 ### 低权限配置引用复验
 
@@ -55,9 +67,10 @@
 
 ### 尚未闭环的场景
 
-- 当前制品的新 Cookie 登录链路未通过，必须重新建立可复现的专用测试会话后，才能完成完整浏览器验收。
-- Deployment、StatefulSet、DaemonSet 的全部 Action 矩阵，以及保存、删除、回滚、重启、伸缩、冲突和网络错误路径尚未在本轮当前制品全部闭环。
-- 低权限 RBAC、完整 namespace 正反隔离和缓存失效需要在当前制品上重新执行；历史证据不继承。
+- 当前制品的新 Cookie 登录链路未通过，低权限浏览器会话尚未建立，完整 RBAC 正反路径不能验收。
+- Deployment、StatefulSet、DaemonSet 仍需按 release-4.1.5 页面逐项完成设置字段、样式、校验、取消和错误态对照；当前只完成了 Deployment 的直接对照样本。
+- 当前制品仍需补齐 HPA/YAML、重启及适用 Action 的逐项浏览器结果，并完成 StatefulSet、DaemonSet 的同基线运行时对照。
+- 完整 namespace 正反隔离和缓存失效仍需在当前制品上补齐；历史证据不继承。
 - 扩展初始化错误仍按负责人决定暂不纳入 Workload 模块验收，但不能写成控制台零错误。
 
 ## 4. 阶段结论

@@ -1,0 +1,130 @@
+{
+  "evidenceId": "workload-release415-source-runtime-rea-20261025",
+  "collectedAt": "2026-10-25",
+  "authority": "shipped-artifact-and-controlled-browser-observation",
+  "scope": {
+    "module": "workloads",
+    "resources": ["Deployment", "StatefulSet", "DaemonSet"],
+    "primaryBaseline": "release-4.1.5 source and deployed page",
+    "historicalSupplement": "origin/release-3.4 only when the current baseline cannot explain a behavior"
+  },
+  "sourceBaseline": {
+    "ref": "release-4.1.5",
+    "commit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
+    "reaArtifact": {
+      "path": "/tmp/ks-console-release-4.1.5-rea.EMVJDX",
+      "sha256": "b7101ae6614a28bc12f447385b83eadc76dcc867e5b45e292fcbde1d13aee8f0",
+      "evidenceId": "ev_b69ce3fcb45e1f5e7680d64bafd0616db65e80df033fa9f6a4c1948b3236f0b",
+      "parentEvidenceId": "ev_275bb222ae15f90988fc631615f26c5188e6fc5ccb82a8a85149c08793dcd1ca",
+      "selectedSourceFiles": 61,
+      "parsedJavaScriptFiles": 61,
+      "parseFailures": 0,
+      "findings": 905,
+      "coverage": "partial: the complete release tree was inventoried; 61 workload-related files were selected for semantic analysis"
+    },
+    "staticObservations": [
+      {
+        "resource": "all three workload kinds",
+        "paths": [
+          "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/Deployments/Detail/index.tsx",
+          "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/StatefulSets/Detail/index.tsx",
+          "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/DaemonSets/Detail/index.tsx"
+        ],
+        "observation": "release-4.1.5 detail pages still import and invoke useV3action; the Deployment source invokes renderV3Modal at line 241. The current V4 detail implementation instead uses WorkloadSettingsModal and does not import useV3action."
+      },
+      {
+        "resource": "Deployment",
+        "path": "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/Deployments/Detail/index.tsx",
+        "observation": "the release source contains the legacy action bridge and current release routing/API behavior; it is a behavior reference and is not copied into the V4 implementation."
+      }
+    ]
+  },
+  "browserBaseline": {
+    "deployment": "kubesphere-system/ks-console-v415-rea",
+    "nodePort": 30881,
+    "image": "crpi-p97knjjid10efrly.cn-shanghai.personal.cr.aliyuncs.com/ecochain/ks-console:release-4.1.5-20261024-155944-fc1253c",
+    "pod": "ks-console-v415-rea-6dd59bf5fc-jn5hz",
+    "podImageId": "crpi-p97knjjid10efrly.cn-shanghai.personal.cr.aliyuncs.com/ecochain/ks-console@sha256:2595b31de4dc01ae67b72b97b857ef40cd1c1ec2a0d406cada177982f380f455",
+    "url": "http://192.168.2.131:30881/consolev3/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/resource-status",
+    "httpStatus": 200,
+    "detailActions": ["编辑信息", "更多操作"],
+    "moreActions": ["回退", "编辑设置", "编辑 YAML", "重新创建", "删除"],
+    "detailTabs": ["资源状态", "修改记录", "元数据", "环境变量", "事件"],
+    "settingsNavigation": ["更新策略", "容器", "存储", "容器组调度规则", "容器组优雅终止"],
+    "settingsInitialView": {
+      "updateStrategy": "滚动更新（推荐）",
+      "maxUnavailable": "25%",
+      "maxSurge": "25%",
+      "confirmButton": "disabled until a change is made"
+    },
+    "apiObservations": [
+      "GET /clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+      "GET /clusters/host/kapis/resources.kubesphere.io/v1alpha3/namespaces/v4-migration-e2e/pods",
+      "GET /clusters/host/kapis/autoscaling.kubesphere.io/v1alpha1/namespaces/v4-migration-e2e/scaledobjects/v4-deploy-edit-ef3",
+      "GET /clusters/host/apis/autoscaling/v2/namespaces/v4-migration-e2e/horizontalpodautoscalers/v4-deploy-edit-ef3"
+    ]
+  },
+  "browserCurrentV4": {
+    "deployment": "kubesphere-system/ks-console",
+    "nodePort": 30880,
+    "image": "ghcr.io/mysstack/ks-console:feature-v4-workloads-20261024-220602-54b863b2ccd6",
+    "pod": "ks-console-7c987bf54b-4gjkz",
+    "podImageId": "ghcr.io/mysstack/ks-console@sha256:53299da2a0add86f3c08208b8ed9728d39af31ae5c0ba7b315283dc5bfdc675a",
+    "url": "http://192.168.2.131:30880/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/resource-status",
+    "httpStatus": 200,
+    "detailActions": ["编辑信息", "更多操作"],
+    "moreActions": ["回退", "编辑自动扩缩", "编辑设置", "编辑 YAML", "重新创建", "删除"],
+    "detailTabs": ["资源状态", "修改记录", "元数据", "环境变量", "配置引用", "事件"],
+    "settingsNavigation": [
+      "更新策略",
+      "容器组设置",
+      "存储设置",
+      "容器组调度规则",
+      "容器组优雅终止",
+      "添加元数据"
+    ],
+    "settingsInitialView": {
+      "name": "disabled field present",
+      "project": "disabled field present",
+      "replicas": 1,
+      "updateStrategy": "滚动更新（推荐）",
+      "maxUnavailable": "25%",
+      "maxSurge": "25%",
+      "containerSections": ["容器", "初始化容器"],
+      "podSecurityContext": "visible",
+      "volumeSection": "visible",
+      "gracePeriodSeconds": 31,
+      "metadataSection": "visible",
+      "confirmButton": "enabled for the loaded form"
+    },
+    "apiObservations": [
+      "GET /clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+      "GET /clusters/host/kapis/resources.kubesphere.io/v1alpha3/namespaces/v4-migration-e2e/pods",
+      "GET /clusters/host/kapis/monitoring.kubesphere.io/v1beta1/pod_metrics",
+      "GET /clusters/host/apis/autoscaling/v2/namespaces/v4-migration-e2e/horizontalpodautoscalers/v4-deploy-edit-ef3"
+    ],
+    "consoleErrors": "8 errors were present during this session; extension initialization errors remain outside the current Workload scope and are not treated as zero-error evidence."
+  },
+  "comparison": {
+    "confirmed": [
+      "release-4.1.5 provides the complete current-version source and a live page that can be opened against the same cluster, namespace, and fixture as V4.",
+      "The release page uses the legacy V3 action bridge in source and exposes a tabbed settings modal at runtime.",
+      "The current V4 page uses the native settings component and exposes the same core Deployment update strategy values while adding native workload sections, metadata, configuration reference, and the current V4 action menu.",
+      "The release page and the current V4 page both return HTTP 200 for the same Deployment and use namespace-scoped Kubernetes API paths.",
+      "The source and runtime evidence is sufficient to drive a field, layout, action, API, and error-state comparison; it is not evidence that every field or action is already equivalent."
+    ],
+    "remaining": [
+      "Repeat the same source/runtime comparison for StatefulSet and DaemonSet settings before claiming resource-level equivalence.",
+      "Complete the field-by-field style and validation matrix, including every settings navigation item and responsive/scroll behavior.",
+      "Complete low-privilege positive/negative browser paths and the remaining current-artifact Action matrix.",
+      "Do not copy useV3action or the V3 modal; reconstruct the observed release behavior using V4-native components and APIs."
+    ],
+    "status": "REA补充证据已完成；当前模块仍为 VERIFY 进行中"
+  },
+  "limitations": [
+    "The REA static run analyzed 61 selected source files and did not execute the JavaScript bundle.",
+    "Playwright DOM snapshots establish observed rendered structure and labels but do not by themselves prove pixel equality or complete keyboard/accessibility equivalence.",
+    "The same fixture was used for the Deployment comparison; StatefulSet and DaemonSet runtime comparison remains open.",
+    "No secret, token, kubeconfig, or password was recorded."
+  ]
+}

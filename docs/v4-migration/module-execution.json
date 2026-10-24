@@ -691,7 +691,7 @@
       },
       {
         "path": "docs/v4-migration/workload-current-head-verify-20261024.md",
-        "sha256": "6f398dbf1a6674ee81d38c0260bb725b244b930e2c951959bff8c7e1ad877c62"
+        "sha256": "81bc4f81e7379859572c1f666c8fa92405c2d4cc6b8cd7045546d7ab7d1e365a"
       },
       {
         "path": "docs/v4-migration/evidence/workload-daemonset-stop-recovery-verify-20261025.json",
@@ -716,6 +716,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-statefulset-service-verify-20261025.json",
         "sha256": "d6136c2348b16f8c26fad66d38c16eea40ebc6ba4f6969dbd3ea36728664ed06"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-release415-source-runtime-rea-20261025.json",
+        "sha256": "78977e579edc17d6af92f8acc45e3a494982ad0f25c4d4a6e2a53f8cbf728db3"
       }
     ],
     "ciRun": "40100881163",
@@ -739,7 +743,8 @@
       "freshLogin": "未通过",
       "authenticatedSessionChecks": "通过（页面和请求复验）",
       "moduleAcceptance": "未完成"
-    }
+    },
+    "lastEvidenceUpdate": "2026-10-25"
   },
   "routeAdjustment": {
     "date": "2026-10-24",
