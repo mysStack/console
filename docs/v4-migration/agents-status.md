@@ -246,3 +246,9 @@
 - 当前源码的 6 个 Workload 相关测试文件已执行，共 85 项测试全部通过：创建/设置表单 81 项、更新策略 3 项、三类详情原生入口 3 项。
 - 测试覆盖资源类型字段分支、更新策略、PVC 模板、元数据、调度、安全上下文、镜像凭据、环境引用和原生详情入口；不代表 131 当前部署制品已通过，也不关闭浏览器写回、RBAC、缓存、错误和逐项 V3 等价缺口。
 - 证据见 [`Workload 静态 REA 测试`](./evidence/workload-static-rea-tests-20261024.json)。模块继续保持 `REA / 分析中，待复核`。
+
+# 当前状态补充（2026-10-24：配置引用原生页面 REA）
+
+- 当前 V4 已在 131 真实浏览器中打开 Deployment、StatefulSet、DaemonSet 三类配置引用页面，页面和只读请求均正常；ConfigMap/Secret 引用名称、前缀、生成环境变量摘要正常渲染，页面不展示 Secret 值。
+- 本轮只完成读取和渲染检查，没有应用引用、没有修改资源。写回、缓存、RBAC、文件挂载、prefix、多容器、Reloader 和逐项 V3 等价仍未验证。
+- 证据见 [`配置引用原生页面 REA`](./evidence/workload-config-reference-rea-browser-20261024.json)。模块继续保持 `REA / 分析中，待复核`。

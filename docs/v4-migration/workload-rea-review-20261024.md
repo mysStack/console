@@ -218,3 +218,15 @@ rg -n 'editConfigTemplate|editYaml|WorkloadSettingsModal' \
 完整命令和结果见 [`evidence/workload-static-rea-tests-20261024.json`](./evidence/workload-static-rea-tests-20261024.json)。这些测试覆盖了当前源码中的资源类型分支、更新策略、PVC 模板、元数据、调度、安全上下文、镜像凭据、环境引用和原生详情入口。它们不能证明 131 已部署制品与当前 workspace HEAD 相同，也不能替代浏览器写回、RBAC、缓存、错误路径和完整 V3 等价验证。
 
 本轮结果补强了 REA 的静态证据，但不改变 `REA / 分析中，待负责人复核` 状态。
+
+## 配置引用原生页面只读 REA 取证（2026-10-24）
+
+本轮在当前 V4 已部署制品上分别打开 Deployment、StatefulSet、DaemonSet 的配置引用路由，证据见 [`evidence/workload-config-reference-rea-browser-20261024.json`](./evidence/workload-config-reference-rea-browser-20261024.json)。
+
+- 三类资源的配置引用路由均返回 HTTP 200，页面均能显示容器选择器、ConfigMap/Secret 引用区域、资源名称、前缀和生成环境变量数量。
+- 页面明确提示只保存资源名称、前缀和键名，不展示 Secret 值；本轮页面没有展示 Secret 明文。
+- 三类页面均提供添加引用、查看、删除、关闭和应用引用边界；本轮只读打开，没有点击应用引用。
+- 浏览器读取请求绑定 `host/v4-migration-e2e`，ConfigMap 列表、Secret 列表和引用 ConfigMap 读取均返回 200。
+- 当前 V4 有原生配置引用路由，而 `release-4.1.5` 基线详情页没有同名原生 Tab。该差异不能直接写成功能缺失，必须继续把旧 V3 环境变量/引用能力与当前 V4 的资源引用、文件挂载、prefix、多容器和 Reloader 行为逐项映射。
+
+本轮关闭了“当前 V4 配置引用页面是否能渲染并读取资源”的未知项，但没有关闭写回、缓存、RBAC、错误态和完整 V3 等价。REA 仍为 **分析中，待负责人复核**。

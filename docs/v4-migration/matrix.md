@@ -147,3 +147,9 @@
 
 - 当前源码相关的 6 个 Workload 测试文件共 85 项全部通过，覆盖资源类型字段分支、更新策略、PVC 模板、元数据、调度、安全上下文、镜像凭据、环境引用和原生详情入口。
 - 该结果只证明当前源码静态逻辑通过，不能替代 131 部署制品上的浏览器、API 写回、RBAC、缓存和完整 V3 等价验证。证据见 [`Workload 静态 REA 测试`](./evidence/workload-static-rea-tests-20261024.json)。模块仍为 `REA / 分析中，待复核`。
+
+## 当前增量（2026-10-24：配置引用原生页面 REA）
+
+- 当前 V4 的 Deployment、StatefulSet、DaemonSet 配置引用路由均已通过真实浏览器打开，HTTP 200，ConfigMap/Secret 引用名称和生成环境变量摘要正常渲染。
+- 页面明确不展示 Secret 值；读取请求绑定 `host/v4-migration-e2e`，ConfigMap 列表、Secret 列表和引用 ConfigMap 读取返回 200。
+- 本轮没有应用写回，不能关闭 prefix、多容器、文件挂载、Reloader、RBAC、缓存和错误路径。`release-4.1.5` 基线没有同名原生 Tab，旧 V3 等价需要单独映射。证据见 [`配置引用原生页面 REA`](./evidence/workload-config-reference-rea-browser-20261024.json)。模块仍为 `REA / 分析中，待复核`。
