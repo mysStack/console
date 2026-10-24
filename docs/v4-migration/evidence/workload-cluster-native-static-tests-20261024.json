@@ -1,7 +1,7 @@
 {
   "record": "Workload 集群级原生入口静态测试取证",
   "date": "2026-10-24",
-  "workspaceHead": "8d561743f22586f23ff75f70a2fad43f8c33e42a",
+  "workspaceHead": "d7cf426843f928e8a4458784d4800f862877477e",
   "phase": "REA",
   "operator": "Codex 单会话",
   "testFile": "packages/console/src/pages/clusters/containers/ApplicationWorkloads/nativeWorkloads.test.ts",
@@ -30,5 +30,5 @@
   ],
   "result": "集群级三类 Workload 主路由静态测试 6/6 通过；作为 REA 输入保留。",
   "rerunDate": "2026-10-24",
-  "rerunResult": "在当前 HEAD 重新执行，结果与原记录一致"
+  "rerunResult": "在当前 HEAD d7cf426843f928e8a4458784d4800f862877477e 重新执行，集群级三类 Workload 原生入口测试 6/6 通过"
 }

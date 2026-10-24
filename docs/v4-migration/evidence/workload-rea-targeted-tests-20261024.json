@@ -1,7 +1,7 @@
 {
   "record": "Workload REA 定向测试取证",
   "date": "2026-10-24",
-  "workspaceHead": "8d561743f22586f23ff75f70a2fad43f8c33e42a",
+  "workspaceHead": "d7cf426843f928e8a4458784d4800f862877477e",
   "phase": "REA",
   "operator": "Codex 单会话",
   "command": "mapfile -t files < <(rg --files packages/console/src/pages/projects | rg '(ConfigReference|WorkloadCreateModal|ApplicationWorkloads/Workloads/.*/Detail|Workloads/settingsAction).*\\.test\\.ts$' | sort); ./node_modules/.bin/esno <each-test-file>",
@@ -55,5 +55,5 @@
   ],
   "result": "34 个 Workload 相关测试文件、211 项测试全部通过；作为 REA 静态输入保留，模块仍为分析中，待负责人复核。",
   "rerunDate": "2026-10-24",
-  "rerunResult": "在当前 HEAD 重新执行，结果与原记录一致"
+  "rerunResult": "在当前 HEAD d7cf426843f928e8a4458784d4800f862877477e 重新执行，34 个 Workload 相关测试文件、211/211 通过"
 }

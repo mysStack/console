@@ -314,6 +314,11 @@
 - Deployment 的“更多操作”展示回退、自动扩缩、编辑设置、编辑 YAML、重新创建和删除；只读打开“编辑设置”后观察到更新策略、容器组设置、存储、调度、终止宽限和元数据分区，取消关闭，没有产生写请求。
 - 证据见 [`evidence/workload-native-detail-browser-rea-20261024.json`](./evidence/workload-native-detail-browser-rea-20261024.json)。当前证据来自已部署旧于工作区 HEAD 的制品，不能直接标记 VERIFY；保存回读、全部 Action、RBAC、缓存、错误和逐项 V3 等价仍未闭环。
 
+## 2026-10-24 当前 HEAD 静态 REA 测试重跑
+
+- 当前 HEAD `d7cf426843f928e8a4458784d4800f862877477e` 上执行 34 个 Workload 定向测试文件，共 211/211 通过；集群级三类原生入口测试 6/6 通过。
+- 本轮没有修改业务代码、构建或部署；证据已重新绑定当前 HEAD。测试结果只覆盖静态逻辑，不能替代当前 SHA 的浏览器写回、RBAC、缓存、错误和 V3 等价验证，模块仍为 `REA / 分析中，待复核`。
+
 ## 2026-10-24 集群级三类 Workload 原生入口补证
 
 - 当前 HEAD `d78cab185f66beaebe16c03c3b3a09518c748cc8` 上执行 `packages/console/src/pages/clusters/containers/ApplicationWorkloads/nativeWorkloads.test.ts`，6 项全部通过。

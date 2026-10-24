@@ -53,11 +53,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "fb5ae471cc70759b92516006b35397c1f7bc73a098db3eb1b897cf8aaa720836"
+        "sha256": "6f13b78b3efb25273ccea8ea47931e248e285f0e3761a80acea6c70fde3b4b66"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "f3483e0587d32a974d5e231e7f89e0f98365fb54c78451495753af9deb46b887"
+        "sha256": "eef6b90f987280b7f5e956fc698acb1fee8857eee3cea3579db10ae62bc997c4"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -113,7 +113,7 @@
       },
       {
         "path": "docs/v4-migration/workload-rea-review-20261024.md",
-        "sha256": "1dd704a52e7768a1b70cde8214073ec8a403ee87ae3146e9f1d72e1a034e9542"
+        "sha256": "e0f4988030ae3286cbb62fc318214d66e73cd60021a22c23d2ba2b189ab1959a"
       },
       {
         "path": "docs/v4-migration/evidence/workload-v415-baseline-browser-20261024.json",
@@ -153,7 +153,7 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-rea-targeted-tests-20261024.json",
-        "sha256": "e7f384b3bbfb3aac279f4de60c57ad354afb88f0b7f5c9bd847c432ae62d8d4a"
+        "sha256": "d21dd021ac0fb78043aff143ffb208a23a0bf086e0a2b53d4c7f3338d36e9088"
       },
       {
         "path": "docs/v4-migration/evidence/workload-browser-login-rea-20261024.json",
@@ -161,7 +161,7 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-cluster-native-static-tests-20261024.json",
-        "sha256": "4173567312a6303a336b8153849a604ff663a7c15730f99e0d2bb87b973ff893"
+        "sha256": "092f0c42a1c9af74e73ec242955e35eecc68087d26c4df737c5715ec0a4b4b39"
       },
       {
         "path": "docs/v4-migration/evidence/workload-browser-login-exported-shell-20261024.json",
@@ -639,11 +639,11 @@
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "f3483e0587d32a974d5e231e7f89e0f98365fb54c78451495753af9deb46b887"
+        "sha256": "eef6b90f987280b7f5e956fc698acb1fee8857eee3cea3579db10ae62bc997c4"
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "fb5ae471cc70759b92516006b35397c1f7bc73a098db3eb1b897cf8aaa720836"
+        "sha256": "6f13b78b3efb25273ccea8ea47931e248e285f0e3761a80acea6c70fde3b4b66"
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
