@@ -2,6 +2,8 @@
 
 > **给执行者：** 本计划按 `REA → DEV → VERIFY → PR` 顺序执行。当前模块仍处于 REA，只有完成本计划的 REA 复核记录后，才能开始业务代码修改。
 
+> **当前执行版本：** 具体任务拆分、文件边界、测试顺序和部署验收以 [`workload-v4-native-migration-plan-20261024.md`](./workload-v4-native-migration-plan-20261024.md) 为准。本文件保留模块路线和完成标准；两者冲突时先停止编码并修正文档。
+
 **目标：** 在固定 `release-4.1.5` `v3dist` 制品证据的基础上，使用已核验的 `origin/release-3.4` 旧 V3 源码作为结构、字段和样式参考，完成 Deployment、StatefulSet、DaemonSet 的 V4 原生化迁移，并通过 131 部署和浏览器验收。
 
 **架构：** `release-4.1.5` 的 `v3dist` 负责证明当前发布制品中的真实入口、字段、静态资源和运行时行为；`origin/release-3.4` 只负责解释旧 V3 的组件结构、字段关系和历史交互。V4 实现继续复用现有 React、React Router、React Query、Workload Store、Kubed UI 和共享资源组件，不复制 V3 代码或样式。三类资源共用底座，但分别保留字段、Action、RBAC、缓存和浏览器验收结果。

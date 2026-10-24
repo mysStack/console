@@ -4,6 +4,7 @@
   "capability": "deployment-statefulset-daemonset",
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
+  "implementationPlan": "docs/superpowers/plans/2026-10-24-workload-v4-native-migration.md",
   "phase": "REA",
   "rea": {
     "status": "分析中，待复核",
@@ -108,7 +109,7 @@
       },
       {
         "path": "docs/v4-migration/workload-development-route-20261024.md",
-        "sha256": "f6c434c5436f75d76b34df06ca3f535d04c66f02815563348900b8e7946dcc1c"
+        "sha256": "0e1ac3f78e50803b97789c85ef90529346b857302b25c6843fb2efa9d3d828fc"
       },
       {
         "path": "docs/v4-migration/workload-rea-review-20261024.md",
