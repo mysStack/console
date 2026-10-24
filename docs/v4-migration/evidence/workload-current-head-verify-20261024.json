@@ -53,8 +53,12 @@
       "configReference": "通过：原生配置引用页面显示 ConfigMap/Secret 资源名称、前缀和键名，不显示 Secret 值",
       "network": "通过：本轮 Workload 页面请求返回 200，未发现 /consolev3、/dist/v3dist 或 Wujie 入口请求",
       "pageRendering": "通过：列表、详情、设置弹窗和配置引用页面均完成 DOM 快照；设置弹窗完成截图检查",
-      "statefulSetSettings": "通过：原生编辑设置弹窗，副本数量、更新策略/分组序号、容器组、PVC 模板、调度、优雅终止和元数据分区可见；取消路径通过"
-    }
+      "statefulSetSettings": "通过：原生编辑设置弹窗，副本数量、更新策略/分组序号、容器组、PVC 模板、调度、优雅终止和元数据分区可见；取消路径通过",
+      "deploymentActionMenu": "通过：显示回退、编辑自动扩缩、编辑设置、编辑 YAML、重新创建和删除入口；本轮只打开菜单，不执行变更",
+      "statefulSetActionMenu": "通过：显示回退、编辑自动扩缩、编辑服务、编辑设置、编辑 YAML、重新创建和删除入口；本轮只打开菜单，不执行变更",
+      "daemonSetActionMenu": "通过：显示回退、编辑设置、编辑 YAML、重新创建和删除入口；本轮只打开菜单，不执行变更"
+    },
+    "consoleErrors": "存在扩展初始化错误；按负责人决定暂不纳入本模块验收，未将页面标记为零错误"
   },
   "notClosed": [
     "新 Cookie 登录链路仍未通过，当前浏览器行为证据使用 rollout 前已认证的 30880 会话复验。",
