@@ -1,0 +1,81 @@
+{
+  "record": "Workload 原生详情与编辑入口浏览器 REA 复核",
+  "date": "2026-10-24",
+  "phase": "REA",
+  "operator": "Codex 单会话",
+  "artifact": {
+    "origin": "http://192.168.2.131:30880",
+    "sourceCommit": "31b6d88fc7e87707776c094aee12f1cdcb02604b",
+    "imageDigest": "sha256:2956710cd7ef2fbda79ff7a0a9695dac466336bd08248784d5afdfb577b951d3"
+  },
+  "scope": {
+    "workspace": "test-workspace",
+    "cluster": "host",
+    "namespace": "v4-migration-e2e"
+  },
+  "detailRoutes": [
+    {
+      "kind": "Deployment",
+      "resource": "v4-deploy-edit-ef3",
+      "path": "/test-workspace/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/resource-status",
+      "result": "200 页面渲染，1/1 Pod，资源状态、修改记录、元数据、环境变量、配置引用、事件入口可见"
+    },
+    {
+      "kind": "StatefulSet",
+      "resource": "v4-pvc-sts-7fa",
+      "path": "/test-workspace/clusters/host/projects/v4-migration-e2e/statefulsets/v4-pvc-sts-7fa/resource-status",
+      "result": "200 页面渲染，资源状态、元数据、环境变量、配置引用、事件入口可见"
+    },
+    {
+      "kind": "DaemonSet",
+      "resource": "v4-stop-ds-7fa",
+      "path": "/test-workspace/clusters/host/projects/v4-migration-e2e/daemonsets/v4-stop-ds-7fa/resource-status",
+      "result": "200 页面渲染，资源状态、元数据、环境变量、配置引用、事件入口可见"
+    }
+  ],
+  "deploymentReadOnlyModal": {
+    "opened": true,
+    "title": "编辑设置",
+    "sections": [
+      "更新策略",
+      "容器组设置",
+      "存储设置",
+      "容器组调度规则",
+      "容器组优雅终止",
+      "添加元数据"
+    ],
+    "actions": ["回退", "编辑自动扩缩", "编辑设置", "编辑 YAML", "重新创建", "删除"],
+    "observedFields": [
+      "名称",
+      "项目",
+      "副本数量",
+      "更新策略",
+      "容器组安全上下文",
+      "容器",
+      "卷",
+      "调度规则",
+      "终止宽限时间",
+      "标签",
+      "注解"
+    ],
+    "cancelledWithoutWrite": true
+  },
+  "apiReads": [
+    {
+      "kind": "Deployment",
+      "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+      "status": 200
+    },
+    {
+      "kind": "StatefulSet",
+      "path": "/clusters/host/kapis/resources.kubesphere.io/v1alpha3/namespaces/v4-migration-e2e/statefulsets",
+      "status": 200
+    },
+    {
+      "kind": "DaemonSet",
+      "path": "/clusters/host/kapis/resources.kubesphere.io/v1alpha3/namespaces/v4-migration-e2e/daemonsets",
+      "status": 200
+    }
+  ],
+  "conclusion": "已部署制品的三类项目详情均可直达并渲染，Deployment 的编辑设置入口打开原生设置弹窗，YAML 是独立入口；本轮没有保存或其他资源写操作。该证据用于 REA 入口和能力边界复核，不能继承为当前 HEAD VERIFY。"
+}

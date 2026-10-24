@@ -201,6 +201,12 @@
 - 三类列表 API 均返回 200，路径包含 `namespaces/v4-migration-e2e`，本轮没有执行创建、编辑、删除或其他写操作。证据见 [`workload-native-list-browser-rea-20261024.json`](./evidence/workload-native-list-browser-rea-20261024.json)。
 - 页面仍记录已知扩展初始化错误和 Wujie 警告；未观察到 Workload 列表自身错误。该扩展问题独立跟踪，不能作为当前 Workload 原生列表通过的替代条件。当前证据来自源提交 `31b6d88fc7e87707776c094aee12f1cdcb02604b` 的已部署制品，当前 HEAD 仍需负责人复核后重新部署验证，模块保持 `REA / 分析中，待复核`。
 
+## 当前增量（2026-10-24：Workload 原生详情浏览器 REA）
+
+- 三类专用资源详情页均可直达并渲染：Deployment `v4-deploy-edit-ef3`、StatefulSet `v4-pvc-sts-7fa`、DaemonSet `v4-stop-ds-7fa`；详情 Tab 包含资源状态、元数据、环境变量、配置引用和事件等入口。
+- Deployment 的“更多操作”包含回退、自动扩缩、编辑设置、编辑 YAML、重新创建和删除；只读打开“编辑设置”后观察到更新策略、容器组设置、存储、调度、终止宽限和元数据分区，取消关闭且没有写请求。证据见 [`workload-native-detail-browser-rea-20261024.json`](./evidence/workload-native-detail-browser-rea-20261024.json)。
+- 本证据来自源提交 `31b6d88fc7e87707776c094aee12f1cdcb02604b` 的已部署制品，不能替代当前 HEAD 的构建部署和 VERIFY；保存回读、全部 Action、RBAC、缓存、错误路径和完整 V3 等价仍未关闭，模块保持 `REA / 分析中，待复核`。
+
 ## 当前增量（2026-10-24：集群级原生入口静态测试）
 
 - 当前 HEAD `d78cab185f66beaebe16c03c3b3a09518c748cc8` 上执行 `nativeWorkloads.test.ts`，6 项全部通过。

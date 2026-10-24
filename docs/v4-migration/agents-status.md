@@ -308,6 +308,12 @@
 - 三类列表读取请求均返回 200，namespace 作用域均为 `v4-migration-e2e`；本轮没有执行任何写操作。证据见 [`evidence/workload-native-list-browser-rea-20261024.json`](./evidence/workload-native-list-browser-rea-20261024.json)。
 - 控制台仍记录已知扩展初始化错误和 Wujie 警告，未观察到 Workload 列表自身错误；扩展问题继续单独跟踪。当前证据来自旧于工作区 HEAD 的已部署制品，不能直接继承为 VERIFY；模块仍为 `REA / 分析中，待复核`。
 
+## 2026-10-24 Workload 原生详情浏览器 REA 补证
+
+- Deployment、StatefulSet、DaemonSet 三类专用资源详情页均可直达并渲染，详情入口包含资源状态、元数据、环境变量、配置引用和事件。
+- Deployment 的“更多操作”展示回退、自动扩缩、编辑设置、编辑 YAML、重新创建和删除；只读打开“编辑设置”后观察到更新策略、容器组设置、存储、调度、终止宽限和元数据分区，取消关闭，没有产生写请求。
+- 证据见 [`evidence/workload-native-detail-browser-rea-20261024.json`](./evidence/workload-native-detail-browser-rea-20261024.json)。当前证据来自已部署旧于工作区 HEAD 的制品，不能直接标记 VERIFY；保存回读、全部 Action、RBAC、缓存、错误和逐项 V3 等价仍未闭环。
+
 ## 2026-10-24 集群级三类 Workload 原生入口补证
 
 - 当前 HEAD `d78cab185f66beaebe16c03c3b3a09518c748cc8` 上执行 `packages/console/src/pages/clusters/containers/ApplicationWorkloads/nativeWorkloads.test.ts`，6 项全部通过。
