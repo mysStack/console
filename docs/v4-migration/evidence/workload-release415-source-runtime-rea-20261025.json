@@ -199,6 +199,25 @@
       "confirmedDifference": "DaemonSet 的无副本编辑特征和最大不可用/最短就绪字段在两套页面均已观察到；V4 增加原生容器、元数据和配置引用能力。"
     }
   },
+  "styleObservation": {
+    "viewport": "1280x720",
+    "release415DeploymentSettingsDialog": {
+      "rect": { "x": 59, "y": 63.5, "width": 1162, "height": 593 },
+      "background": "rgb(255, 255, 255)",
+      "borderRadius": "4px",
+      "boxShadow": "rgba(72, 91, 127, 0.2) 0px 4px 8px 0px",
+      "layout": "tabbed settings content"
+    },
+    "currentV4DeploymentSettingsDialog": {
+      "contentRect": { "x": 160, "y": 20.703125, "width": 960, "height": 654.59375 },
+      "headerBackground": "rgb(249, 251, 253)",
+      "background": "rgb(255, 255, 255)",
+      "borderRadius": "4px",
+      "boxShadow": "rgba(72, 91, 127, 0.2) 0px 4px 8px 0px",
+      "layout": "single scrollable document with section navigation"
+    },
+    "interpretation": "颜色、圆角和阴影已经与 Kubed Modal 基础样式一致；视口尺寸、内容布局和设置导航形态仍有可见差异。该差异必须进入 DEV 的样式/交互等价清单，不能用功能字段一致替代。"
+  },
   "limitations": [
     "The REA static run analyzed 61 selected source files and did not execute the JavaScript bundle.",
     "Playwright DOM snapshots establish observed rendered structure and labels but do not by themselves prove pixel equality or complete keyboard/accessibility equivalence.",
