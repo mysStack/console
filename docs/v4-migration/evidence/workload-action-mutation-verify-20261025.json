@@ -130,5 +130,14 @@
     "ui": "页面显示资源已被其他操作更新、本次设置未保存，要求取消并重新打开编辑设置",
     "postCheck": "取消编辑后移除外部冲突标签，原有标签、spec.replicas=1 和 ready=1/1 保持不变"
   },
-  "conclusion": "当前部署制品已完成三类 Workload 的删除和重新创建正向浏览器与 API 验证，并完成 Deployment 副本伸缩、回退和 409 冲突反馈；低权限、网络失败和逐项功能等价仍需逐项完成。"
+  "deploymentNetworkFailure": {
+    "kind": "Deployment",
+    "name": "v4-deploy-edit-ef3",
+    "namespace": "v4-migration-e2e",
+    "browser": "编辑设置中修改测试标签，浏览器切换 offline 后确认，再恢复 online 并取消",
+    "request": "浏览器 offline，未发出成功写请求",
+    "ui": "页面显示保存失败、设置尚未保存，请检查网络和权限后重试；编辑表单保持可见",
+    "postCheck": "取消后 Kubernetes 标签仍为 workloads-ef3，spec.replicas=1、ready=1/1，草稿未写入"
+  },
+  "conclusion": "当前部署制品已完成三类 Workload 的删除和重新创建正向浏览器与 API 验证，并完成 Deployment 副本伸缩、回退、409 冲突反馈和网络失败反馈；低权限和逐项功能等价仍需逐项完成。"
 }
