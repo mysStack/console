@@ -5,7 +5,7 @@
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-  "phase": "DEV",
+  "phase": "VERIFY",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -53,11 +53,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "2667cf1b42bdee4da874cd5344e7059721e60aa1644e21414e0ea8ae62d56036"
+        "sha256": "6444a275ddd38fe15ff84e351c58fe78f135adc729a8c9f22f6ec556b179d736"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "d34f596fab1ba5da3f4c633883577fa8b456466f44782e86e1219bd46fc481ec"
+        "sha256": "e684184e708a301cc0f2a83fbd7c80307009e4ec283ac98be2daaf29308a58e5"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -121,7 +121,7 @@
       },
       {
         "path": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-        "sha256": "1b755de279ae10b94185eb67b516fff4f59fe24fec960bcd3893f780b50b30fd"
+        "sha256": "770d8ca83369ae9a35ee514ad71b43b42bdad18f546ed2d609006a47d4702f95"
       },
       {
         "path": "docs/v4-migration/evidence/workload-kind-detail-browser-20261024.json",
@@ -324,8 +324,8 @@
     "coverageNotes": "已核对表示当前版本主基线和证据入口已覆盖该维度，不表示运行时验证或功能等价已经通过；运行时缺口转入 DEV/VERIFY 验收清单。"
   },
   "dev": {
-    "status": "进行中",
-    "reason": "对照 release-4.1.5 已确认当前 V4 编辑设置将所有分区同时渲染，而基线按左侧分区只显示当前内容。已补充分区可见性回归测试并完成最小原生实现；定向测试、全量 91 个测试文件/404 个断言和 build:packages 已通过，当前代码待提交后重新构建和部署。",
+    "status": "已完成",
+    "reason": "按 release-4.1.5 部署页面确认分区切换差异后，已补充分区可见性测试和 tab 语义，并完成最小原生实现；定向测试、全量 91 个测试文件/404 个断言和 build:packages 已通过。",
     "sourceCommit": "5f5a7df73bba12951e2b73e83be489743a5b07c2",
     "documents": [
       {
@@ -609,10 +609,10 @@
         "sha256": "57631e774bfc03529677c888101abeac4aae00c66f94ab849c644ce9cd98997a"
       }
     ],
-    "ciRun": null,
-    "ciStatus": "分区显示修复待新 SHA 构建；此前宽度增量 CI 结果仅作输入",
-    "imageTag": null,
-    "imageDigest": null
+    "ciRun": "40126638656",
+    "ciStatus": "Unit tests 与 Build and publish ks-console 成功；该制品包含分区修复代码，当前阶段仍需以阶段记录 SHA 重新构建",
+    "imageTag": "feature-v4-workloads-20261025-034542-b70f20edcac1",
+    "imageDigest": "sha256:5daa0a5e92ad2d5b069b175e912353655436748238bc3f345169cb76ede8c18f"
   },
   "devAcceptanceChecklist": [
     "WL-01：三类资源项目/集群入口、详情 Tab、原生编辑设置分区和路由替代矩阵",
@@ -621,9 +621,9 @@
     "WL-04：移除普通 Workload 配置引用的 useV3action、Wujie Shadow DOM 和 V3 编辑器桥接"
   ],
   "verify": {
-    "status": "待重新验证",
-    "reason": "宽度修复制品的三类弹窗宽度已完成部署后复验；由于分区显示行为发现新的 release-4.1.5 差异，当前阶段退回 DEV。分区修复完成后必须以新 SHA 重新构建、部署并验收，旧制品 VERIFY 结果不继承。",
-    "sourceCommit": "2b0c2c6de2dddddc825b4606897e0362e299cad0",
+    "status": "进行中",
+    "reason": "分区显示修复已完成 DEV，当前阶段重新进入 VERIFY。必须针对阶段记录提交后的新 SHA 重新构建、部署，并在 131 已部署制品上用 Playwright 点击三类资源的每个分区，确认只显示当前内容。此前宽度制品的浏览器结果不替代本次验收。",
+    "sourceCommit": "",
     "documents": [
       {
         "path": "docs/v4-migration/workload-131-verify-20261024.md",
@@ -663,11 +663,11 @@
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "d34f596fab1ba5da3f4c633883577fa8b456466f44782e86e1219bd46fc481ec"
+        "sha256": "e684184e708a301cc0f2a83fbd7c80307009e4ec283ac98be2daaf29308a58e5"
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "2667cf1b42bdee4da874cd5344e7059721e60aa1644e21414e0ea8ae62d56036"
+        "sha256": "6444a275ddd38fe15ff84e351c58fe78f135adc729a8c9f22f6ec556b179d736"
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
@@ -731,7 +731,7 @@
       },
       {
         "path": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-        "sha256": "1b755de279ae10b94185eb67b516fff4f59fe24fec960bcd3893f780b50b30fd"
+        "sha256": "770d8ca83369ae9a35ee514ad71b43b42bdad18f546ed2d609006a47d4702f95"
       },
       {
         "path": "docs/v4-migration/evidence/workload-settings-width-verify-20261025.json",
@@ -739,16 +739,16 @@
       }
     ],
     "ciRun": null,
-    "ciStatus": "等待 DEV 分区修复制品",
+    "ciStatus": "等待当前阶段 SHA 的 CI 构建",
     "imageTag": null,
     "imageDigest": null,
     "rollout": null,
     "browserVerification": {
-      "status": "待重新验证",
-      "evidence": "docs/v4-migration/evidence/workload-settings-width-verify-20261025.json",
+      "status": "待当前阶段制品验证",
+      "evidence": "docs/v4-migration/workload-settings-tabs-dev-20261025.md",
       "report": "docs/v4-migration/workload-current-head-verify-20261024.md",
-      "freshLogin": "未重新建立",
-      "authenticatedSessionChecks": "上一制品已完成宽度复验；分区切换待新制品复验",
+      "freshLogin": "待部署后确认；不继承旧会话结论",
+      "authenticatedSessionChecks": "待当前阶段制品重新执行",
       "moduleAcceptance": "未完成"
     },
     "lastEvidenceUpdate": "2026-10-25"
