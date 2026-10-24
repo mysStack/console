@@ -20,8 +20,10 @@
   },
   "iamReadOnlyCheck": {
     "resourceType": "users.iam.kubesphere.io",
-    "configuredUserResourceFound": true,
-    "configuredUserResourceState": "Active",
+    "configuredUserResourceFound": false,
+    "configuredUsernameMatchesIamUser": false,
+    "iamUserCount": 5,
+    "availableUserStates": "all listed IAM users are Active; no listed user matches the configured username",
     "writeOperations": false
   },
   "browserAttempt": {
@@ -33,5 +35,5 @@
     "resourceWrites": false,
     "evidenceAdded": false
   },
-  "conclusion": "环境变量已加载，集群中的用户资源处于 Active；浏览器认证仍失败，当前无法把失败归因到前端功能，也不能继续当前制品的浏览器 VERIFY。"
+  "conclusion": "环境变量已加载，但配置的测试用户名与当前集群 IAM User 列表不匹配；浏览器认证失败具有外部账号配置阻塞特征，不能归因于前端功能，也不能继续当前制品的浏览器 VERIFY。"
 }

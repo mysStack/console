@@ -293,8 +293,8 @@
 ## 2026-10-24 131 浏览器登录边界核对
 
 - 只读确认 `default` context、131 API Server、V4 `30880`、V3 对比前端 `30881` 和两个前端 Deployment 的 `1/1 Ready` 状态。
-- 浏览器登录确实从 `/home/bruce/.bashrc` 加载 `KS_TEST_USERNAME`、`KS_TEST_PASSWORD`；两个环境变量均存在。IAM User 资源只读状态为 `Active`，但提交登录后页面仍返回 `Incorrect username or password`。
-- 本轮没有修改集群用户、密码、角色或任何测试资源，也没有进入 Workload 页面；该登录问题继续作为当前浏览器验收阻塞边界记录。证据见 [`evidence/workload-browser-login-rea-20261024.json`](./evidence/workload-browser-login-rea-20261024.json)。模块仍为 `REA / 分析中，待复核`。
+- 浏览器登录确实从 `/home/bruce/.bashrc` 加载 `KS_TEST_USERNAME`、`KS_TEST_PASSWORD`；两个环境变量均存在。只读比对发现配置用户名不在当前 IAM User 列表中（现有用户均为 `Active`），提交登录后页面仍返回 `Incorrect username or password`。
+- 本轮没有修改集群用户、密码、角色或任何测试资源，也没有进入 Workload 页面；配置用户名与集群 IAM 用户不匹配，登录问题继续作为当前浏览器验收阻塞边界记录。证据见 [`evidence/workload-browser-login-rea-20261024.json`](./evidence/workload-browser-login-rea-20261024.json)。模块仍为 `REA / 分析中，待复核`。
 
 ## 2026-10-24 集群级三类 Workload 原生入口补证
 
