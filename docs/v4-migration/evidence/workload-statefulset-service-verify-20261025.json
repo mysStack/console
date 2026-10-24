@@ -26,6 +26,15 @@
       "url": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01",
       "status": 200
     },
+    "settingsFieldPersistence": {
+      "field": "metadata.labels.v4-migration-run",
+      "temporaryValue": "workload-watch-20261025-verify",
+      "temporaryPut": 200,
+      "temporaryReadBack": "通过：Kubernetes API 回读临时标签值，StatefulSet 保持 1/1",
+      "restoreValue": "workload-watch-20261022",
+      "restorePut": 200,
+      "restoreReadBack": "通过：Kubernetes API 回读原始标签值，StatefulSet 保持 1/1"
+    },
     "consoleErrors": "存在既有扩展初始化错误；按负责人决定暂不纳入 Workload 验收"
   },
   "kubernetes": {
@@ -53,8 +62,9 @@
   "mutation": {
     "authorized": true,
     "testResourceOnly": true,
-    "changedBusinessValue": false,
-    "cleanup": "未删除测试资源"
+    "changedBusinessValue": true,
+    "restoredAfterTest": true,
+    "cleanup": "未删除测试资源；原始标签值已恢复"
   },
   "conclusion": "StatefulSet 编辑服务的当前制品成功路径已取得浏览器 PATCH 200、回读 200 和 Kubernetes 资源一致性证据；403/404/422、冲突、网络失败和低权限拒绝路径仍未闭环。"
 }

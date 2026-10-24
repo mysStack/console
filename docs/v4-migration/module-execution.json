@@ -691,7 +691,7 @@
       },
       {
         "path": "docs/v4-migration/workload-current-head-verify-20261024.md",
-        "sha256": "76d957b4cd6d706f4306e0111d614cd728925f0e1daf7a1c9f12eb5d1d33fc07"
+        "sha256": "778b49299a2ed45131be6598d7abc5654efdedf0c8284927ec32496394b8593c"
       },
       {
         "path": "docs/v4-migration/evidence/workload-daemonset-settings-verify-20261025.json",
@@ -703,7 +703,7 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-statefulset-service-verify-20261025.json",
-        "sha256": "797cc76d675db91492448adc4bd3227e4717f168b10ca92079653dd73f78288b"
+        "sha256": "d6136c2348b16f8c26fad66d38c16eea40ebc6ba4f6969dbd3ea36728664ed06"
       }
     ],
     "ciRun": "40100881163",
