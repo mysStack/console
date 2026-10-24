@@ -1,4 +1,24 @@
-# Workload 当前制品 VERIFY 记录（2026-10-24）
+# Workload 当前制品 VERIFY 记录（2026-10-24，最新增量 2026-10-25）
+
+> **最新增量优先**：2026-10-25 已对提交 `2b0c2c6de2dddddc825b4606897e0362e299cad0` 对应制品完成重新构建、部署和 Playwright 验收。宽度修复证据见 [`workload-settings-width-verify-20261025.json`](./evidence/workload-settings-width-verify-20261025.json)。本文较早章节中的 `54b863b2ccd`、旧镜像和旧弹窗宽度只保留为历史记录，不能覆盖最新增量结论。
+
+## 2026-10-25 当前 SHA 宽度修复 VERIFY
+
+| 项目        | 结果                                                                                                  |
+| ----------- | ----------------------------------------------------------------------------------------------------- |
+| 分支 / 提交 | `feature/v4-workloads` / `2b0c2c6de2dddddc825b4606897e0362e299cad0`                                   |
+| CI          | Run `40124472412`；Unit tests、Build and publish ks-console 均成功                                    |
+| 镜像        | `ghcr.io/mysstack/ks-console:feature-v4-workloads-20261025-031645-2b0c2c6de2dd`                       |
+| 镜像 digest | `sha256:b23b9b5ea4836778357fd5919c5b002f02a229d87b0e854f9172e47b969ecfdd`                             |
+| 131 rollout | `kubesphere-system/ks-console` 成功，Deployment generation `603`，`1/1` Ready                         |
+| Pod imageID | `ghcr.io/mysstack/ks-console@sha256:b23b9b5ea4836778357fd5919c5b002f02a229d87b0e854f9172e47b969ecfdd` |
+| Playwright  | 已认证会话完成 Deployment、StatefulSet、DaemonSet 编辑设置渲染复验                                    |
+
+本轮在 `1280×720` 视口下确认三类资源编辑设置弹窗内部 `.kubed-modal` 的宽度均为 `1162px`，左侧为 `59px`，与 `release-4.1.5` 对照页面的宽度观察一致。StatefulSet 额外确认了副本分组序号和持久卷声明模板；DaemonSet 额外确认了最大不可用容器组数量和容器组就绪最短运行时长；三类资源均显示容器和元数据原生区域。
+
+本轮页面仍记录到 8 个扩展初始化错误（包括 `getExtensionConsoleV3Embed`、`ConfigConstants` 和 `getStoreWithQueryHooks` 相关错误）。这些错误属于已登记的扩展运行时范围，按项目决定暂不在 Workload 本轮修复；不能把它们记为 Workload 页面零错误。
+
+本轮关闭了“当前制品仍使用 `960px` 弹窗宽度”的 VERIFY 缺口，但没有关闭 Tab 内容切换、完整布局交互、低权限浏览器正反路径、缓存失效、错误/取消矩阵和全部 V3 功能逐项等价。Workload 模块继续保持 `VERIFY / 进行中`，不进入 PR 验收。
 
 ## 1. 本轮边界
 

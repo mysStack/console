@@ -1,12 +1,19 @@
-# 当前 Workload 执行状态（2026-10-24）
+# 当前 Workload 执行状态（2026-10-25）
 
 - 当前阶段：`VERIFY / 进行中`。
-- 当前制品：代码提交 `54b863b2ccd611bab088d39bcbebc8b4e9f68500`；CI Run `40100881163`；镜像 `feature-v4-workloads-20261024-220602-54b863b2ccd6`；digest `sha256:53299da2a0add86f3c08208b8ed9728d39af31ae5c0ba7b315283dc5bfdc675a`；131 rollout 和 Pod imageID 核对成功。
-- 当前浏览器结果：已认证会话完成三类项目列表、详情、原生编辑设置、集群级列表和配置引用页面复验；新建零 Cookie 登录未通过，完整 Action、低权限正反、缓存、错误和逐项等价性仍未闭环。详见[当前制品 VERIFY](./workload-current-head-verify-20261024.md)。
+- 当前制品：代码提交 `2b0c2c6de2dddddc825b4606897e0362e299cad0`；CI Run `40124472412`；镜像 `feature-v4-workloads-20261025-031645-2b0c2c6de2dd`；digest `sha256:b23b9b5ea4836778357fd5919c5b002f02a229d87b0e854f9172e47b969ecfdd`；131 rollout 和 Pod imageID 核对成功，Pod `ks-console-5b65b75bcf-twzhz` 为 `1/1` Ready。
+- 当前浏览器结果：已认证会话在当前部署制品上完成 Deployment、StatefulSet、DaemonSet 原生编辑设置打开和渲染复验，三类弹窗宽度均为 `1162px`；新建零 Cookie 登录仍未重新建立。Tab 内容切换、低权限正反、缓存、错误和逐项等价性仍未闭环。详见[宽度修复 VERIFY](./evidence/workload-settings-width-verify-20261025.json)。
 - 当前主基线：`release-4.1.5` 完整前端源码及同版本已部署页面 `192.168.2.131:30881`；源码定位实现，页面核对真实渲染、交互、Network、错误和权限。
 - 制品校准：同版本 `v3dist` tree `1e499d92e11374e26c76f5e13be45251602bd596`；旧 V3 参考 `origin/release-3.4` / `175710fefeeba6ff295c2c0967b4d45b83563d26` 仅在当前版本无法解释时补充使用。
 - 开发路线：REA 输入已经完成当前版本绑定并获准进入 DEV；当前代码已进入 VERIFY，未闭环项必须在当前制品上继续验证。
 - 下方历史状态不能覆盖上述当前状态。
+
+# 当前状态补充（2026-10-25：宽度修复制品部署与浏览器复验）
+
+- 本轮按 `release-4.1.5` 完整源码及同版本部署页面作为 REA 主基线，未把旧 `origin/release-3.4` 当作当前实现来源；旧 V3 仅保留为历史字段关系补充。
+- 提交 `2b0c2c6de2dddddc825b4606897e0362e299cad0` 已由 CI Run `40124472412` 构建并推送。镜像 `feature-v4-workloads-20261025-031645-2b0c2c6de2dd` 的 digest 为 `sha256:b23b9b5ea4836778357fd5919c5b002f02a229d87b0e854f9172e47b969ecfdd`；131 `ks-console` rollout 成功，Pod imageID 与该 digest 一致。
+- 已认证 Playwright 会话完成三类资源编辑设置渲染复验：Deployment `v4-deploy-edit-ef3`、StatefulSet `v4-watch-sts-20261022-01`、DaemonSet `v4-stop-ds-7fa` 的 `.kubed-modal` 宽度均为 `1162px`。StatefulSet 的副本分组序号/PVC 模板、DaemonSet 的最大不可用数量/就绪最短运行时长、三类资源的容器和元数据区域均可见。
+- 当前页面仍有 8 个扩展初始化错误，按项目决定暂不纳入 Workload 本轮修复；这不等同于页面零错误。当前仍未完成 Tab 交互、低权限浏览器正反、缓存失效、错误/取消矩阵和全部 V3 功能等价，模块不进入 PR 验收。
 
 # 当前状态补充（2026-10-24：重新绑定输入后的 REA 复核）
 

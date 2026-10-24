@@ -1,6 +1,6 @@
-# 当前 Workload 执行路线（2026-10-24）
+# 当前 Workload 执行路线（2026-10-25）
 
-> **最新状态（当前制品 VERIFY）**：代码提交 `54b863b2ccd611bab088d39bcbebc8b4e9f68500` 已完成 CI 构建、镜像推送、131 rollout 和 Pod imageID/digest 核对。Playwright 已在已认证会话中完成项目级三类列表、详情、原生编辑设置、集群级列表和配置引用复验；新建零 Cookie 登录未通过，因此当前阶段保持 `VERIFY / 进行中`。完整 Action、低权限正反、缓存、错误路径和逐项 V3 等价仍未闭环。详见[当前制品 VERIFY](./workload-current-head-verify-20261024.md)及[结构化证据](./evidence/workload-current-head-verify-20261024.json)。
+> **最新状态（当前制品 VERIFY）**：代码提交 `2b0c2c6de2dddddc825b4606897e0362e299cad0` 已完成 CI 构建、镜像推送、131 rollout 和 Pod imageID/digest 核对。当前部署制品上，Deployment、StatefulSet、DaemonSet 三类详情的原生编辑设置均完成 Playwright 打开、渲染和弹窗宽度复验，宽度均为 `1162px`，与 `release-4.1.5` 对照页面一致。当前阶段仍为 `VERIFY / 进行中`：Tab 内容切换、低权限正反、缓存、错误路径和逐项 V3 等价尚未闭环；扩展初始化错误按项目决定暂不纳入本模块修复。详见[宽度修复 VERIFY](./evidence/workload-settings-width-verify-20261025.json)。
 
 > REA 主基线为 `release-4.1.5` 完整前端源码和同版本已部署页面 `192.168.2.131:30881`；同版本 `v3dist` 仅作发布制品校准；`origin/release-3.4` 仅作当前版本无法解释时的历史补充。未闭环的字段、Action、RBAC、缓存、错误和逐项等价性保留在 VERIFY 验收清单，不能标记为已验收。
 
