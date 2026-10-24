@@ -1,5 +1,7 @@
 # Workload 组合开发能力边界矩阵
 
+> **入口描述校准（2026-10-24）**：本文后续历史段落中的“StatefulSet、DaemonSet 编辑设置仍调用 `editYaml`”是 2026-10-23 旧制品 REA 快照。当前分支源码和 131 旧精确制品复验均显示两个资源的 `editConfigTemplate` 打开原生 `WorkloadSettingsModal`，YAML 由独立 `editYaml` Action 提供。当前 HEAD 新制品尚未在 131 Ready，完整设置字段、保存、权限和 V3 等价仍未验收；详见[旧制品原生设置证据](./evidence/workload-native-settings-old-artifact-20261024.json)。
+
 > 当前模块：`workloads`；当前能力：`deployment-statefulset-daemonset`；阶段：`REA`；状态：分析中。
 >
 > 分支：`feature/v4-workloads`；Worktree：`console-workloads`；当前范围：Deployment、StatefulSet、DaemonSet。

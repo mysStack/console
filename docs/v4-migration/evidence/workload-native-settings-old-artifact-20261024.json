@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-24",
+  "module": "workloads",
+  "scope": ["StatefulSet", "DaemonSet"],
+  "artifact": {
+    "sourceCommit": "24c6afa03849d5d5c7b84fccd1602639b1fd0eb5",
+    "image": "ghcr.io/mysstack/ks-console:feature-v4-workloads-20261024-050150-24c6afa03849@sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76",
+    "podImageId": "ghcr.io/mysstack/ks-console@sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76"
+  },
+  "browser": {
+    "baseUrl": "http://192.168.2.131:30880",
+    "session": "已有认证态；不作为当前 HEAD VERIFY 证据",
+    "statefulSet": {
+      "route": "/clusters/host/projects/v4-migration-e2e/statefulsets/v4-pvc-sts-7fa",
+      "settingsAction": "编辑设置",
+      "yamlAction": "编辑 YAML",
+      "nativeSections": ["更新策略", "容器组设置", "存储设置", "容器组调度规则", "添加元数据"],
+      "result": "编辑设置打开原生 WorkloadSettingsModal，未跳转 YAML"
+    },
+    "daemonSet": {
+      "route": "/clusters/host/projects/v4-migration-e2e/daemonsets/v4-stop-ds-7fa",
+      "settingsAction": "编辑设置",
+      "yamlAction": "编辑 YAML",
+      "nativeSections": ["更新策略", "容器组设置", "存储设置", "添加元数据"],
+      "result": "编辑设置打开原生 WorkloadSettingsModal，未跳转 YAML"
+    }
+  },
+  "boundary": "该证据纠正历史记录中的入口描述，但制品不是当前 HEAD；不能替代当前 HEAD 的部署后浏览器验收。"
+}

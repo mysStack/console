@@ -38,6 +38,14 @@
 
 # Workload 131 专项 VERIFY（2026-10-24）
 
+## 当前 HEAD 制品部署未完成（2026-10-24）
+
+当前 HEAD `ae500da86a559b378ba7255ee1d21c3d95a3a768` 的 CI Run `40046932193` 成功，镜像 tag 为 `feature-v4-workloads-20261024-085149-ae500da86a55`，digest 为 `sha256:325f455ab8388f65ab1da254a4ca17d298baa45a118d38b12969c64db175bef5`。部署到 131 后新 Pod 长时间处于 `ContainerCreating`，没有形成可用于浏览器验收的 Ready Pod，已回滚到旧精确制品 `sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76`；回滚 rollout、Pod Ready 和 imageID 通过。当前 HEAD 的浏览器验收未执行，不能标记通过。结构化记录见[当前 HEAD 制品部署证据](./evidence/workload-current-head-deploy-pull-20261024.json)。
+
+## 编辑设置入口版本校准（2026-10-24）
+
+在回滚前旧精确制品的已有认证态中重新打开 StatefulSet `v4-pvc-sts-7fa` 和 DaemonSet `v4-stop-ds-7fa` 的“更多操作 → 编辑设置”：两个入口均打开原生设置弹窗，分别显示资源适用的更新策略、容器组、存储、调度或元数据分区；“编辑 YAML”是单独菜单项。历史 REA 中将两个入口写成仍打开 YAML 的描述已过时，不能继续作为当前实现结论。该观察来自旧制品，当前 HEAD 尚缺部署后浏览器证据，详见[入口校准证据](./evidence/workload-native-settings-old-artifact-20261024.json)。
+
 ## 当前增量：配置引用与 Action 浏览器复验（2026-10-24）
 
 在精确制品 `24c6afa03849d5d5c7b84fccd1602639b1fd0eb5`、镜像 digest `sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76` 上，使用零 Cookie 新浏览器 context 登录 131，完成三类 Workload 的配置引用和 Action 复验，登录 HTTP 200、认证界面正常，未记录页面错误。

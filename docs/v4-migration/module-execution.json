@@ -20,11 +20,11 @@
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
-        "sha256": "4d11487aa127b56b87c16291917e93226b4cab83322b89bc5277c2027663b8a2"
+        "sha256": "bca260ef5d541bab98c136fc132f5388e4cf67cee362fa2f02237dc4b354c311"
       },
       {
         "path": "docs/v4-migration/workload-kind-capability-matrix.md",
-        "sha256": "6987dc90c9ad8eebc16e16ba999565b9cf25f21e1b2e916a647b41ca86aa963e"
+        "sha256": "9750ca8af4c2070228368a8f2ec1d0060994936e4e12d120029c1b6ce8840fed"
       },
       {
         "path": "docs/v4-migration/evidence/workload-edit-factories-20261023-provenance.json",
@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "d7c621b1d0a335285b2e458d68d98fbc77ea846a786db320fc45b95cc54ab71a"
+        "sha256": "f58238faaba56b63f7ba6fb1f9cbedf609a97c5245a84e69af1021a25a724efa"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "bacee6079550f387d114aaa0f352c710a553d3b8375ac08597c4066aa1b5b52c"
+        "sha256": "9be1a806f0a2200bd0394e0640aa60573b8f57eb6e3c9036ec547c771f619d85"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -506,12 +506,12 @@
   ],
   "verify": {
     "status": "未完成",
-    "reason": "批量删除修复制品已完成 131 rollout、Pod Ready 和镜像身份核对；新浏览器 context 登录返回 Incorrect username or password，随后在回滚前使用已有登录态完成 Deployment/StatefulSet/DaemonSet 批量删除和 StatefulSet 关联 Service 清理，DaemonSet DELETE 200 OK。正常登录、完整错误/缓存、跨入口缓存切换和逐项 V3 等价仍未完成。",
+    "reason": "当前 HEAD 制品已完成 CI 构建和推送，但 131 新 Pod 长时间处于 ContainerCreating，未形成 Ready Pod，随后已回滚到部署前精确制品。回滚前在旧制品已有认证态确认 StatefulSet/DaemonSet 编辑设置均打开原生 WorkloadSettingsModal；该观察不继承为当前 HEAD VERIFY。正常登录、当前 HEAD 浏览器验收、完整错误/缓存、跨入口缓存切换和逐项 V3 等价仍未完成。",
     "sourceCommit": "766db6764e052ade7236da411fedc435303d1cc8",
     "documents": [
       {
         "path": "docs/v4-migration/workload-131-verify-20261024.md",
-        "sha256": "b2aeaeb672a4b3e5f5219272f326d5a77121078db088820ae436b277edad1fac"
+        "sha256": "c3fad8c81e605c9a649c13a8593cc040cee0248061b5953b28ed3b7ce34714c0"
       },
       {
         "path": "docs/v4-migration/evidence/workload-settings-verify-attempt-20261024.json",
@@ -544,6 +544,30 @@
       {
         "path": "docs/v4-migration/evidence/workload-batch-delete-deploy-login-20261024.json",
         "sha256": "97d15292731fad05520f70e1846c5a2cba1af0026824f4bb26a2bf676c615767"
+      },
+      {
+        "path": "docs/v4-migration/agents-status.md",
+        "sha256": "9be1a806f0a2200bd0394e0640aa60573b8f57eb6e3c9036ec547c771f619d85"
+      },
+      {
+        "path": "docs/v4-migration/matrix.md",
+        "sha256": "f58238faaba56b63f7ba6fb1f9cbedf609a97c5245a84e69af1021a25a724efa"
+      },
+      {
+        "path": "docs/v4-migration/rea-analysis-summary.md",
+        "sha256": "bca260ef5d541bab98c136fc132f5388e4cf67cee362fa2f02237dc4b354c311"
+      },
+      {
+        "path": "docs/v4-migration/workload-kind-capability-matrix.md",
+        "sha256": "9750ca8af4c2070228368a8f2ec1d0060994936e4e12d120029c1b6ce8840fed"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-current-head-deploy-pull-20261024.json",
+        "sha256": "97c3626382e4c913ab2cd3449c183116d27024ce23eb603b0769ff3a32ae8d60"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-native-settings-old-artifact-20261024.json",
+        "sha256": "55b3878b97444a59ae31be36bba8d0d0cc83e2f2013c81039e2e5ba67e801503"
       }
     ]
   }
