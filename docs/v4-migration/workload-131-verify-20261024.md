@@ -1,3 +1,9 @@
+# 当前增量：已有登录态复验三类批量删除，登录门禁仍未闭环（2026-10-24）
+
+在新制品 `feature-v4-workloads-20261024-080405-766db6764e05` 上，新浏览器 context 登录仍返回 `Incorrect username or password`，因此正常登录条件未通过；按规则本轮部署最终已回滚。回滚前，使用已存在的登录态 Playwright session 进入新制品页面完成三类批量删除：Deployment 两个本体删除，StatefulSet 两个本体及各自登记的 Headless Service 删除，DaemonSet 两个本体删除；DaemonSet 两次 DELETE 请求记录为 200 OK，其余结果由 Kubernetes API 复核资源不存在。
+
+这证明本次 `annotations` 传递修复在已有登录态下覆盖了页面批量删除及 StatefulSet 关联 Service 清理路径，但不能替代新制品的正常登录验证，也不能将页面上的 8 个 Console error、4 个 warning 解释为零错误。扩展/监控相关错误仍按既定范围独立跟踪。证据见 [批量删除制品部署与登录证据](./evidence/workload-batch-delete-deploy-login-20261024.json)。Workload 继续保持 `VERIFY / 未完成`。
+
 # 当前增量：新制品登录失败，已回滚（2026-10-24）
 
 批量删除修复制品 `766db6764e052ade7236da411fedc435303d1cc8` 已通过部署门禁并部署到 131，CI Run `40042970738`、镜像 `feature-v4-workloads-20261024-080405-766db6764e05`、digest `sha256:32a8c980510d13e63e6e47cbe7d52c29f64ad728b8fd19c190e6ac4e499f2dd4` 与 Pod imageID 一致，rollout 和 Pod Ready 通过。

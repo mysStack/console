@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "75b2e47d8892bc71398ffcbaec1d935fc4ecfa3670e355e1840776d669912c9b"
+        "sha256": "d7c621b1d0a335285b2e458d68d98fbc77ea846a786db320fc45b95cc54ab71a"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "3b953e1f7cc0aa93495ab7fa0f796f60f6dd9e0916e4a1bdfcdc0f39fe424a18"
+        "sha256": "bacee6079550f387d114aaa0f352c710a553d3b8375ac08597c4066aa1b5b52c"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -506,12 +506,12 @@
   ],
   "verify": {
     "status": "未完成",
-    "reason": "批量删除修复制品已完成 131 rollout、Pod Ready 和镜像身份核对；新浏览器 context 登录返回 Incorrect username or password，未进入 Workload 页面，按规则停止并回滚到部署前精确制品。登录失败原因、三类批量删除成功路径、StatefulSet 关联 Service 清理、伸缩确认结果、完整错误/缓存、跨入口缓存切换和逐项 V3 等价仍未完成。",
+    "reason": "批量删除修复制品已完成 131 rollout、Pod Ready 和镜像身份核对；新浏览器 context 登录返回 Incorrect username or password，随后在回滚前使用已有登录态完成 Deployment/StatefulSet/DaemonSet 批量删除和 StatefulSet 关联 Service 清理，DaemonSet DELETE 200 OK。正常登录、完整错误/缓存、跨入口缓存切换和逐项 V3 等价仍未完成。",
     "sourceCommit": "766db6764e052ade7236da411fedc435303d1cc8",
     "documents": [
       {
         "path": "docs/v4-migration/workload-131-verify-20261024.md",
-        "sha256": "03b6e046585d39c5d090a47036de6c36df7b3055b4f313d6d6f4cab58c02a03e"
+        "sha256": "b2aeaeb672a4b3e5f5219272f326d5a77121078db088820ae436b277edad1fac"
       },
       {
         "path": "docs/v4-migration/evidence/workload-settings-verify-attempt-20261024.json",
@@ -543,7 +543,7 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-batch-delete-deploy-login-20261024.json",
-        "sha256": "83f6d4d844c030c394c2a4cee564ca29fd7d883698775ae45c6fd8eabb75896a"
+        "sha256": "97d15292731fad05520f70e1846c5a2cba1af0026824f4bb26a2bf676c615767"
       }
     ]
   }

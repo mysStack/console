@@ -1,3 +1,5 @@
+> **2026-10-24 批量删除复验**：新制品在已有登录态下完成三类批量删除，StatefulSet 关联 Headless Service 同步清理，DaemonSet DELETE 200 OK；新制品新浏览器登录仍失败并已回滚，因此登录门禁、完整错误/缓存和逐项 V3 等价仍未闭环。
+
 > **2026-10-24 登录阻塞**：批量删除修复制品完成 131 部署和身份核对，但专用测试账号登录返回 `Incorrect username or password`，未进入浏览器验证；已回滚到部署前精确制品，Workload 保持 `VERIFY / 未完成`。登录失败原因尚未归因，不能将批量删除修复标记为通过。详见 [部署与登录证据](./evidence/workload-batch-delete-deploy-login-20261024.json)。
 
 # 历史记录：批量删除修复已构建（后续已部署并因登录失败回滚）（2026-10-24）

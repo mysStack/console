@@ -1,3 +1,7 @@
+# 当前状态补充（2026-10-24：已有登录态完成三类批量删除复验）
+
+新制品在 131 的新浏览器登录仍失败并已回滚；回滚前使用已有登录态完成 Deployment、StatefulSet、DaemonSet 批量删除，StatefulSet 关联 Headless Service 同步清理，DaemonSet 两次 DELETE 为 200 OK，API 复核专用资源均已不存在。该结果关闭了本次修复对应的批量删除行为缺口，但不关闭新制品正常登录、完整错误矩阵、缓存切换和逐项 V3 等价，模块保持 `VERIFY / 未完成`。
+
 # 当前状态补充（2026-10-24：批量删除修复制品登录失败并回滚）
 
 批量删除修复制品已完成 131 rollout 和镜像身份核对，但新浏览器 context 登录返回 `Incorrect username or password`，未执行 Workload 浏览器验证。已按规则回滚至部署前精确制品，回滚 rollout、Pod Ready 和 Pod imageID 通过。登录失败原因未归因；批量删除修复不能标记为 VERIFY 通过，模块保持 `VERIFY / 未完成`。证据见 [批量删除制品部署与登录证据](./evidence/workload-batch-delete-deploy-login-20261024.json)。
