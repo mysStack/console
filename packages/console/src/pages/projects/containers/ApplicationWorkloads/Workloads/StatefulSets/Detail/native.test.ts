@@ -9,3 +9,9 @@ test('project StatefulSet detail is native and has no V3 bridge', () => {
   assert.match(source, /const module = 'statefulsets'/);
   assert.match(source, /useCommonActions/);
 });
+
+test('StatefulSet 详情请求失败时提供明确错误处理', () => {
+  assert.match(source, /getWorkloadDetailErrorPath/);
+  assert.match(source, /navigate\(detailErrorPath, \{ replace: true \}\)/);
+  assert.match(source, /WORKLOAD_DETAIL_LOAD_FAILED/);
+});

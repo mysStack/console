@@ -19,3 +19,9 @@ test('Deployment 编辑设置使用原生设置表单而不是 YAML 编辑器', 
   assert.match(settingsAction, /openSettingsModal/);
   assert.doesNotMatch(settingsAction, /editYaml/);
 });
+
+test('Deployment 详情请求失败时提供明确错误处理', () => {
+  assert.match(source, /getWorkloadDetailErrorPath/);
+  assert.match(source, /navigate\(detailErrorPath, \{ replace: true \}\)/);
+  assert.match(source, /WORKLOAD_DETAIL_LOAD_FAILED/);
+});

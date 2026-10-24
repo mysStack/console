@@ -28,6 +28,7 @@ module.exports = {
     'Settings were not saved. Check your network and permissions, then try again.',
   WORKLOAD_SETTINGS_LOAD_FAILED:
     'Unable to load the latest workload settings. Refresh and try again.',
+  WORKLOAD_DETAIL_LOAD_FAILED: 'Unable to load the workload details. Refresh and try again.',
   VOLUME_MOUNT_PL: 'Volume Mounts',
   WORKLOAD_PRESERVED_VOLUME: 'Existing {type} volume is preserved while editing other settings.',
   WORKLOAD_ADD_CONTAINER: 'Add Container',

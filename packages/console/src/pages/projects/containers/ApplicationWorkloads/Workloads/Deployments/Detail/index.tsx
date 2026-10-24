@@ -27,6 +27,7 @@ import {
 import { useRollbackModal, useAutoScalingModal } from '../../../../../../clusters/hooks/useModal';
 import type { FormattedWorkload } from '@ks-console/shared';
 import { WorkloadSettingsModal } from '../../../../../components/WorkloadCreateModal';
+import { getWorkloadDetailErrorPath } from '../../detailError';
 
 const module = 'deployments';
 const WORKLOAD_TYPE = 'DEPLOYMENT';
@@ -50,6 +51,7 @@ const DeploymentDetail = () => {
 
   const {
     data: detail,
+    error,
     isLoading,
     isError,
     refetch,
@@ -58,6 +60,14 @@ const DeploymentDetail = () => {
     name,
     namespace,
   });
+
+  const detailErrorPath = getWorkloadDetailErrorPath(error);
+
+  useEffect(() => {
+    if (isError && detailErrorPath) {
+      navigate(detailErrorPath, { replace: true });
+    }
+  }, [detailErrorPath, isError, navigate]);
 
   useWebSocket({
     module,
@@ -381,8 +391,12 @@ const DeploymentDetail = () => {
 
   return (
     <>
-      {isLoading || isError ? (
+      {isLoading ? (
         <Loading className="page-loading" />
+      ) : isError ? (
+        detailErrorPath ? null : (
+          <div role="alert">{t('WORKLOAD_DETAIL_LOAD_FAILED')}</div>
+        )
       ) : (
         <DetailPagee
           tabs={tabs}

@@ -98,6 +98,8 @@ function renderDetail(kind: string, resource: string, rejectLoad = false) {
     globals: { clusterConfig: { host: {} } },
     require: (name: string) => {
       if (name === '@ks-console/shared') return shared;
+      if (name === '../../detailError')
+        return requireDependency(path.join(__dirname, 'detailError.ts'));
       if (name === '@kubed/components')
         return {
           Loading: () => null,

@@ -28,6 +28,8 @@ module.exports = {
     'No se guardaron los ajustes. Comprueba la red y los permisos e inténtalo de nuevo.',
   WORKLOAD_SETTINGS_LOAD_FAILED:
     'No se pudieron cargar los ajustes actuales. Actualiza e inténtalo de nuevo.',
+  WORKLOAD_DETAIL_LOAD_FAILED:
+    'No se pudieron cargar los detalles del trabajo. Actualiza e inténtalo de nuevo.',
   VOLUME_MOUNT_PL: 'Montajes de volumen',
   WORKLOAD_PRESERVED_VOLUME: 'El volumen {type} existente se conserva al editar otros ajustes.',
   WORKLOAD_ADD_CONTAINER: 'Añadir contenedor',

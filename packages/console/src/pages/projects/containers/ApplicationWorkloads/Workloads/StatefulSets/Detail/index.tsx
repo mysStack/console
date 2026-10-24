@@ -34,6 +34,7 @@ import type { FormattedWorkload } from '@ks-console/shared';
 import { Firewall } from '@kubed/icons';
 
 import { WorkloadSettingsModal } from '../../../../../components/WorkloadCreateModal';
+import { getWorkloadDetailErrorPath } from '../../detailError';
 
 const module = 'statefulsets';
 const WORKLOAD_TYPE = 'STATEFULSET';
@@ -63,6 +64,7 @@ const StatefulSetsDetail = () => {
 
   const {
     data: detail,
+    error,
     isLoading,
     isError,
     refetch,
@@ -71,6 +73,14 @@ const StatefulSetsDetail = () => {
     name,
     namespace,
   });
+
+  const detailErrorPath = getWorkloadDetailErrorPath(error);
+
+  useEffect(() => {
+    if (isError && detailErrorPath) {
+      navigate(detailErrorPath, { replace: true });
+    }
+  }, [detailErrorPath, isError, navigate]);
 
   useWebSocket({
     module,
@@ -372,8 +382,12 @@ const StatefulSetsDetail = () => {
 
   return (
     <>
-      {isLoading || isError ? (
+      {isLoading ? (
         <Loading className="page-loading" />
+      ) : isError ? (
+        detailErrorPath ? null : (
+          <div role="alert">{t('WORKLOAD_DETAIL_LOAD_FAILED')}</div>
+        )
       ) : (
         <DetailPagee
           tabs={tabs}

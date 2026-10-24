@@ -29,6 +29,7 @@ import { useRollbackModal, useBaseInfoModal } from '../../../../../../clusters/h
 import type { FormattedWorkload } from '@ks-console/shared';
 
 import { WorkloadSettingsModal } from '../../../../../components/WorkloadCreateModal';
+import { getWorkloadDetailErrorPath } from '../../detailError';
 
 const module = 'daemonsets';
 const WORKLOAD_TYPE = 'DAEMONSET';
@@ -56,6 +57,7 @@ const DaemonSetDetail = () => {
 
   const {
     data: detail,
+    error,
     isLoading,
     isError,
     refetch,
@@ -64,6 +66,14 @@ const DaemonSetDetail = () => {
     name,
     namespace,
   });
+
+  const detailErrorPath = getWorkloadDetailErrorPath(error);
+
+  useEffect(() => {
+    if (isError && detailErrorPath) {
+      navigate(detailErrorPath, { replace: true });
+    }
+  }, [detailErrorPath, isError, navigate]);
 
   useWebSocket({
     module,
@@ -343,8 +353,12 @@ const DaemonSetDetail = () => {
 
   return (
     <>
-      {isLoading || isError ? (
+      {isLoading ? (
         <Loading className="page-loading" />
+      ) : isError ? (
+        detailErrorPath ? null : (
+          <div role="alert">{t('WORKLOAD_DETAIL_LOAD_FAILED')}</div>
+        )
       ) : (
         <DetailPagee
           tabs={tabs}

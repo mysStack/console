@@ -24,6 +24,7 @@ module.exports = {
   WORKLOAD_SETTINGS_CONFLICT: '資源已被其他操作更新，本次設定未儲存。請取消並重新開啟編輯設定。',
   WORKLOAD_SETTINGS_SAVE_FAILED: '儲存失敗，設定尚未儲存。請檢查網路與權限後重試。',
   WORKLOAD_SETTINGS_LOAD_FAILED: '無法讀取最新工作負載設定，請重新整理後重試。',
+  WORKLOAD_DETAIL_LOAD_FAILED: '無法載入工作負載詳情，請重新整理後重試。',
   VOLUME_MOUNT_PL: '卷掛載',
   WORKLOAD_PRESERVED_VOLUME: '現有 {type} 卷原樣保留；此處可編輯其他設置。',
   WORKLOAD_ADD_CONTAINER: '新增工作容器',
