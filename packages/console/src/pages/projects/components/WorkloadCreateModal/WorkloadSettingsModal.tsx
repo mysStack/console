@@ -140,7 +140,7 @@ export default function WorkloadSettingsModal({
   return (
     <Modal
       title={t('EDIT_SETTINGS')}
-      width={960}
+      width={1162}
       visible={visible}
       confirmLoading={confirmLoading}
       onOk={submit}

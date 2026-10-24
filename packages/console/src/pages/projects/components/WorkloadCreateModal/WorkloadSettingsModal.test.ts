@@ -153,3 +153,9 @@ test('分区导航滚动到当前弹窗对应分区而不改变浏览器路由',
   assert.equal(scrolls, 1);
   assert.equal(button.props.href, undefined);
 });
+
+test('编辑设置弹窗使用 release-4.1.5 对照页面的宽度', () => {
+  const { tree } = render('Deployment');
+
+  assert.equal(tree.props.width, 1162);
+});
