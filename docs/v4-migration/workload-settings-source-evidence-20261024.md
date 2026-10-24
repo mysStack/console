@@ -2,6 +2,8 @@
 
 > **2026-10-24 输入口径调整：** 本文使用的 `origin/release-3.4` / `175710fefeeba6ff295c2c0967b4d45b83563d26` 经负责人确认作为旧 V3 结构、字段和样式参考；当前编译制品 REA 固定读取 `release-4.1.5`。该旧源码参考不能证明当前制品来源，也不冒充不存在的 `release-3.1.4`；本文内容必须与当前制品和运行时证据分开复核。
 
+> **2026-10-24 当前源码纠偏：** 本文中早期“StatefulSet、DaemonSet 编辑设置当前进入 YAML”的记录属于旧制品快照。当前 `feature/v4-workloads@9767ad7c2` 的三个详情页均读取原始资源并打开 `WorkloadSettingsModal`，YAML 由独立 `editYaml` Action 提供。最新逐项复核见[Workload 组合批次 REA 复核记录](./workload-rea-review-20261024.md)；本文历史证据仍保留，但后续判断以最新记录和当前源码为准。
+
 ## 证据范围
 
 本记录使用固定的旧源码候选 `origin/release-3.4`，提交为 `175710fefeeba6ff295c2c0967b4d45b83563d26`。旧源码只用于确认历史页面结构和 Action 关系，不作为当前 `v3dist` 的完整来源证明。当前编译制品的入口、Action 和分区证据见[组合能力矩阵](./workload-kind-capability-matrix.md#2026-10-23-定向制品证据普通资源编辑入口与分区)。

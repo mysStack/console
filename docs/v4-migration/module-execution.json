@@ -24,7 +24,7 @@
       },
       {
         "path": "docs/v4-migration/workload-kind-capability-matrix.md",
-        "sha256": "b3a96c0ada52fe78afa1768142a1e2ad707d1d06851d78fa8da643faf73dcca4"
+        "sha256": "ef7b913bd1780ac1a654907d4bd9bb131d84522618677ce4ceae9506253fa00b"
       },
       {
         "path": "docs/v4-migration/evidence/workload-edit-factories-20261023-provenance.json",
@@ -36,7 +36,7 @@
       },
       {
         "path": "docs/v4-migration/workload-settings-source-evidence-20261024.md",
-        "sha256": "aedf341ec381113174287f2251c7d5d359880ddecf93c2c87b8410dfecdb1fd7"
+        "sha256": "132d0cadc41dd1874cb8120d60693c6e987cce31b40ee75e3a895bf43775eb1c"
       },
       {
         "path": "docs/v4-migration/workload-test-design-20261023.md",
@@ -88,7 +88,7 @@
       },
       {
         "path": "docs/v4-migration/workload-action-api-rbac-evidence-20261023.md",
-        "sha256": "28238d61207be46c98a7e8b5d5df2b545ccf822962868fedcba038b24dc327bb"
+        "sha256": "b8a1fd1f3a1f1f54ed0693d5260fb557df910878772151ef798010ff4c5bd63a"
       },
       {
         "path": "docs/v4-migration/workload-rea-test-evidence-20261023.md",
@@ -109,11 +109,15 @@
       {
         "path": "docs/v4-migration/workload-development-route-20261024.md",
         "sha256": "f6c434c5436f75d76b34df06ca3f535d04c66f02815563348900b8e7946dcc1c"
+      },
+      {
+        "path": "docs/v4-migration/workload-rea-review-20261024.md",
+        "sha256": "4bbb282d822bae8774fb64866784593a596335d4f9f283a5fc009bb218cd826d"
       }
     ],
     "coverage": {
       "entry": {
-        "status": "待重新核对",
+        "status": "已完成静态复核，待运行时验证",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
@@ -124,7 +128,7 @@
         ]
       },
       "fields": {
-        "status": "待重新核对",
+        "status": "已完成静态复核，待运行时验证",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
@@ -134,7 +138,7 @@
         ]
       },
       "validation": {
-        "status": "待重新核对",
+        "status": "部分完成，待运行时验证",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
@@ -144,7 +148,7 @@
         ]
       },
       "api": {
-        "status": "待重新核对",
+        "status": "已完成静态复核，待运行时验证",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
@@ -152,7 +156,7 @@
         ]
       },
       "store": {
-        "status": "待重新核对",
+        "status": "已完成静态复核，待运行时验证",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
@@ -160,7 +164,7 @@
         ]
       },
       "action": {
-        "status": "待重新核对",
+        "status": "已完成静态复核，待运行时验证",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
@@ -169,7 +173,7 @@
         ]
       },
       "rbac": {
-        "status": "待重新核对",
+        "status": "未验证",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
@@ -178,7 +182,7 @@
         ]
       },
       "scope": {
-        "status": "待重新核对",
+        "status": "已完成静态复核，待运行时验证",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
@@ -187,7 +191,7 @@
         ]
       },
       "cache": {
-        "status": "待重新核对",
+        "status": "未验证",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
@@ -195,7 +199,7 @@
         ]
       },
       "errors": {
-        "status": "待重新核对",
+        "status": "未验证",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
@@ -203,7 +207,7 @@
         ]
       },
       "runtime": {
-        "status": "待重新核对",
+        "status": "未验证",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
@@ -211,7 +215,7 @@
         ]
       },
       "v4": {
-        "status": "待重新核对",
+        "status": "部分完成，待运行时验证",
         "evidence": [
           "docs/v4-migration/workload-settings-rea-20261022.md",
           "docs/v4-migration/deployment-settings-capability-matrix.md",
@@ -238,6 +242,12 @@
       "sourceReference": "origin/release-3.4 / 175710fefeeba6ff295c2c0967b4d45b83563d26 / AGPL-3.0",
       "originalRiskIds": ["WL-01", "WL-02", "WL-03", "WL-04"],
       "verifyRequirement": "未完成新的 REA 复核前，不得把已有 DEV、镜像或旧浏览器证据继承为当前 VERIFY 通过。"
+    },
+    "lastReview": {
+      "date": "2026-10-24",
+      "record": "docs/v4-migration/workload-rea-review-20261024.md",
+      "head": "9767ad7c261afc796fb94e1db6d86fb8cfc41a19",
+      "conclusion": "当前三个详情页均接入原生 WorkloadSettingsModal；REA 仍待负责人复核，运行时/RBAC/缓存/完整 V3 等价未闭环。"
     }
   },
   "dev": {

@@ -1,5 +1,7 @@
 # Workload Action、API、权限与缓存 REA 证据
 
+> **2026-10-24 当前源码纠偏：** 本文早期静态记录中的“StatefulSet/DaemonSet 编辑设置仍调用 `editYaml`”属于旧制品快照。当前 `feature/v4-workloads@9767ad7c2` 的三个详情页均通过原始资源读取和 `WorkloadSettingsModal` 提供原生编辑设置，YAML 是独立 Action。Action/API/RBAC、缓存和浏览器缺口仍然保留，最新复核见[Workload 组合批次 REA 复核记录](./workload-rea-review-20261024.md)。
+
 ## 1. 取证身份与结论边界
 
 | 项目         | 内容                                         |

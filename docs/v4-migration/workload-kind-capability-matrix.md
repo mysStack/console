@@ -6,6 +6,8 @@
 
 > **入口描述校准（2026-10-24）**：本文后续历史段落中的“StatefulSet、DaemonSet 编辑设置仍调用 `editYaml`”是 2026-10-23 旧制品 REA 快照。当前分支源码和 131 旧精确制品复验均显示两个资源的 `editConfigTemplate` 打开原生 `WorkloadSettingsModal`，YAML 由独立 `editYaml` Action 提供。当前 HEAD 新制品尚未在 131 Ready，完整设置字段、保存、权限和 V3 等价仍未验收；详见[旧制品原生设置证据](./evidence/workload-native-settings-old-artifact-20261024.json)。
 
+> **最新复核记录（2026-10-24）**：当前三个详情页的原生编辑设置入口、资源类型字段分派和未闭环项已重新核对，详见[Workload 组合批次 REA 复核记录](./workload-rea-review-20261024.md)。本文的历史段落继续保留为取证过程，不能覆盖最新记录中的当前源码结论。
+
 > 当前模块：`workloads`；当前能力：`deployment-statefulset-daemonset`；阶段：`REA`；状态：分析中。
 >
 > 分支：`feature/v4-workloads`；Worktree：`console-workloads`；当前范围：Deployment、StatefulSet、DaemonSet。
