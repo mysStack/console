@@ -751,7 +751,7 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-action-surface-verify-20261025.json",
-        "sha256": "549e79ead0aac2a566462b405f77bb0f553c7549c9254580639f9f2ce44f3fcb"
+        "sha256": "7005540842c7557c11f9182a8200d2514a4bf7393461c8ad0397801ad55036c3"
       }
     ],
     "ciRun": 40127350345,
