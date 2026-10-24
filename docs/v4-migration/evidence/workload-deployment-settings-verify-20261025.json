@@ -33,6 +33,15 @@
       "url": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
       "status": 200
     },
+    "fieldPersistence": {
+      "field": "metadata.labels.v4-migration-test",
+      "temporaryValue": "workloads-ef3-verify",
+      "temporaryPut": 200,
+      "temporaryReadBack": "通过：Kubernetes API 回读为 workloads-ef3-verify，Deployment 保持 1/1",
+      "restoreValue": "workloads-ef3",
+      "restorePut": 200,
+      "restoreReadBack": "通过：Kubernetes API 回读为 workloads-ef3，Deployment 保持 1/1"
+    },
     "consoleErrors": "存在既有扩展初始化错误；按负责人决定暂不纳入 Workload 验收"
   },
   "kubernetes": {
@@ -50,8 +59,9 @@
   "mutation": {
     "authorized": true,
     "testResourceOnly": true,
-    "changedBusinessValue": false,
-    "cleanup": "未删除测试资源"
+    "changedBusinessValue": true,
+    "restoredAfterTest": true,
+    "cleanup": "未删除测试资源；原始标签值已恢复"
   },
   "conclusion": "Deployment 编辑设置的当前制品保存回读和 rollout 成功路径已取得浏览器与 Kubernetes 证据；字段清空/保留、409/403/404、网络失败、低权限拒绝和缓存刷新仍未全部闭环。"
 }
