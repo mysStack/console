@@ -36,6 +36,13 @@
 - 本轮 Workload 页面请求未发现 `/consolev3`、`/dist/v3dist` 或 Wujie 入口请求。
 - 列表、详情、编辑设置和配置引用完成 DOM 快照，编辑设置完成截图检查。
 
+### 低权限浏览器结果
+
+- 专用低权限账号在当前制品上完成全新登录。
+- 进入 `v4-migration-e2e` 项目 Deployment 列表返回 200，资源列表可见，页面未显示创建入口。
+- 直接访问 ConfigMap 页面返回 403；这与 Kubernetes `auth can-i` 对 ConfigMap 的读权限结果不一致，说明 Console 权限键或 KubeSphere role template 仍需定位。
+- 该结果只证明一条 Workload 读路径和一条拒绝路径，不能替代完整低权限 RBAC、配置引用和三类资源操作矩阵。
+
 ### 尚未闭环的场景
 
 - 当前制品的新 Cookie 登录链路未通过，必须重新建立可复现的专用测试会话后，才能完成完整浏览器验收。

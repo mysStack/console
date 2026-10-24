@@ -59,14 +59,23 @@
       "daemonSetActionMenu": "通过：显示回退、编辑设置、编辑 YAML、重新创建和删除入口；本轮只打开菜单，不执行变更",
       "nonMutatingActionDialogs": "部分通过：Deployment 回退/自动扩缩、StatefulSet 编辑服务、DaemonSet 重新创建/删除均能打开原生确认或编辑对话框；本轮均点击取消，未执行资源变更"
     },
-    "consoleErrors": "存在扩展初始化错误；按负责人决定暂不纳入本模块验收，未将页面标记为零错误"
+    "consoleErrors": "存在扩展初始化错误；按负责人决定暂不纳入本模块验收，未将页面标记为零错误",
+    "lowPrivilege": {
+      "user": "v4-workload-viewer-20261023",
+      "freshLogin": "通过",
+      "projectWorkloadList": "通过：Deployment 列表返回 200，页面显示 v4-migration-e2e 资源；页面仅显示刷新/定制内容，未显示创建入口",
+      "projectConfigMapDirectRoute": "拒绝：直接访问配置字典页面返回 403",
+      "interpretation": "Kubernetes auth can-i 的资源读权限与 Console 页面权限存在差异，需要继续核对 KubeSphere role template、前端权限键和配置引用场景",
+      "credentials": "未写入证据、日志或截图"
+    }
   },
   "notClosed": [
     "新 Cookie 登录链路仍未通过，当前浏览器行为证据使用 rollout 前已认证的 30880 会话复验。",
     "Deployment/StatefulSet/DaemonSet 的完整 Action 矩阵、真实保存/删除/回滚/重启/伸缩和错误/冲突路径仍未全部闭环。",
     "低权限 RBAC、完整 namespace 正反隔离和缓存失效需要在当前 HEAD 制品上重新执行，历史证据不继承。",
     "扩展初始化错误仍按负责人决定暂不纳入本模块验收。",
-    "低权限 RBAC 已完成 Kubernetes 授权矩阵核对，但该账号当前制品的浏览器登录和 UI 拒绝态尚未闭环。"
+    "低权限 RBAC 已完成 Kubernetes 授权矩阵核对，但该账号当前制品的浏览器登录和 UI 拒绝态尚未闭环。",
+    "低权限浏览器已完成登录和 Workload 列表正向验证，但 ConfigMap 页面返回 403，Console 权限键与 Kubernetes 授权矩阵的差异尚未定位；配置引用低权限场景未闭环。"
   ],
   "conclusion": "当前 HEAD 已完成构建、推送、部署、rollout、Pod digest 核对和已认证浏览器页面复验；Workload 模块保持 VERIFY 进行中，不能标记为已验收或进入 PR。",
   "rbac": {
