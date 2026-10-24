@@ -295,3 +295,9 @@
 - 只读确认 `default` context、131 API Server、V4 `30880`、V3 对比前端 `30881` 和两个前端 Deployment 的 `1/1 Ready` 状态。
 - 浏览器登录确实从 `/home/bruce/.bashrc` 加载 `KS_TEST_USERNAME`、`KS_TEST_PASSWORD`；两个环境变量均存在。IAM User 资源只读状态为 `Active`，但提交登录后页面仍返回 `Incorrect username or password`。
 - 本轮没有修改集群用户、密码、角色或任何测试资源，也没有进入 Workload 页面；该登录问题继续作为当前浏览器验收阻塞边界记录。证据见 [`evidence/workload-browser-login-rea-20261024.json`](./evidence/workload-browser-login-rea-20261024.json)。模块仍为 `REA / 分析中，待复核`。
+
+## 2026-10-24 集群级三类 Workload 原生入口补证
+
+- 当前 HEAD `d78cab185f66beaebe16c03c3b3a09518c748cc8` 上执行 `packages/console/src/pages/clusters/containers/ApplicationWorkloads/nativeWorkloads.test.ts`，6 项全部通过。
+- 测试确认集群级 Deployment、StatefulSet、DaemonSet 主路由已使用原生列表，保留 namespace 选择，并按所选 namespace 使用对应 Store 创建资源。
+- 该结果只证明源码主路由静态行为；全局 V3 预加载、其他集群级 Embed、当前制品浏览器、RBAC、缓存、错误和逐项 V3 等价仍未闭环。模块保持 `REA / 分析中，待复核`。证据见 [`evidence/workload-cluster-native-static-tests-20261024.json`](./evidence/workload-cluster-native-static-tests-20261024.json)。

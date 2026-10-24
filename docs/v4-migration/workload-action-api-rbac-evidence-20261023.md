@@ -53,7 +53,7 @@
 ### 2.3 已确认的功能等价风险
 
 - `packages/shared/src/stores/workload/index.ts:181-209` 的 `stopDeployment` 对所有 workload module 都写入 `spec.replicas: 0`。DaemonSet 没有 Deployment/StatefulSet 的 replicas 语义，停止、恢复和批量停止必须在 DEV 中拆分并验证。
-- 集群级 `/clusters/{cluster}/deployments`、`statefulsets`、`daemonsets` 仍由 `Workloads/Embed` 生成 `/consolev3/clusters/...` 并渲染 `WujieReact`；详情页静态原生化不能覆盖这一入口。
+- 当前集群级 `/clusters/{cluster}/deployments`、`statefulsets`、`daemonsets` 主路由已引用原生 `ApplicationWorkloads/Workloads/index.tsx`，不再挂载三类 Workload 的 `Workloads/Embed`。全局启动层仍可能预加载 V3 资源，其他集群级 Ingress、Service、Job 等入口仍存在 Wujie/Embed；这些边界不能与三类 Workload 主路由混为一谈。
 
 ## 3. API 与 Store 请求边界
 
@@ -94,7 +94,7 @@
 
 | 高风险项                        | 当前结论                                   | 依据                                                                                                                                                               |
 | ------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| WL-01 入口与页面分区            | 部分确认，未闭环                           | 项目详情三类资源均已定位原生设置入口；集群列表仍为 V3/Wujie，页面分区和完整字段仍需验证                                                                            |
+| WL-01 入口与页面分区            | 部分确认，未闭环                           | 项目和集群主列表、项目详情三类资源均已定位原生入口；全局预加载、其他集群 Embed、页面分区和完整字段仍需验证                                                         |
 | WL-02 字段与写入语义            | 未关闭                                     | 当前 Modal 已按资源类型分派部分设置，但三类资源专属字段和完整清空/保留验证仍未完成                                                                                 |
 | WL-03 Action/API/RBAC/缓存/错误 | 静态链路已定位，运行时未闭环               | 本文完成源码矩阵；未完成当前 SHA 的 API、RBAC、隔离、缓存和浏览器证据                                                                                              |
 | WL-04 配置引用 V3 桥接          | 项目详情静态边界已校正，集群入口仍有旧依赖 | 当前 ConfigReference 生产入口未发现 `useV3action`、Wujie 或 `consolev3` 调用；部分注释和样式说明仍引用 V3 历史尺寸，集群级 Workload Embed 仍需单独迁移和运行时验证 |

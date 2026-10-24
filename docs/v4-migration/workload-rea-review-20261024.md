@@ -109,7 +109,7 @@ rg -n 'editConfigTemplate|editYaml|WorkloadSettingsModal' \
 
 ### 配置引用与 V3/Wujie 边界
 
-当前 Workload 的 ConfigMap/Secret 环境引用面板已经有 V4 原生解析和写回实现，但配置引用的文件挂载、旧入口和所有资源类型的真实页面验证仍需单独记录。仓库中其他 Workload 入口仍存在 `useV3action`、`/consolev3` 或 Wujie 引用；这些不能因项目详情页已原生化而自动关闭。集群级入口、配置引用和扩展初始化必须在后续 DEV/VERIFY 中逐项核对。
+当前 Workload 的 ConfigMap/Secret 环境引用面板已经有 V4 原生解析和写回实现，项目级和集群级三类 Workload 主路由也已静态切换到原生列表。配置引用的文件挂载和所有资源类型的真实页面验证仍需单独记录；全局启动层的 V3 预加载以及其他集群级 Ingress、Service、Job 等 Embed 入口仍存在，不能因三类 Workload 主路由已原生化而自动关闭。
 
 ## REA 门禁结论
 
@@ -124,7 +124,7 @@ rg -n 'editConfigTemplate|editYaml|WorkloadSettingsModal' \
 | V3/Wujie 完全移除 | 未完成，仍有工作负载相关边界待处理                    |
 | REA 状态          | **分析中，待负责人复核**                              |
 
-本记录只完成 REA 证据纠偏和缺口收敛，不授权直接进入 DEV。下一步应由负责人复核本记录和现有矩阵；确认进入 DEV 后，优先处理配置引用原生闭环、DaemonSet 停止语义、三类设置保存/缓存/RBAC 以及集群级 V3/Wujie 入口。
+本记录只完成 REA 证据纠偏和缺口收敛，不授权直接进入 DEV。下一步应由负责人复核本记录和现有矩阵；确认进入 DEV 后，优先处理配置引用原生闭环、DaemonSet 停止语义、三类设置保存/缓存/RBAC、全局 V3 预加载边界以及其他仍属于本模块范围的集群级入口。
 
 ## `release-4.1.5` 集群基线对比环境
 
@@ -271,7 +271,7 @@ rg -n 'editConfigTemplate|editYaml|WorkloadSettingsModal' \
 
 复核发现旧的 `workload-action-api-rbac-evidence-20261023.md` 表格仍保留早期“StatefulSet/DaemonSet 编辑设置调用 `editYaml`”和“配置引用仍使用 V3/Wujie 桥接”的结论，已按当前源码修正。当前三个项目级详情页均通过原始资源读取打开 `WorkloadSettingsModal`，YAML 为独立 Action；当前 ConfigReference 生产入口的静态测试未发现 `useV3action`、Wujie 或 `consolev3` 调用。
 
-该纠偏不代表运行时等价已经通过：集群级 Workload Embed 仍存在旧 V3/Wujie 入口，三类资源完整字段、Action、API 回写、RBAC、缓存、错误路径和逐项 V3 等价仍未闭环。
+该纠偏不代表运行时等价已经通过：三类 Workload 主路由已静态原生化，但全局 V3 预加载、其他集群级 Embed 入口、三类资源完整字段、Action、API 回写、RBAC、缓存、错误路径和逐项 V3 等价仍未闭环。
 
 ## 131 浏览器登录边界复核（2026-10-24）
 
@@ -280,3 +280,9 @@ rg -n 'editConfigTemplate|editYaml|WorkloadSettingsModal' \
 浏览器测试账号从 `/home/bruce/.bashrc` 加载 `KS_TEST_USERNAME` 和 `KS_TEST_PASSWORD`，变量均存在；集群只读核对显示对应 IAM User 资源处于 `Active`。在基线 `30881` 的新浏览器登录页提交后仍返回 `Incorrect username or password`，未进入 Workload 页面，也没有执行任何资源写操作。
 
 结构化记录见 [`evidence/workload-browser-login-rea-20261024.json`](./evidence/workload-browser-login-rea-20261024.json)。该结果确认登录阻塞边界，但不能把问题归因于 V4 前端，也不能替代当前制品浏览器验收；模块继续保持 **REA / 分析中，待复核**。
+
+## 集群级原生入口静态测试补证（2026-10-24）
+
+在当前工作区 HEAD `d78cab185f66beaebe16c03c3b3a09518c748cc8` 上执行 `nativeWorkloads.test.ts`，6 项测试全部通过。该测试确认集群级 Deployment、StatefulSet、DaemonSet 主路由均引用原生 `Workloads/index.tsx`，保留 namespace 选择，并按所选 namespace 调用对应创建 Store。
+
+证据见 [`evidence/workload-cluster-native-static-tests-20261024.json`](./evidence/workload-cluster-native-static-tests-20261024.json)。该结果不能替代当前制品浏览器、全局 V3 预加载、其他集群 Embed、RBAC、缓存、错误和逐项 V3 等价验证；模块继续保持 **REA / 分析中，待复核**。

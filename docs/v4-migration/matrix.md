@@ -180,7 +180,7 @@
 ## 当前增量（2026-10-24：Action/API 静态记录纠偏）
 
 - 已修正旧静态证据中关于 StatefulSet/DaemonSet 编辑设置仍调用 YAML 的过时描述；当前三个项目级详情页均打开原生 `WorkloadSettingsModal`，YAML 是独立 Action。
-- 已修正配置引用桥接描述：当前 ConfigReference 生产入口的静态测试未发现 `useV3action`、Wujie 或 `consolev3` 调用；集群级 Workload Embed 的旧 V3/Wujie 依赖仍单独保留为未关闭项。
+- 已修正配置引用桥接描述：当前 ConfigReference 生产入口的静态测试未发现 `useV3action`、Wujie 或 `consolev3` 调用；集群级三类 Workload 主路由也已由静态测试确认使用原生列表。全局 V3 预加载及其他集群级 Embed 入口仍单独保留为未关闭项。
 - 该纠偏只更新证据口径，不关闭运行时字段、API、RBAC、缓存、错误和完整 V3 等价风险。模块继续保持 `REA / 分析中，待复核`。
 
 ## 当前增量（2026-10-24：131 登录边界核对）
@@ -188,3 +188,9 @@
 - 只读核对确认 context `default`、API Server `192.168.2.131:6443`、V4 NodePort `30880` 和 `release-4.1.5` 对比 NodePort `30881` 均可达，两个前端 Deployment 均 `1/1 Ready`。
 - 浏览器登录使用 `/home/bruce/.bashrc` 中的 `KS_TEST_USERNAME`、`KS_TEST_PASSWORD`，变量存在；IAM User 资源处于 `Active`，但新浏览器上下文登录仍返回 `Incorrect username or password`。
 - 本轮没有进入 Workload 页面，没有写请求，也没有把登录失败归因于前端功能。当前制品浏览器 VERIFY 仍未完成，模块继续保持 `REA / 分析中，待复核`。证据见 [`workload-browser-login-rea-20261024.json`](./evidence/workload-browser-login-rea-20261024.json)。
+
+## 当前增量（2026-10-24：集群级原生入口静态测试）
+
+- 当前 HEAD `d78cab185f66beaebe16c03c3b3a09518c748cc8` 上执行 `nativeWorkloads.test.ts`，6 项全部通过。
+- 已验证集群级 Deployment、StatefulSet、DaemonSet 主路由引用原生 Workload 列表，保留 namespace 选择，并按所选 namespace 调用对应创建 Store。
+- 该结果只关闭集群级三类 Workload 主路由的静态未知项；全局 V3 预加载、其他集群级 Embed、当前制品浏览器、RBAC、缓存、错误和逐项 V3 等价仍未验证。证据见 [`workload-cluster-native-static-tests-20261024.json`](./evidence/workload-cluster-native-static-tests-20261024.json)，模块继续保持 `REA / 分析中，待复核`。
