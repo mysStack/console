@@ -1,6 +1,6 @@
 # Workload Action、API、权限与缓存 REA 证据
 
-> **2026-10-24 当前源码纠偏：** 本文早期静态记录中的“StatefulSet/DaemonSet 编辑设置仍调用 `editYaml`”属于旧制品快照。当前 `feature/v4-workloads@9767ad7c2` 的三个详情页均通过原始资源读取和 `WorkloadSettingsModal` 提供原生编辑设置，YAML 是独立 Action。Action/API/RBAC、缓存和浏览器缺口仍然保留，最新复核见[Workload 组合批次 REA 复核记录](./workload-rea-review-20261024.md)。
+> **2026-10-24 当前源码纠偏：** 本文早期静态记录中的“StatefulSet/DaemonSet 编辑设置仍调用 `editYaml`”属于旧制品快照。当前业务代码（原生设置提交 `0c1d9aadf` 及其后续修复）三个详情页均通过原始资源读取和 `WorkloadSettingsModal` 提供原生编辑设置，YAML 是独立 Action。当前分支 HEAD 的后续提交只补充 REA 记录；Action/API/RBAC、缓存和浏览器缺口仍然保留，最新复核见[Workload 组合批次 REA 复核记录](./workload-rea-review-20261024.md)。
 
 ## 1. 取证身份与结论边界
 
@@ -33,16 +33,16 @@
 
 ### 2.2 当前详情操作矩阵
 
-| 操作                | Deployment                                     | StatefulSet                                | DaemonSet | 当前实现事实                                                                 |
-| ------------------- | ---------------------------------------------- | ------------------------------------------ | --------- | ---------------------------------------------------------------------------- |
-| 编辑基础信息        | `edit`                                         | `edit`                                     | `edit`    | 通过 `store.patch` 更新详情                                                  |
-| 回滚                | `edit`                                         | `edit`                                     | `edit`    | 通过 `useRollbackMutation` 发起 PATCH                                        |
-| HPA                 | `edit`，受 metrics-server 和自定义伸缩状态影响 | 同左                                       | 未提供    | DaemonSet 代码中的 HPA 操作仍为注释                                          |
-| 编辑设置            | `edit`                                         | `edit`                                     | `edit`    | Deployment 打开原生设置；StatefulSet/DaemonSet 当前仍调用 `editYaml(detail)` |
-| 编辑 YAML           | `edit`                                         | `edit`                                     | `edit`    | 三类资源均调用公共 YAML 编辑器                                               |
-| 重新部署/重启       | `edit`                                         | `edit`                                     | `edit`    | 通过 PATCH 写入 `kubesphere.io/restartedAt`                                  |
-| 删除                | `delete`                                       | `delete`                                   | `delete`  | 通过 workload store 的后台删除逻辑                                           |
-| StatefulSet Service | 无                                             | `edit`，仅在 `spec.serviceName` 存在时显示 | 无        | 调用 Headless Service 编辑入口                                               |
+| 操作                | Deployment                                     | StatefulSet                                | DaemonSet | 当前实现事实                                                                   |
+| ------------------- | ---------------------------------------------- | ------------------------------------------ | --------- | ------------------------------------------------------------------------------ |
+| 编辑基础信息        | `edit`                                         | `edit`                                     | `edit`    | 通过 `store.patch` 更新详情                                                    |
+| 回滚                | `edit`                                         | `edit`                                     | `edit`    | 通过 `useRollbackMutation` 发起 PATCH                                          |
+| HPA                 | `edit`，受 metrics-server 和自定义伸缩状态影响 | 同左                                       | 未提供    | DaemonSet 代码中的 HPA 操作仍为注释                                            |
+| 编辑设置            | `edit`                                         | `edit`                                     | `edit`    | 三类详情页均读取当前资源并打开原生 `WorkloadSettingsModal`；YAML 是独立 Action |
+| 编辑 YAML           | `edit`                                         | `edit`                                     | `edit`    | 三类资源均调用公共 YAML 编辑器                                                 |
+| 重新部署/重启       | `edit`                                         | `edit`                                     | `edit`    | 通过 PATCH 写入 `kubesphere.io/restartedAt`                                    |
+| 删除                | `delete`                                       | `delete`                                   | `delete`  | 通过 workload store 的后台删除逻辑                                             |
+| StatefulSet Service | 无                                             | `edit`，仅在 `spec.serviceName` 存在时显示 | 无        | 调用 Headless Service 编辑入口                                                 |
 
 证据文件：
 
@@ -52,7 +52,6 @@
 
 ### 2.3 已确认的功能等价风险
 
-- StatefulSet 的“编辑设置”和 DaemonSet 的“编辑设置”目前与“编辑 YAML”使用同一回调，不能视为旧 V3 设置页面的原生替代。
 - `packages/shared/src/stores/workload/index.ts:181-209` 的 `stopDeployment` 对所有 workload module 都写入 `spec.replicas: 0`。DaemonSet 没有 Deployment/StatefulSet 的 replicas 语义，停止、恢复和批量停止必须在 DEV 中拆分并验证。
 - 集群级 `/clusters/{cluster}/deployments`、`statefulsets`、`daemonsets` 仍由 `Workloads/Embed` 生成 `/consolev3/clusters/...` 并渲染 `WujieReact`；详情页静态原生化不能覆盖这一入口。
 
@@ -67,7 +66,7 @@
 | 项目资源列表 | `GET`    | `kapis/resources.kubesphere.io/v1alpha3/klusters/{cluster}/namespaces/{namespace}/{module}` | `fetchList` 将 `cluster`、`namespace` 从查询参数移出，资源范围由 URL 决定                |
 | 详情         | `GET`    | 上述列表 URL `/{name}`                                                                      | `useGetDetail` 的 React Query key 是 `[module, params]`                                  |
 | 创建         | `POST`   | Kubernetes `apiVersion + path + /{module}`                                                  | 由基础 Store `post` 发送                                                                 |
-| 原生编辑设置 | `PATCH`  | 详情 URL                                                                                    | Deployment 当前设置保存调用 workload store patch                                         |
+| 原生编辑设置 | `PATCH`  | 详情 URL                                                                                    | 三类资源当前设置保存均通过 Workload store patch；实际服务端回写仍需当前制品验证          |
 | YAML 编辑    | `PUT`    | 详情 URL                                                                                    | 保存前默认重新 GET 详情并补 `metadata.resourceVersion`                                   |
 | 删除         | `DELETE` | 详情 URL                                                                                    | workload store 携带 `DeleteOptions` 和 `propagationPolicy: Background`                   |
 | 回滚         | `PATCH`  | 详情 URL                                                                                    | Deployment 使用 `application/json-patch+json`，StatefulSet/DaemonSet 未设置该专用 header |
@@ -88,17 +87,17 @@
 | 列表刷新         | 公共操作递增按资源类型保存的 revision                                                   | 需要证明实际列表订阅了 revision，并且 revision 不会跨 namespace 误刷新或泄露数据 |
 | 资源作用域       | URL 由 `cluster` 和 `namespace` 构造；项目权限由 `params.namespace` 进入 `projectRules` | 需要用不同 namespace、低权限账号和实际 API 响应验证正反隔离                      |
 | 403/404/网络失败 | Store 测试和部分页面错误分支已有静态/单测输入                                           | 没有当前 SHA 部署后的逐项浏览器错误态证据                                        |
-| 409 冲突         | 原生 Deployment 设置组件区分 409 与普通保存失败                                         | StatefulSet/DaemonSet 原生设置尚未接入，且需要当前制品的真实冲突路径             |
+| 409 冲突         | 原生设置组件静态区分 409 与普通保存失败                                                 | 三类资源当前制品的真实冲突路径和错误文案仍需验证                                 |
 | 取消操作         | 详情页 modal 和 YAML 编辑器有取消入口                                                   | 尚未完成三类资源逐项浏览器验证，不能宣称取消路径等价                             |
 
 ## 5. REA 状态结论
 
-| 高风险项                        | 当前结论                     | 依据                                                                                        |
-| ------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------- |
-| WL-01 入口与页面分区            | 部分确认，未闭环             | 项目详情操作已定位；集群列表仍为 V3/Wujie，StatefulSet/DaemonSet 设置入口未原生化           |
-| WL-02 字段与写入语义            | 未关闭                       | 当前 Modal 仍是公共 Deployment 形态，缺少 StatefulSet/DaemonSet 专属字段和完整清空/保留验证 |
-| WL-03 Action/API/RBAC/缓存/错误 | 静态链路已定位，运行时未闭环 | 本文完成源码矩阵；未完成当前 SHA 的 API、RBAC、隔离、缓存和浏览器证据                       |
-| WL-04 配置引用 V3 桥接          | 已确认实现缺口               | ConfigReference 仍使用 `useV3action`、Wujie Shadow DOM 和 V3 编辑器实例                     |
+| 高风险项                        | 当前结论                                   | 依据                                                                                                                                                               |
+| ------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| WL-01 入口与页面分区            | 部分确认，未闭环                           | 项目详情三类资源均已定位原生设置入口；集群列表仍为 V3/Wujie，页面分区和完整字段仍需验证                                                                            |
+| WL-02 字段与写入语义            | 未关闭                                     | 当前 Modal 已按资源类型分派部分设置，但三类资源专属字段和完整清空/保留验证仍未完成                                                                                 |
+| WL-03 Action/API/RBAC/缓存/错误 | 静态链路已定位，运行时未闭环               | 本文完成源码矩阵；未完成当前 SHA 的 API、RBAC、隔离、缓存和浏览器证据                                                                                              |
+| WL-04 配置引用 V3 桥接          | 项目详情静态边界已校正，集群入口仍有旧依赖 | 当前 ConfigReference 生产入口未发现 `useV3action`、Wujie 或 `consolev3` 调用；部分注释和样式说明仍引用 V3 历史尺寸，集群级 Workload Embed 仍需单独迁移和运行时验证 |
 
 **结论：当前 REA 材料不足以放行 DEV。阶段保持“分析中，待负责人复核”，`rea.review` 保持 `null`。** 本次复核不修改业务代码、不构建、不部署，也不把静态证据写成测试通过。
 

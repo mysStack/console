@@ -283,3 +283,9 @@
 - 本次没有修改业务代码、构建、部署或推进模块阶段。证据见 [`evidence/workload-rea-targeted-tests-20261024.json`](./evidence/workload-rea-targeted-tests-20261024.json)。
 - 已验证静态范围：配置引用、设置表单、Deployment/StatefulSet/DaemonSet 资源类型分支、原生详情入口和 Action。
 - 未验证：当前 SHA 部署制品的浏览器写回、API 回读、低权限 RBAC、namespace 缓存隔离、错误路径和完整 V3 功能等价。模块仍为 `REA / 分析中，待复核`。
+
+## 2026-10-24 Action/API 静态记录纠偏
+
+- 复核并修正旧 Action/API/RBAC 文档中的过时结论：当前 Deployment、StatefulSet、DaemonSet 项目详情均通过原始资源读取打开原生 `WorkloadSettingsModal`，YAML 是独立 Action。
+- 当前 ConfigReference 生产入口静态测试未发现 `useV3action`、Wujie 或 `consolev3` 调用；集群级 Workload Embed 仍有旧 V3/Wujie 依赖，不能合并判断。
+- 本次只修正 REA 记录，没有修改业务代码；三类资源的运行时字段、API 写回、RBAC、缓存、错误和逐项 V3 等价仍未验证，模块保持 `REA / 分析中，待复核`。

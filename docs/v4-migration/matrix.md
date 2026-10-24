@@ -176,3 +176,9 @@
 - 当前 HEAD `1b505477e96cab4999065ce63683f0f3c69a7223` 上，Workload 相关目录筛选出的 34 个现有测试文件共 211 项全部通过。
 - 覆盖配置引用、设置表单、资源类型字段分支、三类资源原生详情入口和 Action 静态行为。
 - 该结果只作为 REA 静态输入，不能替代当前 SHA 的构建、部署、浏览器写回、RBAC、namespace 缓存隔离、错误路径和完整 V3 等价验证。证据见 [`evidence/workload-rea-targeted-tests-20261024.json`](./evidence/workload-rea-targeted-tests-20261024.json)，模块继续保持 `REA / 分析中，待复核`。
+
+## 当前增量（2026-10-24：Action/API 静态记录纠偏）
+
+- 已修正旧静态证据中关于 StatefulSet/DaemonSet 编辑设置仍调用 YAML 的过时描述；当前三个项目级详情页均打开原生 `WorkloadSettingsModal`，YAML 是独立 Action。
+- 已修正配置引用桥接描述：当前 ConfigReference 生产入口的静态测试未发现 `useV3action`、Wujie 或 `consolev3` 调用；集群级 Workload Embed 的旧 V3/Wujie 依赖仍单独保留为未关闭项。
+- 该纠偏只更新证据口径，不关闭运行时字段、API、RBAC、缓存、错误和完整 V3 等价风险。模块继续保持 `REA / 分析中，待复核`。

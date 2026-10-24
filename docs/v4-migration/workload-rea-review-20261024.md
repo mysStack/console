@@ -266,3 +266,9 @@ rg -n 'editConfigTemplate|editYaml|WorkloadSettingsModal' \
 在当前工作区 HEAD `1b505477e96cab4999065ce63683f0f3c69a7223` 上，按 Workload 相关目录筛选并逐个执行 34 个现有测试文件，共 211 项全部通过。覆盖配置引用、Workload 设置表单、Deployment/StatefulSet/DaemonSet 资源类型分支、原生详情入口和 Action 静态行为。
 
 证据见 [`evidence/workload-rea-targeted-tests-20261024.json`](./evidence/workload-rea-targeted-tests-20261024.json)。该结果只证明当前源码静态测试通过，不能替代 `release-4.1.5` 制品等价、当前 SHA 构建部署、浏览器写回、RBAC、缓存隔离、错误路径和完整 V3 功能等价验证。模块继续保持 **REA / 分析中，待复核**。
+
+## Action/API/RBAC 静态记录纠偏（2026-10-24）
+
+复核发现旧的 `workload-action-api-rbac-evidence-20261023.md` 表格仍保留早期“StatefulSet/DaemonSet 编辑设置调用 `editYaml`”和“配置引用仍使用 V3/Wujie 桥接”的结论，已按当前源码修正。当前三个项目级详情页均通过原始资源读取打开 `WorkloadSettingsModal`，YAML 为独立 Action；当前 ConfigReference 生产入口的静态测试未发现 `useV3action`、Wujie 或 `consolev3` 调用。
+
+该纠偏不代表运行时等价已经通过：集群级 Workload Embed 仍存在旧 V3/Wujie 入口，三类资源完整字段、Action、API 回写、RBAC、缓存、错误路径和逐项 V3 等价仍未闭环。
