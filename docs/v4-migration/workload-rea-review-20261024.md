@@ -150,3 +150,5 @@ rg -n 'editConfigTemplate|editYaml|WorkloadSettingsModal' \
 | 请求边界           | 通过 `consolev3` 入口加载旧页面和资源请求                            | 通过当前 V4 路由和 `resources.kubesphere.io` API 加载列表 |
 
 该部署只提供当前 `release-4.1.5` 制品的 REA 对照输入，不能直接视为 V4 VERIFY 通过。Deployment、StatefulSet、DaemonSet 的详情、编辑设置、字段默认值、校验、配置引用、错误态和完整 Action 对比仍需继续采集。
+
+本轮又使用同一集群、同一 namespace、同一 Deployment `v4-deploy-edit-ef3` 完成详情页对比，证据见 [`evidence/workload-v415-baseline-browser-20261024.json`](./evidence/workload-v415-baseline-browser-20261024.json)。`release-4.1.5` 详情页显示“编辑设置、编辑 YAML、重新创建、删除”等入口；当前 V4 详情页显示原生“配置引用”Tab，操作菜单尚未展开。两边详情请求均返回 200，当前采集未发现 `wujie-app` 元素。该结果只关闭了 Deployment 详情入口的部分 REA 未知项，不能推断编辑表单、StatefulSet、DaemonSet、RBAC 或缓存已经等价。

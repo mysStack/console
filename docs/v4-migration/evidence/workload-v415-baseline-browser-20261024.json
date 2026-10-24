@@ -1,0 +1,59 @@
+{
+  "evidenceId": "workload-v415-baseline-browser-20261024",
+  "collectedAt": "2026-10-24",
+  "source": {
+    "ref": "release-4.1.5",
+    "commit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
+    "v3distTree": "1e499d92e11374e26c76f5e13be45251602bd596",
+    "worktree": "/home/bruce/code/ks-develop/console-v415-rea",
+    "deployment": "kubesphere-system/ks-console-v415-rea",
+    "service": "kubesphere-system/ks-console-v415-rea",
+    "nodePort": 30881,
+    "podImageId": "sha256:2595b31de4dc01ae67b72b97b857ef40cd1c1ec2a0d406cada177982f380f455"
+  },
+  "comparison": {
+    "fixture": {
+      "namespace": "v4-migration-e2e",
+      "deployment": "v4-deploy-edit-ef3"
+    },
+    "baseline": {
+      "url": "http://192.168.2.131:30881/consolev3/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/resource-status",
+      "httpStatus": 200,
+      "wujieElementCount": 0,
+      "visibleActions": ["编辑信息", "编辑设置", "编辑 YAML", "重新创建", "删除"],
+      "visibleTabs": ["资源状态", "修改记录", "元数据", "环境变量", "事件"],
+      "apiObservations": [
+        "GET /clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+        "GET /clusters/host/kapis/resources.kubesphere.io/v1alpha3/namespaces/v4-migration-e2e/pods",
+        "GET /clusters/host/kapis/autoscaling.kubesphere.io/v1alpha1/namespaces/v4-migration-e2e/scaledobjects/v4-deploy-edit-ef3",
+        "GET /clusters/host/apis/autoscaling/v2/namespaces/v4-migration-e2e/horizontalpodautoscalers/v4-deploy-edit-ef3"
+      ]
+    },
+    "currentV4": {
+      "url": "http://192.168.2.131:30880/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/resource-status",
+      "httpStatus": 200,
+      "wujieElementCount": 0,
+      "visibleActions": ["编辑信息", "更多操作"],
+      "visibleTabs": ["资源状态", "修改记录", "元数据", "环境变量", "配置引用", "事件"],
+      "apiObservations": [
+        "GET /clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+        "GET /clusters/host/kapis/resources.kubesphere.io/v1alpha3/namespaces/v4-migration-e2e/pods",
+        "GET /clusters/host/kapis/monitoring.kubesphere.io/v1beta1/pod_metrics",
+        "GET /clusters/host/apis/autoscaling/v2/namespaces/v4-migration-e2e/horizontalpodautoscalers/v4-deploy-edit-ef3"
+      ]
+    }
+  },
+  "interpretation": {
+    "confirmed": [
+      "两个入口都能在同一集群、同一 namespace、同一 Deployment 上打开详情页并返回 HTTP 200。",
+      "当前 V4 详情页显示原生配置引用 Tab，基线页面显示旧 V3 的编辑设置、YAML、重新创建和删除入口。",
+      "本轮浏览器上下文未检测到 wujie-app 元素。"
+    ],
+    "notClosed": [
+      "编辑设置菜单打开后的完整字段、默认值、校验和保存请求尚未逐项对比。",
+      "StatefulSet、DaemonSet 详情和资源专属 Action 尚未采集。",
+      "RBAC、缓存失效、错误/取消、配置引用编辑和写请求仍需单独验证。"
+    ],
+    "status": "REA补充证据，不能作为DEV或VERIFY通过"
+  }
+}

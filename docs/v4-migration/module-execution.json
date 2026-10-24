@@ -113,7 +113,11 @@
       },
       {
         "path": "docs/v4-migration/workload-rea-review-20261024.md",
-        "sha256": "37b420e9fd5e4aebdc07df8f7628b4b3fcd3ab6ad1e6d8f2fe05c4f8b64ccf8a"
+        "sha256": "499e5362d0a2cc9823f56a328362303c89969dba5091a5b6bb386805b69982b2"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-v415-baseline-browser-20261024.json",
+        "sha256": "862630c6fc1f73a06b365b932edeb849888cb87d498ed649a2a206f942e62794"
       }
     ],
     "coverage": {
