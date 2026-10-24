@@ -44,13 +44,13 @@
 
 本轮又在三个资源上执行终止宽限期 `30 → 31 → 30`，保存请求成功并由 Kubernetes API 回读为 `30`。另起零 Cookie 新 context 登录当前制品仍返回账号或密码错误，未进入工作负载页面。页面 Console error 数为 Deployment 8、StatefulSet 10、DaemonSet 8；完整字段等价、RBAC、缓存及错误矩阵尚未执行，因此只能关闭“入口仍跳转 YAML”和一个字段保存场景，不能标记三类 Workload 或编辑设置功能验收通过。结构化证据见[当前 HEAD 原生设置复验](./evidence/workload-native-settings-current-head-20261024.json)。
 
-## 当前 HEAD 制品部署未完成（2026-10-24）
+## 历史部署尝试：源码提交 ae500da 的制品拉取延迟（2026-10-24）
 
-当前 HEAD `ae500da86a559b378ba7255ee1d21c3d95a3a768` 的 CI Run `40046932193` 成功，镜像 tag 为 `feature-v4-workloads-20261024-085149-ae500da86a55`，digest 为 `sha256:325f455ab8388f65ab1da254a4ca17d298baa45a118d38b12969c64db175bef5`。部署到 131 后新 Pod 长时间处于 `ContainerCreating`，没有形成可用于浏览器验收的 Ready Pod，已回滚到旧精确制品 `sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76`；回滚 rollout、Pod Ready 和 imageID 通过。当前 HEAD 的浏览器验收未执行，不能标记通过。结构化记录见[当前 HEAD 制品部署证据](./evidence/workload-current-head-deploy-pull-20261024.json)。
+源码提交 `ae500da86a559b378ba7255ee1d21c3d95a3a768` 的 CI Run `40046932193` 成功，镜像 tag 为 `feature-v4-workloads-20261024-085149-ae500da86a55`，digest 为 `sha256:325f455ab8388f65ab1da254a4ca17d298baa45a118d38b12969c64db175bef5`。首次部署时新 Pod 长时间处于 `ContainerCreating`，随后已回滚；该次尝试后来由源码提交 `31b6d88fc7e8` 的新制品重新部署成功，当前 Ready 制品及浏览器结果见上文。结构化记录见[历史部署证据](./evidence/workload-current-head-deploy-pull-20261024.json)。
 
 ## 编辑设置入口版本校准（2026-10-24）
 
-在回滚前旧精确制品的已有认证态中重新打开 StatefulSet `v4-pvc-sts-7fa` 和 DaemonSet `v4-stop-ds-7fa` 的“更多操作 → 编辑设置”：两个入口均打开原生设置弹窗，分别显示资源适用的更新策略、容器组、存储、调度或元数据分区；“编辑 YAML”是单独菜单项。历史 REA 中将两个入口写成仍打开 YAML 的描述已过时，不能继续作为当前实现结论。该观察来自旧制品，当前 HEAD 尚缺部署后浏览器证据，详见[入口校准证据](./evidence/workload-native-settings-old-artifact-20261024.json)。
+在回滚前旧精确制品的已有认证态中重新打开 StatefulSet `v4-pvc-sts-7fa` 和 DaemonSet `v4-stop-ds-7fa` 的“更多操作 → 编辑设置”：两个入口均打开原生设置弹窗，分别显示资源适用的更新策略、容器组、存储、调度或元数据分区；“编辑 YAML”是单独菜单项。历史 REA 中将两个入口写成仍打开 YAML 的描述已过时，当前源码提交 `31b6d88fc7e8` 的部署后证据已在上文补齐。详见[入口校准证据](./evidence/workload-native-settings-old-artifact-20261024.json)。
 
 ## 当前增量：配置引用与 Action 浏览器复验（2026-10-24）
 

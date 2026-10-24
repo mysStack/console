@@ -1,6 +1,6 @@
-> **2026-10-24 批量删除复验**：新制品在已有登录态下完成三类批量删除，StatefulSet 关联 Headless Service 同步清理，DaemonSet DELETE 200 OK；新制品新浏览器登录仍失败并已回滚，因此登录门禁、完整错误/缓存和逐项 V3 等价仍未闭环。
+> **2026-10-24 批量删除复验**：在已有登录态下完成三类批量删除，StatefulSet 关联 Headless Service 同步清理，DaemonSet DELETE 200 OK；该结果来自此前精确制品，当前 31b6 制品的零 Cookie 登录仍失败，因此当前制品的登录门禁、完整错误/缓存和逐项 V3 等价仍未闭环。
 
-> **2026-10-24 登录阻塞**：批量删除修复制品完成 131 部署和身份核对，但专用测试账号登录返回 `Incorrect username or password`，未进入浏览器验证；已回滚到部署前精确制品，Workload 保持 `VERIFY / 未完成`。登录失败原因尚未归因，不能将批量删除修复标记为通过。详见 [部署与登录证据](./evidence/workload-batch-delete-deploy-login-20261024.json)。
+> **2026-10-24 登录阻塞**：当前 31b6 制品已完成 131 部署和身份核对，但零 Cookie 新 context 的专用测试账号登录仍返回 `Incorrect username or password`，未进入本轮完整浏览器验证；此前批量删除修复制品的部署尝试已按规则回滚。登录失败原因尚未归因，不能将当前制品的批量删除、完整错误/缓存和逐项 V3 等价标记为通过。详见 [当前制品原生设置证据](./evidence/workload-native-settings-current-head-20261024.json)。
 
 # 历史记录：批量删除修复已构建（后续已部署并因登录失败回滚）（2026-10-24）
 
@@ -16,7 +16,7 @@
 
 # V4 迁移矩阵
 
-> **2026-10-24 制品边界校准**：当前 HEAD `ae500da86a55` 的新制品已由 CI 构建并推送，但 131 拉取新 Pod 长时间处于 `ContainerCreating`，随后回滚；因此当前 HEAD 没有部署后浏览器通过证据。回滚前在旧精确制品上确认 StatefulSet、DaemonSet 的“编辑设置”均打开原生设置弹窗，历史文档中“仍打开 YAML”的描述属于旧 REA 快照，已由[原生设置证据](./evidence/workload-native-settings-old-artifact-20261024.json)校准。该校准不改变 `VERIFY / 未完成`，也不关闭当前 HEAD 的部署、浏览器、完整字段和等价性缺口。
+> **2026-10-24 制品边界校准**：源码提交 `ae500da86a55` 的首次部署曾因新 Pod 长时间处于 `ContainerCreating` 而回滚，后续源码提交 `31b6d88fc7e8` 的精确制品已完成 131 Ready、digest/imageID 核对及当前制品设置入口复验。旧精确制品与旧部署尝试仍只作为历史证据；当前 31b6 制品的完整字段、登录、RBAC、缓存、错误和逐项等价性仍未闭环。历史文档中“仍打开 YAML”的描述属于旧 REA 快照，已由[原生设置证据](./evidence/workload-native-settings-old-artifact-20261024.json)校准。
 
 > **2026-10-24 当前制品设置复验**：源码提交 `31b6d88fc7e8`（之后仅有记录提交）已完成精确部署和 Pod imageID 核对；在已有认证态中三类详情的“编辑设置”均打开原生设置弹窗，未跳转 YAML，并完成终止宽限期 `30 → 31 → 30` 的保存与 API 回读。零 Cookie 新 context 登录仍返回账号或密码错误。该结果只关闭入口形态和一个字段保存场景，当前制品完整字段、RBAC、缓存、错误和逐项 V3 等价仍未闭环。详见[当前制品原生设置复验](./evidence/workload-native-settings-current-head-20261024.json)。
 

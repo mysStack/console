@@ -5,12 +5,12 @@
 - 当前设置页面使用已有会话；另起零 Cookie 新 context 登录当前制品仍失败，页面显示账号或密码错误，未进入工作负载页面。页面 Console error 为 Deployment 8、StatefulSet 10、DaemonSet 8，错误归因、完整字段等价、RBAC、缓存和错误矩阵仍未完成。结构化证据见[当前 HEAD 原生设置复验](./evidence/workload-native-settings-current-head-20261024.json)。
 - 当前阶段仍为 `VERIFY / 未完成`。
 
-# 当前状态补充（2026-10-24：当前 HEAD 制品拉取失败并回滚）
+# 历史状态记录（2026-10-24：源码提交 ae500da 的制品拉取延迟）
 
 - 当前 HEAD `ae500da86a559b378ba7255ee1d21c3d95a3a768` 的 CI Run `40046932193` 已完成单元测试和镜像构建，制品为 `feature-v4-workloads-20261024-085149-ae500da86a55@sha256:325f455ab8388f65ab1da254a4ca17d298baa45a118d38b12969c64db175bef5`。
 - 131 部署尝试创建新 Pod `ks-console-87f865b86-h7kpp`，长时间处于 `ContainerCreating`，没有取得新制品的 Ready/imageID 和浏览器证据；已回滚到部署前制品，回滚 rollout 和旧 Pod Ready/imageID 通过。详细证据见[当前 HEAD 制品部署记录](./evidence/workload-current-head-deploy-pull-20261024.json)。
 - 回滚前使用已有认证态在旧精确制品上重新确认：StatefulSet、DaemonSet 的“编辑设置”均打开原生 `WorkloadSettingsModal`，分别渲染当前实现的设置分区；“编辑 YAML”是独立操作。该结果纠正历史 REA 文档中的过时入口描述，但不继承为当前 HEAD VERIFY。见[旧制品原生设置证据](./evidence/workload-native-settings-old-artifact-20261024.json)。
-- 当前阶段仍为 `VERIFY / 未完成`；当前 HEAD 的新制品浏览器验收尚未开始，不能据此标记设置功能通过。
+- 该次部署尝试不代表当前制品状态；当前制品已在后续精确部署中完成 Ready 和设置入口复验。模块仍为 `VERIFY / 未完成`，原因见上方当前状态。
 
 # 当前状态补充（2026-10-24：已有登录态完成三类批量删除复验）
 

@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "67a826835d3efdd66dbbd5288df39c0be721db3d2693c1a78ead143b9bc874cb"
+        "sha256": "3e631619a738b23ff439ce89087b178e81d8763a81abc90dd9ac003c95de00e8"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "8379f458ac1cdfb2893e2e21b83adf5b3e18f80b2923871b47992ce591d0115a"
+        "sha256": "1b205e807b036d66a13cfd7bf2a2ec1a18b3235797ea252c16f35520ee262afd"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -506,12 +506,12 @@
   ],
   "verify": {
     "status": "未完成",
-    "reason": "当前 HEAD 制品已完成 CI 构建和推送，但 131 新 Pod 长时间处于 ContainerCreating，未形成 Ready Pod，随后已回滚到部署前精确制品。回滚前在旧制品已有认证态确认 StatefulSet/DaemonSet 编辑设置均打开原生 WorkloadSettingsModal；该观察不继承为当前 HEAD VERIFY。正常登录、当前 HEAD 浏览器验收、完整错误/缓存、跨入口缓存切换和逐项 V3 等价仍未完成。",
+    "reason": "源码提交 31b6d88fc7e8 的当前制品已完成 131 rollout、Pod Ready 和 digest/imageID 核对；已有认证态下三类编辑设置入口均打开原生 WorkloadSettingsModal，终止宽限期 30→31→30 保存与 API 回读通过。零 Cookie 新 context 登录仍返回账号或密码错误，完整字段等价、RBAC、namespace、缓存、错误矩阵和逐项 V3 等价仍未完成。",
     "sourceCommit": "31b6d88fc7e87707776c094aee12f1cdcb02604b",
     "documents": [
       {
         "path": "docs/v4-migration/workload-131-verify-20261024.md",
-        "sha256": "59b369dd30193254ba87f10b908ff5a6ea0e6dcf9c99138e751419aa7735c913"
+        "sha256": "a5e4cd6f8ef9c8563bb6aff01f004e7d56bb8619594ef65926d9b8975db6f8f2"
       },
       {
         "path": "docs/v4-migration/evidence/workload-settings-verify-attempt-20261024.json",
@@ -547,11 +547,11 @@
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "8379f458ac1cdfb2893e2e21b83adf5b3e18f80b2923871b47992ce591d0115a"
+        "sha256": "1b205e807b036d66a13cfd7bf2a2ec1a18b3235797ea252c16f35520ee262afd"
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "67a826835d3efdd66dbbd5288df39c0be721db3d2693c1a78ead143b9bc874cb"
+        "sha256": "3e631619a738b23ff439ce89087b178e81d8763a81abc90dd9ac003c95de00e8"
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
