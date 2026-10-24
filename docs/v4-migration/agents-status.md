@@ -1,3 +1,9 @@
+# 当前增量：批量删除修复已构建，待 131 部署复验（2026-10-24）
+
+批量删除参数修复已提交于 `9a5bd5cdc22ec7877c33773ca1ba8562a463bcd6`。本地 `./scripts/test.sh` 通过 91 个测试文件、402 项测试，`corepack yarn build:packages` 通过；CI Run `40042145365` 成功，精确制品为 `feature-v4-workloads-20261024-075502-9a5bd5cdc22e`，镜像 digest 为 `sha256:cb4e48ff69f11fe829586f5134c0de24831895a46f558f2fdf9f85a1a19861f0`。
+
+当前尚未将该新制品部署到 131，StatefulSet 关联 Service、Deployment/StatefulSet/DaemonSet 批量删除成功路径仍未在新制品上复验；模块保持 `VERIFY / 未完成`。部署前须通过模块 `deploy` 门禁，部署后使用浏览器逐项确认本体和关联资源清理结果。
+
 # 当前状态补充（2026-10-24：批量删除关联资源缺陷）
 
 131 真实浏览器复验发现：旧精确制品执行 StatefulSet 批量删除后，StatefulSet 已删除，但其 Headless Service 残留。根因是页面批量删除参数转换丢弃 `annotations`，与 Store 中已有的关联资源清理逻辑脱节。已补充最小代码修复和参数传递回归测试，Workload 从 `VERIFY` 退回 `DEV`。新制品尚未构建、部署或浏览器复验，不能报告批量删除通过。证据见 [批量删除缺陷取证](./evidence/workload-batch-delete-defect-20261024.json)。

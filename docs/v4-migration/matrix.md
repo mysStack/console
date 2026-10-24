@@ -1,3 +1,9 @@
+# 当前增量：批量删除修复已构建，待 131 部署复验（2026-10-24）
+
+批量删除参数修复已提交于 `9a5bd5cdc22ec7877c33773ca1ba8562a463bcd6`。本地 `./scripts/test.sh` 通过 91 个测试文件、402 项测试，`corepack yarn build:packages` 通过；CI Run `40042145365` 成功，精确制品为 `feature-v4-workloads-20261024-075502-9a5bd5cdc22e`，镜像 digest 为 `sha256:cb4e48ff69f11fe829586f5134c0de24831895a46f558f2fdf9f85a1a19861f0`。
+
+当前尚未将该新制品部署到 131，StatefulSet 关联 Service、Deployment/StatefulSet/DaemonSet 批量删除成功路径仍未在新制品上复验；模块保持 `VERIFY / 未完成`。部署前须通过模块 `deploy` 门禁，部署后使用浏览器逐项确认本体和关联资源清理结果。
+
 > **2026-10-24 批量删除缺陷复核**：旧精确制品的真实浏览器批量删除发现 StatefulSet 关联 Headless Service 残留，根因是页面 Hook 丢弃 `annotations`。已补充最小修复和回归测试，Workload 阶段退回 `DEV`；新制品尚未完成构建、部署和浏览器复验，批量删除不能标记通过。详见 [批量删除缺陷取证](./evidence/workload-batch-delete-defect-20261024.json)。
 
 > **2026-10-24 回退复验**：Deployment 专用 fixture 已在精确制品上完成回退目标选择、实际 PATCH 200、弹窗关闭和 rollout/Ready 恢复；证据见 [Deployment 回退浏览器复验](./evidence/workload-rollback-browser-verify-20261024.json)。批量删除、伸缩确认、完整错误/缓存和逐项 V3 等价仍未闭环，Workload 保持 `VERIFY / 未完成`。

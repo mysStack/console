@@ -4,7 +4,7 @@
   "capability": "deployment-statefulset-daemonset",
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
-  "phase": "DEV",
+  "phase": "VERIFY",
   "rea": {
     "status": "已通过",
     "sourceCommit": "e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0",
@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "f8b4975eda2c1872443f0c7b2e0198dbc0ffa83a79dc4447dcc2d71e763b051e"
+        "sha256": "b4512c525a0c75b437a15ade2a1678892c2cea4c710f7a8a58fbd80db1ae8e54"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "d297cf24c8ccb8227bcda61863f935ee75b3f7d523f6770f3fafef7d0a41e83d"
+        "sha256": "0123ab805d1c12296ac0e1c516bc7b51906722f28d06e4eb92d7a48c2f009128"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -224,9 +224,9 @@
     }
   },
   "dev": {
-    "status": "进行中",
-    "reason": "发现旧精确制品的真实浏览器批量删除缺陷：页面 Hook 丢弃资源 annotations，导致 StatefulSet 关联 Headless Service 残留。已补充最小参数传递修复和回归测试；新制品待完成本地验证、CI、131 部署及三类批量删除浏览器复验。",
-    "sourceCommit": "45d9f14e53d6a0c1d74011197ade9d5accbcdae9",
+    "status": "已完成",
+    "reason": "修复批量删除页面 Hook 丢弃 annotations 的缺陷，保留关联 Service/HPA 清理所需信息；新增参数转换回归测试。9a5bd5cdc22ec7877c33773ca1ba8562a463bcd6 本地 ./scripts/test.sh 通过 91 个测试文件/402 项，corepack yarn build:packages 通过；CI Run 40042145365 成功，镜像 feature-v4-workloads-20261024-075502-9a5bd5cdc22e / sha256:cb4e48ff69f11fe829586f5134c0de24831895a46f558f2fdf9f85a1a19861f0 已生成，待 131 部署和浏览器复验。",
+    "sourceCommit": "9a5bd5cdc22ec7877c33773ca1ba8562a463bcd6",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
@@ -491,6 +491,10 @@
       {
         "path": "docs/v4-migration/workload-dev-v3-preload-20261024.md",
         "sha256": "da62c5be3beb9502c7a7b977105b366938b4c18d64fbacd040e6f7d0b9cf971c"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-batch-delete-defect-20261024.json",
+        "sha256": "c80069ff002faa6405fe91ee790a3dd9a1efd03ae68c1f9250c877327d1433e7"
       }
     ]
   },
@@ -502,12 +506,12 @@
   ],
   "verify": {
     "status": "未完成",
-    "reason": "旧精确制品的真实浏览器批量删除发现 StatefulSet 关联 Headless Service 残留；已退回 DEV 修复。批量删除新制品复验、伸缩确认结果、完整错误/缓存、跨入口缓存切换和逐项 V3 等价仍未完成。",
+    "reason": "新制品 9a5bd5cdc22e 已完成本地测试、构建和 CI 镜像生成，尚未部署到 131；批量删除本体及 StatefulSet 关联 Service 清理的浏览器复验、伸缩确认结果、完整错误/缓存、跨入口缓存切换和逐项 V3 等价仍未完成。",
     "sourceCommit": "45d9f14e53d6a0c1d74011197ade9d5accbcdae9",
     "documents": [
       {
         "path": "docs/v4-migration/workload-131-verify-20261024.md",
-        "sha256": "c1c252427d0e8dfad309e7c51cb65ac14422528ab53568f5b7ab753534fdb20e"
+        "sha256": "000e97e15f2c24e3599214a8e58a1c7514baa9489f9e2005ab122e7028bada99"
       },
       {
         "path": "docs/v4-migration/evidence/workload-settings-verify-attempt-20261024.json",
@@ -527,7 +531,7 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-action-browser-verify-20261024.json",
-        "sha256": "7579d21c5e8526779380278fca4375e44247017e0eedf61cff775aab9016b7ef"
+        "sha256": "58e5e600d0a05ef56061c5d6f45aefb6c33d679076d8a902582be0e4ae4419a8"
       },
       {
         "path": "docs/v4-migration/evidence/workload-cluster-native-browser-verify-20261024.json",
