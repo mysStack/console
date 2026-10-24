@@ -8,6 +8,12 @@
 
 本轮关闭了管理员列表视角下的 namespace 切换与刷新样本，不能替代低权限账号、StatefulSet/DaemonSet 列表、详情页返回和完整用户/namespace 缓存组合验证；模块继续保持 `VERIFY / 进行中`。
 
+## 2026-10-25 Deployment 自动扩缩保存与回读 VERIFY
+
+在当前 131 制品的 `v4-migration-e2e/v4-deploy-edit-ef3` 上，通过浏览器打开“编辑自动扩缩”，保存 CPU 目标 `50%`、最小副本数 `1`、最大副本数 `2`，未设置内存目标。页面保存后显示自动扩缩卡片；Kubernetes API 回读确认 HPA 指向该 Deployment，`minReplicas=1`、`maxReplicas=2`、CPU `averageUtilization=50`。再次打开页面显示相同值。随后删除本轮创建的 HPA，Deployment 保持 `replicas=1`、`readyReplicas=1`，没有测试 HPA 残留。结构化证据见 [`workload-hpa-save-readback-verify-20261025.json`](./evidence/workload-hpa-save-readback-verify-20261025.json)。
+
+本轮关闭了 Deployment 自动扩缩的一个成功保存、API 持久化和浏览器回读样本；不代表完整 HPA 错误/冲突/权限矩阵或其他 Workload Action 已验收，模块继续保持 `VERIFY / 进行中`。
+
 ## 2026-10-25 当前 SHA 分区切换 VERIFY
 
 | 项目        | 结果                                                                                                  |

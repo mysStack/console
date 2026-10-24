@@ -8,6 +8,7 @@
 - 当前制品又完成三类详情 Action 入口复验：Deployment 的自动扩缩/YAML、StatefulSet 的编辑服务、三类的编辑设置/回退/重新创建/删除入口按资源差异显示；只打开并取消，未提交修改。证据见 [`workload-action-surface-verify-20261025.json`](./evidence/workload-action-surface-verify-20261025.json)。
 - 当前制品已补齐项目级 namespace 正反隔离：只绑定第一项目 viewer 的临时账号可读第一 namespace，直达第二 namespace 资源跳转 `/errors/403`；第二 namespace 临时 Deployment、用户、绑定和 Workspace 标签均已清理/恢复。列表缓存切换、刷新和返回组合仍未完成。证据见 [`workload-namespace-isolation-current-head-verify-20261025.json`](./evidence/workload-namespace-isolation-current-head-verify-20261025.json)。
 - 当前制品已补做集群级 Deployment 列表 namespace 缓存样本：`v4-migration-e2e` → `dev-biz` → `v4-migration-e2e` 切换后列表分别只显示当前项目资源，刷新后仍保持当前 namespace 两条资源。低权限列表、StatefulSet/DaemonSet 列表、详情返回和完整用户/namespace 缓存组合仍未完成。证据见 [`workload-cluster-namespace-cache-verify-20261025.json`](./evidence/workload-cluster-namespace-cache-verify-20261025.json)。
+- 当前制品已完成 Deployment 自动扩缩一次真实保存与回读：浏览器保存 CPU 50%、最小副本 1、最大副本 2，API 回读一致，重新打开页面显示一致；随后删除测试 HPA，Deployment 保持 1/1。完整错误、冲突、权限和其他 Action 矩阵仍未完成。证据见 [`workload-hpa-save-readback-verify-20261025.json`](./evidence/workload-hpa-save-readback-verify-20261025.json)。
 - 当前主基线：`release-4.1.5` 完整前端源码及同版本已部署页面 `192.168.2.131:30881`；源码定位实现，页面核对真实渲染、交互、Network、错误和权限。
 - 制品校准：同版本 `v3dist` tree `1e499d92e11374e26c76f5e13be45251602bd596`；旧 V3 参考 `origin/release-3.4` / `175710fefeeba6ff295c2c0967b4d45b83563d26` 仅在当前版本无法解释时补充使用。
 - 开发路线：REA 输入已经完成当前版本绑定并获准进入 DEV；当前代码已进入 VERIFY，未闭环项必须在当前制品上继续验证。

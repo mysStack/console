@@ -53,11 +53,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "85aa461d7ba7c627ab423fe3dd6c11025d91d9b8f0b52165ea5a5dab31420c47"
+        "sha256": "93e1e1a5250d049a0ce9455b53f272fa03d9ea57bb4fd0518b3fccf99332c73a"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "2cb6530402bd1ca0d61bf75f6cc5a87117d9ce5be6b08fa20b6eed5aa71d0d3f"
+        "sha256": "5ba8c6df625ad54b4d97f31d82d6e6548b11a0b7dbe88d4452c3977e3f4a96fc"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -622,7 +622,7 @@
   ],
   "verify": {
     "status": "进行中",
-    "reason": "按 release-4.1.5 同版本源码和已部署页面确认编辑设置分区行为后，当前阶段制品已完成 CI、131 rollout、Pod imageID、三类资源分区点击验收，以及管理员视角下 Deployment 列表 namespace 切换、切回和刷新缓存样本；每次只显示当前分区，namespace 列表无跨项目残留。低权限列表、StatefulSet/DaemonSet 列表、详情返回、完整字段写回、错误矩阵和逐项 V3 功能等价仍需继续验证。",
+    "reason": "按 release-4.1.5 同版本源码和已部署页面确认编辑设置分区行为后，当前阶段制品已完成 CI、131 rollout、Pod imageID、三类资源分区点击验收、管理员视角下 Deployment 列表 namespace 切换/切回/刷新缓存样本，以及 Deployment 自动扩缩一次真实保存和 API/页面回读；每次只显示当前分区，namespace 列表无跨项目残留。低权限列表、StatefulSet/DaemonSet 列表、详情返回、完整字段写回、错误矩阵和逐项 V3 功能等价仍需继续验证。",
     "sourceCommit": "4b363c688f1e784acb68fe32117756f03bb55bd2",
     "documents": [
       {
@@ -663,11 +663,11 @@
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "2cb6530402bd1ca0d61bf75f6cc5a87117d9ce5be6b08fa20b6eed5aa71d0d3f"
+        "sha256": "5ba8c6df625ad54b4d97f31d82d6e6548b11a0b7dbe88d4452c3977e3f4a96fc"
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "85aa461d7ba7c627ab423fe3dd6c11025d91d9b8f0b52165ea5a5dab31420c47"
+        "sha256": "93e1e1a5250d049a0ce9455b53f272fa03d9ea57bb4fd0518b3fccf99332c73a"
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
@@ -699,7 +699,7 @@
       },
       {
         "path": "docs/v4-migration/workload-current-head-verify-20261024.md",
-        "sha256": "5ba03b1be9e27acd6a2708f598706437cd67f4f38f3629f3970d0f0c19ca5713"
+        "sha256": "52f8e8a715cbda87e42024a7ef4b5e20e824d3e624c6be84e86ca3816de0c0a0"
       },
       {
         "path": "docs/v4-migration/evidence/workload-daemonset-stop-recovery-verify-20261025.json",
@@ -760,6 +760,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-cluster-namespace-cache-verify-20261025.json",
         "sha256": "78bef10636ef840b5f6cf4b1ef4bbae9c80af6f8c4fc8430e755444bf62bab75"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-hpa-save-readback-verify-20261025.json",
+        "sha256": "7e1c6c52312ae3c335492135339c0344f94fa0c7898c710569bb23f969f60d56"
       }
     ],
     "ciRun": 40127350345,
@@ -780,7 +784,7 @@
     },
     "browserVerification": {
       "status": "部分完成",
-      "evidence": "docs/v4-migration/evidence/workload-settings-tabs-verify-20261025.json; docs/v4-migration/evidence/workload-rbac-current-head-verify-20261025.json; docs/v4-migration/evidence/workload-action-surface-verify-20261025.json; docs/v4-migration/evidence/workload-namespace-isolation-current-head-verify-20261025.json; docs/v4-migration/evidence/workload-cluster-namespace-cache-verify-20261025.json",
+      "evidence": "docs/v4-migration/evidence/workload-settings-tabs-verify-20261025.json; docs/v4-migration/evidence/workload-rbac-current-head-verify-20261025.json; docs/v4-migration/evidence/workload-action-surface-verify-20261025.json; docs/v4-migration/evidence/workload-namespace-isolation-current-head-verify-20261025.json; docs/v4-migration/evidence/workload-cluster-namespace-cache-verify-20261025.json; docs/v4-migration/evidence/workload-hpa-save-readback-verify-20261025.json",
       "report": "docs/v4-migration/workload-current-head-verify-20261024.md",
       "freshLogin": "管理员环境变量登录尝试失败；随后创建并清理临时 viewer 账号，新的零 Cookie viewer 登录成功；不记录任何密码",
       "authenticatedSessionChecks": "当前制品已验证 Deployment、StatefulSet、DaemonSet 编辑设置分区切换、当前面板唯一可见、资源差异字段、取消路径、Action 入口和项目级 namespace 正反直达；项目 viewer 访问未授权 namespace 返回 403；页面仍有已登记扩展初始化错误",
