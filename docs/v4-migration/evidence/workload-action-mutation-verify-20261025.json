@@ -88,5 +88,34 @@
     },
     "postCheck": "rollout 成功，最终副本为 1/1，资源标签和镜像保持测试基线，回退产生新的 revision"
   },
-  "conclusion": "当前部署制品已完成三类 Workload 的删除正向浏览器与 API 验证，并完成 Deployment 副本伸缩；失败/取消/权限路径仍需逐项完成。"
+  "recreate": {
+    "browser": "三类详情页均通过更多操作→重新创建→确认完成",
+    "requests": [
+      {
+        "kind": "Deployment",
+        "name": "v4-deploy-edit-ef3",
+        "method": "PATCH",
+        "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+        "status": 200,
+        "rollout": "1/1"
+      },
+      {
+        "kind": "StatefulSet",
+        "name": "v4-watch-sts-20261022-01",
+        "method": "PATCH",
+        "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01",
+        "status": 200,
+        "rollout": "1/1"
+      },
+      {
+        "kind": "DaemonSet",
+        "name": "v4-watch-ds-20261022-01",
+        "method": "PATCH",
+        "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/daemonsets/v4-watch-ds-20261022-01",
+        "status": 200,
+        "rollout": "1/1"
+      }
+    ]
+  },
+  "conclusion": "当前部署制品已完成三类 Workload 的删除和重新创建正向浏览器与 API 验证，并完成 Deployment 副本伸缩与回退；失败/取消/权限路径仍需逐项完成。"
 }
