@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-25",
+  "module": "workloads",
+  "phase": "VERIFY -> DEV",
+  "sourceCommit": "8b28372521d91bdaa511a57061ff25447b6887fa",
+  "artifact": {
+    "imageTag": "feature-v4-workloads-20261025-062345-8b28372521d9",
+    "imageDigest": "sha256:5c1ed805c681275332dfff4c4fdfdd85732a54448cab27bb09c17d02458b3b24",
+    "pod": "ks-console-bc55596d6-km84z",
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:5c1ed805c681275332dfff4c4fdfdd85732a54448cab27bb09c17d02458b3b24",
+    "rollout": "kubesphere-system/ks-console generation 606, 1/1 Ready"
+  },
+  "browser": {
+    "session": "workload-verify-20261025",
+    "resource": "v4-migration-e2e/v4-deploy-edit-ef3",
+    "input": "在现有编辑器内容末尾输入未闭合的 spec: [",
+    "modalAfterSubmit": "仍保持打开",
+    "visibleFeedback": "显示 API BadRequest；客户端未在请求前阻止",
+    "resourceState": "Deployment 保持 1/1"
+  },
+  "runtimeTrace": {
+    "yamlLoadStrictCalled": false,
+    "yamlLoadCalled": true,
+    "yamlLoadInputType": "string",
+    "yamlLoadInputLength": 1760,
+    "yamlLoadInputSuffix": "spec: [",
+    "yamlLoadResultType": "string"
+  },
+  "request": {
+    "method": "PUT",
+    "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+    "status": 400,
+    "requestBodyType": "string",
+    "requestBodySuffix": "spec: ["
+  },
+  "rootCause": {
+    "sourcePath": "packages/shared/src/hooks/useCommonActions/index.tsx",
+    "currentBehavior": "详情页通用 YAML 编辑路径仍使用 yaml.load(data)，绕过了 c8b0df35c 的严格解析入口",
+    "affectedResources": ["Deployment", "StatefulSet", "DaemonSet"],
+    "conclusion": "第二次修复只覆盖项目列表页，详情页仍存在同一缺陷；不能关闭非法 YAML 门禁。"
+  },
+  "next": "将通用详情页改为严格解析并捕获解析/API错误，重新执行 DEV、构建、部署和 Playwright 验证。"
+}

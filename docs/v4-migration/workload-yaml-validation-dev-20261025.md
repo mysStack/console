@@ -61,6 +61,12 @@ corepack yarn build:packages                                                    
 git diff --check                                                                        通过
 ```
 
-## 8. 阶段处理
+## 8. 第二次修复的部署后回归
 
-第二次 DEV 修复已完成，当前进入 `VERIFY / 进行中`。必须以提交 `c8b0df35c` 重新执行 CI 构建、镜像推送、131 rollout、Pod 镜像身份核对和部署后 Playwright 验收。只有确认非法 YAML 在请求前被阻止、弹窗保持打开并显示错误，才能关闭该缺陷；旧制品的 VERIFY 证据不能替代当前制品验证。
+提交 `c8b0df35c` 的列表页已经使用 `loadStrict`，但浏览器实际进入的是三类资源详情页。详情页通过共享 `useCommonActions` 打开 YAML 编辑器，运行时追踪确认调用的是 `yaml.load(data)`，没有调用 `loadStrict`。非法 YAML 因此仍以字符串发起 Deployment PUT，API 返回 `400`，弹窗保持打开。
+
+证据见 [`workload-yaml-validation-common-action-regression-20261025.json`](./evidence/workload-yaml-validation-common-action-regression-20261025.json)。该结果证明第二次修复仍未覆盖完整的 Workload YAML 编辑入口。
+
+## 9. 阶段处理
+
+第二次修复未闭环，已按模块门禁再次退回 `DEV / 进行中`。下一次修复必须将通用详情页改为严格解析，并在解析失败或 API 失败时显示保存失败提示、保持弹窗打开且不发起非法 PUT。完成后重新执行测试、构建、CI、131 rollout、Pod 镜像身份核对和部署后 Playwright 验收。

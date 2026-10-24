@@ -5,8 +5,8 @@
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-  "phase": "VERIFY",
-  "phaseReason": "第二次 DEV 修复已完成字符串对象和解析结果边界处理；本地验证通过，待当前提交的 CI、131 部署和浏览器验收。",
+  "phase": "DEV",
+  "phaseReason": "第二次修复制品已完成 CI、131 rollout 和浏览器验证，但详情页通用 useCommonActions 仍调用 yaml.load 并发送非法 YAML PUT 400；已按门禁退回 DEV。",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "064bd56c52afb7782b222d529ad7d7f170836d7fc6a8d99eafba8c2184053b24"
+        "sha256": "d6aeea7adf3756d38b0495e97e50fa78b32c3dcd379aba15a157819c6f9052f8"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "4debac1092721b229e8725bd515da1221dc8df3d2020d797872c14eb2aa38b30"
+        "sha256": "73e26e5d8bfcd180630d995dae0b782b89fd06e71f5f379d9ca0eb5d5454d4e7"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -325,8 +325,8 @@
     "coverageNotes": "已核对表示当前版本主基线和证据入口已覆盖该维度，不表示运行时验证或功能等价已经通过；运行时缺口转入 DEV/VERIFY 验收清单。"
   },
   "dev": {
-    "status": "已完成",
-    "reason": "已修复 String 对象绕过解析以及标量/数组解析结果未校验的问题；新增回归测试，本地全量测试、相关 ESLint、build:packages 和 diff 检查通过。",
+    "status": "进行中",
+    "reason": "c8b0df35c 只修复了项目列表页的严格 YAML 解析；详情页通用 useCommonActions 仍使用 yaml.load，部署后浏览器已复现非法 YAML 发起 PUT 400，待修复详情路径并重新验证。",
     "sourceCommit": "c8b0df35cd2893e504cb3379a732fdf83c5fafb9",
     "documents": [
       {
@@ -611,7 +611,7 @@
       },
       {
         "path": "docs/v4-migration/workload-yaml-validation-dev-20261025.md",
-        "sha256": "b2bbdad09e886eb618e8de8a6c02c4dac5dd56dee06417671186fc8b29461f07"
+        "sha256": "2e4a7741180d922cea0f979b2b3970e102fd234242d0bb523a6a5a55b6dbb17b"
       },
       {
         "path": "docs/v4-migration/evidence/workload-yaml-validation-defect-20261025.json",
@@ -620,12 +620,16 @@
       {
         "path": "docs/v4-migration/evidence/workload-yaml-validation-regression-20261025.json",
         "sha256": "819588b07b7b95ce9d72d81b63d182a4a1938228552709066be1d85e7936d6ea"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-yaml-validation-common-action-regression-20261025.json",
+        "sha256": "dc6099dfd30a5d2ffac356a07a2e656673cd89d11e2a59cd747c4e9d1eeee0f7"
       }
     ],
-    "ciRun": "",
-    "ciStatus": "本地测试和构建已完成，待当前提交重新提交 CI",
-    "imageTag": "",
-    "imageDigest": ""
+    "ciRun": "40138280587",
+    "ciStatus": "CI 构建和本地验证通过；浏览器发现详情路径缺陷，已退回 DEV",
+    "imageTag": "feature-v4-workloads-20261025-062345-8b28372521d9",
+    "imageDigest": "sha256:5c1ed805c681275332dfff4c4fdfdd85732a54448cab27bb09c17d02458b3b24"
   },
   "devAcceptanceChecklist": [
     "WL-01：三类资源项目/集群入口、详情 Tab、原生编辑设置分区和路由替代矩阵",
@@ -634,21 +638,21 @@
     "WL-04：移除普通 Workload 配置引用的 useV3action、Wujie Shadow DOM 和 V3 编辑器桥接"
   ],
   "verify": {
-    "status": "进行中",
-    "reason": "第二次 DEV 修复已完成，必须以当前提交重新构建、部署并验证非法 YAML 在请求前被阻止。",
-    "sourceCommit": "c8b0df35cd2893e504cb3379a732fdf83c5fafb9",
+    "status": "已退回 DEV，待修复后重新 VERIFY",
+    "reason": "当前制品的详情页通用 YAML 编辑路径仍调用 yaml.load，非法 YAML 发起 PUT 400；必须修复后重新构建、部署和浏览器验收。",
+    "sourceCommit": "8b28372521d91bdaa511a57061ff25447b6887fa",
     "documents": [],
     "ciRun": "",
-    "ciStatus": "待当前提交 CI 构建和部署",
+    "ciStatus": "已完成旧修复制品验证，但详情路径回归，待 DEV 修复后重新 CI",
     "imageTag": "",
     "imageDigest": "",
     "rollout": {},
     "browserVerification": {
-      "status": "待当前制品验证",
-      "evidence": "",
+      "status": "未通过，已退回 DEV",
+      "evidence": "docs/v4-migration/evidence/workload-yaml-validation-common-action-regression-20261025.json",
       "report": "docs/v4-migration/workload-yaml-validation-dev-20261025.md",
-      "freshLogin": "待当前制品重新验证；不记录凭据",
-      "authenticatedSessionChecks": "待确认非法 YAML 不产生 PUT 且显示错误",
+      "freshLogin": "已使用已认证 Playwright 会话完成当前制品验证；不记录凭据",
+      "authenticatedSessionChecks": "详情页运行时 yaml.load 被调用，未调用 yaml.loadStrict；非法 YAML 发起 PUT 400，弹窗保持打开",
       "moduleAcceptance": "未完成"
     },
     "lastEvidenceUpdate": "2026-10-25"
