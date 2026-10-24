@@ -28,6 +28,30 @@
     ],
     "postCheck": "页面刷新后不再显示两个资源；Kubernetes 中 selector=v4-migration-test=batch-delete 的 Deployment、Pod 和 ReplicaSet 均无残留"
   },
+  "statefulSetBatchDelete": {
+    "kind": "StatefulSet",
+    "name": "v4-batch-delete-sts-20261025",
+    "namespace": "v4-migration-e2e",
+    "browser": "原生 StatefulSet 项目列表选择专用资源，打开删除确认并输入资源名确认",
+    "request": {
+      "method": "DELETE",
+      "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/statefulsets/v4-batch-delete-sts-20261025",
+      "status": 200
+    },
+    "postCheck": "页面刷新和 Kubernetes 回读均确认 StatefulSet 不存在"
+  },
+  "daemonSetBatchDelete": {
+    "kind": "DaemonSet",
+    "name": "v4-batch-delete-ds-20261025",
+    "namespace": "v4-migration-e2e",
+    "browser": "原生 DaemonSet 项目列表选择专用资源，打开删除确认并输入资源名确认",
+    "request": {
+      "method": "DELETE",
+      "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/daemonsets/v4-batch-delete-ds-20261025",
+      "status": 200
+    },
+    "postCheck": "页面刷新和 Kubernetes 回读均确认 DaemonSet 不存在"
+  },
   "deploymentScale": {
     "kind": "Deployment",
     "name": "v4-deploy-edit-ef3",
@@ -52,5 +76,5 @@
     ],
     "postCheck": "两次 PUT 后 API 回读和 rollout 均成功，最终 spec.replicas=1、ready=1/1，测试资源恢复原状态"
   },
-  "conclusion": "当前部署制品已完成 Deployment 批量删除和副本伸缩的正向浏览器与 API 验证；其余资源类型和失败/取消/权限路径仍需逐项完成。"
+  "conclusion": "当前部署制品已完成三类 Workload 的删除正向浏览器与 API 验证，并完成 Deployment 副本伸缩；失败/取消/权限路径仍需逐项完成。"
 }

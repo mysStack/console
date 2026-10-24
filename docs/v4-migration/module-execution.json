@@ -691,7 +691,7 @@
       },
       {
         "path": "docs/v4-migration/workload-current-head-verify-20261024.md",
-        "sha256": "92ba85da3d8ae2380f6d65f451520dfae958d542f813b318d28f448532ce57f7"
+        "sha256": "2df0fced666b9fd86839e8c5d4c6502568bf23610aa2833e8cae95fdb85d15a9"
       },
       {
         "path": "docs/v4-migration/evidence/workload-daemonset-stop-recovery-verify-20261025.json",
@@ -699,7 +699,7 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-action-mutation-verify-20261025.json",
-        "sha256": "56376e651b6a3a7873fc1bbf07286de013aa3a93ac7959610faaa5e367ae3d17"
+        "sha256": "e61dfcd19a4cbaf9c0c3f39beb3ab234c324f4090619259d4c155c6bac4d160"
       },
       {
         "path": "docs/v4-migration/evidence/workload-daemonset-settings-verify-20261025.json",
