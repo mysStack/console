@@ -28,7 +28,7 @@
 ### 已通过的当前制品场景
 
 - 项目级 Deployment、StatefulSet、DaemonSet 列表均渲染原生 Workload 页面，并只显示 `v4-migration-e2e` namespace 的资源。
-- 三类资源详情页支持直达和刷新，详情内容、Pod 状态和资源专属信息正常渲染。
+- Deployment 和 DaemonSet 详情页完成直达与渲染检查；StatefulSet 详情页本轮尚未在当前制品上复验。
 - Deployment 的原生“编辑设置”显示更新策略、容器组、存储、调度、优雅终止和元数据分区；取消路径通过。
 - DaemonSet 的原生“编辑设置”不显示副本数，显示其更新策略和就绪时间字段；取消路径通过。
 - 集群级 `/clusters/host/deployments` 渲染原生列表，并显示“全部项目”筛选入口；该入口结果不能推断为项目 namespace 过滤结果。

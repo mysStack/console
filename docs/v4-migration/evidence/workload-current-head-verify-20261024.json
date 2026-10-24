@@ -46,7 +46,7 @@
       "projectDaemonSetList": "通过：v4-migration-e2e 只显示该 namespace 的 DaemonSet",
       "clusterDeploymentList": "通过：/clusters/host/deployments 渲染集群级列表，并显示全部项目筛选入口",
       "deploymentDetail": "通过：直达 / 刷新 / 详情页渲染",
-      "statefulSetDetail": "通过：直达 / 刷新 / 详情页渲染",
+      "statefulSetDetail": "本轮未复验；历史证据不继承为当前制品通过",
       "daemonSetDetail": "通过：直达 / 刷新 / 详情页渲染",
       "deploymentSettings": "通过：原生编辑设置弹窗，更新策略、容器组设置、存储、调度、优雅终止和元数据分区可见；取消路径通过",
       "daemonSetSettings": "通过：原生编辑设置弹窗，未出现副本数编辑，DaemonSet 专属更新策略和就绪时间可见；取消路径通过",
