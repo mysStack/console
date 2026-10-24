@@ -1,3 +1,11 @@
+# 当前 Workload 执行状态（2026-10-24）
+
+- 当前阶段：`REA / 分析中，待复核`。
+- 当前制品基线：`release-4.1.5` / `fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`，`v3dist` tree `1e499d92e11374e26c76f5e13be45251602bd596`。
+- 旧 V3 参考：`origin/release-3.4` / `175710fefeeba6ff295c2c0967b4d45b83563d26`，仅用于结构、字段和样式参考。
+- 开发路线：先完成三类资源组合 REA 复核，再进入 DEV；之后按构建、部署、Playwright、RBAC 和 V3 等价结果进入 VERIFY。
+- 下方历史状态不能覆盖上述当前状态。
+
 # 当前状态补充（2026-10-24：当前 HEAD 设置入口部署后复验）
 
 - 当前制品源码提交 `31b6d88fc7e87707776c094aee12f1cdcb02604b`（之后仅有记录提交）的 CI Run `40048500939`、镜像 `feature-v4-workloads-20261024-091102-31b6d88fc7e8`、digest `sha256:2956710cd7ef2fbda79ff7a0a9695dac466336bd08248784d5afdfb577b951d3` 与 131 Pod imageID 一致，rollout/Ready 通过。

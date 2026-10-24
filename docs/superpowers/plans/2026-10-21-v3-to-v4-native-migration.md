@@ -1,7 +1,7 @@
 # KubeSphere Console V3 → V4 原生化迁移实施计划
 
 > 执行模式：单 Codex 会话顺序执行，不创建子 Agent。本文为实施清单，主计划和模块规则优先。
-> 当前 Workload 能力为 Deployment、StatefulSet、DaemonSet 组合批次（`deployment-statefulset-daemonset`），阶段 `DEV`、REA 状态“已通过（负责人批准）”，见[阶段记录](../../v4-migration/module-execution.json)和[组合能力边界](../../v4-migration/workload-kind-capability-matrix.md)。公共实现可以共用，三类资源分别完成差异核对和验收；以下历史任务与限定 VERIFY 不等于当前能力已放行。
+> 当前 Workload 能力为 Deployment、StatefulSet、DaemonSet 组合批次（`deployment-statefulset-daemonset`），阶段 `REA`、状态“分析中，待复核”，见[阶段记录](../../v4-migration/module-execution.json)和[组合能力边界](../../v4-migration/workload-kind-capability-matrix.md)。旧 V3 参考固定为 origin/release-3.4；完成新的 REA 复核后才能进入 DEV。公共实现可以共用，三类资源分别完成差异核对和验收；以下历史任务与限定 VERIFY 不等于当前能力已放行。
 
 **Goal:** 以现有 V3 源码、当前 `v3dist`、REA 证据和 131 浏览器证据为行为基线，逐模块把 KubeSphere Console 重构为 V4 原生实现，最终移除所有实际启用功能对 V3/Wujie 的运行时依赖。
 

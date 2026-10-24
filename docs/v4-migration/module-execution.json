@@ -20,11 +20,11 @@
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
-        "sha256": "ff3a76486f3611d80dd09789cf449a44258220db396457f3119fc413ad646784"
+        "sha256": "e3bda137904bdff7c5ef53e6eb7d9fd7649506e0645a6294782711e7ab7c86a9"
       },
       {
         "path": "docs/v4-migration/workload-kind-capability-matrix.md",
-        "sha256": "d480f3756eb1d8b8cd4846dfe859527f0027509d8e2ecd8828ae70ed4b2742cb"
+        "sha256": "b3a96c0ada52fe78afa1768142a1e2ad707d1d06851d78fa8da643faf73dcca4"
       },
       {
         "path": "docs/v4-migration/evidence/workload-edit-factories-20261023-provenance.json",
@@ -36,7 +36,7 @@
       },
       {
         "path": "docs/v4-migration/workload-settings-source-evidence-20261024.md",
-        "sha256": "315acc54562adfc81c5f015ad9282e197eb8b5c0f653998e5856470fcab34bf1"
+        "sha256": "aedf341ec381113174287f2251c7d5d359880ddecf93c2c87b8410dfecdb1fd7"
       },
       {
         "path": "docs/v4-migration/workload-test-design-20261023.md",
@@ -48,15 +48,15 @@
       },
       {
         "path": "docs/v4-migration/workload-v3-field-equivalence-20261023.md",
-        "sha256": "343065295ad0053adda0384d6cd7a3d030bb05df1541a56d015c85f736542745"
+        "sha256": "f7b94cfd34173fe02cfb0ff828872a94f06198161d8ad12af1f90ce76e05762e"
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "3e631619a738b23ff439ce89087b178e81d8763a81abc90dd9ac003c95de00e8"
+        "sha256": "cbb910ef7710bb8d35fe2b5d8149591a7f7fe467f81857fadb8785cfffd8ff02"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "1b205e807b036d66a13cfd7bf2a2ec1a18b3235797ea252c16f35520ee262afd"
+        "sha256": "872ea5a0b024c28d8c57e6c71205efcd246c5a540b690570eaa666d205005192"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -100,11 +100,15 @@
       },
       {
         "path": "docs/v4-migration/workload-rea-source-correction-20261024.md",
-        "sha256": "e152897c17f6b965645312875d096c4b4ce33e79229c9f950c9db510643fe6bc"
+        "sha256": "1c513ecf85d2ecaf4c36c5cb0981f81246a107b52c38cfa139e4363c79ffa3c8"
       },
       {
         "path": "docs/v4-migration/evidence/workload-style-rea-20261024.json",
         "sha256": "be55abdf641cc4fe9404db67b3e9cf85a6d31d46e83e88a2b1e0e38281eba9e9"
+      },
+      {
+        "path": "docs/v4-migration/workload-development-route-20261024.md",
+        "sha256": "f6c434c5436f75d76b34df06ca3f535d04c66f02815563348900b8e7946dcc1c"
       }
     ],
     "coverage": {
@@ -218,9 +222,9 @@
       }
     },
     "highRiskUnknowns": [
-      "当前制品 REA 之前绑定到了 feature/v4-workloads 提交，已纠正为 release-4.1.5；需要按固定基线重新核对当前 v3dist 证据。",
-      "release-3.1.4 旧 V3 源码参考尚未在当前工作区和可核验远程引用中定位；origin/release-3.4 不能替代它。",
-      "此前基于 origin/release-3.4 的字段与样式对照不得继续作为当前 REA 通过依据，需重新建立旧源码参考矩阵。"
+      "当前制品 REA 已固定到 release-4.1.5；仍需按该 v3dist tree 重新核对三类资源的字段、Action、API、RBAC、缓存、错误和运行时证据。",
+      "旧 V3 参考已固定为 origin/release-3.4 / 175710fefeeba6ff295c2c0967b4d45b83563d26；该版本与当前 v3dist 的构建对应关系未知，不能据此证明制品来源或版本完全等价。",
+      "release-3.1.4 在当前本地和已核验远程引用中不存在；本轮保留该版本限制，不把 release-3.4 写成 release-3.1.4。"
     ],
     "review": {
       "reviewer": "历史记录（当前纠偏后不作为复核签署）",
@@ -229,15 +233,16 @@
       "decision": "原批准仅保留为历史记录；因 REA 输入源绑定错误，当前模块退回 REA，待重新复核。"
     },
     "riskDisposition": {
-      "decision": "当前 REA 不放行；先固定 release-4.1.5 制品并补齐 release-3.1.4 旧源码参考，再重新提交复核。",
+      "decision": "当前 REA 仍为分析中，待复核；采用 release-4.1.5 v3dist 与 origin/release-3.4 旧源码参考的分层证据，完成矩阵复核后再申请进入 DEV。",
       "reference": "docs/v4-migration/workload-rea-source-correction-20261024.md",
+      "sourceReference": "origin/release-3.4 / 175710fefeeba6ff295c2c0967b4d45b83563d26 / AGPL-3.0",
       "originalRiskIds": ["WL-01", "WL-02", "WL-03", "WL-04"],
-      "verifyRequirement": "未完成重新 REA 前，不得把已有 DEV、镜像或旧浏览器证据继承为当前 VERIFY 通过。"
+      "verifyRequirement": "未完成新的 REA 复核前，不得把已有 DEV、镜像或旧浏览器证据继承为当前 VERIFY 通过。"
     }
   },
   "dev": {
     "status": "待重新执行",
-    "reason": "历史 DEV 实现和本地测试记录保留，但由于当前 REA 输入源已纠正，不能直接继承为本轮 DEV 完成；重新 REA 复核后按固定基线重新检查。",
+    "reason": "当前路线已重新绑定旧 V3 参考，历史 DEV 实现和测试继续保留为输入；在新的 REA 复核完成前，不能继承为本轮 DEV 完成。",
     "sourceCommit": "5c2525681615804dc284221e2e1434d05d655213",
     "documents": [
       {
@@ -522,7 +527,7 @@
   ],
   "verify": {
     "status": "待重新执行",
-    "reason": "阶段已退回 REA。此前构建和旧制品 VERIFY 记录保留为历史证据，不能在当前 REA 重新复核前作为模块验收依据。",
+    "reason": "当前路线已重新绑定旧 V3 参考；此前构建、部署和浏览器记录保留为历史证据，必须在新的 REA 复核后按当前 SHA 重新执行 VERIFY。",
     "sourceCommit": "baf43d95d1cc80ae6d95b283a5c796d47b9a02ae",
     "documents": [
       {
@@ -563,19 +568,19 @@
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "1b205e807b036d66a13cfd7bf2a2ec1a18b3235797ea252c16f35520ee262afd"
+        "sha256": "872ea5a0b024c28d8c57e6c71205efcd246c5a540b690570eaa666d205005192"
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "3e631619a738b23ff439ce89087b178e81d8763a81abc90dd9ac003c95de00e8"
+        "sha256": "cbb910ef7710bb8d35fe2b5d8149591a7f7fe467f81857fadb8785cfffd8ff02"
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
-        "sha256": "ef90cfa604b13e3e0bab86afeb4b842fea577452c2921f317344634fa6ad098d"
+        "sha256": "e3bda137904bdff7c5ef53e6eb7d9fd7649506e0645a6294782711e7ab7c86a9"
       },
       {
         "path": "docs/v4-migration/workload-kind-capability-matrix.md",
-        "sha256": "d480f3756eb1d8b8cd4846dfe859527f0027509d8e2ecd8828ae70ed4b2742cb"
+        "sha256": "b3a96c0ada52fe78afa1768142a1e2ad707d1d06851d78fa8da643faf73dcca4"
       },
       {
         "path": "docs/v4-migration/evidence/workload-current-head-deploy-pull-20261024.json",
@@ -594,5 +599,21 @@
         "sha256": "751862ab32a936a8c16aebe2e37702f30bd6cb0157ac66f330c3c95070301f44"
       }
     ]
+  },
+  "routeAdjustment": {
+    "date": "2026-10-24",
+    "decision": "重新整理 Workload 开发路线：当前制品使用 release-4.1.5 v3dist，旧 V3 参考使用 origin/release-3.4；release-3.1.4 在当前可核验引用中不存在。",
+    "currentArtifact": {
+      "ref": "release-4.1.5",
+      "commit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
+      "artifactTree": "1e499d92e11374e26c76f5e13be45251602bd596"
+    },
+    "legacyReference": {
+      "ref": "origin/release-3.4",
+      "commit": "175710fefeeba6ff295c2c0967b4d45b83563d26",
+      "license": "AGPL-3.0",
+      "scope": "只用于旧 V3 结构、字段和样式参考，不证明当前制品来源"
+    },
+    "next": "按新输入口径完成三类资源组合 REA 复核；复核通过后才进入 DEV。"
   }
 }

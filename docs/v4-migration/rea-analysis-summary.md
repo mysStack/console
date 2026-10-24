@@ -1,6 +1,6 @@
 # Workload 分支 REA 分析索引
 
-> **2026-10-24 输入源纠偏：** 当前制品 REA 的唯一固定源码基线是 `release-4.1.5` / `fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`，读取该基线中的 `v3dist`。`feature/v4-workloads` 只承载 V4 开发，不能作为当前 V3 制品 REA 源。旧 V3 可读源码应使用 `release-3.1.4` 作为参考；此前 `origin/release-3.4` 对照材料降为历史输入，不能替代 `release-3.1.4`，也不能支撑当前 REA 通过。当前模块阶段已退回 `REA / 分析中，待复核`。
+> **2026-10-24 输入源纠偏：** 当前制品 REA 的唯一固定源码基线是 `release-4.1.5` / `fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`，读取该基线中的 `v3dist`。`feature/v4-workloads` 只承载 V4 开发，不能作为当前 V3 制品 REA 源。旧 V3 可读源码参考固定为 `origin/release-3.4` / `175710fefeeba6ff295c2c0967b4d45b83563d26`；该参考不能证明当前制品来源，也不冒充不存在的 `release-3.1.4`。当前模块阶段已退回 `REA / 分析中，待复核`。
 
 > **2026-10-24 入口与制品状态校准**：历史运行时 REA 中“StatefulSet、DaemonSet 的编辑设置仍打开 YAML”只适用于当时的旧制品快照。当前源码提交 `31b6d88fc7e8` 的制品已在 131 Ready；已有认证态复验确认三类入口均打开原生 `WorkloadSettingsModal`，YAML 是独立 Action，并完成终止宽限期 `30 → 31 → 30` 保存与 API 回读。零 Cookie 新 context 登录仍失败，完整字段、RBAC、缓存、错误和逐项 V3 等价仍未闭环。详见[当前制品原生设置证据](./evidence/workload-native-settings-current-head-20261024.json)。
 
@@ -20,7 +20,7 @@
 | 未知及影响        | 原生入口和配置引用桥接移除已完成 DEV；当前浏览器发现引用面板低权限控件暴露，退回 DEV 修复。完整权限/namespace/缓存与功能等价继续 VERIFY，不重做全量 REA。                                                                                                                |
 | 关闭条件          | 公共行为和三类资源差异均有可追溯制品定位、运行时对照、V4 替代与差异；所有高风险已关闭或经复核明确隔离                                                                                                                                                                    |
 | 复核人/日期/依据  | 当前无新签署；历史复核仅保留为失效记录 / 2026-10-24 纠偏记录                                                                                                                                                                                                             |
-| 下一步            | 固定 release-4.1.5 制品重做 Workload 字段与样式 REA；补齐 release-3.1.4 旧源码位置后再提交复核，未复核前不进入 DEV/VERIFY。                                                                                                                                              |
+| 下一步            | 固定 release-4.1.5 制品并以 origin/release-3.4 为旧源码参考，重做 Workload 字段与样式 REA；未完成复核前不进入 DEV/VERIFY。                                                                                                                                               |
 
 REA 的 `partial/no-match` 是覆盖限制，不能证明功能不存在，也不是所有模块必须停止的理由。当前受限的是尚未证明的 Workload 组合批次；无关模块仍遵循自己的证据和门禁。无需恢复全部原始 TSX，只需要公共行为和三类资源差异的证据足以指导完整 V4 重构。
 
@@ -82,6 +82,5 @@ Deployment、StatefulSet、DaemonSet 共用一个模块分支和组合能力记�
 
 该证据只确认编译制品中的静态样式资源可以作为重建输入，不能替代旧源码、真实 V3
 Workload 设置页 DOM、计算样式、截图、交互状态和 Network 证据，也不能证明 V4 视觉或
-功能等价。`release-3.1.4` 的确切本地路径或远程仓库仍待补齐；`origin/release-3.4`
-不得代替它。当前模块仍为 `REA / 分析中，待复核`，已有代码、镜像和浏览器记录均不
+功能等价。`origin/release-3.4` 已作为负责人确认的旧 V3 参考；`release-3.1.4` 不存在的事实保留为版本限制。当前模块仍为 `REA / 分析中，待复核`，已有代码、镜像和浏览器记录均不
 继承为本轮通过。

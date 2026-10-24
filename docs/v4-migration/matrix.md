@@ -1,3 +1,9 @@
+# 当前 Workload 执行路线（2026-10-24）
+
+> 当前阶段：`REA / 分析中，待复核`。当前制品 REA 固定使用 `release-4.1.5` 的 `v3dist`；旧 V3 结构、字段和样式参考固定使用 `origin/release-3.4` / `175710fefeeba6ff295c2c0967b4d45b83563d26`。此前 DEV、VERIFY、镜像和浏览器记录均保留为历史输入，不能继承为当前通过。完成 REA 复核后，按 `DEV → VERIFY → PR` 顺序推进。
+
+> 本页下方旧日期段落保留为历史证据；最新阶段只以 `module-execution.json` 为准。
+
 > **2026-10-24 批量删除复验**：在已有登录态下完成三类批量删除，StatefulSet 关联 Headless Service 同步清理，DaemonSet DELETE 200 OK；该结果来自此前精确制品，当前 31b6 制品的零 Cookie 登录仍失败，因此当前制品的登录门禁、完整错误/缓存和逐项 V3 等价仍未闭环。
 
 > **2026-10-24 登录阻塞**：当前 31b6 制品已完成 131 部署和身份核对，但零 Cookie 新 context 的专用测试账号登录仍返回 `Incorrect username or password`，未进入本轮完整浏览器验证；此前批量删除修复制品的部署尝试已按规则回滚。登录失败原因尚未归因，不能将当前制品的批量删除、完整错误/缓存和逐项 V3 等价标记为通过。详见 [当前制品原生设置证据](./evidence/workload-native-settings-current-head-20261024.json)。

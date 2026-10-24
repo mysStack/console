@@ -10,12 +10,12 @@
 | 输入                   | 正确用途                             | 固定身份                                                                                             |
 | ---------------------- | ------------------------------------ | ---------------------------------------------------------------------------------------------------- |
 | `release-4.1.5`        | 当前发布制品 `v3dist` 的 REA 目标    | `fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`，`v3dist` tree `1e499d92e11374e26c76f5e13be45251602bd596` |
-| `release-3.1.4`        | 旧 V3 可读源码的结构、字段和样式参考 | 仅作参考，不作为当前制品来源证明                                                                     |
+| `origin/release-3.4`   | 旧 V3 可读源码的结构、字段和样式参考 | commit `175710fefeeba6ff295c2c0967b4d45b83563d26`，许可证 AGPL-3.0；不作为当前制品来源证明           |
 | `feature/v4-workloads` | V4 重构代码和验证记录                | 不作为当前 V3 制品 REA 的输入源                                                                      |
 
-因此，之前以 `e67b95cc...` 作为当前制品 REA 源提交的记录需要重新绑定；之前以
-`origin/release-3.4` 作为旧源码对照的材料只能保留为历史输入，不能直接作为
-`release-3.1.4` 的替代证据，也不能继续支撑当前 REA 通过结论。
+因此，之前以 `e67b95cc...` 作为当前制品 REA 源提交的记录需要重新绑定。项目负责人已确认将
+`origin/release-3.4` 作为旧 V3 可读参考；该参考用于结构、字段和样式对照，但不能证明当前
+`release-4.1.5` 的 `v3dist` 构建来源，也不能宣称等同于不存在的 `release-3.1.4`。
 
 ## 当前核验
 
@@ -36,14 +36,13 @@ git diff --name-only release-4.1.5..HEAD -- packages/bootstrap/assets/v3dist
 - `release-4.1.5..feature/v4-workloads` 没有 `v3dist` 文件差异。
 - 当前 131 仍运行旧的 `31b6d88fc7e8` 镜像；本次纠偏前构建的新镜像没有部署。
 
-当前工作区没有可直接核验的 `release-3.1.4` 分支或独立旧 V3 源码目录；现有
-`origin/release-3.4` 不能冒充该输入。根据项目负责人提供的远程仓库
-`https://github.com/mysStack/kse-console-v3` 进行只读核验，当前可见分支为
+已对项目负责人提供的远程仓库
+`https://github.com/mysStack/kse-console-v3` 进行只读核验。该仓库当前可见分支为
 `main`、`feature/app-env-from`、`feature/v3-artifact-decouple`、`release-4.1.5`，
 可见标签为 `v3.0.0-mystack.1` 至 `v3.0.0-mystack.6`，远程 API 对
-`release-3.1.4` 返回 `404 Not Found`。因此该地址目前仍不能提供指定的旧源码引用。
-旧源码的确切 commit、实际分支或其他镜像位置及许可证需要在重新进行旧源码对照前补齐。
-未补齐前，不把旧源码字段或样式对照写成已完成。
+`release-3.1.4` 返回 `404 Not Found`。因此本轮不再等待不存在的引用，改用当前仓库已核验的
+`origin/release-3.4` / `175710fefeeba6ff295c2c0967b4d45b83563d26` 作为旧 V3 参考，并在矩阵中
+明确其版本限制。
 
 ## 样式逆向边界
 
@@ -53,7 +52,7 @@ git diff --name-only release-4.1.5..HEAD -- packages/bootstrap/assets/v3dist
 - 用真实 V3 页面和 Playwright 记录 DOM 层级、可见文案、分区顺序、间距、尺寸、
   字体、颜色、边框、滚动、禁用、校验错误、加载、空态和弹窗行为。
 - 用浏览器 `getComputedStyle` 和 Network 证据区分实际渲染结果与静态推断。
-- 用 `release-3.1.4` 的可读源码解释组件意图和字段关系，但不把旧版本样式直接复制
+- 用 `origin/release-3.4` 的可读源码解释组件意图和字段关系，但不把旧版本样式直接复制
   成 V4 实现，也不把编译产物还原成原始 TSX。
 - V4 交付应使用现有 V4 React、Kubed UI 和设计令牌重建同等布局、密度、状态和交互，
   并通过浏览器截图/DOM/计算样式逐项比较。
@@ -65,5 +64,4 @@ git diff --name-only release-4.1.5..HEAD -- packages/bootstrap/assets/v3dist
 ## 阶段处理
 
 本次纠偏后，`module-execution.json` 退回 `REA`，原先的负责人批准记录保留为历史记录，
-不再作为当前分支进入 DEV/VERIFY 的授权。重新绑定 `release-4.1.5` 制品、补齐
-`release-3.1.4` 旧源码参考并完成样式/行为矩阵后，再提交新的 REA 复核。
+不再作为当前分支进入 DEV/VERIFY 的授权。重新绑定 `release-4.1.5` 制品、使用已确认的 `origin/release-3.4` 旧源码参考并完成样式/行为矩阵后，再提交新的 REA 复核。
