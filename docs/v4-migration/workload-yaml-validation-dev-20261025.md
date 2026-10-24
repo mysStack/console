@@ -40,8 +40,27 @@ git diff --check                                                                
 
 证据见 [`workload-yaml-validation-regression-20261025.json`](./evidence/workload-yaml-validation-regression-20261025.json)。该结果证明首次修复没有闭环，不能标记 VERIFY 通过。
 
-## 6. 阶段处理
+## 6. 第二次修复
 
-该缺陷属于 VERIFY 中发现的功能正确性问题，首次修复未闭环，已再次按模块门禁退回 `DEV / 进行中`。下一次修复必须重新执行测试、构建、CI、131 rollout、Pod 镜像身份核对和部署后 Playwright 验收，旧制品的 VERIFY 证据不能替代新制品验证。
+首次部署回归显示，编辑器可能传入 `String` 对象；旧实现使用 `isObject` 判断时会直接返回该对象，导致它绕过 YAML 解析。旧实现对标量 YAML 也没有确认解析结果是 Kubernetes 对象。
 
-在新的 DEV 修复完成前，模块保持 `DEV / 进行中`，不进入 P1/P2 或 PR 验收。
+提交 `c8b0df35c` 完成以下最小修复：
+
+1. 对原始字符串和 `String` 对象统一转为文本后调用 `js-yaml` 解析。
+2. 对非字符串输入保留已有对象更新路径。
+3. 要求解析结果为非数组对象；标量、空文档和数组文档直接抛出错误，不进入 mutation。
+4. 新增 `String` 对象非法 YAML 和标量 YAML 回归测试。
+
+## 7. 第二次 DEV 本地验证
+
+```text
+./node_modules/.bin/esno packages/shared/src/utils/yaml.test.ts                         4/4 通过
+./scripts/test.sh                                                                       92 个测试文件、411 项测试通过
+相关 ESLint 文件检查                                                                  0 个错误、3 个已有警告
+corepack yarn build:packages                                                            成功
+git diff --check                                                                        通过
+```
+
+## 8. 阶段处理
+
+第二次 DEV 修复已完成，当前进入 `VERIFY / 进行中`。必须以提交 `c8b0df35c` 重新执行 CI 构建、镜像推送、131 rollout、Pod 镜像身份核对和部署后 Playwright 验收。只有确认非法 YAML 在请求前被阻止、弹窗保持打开并显示错误，才能关闭该缺陷；旧制品的 VERIFY 证据不能替代当前制品验证。

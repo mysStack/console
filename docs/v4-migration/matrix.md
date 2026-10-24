@@ -1,10 +1,12 @@
 # 当前 Workload 执行路线（2026-10-25）
 
-> **最新状态（2026-10-25，再次退回 DEV）**：提交 `e066ddac4` 的修复制品已经完成构建、部署和浏览器复验，但非法 YAML 仍以字符串发起 PUT 并返回 400。页面显示 API 错误，但客户端没有在请求前阻止非法内容；该缺陷未闭环，已再次退回 `DEV / 进行中`。
+> **最新状态（2026-10-25，第二次修复进入 VERIFY）**：提交 `c8b0df35c` 已修复 `String` 对象透传和解析结果非对象边界，并通过本地回归测试、全量测试、相关 ESLint、`build:packages` 和 `git diff --check`。当前尚未完成该 SHA 的 CI 制品、131 部署和浏览器复验。
 
 > **退回 DEV 的缺陷记录**：在提交 `4b363c688f1e784acb68fe32117756f03bb55bd2` 制品上发现非法 YAML 会发起 PUT 并返回 400，但页面没有可见错误反馈。该缺陷已记录并完成 DEV 修复，证据见[非法 YAML 缺陷取证](./evidence/workload-yaml-validation-defect-20261025.json)和[DEV 修复记录](./workload-yaml-validation-dev-20261025.md)。
 
 > **首次修复回归**：提交 `2676f00d054e11f6b8569e6f9b889e1cefbfba88` 的部署制品仍发送非法 YAML 字符串；证据见[首次修复回归](./evidence/workload-yaml-validation-regression-20261025.json)。
+
+> **第二次 DEV 修复**：提交 `c8b0df35c` 对 `String` 对象先转为文本再解析，并要求解析结果为 Kubernetes 对象；新增 String 对象和标量文档回归测试。当前进入 `VERIFY / 进行中`，必须以该 SHA 的部署制品验证非法 YAML 不产生 PUT。
 
 > **上一个 VERIFY 结果**：`release-4.1.5` 对照发现的分区显示差异已完成 DEV 修复。提交 `4b363c688f1e784acb68fe32117756f03bb55bd2` 对应 CI、镜像、131 rollout 和 Pod imageID 已核对；已认证 Playwright 会话完成 Deployment、StatefulSet、DaemonSet 的分区点击验收，每次只显示当前分区。该结果仅作为退回 DEV 前的历史 VERIFY 证据，不能覆盖当前缺陷状态。证据见[分区切换验收](./evidence/workload-settings-tabs-verify-20261025.json)。
 
