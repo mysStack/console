@@ -53,11 +53,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "e8fde6e8c4f505b857dab0a2eba6730d8219481dab500a63b81cf9a66c9234f8"
+        "sha256": "45b76c5c73ff1011232b748a332ae209ee2ade275af0cd6ae863340d6775c4df"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "8bec52198a9fb2b5457936670fd469822a5e0589970db915cfb214685c5eda19"
+        "sha256": "96a3774bbc4db361baf36f5ceb0a8036c4aadfac1b9b30674e11ddc1298ecd36"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -113,7 +113,7 @@
       },
       {
         "path": "docs/v4-migration/workload-rea-review-20261024.md",
-        "sha256": "be25c6e42ac3a74ed6e4b3af3b642f6c2376e4fa1f25297552c1f9c2fd186fc0"
+        "sha256": "9897b39dd60e6d668ff165ddf899202d3a7b769eaca14de06f47e5f054940c87"
       },
       {
         "path": "docs/v4-migration/evidence/workload-v415-baseline-browser-20261024.json",
@@ -157,7 +157,7 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-browser-login-rea-20261024.json",
-        "sha256": "13a0fa1ac2414a4178604f93cfe347307d6f9e8f90b746998d05c2c84f2f5054"
+        "sha256": "9f10ac08324116d7a79f68b704d6f9497d7cb464d4d6e96d5b44bd207c27edbe"
       },
       {
         "path": "docs/v4-migration/evidence/workload-cluster-native-static-tests-20261024.json",

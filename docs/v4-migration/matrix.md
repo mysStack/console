@@ -186,8 +186,8 @@
 ## 当前增量（2026-10-24：131 登录边界核对）
 
 - 只读核对确认 context `default`、API Server `192.168.2.131:6443`、V4 NodePort `30880` 和 `release-4.1.5` 对比 NodePort `30881` 均可达，两个前端 Deployment 均 `1/1 Ready`。
-- 浏览器登录使用 `/home/bruce/.bashrc` 中的 `KS_TEST_USERNAME`、`KS_TEST_PASSWORD`，变量存在；只读比对发现配置用户名与当前 IAM User 列表不匹配（现有用户均为 `Active`），新浏览器上下文登录仍返回 `Incorrect username or password`。
-- 本轮没有进入 Workload 页面，没有写请求，也没有把登录失败归因于前端功能；测试用户名与集群 IAM 用户不匹配，当前制品浏览器 VERIFY 仍未完成。模块继续保持 `REA / 分析中，待复核`。证据见 [`workload-browser-login-rea-20261024.json`](./evidence/workload-browser-login-rea-20261024.json)。
+- 浏览器登录读取 `/home/bruce/.bashrc` 中的 `KS_TEST_USERNAME`、`KS_TEST_PASSWORD`；实际读取后 `KS_TEST_USERNAME` 为空、密码变量已导出，当前 IAM 用户均为 `Active`，新浏览器上下文登录仍返回 `Incorrect username or password`。
+- 本轮没有进入 Workload 页面，没有写请求，也没有把登录失败归因于前端功能；测试用户名为空，当前制品浏览器 VERIFY 仍未完成。模块继续保持 `REA / 分析中，待复核`。证据见 [`workload-browser-login-rea-20261024.json`](./evidence/workload-browser-login-rea-20261024.json)。
 
 ## 当前增量（2026-10-24：集群级原生入口静态测试）
 

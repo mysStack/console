@@ -15,7 +15,9 @@
   "credentialHandling": {
     "source": "/home/bruce/.bashrc",
     "variables": ["KS_TEST_USERNAME", "KS_TEST_PASSWORD"],
-    "present": true,
+    "usernameAssignmentPresent": true,
+    "usernameValuePresentAfterSource": false,
+    "passwordExportedAfterSource": true,
     "valuesRecorded": false
   },
   "iamReadOnlyCheck": {
@@ -23,7 +25,7 @@
     "configuredUserResourceFound": false,
     "configuredUsernameMatchesIamUser": false,
     "iamUserCount": 5,
-    "availableUserStates": "all listed IAM users are Active; no listed user matches the configured username",
+    "availableUserStates": "all listed IAM users are Active; the sourced username is empty, so it cannot match an IAM user",
     "writeOperations": false
   },
   "browserAttempt": {
@@ -35,5 +37,5 @@
     "resourceWrites": false,
     "evidenceAdded": false
   },
-  "conclusion": "环境变量已加载，但配置的测试用户名与当前集群 IAM User 列表不匹配；浏览器认证失败具有外部账号配置阻塞特征，不能归因于前端功能，也不能继续当前制品的浏览器 VERIFY。"
+  "conclusion": "读取 /home/bruce/.bashrc 后，KS_TEST_USERNAME 没有值，KS_TEST_PASSWORD 已导出；浏览器认证失败具有外部账号配置阻塞特征，不能归因于前端功能，也不能继续当前制品的浏览器 VERIFY。"
 }
