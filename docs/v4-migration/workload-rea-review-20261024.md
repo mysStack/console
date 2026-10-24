@@ -272,3 +272,11 @@ rg -n 'editConfigTemplate|editYaml|WorkloadSettingsModal' \
 复核发现旧的 `workload-action-api-rbac-evidence-20261023.md` 表格仍保留早期“StatefulSet/DaemonSet 编辑设置调用 `editYaml`”和“配置引用仍使用 V3/Wujie 桥接”的结论，已按当前源码修正。当前三个项目级详情页均通过原始资源读取打开 `WorkloadSettingsModal`，YAML 为独立 Action；当前 ConfigReference 生产入口的静态测试未发现 `useV3action`、Wujie 或 `consolev3` 调用。
 
 该纠偏不代表运行时等价已经通过：集群级 Workload Embed 仍存在旧 V3/Wujie 入口，三类资源完整字段、Action、API 回写、RBAC、缓存、错误路径和逐项 V3 等价仍未闭环。
+
+## 131 浏览器登录边界复核（2026-10-24）
+
+本轮先用只读方式核对测试环境：Kubernetes context 为 `default`，API Server 为 `192.168.2.131:6443`；当前 V4 `ks-console` 使用 NodePort `30880`，`release-4.1.5` 对比前端 `ks-console-v415-rea` 使用 NodePort `30881`，两个 Deployment 均为 `1/1 Ready`。
+
+浏览器测试账号从 `/home/bruce/.bashrc` 加载 `KS_TEST_USERNAME` 和 `KS_TEST_PASSWORD`，变量均存在；集群只读核对显示对应 IAM User 资源处于 `Active`。在基线 `30881` 的新浏览器登录页提交后仍返回 `Incorrect username or password`，未进入 Workload 页面，也没有执行任何资源写操作。
+
+结构化记录见 [`evidence/workload-browser-login-rea-20261024.json`](./evidence/workload-browser-login-rea-20261024.json)。该结果确认登录阻塞边界，但不能把问题归因于 V4 前端，也不能替代当前制品浏览器验收；模块继续保持 **REA / 分析中，待复核**。

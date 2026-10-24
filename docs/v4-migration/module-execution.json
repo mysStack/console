@@ -53,11 +53,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "7ec8ab537c7fd0de485707613cb273f82ea2812334ae859046b9cbd4ede329cb"
+        "sha256": "221f9cb15aa9f26205e5e7ba20304d3947826fb95f69185b985d901036ac2141"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "94ea2ea08aa317a4e03bb749b3223a1bdf8846ca487e7bd326fa75e3e2fe9ea7"
+        "sha256": "485bdea2ab2353259d194235cb96432cf7c5e5b0513588670e4ad7e164ac7356"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -113,7 +113,7 @@
       },
       {
         "path": "docs/v4-migration/workload-rea-review-20261024.md",
-        "sha256": "08aa003634cd9f9ba1239ca4dda9dd33313b7b455b21d70c6eaf8d10fe5fa492"
+        "sha256": "b60f613c7a4ad21b325e7796102975cf827abbeadff7f8d73c7859ba977faf94"
       },
       {
         "path": "docs/v4-migration/evidence/workload-v415-baseline-browser-20261024.json",
@@ -154,6 +154,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-rea-targeted-tests-20261024.json",
         "sha256": "1133b03369f526004f033dfd012b95555c06a4e3ba66f7e7c535965403664551"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-browser-login-rea-20261024.json",
+        "sha256": "4a7c5c81aea6971ba669a8aefb1a687315219cf6de9675a95288d91c5259c1ba"
       }
     ],
     "coverage": {

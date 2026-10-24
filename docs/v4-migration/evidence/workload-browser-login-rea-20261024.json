@@ -1,0 +1,37 @@
+{
+  "record": "Workload 131 浏览器登录 REA 取证",
+  "date": "2026-10-24",
+  "phase": "REA",
+  "operator": "Codex 单会话",
+  "cluster": {
+    "context": "default",
+    "apiServer": "https://192.168.2.131:6443",
+    "target": "192.168.2.131",
+    "consoleServices": [
+      { "name": "ks-console", "namespace": "kubesphere-system", "port": 30880 },
+      { "name": "ks-console-v415-rea", "namespace": "kubesphere-system", "port": 30881 }
+    ]
+  },
+  "credentialHandling": {
+    "source": "/home/bruce/.bashrc",
+    "variables": ["KS_TEST_USERNAME", "KS_TEST_PASSWORD"],
+    "present": true,
+    "valuesRecorded": false
+  },
+  "iamReadOnlyCheck": {
+    "resourceType": "users.iam.kubesphere.io",
+    "configuredUserResourceFound": true,
+    "configuredUserResourceState": "Active",
+    "writeOperations": false
+  },
+  "browserAttempt": {
+    "origin": "http://192.168.2.131:30881",
+    "route": "/consolev3/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/env",
+    "freshLoginPage": true,
+    "authenticatedUI": false,
+    "pageResult": "Incorrect username or password",
+    "resourceWrites": false,
+    "evidenceAdded": false
+  },
+  "conclusion": "环境变量已加载，集群中的用户资源处于 Active；浏览器认证仍失败，当前无法把失败归因到前端功能，也不能继续当前制品的浏览器 VERIFY。"
+}

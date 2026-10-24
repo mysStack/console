@@ -289,3 +289,9 @@
 - 复核并修正旧 Action/API/RBAC 文档中的过时结论：当前 Deployment、StatefulSet、DaemonSet 项目详情均通过原始资源读取打开原生 `WorkloadSettingsModal`，YAML 是独立 Action。
 - 当前 ConfigReference 生产入口静态测试未发现 `useV3action`、Wujie 或 `consolev3` 调用；集群级 Workload Embed 仍有旧 V3/Wujie 依赖，不能合并判断。
 - 本次只修正 REA 记录，没有修改业务代码；三类资源的运行时字段、API 写回、RBAC、缓存、错误和逐项 V3 等价仍未验证，模块保持 `REA / 分析中，待复核`。
+
+## 2026-10-24 131 浏览器登录边界核对
+
+- 只读确认 `default` context、131 API Server、V4 `30880`、V3 对比前端 `30881` 和两个前端 Deployment 的 `1/1 Ready` 状态。
+- 浏览器登录确实从 `/home/bruce/.bashrc` 加载 `KS_TEST_USERNAME`、`KS_TEST_PASSWORD`；两个环境变量均存在。IAM User 资源只读状态为 `Active`，但提交登录后页面仍返回 `Incorrect username or password`。
+- 本轮没有修改集群用户、密码、角色或任何测试资源，也没有进入 Workload 页面；该登录问题继续作为当前浏览器验收阻塞边界记录。证据见 [`evidence/workload-browser-login-rea-20261024.json`](./evidence/workload-browser-login-rea-20261024.json)。模块仍为 `REA / 分析中，待复核`。
