@@ -4,7 +4,7 @@
   "capability": "deployment-statefulset-daemonset",
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
-  "phase": "DEV",
+  "phase": "VERIFY",
   "rea": {
     "status": "已通过",
     "sourceCommit": "e67b95ccdfd0b0b98d3e83de393fbfbcd4e172a0",
@@ -510,8 +510,8 @@
   ],
   "verify": {
     "status": "未完成",
-    "reason": "源码提交 31b6d88fc7e8 的当前制品已完成 131 rollout、Pod Ready 和 digest/imageID 核对；已有认证态下三类编辑设置入口均打开原生 WorkloadSettingsModal，终止宽限期 30→31→30 保存与 API 回读通过。零 Cookie 新 context 登录仍返回账号或密码错误，完整字段等价、RBAC、namespace、缓存、错误矩阵和逐项 V3 等价仍未完成。",
-    "sourceCommit": "31b6d88fc7e87707776c094aee12f1cdcb02604b",
+    "reason": "最新源码构建已完成并通过 CI，待将 feature-v4-workloads-20261024-102558-baf43d95d1cc 部署到 131。旧制品的 rollout、认证态编辑设置和终止宽限期 API 回读证据不能继承为新制品通过；新制品仍需完成 rollout、Pod imageID/digest、浏览器页面渲染、三类资源操作、RBAC、namespace、缓存、错误路径和逐项 V3 等价验证。",
+    "sourceCommit": "baf43d95d1cc80ae6d95b283a5c796d47b9a02ae",
     "documents": [
       {
         "path": "docs/v4-migration/workload-131-verify-20261024.md",
@@ -576,6 +576,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-native-settings-current-head-20261024.json",
         "sha256": "5fca4cc99588b8c0aa6a194628b9f2f2898794c3acfeb9109a34af5ace9abceb"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-grace-period-build-20261024.json",
+        "sha256": "751862ab32a936a8c16aebe2e37702f30bd6cb0157ac66f330c3c95070301f44"
       }
     ]
   }
