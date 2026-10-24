@@ -18,7 +18,7 @@
 
 > **2026-10-24 制品边界校准**：当前 HEAD `ae500da86a55` 的新制品已由 CI 构建并推送，但 131 拉取新 Pod 长时间处于 `ContainerCreating`，随后回滚；因此当前 HEAD 没有部署后浏览器通过证据。回滚前在旧精确制品上确认 StatefulSet、DaemonSet 的“编辑设置”均打开原生设置弹窗，历史文档中“仍打开 YAML”的描述属于旧 REA 快照，已由[原生设置证据](./evidence/workload-native-settings-old-artifact-20261024.json)校准。该校准不改变 `VERIFY / 未完成`，也不关闭当前 HEAD 的部署、浏览器、完整字段和等价性缺口。
 
-> **2026-10-24 当前 HEAD 设置复验**：当前 HEAD `31b6d88fc7e8` 已完成精确部署和 Pod imageID 核对；在已有认证态中三类详情的“编辑设置”均打开原生设置弹窗，未跳转 YAML。该结果只关闭入口形态缺口，当前制品新登录、保存持久化、完整字段、RBAC、缓存、错误和逐项 V3 等价仍未闭环。详见[当前 HEAD 原生设置复验](./evidence/workload-native-settings-current-head-20261024.json)。
+> **2026-10-24 当前 HEAD 设置复验**：当前 HEAD `31b6d88fc7e8` 已完成精确部署和 Pod imageID 核对；在已有认证态中三类详情的“编辑设置”均打开原生设置弹窗，未跳转 YAML，并完成终止宽限期 `30 → 31 → 30` 的保存与 API 回读。该结果只关闭入口形态和一个字段保存场景，当前制品新登录、完整字段、RBAC、缓存、错误和逐项 V3 等价仍未闭环。详见[当前 HEAD 原生设置复验](./evidence/workload-native-settings-current-head-20261024.json)。
 
 > **2026-10-24 Workload 当前 VERIFY 结果**：精确制品 `24c6afa03849d5d5c7b84fccd1602639b1fd0eb5` 已完成三类原生路由、配置引用、低权限拒绝、第二 namespace 正反隔离、Action 菜单/取消、重新创建和 DaemonSet 批量停止的浏览器复验。批量删除、伸缩确认结果、完整错误矩阵和逐项 V3 等价仍未闭环；Deployment 回退确认写入已完成独立复验，状态保持 `VERIFY / 未完成`，不得进入 PR 合并或标记模块已验收。详见 [131 VERIFY](./workload-131-verify-20261024.md)、[配置引用证据](./evidence/workload-config-reference-browser-verify-20261024.json)、[Action 证据](./evidence/workload-action-browser-verify-20261024.json)。
 

@@ -46,5 +46,13 @@
       "result": "当前 HEAD 制品打开原生设置弹窗"
     }
   },
-  "boundary": "本轮只验证当前制品部署身份和三个详情页的设置入口/分区渲染；未执行新浏览器登录、保存持久化、完整字段等价、RBAC、缓存或错误矩阵。页面 Console error 数量不为零，需单独归因。"
+  "persistence": {
+    "field": "spec.template.spec.terminationGracePeriodSeconds",
+    "scenario": "三个资源均通过当前制品页面执行 30 -> 31 保存，再执行 31 -> 30 恢复",
+    "deployment": { "saveReadback": 31, "restoreReadback": 30 },
+    "statefulSet": { "saveReadback": 31, "restoreReadback": 30 },
+    "daemonSet": { "saveReadback": 31, "restoreReadback": 30 },
+    "result": "三类资源页面保存成功，Kubernetes API 回读恢复为 30"
+  },
+  "boundary": "本轮验证当前制品部署身份、三个详情页的设置入口/分区渲染和终止宽限期保存回读；未执行新浏览器登录、完整字段等价、RBAC、缓存或错误矩阵。页面 Console error 数量不为零，需单独归因。"
 }

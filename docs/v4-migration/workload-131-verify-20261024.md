@@ -42,7 +42,7 @@
 
 当前 HEAD `31b6d88fc7e87707776c094aee12f1cdcb02604b` 的 CI Run `40048500939`、镜像 tag `feature-v4-workloads-20261024-091102-31b6d88fc7e8`、digest `sha256:2956710cd7ef2fbda79ff7a0a9695dac466336bd08248784d5afdfb577b951d3` 和 131 Pod imageID 一致，rollout/Ready 通过。使用已有认证态在当前制品验证三类详情的“更多操作 → 编辑设置”：三个入口均打开原生 `WorkloadSettingsModal`，StatefulSet 显示 PVC 模板与容器组调度规则，DaemonSet 不显示不适用的副本数和调度规则；“编辑 YAML”是独立菜单项，没有把编辑设置跳转到 YAML。
 
-本轮页面 Console error 数为 Deployment 8、StatefulSet 10、DaemonSet 8；新浏览器登录、保存请求和回读、完整字段等价、RBAC、缓存及错误矩阵尚未执行，因此只能关闭“入口仍跳转 YAML”这一项，不能标记三类 Workload 或编辑设置功能验收通过。结构化证据见[当前 HEAD 原生设置复验](./evidence/workload-native-settings-current-head-20261024.json)。
+本轮又在三个资源上执行终止宽限期 `30 → 31 → 30`，保存请求成功并由 Kubernetes API 回读为 `30`。页面 Console error 数为 Deployment 8、StatefulSet 10、DaemonSet 8；新浏览器登录、完整字段等价、RBAC、缓存及错误矩阵尚未执行，因此只能关闭“入口仍跳转 YAML”和一个字段保存场景，不能标记三类 Workload 或编辑设置功能验收通过。结构化证据见[当前 HEAD 原生设置复验](./evidence/workload-native-settings-current-head-20261024.json)。
 
 ## 当前 HEAD 制品部署未完成（2026-10-24）
 
