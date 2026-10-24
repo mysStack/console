@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-25",
+  "module": "workloads",
+  "phase": "DEV",
+  "sourceCommit": "8ae475a52",
+  "sourceCommitNote": "提交后补全为完整 SHA",
+  "scope": ["Deployment", "StatefulSet", "DaemonSet"],
+  "fix": {
+    "sourcePath": "packages/shared/src/hooks/useCommonActions/index.tsx",
+    "strictParser": "yaml.loadStrict(data)",
+    "errorHandling": "解析或 API 异常时显示保存失败提示并保持编辑弹窗打开",
+    "regressionTest": "packages/shared/src/hooks/useCommonActions/editYamlValidation.test.ts"
+  },
+  "verification": {
+    "targetedTests": {
+      "command": "./node_modules/.bin/esno packages/shared/src/hooks/useCommonActions/editYamlValidation.test.ts",
+      "result": "1 passed"
+    },
+    "yamlTests": {
+      "command": "./node_modules/.bin/esno packages/shared/src/utils/yaml.test.ts",
+      "result": "4 passed"
+    },
+    "fullTests": {
+      "command": "./scripts/test.sh",
+      "result": "93 files passed, 412 tests passed"
+    },
+    "eslint": {
+      "command": "./node_modules/.bin/eslint packages/shared/src/hooks/useCommonActions/index.tsx packages/shared/src/hooks/useCommonActions/editYamlValidation.test.ts packages/shared/src/utils/yaml.ts packages/shared/src/utils/yaml.test.ts",
+      "result": "0 errors, 1 pre-existing max-len warning"
+    },
+    "build": {
+      "command": "corepack yarn build:packages",
+      "result": "passed; existing circular dependency and Node warnings only"
+    },
+    "diffCheck": {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  },
+  "next": "以当前 sourceCommit 重新执行 CI、131 rollout、Pod imageID 核对和 Playwright 非法 YAML 验证；VERIFY 未完成前不得关闭模块门禁。"
+}

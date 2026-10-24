@@ -1,6 +1,6 @@
 # 当前 Workload 执行路线（2026-10-25）
 
-> **最新状态（2026-10-25，第二次修复再次退回 DEV）**：提交 `c8b0df35c` 的制品已经完成 CI、131 rollout 和浏览器验证，但详情页通用 `useCommonActions` 仍调用 `yaml.load`，非法 YAML 继续发起 PUT 400；已再次退回 `DEV / 进行中`。
+> **最新状态（2026-10-25，详情页修复进入 VERIFY）**：提交 `8ae475a52` 已修复详情页通用 `useCommonActions` 的严格 YAML 解析和错误处理，本地测试与构建通过；待该提交重新完成 CI、131 rollout 和浏览器验收。
 
 > **退回 DEV 的缺陷记录**：在提交 `4b363c688f1e784acb68fe32117756f03bb55bd2` 制品上发现非法 YAML 会发起 PUT 并返回 400，但页面没有可见错误反馈。该缺陷已记录并完成 DEV 修复，证据见[非法 YAML 缺陷取证](./evidence/workload-yaml-validation-defect-20261025.json)和[DEV 修复记录](./workload-yaml-validation-dev-20261025.md)。
 
@@ -8,7 +8,7 @@
 
 > **第二次 DEV 修复**：提交 `c8b0df35c` 对 `String` 对象先转为文本再解析，并要求解析结果为 Kubernetes 对象；新增 String 对象和标量文档回归测试。部署后确认详情页通用路径仍有缺陷，当前已退回 `DEV / 进行中`，待修复后重新验证非法 YAML 不产生 PUT。
 
-> **第二次修复回归**：当前部署制品的运行时调用链命中 `packages/shared/src/hooks/useCommonActions/index.tsx` 的 `yaml.load(data)`，未进入 `loadStrict`；详情页仍发送非法 YAML PUT 400。证据见[通用详情页回归](./evidence/workload-yaml-validation-common-action-regression-20261025.json)。
+> **详情页修复**：已将 `packages/shared/src/hooks/useCommonActions/index.tsx` 改为严格解析，并捕获解析/API 异常显示保存失败提示；详情页部署后验证仍待当前提交完成。此前的回归证据保留在[通用详情页回归](./evidence/workload-yaml-validation-common-action-regression-20261025.json)。
 
 > **上一个 VERIFY 结果**：`release-4.1.5` 对照发现的分区显示差异已完成 DEV 修复。提交 `4b363c688f1e784acb68fe32117756f03bb55bd2` 对应 CI、镜像、131 rollout 和 Pod imageID 已核对；已认证 Playwright 会话完成 Deployment、StatefulSet、DaemonSet 的分区点击验收，每次只显示当前分区。该结果仅作为退回 DEV 前的历史 VERIFY 证据，不能覆盖当前缺陷状态。证据见[分区切换验收](./evidence/workload-settings-tabs-verify-20261025.json)。
 

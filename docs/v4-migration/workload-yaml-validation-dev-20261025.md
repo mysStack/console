@@ -67,6 +67,23 @@ git diff --check                                                                
 
 证据见 [`workload-yaml-validation-common-action-regression-20261025.json`](./evidence/workload-yaml-validation-common-action-regression-20261025.json)。该结果证明第二次修复仍未覆盖完整的 Workload YAML 编辑入口。
 
-## 9. 阶段处理
+## 9. 详情页通用路径修复
 
-第二次修复未闭环，已按模块门禁再次退回 `DEV / 进行中`。下一次修复必须将通用详情页改为严格解析，并在解析失败或 API 失败时显示保存失败提示、保持弹窗打开且不发起非法 PUT。完成后重新执行测试、构建、CI、131 rollout、Pod 镜像身份核对和部署后 Playwright 验收。
+提交 `8ae475a52` 将通用详情页的 `yaml.load(data)` 改为 `yaml.loadStrict(data)`，并在解析或 API 异常时显示保存失败提示、保持编辑弹窗打开。该处理覆盖 Deployment、StatefulSet、DaemonSet 详情页共用的 YAML 编辑入口。
+
+本地验证结果：
+
+```text
+./node_modules/.bin/esno packages/shared/src/hooks/useCommonActions/editYamlValidation.test.ts  1 passed
+./node_modules/.bin/esno packages/shared/src/utils/yaml.test.ts                               4 passed
+./scripts/test.sh                                                                            93 files / 412 tests passed
+相关 ESLint                                                                                    0 errors, 1 pre-existing max-len warning
+corepack yarn build:packages                                                                  通过
+git diff --check                                                                              通过
+```
+
+结构化证据见 [`workload-yaml-validation-common-action-dev-20261025.json`](./evidence/workload-yaml-validation-common-action-dev-20261025.json)。
+
+## 10. 阶段处理
+
+详情页修复已完成 DEV，当前进入 `VERIFY / 进行中`。必须以提交 `8ae475a52` 重新执行 CI 构建、镜像推送、131 rollout、Pod 镜像身份核对和部署后 Playwright 验收。非法 YAML 的通过条件是：解析失败在请求前被阻止、不产生非法 PUT、弹窗保持打开并显示保存失败提示。
