@@ -136,3 +136,9 @@
 - 在同一 StatefulSet `v4-pvc-sts-7fa` 上，基线 `30881` 和当前 V4 `30880` 均可打开“编辑设置”。基线按分区切换单一内容，当前 V4 使用连续可滚动原生表单；两边的分区命名和首屏字段范围存在差异。
 - 该差异已记录为 REA 的功能与样式审查项：必须继续逐项确认字段、默认值、校验、清空/保留和保存回读，再决定是否需要 DEV 调整布局或交互。详情见 [`编辑设置 Modal 对照`](./evidence/workload-settings-modal-browser-20261024.json)。
 - 本轮没有写操作，不能标记编辑设置等价通过；模块仍为 `REA / 分析中，待复核`。
+
+## 当前增量（2026-10-24：Deployment 编辑设置 Modal 对照）
+
+- `Deployment/v4-deploy-edit-ef3` 在基线 `30881` 和当前 V4 `30880` 均可打开编辑设置。基线按分区切换，V4 使用连续可滚动原生表单；两边均有更新策略 `25%/25%`，但首屏字段范围和分区命名不同。
+- 当前 V4 页面展示了完整的 `kubectl.kubernetes.io/last-applied-configuration` 注解文本，该展示规则需要负责人确认后纳入验收标准；当前不直接判定为缺陷。
+- 证据见 [`Deployment 编辑设置浏览器对照`](./evidence/workload-deployment-settings-browser-20261024.json)。本轮没有写操作，保存回读、错误路径、缓存和 RBAC 仍未完成。模块继续保持 `REA / 分析中，待复核`。

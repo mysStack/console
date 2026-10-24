@@ -191,3 +191,15 @@ rg -n 'editConfigTemplate|editYaml|WorkloadSettingsModal' \
 - 本轮未点击确定，未修改测试资源，没有取得写请求或保存回读证据；Deployment、DaemonSet 及低权限场景的 Modal 字段差异仍未关闭。
 
 因此 REA 仍为 **分析中，待负责人复核**。后续如果负责人要求保持 V3 的布局和交互，需要在 DEV 阶段依据本证据明确验收标准后再调整；当前不直接修改业务代码。
+
+## Deployment 编辑设置 Modal 运行时对照（2026-10-24）
+
+本轮继续对照 `Deployment/v4-deploy-edit-ef3` 的基线 `30881` 与当前 V4 `30880` 编辑设置页面，结构化证据见 [`evidence/workload-deployment-settings-browser-20261024.json`](./evidence/workload-deployment-settings-browser-20261024.json)。
+
+- 两边详情页均返回 HTTP 200，均可通过“更多操作 → 编辑设置”打开编辑 Modal。
+- 基线初始分区显示滚动更新和 `25%/25%` 更新参数，使用分区切换式布局；当前 V4 首屏显示副本数量、更新策略、`25%/25%`、容器组设置、存储、调度、终止宽限时间和元数据，使用连续可滚动原生表单。
+- 两边均覆盖 Deployment 更新策略、容器、存储、调度和优雅终止的功能边界，但分区命名和首屏可见范围不同。
+- 当前 V4 还直接展示了 `kubectl.kubernetes.io/last-applied-configuration` 的完整 JSON 注解文本。本轮没有判定这一定是缺陷，但需要在 REA/DEV 验收标准中明确元数据展示规则，避免把不应展示的敏感内容带入页面。
+- 本轮没有点击确定，没有执行写操作，没有验证保存回读、取消回读、409/403/404、网络失败或缓存失效。
+
+该结果补齐了 Deployment 设置页面的真实样式、字段和元数据展示证据，但不能替代功能等价验收。REA 仍为 **分析中，待负责人复核**。

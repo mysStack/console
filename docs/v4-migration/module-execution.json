@@ -130,6 +130,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-settings-modal-browser-20261024.json",
         "sha256": "9cc2944bd2b6adb9a693832ca8f752e28bad21a0d99dbb9bedd8509711cfe7cd"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-deployment-settings-browser-20261024.json",
+        "sha256": "3434851fe97e08b8cbf2a105b5312fcfd5ab562919fb0796829675df7840bc4a"
       }
     ],
     "coverage": {
@@ -641,6 +645,6 @@
       "license": "AGPL-3.0",
       "scope": "只用于旧 V3 结构、字段和样式参考，不证明当前制品来源"
     },
-    "next": "完成新增 StatefulSet/DaemonSet 详情页证据后，由负责人复核当前 REA 材料；复核通过并明确将 phase 改为 DEV 后，才能进入业务编码。"
+    "next": "完成 Deployment、StatefulSet、DaemonSet 的设置页面 REA 对照后，由负责人复核当前材料；复核通过并明确将 phase 改为 DEV 后，才能进入业务编码。"
   }
 }

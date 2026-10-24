@@ -234,3 +234,9 @@
 - 在 `v4-pvc-sts-7fa` 上完成基线 `30881` 与 V4 `30880` 的真实浏览器 Modal 对照。两边都能打开“编辑设置”，但基线是分区切换式 Modal，V4 是连续可滚动原生表单；导航命名、首屏字段范围和可见分区不同。
 - 该结果说明当前 V4 采用功能边界重构，不能把布局差异直接写成“样式已等价”，也不能把打开 Modal 写成编辑行为已通过。字段默认值、校验、清空/保留、保存回读、Deployment/DaemonSet 差异仍需复核。
 - 证据见 [`编辑设置 Modal 对照`](./evidence/workload-settings-modal-browser-20261024.json)，截图仅保留本地 `.playwright-cli/`。当前阶段保持 `REA / 分析中，待复核`，本轮未修改业务代码。
+
+# 当前状态补充（2026-10-24：Deployment 编辑设置浏览器 REA 对照）
+
+- 在 `Deployment/v4-deploy-edit-ef3` 上完成基线 `30881` 与 V4 `30880` 编辑设置 Modal 对照。两边均能打开编辑设置，均有滚动更新和 `25%/25%` 更新参数；基线按分区切换，V4 使用连续可滚动原生表单。
+- 当前 V4 首屏还展示副本数量、终止宽限时间、标签和注解；其中 `kubectl.kubernetes.io/last-applied-configuration` 完整 JSON 会显示在表单中。本轮仅登记为需要确认的元数据展示风险，没有擅自修改。
+- 证据见 [`Deployment 编辑设置浏览器对照`](./evidence/workload-deployment-settings-browser-20261024.json)，截图只保留本地 `.playwright-cli/`。未执行写操作，模块仍为 `REA / 分析中，待复核`。
