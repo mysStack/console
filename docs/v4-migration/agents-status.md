@@ -6,6 +6,13 @@
 - 开发路线：先完成三类资源组合 REA 复核，再进入 DEV；之后按构建、部署、Playwright、RBAC 和 V3 等价结果进入 VERIFY。
 - 下方历史状态不能覆盖上述当前状态。
 
+# 当前状态补充（2026-10-24：重新绑定输入后的 REA 复核）
+
+- 当前 HEAD：`9456fd8ebcf4adaa70da729266c6c786f7a52227`；本次提交只包含 REA 记录和矩阵校正，已推送到 `origin/feature/v4-workloads`。
+- 新增[Workload 组合批次 REA 复核记录](./workload-rea-review-20261024.md)：纠正了当前源码事实，确认 Deployment、StatefulSet、DaemonSet 三个详情页均打开原生 `WorkloadSettingsModal`，YAML 为独立 Action；同时重新登记资源差异和未验证项。
+- 当前门禁仍为 `REA / 分析中，待复核`。历史 DEV、VERIFY、镜像和浏览器结果不继承为当前阶段通过；本轮没有修改业务代码、构建、部署或执行模块验收。
+- 当前待复核项：当前 SHA 的完整字段保存、配置引用、DaemonSet 停止语义、RBAC 正反权限、namespace 缓存隔离、错误/取消路径、集群级 V3/Wujie 边界和三类逐项 V3 等价性。
+
 # 当前状态补充（2026-10-24：当前 HEAD 设置入口部署后复验）
 
 - 当前制品源码提交 `31b6d88fc7e87707776c094aee12f1cdcb02604b`（之后仅有记录提交）的 CI Run `40048500939`、镜像 `feature-v4-workloads-20261024-091102-31b6d88fc7e8`、digest `sha256:2956710cd7ef2fbda79ff7a0a9695dac466336bd08248784d5afdfb577b951d3` 与 131 Pod imageID 一致，rollout/Ready 通过。

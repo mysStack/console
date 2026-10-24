@@ -56,7 +56,7 @@
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "872ea5a0b024c28d8c57e6c71205efcd246c5a540b690570eaa666d205005192"
+        "sha256": "3c4b89de5122f666bc71da490de418db498ccf04bded9594e673149ff9248366"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -112,7 +112,7 @@
       },
       {
         "path": "docs/v4-migration/workload-rea-review-20261024.md",
-        "sha256": "4bbb282d822bae8774fb64866784593a596335d4f9f283a5fc009bb218cd826d"
+        "sha256": "8ec302ef9d93fcb05b10df599a673fb4cf212f78369f28f1e78a2b2dd0cb9e26"
       }
     ],
     "coverage": {
