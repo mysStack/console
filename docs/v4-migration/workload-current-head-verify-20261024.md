@@ -20,6 +20,12 @@
 
 本轮关闭了 Deployment YAML 的一次字段添加、回读和字段清除样本；StatefulSet/DaemonSet YAML、非法 YAML、冲突、权限和网络失败路径仍未闭环，模块继续保持 `VERIFY / 进行中`。
 
+## 2026-10-25 StatefulSet/DaemonSet YAML 保存、回读与清理 VERIFY
+
+在当前制品上分别对 `v4-watch-sts-20261022-01` 和 `v4-stop-ds-7fa` 打开原生 YAML 编辑器，写入各自唯一测试 annotation，保存后通过 Kubernetes API 回读；重新打开编辑器确认页面可见，再通过浏览器清除并保存。清理后 StatefulSet 保持 `replicas=1/readyReplicas=1`，DaemonSet 保持 `desiredNumberScheduled=1/numberReady=1`。结构化证据见 [`workload-yaml-resource-kinds-verify-20261025.json`](./evidence/workload-yaml-resource-kinds-verify-20261025.json)。
+
+本轮关闭了三类 Workload 的 YAML 字段写入、回读和清除成功样本；YAML 非法、冲突、权限拒绝、网络失败和完整 V3 等价仍未闭环，模块继续保持 `VERIFY / 进行中`。
+
 ## 2026-10-25 当前 SHA 分区切换 VERIFY
 
 | 项目        | 结果                                                                                                  |
