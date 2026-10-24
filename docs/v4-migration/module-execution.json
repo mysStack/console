@@ -691,7 +691,11 @@
       },
       {
         "path": "docs/v4-migration/workload-current-head-verify-20261024.md",
-        "sha256": "1fec188cf92c1cf8bc0c1830378e2ed90b742226239c1c0cbf669e23d7788abd"
+        "sha256": "4e812a9a0035628b7eeeb34d154244097f404b0418725919c09eb22f4a139dfc"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-statefulset-service-verify-20261025.json",
+        "sha256": "797cc76d675db91492448adc4bd3227e4717f168b10ca92079653dd73f78288b"
       }
     ],
     "ciRun": "40100881163",
