@@ -5,7 +5,7 @@
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-  "phase": "VERIFY",
+  "phase": "DEV",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -121,7 +121,7 @@
       },
       {
         "path": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-        "sha256": "4c63d4b20aebbd76319ebf36a950e1eeed529e8c43beb82c3d84becb21e18e22"
+        "sha256": "968607d6617cc0e87412fe0a21d5f1d8ded706038b10faf57aabb3291b194c3d"
       },
       {
         "path": "docs/v4-migration/evidence/workload-kind-detail-browser-20261024.json",
@@ -324,8 +324,8 @@
     "coverageNotes": "已核对表示当前版本主基线和证据入口已覆盖该维度，不表示运行时验证或功能等价已经通过；运行时缺口转入 DEV/VERIFY 验收清单。"
   },
   "dev": {
-    "status": "已完成",
-    "reason": "当前分支的 Workload 原生实现已完成本地单元/组件测试、全量测试和 packages 构建；CI 已按 feature-v4-workloads-上海时间-commit 短 SHA 生成并发布镜像，进入当前制品的 131 部署与浏览器 VERIFY。",
+    "status": "进行中",
+    "reason": "已有 Workload 原生实现完成过本地测试、构建和一次 131 部署；本轮基于 release-4.1.5 页面复核发现编辑设置弹窗的宽度、布局和分区交互仍有差异，先回到 DEV 补齐布局回归测试并修复，再重新构建和 VERIFY。",
     "sourceCommit": "7e27d506c6fb387e758f9288375416b2ed1cd499",
     "documents": [
       {
@@ -613,8 +613,8 @@
     "WL-04：移除普通 Workload 配置引用的 useV3action、Wujie Shadow DOM 和 V3 编辑器桥接"
   ],
   "verify": {
-    "status": "进行中",
-    "reason": "当前制品已完成构建、推送、131 rollout、Pod imageID/digest 核对及部分 Playwright 复验；新 Cookie 登录、完整 Action、低权限正反、缓存、错误路径和逐项等价仍未闭环，保持 VERIFY 进行中。",
+    "status": "待重测",
+    "reason": "上一轮制品已完成构建、推送、131 rollout、Pod imageID/digest 核对及部分 Playwright 复验；本轮基线复核发现编辑设置弹窗的布局和分区交互差异，修复后必须以新的代码 SHA 重新构建、部署并执行 Playwright。低权限正反、缓存、错误路径和逐项等价仍未闭环。",
     "sourceCommit": "54b863b2ccd611bab088d39bcbebc8b4e9f68500",
     "documents": [
       {
@@ -691,7 +691,7 @@
       },
       {
         "path": "docs/v4-migration/workload-current-head-verify-20261024.md",
-        "sha256": "83898c243fc81901fb0fa8770f62d56b7049cff3c69643d7913913ebd0e294be"
+        "sha256": "bcbd378ad24487b96d2e5ad05d3282390238cb62b7ed867416c632975f0a3536"
       },
       {
         "path": "docs/v4-migration/evidence/workload-daemonset-stop-recovery-verify-20261025.json",
@@ -720,6 +720,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-release415-source-runtime-rea-20261025.json",
         "sha256": "e76c27f4aa28cb70ff1b68434009260568214fad92b6d44b0712c2aee240b3d6"
+      },
+      {
+        "path": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
+        "sha256": "968607d6617cc0e87412fe0a21d5f1d8ded706038b10faf57aabb3291b194c3d"
       }
     ],
     "ciRun": "40100881163",

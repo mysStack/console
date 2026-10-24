@@ -78,6 +78,6 @@
 
 ## 4. 阶段结论
 
-当前制品已完成构建、推送、部署、rollout、Pod digest 核对和部分浏览器页面复验，Workload 保持 `VERIFY / 进行中`。本记录不批准模块进入 PR，不标记 Deployment、StatefulSet 或 DaemonSet 已验收。
+当前制品已完成构建、推送、部署、rollout、Pod digest 核对和部分浏览器页面复验。由于本轮基线对照确认编辑设置弹窗存在布局和分区交互差异，模块阶段已回到 `DEV / 进行中`；修复后的新 SHA 必须重新完成构建、部署和浏览器 VERIFY。本记录不批准模块进入 PR，不标记 Deployment、StatefulSet 或 DaemonSet 已验收。
 
 结构化证据：[workload-current-head-verify-20261024.json](./evidence/workload-current-head-verify-20261024.json)。
