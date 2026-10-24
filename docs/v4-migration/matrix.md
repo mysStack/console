@@ -142,3 +142,8 @@
 - `Deployment/v4-deploy-edit-ef3` 在基线 `30881` 和当前 V4 `30880` 均可打开编辑设置。基线按分区切换，V4 使用连续可滚动原生表单；两边均有更新策略 `25%/25%`，但首屏字段范围和分区命名不同。
 - 当前 V4 页面展示了完整的 `kubectl.kubernetes.io/last-applied-configuration` 注解文本，该展示规则需要负责人确认后纳入验收标准；当前不直接判定为缺陷。
 - 证据见 [`Deployment 编辑设置浏览器对照`](./evidence/workload-deployment-settings-browser-20261024.json)。本轮没有写操作，保存回读、错误路径、缓存和 RBAC 仍未完成。模块继续保持 `REA / 分析中，待复核`。
+
+## 当前增量（2026-10-24：Workload 静态 REA 测试）
+
+- 当前源码相关的 6 个 Workload 测试文件共 85 项全部通过，覆盖资源类型字段分支、更新策略、PVC 模板、元数据、调度、安全上下文、镜像凭据、环境引用和原生详情入口。
+- 该结果只证明当前源码静态逻辑通过，不能替代 131 部署制品上的浏览器、API 写回、RBAC、缓存和完整 V3 等价验证。证据见 [`Workload 静态 REA 测试`](./evidence/workload-static-rea-tests-20261024.json)。模块仍为 `REA / 分析中，待复核`。

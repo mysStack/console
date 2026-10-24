@@ -203,3 +203,18 @@ rg -n 'editConfigTemplate|editYaml|WorkloadSettingsModal' \
 - 本轮没有点击确定，没有执行写操作，没有验证保存回读、取消回读、409/403/404、网络失败或缓存失效。
 
 该结果补齐了 Deployment 设置页面的真实样式、字段和元数据展示证据，但不能替代功能等价验收。REA 仍为 **分析中，待负责人复核**。
+
+## Workload 静态 REA 测试取证（2026-10-24）
+
+针对当前源码执行了 6 个与 Workload 相关的静态测试文件，共 85 项测试全部通过：
+
+- `WorkloadCreateModal/index.test.ts`：5/5；
+- `WorkloadCreateModal/deployment.test.ts`：73/73；
+- `WorkloadUpdateStrategyInput.test.ts`：3/3；
+- Deployment 详情 `native.test.ts`：2/2；
+- StatefulSet 详情 `native.test.ts`：1/1；
+- DaemonSet 详情 `native.test.ts`：1/1。
+
+完整命令和结果见 [`evidence/workload-static-rea-tests-20261024.json`](./evidence/workload-static-rea-tests-20261024.json)。这些测试覆盖了当前源码中的资源类型分支、更新策略、PVC 模板、元数据、调度、安全上下文、镜像凭据、环境引用和原生详情入口。它们不能证明 131 已部署制品与当前 workspace HEAD 相同，也不能替代浏览器写回、RBAC、缓存、错误路径和完整 V3 等价验证。
+
+本轮结果补强了 REA 的静态证据，但不改变 `REA / 分析中，待负责人复核` 状态。

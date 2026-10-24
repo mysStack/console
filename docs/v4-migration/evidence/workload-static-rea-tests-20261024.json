@@ -1,0 +1,71 @@
+{
+  "record": "Workload REA 静态测试取证",
+  "date": "2026-10-24",
+  "workspaceHead": "0b2a7b3f188d985281361f8d9cb49dfffb42d559",
+  "phase": "REA",
+  "operator": "Codex 单会话",
+  "commands": [
+    "./node_modules/.bin/esno packages/console/src/pages/projects/components/WorkloadCreateModal/index.test.ts",
+    "./node_modules/.bin/esno packages/console/src/pages/projects/components/WorkloadCreateModal/deployment.test.ts",
+    "./node_modules/.bin/esno packages/console/src/pages/projects/components/WorkloadCreateModal/WorkloadUpdateStrategyInput.test.ts",
+    "./node_modules/.bin/esno packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/Deployments/Detail/native.test.ts",
+    "./node_modules/.bin/esno packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/StatefulSets/Detail/native.test.ts",
+    "./node_modules/.bin/esno packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/DaemonSets/Detail/native.test.ts"
+  ],
+  "results": [
+    {
+      "file": "packages/console/src/pages/projects/components/WorkloadCreateModal/index.test.ts",
+      "files": 1,
+      "tests": 5,
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "file": "packages/console/src/pages/projects/components/WorkloadCreateModal/deployment.test.ts",
+      "files": 1,
+      "tests": 73,
+      "passed": 73,
+      "failed": 0
+    },
+    {
+      "file": "packages/console/src/pages/projects/components/WorkloadCreateModal/WorkloadUpdateStrategyInput.test.ts",
+      "files": 1,
+      "tests": 3,
+      "passed": 3,
+      "failed": 0
+    },
+    {
+      "file": "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/Deployments/Detail/native.test.ts",
+      "files": 1,
+      "tests": 2,
+      "passed": 2,
+      "failed": 0
+    },
+    {
+      "file": "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/StatefulSets/Detail/native.test.ts",
+      "files": 1,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0
+    },
+    {
+      "file": "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/DaemonSets/Detail/native.test.ts",
+      "files": 1,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0
+    }
+  ],
+  "summary": {
+    "files": 6,
+    "tests": 85,
+    "passed": 85,
+    "failed": 0
+  },
+  "coverageMeaning": [
+    "验证当前源码中的资源类型字段分支、更新策略、PVC 模板、元数据、调度、安全上下文、镜像凭据、环境引用和原生详情入口静态行为。",
+    "不能证明 131 当前部署制品与 workspace HEAD 相同。",
+    "不能替代浏览器保存回读、RBAC、缓存、错误路径和完整 V3 功能等价。"
+  ],
+  "result": "6 个 Workload 相关静态测试文件、85 项测试全部通过；该结果作为 REA 输入保留，不改变模块阶段。"
+}

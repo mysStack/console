@@ -240,3 +240,9 @@
 - 在 `Deployment/v4-deploy-edit-ef3` 上完成基线 `30881` 与 V4 `30880` 编辑设置 Modal 对照。两边均能打开编辑设置，均有滚动更新和 `25%/25%` 更新参数；基线按分区切换，V4 使用连续可滚动原生表单。
 - 当前 V4 首屏还展示副本数量、终止宽限时间、标签和注解；其中 `kubectl.kubernetes.io/last-applied-configuration` 完整 JSON 会显示在表单中。本轮仅登记为需要确认的元数据展示风险，没有擅自修改。
 - 证据见 [`Deployment 编辑设置浏览器对照`](./evidence/workload-deployment-settings-browser-20261024.json)，截图只保留本地 `.playwright-cli/`。未执行写操作，模块仍为 `REA / 分析中，待复核`。
+
+# 当前状态补充（2026-10-24：静态 REA 测试取证）
+
+- 当前源码的 6 个 Workload 相关测试文件已执行，共 85 项测试全部通过：创建/设置表单 81 项、更新策略 3 项、三类详情原生入口 3 项。
+- 测试覆盖资源类型字段分支、更新策略、PVC 模板、元数据、调度、安全上下文、镜像凭据、环境引用和原生详情入口；不代表 131 当前部署制品已通过，也不关闭浏览器写回、RBAC、缓存、错误和逐项 V3 等价缺口。
+- 证据见 [`Workload 静态 REA 测试`](./evidence/workload-static-rea-tests-20261024.json)。模块继续保持 `REA / 分析中，待复核`。
