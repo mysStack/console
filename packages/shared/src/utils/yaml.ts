@@ -30,11 +30,17 @@ function load(value: unknown): any {
 }
 
 function loadStrict(value: unknown): any {
-  if (isObject(value)) {
-    return value;
+  const parsed = isString(value)
+    ? yaml.load(String(value))
+    : isObject(value)
+      ? value
+      : yaml.load(String(value));
+
+  if (!isObject(parsed) || Array.isArray(parsed)) {
+    throw new Error('YAML document must evaluate to an object');
   }
 
-  return yaml.load(value as string);
+  return parsed;
 }
 
 function loadAll(value: string) {
