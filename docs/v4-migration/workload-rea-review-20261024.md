@@ -286,3 +286,9 @@ rg -n 'editConfigTemplate|editYaml|WorkloadSettingsModal' \
 在当前工作区 HEAD `d78cab185f66beaebe16c03c3b3a09518c748cc8` 上执行 `nativeWorkloads.test.ts`，6 项测试全部通过。该测试确认集群级 Deployment、StatefulSet、DaemonSet 主路由均引用原生 `Workloads/index.tsx`，保留 namespace 选择，并按所选 namespace 调用对应创建 Store。
 
 证据见 [`evidence/workload-cluster-native-static-tests-20261024.json`](./evidence/workload-cluster-native-static-tests-20261024.json)。该结果不能替代当前制品部署后的 Network/浏览器、其他集群 Embed、RBAC、缓存、错误和逐项 V3 等价验证；模块继续保持 **REA / 分析中，待复核**。
+
+## 2026-10-24 当前 HEAD 重跑定向测试
+
+在当前 HEAD `8d561743f22586f23ff75f70a2fad43f8c33e42a` 上重新执行 34 个 Workload 定向测试文件，共 211/211 通过；另外执行集群级三类 Workload 原生入口测试，共 6/6 通过。此次重跑没有修改业务代码、没有构建、没有部署，仅更新证据绑定到当前 HEAD。
+
+证据见 [`Workload 定向静态测试`](./evidence/workload-rea-targeted-tests-20261024.json) 和 [`集群级原生入口静态测试`](./evidence/workload-cluster-native-static-tests-20261024.json)。这些结果仍不能替代当前制品浏览器、RBAC、缓存、错误和逐项 V3 等价验证；模块保持 `REA / 分析中，待复核`。

@@ -1,7 +1,7 @@
 {
   "record": "Workload REA 定向测试取证",
   "date": "2026-10-24",
-  "workspaceHead": "1b505477e96cab4999065ce63683f0f3c69a7223",
+  "workspaceHead": "8d561743f22586f23ff75f70a2fad43f8c33e42a",
   "phase": "REA",
   "operator": "Codex 单会话",
   "command": "mapfile -t files < <(rg --files packages/console/src/pages/projects | rg '(ConfigReference|WorkloadCreateModal|ApplicationWorkloads/Workloads/.*/Detail|Workloads/settingsAction).*\\.test\\.ts$' | sort); ./node_modules/.bin/esno <each-test-file>",
@@ -53,5 +53,7 @@
     "测试不证明 release-4.1.5 v3dist 的完整 V3 行为等价，也不证明当前 HEAD 已构建、部署到 131 或在部署制品上完成浏览器验收。",
     "低权限 RBAC、namespace 缓存隔离、API 写回、错误路径、完整字段对照和运行时样式仍需独立证据。"
   ],
-  "result": "34 个 Workload 相关测试文件、211 项测试全部通过；作为 REA 静态输入保留，模块仍为分析中，待负责人复核。"
+  "result": "34 个 Workload 相关测试文件、211 项测试全部通过；作为 REA 静态输入保留，模块仍为分析中，待负责人复核。",
+  "rerunDate": "2026-10-24",
+  "rerunResult": "在当前 HEAD 重新执行，结果与原记录一致"
 }

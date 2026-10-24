@@ -1,7 +1,7 @@
 {
   "record": "Workload 集群级原生入口静态测试取证",
   "date": "2026-10-24",
-  "workspaceHead": "d78cab185f66beaebe16c03c3b3a09518c748cc8",
+  "workspaceHead": "8d561743f22586f23ff75f70a2fad43f8c33e42a",
   "phase": "REA",
   "operator": "Codex 单会话",
   "testFile": "packages/console/src/pages/clusters/containers/ApplicationWorkloads/nativeWorkloads.test.ts",
@@ -28,5 +28,7 @@
     "全局 initWujie/preloadApp 链路以及 Ingress、Service、Job 等其他集群入口仍需独立处理，不能因三类 Workload 主路由已原生化而宣称整个集群工作负载范围已无 V3/Wujie。",
     "当前制品浏览器的列表、namespace 隔离、Action、错误和完整 V3 等价仍需在可登录环境中验证。"
   ],
-  "result": "集群级三类 Workload 主路由静态测试 6/6 通过；作为 REA 输入保留。"
+  "result": "集群级三类 Workload 主路由静态测试 6/6 通过；作为 REA 输入保留。",
+  "rerunDate": "2026-10-24",
+  "rerunResult": "在当前 HEAD 重新执行，结果与原记录一致"
 }
