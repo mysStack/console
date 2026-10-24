@@ -687,7 +687,7 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-current-head-verify-20261024.json",
-        "sha256": "927c9274d4ec7446720c15227ea9f614ef49430ddafdd49f81755dd44b058cf0"
+        "sha256": "5b1da80c92ce0bd32ef485c4380c90a0499fb63785ea3f28bb08d285ae35e4d2"
       },
       {
         "path": "docs/v4-migration/workload-current-head-verify-20261024.md",
