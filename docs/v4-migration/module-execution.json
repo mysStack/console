@@ -20,11 +20,11 @@
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
-        "sha256": "bca260ef5d541bab98c136fc132f5388e4cf67cee362fa2f02237dc4b354c311"
+        "sha256": "780be8088a8bfb2c0411b0eca497bfbfd3d339b8a152812acaba9f20557aeb19"
       },
       {
         "path": "docs/v4-migration/workload-kind-capability-matrix.md",
-        "sha256": "9750ca8af4c2070228368a8f2ec1d0060994936e4e12d120029c1b6ce8840fed"
+        "sha256": "fbfd71f19de614fd7c20439781b9bb0f3f625dbdb323009d5a6bb3fc00333046"
       },
       {
         "path": "docs/v4-migration/evidence/workload-edit-factories-20261023-provenance.json",
@@ -48,7 +48,7 @@
       },
       {
         "path": "docs/v4-migration/workload-v3-field-equivalence-20261023.md",
-        "sha256": "e992e85ea1db4cf20f67731df248c56c0b97d25a688b7ac2a3cf4cd370cb1e9a"
+        "sha256": "093c275f1bdc5539b37d63b8c86fc266a38ff8590f90906d4284bbf93fa0198e"
       },
       {
         "path": "docs/v4-migration/matrix.md",
@@ -555,11 +555,11 @@
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
-        "sha256": "bca260ef5d541bab98c136fc132f5388e4cf67cee362fa2f02237dc4b354c311"
+        "sha256": "780be8088a8bfb2c0411b0eca497bfbfd3d339b8a152812acaba9f20557aeb19"
       },
       {
         "path": "docs/v4-migration/workload-kind-capability-matrix.md",
-        "sha256": "9750ca8af4c2070228368a8f2ec1d0060994936e4e12d120029c1b6ce8840fed"
+        "sha256": "fbfd71f19de614fd7c20439781b9bb0f3f625dbdb323009d5a6bb3fc00333046"
       },
       {
         "path": "docs/v4-migration/evidence/workload-current-head-deploy-pull-20261024.json",

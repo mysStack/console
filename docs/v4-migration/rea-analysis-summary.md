@@ -1,6 +1,6 @@
 # Workload 分支 REA 分析索引
 
-> **2026-10-24 入口描述校准**：历史运行时 REA 中“StatefulSet、DaemonSet 的编辑设置仍打开 YAML”只适用于当时的旧制品快照。回滚前在 131 旧精确制品上复验，两个入口均打开原生 `WorkloadSettingsModal`，YAML 是独立 Action；详见[旧制品原生设置证据](./evidence/workload-native-settings-old-artifact-20261024.json)。当前 HEAD `ae500da86a55` 虽已构建，但新制品未在 131 Ready，不能把该旧制品观察结果继承为当前 HEAD VERIFY。
+> **2026-10-24 入口与制品状态校准**：历史运行时 REA 中“StatefulSet、DaemonSet 的编辑设置仍打开 YAML”只适用于当时的旧制品快照。当前源码提交 `31b6d88fc7e8` 的制品已在 131 Ready；已有认证态复验确认三类入口均打开原生 `WorkloadSettingsModal`，YAML 是独立 Action，并完成终止宽限期 `30 → 31 → 30` 保存与 API 回读。零 Cookie 新 context 登录仍失败，完整字段、RBAC、缓存、错误和逐项 V3 等价仍未闭环。详见[当前制品原生设置证据](./evidence/workload-native-settings-current-head-20261024.json)。
 
 > 当前状态以 [module-execution.json](./module-execution.json) 为准。
 > 本索引属于 `feature/v4-workloads`，不复制或覆盖 ConfigMap/Secret 分支的全局 P0 证据。历史全局索引保留在 `feature/v4-configmaps-secrets:docs/v4-migration/rea-analysis-summary.md`；需要输入时按固定 SHA 读取，不能继承其通过结论。

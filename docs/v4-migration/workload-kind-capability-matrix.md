@@ -1,5 +1,7 @@
 # Workload 组合开发能力边界矩阵
 
+> **2026-10-24 状态校准**：本文保留组合批次的 REA 防遗漏矩阵；其中历史段落的“阶段：REA”“REA 未完成”只表示该段记录生成时的状态，不是当前门禁状态。当前阶段以 `module-execution.json` 为准：REA 已通过、DEV 已完成、VERIFY 未完成。当前制品的原生设置入口和终止宽限期保存回读已有 131 证据，但完整字段、权限、缓存、错误和逐项 V3 等价仍待验证。
+
 > **入口描述校准（2026-10-24）**：本文后续历史段落中的“StatefulSet、DaemonSet 编辑设置仍调用 `editYaml`”是 2026-10-23 旧制品 REA 快照。当前分支源码和 131 旧精确制品复验均显示两个资源的 `editConfigTemplate` 打开原生 `WorkloadSettingsModal`，YAML 由独立 `editYaml` Action 提供。当前 HEAD 新制品尚未在 131 Ready，完整设置字段、保存、权限和 V3 等价仍未验收；详见[旧制品原生设置证据](./evidence/workload-native-settings-old-artifact-20261024.json)。
 
 > 当前模块：`workloads`；当前能力：`deployment-statefulset-daemonset`；阶段：`REA`；状态：分析中。
