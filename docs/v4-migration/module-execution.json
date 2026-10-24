@@ -732,5 +732,21 @@
       "scope": "仅在当前版本源码和部署证据无法解释时补充历史结构、字段和样式，不覆盖 release-4.1.5 证据"
     },
     "next": "按当前版本主基线执行 DEV：先补测试和已确认缺口，再构建、部署和浏览器验收；未闭环项不得标记为已验收。"
-  }
+  },
+  "crossModuleImpact": [
+    {
+      "date": "2026-10-24",
+      "status": "已登记，待修复与复验",
+      "change": "修正共享 ListPage 在项目级 ConfigMap/Secret 列表未携带路由 namespace 的问题",
+      "evidence": "当前低权限浏览器请求访问 /kapis/resources.kubesphere.io/v1alpha3/configmaps 并返回 403；请求路径缺少 /namespaces/<当前项目>",
+      "files": [
+        "packages/shared/src/components/Layouts/ListPage/index.tsx",
+        "packages/shared/src/components/Layouts/ListPage/namespace.test.ts",
+        "packages/console/src/pages/projects/containers/ConfigMaps/index.tsx",
+        "packages/console/src/pages/projects/containers/Secrets/index.tsx"
+      ],
+      "impact": "影响项目级 ConfigMap/Secret 列表的 namespace 隔离、低权限读取和配置引用验收；不改变集群级列表和 Kubernetes API 契约",
+      "validation": "先补共享 ListPage namespace 选择逻辑测试，再构建部署当前制品并用低权限账号复验项目列表、403/200 边界和 Workload 配置引用"
+    }
+  ]
 }
