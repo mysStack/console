@@ -302,6 +302,12 @@
 - 本次仅验证登录链路，没有执行资源写操作；实际部署制品源提交为 `31b6d88fc7e87707776c094aee12f1cdcb02604b`，不是当前工作区 HEAD。证据见 [`evidence/workload-browser-login-exported-shell-20261024.json`](./evidence/workload-browser-login-exported-shell-20261024.json)。
 - 登录配置阻塞已解除；当前 HEAD 的构建、部署、Workload 页面浏览器验收、RBAC、缓存、错误和逐项 V3 等价仍未闭环，模块继续保持 `REA / 分析中，待复核`。
 
+## 2026-10-24 Workload 原生列表浏览器 REA 补证
+
+- 在已认证浏览器中直达 `test-workspace / host / v4-migration-e2e` 的 Deployment、StatefulSet、DaemonSet 项目列表，三类页面均渲染 2 条资源，类型切换、搜索、刷新、定制内容、创建入口和分页控件均可见。
+- 三类列表读取请求均返回 200，namespace 作用域均为 `v4-migration-e2e`；本轮没有执行任何写操作。证据见 [`evidence/workload-native-list-browser-rea-20261024.json`](./evidence/workload-native-list-browser-rea-20261024.json)。
+- 控制台仍记录已知扩展初始化错误和 Wujie 警告，未观察到 Workload 列表自身错误；扩展问题继续单独跟踪。当前证据来自旧于工作区 HEAD 的已部署制品，不能直接继承为 VERIFY；模块仍为 `REA / 分析中，待复核`。
+
 ## 2026-10-24 集群级三类 Workload 原生入口补证
 
 - 当前 HEAD `d78cab185f66beaebe16c03c3b3a09518c748cc8` 上执行 `packages/console/src/pages/clusters/containers/ApplicationWorkloads/nativeWorkloads.test.ts`，6 项全部通过。

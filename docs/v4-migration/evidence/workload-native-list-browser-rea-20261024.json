@@ -1,0 +1,59 @@
+{
+  "record": "Workload 原生列表浏览器 REA 复核",
+  "date": "2026-10-24",
+  "phase": "REA",
+  "operator": "Codex 单会话",
+  "artifact": {
+    "origin": "http://192.168.2.131:30880",
+    "deployment": "kubesphere-system/ks-console",
+    "sourceCommit": "31b6d88fc7e87707776c094aee12f1cdcb02604b",
+    "imageTag": "feature-v4-workloads-20261024-091102-31b6d88fc7e8",
+    "imageDigest": "sha256:2956710cd7ef2fbda79ff7a0a9695dac466336bd08248784d5afdfb577b951d3",
+    "podImageID": "sha256:2956710cd7ef2fbda79ff7a0a9695dac466336bd08248784d5afdfb577b951d3"
+  },
+  "browser": {
+    "login": {
+      "route": "/login",
+      "resultRoute": "/dashboard",
+      "authenticated": true,
+      "role": "platform-admin"
+    },
+    "workspace": "test-workspace",
+    "cluster": "host",
+    "namespace": "v4-migration-e2e",
+    "projectRoutes": {
+      "deployment": "/test-workspace/clusters/host/projects/v4-migration-e2e/deployments",
+      "statefulset": "/test-workspace/clusters/host/projects/v4-migration-e2e/statefulsets",
+      "daemonset": "/test-workspace/clusters/host/projects/v4-migration-e2e/daemonsets"
+    },
+    "renderedCounts": {
+      "deployment": 2,
+      "statefulset": 2,
+      "daemonset": 2
+    },
+    "renderedControls": ["类型切换", "名称搜索", "刷新", "定制内容", "创建", "分页"],
+    "apiReads": [
+      {
+        "kind": "Deployment",
+        "path": "/clusters/host/kapis/resources.kubesphere.io/v1alpha3/namespaces/v4-migration-e2e/deployments",
+        "status": 200
+      },
+      {
+        "kind": "StatefulSet",
+        "path": "/clusters/host/kapis/resources.kubesphere.io/v1alpha3/namespaces/v4-migration-e2e/statefulsets",
+        "status": 200
+      },
+      {
+        "kind": "DaemonSet",
+        "path": "/clusters/host/kapis/resources.kubesphere.io/v1alpha3/namespaces/v4-migration-e2e/daemonsets",
+        "status": 200
+      }
+    ],
+    "resourceWrites": false,
+    "consoleErrors": {
+      "count": 8,
+      "classification": "已知扩展初始化错误（含 getExtensionConsoleV3Embed）和 Wujie documentClick 警告；本次未观察到 Workload 页面自身错误，扩展问题单独保留为后续范围"
+    }
+  },
+  "conclusion": "登录配置修正后，131 已部署 V4 制品的项目级 Deployment、StatefulSet、DaemonSet 原生列表均可直达、渲染并按 v4-migration-e2e namespace 返回 2 条资源。该证据证明当前已部署制品的入口和读取边界，不代表当前工作区 HEAD 的 VERIFY；当前 HEAD 仍需经 REA 负责人复核后重新构建部署。"
+}
