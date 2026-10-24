@@ -8,7 +8,16 @@
     "namespace": "v4-migration-e2e",
     "resource": "StatefulSet/v4-pvc-sts-7fa",
     "baseline": "http://192.168.2.131:30881/consolev3/clusters/host/projects/v4-migration-e2e/statefulsets/v4-pvc-sts-7fa/resource-status",
-    "currentV4": "http://192.168.2.131:30880/clusters/host/projects/v4-migration-e2e/statefulsets/v4-pvc-sts-7fa/resource-status"
+    "currentV4": "http://192.168.2.131:30880/clusters/host/projects/v4-migration-e2e/statefulsets/v4-pvc-sts-7fa/resource-status",
+    "baselineArtifact": {
+      "imageTag": "release-4.1.5-20261024-155944-fc1253c",
+      "podImageID": "sha256:2595b31de4dc01ae67b72b97b857ef40cd1c1ec2a0d406cada177982f380f455"
+    },
+    "currentV4Artifact": {
+      "imageTag": "feature-v4-workloads-20261024-091102-31b6d88fc7e8",
+      "sourceCommit": "31b6d88fc7e87707776c094aee12f1cdcb02604b",
+      "podImageID": "sha256:2956710cd7ef2fbda79ff7a0a9695dac466336bd08248784d5afdfb577b951d3"
+    }
   },
   "steps": [
     "从两个入口登录后直达同一 StatefulSet 详情页",
@@ -70,5 +79,6 @@
     "本轮只对 StatefulSet 进行了 Modal 结构对照；Deployment、DaemonSet 的 Modal 字段差异仍需分别验证。",
     "旧 V3 页面使用 release-4.1.5 制品；旧源码 release-3.4 仅作为结构/字段/样式参考。"
   ],
-  "result": "发现并记录当前 V4 与 release-4.1.5 基线的 Modal 布局和分区差异；该差异进入 REA 功能等价与样式审查清单，不直接判定为缺陷，也不授权进入 DEV。"
+  "result": "发现并记录当前 V4 与 release-4.1.5 基线的 Modal 布局和分区差异；该差异进入 REA 功能等价与样式审查清单，不直接判定为缺陷，也不授权进入 DEV。",
+  "artifactBinding": "本轮浏览器对照使用 131 已部署制品；db55a7f7c 只包含证据文档，未重新构建或部署。"
 }

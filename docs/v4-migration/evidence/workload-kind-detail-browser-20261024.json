@@ -11,14 +11,20 @@
       "origin": "http://192.168.2.131:30881",
       "source": "release-4.1.5",
       "deployment": "ks-console-v415-rea",
-      "nodePort": 30881
+      "nodePort": 30881,
+      "imageTag": "release-4.1.5-20261024-155944-fc1253c",
+      "podImageID": "sha256:2595b31de4dc01ae67b72b97b857ef40cd1c1ec2a0d406cada177982f380f455"
     },
     "currentV4": {
       "origin": "http://192.168.2.131:30880",
       "source": "feature-v4-workloads 已部署制品",
       "deployment": "ks-console",
-      "nodePort": 30880
-    }
+      "nodePort": 30880,
+      "imageTag": "feature-v4-workloads-20261024-091102-31b6d88fc7e8",
+      "podImageID": "sha256:2956710cd7ef2fbda79ff7a0a9695dac466336bd08248784d5afdfb577b951d3",
+      "sourceCommit": "31b6d88fc7e87707776c094aee12f1cdcb02604b"
+    },
+    "artifactBinding": "本轮浏览器对照使用 131 已部署的 release-4.1.5 基线和既有 current-v4 制品；本轮仅新增 REA 文档提交，没有重新构建或部署 db55a7f7c。"
   },
   "browser": {
     "method": "playwright-cli 真实浏览器会话，从登录页登录后直达详情路由",

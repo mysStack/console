@@ -125,11 +125,11 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-kind-detail-browser-20261024.json",
-        "sha256": "d170463833dff5143566e988151cd46905e5d61e7169b2a761dc3cfd87d3534a"
+        "sha256": "3573cff15c7bb9c1675a075af2946379087fcbd1a98a9e0e162f1eadefb0fb87"
       },
       {
         "path": "docs/v4-migration/evidence/workload-settings-modal-browser-20261024.json",
-        "sha256": "7566c5d02052eb17aa023d271d73679a738ff337a7fba2b8da135a721200c5b5"
+        "sha256": "9cc2944bd2b6adb9a693832ca8f752e28bad21a0d99dbb9bedd8509711cfe7cd"
       }
     ],
     "coverage": {
