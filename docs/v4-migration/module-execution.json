@@ -296,17 +296,17 @@
       "reference": "docs/v4-migration/workload-rea-review-20261024.md"
     },
     "riskDisposition": {
-      "decision": "当前 REA 仍为分析中，待复核；采用 release-4.1.5 v3dist 与 origin/release-3.4 旧源码参考的分层证据，完成矩阵复核后再申请进入 DEV。",
+      "decision": "历史纠偏结论已由 2026-10-24 的 routeAdjustment supersede。当前有效结论：release-4.1.5 完整前端源码和同版本已部署页面是 REA 主基线，v3dist 仅作制品校准，origin/release-3.4 仅作历史补充；负责人已批准进入 DEV，当前模块按 DEV→VERIFY 执行。",
       "reference": "docs/v4-migration/workload-rea-source-correction-20261024.md",
       "sourceReference": "origin/release-3.4 / 175710fefeeba6ff295c2c0967b4d45b83563d26 / AGPL-3.0",
       "originalRiskIds": ["WL-01", "WL-02", "WL-03", "WL-04"],
-      "verifyRequirement": "未完成新的 REA 复核前，不得把已有 DEV、镜像或旧浏览器证据继承为当前 VERIFY 通过。"
+      "verifyRequirement": "不得把 REA 主基线确认等同于模块验收；当前分支仍须完成构建、部署、浏览器、Action、RBAC、缓存、错误和逐项功能等价验证。"
     },
     "lastReview": {
       "date": "2026-10-24",
       "record": "docs/v4-migration/workload-rea-review-20261024.md",
       "head": "ffc2b27e785dff7518c5db7e5fb667e416080139",
-      "conclusion": "已补充 StatefulSet/DaemonSet 详情页真实浏览器对照和读请求证据；当前三个资源类型的字段保存、RBAC、缓存、错误和完整 V3 等价仍未闭环，REA 分析中，待负责人复核。"
+      "conclusion": "已补充 StatefulSet/DaemonSet 详情页真实浏览器对照和读请求证据；REA 主基线已按负责人复核结论固定为 release-4.1.5 完整源码与同版本部署页面，模块已进入 DEV/VERIFY。三个资源类型的字段保存、RBAC、缓存、错误和完整 V3 等价仍未闭环。"
     },
     "primaryBaseline": {
       "sourceRef": "release-4.1.5",
