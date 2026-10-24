@@ -1,6 +1,7 @@
 {
   "schema": "v4-workload-current-head-verify",
   "date": "2026-10-24",
+  "lastUpdated": "2026-10-25",
   "module": "workloads",
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "source": {
@@ -54,15 +55,15 @@
       "network": "通过：本轮 Workload 页面请求返回 200，未发现 /consolev3、/dist/v3dist 或 Wujie 入口请求",
       "pageRendering": "通过：列表、详情、设置弹窗和配置引用页面均完成 DOM 快照；设置弹窗完成截图检查",
       "statefulSetSettings": "通过：原生编辑设置弹窗，副本数量、更新策略/分组序号、容器组、PVC 模板、调度、优雅终止和元数据分区可见；取消路径通过",
-      "deploymentActionMenu": "通过：显示回退、编辑自动扩缩、编辑设置、编辑 YAML、重新创建和删除入口；本轮只打开菜单，不执行变更",
-      "statefulSetActionMenu": "通过：显示回退、编辑自动扩缩、编辑服务、编辑设置、编辑 YAML、重新创建和删除入口；本轮只打开菜单，不执行变更",
-      "daemonSetActionMenu": "通过：显示回退、编辑设置、编辑 YAML、重新创建和删除入口；本轮只打开菜单，不执行变更",
-      "nonMutatingActionDialogs": "部分通过：Deployment 回退/自动扩缩、StatefulSet 编辑服务、DaemonSet 重新创建/删除均能打开原生确认或编辑对话框；本轮均点击取消，未执行资源变更"
+      "deploymentActionMenu": "通过：当前制品已实际验证回退、编辑设置伸缩、重新创建、批量删除和停止入口；编辑自动扩缩、YAML 和部分失败权限路径仍需单独验证",
+      "statefulSetActionMenu": "通过：当前制品已实际验证编辑服务、重新创建和删除入口；编辑自动扩缩、YAML 和部分失败权限路径仍需单独验证",
+      "daemonSetActionMenu": "通过：当前制品已实际验证停止、重新创建和删除入口；YAML 和部分失败权限路径仍需单独验证",
+      "mutationEvidence": "见 workload-action-mutation-verify-20261025.json：三类删除/重新创建、Deployment 伸缩/回退、409 冲突和网络失败均有当前制品浏览器与 API 证据"
     },
     "consoleErrors": "存在扩展初始化错误；按负责人决定暂不纳入本模块验收，未将页面标记为零错误",
     "lowPrivilege": {
       "user": "v4-workload-viewer-20261023",
-      "freshLogin": "通过",
+      "freshLogin": "未完成：当前环境仅有管理员测试账号变量；该账号的零 Cookie 登录失败不能替代 viewer 账号登录，viewer 凭据未写入或输出",
       "projectWorkloadList": "通过：Deployment 列表返回 200，页面显示 v4-migration-e2e 资源；页面仅显示刷新/定制内容，未显示创建入口",
       "projectConfigMapDirectRoute": "拒绝：直接访问配置字典页面返回 403",
       "interpretation": "Kubernetes auth can-i 的资源读权限与 Console 页面权限存在差异，需要继续核对 KubeSphere role template、前端权限键和配置引用场景",
@@ -76,10 +77,10 @@
   },
   "notClosed": [
     "新 Cookie 登录链路仍未通过，当前浏览器行为证据使用 rollout 前已认证的 30880 会话复验。",
-    "Deployment/StatefulSet/DaemonSet 的完整 Action 矩阵、真实保存/删除/回滚/重启/伸缩和错误/冲突路径仍未全部闭环。",
-    "低权限 RBAC、完整 namespace 正反隔离和缓存失效需要在当前 HEAD 制品上重新执行，历史证据不继承。",
+    "编辑自动扩缩、YAML、403/404/422 及部分取消路径仍未形成当前制品的完整 Action 矩阵；删除、重新创建、Deployment 伸缩/回退、409 和网络失败已有独立证据。",
+    "低权限 RBAC 的 Kubernetes 授权已核对，但当前制品的 viewer 浏览器登录和 UI 拒绝态未完成；namespaceB 因缺少 workspace 关联，跨项目缓存切换也未完成。",
     "扩展初始化错误仍按负责人决定暂不纳入本模块验收。",
-    "低权限 RBAC 已完成 Kubernetes 授权矩阵核对，但该账号当前制品的浏览器登录和 UI 拒绝态尚未闭环。",
+    "低权限 RBAC 已完成 Kubernetes 授权矩阵核对，但 viewer 账号凭据未在当前环境提供，当前制品浏览器登录和 UI 拒绝态尚未闭环。",
     "低权限 Deployment 详情已通过读取验证，编辑操作入口未显示；ConfigMap 403 的请求路径缺少 namespace，作用域修复仍在依赖记录中。",
     "独立 ConfigMap 列表页面仍发起缺少 namespace 的集群级请求并返回 403，已确认不影响当前 Workload 配置引用的 namespace 读取；该修复归入共享列表/配置资源依赖。"
   ],
