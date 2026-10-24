@@ -1,3 +1,10 @@
+# 当前状态补充（2026-10-24：当前 HEAD 设置入口部署后复验）
+
+- 当前 HEAD `31b6d88fc7e87707776c094aee12f1cdcb02604b` 的 CI Run `40048500939`、镜像 `feature-v4-workloads-20261024-091102-31b6d88fc7e8`、digest `sha256:2956710cd7ef2fbda79ff7a0a9695dac466336bd08248784d5afdfb577b951d3` 与 131 Pod imageID 一致，rollout/Ready 通过。
+- 使用已有认证态在当前制品重新打开三类详情的“编辑设置”：Deployment、StatefulSet、DaemonSet 均打开原生 `WorkloadSettingsModal`，StatefulSet 显示 PVC 与调度分区，DaemonSet 不显示副本数/调度分区，YAML 是独立 Action。该结果关闭“当前版本仍将编辑设置跳转 YAML”的入口缺口。
+- 当前登录为已有会话，新浏览器登录仍未验证；页面 Console error 为 Deployment 8、StatefulSet 10、DaemonSet 8，错误归因、保存持久化、完整字段等价、RBAC、缓存和错误矩阵仍未完成。结构化证据见[当前 HEAD 原生设置复验](./evidence/workload-native-settings-current-head-20261024.json)。
+- 当前阶段仍为 `VERIFY / 未完成`。
+
 # 当前状态补充（2026-10-24：当前 HEAD 制品拉取失败并回滚）
 
 - 当前 HEAD `ae500da86a559b378ba7255ee1d21c3d95a3a768` 的 CI Run `40046932193` 已完成单元测试和镜像构建，制品为 `feature-v4-workloads-20261024-085149-ae500da86a55@sha256:325f455ab8388f65ab1da254a4ca17d298baa45a118d38b12969c64db175bef5`。

@@ -52,11 +52,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "f58238faaba56b63f7ba6fb1f9cbedf609a97c5245a84e69af1021a25a724efa"
+        "sha256": "0486bb1d823ef18c1d3869bc3e0510475e5ed645251790e80a787ed75b515db0"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "9be1a806f0a2200bd0394e0640aa60573b8f57eb6e3c9036ec547c771f619d85"
+        "sha256": "c6c6f0852f802dd1c48565ca9eb32afe469ee1151f331659b90c9084c25dd720"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -507,11 +507,11 @@
   "verify": {
     "status": "未完成",
     "reason": "当前 HEAD 制品已完成 CI 构建和推送，但 131 新 Pod 长时间处于 ContainerCreating，未形成 Ready Pod，随后已回滚到部署前精确制品。回滚前在旧制品已有认证态确认 StatefulSet/DaemonSet 编辑设置均打开原生 WorkloadSettingsModal；该观察不继承为当前 HEAD VERIFY。正常登录、当前 HEAD 浏览器验收、完整错误/缓存、跨入口缓存切换和逐项 V3 等价仍未完成。",
-    "sourceCommit": "766db6764e052ade7236da411fedc435303d1cc8",
+    "sourceCommit": "31b6d88fc7e87707776c094aee12f1cdcb02604b",
     "documents": [
       {
         "path": "docs/v4-migration/workload-131-verify-20261024.md",
-        "sha256": "c3fad8c81e605c9a649c13a8593cc040cee0248061b5953b28ed3b7ce34714c0"
+        "sha256": "e8e90fb0a5123839b6b147ebeb34d70ff094f62117d7c513ab97cd3a21d32352"
       },
       {
         "path": "docs/v4-migration/evidence/workload-settings-verify-attempt-20261024.json",
@@ -547,11 +547,11 @@
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "9be1a806f0a2200bd0394e0640aa60573b8f57eb6e3c9036ec547c771f619d85"
+        "sha256": "c6c6f0852f802dd1c48565ca9eb32afe469ee1151f331659b90c9084c25dd720"
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "f58238faaba56b63f7ba6fb1f9cbedf609a97c5245a84e69af1021a25a724efa"
+        "sha256": "0486bb1d823ef18c1d3869bc3e0510475e5ed645251790e80a787ed75b515db0"
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
@@ -568,6 +568,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-native-settings-old-artifact-20261024.json",
         "sha256": "55b3878b97444a59ae31be36bba8d0d0cc83e2f2013c81039e2e5ba67e801503"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-native-settings-current-head-20261024.json",
+        "sha256": "1c45558e0e03bace3b29223a0d36b0c1e6b3648c542be0e6620e7d64d6e02754"
       }
     ]
   }

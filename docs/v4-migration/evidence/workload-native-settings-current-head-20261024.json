@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-24",
+  "module": "workloads",
+  "branch": "feature/v4-workloads",
+  "sourceCommit": "31b6d88fc7e87707776c094aee12f1cdcb02604b",
+  "ciRun": "40048500939",
+  "image": {
+    "tag": "feature-v4-workloads-20261024-091102-31b6d88fc7e8",
+    "digest": "sha256:2956710cd7ef2fbda79ff7a0a9695dac466336bd08248784d5afdfb577b951d3",
+    "podImageId": "ghcr.io/mysstack/ks-console@sha256:2956710cd7ef2fbda79ff7a0a9695dac466336bd08248784d5afdfb577b951d3"
+  },
+  "deployment": {
+    "target": "131 / kubesphere-system/ks-console",
+    "pod": "ks-console-67bb95489c-dvtq8",
+    "rollout": "通过",
+    "ready": "通过"
+  },
+  "browser": {
+    "baseUrl": "http://192.168.2.131:30880",
+    "session": "已有认证态；当前制品新登录未执行",
+    "login": "未验证",
+    "consoleErrors": {
+      "deployment": 8,
+      "statefulSet": 10,
+      "daemonSet": 8
+    },
+    "deployment": {
+      "route": "/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+      "settingsAction": "编辑设置",
+      "nativeSections": ["更新策略", "容器组设置", "存储设置", "容器组调度规则", "添加元数据"],
+      "yamlAction": "编辑 YAML（独立菜单项）",
+      "result": "当前 HEAD 制品打开原生设置弹窗"
+    },
+    "statefulSet": {
+      "route": "/clusters/host/projects/v4-migration-e2e/statefulsets/v4-pvc-sts-7fa",
+      "settingsAction": "编辑设置",
+      "nativeSections": ["更新策略", "容器组设置", "存储设置", "容器组调度规则", "添加元数据"],
+      "yamlAction": "编辑 YAML（独立菜单项）",
+      "result": "当前 HEAD 制品打开原生设置弹窗"
+    },
+    "daemonSet": {
+      "route": "/clusters/host/projects/v4-migration-e2e/daemonsets/v4-stop-ds-7fa",
+      "settingsAction": "编辑设置",
+      "nativeSections": ["更新策略", "容器组设置", "存储设置", "添加元数据"],
+      "yamlAction": "编辑 YAML（独立菜单项）",
+      "result": "当前 HEAD 制品打开原生设置弹窗"
+    }
+  },
+  "boundary": "本轮只验证当前制品部署身份和三个详情页的设置入口/分区渲染；未执行新浏览器登录、保存持久化、完整字段等价、RBAC、缓存或错误矩阵。页面 Console error 数量不为零，需单独归因。"
+}
