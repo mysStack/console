@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-25",
+  "module": "workloads",
+  "currentArtifact": {
+    "sourceCommit": "54b863b2ccd611bab088d39bcbebc8b4e9f68500",
+    "image": "ghcr.io/mysstack/ks-console:feature-v4-workloads-20261024-220602-54b863b2ccd6",
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:53299da2a0add86f3c08208b8ed9728d39af31ae5c0ba7b315283dc5bfdc675a"
+  },
+  "batchDelete": {
+    "kind": "Deployment",
+    "namespace": "v4-migration-e2e",
+    "resources": ["v4-batch-delete-a-20261025", "v4-batch-delete-b-20261025"],
+    "browser": {
+      "url": "http://192.168.2.131:30880/test-workspace/clusters/host/projects/v4-migration-e2e/deployments",
+      "flow": "原生项目列表选择两个专用 Deployment，打开批量删除确认，输入两个资源名并确认"
+    },
+    "requests": [
+      {
+        "method": "DELETE",
+        "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-batch-delete-b-20261025",
+        "status": 200
+      },
+      {
+        "method": "DELETE",
+        "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-batch-delete-a-20261025",
+        "status": 200
+      }
+    ],
+    "postCheck": "页面刷新后不再显示两个资源；Kubernetes 中 selector=v4-migration-test=batch-delete 的 Deployment、Pod 和 ReplicaSet 均无残留"
+  },
+  "deploymentScale": {
+    "kind": "Deployment",
+    "name": "v4-deploy-edit-ef3",
+    "namespace": "v4-migration-e2e",
+    "browser": {
+      "url": "http://192.168.2.131:30880/test-workspace/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+      "flow": "更多操作→编辑设置，将副本数量 1 改为 2，保存；再次打开编辑设置改回 1"
+    },
+    "requests": [
+      {
+        "method": "PUT",
+        "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+        "status": 200,
+        "result": "spec.replicas=2"
+      },
+      {
+        "method": "PUT",
+        "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+        "status": 200,
+        "result": "spec.replicas=1"
+      }
+    ],
+    "postCheck": "两次 PUT 后 API 回读和 rollout 均成功，最终 spec.replicas=1、ready=1/1，测试资源恢复原状态"
+  },
+  "conclusion": "当前部署制品已完成 Deployment 批量删除和副本伸缩的正向浏览器与 API 验证；其余资源类型和失败/取消/权限路径仍需逐项完成。"
+}
