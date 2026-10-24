@@ -149,7 +149,7 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-config-reference-static-tests-20261024.json",
-        "sha256": "97166c412936b6a90e83c3be165fd9fad5a9bafab347fa87c697d1982d253634"
+        "sha256": "c3099781c26cd929e8003191df48cec9343c8186a9449dd2013a29070a91d45d"
       }
     ],
     "coverage": {
