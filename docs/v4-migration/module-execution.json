@@ -5,7 +5,7 @@
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-  "phase": "VERIFY",
+  "phase": "DEV",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -53,11 +53,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "d3500fbcddfbd063ada581784c1ac93ada809474705bf3906807d3e0cf28135e"
+        "sha256": "2667cf1b42bdee4da874cd5344e7059721e60aa1644e21414e0ea8ae62d56036"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "78ef4d91e1d0b185f78aedebe089ffc8087a09eed21aa52497eaea792d146820"
+        "sha256": "d34f596fab1ba5da3f4c633883577fa8b456466f44782e86e1219bd46fc481ec"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -121,7 +121,7 @@
       },
       {
         "path": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-        "sha256": "f96782db108c2425246834c81afe530d5252ef6e5e505289107f273e29b7064c"
+        "sha256": "1b755de279ae10b94185eb67b516fff4f59fe24fec960bcd3893f780b50b30fd"
       },
       {
         "path": "docs/v4-migration/evidence/workload-kind-detail-browser-20261024.json",
@@ -324,9 +324,9 @@
     "coverageNotes": "已核对表示当前版本主基线和证据入口已覆盖该维度，不表示运行时验证或功能等价已经通过；运行时缺口转入 DEV/VERIFY 验收清单。"
   },
   "dev": {
-    "status": "已完成",
-    "reason": "编辑设置弹窗宽度对齐的 TDD 增量已完成；19 个 WorkloadCreateModal 测试、全量 91 个测试文件/403 个断言和 build:packages 已通过。当前代码提交进入新制品 VERIFY；Tab 内容切换和完整布局仍作为 VERIFY 对照项。",
-    "sourceCommit": "1be276245c359a7181d4515b0a053c03e178160f",
+    "status": "进行中",
+    "reason": "对照 release-4.1.5 已确认当前 V4 编辑设置将所有分区同时渲染，而基线按左侧分区只显示当前内容。已补充分区可见性回归测试并完成最小原生实现；定向测试、全量 91 个测试文件/404 个断言和 build:packages 已通过，当前代码待提交后重新构建和部署。",
+    "sourceCommit": "33e9520898248b2fbf1f2dd2721ef6b13e93bb80",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
@@ -605,10 +605,10 @@
         "sha256": "22d0881e18e8db1ad066289187372722bccf6d9a38ced2e87faeb02b715e4ded"
       }
     ],
-    "ciRun": "40100018686",
-    "ciStatus": "Unit tests 与 Build and publish ks-console 均成功",
-    "imageTag": "feature-v4-workloads-20261024-215402-54e4f4a2da49",
-    "imageDigest": "sha256:3c3c3fdca41d9f39c10caffe9ca4e273cc9095dae9b217a9a9ab92bd0c1a04b3"
+    "ciRun": null,
+    "ciStatus": "分区显示修复待新 SHA 构建；此前宽度增量 CI 结果仅作输入",
+    "imageTag": null,
+    "imageDigest": null
   },
   "devAcceptanceChecklist": [
     "WL-01：三类资源项目/集群入口、详情 Tab、原生编辑设置分区和路由替代矩阵",
@@ -617,8 +617,8 @@
     "WL-04：移除普通 Workload 配置引用的 useV3action、Wujie Shadow DOM 和 V3 编辑器桥接"
   ],
   "verify": {
-    "status": "进行中",
-    "reason": "当前 SHA 已完成 CI 构建、131 rollout、Pod imageID 核对和部署后 Playwright。Deployment、StatefulSet、DaemonSet 编辑设置弹窗宽度均已对齐 release-4.1.5 对照页面的 1162px，并复验资源特有字段渲染；Tab 内容切换、完整布局、低权限正反、缓存、错误路径和逐项 V3 等价仍未闭环。",
+    "status": "待重新验证",
+    "reason": "宽度修复制品的三类弹窗宽度已完成部署后复验；由于分区显示行为发现新的 release-4.1.5 差异，当前阶段退回 DEV。分区修复完成后必须以新 SHA 重新构建、部署并验收，旧制品 VERIFY 结果不继承。",
     "sourceCommit": "2b0c2c6de2dddddc825b4606897e0362e299cad0",
     "documents": [
       {
@@ -659,11 +659,11 @@
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "78ef4d91e1d0b185f78aedebe089ffc8087a09eed21aa52497eaea792d146820"
+        "sha256": "d34f596fab1ba5da3f4c633883577fa8b456466f44782e86e1219bd46fc481ec"
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "d3500fbcddfbd063ada581784c1ac93ada809474705bf3906807d3e0cf28135e"
+        "sha256": "2667cf1b42bdee4da874cd5344e7059721e60aa1644e21414e0ea8ae62d56036"
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
@@ -727,35 +727,24 @@
       },
       {
         "path": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-        "sha256": "f96782db108c2425246834c81afe530d5252ef6e5e505289107f273e29b7064c"
+        "sha256": "1b755de279ae10b94185eb67b516fff4f59fe24fec960bcd3893f780b50b30fd"
       },
       {
         "path": "docs/v4-migration/evidence/workload-settings-width-verify-20261025.json",
         "sha256": "c29a8688633f166a050c42c9e7abeb314ca2622df1abe8abc427021b3d88a482"
       }
     ],
-    "ciRun": "40124472412",
-    "ciStatus": "Unit tests 与 Build and publish ks-console 均成功；本地定向测试、全量测试和 build:packages 已通过",
-    "imageTag": "feature-v4-workloads-20261025-031645-2b0c2c6de2dd",
-    "imageDigest": "sha256:b23b9b5ea4836778357fd5919c5b002f02a229d87b0e854f9172e47b969ecfdd",
-    "rollout": {
-      "context": "default",
-      "namespace": "kubesphere-system",
-      "deployment": "ks-console",
-      "nodePort": 30880,
-      "generation": 603,
-      "status": "成功",
-      "replicas": "1/1",
-      "pod": "ks-console-5b65b75bcf-twzhz",
-      "podImageID": "ghcr.io/mysstack/ks-console@sha256:b23b9b5ea4836778357fd5919c5b002f02a229d87b0e854f9172e47b969ecfdd"
-    },
+    "ciRun": null,
+    "ciStatus": "等待 DEV 分区修复制品",
+    "imageTag": null,
+    "imageDigest": null,
+    "rollout": null,
     "browserVerification": {
-      "status": "部分完成",
+      "status": "待重新验证",
       "evidence": "docs/v4-migration/evidence/workload-settings-width-verify-20261025.json",
       "report": "docs/v4-migration/workload-current-head-verify-20261024.md",
-      "freshLogin": "本轮未重新建立；复用已认证测试会话完成页面复验",
-      "authenticatedSessionChecks": "通过（三类资源弹窗宽度和资源特有字段渲染复验）",
-      "consoleErrors": "8 个扩展初始化错误；按项目决定暂不纳入本模块修复",
+      "freshLogin": "未重新建立",
+      "authenticatedSessionChecks": "上一制品已完成宽度复验；分区切换待新制品复验",
       "moduleAcceptance": "未完成"
     },
     "lastEvidenceUpdate": "2026-10-25"

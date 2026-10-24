@@ -148,12 +148,15 @@ export default function WorkloadSettingsModal({
       bodyStyle={{ padding: 20 }}
     >
       <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
-        <nav aria-label={t('EDIT_SETTINGS')} style={{ width: 160, flexShrink: 0 }}>
+        <nav aria-label={t('EDIT_SETTINGS')} role="tablist" style={{ width: 160, flexShrink: 0 }}>
           {sections.map(section => (
             <Button
               key={section.id}
               variant="text"
               aria-current={activeSection === section.id ? 'location' : undefined}
+              aria-selected={activeSection === section.id}
+              aria-controls={`workload-settings-${section.id}`}
+              role="tab"
               style={{
                 display: 'block',
                 width: '100%',
@@ -209,7 +212,10 @@ export default function WorkloadSettingsModal({
             )}
 
             <section
+              id="workload-settings-updateStrategy"
               aria-label={t('UPDATE_STRATEGY')}
+              role="tabpanel"
+              hidden={activeSection !== 'updateStrategy'}
               ref={node => {
                 sectionRefs.current.updateStrategy = node;
               }}
@@ -229,7 +235,10 @@ export default function WorkloadSettingsModal({
               )}
             </section>
             <section
+              id="workload-settings-podTemplate"
               aria-label={t('POD_SETTINGS')}
+              role="tabpanel"
+              hidden={activeSection !== 'podTemplate'}
               ref={node => {
                 sectionRefs.current.podTemplate = node;
               }}
@@ -276,7 +285,10 @@ export default function WorkloadSettingsModal({
               </FormItem>
             </section>
             <section
+              id="workload-settings-volumeSettings"
               aria-label={t('STORAGE_SETTINGS')}
+              role="tabpanel"
+              hidden={activeSection !== 'volumeSettings'}
               ref={node => {
                 sectionRefs.current.volumeSettings = node;
               }}
@@ -318,7 +330,10 @@ export default function WorkloadSettingsModal({
             </section>
             {kind !== 'DaemonSet' && (
               <section
+                id="workload-settings-podMode"
                 aria-label={t('POD_SCHEDULING_RULES')}
+                role="tabpanel"
+                hidden={activeSection !== 'podMode'}
                 ref={node => {
                   sectionRefs.current.podMode = node;
                 }}
@@ -334,7 +349,10 @@ export default function WorkloadSettingsModal({
               </section>
             )}
             <section
+              id="workload-settings-podGracePeriod"
               aria-label={t('WORKLOAD_TERMINATION_GRACE_PERIOD')}
+              role="tabpanel"
+              hidden={activeSection !== 'podGracePeriod'}
               ref={node => {
                 sectionRefs.current.podGracePeriod = node;
               }}
@@ -349,7 +367,10 @@ export default function WorkloadSettingsModal({
               </FormItem>
             </section>
             <section
+              id="workload-settings-metadata"
               aria-label={t('ADD_METADATA')}
+              role="tabpanel"
+              hidden={activeSection !== 'metadata'}
               ref={node => {
                 sectionRefs.current.metadata = node;
               }}

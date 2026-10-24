@@ -139,19 +139,31 @@ test('三类设置均提供分区导航，字段保留挂载并区分 DaemonSet 
   }
 });
 
-test('分区导航滚动到当前弹窗对应分区而不改变浏览器路由', () => {
+test('分区导航使用弹窗内的 tab 语义而不改变浏览器路由', () => {
   const { tree } = render('Deployment');
   const all = nodes(tree);
   const nav = all.find(node => node.type === 'nav');
   assert.ok(nav);
-  const section = all.find(node => node.type === 'section');
-  let scrolls = 0;
-  section.ref({ scrollIntoView: () => scrolls++ });
+  assert.equal(nav.props.role, 'tablist');
   const button = nodes(nav).find(node => node.type === 'button');
   assert.ok(button);
   button.props.onClick();
-  assert.equal(scrolls, 1);
+  assert.equal(button.props.role, 'tab');
+  assert.equal(button.props['aria-selected'], true);
+  assert.match(button.props['aria-controls'], /^workload-settings-/);
   assert.equal(button.props.href, undefined);
+});
+
+test('分区导航只显示当前分区的内容', () => {
+  const { tree } = render('Deployment');
+  const sections = nodes(tree).filter(node => node.type === 'section');
+  const updateStrategy = sections.find(node => node.props['aria-label'] === 'UPDATE_STRATEGY');
+  assert.ok(updateStrategy);
+  assert.equal(updateStrategy.props.hidden, false);
+  assert.ok(
+    sections.filter(node => node !== updateStrategy).every(node => node.props.hidden === true),
+    '非当前分区不应在弹窗中同时显示',
+  );
 });
 
 test('编辑设置弹窗使用 release-4.1.5 对照页面的宽度', () => {
