@@ -1,0 +1,79 @@
+{
+  "baseCommit": "6cef32296e23490085bb7aa92f3d83f496993583",
+  "sourceIdentity": "本地未提交增量；由以下文件 SHA256 与后续 Git 提交共同绑定，不作为 VERIFY 完成证据",
+  "sourceFiles": [
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/ContainerInput.tsx",
+      "sha256": "328e3e0414e3bc968149f368b74bbfaaaea0cb642e7ee6c51f81c9f7d90ec8d0"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/ContainerLifecycle.test.ts",
+      "sha256": "b9c10fbcf2fd3865037e28253faf46a4e330d269170d3c6444fa7cfacddf8113"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/deployment.ts",
+      "sha256": "be508058658c17ed7eecdaca080fce796f377e7ddff3e83abaf9e1f885b5b134"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/deployment.test.ts",
+      "sha256": "67087c120970d0c543d86562ac3c46bff5369de64e8134fa6d150e0ead624d7f"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/useWorkloadResourceOptions.ts",
+      "sha256": "18f198c7afe1bfbc76b4c46b3599f5f1543352dedde3b9bf1506cbc939a62f02"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/useWorkloadResourceOptions.test.ts",
+      "sha256": "c520cb6158bae781a943218112c1f43f3d5ec7436d1e5bf4a80ad5a132c66532"
+    }
+  ],
+  "checks": [
+    {
+      "command": "./scripts/test.sh",
+      "exitCode": 0,
+      "files": 82,
+      "passed": 371,
+      "failed": 0
+    },
+    {
+      "command": "corepack yarn build:packages",
+      "exitCode": 0,
+      "sharedMinified": 633
+    },
+    {
+      "command": "corepack yarn eslint <三个变更生产文件>",
+      "exitCode": 0
+    },
+    {
+      "command": "corepack yarn prettier --check <六个变更源码和测试文件>",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0
+    }
+  ],
+  "typecheck": {
+    "configuration": "packages/console/tsconfig.json",
+    "method": "TypeScript compiler host：基线读取 HEAD 的变更文件，当前读取工作区，按文件/诊断编号/消息对照，未修改工作区以运行基线",
+    "baselineDiagnostics": 1326,
+    "currentDiagnostics": 1326,
+    "introduced": [],
+    "changedFileErrors": [],
+    "fullTypecheckPassed": false
+  },
+  "environment": {
+    "deployedThisIncrement": false,
+    "ciRun": null,
+    "image": null,
+    "digest": null,
+    "podImageID": null,
+    "playwrightOnThisIncrement": "未执行"
+  },
+  "remaining": [
+    "DS-01 设置分区与容器二级编辑",
+    "DS-07/08 变量引用完整编辑",
+    "配置引用低权限 edit 控件",
+    "完整当前 SHA 部署后浏览器 VERIFY"
+  ]
+}

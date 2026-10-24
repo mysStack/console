@@ -1,0 +1,143 @@
+{
+  "date": "2026-10-25",
+  "module": "workloads",
+  "currentArtifact": {
+    "sourceCommit": "54b863b2ccd611bab088d39bcbebc8b4e9f68500",
+    "image": "ghcr.io/mysstack/ks-console:feature-v4-workloads-20261024-220602-54b863b2ccd6",
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:53299da2a0add86f3c08208b8ed9728d39af31ae5c0ba7b315283dc5bfdc675a"
+  },
+  "batchDelete": {
+    "kind": "Deployment",
+    "namespace": "v4-migration-e2e",
+    "resources": ["v4-batch-delete-a-20261025", "v4-batch-delete-b-20261025"],
+    "browser": {
+      "url": "http://192.168.2.131:30880/test-workspace/clusters/host/projects/v4-migration-e2e/deployments",
+      "flow": "原生项目列表选择两个专用 Deployment，打开批量删除确认，输入两个资源名并确认"
+    },
+    "requests": [
+      {
+        "method": "DELETE",
+        "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-batch-delete-b-20261025",
+        "status": 200
+      },
+      {
+        "method": "DELETE",
+        "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-batch-delete-a-20261025",
+        "status": 200
+      }
+    ],
+    "postCheck": "页面刷新后不再显示两个资源；Kubernetes 中 selector=v4-migration-test=batch-delete 的 Deployment、Pod 和 ReplicaSet 均无残留"
+  },
+  "statefulSetBatchDelete": {
+    "kind": "StatefulSet",
+    "name": "v4-batch-delete-sts-20261025",
+    "namespace": "v4-migration-e2e",
+    "browser": "原生 StatefulSet 项目列表选择专用资源，打开删除确认并输入资源名确认",
+    "request": {
+      "method": "DELETE",
+      "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/statefulsets/v4-batch-delete-sts-20261025",
+      "status": 200
+    },
+    "postCheck": "页面刷新和 Kubernetes 回读均确认 StatefulSet 不存在"
+  },
+  "daemonSetBatchDelete": {
+    "kind": "DaemonSet",
+    "name": "v4-batch-delete-ds-20261025",
+    "namespace": "v4-migration-e2e",
+    "browser": "原生 DaemonSet 项目列表选择专用资源，打开删除确认并输入资源名确认",
+    "request": {
+      "method": "DELETE",
+      "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/daemonsets/v4-batch-delete-ds-20261025",
+      "status": 200
+    },
+    "postCheck": "页面刷新和 Kubernetes 回读均确认 DaemonSet 不存在"
+  },
+  "deploymentScale": {
+    "kind": "Deployment",
+    "name": "v4-deploy-edit-ef3",
+    "namespace": "v4-migration-e2e",
+    "browser": {
+      "url": "http://192.168.2.131:30880/test-workspace/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+      "flow": "更多操作→编辑设置，将副本数量 1 改为 2，保存；再次打开编辑设置改回 1"
+    },
+    "requests": [
+      {
+        "method": "PUT",
+        "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+        "status": 200,
+        "result": "spec.replicas=2"
+      },
+      {
+        "method": "PUT",
+        "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+        "status": 200,
+        "result": "spec.replicas=1"
+      }
+    ],
+    "postCheck": "两次 PUT 后 API 回读和 rollout 均成功，最终 spec.replicas=1、ready=1/1，测试资源恢复原状态"
+  },
+  "deploymentRollback": {
+    "kind": "Deployment",
+    "name": "v4-deploy-edit-ef3",
+    "namespace": "v4-migration-e2e",
+    "browser": "详情页更多操作→回退，选择目标修改记录 #30 并确认",
+    "request": {
+      "method": "PATCH",
+      "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+      "status": 200
+    },
+    "postCheck": "rollout 成功，最终副本为 1/1，资源标签和镜像保持测试基线，回退产生新的 revision"
+  },
+  "recreate": {
+    "browser": "三类详情页均通过更多操作→重新创建→确认完成",
+    "requests": [
+      {
+        "kind": "Deployment",
+        "name": "v4-deploy-edit-ef3",
+        "method": "PATCH",
+        "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+        "status": 200,
+        "rollout": "1/1"
+      },
+      {
+        "kind": "StatefulSet",
+        "name": "v4-watch-sts-20261022-01",
+        "method": "PATCH",
+        "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01",
+        "status": 200,
+        "rollout": "1/1"
+      },
+      {
+        "kind": "DaemonSet",
+        "name": "v4-watch-ds-20261022-01",
+        "method": "PATCH",
+        "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/daemonsets/v4-watch-ds-20261022-01",
+        "status": 200,
+        "rollout": "1/1"
+      }
+    ]
+  },
+  "deploymentConflict": {
+    "kind": "Deployment",
+    "name": "v4-deploy-edit-ef3",
+    "namespace": "v4-migration-e2e",
+    "browser": "打开原生编辑设置后，使用 Kubernetes API 外部更新资源，再确认旧编辑快照",
+    "request": {
+      "method": "PUT",
+      "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+      "status": 409
+    },
+    "ui": "页面显示资源已被其他操作更新、本次设置未保存，要求取消并重新打开编辑设置",
+    "postCheck": "取消编辑后移除外部冲突标签，原有标签、spec.replicas=1 和 ready=1/1 保持不变"
+  },
+  "deploymentNetworkFailure": {
+    "kind": "Deployment",
+    "name": "v4-deploy-edit-ef3",
+    "namespace": "v4-migration-e2e",
+    "browser": "编辑设置中修改测试标签，浏览器切换 offline 后确认，再恢复 online 并取消",
+    "request": "浏览器 offline，未发出成功写请求",
+    "ui": "页面显示保存失败、设置尚未保存，请检查网络和权限后重试；编辑表单保持可见",
+    "postCheck": "取消后 Kubernetes 标签仍为 workloads-ef3，spec.replicas=1、ready=1/1，草稿未写入"
+  },
+  "conclusion": "当前部署制品已完成三类 Workload 的删除和重新创建正向浏览器与 API 验证，并完成 Deployment 副本伸缩、回退、409 冲突反馈和网络失败反馈；低权限和逐项功能等价仍需逐项完成。"
+}

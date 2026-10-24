@@ -1,0 +1,144 @@
+{
+  "baseCommit": "38536e40dd656b8a8f0552584095c4adab68ee9e",
+  "sourceIdentity": "本地 DEV 增量，以文件 SHA256 与包含本记录的 Git 提交绑定；当前代码尚未部署",
+  "sourceFiles": [
+    {
+      "path": "locales/en/l10n-projects-applicationWorkloads-deployments-list.js",
+      "sha256": "60f548f8de3d1032f67f5d4234c47a454f38868d7559ff319be2f11c4b9879dd"
+    },
+    {
+      "path": "locales/es/l10n-projects-applicationWorkloads-deployments-list.js",
+      "sha256": "7e2ddd0ec8ad213693685b25a3b062c0529950616546dabfb2e0a35e5c1b3c69"
+    },
+    {
+      "path": "locales/tc/l10n-projects-applicationWorkloads-deployments-list.js",
+      "sha256": "873d2ac2c6b4f8d7152116a1b08c8446ca697bb3072d6e382426f94ebaa21802"
+    },
+    {
+      "path": "locales/zh/l10n-projects-applicationWorkloads-deployments-list.js",
+      "sha256": "b3a6637f655175c75729624a236f212d1649cad307c368c2eb2d419f97af8e1a"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/ContainerEnvironment.test.ts",
+      "sha256": "fd94facfde675ecf59b8963dbd28b0fa40cd8458459fbf1a207b5797ce017cb2"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/ContainerInput.tsx",
+      "sha256": "2f71c31990223f368d94ed4d288a0e84ed5937dc7856a7de84ee56e2a020a62f"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/ContainerLifecycle.test.ts",
+      "sha256": "07264af9124bb10a01334ddfd58400901a2068ec77160955c65c20eb42fcd9a1"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/WorkloadImageInput.test.ts",
+      "sha256": "dcbc57ca95173feed8f4d42640d85a6d39d37aa917caac454647a581c0a8c242"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/WorkloadImageInput.tsx",
+      "sha256": "5edd7bc7c8665a4131ce00bc3b7aefaa2497e951bb1ca6e600322941dacdd73c"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/deployment.locale.test.ts",
+      "sha256": "a1d4ab764a1a8b711900f98346a9fb70f876acfbb2fde6456df5c000ba0e1d6d"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/workloadImages.test.ts",
+      "sha256": "4afaa4502d0cca33aed640684046b90642de8f833713d06259fbac22d0574520"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/workloadImages.ts",
+      "sha256": "68a5b402db41ffcbae68c60984a08f9e16fcaa2a4e34b0a5dabb81bd06791b5b"
+    }
+  ],
+  "checks": [
+    {
+      "command": "./scripts/test.sh",
+      "exitCode": 0,
+      "files": 89,
+      "passed": 400,
+      "failed": 0
+    },
+    {
+      "command": "corepack yarn build:packages",
+      "exitCode": 0,
+      "sharedMinified": 633,
+      "elapsedSeconds": 189.8
+    },
+    {
+      "command": "corepack yarn build:locales",
+      "exitCode": 0
+    },
+    {
+      "command": "corepack yarn eslint <三个变更生产文件>",
+      "exitCode": 0,
+      "warnings": 0
+    },
+    {
+      "command": "impeccable detect --json <两个 UI 文件>",
+      "exitCode": 0,
+      "findings": []
+    }
+  ],
+  "typecheck": {
+    "baselineDiagnostics": 1326,
+    "currentDiagnostics": 1326,
+    "fullMessageReplacements": [
+      {
+        "file": "packages/console/src/pages/platform/containers/SettingsLayout/index.tsx",
+        "code": 6059,
+        "primaryMessageUnchanged": true,
+        "removedLines": [],
+        "addedLines": [
+          "    Imported via '@ks-console/shared' from file '/home/bruce/code/ks-develop/console-workloads/packages/console/src/pages/projects/components/WorkloadCreateModal/workloadImages.ts'"
+        ]
+      },
+      {
+        "file": "packages/console/src/pages/platform/containers/SettingsLayout/index.tsx",
+        "code": 6307,
+        "primaryMessageUnchanged": true,
+        "removedLines": [],
+        "addedLines": [
+          "    Imported via '@ks-console/shared' from file '/home/bruce/code/ks-develop/console-workloads/packages/console/src/pages/projects/components/WorkloadCreateModal/workloadImages.ts'"
+        ]
+      }
+    ],
+    "changedFileErrors": [],
+    "fullTypecheckPassed": false,
+    "conclusion": "仅原有两条 rootDir/file-list 诊断增加本增量导入说明；无新增主错误，不代表全项目类型检查通过"
+  },
+  "rea": {
+    "provenance": "docs/v4-migration/evidence/workload-image-provenance-20261024.json",
+    "summary": "docs/v4-migration/evidence/workload-image-rea-20261024.json",
+    "currentArtifactFactories": [1040, 2265, 2266],
+    "semanticCoverage": "unknown，不据此宣称完整行为已还原"
+  },
+  "runtimeInput": {
+    "url": "http://192.168.2.131:30880/consolev3/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/resource-status",
+    "enableImageSearch": true,
+    "steps": ["编辑设置", "容器", "编辑容器", "镜像搜索", "搜索 nginx", "取消，不保存"],
+    "observedMethod": "GET",
+    "observedPath": "/clusters/host/kapis/resources.kubesphere.io/v1alpha3/namespaces/v4-migration-e2e/images?q=nginx",
+    "responseWithin25Seconds": false,
+    "result": "超时；没有正向成功或返回 schema 的运行时证明",
+    "scope": "旧部署 V3 只读输入证据，不能替代新 V4 验收"
+  },
+  "dataBoundary": {
+    "registrySecret": "只在选中一个仓库后读取原始 dockerconfigjson，返回并缓存主机名；不缓存/输出认证字段",
+    "imageApis": "传 Secret 名称，不传凭据",
+    "imageDetails": "只投影时间、仓库、端口、大小、层数；不缓存 config.Env"
+  },
+  "environment": {
+    "deployedThisIncrement": false,
+    "ciRun": null,
+    "image": null,
+    "digest": null,
+    "podImageID": null,
+    "playwrightOnThisIncrement": "未执行"
+  },
+  "remaining": [
+    "当前 SHA 镜像、131 rollout 和 Pod 身份",
+    "三类资源新浏览器登录及完整功能/权限/作用域/缓存回归",
+    "镜像 API 超时定位及正向搜索、标签和详情结果"
+  ]
+}

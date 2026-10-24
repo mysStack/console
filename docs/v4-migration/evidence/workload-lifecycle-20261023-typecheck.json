@@ -1,0 +1,20 @@
+{
+  "baselineCommit": "6219e6fb7d9773e32b01cb5b01c9ec62312a9514",
+  "method": "TypeScript compiler API, same configuration/dependencies; tracked production source overlaid from baseline in memory; emit/composite/incremental disabled for diagnostics",
+  "baselineDiagnostics": 699,
+  "currentDiagnostics": 699,
+  "introduced": [],
+  "changedFileErrors": [],
+  "sources": [
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/ContainerInput.tsx",
+      "sha256": "ab98659d8ae3183d0fcf266344bca431d78be6f1ece527255aa60ba92bc0c59d"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/deployment.ts",
+      "sha256": "b8f8de2781e62758ed8b2479d5be8dd17938d3d5bf944358af74f8883d1199e9"
+    }
+  ],
+  "statement": "项目类型检查仍有既有诊断；基线差异检查不能替代全项目 TypeScript 通过",
+  "sourceCommit": "da25187d33ca49d21afa0ad748b619e8a2786c64"
+}

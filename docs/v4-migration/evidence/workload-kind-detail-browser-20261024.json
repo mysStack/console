@@ -1,0 +1,164 @@
+{
+  "record": "Workload StatefulSet/DaemonSet 详情页浏览器 REA 对照",
+  "date": "2026-10-24",
+  "operator": "Codex 单会话",
+  "branch": "feature/v4-workloads",
+  "sourceHead": "6f981c332416195fea7f3bb8c08566a5c7c18d61",
+  "environment": {
+    "cluster": "default",
+    "namespace": "v4-migration-e2e",
+    "baseline": {
+      "origin": "http://192.168.2.131:30881",
+      "source": "release-4.1.5",
+      "deployment": "ks-console-v415-rea",
+      "nodePort": 30881,
+      "imageTag": "release-4.1.5-20261024-155944-fc1253c",
+      "podImageID": "sha256:2595b31de4dc01ae67b72b97b857ef40cd1c1ec2a0d406cada177982f380f455"
+    },
+    "currentV4": {
+      "origin": "http://192.168.2.131:30880",
+      "source": "feature-v4-workloads 已部署制品",
+      "deployment": "ks-console",
+      "nodePort": 30880,
+      "imageTag": "feature-v4-workloads-20261024-091102-31b6d88fc7e8",
+      "podImageID": "sha256:2956710cd7ef2fbda79ff7a0a9695dac466336bd08248784d5afdfb577b951d3",
+      "sourceCommit": "31b6d88fc7e87707776c094aee12f1cdcb02604b"
+    },
+    "artifactBinding": "本轮浏览器对照使用 131 已部署的 release-4.1.5 基线和既有 current-v4 制品；本轮仅新增 REA 文档提交，没有重新构建或部署 db55a7f7c。"
+  },
+  "browser": {
+    "method": "playwright-cli 真实浏览器会话，从登录页登录后直达详情路由",
+    "fixtureResources": [
+      "StatefulSet/v4-pvc-sts-7fa",
+      "StatefulSet/v4-watch-sts-20261022-01",
+      "DaemonSet/v4-stop-ds-7fa",
+      "DaemonSet/v4-watch-ds-20261022-01"
+    ],
+    "wujieAppCount": {
+      "baselineStatefulSet": 0,
+      "currentV4StatefulSet": 0
+    },
+    "screenshots": [
+      ".playwright-cli/page-2026-10-24T10-15-47-479Z.png",
+      ".playwright-cli/page-2026-10-24T10-13-47-155Z.png",
+      ".playwright-cli/page-2026-10-24T10-13-34-483Z.png",
+      ".playwright-cli/page-2026-10-24T10-13-58-999Z.png"
+    ]
+  },
+  "comparisons": [
+    {
+      "kind": "StatefulSet",
+      "resource": "v4-pvc-sts-7fa",
+      "baselinePath": "/consolev3/clusters/host/projects/v4-migration-e2e/statefulsets/v4-pvc-sts-7fa/resource-status",
+      "currentV4Path": "/clusters/host/projects/v4-migration-e2e/statefulsets/v4-pvc-sts-7fa/resource-status",
+      "baselineHttp": 200,
+      "currentV4Http": 200,
+      "baselineTabs": ["资源状态", "修改记录", "元数据", "环境变量", "事件"],
+      "currentV4Tabs": ["资源状态", "修改记录", "元数据", "环境变量", "配置引用", "事件"],
+      "baselineActions": ["回退", "编辑服务", "编辑设置", "编辑 YAML", "重新创建", "删除"],
+      "currentV4Actions": [
+        "回退",
+        "编辑自动扩缩",
+        "编辑服务",
+        "编辑设置",
+        "编辑 YAML",
+        "重新创建",
+        "删除"
+      ],
+      "renderedState": "两边均显示 1/1 副本和 1 个 Running Pod；当前 V4 页面增加配置引用 Tab。",
+      "conclusion": "入口、详情路由和基础渲染已取得对照证据；编辑表单字段、Service/PVC 保存语义、RBAC、缓存和错误路径仍未验证。"
+    },
+    {
+      "kind": "StatefulSet",
+      "resource": "v4-watch-sts-20261022-01",
+      "baselinePath": "/consolev3/clusters/host/projects/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01/resource-status",
+      "currentV4Path": "/clusters/host/projects/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01/resource-status",
+      "baselineHttp": 200,
+      "currentV4Http": 200,
+      "baselineTabs": ["资源状态", "修改记录", "元数据", "环境变量", "事件"],
+      "currentV4Tabs": ["资源状态", "修改记录", "元数据", "环境变量", "配置引用", "事件"],
+      "baselineActions": ["回退", "编辑服务", "编辑设置", "编辑 YAML", "重新创建", "删除"],
+      "currentV4Actions": [
+        "回退",
+        "编辑自动扩缩",
+        "编辑服务",
+        "编辑设置",
+        "编辑 YAML",
+        "重新创建",
+        "删除"
+      ],
+      "renderedState": "两边均显示 1/1 副本和 1 个 Running Pod。",
+      "conclusion": "第二个 StatefulSet 入口和渲染已复核；Service、PVC 模板和自动扩缩控件的实际操作仍未验证。"
+    },
+    {
+      "kind": "DaemonSet",
+      "resource": "v4-stop-ds-7fa",
+      "baselinePath": "/consolev3/clusters/host/projects/v4-migration-e2e/daemonsets/v4-stop-ds-7fa/resource-status",
+      "currentV4Path": "/clusters/host/projects/v4-migration-e2e/daemonsets/v4-stop-ds-7fa/resource-status",
+      "baselineHttp": 200,
+      "currentV4Http": 200,
+      "baselineTabs": ["资源状态", "修改记录", "元数据", "环境变量", "事件"],
+      "currentV4Tabs": ["资源状态", "修改记录", "元数据", "环境变量", "配置引用", "事件"],
+      "baselineActions": ["回退", "编辑设置", "编辑 YAML", "重新创建", "删除"],
+      "currentV4Actions": ["回退", "编辑设置", "编辑 YAML", "重新创建", "删除"],
+      "renderedState": "两边均显示 1/1 副本和 1 个 Running Pod；当前 V4 页面增加配置引用 Tab。",
+      "conclusion": "DaemonSet 的 Action 集合与当前基线页面一致；停止/恢复、更新策略、节点调度和配置引用仍未验证。"
+    },
+    {
+      "kind": "DaemonSet",
+      "resource": "v4-watch-ds-20261022-01",
+      "baselinePath": "/consolev3/clusters/host/projects/v4-migration-e2e/daemonsets/v4-watch-ds-20261022-01/resource-status",
+      "currentV4Path": "/clusters/host/projects/v4-migration-e2e/daemonsets/v4-watch-ds-20261022-01/resource-status",
+      "baselineHttp": 200,
+      "currentV4Http": 200,
+      "baselineTabs": ["资源状态", "修改记录", "元数据", "环境变量", "事件"],
+      "currentV4Tabs": ["资源状态", "修改记录", "元数据", "环境变量", "配置引用", "事件"],
+      "baselineActions": ["回退", "编辑设置", "编辑 YAML", "重新创建", "删除"],
+      "currentV4Actions": ["回退", "编辑设置", "编辑 YAML", "重新创建", "删除"],
+      "renderedState": "两边均成功打开详情路由；该资源页面显示 1/1 副本。",
+      "conclusion": "第二个 DaemonSet 页面渲染已复核；运行时写入和异常路径仍未验证。"
+    }
+  ],
+  "networkApiSamples": {
+    "baselineDaemonSet": [
+      {
+        "method": "GET",
+        "status": 200,
+        "urlPattern": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/daemonsets/v4-stop-ds-7fa"
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "urlPattern": "/clusters/host/kapis/resources.kubesphere.io/v1alpha3/namespaces/v4-migration-e2e/pods?ownerReference=...&labelSelector=app%3Dv4-stop-ds-7fa"
+      }
+    ],
+    "currentV4DaemonSet": [
+      {
+        "method": "GET",
+        "status": 200,
+        "urlPattern": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/daemonsets/v4-stop-ds-7fa"
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "urlPattern": "/clusters/host/kapis/resources.kubesphere.io/v1alpha3/namespaces/v4-migration-e2e/pods?ownerReference=...&labelSelector=app%3Dv4-stop-ds-7fa&limit=10&page=1"
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "urlPattern": "/clusters/host/apis/autoscaling/v2/namespaces/v4-migration-e2e/horizontalpodautoscalers/v4-stop-ds-7fa"
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "urlPattern": "/kapis/monitoring.kubesphere.io/v1beta1/pod_metrics?cluster=host&namespace=v4-migration-e2e&ownerReference=..."
+      }
+    ]
+  },
+  "limits": [
+    "本轮是浏览器页面与读请求 REA 对照，没有执行创建、编辑、删除、伸缩、停止或恢复。",
+    "本轮没有验证低权限账号、namespace 切换后的缓存、表单字段保存、409/403/404/网络错误和完整 V3 功能等价。",
+    "截图和 Playwright CLI 日志只保留在本地未跟踪目录，没有加入 Git。"
+  ],
+  "result": "StatefulSet、DaemonSet 的详情入口和基础页面渲染已补充运行时证据；REA 仍为分析中，待负责人复核，不放行 DEV。"
+}

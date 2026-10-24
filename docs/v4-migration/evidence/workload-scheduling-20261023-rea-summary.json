@@ -1,0 +1,32 @@
+{
+  "operation": "analyze_javascript_application",
+  "authority": "shipped-artifact",
+  "confidence": "derived",
+  "parentEvidenceId": "ev_e4db32af4c5ea5c86973b86fada43c7ba5ef23efbad10df89f4aaa0c40c1abec",
+  "summaryEvidenceId": "ev_6af275c46dd44edd51db736bfe765ace9c8b8e2e15da88280c8ca674d5ad9178",
+  "inputDigest": "7f4b0bee794d799348a1f651554c3faed1f9b32c0661f6462c3eddfcdb481b9b",
+  "selectedFactories": [1530, 2440, 2583],
+  "statistics": {
+    "relevantFiles": 3,
+    "parsedJavascriptFiles": 3,
+    "parseFailures": 0,
+    "visitedAstNodes": 2350,
+    "findings": 3
+  },
+  "coverage": {
+    "application": "partial",
+    "semantic": "unknown",
+    "semanticUnknowns": 545
+  },
+  "observations": [
+    "工厂 1530 定义 Pod 调度的默认、分散、聚合和自定义模式；分散/聚合分别生成 preferred podAntiAffinity/podAffinity，权重 100，拓扑键为 kubernetes.io/hostname。",
+    "自定义规则由 policy、required/preferred type 和同 cluster/namespace 的同类工作负载 target 组成，使用 app In [target] 表达式。",
+    "工厂 2440 的非联邦节点选择路径为 spec.template.spec.nodeSelector；工厂 2583 是联邦路径变体。131 旧 V3 UI 快照显示 Deployment/StatefulSet 有调度分区，DaemonSet 不显示。"
+  ],
+  "limitations": [
+    "输入是固定当前 v3dist 的三个定向工厂，不是整个 V3 应用或原始完整源码。",
+    "分析为静态语法和关系证据，不证明运行时保存、RBAC、调度结果或页面渲染。",
+    "V3 模型不能安全表达任意 Kubernetes affinity；V4 对无法精确回填的已有 affinity 采用只读保留状态，避免静默丢失。",
+    "tolerations 未在本次当前制品 UI 工厂中闭环，继续保留为 DEV 缺口。"
+  ]
+}

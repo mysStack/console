@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-23",
+  "authority": "131 已部署旧 SHA 的既有 admin 浏览器会话",
+  "sourceCommit": "7f03a8b9d44a10d3c4224d61b22726c54f88bc1d",
+  "deployedArtifact": "feature-v4-workloads-20261022-215739-27aaeced74e8",
+  "purpose": "只读打开旧 V3 编辑设置并记录资源分区、字段名和已有值",
+  "method": "Playwright 进入 consolev3 资源详情，打开编辑设置，逐个点击 data-name 分区，读取可见文本和 input name/value，最后取消",
+  "resources": {
+    "Deployment": {
+      "name": "v4-watch-20261022-02",
+      "sections": {
+        "updateStrategy": [
+          "spec.strategy.rollingUpdate.maxUnavailable=25%",
+          "spec.strategy.rollingUpdate.maxSurge=25%"
+        ],
+        "podTemplate": ["容器", "web", "nginx:alpine"],
+        "volumeSettings": ["普通卷挂载", "ConfigMap/Secret 挂载"],
+        "deploymentMode": ["默认规则"],
+        "podMode": ["spec.template.spec.terminationGracePeriodSeconds=30"]
+      }
+    },
+    "StatefulSet": {
+      "name": "v4-watch-sts-20261022-01",
+      "sections": {
+        "updateStrategy": ["spec.updateStrategy.rollingUpdate.partition=0"],
+        "podTemplate": ["容器", "web", "nginx:alpine"],
+        "podMode": ["spec.template.spec.terminationGracePeriodSeconds=30"],
+        "volumeSettings": ["普通卷挂载", "ConfigMap/Secret 挂载"],
+        "deploymentMode": ["默认规则"]
+      },
+      "notObservedInModal": "volumeClaimTemplates、Service 字段未在这次设置弹窗的分区文本中显示；旧源码仍证明它们属于 StatefulSet 专属能力，不能据此判定已不存在"
+    },
+    "DaemonSet": {
+      "name": "v4-watch-ds-20261022-01",
+      "sections": {
+        "updateStrategy": [
+          "spec.updateStrategy.rollingUpdate.maxUnavailable=1",
+          "spec.minReadySeconds=0"
+        ],
+        "podTemplate": ["容器组", "web", "nginx:alpine"],
+        "volumeSettings": ["普通卷挂载", "ConfigMap/Secret 挂载"],
+        "podMode": ["spec.template.spec.terminationGracePeriodSeconds=30"]
+      },
+      "notObservedInModal": "副本控件和调度规则不在该页面分区中"
+    }
+  },
+  "limitations": [
+    "页面读取的是旧部署制品，不是当前分支 VERIFY",
+    "当前值不是空对象默认值",
+    "未提交任何保存请求，不证明 payload、服务端持久化、RBAC、缓存或错误态",
+    "没有读取凭据、请求头、Token 或 Secret 明文"
+  ]
+}

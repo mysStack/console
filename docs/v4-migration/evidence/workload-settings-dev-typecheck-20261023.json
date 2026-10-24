@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-23",
+  "baselineCommit": "5c24342571419708b6f0c21f3ce9e8f193da0e17",
+  "sourceCommit": "0c1d9aadf219fcabf5e6a310722591c9d7bef136",
+  "method": "TypeScript compiler host overlays tracked source from HEAD; new production inputs absent in baseline; same configuration and dependencies",
+  "baselineDiagnostics": 1325,
+  "currentDiagnostics": 1325,
+  "introduced": [],
+  "statement": "原项目 TypeScript 检查未通过；本次同配置编译器内存覆盖对照没有新增诊断，不等同全项目 TypeScript 通过",
+  "samples": [
+    {
+      "file": "packages/console/src/pages/clusters/components/Inputs/ServicePort/styles.ts",
+      "code": 4023,
+      "message": "Exported variable 'StyledSelect' has or is using name 'SelectInterface' from external module \"/home/bruce/code/ks-develop/console-workloads/node_modules/@kubed/components/lib/src/Select/Select\" but cannot be named."
+    },
+    {
+      "file": "packages/console/src/pages/clusters/components/SchemeInput/styles.ts",
+      "code": 4023,
+      "message": "Exported variable 'SelectStyle' has or is using name 'SelectInterface' from external module \"/home/bruce/code/ks-develop/console-workloads/node_modules/@kubed/components/lib/src/Select/Select\" but cannot be named."
+    },
+    {
+      "file": "packages/console/src/pages/clusters/containers/ClusterSetting/Gateway/Components/MonitoringOverview/styles.ts",
+      "code": 4023,
+      "message": "Exported variable 'SelectWithoutBorder' has or is using name 'SelectInterface' from external module \"/home/bruce/code/ks-develop/console-workloads/node_modules/@kubed/components/lib/src/Select/Select\" but cannot be named."
+    },
+    {
+      "file": "packages/console/src/pages/clusters/containers/Network/Policies/Detail/Viewer/Table/index.tsx",
+      "code": 2322,
+      "message": "Type 'Column<{}>[]' is not assignable to type 'readonly Column<ViewTable>[]'.\n  Type 'Column<{}>' is not assignable to type 'Column<ViewTable>'.\n    Type 'ColumnInterface<{}> & ColumnInterfaceBasedOnValue<{}, any> & { Header: string; } & { accessor?: string | Accessor<{}> | undefined; }' is not assignable to type 'Column<ViewTable>'.\n      Type 'ColumnInterface<{}> & ColumnInterfaceBasedOnValue<{}, any> & { Header: string; } & { accessor?: string | Accessor<{}> | undefined; }' is not assignable to type 'ColumnWithStrictAccessor<ViewTable>'.\n        Type 'ColumnInterface<{}> & ColumnInterfaceBasedOnValue<{}, any> & { Header: string; } & { accessor?: string | Accessor<{}> | undefined; }' is not assignable to type '{ accessor: string; }'.\n          Types of property 'accessor' are incompatible.\n            Type 'string | Accessor<{}> | undefined' is not assignable to type 'string'.\n              Type 'undefined' is not assignable to type 'string'."
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-23T03:27:31.827Z",
+  "sourceCommit": "4f2b5fac91539ff4b7e96411897db5dd4e39f6ea",
+  "uncommittedSourceFiles": [],
+  "server": "https://192.168.2.131:6443",
+  "version": "v1.31.13+k3s1",
+  "namespace": "v4-migration-e2e",
+  "mode": "server dry-run; no resource persisted",
+  "residualResources": [],
+  "results": [
+    {
+      "kind": "Deployment",
+      "expected": "accepted",
+      "passed": true,
+      "result": "deployment.apps/v4-metadata-dryrun-deployment-1792726049878",
+      "error": "",
+      "annotations": {
+        "example.com/source": "settings",
+        "kubesphere.io/restartedAt": "preserved",
+        "example.com/empty": ""
+      }
+    },
+    {
+      "kind": "StatefulSet",
+      "expected": "accepted",
+      "passed": true,
+      "result": "statefulset.apps/v4-metadata-dryrun-statefulset-1792726049878",
+      "error": "",
+      "annotations": {
+        "example.com/source": "settings",
+        "kubesphere.io/restartedAt": "preserved",
+        "example.com/empty": ""
+      }
+    },
+    {
+      "kind": "DaemonSet",
+      "expected": "accepted",
+      "passed": true,
+      "result": "daemonset.apps/v4-metadata-dryrun-daemonset-1792726049878",
+      "error": "",
+      "annotations": {
+        "example.com/source": "settings",
+        "kubesphere.io/restartedAt": "preserved",
+        "example.com/empty": ""
+      }
+    }
+  ]
+}

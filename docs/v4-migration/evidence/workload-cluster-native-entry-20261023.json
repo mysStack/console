@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-23T07:23:33.864Z",
+  "sourceCommit": "d762c005bdf5b4c48e594a069785f1fa51e86489",
+  "uncommittedSourceFiles": [],
+  "scope": "cluster deployments/statefulsets/daemonsets routes and native create wiring",
+  "files": [
+    "packages/console/src/pages/clusters/containers/ApplicationWorkloads/routes.tsx",
+    "packages/console/src/pages/clusters/containers/ApplicationWorkloads/Workloads/index.tsx",
+    "packages/console/src/pages/projects/components/WorkloadCreateModal/index.tsx",
+    "packages/console/src/pages/projects/components/WorkloadCreateModal/useWorkloadResourceOptions.ts",
+    "packages/console/src/pages/projects/components/WorkloadCreateModal/useWorkloadTargetOptions.ts"
+  ],
+  "checks": {
+    "deploymentRouteNative": true,
+    "statefulSetRouteNative": true,
+    "daemonSetRouteNative": true,
+    "workloadRouteHasNoV3List": true,
+    "nativeListHasNamespaceSelector": true,
+    "nativeListHasCreateModal": true,
+    "deploymentAndDaemonSetCreate": true,
+    "statefulSetCreate": true,
+    "createUsesPayloadNamespace": true,
+    "namespaceSelectable": true,
+    "namespaceDependencyReload": true,
+    "emptyNamespaceDoesNotFetch": true,
+    "statusReasonIsRendered": true,
+    "exactCommittedSource": true
+  },
+  "limits": [
+    "static source validation only",
+    "no image build or deployment identity validation",
+    "no browser rendering, RBAC, namespace isolation, persistence, cache or V3 equivalence validation"
+  ]
+}

@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+python3 docs/v4-migration/governance/scripts/v4-module-gate.py auto message --hook --message-file "$1"

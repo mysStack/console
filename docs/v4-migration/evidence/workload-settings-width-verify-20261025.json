@@ -1,0 +1,90 @@
+{
+  "date": "2026-10-25",
+  "module": "workloads",
+  "stage": "VERIFY",
+  "source": {
+    "branch": "feature/v4-workloads",
+    "commit": "2b0c2c6de2dddddc825b4606897e0362e299cad0",
+    "ciRun": "40124472412",
+    "ciUrl": "https://github.com/mysStack/console/actions/runs/40124472412",
+    "image": "ghcr.io/mysstack/ks-console:feature-v4-workloads-20261025-031645-2b0c2c6de2dd",
+    "imageDigest": "sha256:b23b9b5ea4836778357fd5919c5b002f02a229d87b0e854f9172e47b969ecfdd"
+  },
+  "deployment": {
+    "context": "default",
+    "namespace": "kubesphere-system",
+    "deployment": "ks-console",
+    "generation": 603,
+    "nodePort": 30880,
+    "rollout": "成功",
+    "replicas": "1/1",
+    "pod": "ks-console-5b65b75bcf-twzhz",
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:b23b9b5ea4836778357fd5919c5b002f02a229d87b0e854f9172e47b969ecfdd"
+  },
+  "browser": {
+    "tool": "Playwright CLI",
+    "session": "workload-rea-current",
+    "authenticatedSession": true,
+    "freshLogin": "未重新建立；本轮复用已认证测试会话",
+    "viewport": "1280x720",
+    "urlBase": "http://192.168.2.131:30880",
+    "resourceNamespace": "v4-migration-e2e",
+    "resources": {
+      "Deployment": {
+        "name": "v4-deploy-edit-ef3",
+        "route": "/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+        "modalWidth": 1162,
+        "modalLeft": 59,
+        "modalTop": 20.7,
+        "nativeSections": [
+          "更新策略",
+          "容器组设置",
+          "存储设置",
+          "容器组调度规则",
+          "容器组优雅终止",
+          "添加元数据"
+        ],
+        "status": "通过宽度和原生字段渲染复验"
+      },
+      "StatefulSet": {
+        "name": "v4-watch-sts-20261022-01",
+        "route": "/clusters/host/projects/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01",
+        "modalWidth": 1162,
+        "modalLeft": 59,
+        "modalTop": 20.7,
+        "nativeChecks": ["容器组副本分组序号", "持久卷声明模板", "容器", "元数据"],
+        "status": "通过宽度和 StatefulSet 特有字段渲染复验"
+      },
+      "DaemonSet": {
+        "name": "v4-stop-ds-7fa",
+        "route": "/clusters/host/projects/v4-migration-e2e/daemonsets/v4-stop-ds-7fa",
+        "modalWidth": 1162,
+        "modalLeft": 59,
+        "modalTop": 20.7,
+        "nativeChecks": ["最大不可用容器组数量", "容器组就绪最短运行时长", "容器", "元数据"],
+        "status": "通过宽度和 DaemonSet 特有字段渲染复验"
+      }
+    },
+    "consoleErrors": {
+      "count": 8,
+      "scope": "当前页面加载期间",
+      "disposition": "扩展初始化错误，属于已登记的扩展范围问题；本轮不将其误记为 Workload 原生页面通过"
+    }
+  },
+  "conclusion": {
+    "passed": [
+      "当前 SHA 镜像已由 CI 构建并推送",
+      "131 ks-console rollout 成功，Pod Ready，Pod imageID 与镜像 digest 一致",
+      "三类资源详情页可直达并打开原生编辑设置",
+      "三类资源编辑设置弹窗宽度均为 1162px",
+      "StatefulSet 分区/PVC 模板和 DaemonSet 更新策略等资源特有字段可见"
+    ],
+    "notClosed": [
+      "Tab 内容切换与 release-4.1.5 的完整分区交互尚未逐项等价验收",
+      "低权限账号的浏览器正反路径和完整 RBAC 组合矩阵未闭环",
+      "完整缓存失效、错误/取消路径和全部 V3 功能逐项等价未闭环",
+      "扩展初始化错误未处理，按项目决定暂不纳入本模块修复"
+    ],
+    "moduleAcceptance": "未完成"
+  }
+}

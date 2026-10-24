@@ -1,0 +1,28 @@
+{
+  "记录类型": "Workload 容器组优雅终止修复构建证据",
+  "记录时间": "2026-10-24",
+  "模块": "workloads",
+  "分支": "feature/v4-workloads",
+  "代码变更提交": "5c2525681615804dc284221e2e1434d05d655213",
+  "构建检出提交": "baf43d95d1cc80ae6d95b283a5c796d47b9a02ae",
+  "构建说明": "构建检出提交仅包含代码提交之后的文档记录变更，业务代码来自代码变更提交。",
+  "ci": {
+    "run": "40054050215",
+    "url": "https://github.com/mysStack/console/actions/runs/40054050215",
+    "结论": "success",
+    "单元测试任务": "success",
+    "镜像构建任务": "success"
+  },
+  "镜像": {
+    "名称": "ghcr.io/mysstack/ks-console",
+    "tag": "feature-v4-workloads-20261024-102558-baf43d95d1cc",
+    "digest": "sha256:6cd6ceaeeea2041026cded3b89e94e046d1a46426d5a001db9b510e3d9f10d36"
+  },
+  "本地验证": {
+    "./scripts/test.sh": "91 个文件 / 402 项通过",
+    "corepack yarn build:packages": "通过",
+    "git diff --check": "通过"
+  },
+  "部署状态": "尚未部署到 131；待执行 VERIFY 部署门禁、rollout、Pod imageID/digest 核对和 Playwright 浏览器验收",
+  "验收边界": "本证据只证明构建制品可追溯，不代表 Deployment、StatefulSet、DaemonSet 的 VERIFY 已通过"
+}

@@ -4,11 +4,104 @@
  */
 
 module.exports = {
+  WORKLOAD_IMAGE_RETRY: 'Retry image lookup',
+  WORKLOAD_IMAGE_SEARCH: 'Search images',
+  WORKLOAD_IMAGE_SEARCH_SUBMIT: 'Search image registry',
+  WORKLOAD_IMAGE_RESULTS: 'Image search results',
+  WORKLOAD_IMAGE_TAG_PREVIOUS: 'Previous tags',
+  WORKLOAD_IMAGE_TAG_NEXT: 'Next tags',
+  WORKLOAD_IMAGE_SEARCH_FAILED: 'Image search failed. Retry or enter the image manually.',
+  WORKLOAD_IMAGE_LOOKUP_FAILED:
+    'Unable to load image tags or details. Retry; the entered image is preserved.',
+  WORKLOAD_IMAGE_REGISTRY_FAILED:
+    'Unable to read the selected registry. Check permissions or enter the full image address manually.',
+  WORKLOAD_IMAGE_SIZE: 'Image size (bytes)',
+  WORKLOAD_IMAGE_LAYERS: 'Image layers',
+  WORKLOAD_SETTINGS_INVALID:
+    'Invalid update strategy, count or duration. Use non-negative integers or valid percentages; max unavailable and max surge must not both be zero.',
+  WORKLOAD_TERMINATION_GRACE_PERIOD: 'Pod Graceful Termination',
+  WORKLOAD_TERMINATION_GRACE_SECONDS: 'Termination grace period (seconds)',
+
+  WORKLOAD_SETTINGS_CONFLICT:
+    'The resource was updated by another operation. Cancel and reopen Edit Settings before saving.',
+  WORKLOAD_SETTINGS_SAVE_FAILED:
+    'Settings were not saved. Check your network and permissions, then try again.',
+  WORKLOAD_SETTINGS_LOAD_FAILED:
+    'Unable to load the latest workload settings. Refresh and try again.',
+  VOLUME_MOUNT_PL: 'Volume Mounts',
+  WORKLOAD_PRESERVED_VOLUME: 'Existing {type} volume is preserved while editing other settings.',
+  WORKLOAD_ADD_CONTAINER: 'Add Container',
+  WORKLOAD_ADD_INIT_CONTAINER: 'Add Init Container',
+  WORKLOAD_ADD_ENV: 'Add Environment Variable',
+  WORKLOAD_CONTAINER_INVALID: 'Enter a valid container name and image.',
+  WORKLOAD_CONTAINER_DUPLICATE: 'Container and init container names must be unique.',
+  WORKLOAD_ENV_DUPLICATE: 'Environment variable names must be unique within a container.',
+  WORKLOAD_PORT_INVALID:
+    'Enter a valid port (1–65535), protocol and optional port name (up to 15 characters).',
+  WORKLOAD_PORT_DUPLICATE: 'Port names must be unique across the Pod.',
+  WORKLOAD_PROBE_INVALID: 'Enter a valid probe type, path, port, and timing values.',
+  WORKLOAD_LIFECYCLE_INVALID:
+    'Enter a valid lifecycle action, path, port, or command. Regular init containers do not support lifecycle actions.',
+  WORKLOAD_SECURITY_CONTEXT_INVALID:
+    'Enter valid security context booleans, integer user or group IDs, SELinux values, and capability names.',
+  WORKLOAD_ANNOTATIONS_INVALID: 'Enter valid Kubernetes annotation names and text values.',
+  WORKLOAD_LABELS_INVALID: 'Enter valid Kubernetes label names and values.',
+  WORKLOAD_LABEL_CHECK_FAILED: 'Unable to check duplicate labels. Check the project and retry.',
+  POD_TEMPLATE_METADATA: 'Pod Template Metadata',
+  WORKLOAD_SCHEDULING_INVALID: 'Complete every Pod scheduling rule and select a valid target.',
+  WORKLOAD_SCHEDULING_PRESERVED: 'Keep existing advanced scheduling',
+  WORKLOAD_NODE_SELECTOR_INVALID: 'Enter valid Kubernetes node selector keys and values.',
+  WORKLOAD_TARGET_OPTIONS_FAILED:
+    'Unable to load workload targets. Check the namespace and try again.',
+  CONTAINER_SECURITY_CONTEXT: 'Container Security Context',
+  POD_SECURITY_CONTEXT: 'Pod Security Context',
+  PRIVILEGED_MODE: 'Privileged Mode',
+  ALLOW_PRIVILEGE_ESCALATION: 'Allow Privilege Escalation',
+  ROOT_DIRECTORY_READONLY: 'Root Directory Read-Only',
+  USER_GROUP: 'User Group',
+  RUN_AS_NON_ROOT: 'Run as Non-root',
+  SELINUX_CONTEXT: 'SELinux Context',
+  CAPABILITIES: 'Capabilities',
+  WORKLOAD_RESOURCE_INVALID: 'Enter valid CPU and memory quantities.',
+  WORKLOAD_CONFIG_REFERENCE_INVALID: 'Select a valid ConfigMap or Secret.',
+  WORKLOAD_VOLUME_INVALID: 'Enter a valid volume name, source, and path.',
+  WORKLOAD_VOLUME_DUPLICATE: 'Volume names must be unique.',
+  WORKLOAD_VOLUME_MOUNT_INVALID:
+    'Select an existing volume and enter a unique absolute mount path.',
+  WORKLOAD_ADD_CONFIG_REFERENCE: 'Add Config Reference',
+  WORKLOAD_REFERENCE_TYPE: 'Resource Type',
+  WORKLOAD_REFERENCE_RESOURCE: 'Configuration Resource',
+  WORKLOAD_SELECT_RESOURCE: 'Select a resource',
+  WORKLOAD_HEALTH_CHECKS: 'Health Checks',
+  WORKLOAD_INITIAL_DELAY: 'Initial Delay (s)',
+  WORKLOAD_TIMEOUT: 'Timeout (s)',
+  WORKLOAD_PERIOD: 'Period (s)',
+  WORKLOAD_SUCCESS_THRESHOLD: 'Success Threshold',
+  WORKLOAD_FAILURE_THRESHOLD: 'Failure Threshold',
+  WORKLOAD_CPU_REQUEST: 'CPU Request',
+  WORKLOAD_MEMORY_REQUEST: 'Memory Request',
+  WORKLOAD_CPU_LIMIT: 'CPU Limit',
+  WORKLOAD_MEMORY_LIMIT: 'Memory Limit',
+  WORKLOAD_ADD_VOLUME_MOUNT: 'Add Volume Mount',
+  WORKLOAD_ADD_VOLUME: 'Add Volume',
+  WORKLOAD_RESOURCE_OPTIONS_FAILED:
+    'Failed to load ConfigMaps, Secrets, or persistent volume claims in this project.',
+  WORKLOAD_PATH_TYPE_UNSET: 'Do not check path type',
+  WORKLOAD_EMPTY_DIR_MEDIUM: 'Storage Medium',
+  WORKLOAD_NODE_STORAGE: 'Node Storage',
+  WORKLOAD_SIZE_LIMIT: 'Size Limit',
+  STARTUP_COMMAND: 'Start Command',
+  COMMAND: 'Command',
+  PARAMETERS: 'Parameters',
+
   // Banner
   // List
   HPA_SET_TIP: 'Horizontal pod autoscaling has been set.',
   WORKLOAD_EMPTY_DESC: 'Please create a workload.',
   // List > Create > Basic Information
+  CREATE_DEPLOYMENT: 'Create Deployment',
+  CREATE_DEPLOYMENT_FAILED: 'Failed to create Deployment.',
+  REPLICAS: 'Replicas',
   // List > Create > Pod Settings
   // List > Create > Pod Settings > Add Container > Container Settings
   INVALID_IMAGE: 'Invalid image.',
@@ -34,6 +127,12 @@ module.exports = {
   AVAILABLE: 'Available',
   IN_USER: 'In use',
   ACCESS_MODE_SCAP: 'Access mode',
+  PVC_TEMPLATE_NAME: 'PVC template name',
+  PERSISTENT_VOLUME_CLAIM_TEMPLATE_PL: 'Persistent Volume Claim Templates',
+  WORKLOAD_ADD_VOLUME_CLAIM_TEMPLATE: 'Add PVC template',
+  WORKLOAD_VOLUME_CLAIM_INVALID:
+    'Enter a valid PVC template name, capacity, access mode, and storage class.',
+  WORKLOAD_VOLUME_CLAIM_DUPLICATE: 'PVC template names must be unique.',
   PVC_OR_TEMPLATE_EMPTY:
     'You have enabled Collect Logs on Volumes. Please add at least one persistent volume, temperary volume, or persistent volume claim template and specify the path of container logs.',
   PVC_EMPTY:
@@ -67,4 +166,11 @@ module.exports = {
     'The resource is managed by <strong>{app}</strong>, which may affect the normal use of this app if the resource is deleted. Please enter the {type} name <strong>{resource}</strong> to make sure you understand the risks associated with the operation.',
   STOP_APP_RESOURCE_TIP:
     'The resource is managed by <strong>{app}</strong>, which may affect the normal use of this app if the resource is stopped. Please enter the {type} name <strong>{resource}</strong> to make sure you understand the risks associated with the operation.',
+  WORKLOAD_ENV_SOURCE: 'Variable source',
+  WORKLOAD_ENV_FIELD_PATH: 'Pod field path',
+  WORKLOAD_ENV_RESOURCE: 'Container resource reference',
+  WORKLOAD_ENV_DIVISOR: 'Resource divisor',
+  WORKLOAD_REFERENCE_OPTIONAL: 'Allow missing resource or key',
+  WORKLOAD_ENV_REFERENCE_INVALID:
+    'Specify one valid variable source, resource name, key or field; the resource divisor must be positive.',
 };

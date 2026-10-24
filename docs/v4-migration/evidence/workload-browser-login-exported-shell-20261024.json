@@ -1,0 +1,38 @@
+{
+  "record": "Workload 131 浏览器登录环境变量继承补证",
+  "date": "2026-10-24",
+  "phase": "REA",
+  "operator": "Codex 单会话",
+  "credentialHandling": {
+    "source": "/home/bruce/.bashrc",
+    "variables": ["KS_TEST_USERNAME", "KS_TEST_PASSWORD"],
+    "usernameShellAssignmentPresent": true,
+    "usernameShellValuePresentAfterSource": true,
+    "usernameExportedByBashrc": false,
+    "usernameExportedForBrowserProcess": true,
+    "passwordExportedByBashrc": true,
+    "valuesRecorded": false
+  },
+  "cluster": {
+    "context": "default",
+    "apiServer": "https://192.168.2.131:6443",
+    "origin": "http://192.168.2.131:30880",
+    "deployment": "kubesphere-system/ks-console",
+    "sourceCommitOfDeployedArtifact": "31b6d88fc7e87707776c094aee12f1cdcb02604b",
+    "imageTag": "feature-v4-workloads-20261024-091102-31b6d88fc7e8",
+    "imageDigest": "sha256:2956710cd7ef2fbda79ff7a0a9695dac466336bd08248784d5afdfb577b951d3",
+    "podImageID": "sha256:2956710cd7ef2fbda79ff7a0a9695dac466336bd08248784d5afdfb577b951d3"
+  },
+  "browser": {
+    "freshSession": true,
+    "loginPage": "/login",
+    "authenticatedRoute": "/dashboard",
+    "authenticatedUI": true,
+    "principalRole": "platform-admin",
+    "resourceWrites": false,
+    "consoleErrorCountAfterLogin": 8,
+    "consoleErrorScope": "已记录为扩展运行时错误；未将其归因于登录流程或 Workload 原生页面",
+    "evidenceAdded": true
+  },
+  "conclusion": "环境变量已从 /home/bruce/.bashrc 读取；由于 KS_TEST_USERNAME 未在文件中 export，浏览器启动前在同一 shell 显式 export 该已有 shell 变量后登录成功。当前证明了 131 登录链路可用，但使用的是 31b6d88fc7e87707776c094aee12f1cdcb02604b 部署制品，不等同于当前工作区 HEAD 的 Workload VERIFY。"
+}

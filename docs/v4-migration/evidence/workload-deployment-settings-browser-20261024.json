@@ -1,0 +1,83 @@
+{
+  "record": "Deployment 编辑设置 Modal 基线与 V4 浏览器对照",
+  "date": "2026-10-24",
+  "operator": "Codex 单会话",
+  "workspaceHead": "8e22e8cce68d3b3b216eb6f5bfe1d581de2d001c",
+  "environment": {
+    "cluster": "host",
+    "namespace": "v4-migration-e2e",
+    "resource": "Deployment/v4-deploy-edit-ef3",
+    "baseline": {
+      "url": "http://192.168.2.131:30881/consolev3/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/resource-status",
+      "imageTag": "release-4.1.5-20261024-155944-fc1253c",
+      "podImageID": "sha256:2595b31de4dc01ae67b72b97b857ef40cd1c1ec2a0d406cada177982f380f455"
+    },
+    "currentV4": {
+      "url": "http://192.168.2.131:30880/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/resource-status",
+      "imageTag": "feature-v4-workloads-20261024-091102-31b6d88fc7e8",
+      "sourceCommit": "31b6d88fc7e87707776c094aee12f1cdcb02604b",
+      "podImageID": "sha256:2956710cd7ef2fbda79ff7a0a9695dac466336bd08248784d5afdfb577b951d3"
+    }
+  },
+  "steps": [
+    "分别从基线 30881 和当前 V4 30880 登录",
+    "直达同一 Deployment 详情页",
+    "打开更多操作中的编辑设置",
+    "只读观察 Modal、默认值、分区、字段和页面截图",
+    "未点击确定，未修改 Deployment"
+  ],
+  "baseline": {
+    "http": 200,
+    "dialogTitle": "编辑设置",
+    "navigation": ["更新策略", "容器", "存储", "容器组调度规则", "容器组优雅终止"],
+    "initialSection": "更新策略",
+    "visibleFields": ["滚动更新（推荐）", "最大不可用容器组数量：25%", "最大多余容器组数量：25%"],
+    "buttons": ["取消", "确定（初始禁用）"],
+    "layout": "独立大 Modal；左侧分段导航，右侧一次显示当前分区，底部固定取消/确定操作区。",
+    "screenshot": ".playwright-cli/page-2026-10-24T10-41-24-469Z.png"
+  },
+  "currentV4": {
+    "http": 200,
+    "dialogTitle": "编辑设置",
+    "navigation": ["更新策略", "容器组设置", "存储设置", "容器组调度规则", "添加元数据"],
+    "initialSection": "更新策略",
+    "visibleFields": [
+      "名称（禁用）",
+      "项目（禁用）",
+      "副本数量：1",
+      "更新策略：滚动更新（推荐）",
+      "最大不可用容器组数量：25%",
+      "最大多余容器组数量：25%",
+      "容器组安全上下文",
+      "容器/初始化容器",
+      "卷",
+      "容器组调度规则：默认规则",
+      "终止宽限时间：30 秒",
+      "标签：v4-migration-test=workloads-ef3",
+      "注解：deployment.kubernetes.io/revision=31",
+      "容器组模板元数据"
+    ],
+    "buttons": ["取消", "确定"],
+    "layout": "V4 原生长表单；左侧导航，右侧连续展示多个设置分区，底部固定取消/确定操作区。",
+    "screenshot": ".playwright-cli/page-2026-10-24T10-40-10-554Z.png"
+  },
+  "comparison": {
+    "same": [
+      "两边均能从 Deployment 详情页进入编辑设置",
+      "两边均支持滚动更新、最大不可用数量和最大多余数量",
+      "两边都提供容器、存储、调度、优雅终止和取消/确定边界"
+    ],
+    "different": [
+      "基线使用单分区视图，V4 首屏连续展示多个分区",
+      "V4 首屏直接展示副本数量、元数据和终止宽限时间",
+      "当前 V4 编辑设置首屏展示 kubectl.kubernetes.io/last-applied-configuration 的完整 JSON；后续元数据页对照确认基线元数据 Tab 也展示同一注解，因此这是 Modal 信息组织差异，不是资源元数据来源差异。"
+    ],
+    "reaMeaning": "当前 V4 的 Deployment 设置 Modal 是原生表单重构，不是旧 V3 布局复刻。功能等价必须按字段、默认值、校验、清空/保留、写回和敏感信息展示规则逐项验证。"
+  },
+  "limits": [
+    "本轮只读打开 Modal，没有执行保存、取消后的回读、冲突、403、404、网络失败或缓存验证。",
+    "本轮使用 131 已部署的 31b6d88fc7e8 制品；workspace 当前 HEAD 只包含 REA 文档提交，没有重新构建或部署。",
+    "当前 V4 页面完整展示 last-applied 注解的编辑设置首屏布局与基线不同，但基线元数据 Tab 同样展示该资源注解；仍需验证编辑表单是否应隐藏或折叠该内容。"
+  ],
+  "result": "Deployment 编辑设置的布局和字段差异已取得真实浏览器证据；功能等价、元数据展示规则和写回行为仍未闭环，REA 不放行 DEV。"
+}

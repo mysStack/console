@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-23T05:49:15.272Z",
+  "sourceCommit": "f32b13391184d798fb6a119d2837d58d15ed5e03",
+  "server": "https://192.168.2.131:6443",
+  "namespace": "v4-migration-e2e",
+  "resource": "service/v4-watch-sts-20261022-01",
+  "mode": "merge PATCH server dry-run; no resource persisted",
+  "beforeResourceVersion": "134406357",
+  "dryRunResourceVersion": "134406357",
+  "afterResourceVersion": "134406357",
+  "beforeClusterIP": "None",
+  "dryRunClusterIP": "None",
+  "requestedPorts": [
+    {
+      "name": "http",
+      "port": 80,
+      "protocol": "TCP",
+      "targetPort": 81
+    }
+  ],
+  "dryRunPorts": [
+    {
+      "name": "http",
+      "port": 80,
+      "protocol": "TCP",
+      "targetPort": 81
+    }
+  ],
+  "checks": {
+    "headlessPreserved": true,
+    "portPatchAccepted": true,
+    "unchangedAfter": true
+  }
+}

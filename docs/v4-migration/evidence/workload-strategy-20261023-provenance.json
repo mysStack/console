@@ -1,0 +1,48 @@
+{
+  "sourceRoot": "/home/bruce/code/ks-develop/console-workloads/packages/bootstrap/assets/v3dist",
+  "method": "@babel/parser inert AST; literal webpack Array(base).concat index; no target code executed",
+  "records": [
+    {
+      "file": "1.9ca3a76d71946712055c.js",
+      "module": 1299,
+      "sourceSha256": "924556b7889c21dbd450535163cdd63e5a6c92daad2cbdc3ec8514a005d765a3",
+      "utf16Range": [938536, 944359],
+      "byteRange": [938572, 944395],
+      "factorySha256": "7afba5f779134ce4eb3784ef876fe2209165573f7fe05a34e399295451a1a942",
+      "analysisFile": "webpack-1299.js",
+      "analysisSha256": "e7c690f6054650f36a9abd43fde3817767cbe7811c9c9ed5047ee3efc157f1f6",
+      "wrapper": {
+        "prefix": "(",
+        "suffix": ");\n"
+      }
+    },
+    {
+      "file": "1.9ca3a76d71946712055c.js",
+      "module": 1530,
+      "sourceSha256": "924556b7889c21dbd450535163cdd63e5a6c92daad2cbdc3ec8514a005d765a3",
+      "utf16Range": [1191157, 1197090],
+      "byteRange": [1191228, 1197161],
+      "factorySha256": "372e41cfc1d1877e0e33b3665b08bd98576d2280e643335a43f4ebc3745b8d0a",
+      "analysisFile": "webpack-1530.js",
+      "analysisSha256": "ad3ff21f25ff77ed6de95d2fbe08e5efcf85f242001a6476c396bcf74a54ebc7",
+      "wrapper": {
+        "prefix": "(",
+        "suffix": ");\n"
+      }
+    },
+    {
+      "file": "1.9ca3a76d71946712055c.js",
+      "module": 1542,
+      "sourceSha256": "924556b7889c21dbd450535163cdd63e5a6c92daad2cbdc3ec8514a005d765a3",
+      "utf16Range": [1217145, 1218503],
+      "byteRange": [1217216, 1218574],
+      "factorySha256": "a3f09a970752beb5e0adbc59fb3832cebe34bf05f6c2cd413ec27faaa3bc7279",
+      "analysisFile": "webpack-1542.js",
+      "analysisSha256": "7cae01419dd248736fa7962f18db66fb335fb54d56c4332aa1f432b517900483",
+      "wrapper": {
+        "prefix": "(",
+        "suffix": ");\n"
+      }
+    }
+  ]
+}

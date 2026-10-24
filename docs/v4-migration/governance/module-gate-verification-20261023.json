@@ -1,0 +1,75 @@
+{
+  "记录日期": "2026-10-23",
+  "类型": "执行入口工具验证，不是业务验收",
+  "sourceCommit": "da38cb87ec683a6bf67b3f3a90764a6f2910b0af",
+  "baseCommit": "3e09afd6a051d4091b3c887462c880eff2ba6754",
+  "branch": "feature/v4-workloads",
+  "phase": "REA",
+  "reaStatus": "分析中",
+  "pr": {
+    "number": 2,
+    "url": "https://github.com/mysStack/console/pull/2",
+    "state": "open",
+    "draft": true,
+    "base": "feature/v4-migration"
+  },
+  "ci": {
+    "id": 39812232782,
+    "url": "https://github.com/mysStack/console/actions/runs/39812232782",
+    "headSha": "da38cb87ec683a6bf67b3f3a90764a6f2910b0af",
+    "conclusion": "failure",
+    "jobs": [
+      {
+        "name": "模块阶段与 PR 范围",
+        "id": 119941287839,
+        "conclusion": "failure",
+        "url": "https://github.com/mysStack/console/actions/runs/39812232782/job/119941287839",
+        "logEvidence": [
+          "2026-10-22T16:14:13.1957365Z 门禁失败：REA/记录通道禁止业务或无关改动：locales/en/l10n-projects-applicationWorkloads-deployments-list.js"
+        ]
+      },
+      {
+        "name": "门禁工具回归",
+        "id": 119941288424,
+        "conclusion": "success",
+        "url": "https://github.com/mysStack/console/actions/runs/39812232782/job/119941288424",
+        "logEvidence": [
+          "2026-10-22T16:14:20.6866818Z Ran 32 tests in 5.733s",
+          "2026-10-22T16:14:20.6867133Z OK"
+        ]
+      }
+    ]
+  },
+  "localCi": {
+    "exitCode": 1,
+    "error": "门禁失败：REA/记录通道禁止业务或无关改动：locales/en/l10n-projects-applicationWorkloads-deployments-list.js",
+    "expectation": "REA 中存在历史业务差异必须拒绝，不能豁免或伪造通过"
+  },
+  "integrationProtection": {
+    "branch": "feature/v4-migration",
+    "strict": true,
+    "enforceAdmins": true,
+    "checks": [
+      {
+        "context": "门禁工具回归",
+        "app_id": 15368
+      },
+      {
+        "context": "模块阶段与 PR 范围",
+        "app_id": 15368
+      }
+    ],
+    "allowForcePushes": false,
+    "allowDeletions": false,
+    "requiredReviewCount": null,
+    "说明": "只增加必需状态检查，未新增评审人数要求，未修改稳定分支"
+  },
+  "environmentVerification": {
+    "appBuild": "未执行",
+    "image": null,
+    "deployment": "未执行",
+    "podImageID": null,
+    "browser": "未执行",
+    "reason": "本批无业务界面、路由或制品变更，不代表 Deployment 功能完成"
+  }
+}

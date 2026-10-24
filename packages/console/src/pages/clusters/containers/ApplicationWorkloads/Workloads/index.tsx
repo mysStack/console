@@ -15,34 +15,57 @@ import {
   Icon,
   RecreateModal,
   StopModal,
+  StatusReason,
   getWorkloadStatus,
   formatTime,
   TableRef,
   ListPage,
   useActionMenu,
+  useCacheStore,
   useCommonActions,
 } from '@ks-console/shared';
 import { workloadStore } from '@ks-console/shared';
 import WorkloadStatus from '../../../../../components/WorkloadStatus';
+import WorkloadCreateModal from '../../../../projects/components/WorkloadCreateModal';
 import type { FormattedWorkload } from '@ks-console/shared';
 
-const workloadTypeMapper: Record<string, any> = {
+const workloadKindMapper = {
+  deployments: 'Deployment',
+  statefulsets: 'StatefulSet',
+  daemonsets: 'DaemonSet',
+} as const;
+
+type WorkloadModule = keyof typeof workloadKindMapper;
+
+const workloadTypeMapper: Record<WorkloadModule, string> = {
   deployments: 'DEPLOYMENT',
   daemonsets: 'DAEMONSET',
   statefulsets: 'STATEFULSET',
 };
 
-const Deployment = ({ module }: { module: string }) => {
+const createErrorMapper: Record<WorkloadModule, string> = {
+  deployments: 'CREATE_DEPLOYMENT_FAILED',
+  statefulsets: 'CREATE_STATEFULSET_FAILED',
+  daemonsets: 'CREATE_DAEMONSET_FAILED',
+};
+
+const Deployment = ({ module }: { module: WorkloadModule }) => {
   const WORKLOAD_TYPE = workloadTypeMapper[module];
   const params: Record<string, any> = useParams();
   const { cluster } = params;
 
   const authKey = module;
   const store = workloadStore(module);
-  const { useUpdateDeploymentMutation, useBatchStopDeploymentMutation } = store;
+  const {
+    useUpdateDeploymentMutation,
+    useBatchStopDeploymentMutation,
+    useCreateWorkloadMutation,
+    useCreateStatefulSetMutation,
+  } = store;
 
   const tableRef = useRef<TableRef<FormattedWorkload>>();
   const [recordData, setRecordData] = useState<FormattedWorkload[]>([]);
+  const [selectedNamespace] = useCacheStore(`${cluster}-selectedNamespace`);
 
   const refetch = () => {
     tableRef?.current?.refetch();
@@ -52,6 +75,12 @@ const Deployment = ({ module }: { module: string }) => {
     open: openBatchStopModal,
     close: closeBatchStopModal,
     isOpen: batchStopModalIsOpen,
+  } = useDisclosure();
+
+  const {
+    open: openCreateModal,
+    close: closeCreateModal,
+    isOpen: createModalIsOpen,
   } = useDisclosure();
 
   const {
@@ -77,6 +106,19 @@ const Deployment = ({ module }: { module: string }) => {
       closeRecreateModal();
     },
   });
+
+  const createOptions = {
+    onSuccess: () => {
+      closeCreateModal();
+      refetch();
+      notify.success(t('CREATE_SUCCESSFUL'));
+    },
+    onError: () => notify.error(t(createErrorMapper[module])),
+  };
+  const { mutate: mutateCreate, isLoading: createIsLoading } =
+    useCreateWorkloadMutation(createOptions);
+  const { mutate: mutateCreateStatefulSet, isLoading: statefulSetCreateIsLoading } =
+    useCreateStatefulSetMutation(createOptions);
 
   const { editBaseInfo, editYaml, del } = useCommonActions({
     store,
@@ -129,13 +171,10 @@ const Deployment = ({ module }: { module: string }) => {
   // table columns
   const getItemDesc = (record: any) => {
     const asRecord = record as FormattedWorkload;
-    const { reason } = getWorkloadStatus(asRecord, module);
-    // const { status, reason } = getWorkloadStatus(asRecord, module);
+    const { status, reason } = getWorkloadStatus(asRecord, module);
 
     return reason !== '' ? (
-      // TODO: implement here with exist component
-      // <StatusReason status={status} reason={t(reason)} data={record} />
-      <span>reason</span>
+      <StatusReason status={status} reason={reason} data={record} hasTip />
     ) : (
       record.description || '-'
     );
@@ -209,6 +248,14 @@ const Deployment = ({ module }: { module: string }) => {
     });
   };
 
+  const handleCreate = (data: Record<string, any>) => {
+    const namespace =
+      module === 'statefulsets' ? data.workload?.metadata?.namespace : data.metadata?.namespace;
+    const request = { params: { cluster, namespace }, data };
+    if (module === 'statefulsets') mutateCreateStatefulSet(request as any);
+    else mutateCreate(request);
+  };
+
   const renderTableActions = useActionMenu({
     authKey,
     params,
@@ -216,14 +263,14 @@ const Deployment = ({ module }: { module: string }) => {
     actions: [
       {
         key: 'create',
-        text: t('Create'),
+        text: t('CREATE'),
         action: 'create',
         props: {
           color: 'secondary',
           shadow: true,
           className: 'table-button',
         },
-        onClick: () => {},
+        onClick: openCreateModal,
       },
     ],
   });
@@ -310,6 +357,17 @@ const Deployment = ({ module }: { module: string }) => {
         tabs={tabs}
         store={store}
         hasNamespaceSelector
+      />
+      <WorkloadCreateModal
+        key={`${module}:${selectedNamespace || 'all'}`}
+        visible={createModalIsOpen}
+        cluster={cluster}
+        namespace={selectedNamespace || ''}
+        namespaceSelectable
+        kind={workloadKindMapper[module]}
+        confirmLoading={createIsLoading || statefulSetCreateIsLoading}
+        onOk={handleCreate}
+        onCancel={closeCreateModal}
       />
       {batchStopModalIsOpen && (
         <StopModal

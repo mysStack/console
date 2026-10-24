@@ -1,0 +1,9 @@
+{
+  "baselineCommit": "f8a768d8f739a3324197775e6df2f14dc33b43f2",
+  "sourceCommit": "e0dbb45d3f70e799f3441ac515a575af9a50f94f",
+  "method": "tsc --noEmit -p packages/console/tsconfig.json; direct repository check",
+  "exitCode": 2,
+  "diagnosticCount": 1316,
+  "changedFileErrors": [],
+  "statement": "全项目 TypeScript 检查仍因仓库既有 rootDir/文件列表诊断失败；输出未发现本轮三个生产文件的直接错误，不能记为全项目 TypeScript 通过。"
+}

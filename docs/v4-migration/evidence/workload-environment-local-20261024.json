@@ -1,0 +1,151 @@
+{
+  "baseCommit": "22e65745611339817c5c1fd514915ba40d95f3c8",
+  "sourceIdentity": "文件摘要与包含记录的 Git 提交绑定，不代表部署或浏览器验收",
+  "sourceFiles": [
+    {
+      "path": "locales/en/l10n-projects-applicationWorkloads-deployments-list.js",
+      "sha256": "c0447ef2dfe2f0fda6d7ebf1dfddf2cdec2876aa2bf4a17b7ac8a2ecbc9207ca"
+    },
+    {
+      "path": "locales/es/l10n-projects-applicationWorkloads-deployments-list.js",
+      "sha256": "e6a00e29fa17cab046f0fa3d5407306dc55661c99590a02bad4a2974de3548eb"
+    },
+    {
+      "path": "locales/tc/l10n-projects-applicationWorkloads-deployments-list.js",
+      "sha256": "b982252bd80bacbcaf4748e1acd968f2c3ad2e36aa3b01746d22d4bea521b9d6"
+    },
+    {
+      "path": "locales/zh/l10n-projects-applicationWorkloads-deployments-list.js",
+      "sha256": "2482b247d9bf859c1da49e766227aebf6b70699fa6de98e8d963ccf0b2cf5deb"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/ContainerInput.tsx",
+      "sha256": "6d6e8a787421be745e1664d25d370df6158d91225021021c0c3b3ca46b4d9509"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/deployment.locale.test.ts",
+      "sha256": "037f260c6e19888f593c0aaf18174310e084e7478c6497e8e40e435d2413c0fb"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/deployment.test.ts",
+      "sha256": "79fc8ed65059a25b1c29b1fa1342fb01a7a5b03a0f26e4d60075f3f96e3cda06"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/deployment.ts",
+      "sha256": "ba7742e027cd9b8cb027938638c72ea5a0177c589327dafbbf9d1f9b9c20d4cd"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/ContainerEnvironment.test.ts",
+      "sha256": "e4ed4f909e07d0e300183d64bc62470eb605a23cb97f18228f731acb8a7c7201"
+    }
+  ],
+  "currentV3": {
+    "artifactTree": "1e499d92e11374e26c76f5e13be45251602bd596",
+    "bundle": "packages/bootstrap/assets/v3dist/1.9ca3a76d71946712055c.js",
+    "bundleSha256": "924556b7889c21dbd450535163cdd63e5a6c92daad2cbdc3ec8514a005d765a3",
+    "module": 2254,
+    "utf16Range": [1893307, 1900832],
+    "factorySha256": "649c48cd1c0c8435ca495cf145e153e0ffdc01755117b894a97cd5a1e977a092",
+    "observed": [
+      "CUSTOM/customization",
+      "FROM_CONFIGMAP/configMapKeyRef",
+      "FROM_SECRET/secretKeyRef",
+      "getKeysOptions"
+    ],
+    "notObservedInFactory": ["fieldRef", "resourceFieldRef"],
+    "method": "@babel/parser 只读 AST，提取 literal webpack factory，不执行目标代码"
+  },
+  "scope": ["Deployment", "StatefulSet", "DaemonSet"],
+  "tdd": {
+    "model": {
+      "red": {
+        "passed": 70,
+        "failed": 3
+      },
+      "green": {
+        "passed": 73,
+        "failed": 0
+      }
+    },
+    "interaction": {
+      "red": {
+        "passed": 0,
+        "failed": 2
+      },
+      "green": {
+        "passed": 2,
+        "failed": 0
+      }
+    },
+    "locales": {
+      "red": {
+        "passed": 1,
+        "failed": 1
+      },
+      "green": {
+        "passed": 2,
+        "failed": 0
+      }
+    }
+  },
+  "checks": [
+    {
+      "command": "./scripts/test.sh",
+      "exitCode": 0,
+      "files": 86,
+      "passed": 383,
+      "failed": 0
+    },
+    {
+      "command": "corepack yarn eslint <ContainerInput.tsx deployment.ts>",
+      "initialErrors": 4,
+      "exitCode": 0
+    },
+    {
+      "command": "corepack yarn prettier --check <九个源码/测试/语言文件>",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0
+    },
+    {
+      "command": "corepack yarn build:locales",
+      "exitCode": 0,
+      "warnings": [
+        "es/tc configHistory 的 CONFIG_HISTORY_SOURCE_NOTE 原有重复键，各在 HEAD 定义两次"
+      ]
+    },
+    {
+      "command": "impeccable detect --json <ContainerInput.tsx>",
+      "exitCode": 0,
+      "findings": []
+    },
+    {
+      "command": "corepack yarn build:packages",
+      "exitCode": 0,
+      "sharedMinified": 633
+    }
+  ],
+  "typecheck": {
+    "configuration": "packages/console/tsconfig.json",
+    "baselineDiagnostics": 1326,
+    "currentDiagnostics": 1326,
+    "introduced": [],
+    "changedFileErrors": [],
+    "fullTypecheckPassed": false
+  },
+  "environment": {
+    "deployedThisIncrement": false,
+    "ciRun": null,
+    "image": null,
+    "digest": null,
+    "podImageID": null,
+    "playwrightOnThisIncrement": "未执行"
+  },
+  "remaining": [
+    "key 仍为输入框，待补当前 V3 下拉选择交互",
+    "镜像选择完整交互",
+    "当前 SHA 制品、部署及三类 Playwright/RBAC/namespace/持久化验收"
+  ]
+}

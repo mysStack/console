@@ -4,12 +4,13 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { get, unset, set } from 'lodash';
+import { get } from 'lodash';
 import { useForm, Loading, Button } from '@kubed/components';
 import { serviceStore } from '@ks-console/shared';
 import Form from './Form';
 import { StyledLoading, ButtonWrapper, FormWrapper } from './styles';
 import type { OriginData, OriginalService } from '@ks-console/shared';
+import { buildStatefulSetServicePatch } from './servicePatch';
 
 interface IProps {
   type: string;
@@ -53,16 +54,7 @@ const StatefulSetServiceModal = ({
 
   const handleOk = () => {
     formRef.validateFields().then(form => {
-      const typeFiled = get(form, 'spec.clusterIP', 'virtualIP');
-
-      if (typeFiled === 'headlessSelector') {
-        set(form, 'spec.clusterIP', 'None');
-      } else {
-        unset(form, 'spec.clusterIP');
-      }
-
-      set(form, 'metadata.resourceVersion', resourceVersion);
-      onOk(form);
+      onOk(buildStatefulSetServicePatch(form, resourceVersion));
     });
   };
 

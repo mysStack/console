@@ -1,0 +1,54 @@
+{
+  "module": "workloads",
+  "sourceCommit": "24c6afa03849d5d5c7b84fccd1602639b1fd0eb5",
+  "account": "v4-workload-viewer-20261023",
+  "secretsPrinted": false,
+  "browser": {
+    "freshContext": true,
+    "initialCookies": 0,
+    "loginHttp": 200,
+    "authenticatedUI": true,
+    "configReferencePanelVisible": {
+      "deployments": true,
+      "statefulsets": true,
+      "daemonsets": true
+    }
+  },
+  "rbac": {
+    "role": "kubesphere:iam:viewer",
+    "verbs": ["get", "list", "watch"],
+    "positiveGet": {
+      "namespace": "v4-migration-e2e",
+      "status": 200
+    },
+    "negativeUpdate": {
+      "deployments": 403,
+      "statefulsets": 403,
+      "daemonsets": 403
+    },
+    "unchanged": {
+      "deployments": true,
+      "statefulsets": true,
+      "daemonsets": true
+    },
+    "resourceVersions": {
+      "deployments": "136249933",
+      "statefulsets": "136250126",
+      "daemonsets": "136250867"
+    },
+    "namespaceUpdatePermission": "no",
+    "otherNamespaceGetPermission": "no"
+  },
+  "namespace": {
+    "positiveNamespace": "v4-migration-e2e",
+    "positiveListStatus": 200,
+    "positiveListNamespaces": ["v4-migration-e2e"],
+    "positiveNames": ["v4-deploy-edit-ef3", "v4-watch-20261022-02"],
+    "otherNamespace": "v4-migration-e2e-isolation",
+    "otherNamespaceFixture": "v4-isolation-deploy",
+    "otherNamespaceGetStatus": 403,
+    "otherNamespaceAuth": "get/list denied",
+    "cleanup": "仅删除本轮临时 Deployment，保留测试 namespace"
+  },
+  "conclusion": "低权限账号在当前精确制品上可读专用 namespace 三类配置引用页，更新请求均 403 且资源未改变；专用第二 namespace 的临时 Deployment 访问返回 403，第一 namespace 列表只返回本 namespace 资源，namespace 正反隔离本轮通过。"
+}

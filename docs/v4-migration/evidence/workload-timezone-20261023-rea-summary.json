@@ -1,0 +1,33 @@
+{
+  "operation": "analyze_javascript_application",
+  "authority": "shipped-artifact",
+  "confidence": "derived",
+  "parentEvidenceId": "ev_6cb9459efa2f4ace1cbe93ed88e3948933873e8e268dc8bf6113ead43d8bab8f",
+  "summaryEvidenceId": "ev_d25ffd82edf028b2d2cb795a6ea57a7d2652f42aa24797092e49038aac3dd1b9",
+  "inputDigest": "d9813d3d7d97d94fbab7352e20a4d4be1f520f2411ede21133b8152243b132de",
+  "selectedFactories": [933, 2285],
+  "statistics": {
+    "relevantFiles": 2,
+    "bytes": 19367,
+    "parsedJavascriptFiles": 2,
+    "parseFailures": 0,
+    "visitedAstNodes": 5401,
+    "findings": 3
+  },
+  "coverage": {
+    "application": "complete",
+    "semantic": "unknown",
+    "semanticUnknowns": 1414
+  },
+  "observations": [
+    "工厂 2285 的容器开关通过 /etc/localtime 挂载判断启用状态；启用时追加 host-time 只读挂载，关闭时按 mountPath 移除挂载。",
+    "工厂 933 在普通容器和初始化容器合并后检查 /etc/localtime；任一容器启用时补 host-time HostPath 卷，全部关闭时删除对应系统卷。",
+    "固定 release-3.4 源码的 SyncTimeZone 和 updateTimeZone 与当前制品结构一致，仅作为可读性对照。"
+  ],
+  "limitations": [
+    "输入是固定当前 v3dist 的两个定向工厂，不是完整 V3 应用或原始完整源码。",
+    "语义覆盖为 unknown，仍有 1414 个未知节点；不能据此证明未观察到的行为不存在。",
+    "静态证据和 server dry-run 不证明页面渲染、实际 Pod 时区、RBAC、持久化或缓存；这些属于 VERIFY。",
+    "HostPath 是否获集群策略允许以及容器时区是否与节点一致，必须在部署后的专用测试资源上验证。"
+  ]
+}

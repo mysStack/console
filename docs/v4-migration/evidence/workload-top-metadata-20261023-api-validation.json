@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-23T04:14:39.870Z",
+  "sourceCommit": "86ce8b4abdb4a27b8b6bd35e55406d238eb56383",
+  "uncommittedSourceFiles": [],
+  "server": "https://192.168.2.131:6443",
+  "version": "v1.31.13+k3s1",
+  "namespace": "v4-migration-e2e",
+  "mode": "server dry-run; no resource persisted",
+  "residualResources": [],
+  "result": {
+    "kind": "Deployment",
+    "expected": "accepted",
+    "passed": true,
+    "result": "Deployment/v4-top-metadata-dryrun-1792728879354",
+    "error": "",
+    "checks": {
+      "customLabelRetained": true,
+      "systemAppLabelWins": true,
+      "labelsSynchronized": true,
+      "systemAliasWins": true,
+      "podAnnotationKeptSeparate": true
+    }
+  }
+}

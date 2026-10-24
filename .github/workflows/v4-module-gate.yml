@@ -1,0 +1,56 @@
+name: V4 模块门禁
+
+on:
+  pull_request:
+    branches: [feature/v4-migration]
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft, edited]
+
+permissions:
+  contents: read
+
+jobs:
+  regression:
+    name: 门禁工具回归
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出 PR 实际提交
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: 安装 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 执行隔离 Git 和真实提交钩子回归
+        run: python3 docs/v4-migration/governance/scripts/test_v4_module_gate.py
+
+  phase:
+    name: 模块阶段与 PR 范围
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出 PR 实际提交
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: 安装 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 检查实际 SHA、阶段和完整 PR 差异
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+          PR_BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_IS_DRAFT: ${{ github.event.pull_request.draft }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$PR_HEAD_SHA"
+          args=()
+          if [ "$PR_IS_DRAFT" = "true" ]; then args+=(--draft); fi
+          python3 docs/v4-migration/governance/scripts/v4-module-gate.py auto ci \
+            --head-branch "$PR_HEAD_BRANCH" --base-branch "$PR_BASE_BRANCH" \
+            --base "$PR_BASE_SHA" "${args[@]}"

@@ -3,7 +3,7 @@
  * https://github.com/kubesphere/console/blob/master/LICENSE
  */
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { isEmpty, get } from 'lodash';
 import { DeleteConfirmModal, useCacheStore as useStore } from '@ks-console/shared';
@@ -13,18 +13,20 @@ import { Pen, TimedTask, Restart, Firewall, Trash, Storage } from '@kubed/icons'
 import {
   RecreateModal,
   workloadStore,
+  useWebSocket,
   hpaStore,
   DetailPagee,
   getDisplayName,
   formatTime,
   useCommonActions,
-  useV3action,
   hasClusterModule,
   ClusterAliasName,
   ProjectAliasName,
+  request,
 } from '@ks-console/shared';
 import { useRollbackModal, useAutoScalingModal } from '../../../../../../clusters/hooks/useModal';
 import type { FormattedWorkload } from '@ks-console/shared';
+import { WorkloadSettingsModal } from '../../../../../components/WorkloadCreateModal';
 
 const module = 'deployments';
 const WORKLOAD_TYPE = 'DEPLOYMENT';
@@ -34,8 +36,9 @@ const { usePatchHpaMutation } = hpaStore;
 const DeploymentDetail = () => {
   const authKey = module;
   const params = useParams();
-  const { cluster, namespace, name } = params;
+  const { workspace, cluster, namespace, name } = params;
   const navigate = useNavigate();
+  const [settingsResource, setSettingsResource] = useState<Record<string, any>>();
   const {
     useGetDetail,
     useUpdateDeploymentMutation,
@@ -56,6 +59,15 @@ const DeploymentDetail = () => {
     namespace,
   });
 
+  useWebSocket({
+    module,
+    url: store.getWatchListUrl({ cluster, namespace }),
+    params: { fieldSelector: `metadata.name=${name}` },
+    enabled: Boolean(cluster && namespace && name) && !isError,
+    onAdded: () => refetch(),
+    onModified: () => refetch(),
+  });
+
   const [sharedDetail, setDetailProps] = useStore('DeploymentDetailProps', {
     module,
     detail: {},
@@ -64,11 +76,16 @@ const DeploymentDetail = () => {
   });
 
   const listUrl = useMemo(() => {
-    return `/clusters/${cluster}/deployments`;
-  }, []);
+    return workspace
+      ? `/${workspace}/clusters/${cluster}/projects/${namespace}/deployments`
+      : `/clusters/${cluster}/deployments`;
+  }, [workspace, cluster, namespace]);
 
   const tabs = useMemo(() => {
-    const path = `/clusters/${cluster}/projects/${namespace}/deployments/${name}`;
+    const prefix = workspace
+      ? `/${workspace}/clusters/${cluster}/projects/${namespace}`
+      : `/clusters/${cluster}/projects/${namespace}`;
+    const path = `${prefix}/deployments/${name}`;
 
     return cluster && hasClusterModule(cluster, 'whizard-monitoring')
       ? [
@@ -88,7 +105,7 @@ const DeploymentDetail = () => {
           { title: t('CONFIG_REFERENCE'), path: `${path}/config-reference` },
           { title: t('EVENT_PL'), path: `${path}/events` },
         ];
-  }, []);
+  }, [workspace, cluster, namespace, name]);
 
   const isCustomScaling = useMemo(() => {
     const labels = get(detail, 'labels', {});
@@ -128,7 +145,7 @@ const DeploymentDetail = () => {
         value: creator,
       },
     ];
-  }, [detail]);
+  }, [detail, cluster, namespace]);
 
   const { editBaseInfo, editYaml } = useCommonActions({
     store,
@@ -140,7 +157,7 @@ const DeploymentDetail = () => {
     callback: (type: string) => {
       switch (type) {
         case 'delete':
-          navigate('/clusters/host/deployments');
+          navigate(listUrl);
           break;
         default:
           refetch();
@@ -155,6 +172,12 @@ const DeploymentDetail = () => {
   } = useDisclosure();
 
   const {
+    open: openSettingsModal,
+    close: closeSettingsModal,
+    isOpen: settingsModalIsOpen,
+  } = useDisclosure();
+
+  const {
     open: openDeleteModal,
     close: closeDeleteModal,
     isOpen: deleteModalIsOpen,
@@ -164,6 +187,19 @@ const DeploymentDetail = () => {
     onSuccess: () => {
       notify.success(t('RECREATE_SUCCESS_DESC'));
       closeRecreateModal();
+      refetch();
+    },
+  });
+  const {
+    mutate: mutateSettings,
+    isLoading: settingsIsLoading,
+    error: settingsError,
+    reset: resetSettings,
+  } = store.usePutMutation(undefined, {
+    noGetDetail: true,
+    onSuccess: () => {
+      notify.success(t('UPDATE_SUCCESSFUL'));
+      closeSettingsModal();
       refetch();
     },
   });
@@ -236,9 +272,8 @@ const DeploymentDetail = () => {
 
   useEffect(() => {
     setDetailProps({ module, detail, isLoading, isError });
-  }, [detail]);
+  }, [detail, isLoading, isError, setDetailProps]);
 
-  const { open, render: renderV3Modal } = useV3action();
   const isExtensionEnabledInCluster = hasClusterModule(cluster!, 'metrics-server');
   const actions = () => {
     return [
@@ -278,19 +313,20 @@ const DeploymentDetail = () => {
         icon: <Storage />,
         text: t('EDIT_SETTINGS'),
         action: 'edit',
-        onClick: () => {
-          open({
-            module,
-            ...params,
-            detail,
-            v3Module: 'workload',
-            v3StoreParams: module,
-            hasRootStore: true,
-            success: () => {
-              notify.success(t('UPDATE_SUCCESSFUL'));
-              refetch();
-            },
-          });
+        show: !detail.isFedManaged,
+        onClick: async () => {
+          try {
+            // The formatted detail deliberately omits resourceVersion and ownerReferences.
+            // Edit a raw snapshot so concurrent updates return 409 instead of being overwritten.
+            const resource = await request.get<Record<string, any>, Record<string, any>>(
+              store.getDetailUrl({ cluster, namespace, name }),
+            );
+            setSettingsResource(resource);
+            resetSettings();
+            openSettingsModal();
+          } catch {
+            notify.error(t('WORKLOAD_SETTINGS_LOAD_FAILED'));
+          }
         },
       },
       {
@@ -364,9 +400,25 @@ const DeploymentDetail = () => {
           }}
         />
       )}
-      {renderV3Modal()}
       {renderRollbackModal()}
       {renderAutoScalingModal()}
+      {settingsModalIsOpen && settingsResource && (
+        <WorkloadSettingsModal
+          visible
+          cluster={cluster!}
+          namespace={namespace!}
+          resource={settingsResource}
+          confirmLoading={settingsIsLoading}
+          error={settingsError}
+          onOk={data =>
+            mutateSettings({
+              params: { cluster, namespace, name },
+              data,
+            })
+          }
+          onCancel={closeSettingsModal}
+        />
+      )}
       {recreateModalIsOpen && (
         <RecreateModal
           name={detail?.name}

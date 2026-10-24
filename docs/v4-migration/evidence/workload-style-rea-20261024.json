@@ -1,0 +1,94 @@
+{
+  "evidenceId": "WL-REA-STYLE-20261024",
+  "purpose": "固定 release-4.1.5 v3dist 的 Workload 样式资产清单，为 V4 样式重建提供可复核输入",
+  "status": "部分完成，待旧源码与运行时样式对照",
+  "baseline": {
+    "branch": "release-4.1.5",
+    "commit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
+    "v3distTree": "1e499d92e11374e26c76f5e13be45251602bd596",
+    "manifest": "packages/bootstrap/assets/v3dist/manifest.json"
+  },
+  "method": [
+    "读取固定基线 manifest.json 中的 CSS 资产映射",
+    "对每个 CSS 文件记录字节数、SHA-256 和静态 token 计数",
+    "记录字体资源由 manifest 提供的 hashed 路径",
+    "静态资产只证明制品内容，不证明原始 SCSS/TSX 结构或页面运行时等价"
+  ],
+  "cssAssets": [
+    {
+      "logical": "main.css",
+      "path": "main.39ed81f6e5a43d5bb447.css",
+      "bytes": 129268,
+      "sha256": "360b74c29242e8c99cf89436f526648d99360f9266c7c4952aaedba0a08f6dfc"
+    },
+    {
+      "logical": "common.css",
+      "path": "1.9dcfc2ca150f3eeabe9b.css",
+      "bytes": 514213,
+      "sha256": "77d989c0695a916ef877d696706c287331e417ba3400f0415bd90c0ec1d83634"
+    },
+    {
+      "logical": "actions.css",
+      "path": "3.460a788d2dd1417c95c2.css",
+      "bytes": 263264,
+      "sha256": "fe1099936a659c9f9e304b915366b61eaa8a5c2233b3487d3e38e63eb90f4608"
+    },
+    {
+      "logical": "clusters.css",
+      "path": "4.8eaae65bb2ac132e0393.css",
+      "bytes": 62363,
+      "sha256": "bacbe0b7736b06dce786eb37bd2dc8a8e822404ebea478510a137a1d04c2e753"
+    },
+    {
+      "logical": "console.css",
+      "path": "5.cf8d79e7b36287e34d92.css",
+      "bytes": 13761,
+      "sha256": "022ecd58217c4a8019f43634be597fae1fd0b6bfd4793ea69a0071003e98ca3a"
+    },
+    {
+      "logical": "projects.css",
+      "path": "12.5ab8d0604671d18a395b.css",
+      "bytes": 103631,
+      "sha256": "620a58c22f4a3cd0bcd1117d19d209ace6e48d7e48c0358c643b59810de36860"
+    },
+    {
+      "logical": "settings.css",
+      "path": "14.a9d808965273c53459db.css",
+      "bytes": 17021,
+      "sha256": "fc041e81a7d89c00e3af48795b096a74d974a91947cb0a32f8ae068f4f0b91a1"
+    },
+    {
+      "logical": "workspaces.css",
+      "path": "16.0d433cc8649b4cc966e4.css",
+      "bytes": 28625,
+      "sha256": "9b5114bf1b49926cef88d25ceb0b8ea7bccd8436777fbc7e4ba87e537a460a2d"
+    }
+  ],
+  "fontAssets": {
+    "manifestEntries": 18,
+    "families": [
+      "Roboto-Regular",
+      "Roboto-Medium",
+      "Roboto-Bold",
+      "Roboto-Italic",
+      "Roboto-MediumItalic",
+      "Roboto-BoldItalic"
+    ],
+    "formats": ["ttf", "woff", "woff2"]
+  },
+  "observations": [
+    "固定制品包含 common/actions/main 等公共与操作页面样式资产，且 manifest 对字体使用 hashed 路径。",
+    "CSS 资产包含弹窗、表单、输入控件、按钮和滚动相关规则，可作为设置弹窗视觉结构的静态输入。",
+    "当前记录尚未证明 Deployment、StatefulSet、DaemonSet 设置页的真实 DOM、计算样式、交互状态和浏览器布局等价。"
+  ],
+  "remaining": [
+    "定位并核验 release-3.1.4 旧 V3 可读源码的确切 commit、路径和许可证。",
+    "在固定 release-4.1.5 制品上补齐 Workload 设置页的真实 DOM、getComputedStyle、截图和 Network 证据。",
+    "将样式意图、字段行为和 V4 Kubed/设计令牌实现建立逐项映射；不能直接复制 V3 CSS。"
+  ],
+  "limitations": [
+    "没有 source map 时，不能从 CSS 制品证明原始 SCSS/TSX 文件结构。",
+    "CSS token 数量是辅助索引，不是功能或视觉等价结论。",
+    "本证据不授权进入 DEV、部署或 VERIFY。"
+  ]
+}

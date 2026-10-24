@@ -1,0 +1,34 @@
+{
+  "record": "Workload 集群级原生入口静态测试取证",
+  "date": "2026-10-24",
+  "workspaceHead": "d7cf426843f928e8a4458784d4800f862877477e",
+  "phase": "REA",
+  "operator": "Codex 单会话",
+  "testFile": "packages/console/src/pages/clusters/containers/ApplicationWorkloads/nativeWorkloads.test.ts",
+  "command": "./node_modules/.bin/esno packages/console/src/pages/clusters/containers/ApplicationWorkloads/nativeWorkloads.test.ts",
+  "summary": {
+    "tests": 6,
+    "passed": 6,
+    "failed": 0
+  },
+  "verified": [
+    "集群级 deployments、statefulsets、daemonsets 主路由均引用原生 Workloads/index",
+    "三类集群级列表不再挂载 Workload Embed",
+    "集群级列表保留 namespace 选择",
+    "三类资源创建分别使用对应 Store 和弹窗选择的 namespace",
+    "空 namespace 时不加载创建依赖的静态约束已由现有测试覆盖"
+  ],
+  "sourcePaths": [
+    "packages/console/src/pages/clusters/containers/ApplicationWorkloads/routes.tsx",
+    "packages/console/src/pages/clusters/containers/ApplicationWorkloads/Workloads/index.tsx",
+    "packages/console/src/pages/clusters/containers/ApplicationWorkloads/nativeWorkloads.test.ts"
+  ],
+  "boundary": [
+    "该测试只证明当前源码的集群级三类主路由和创建参数静态行为，不证明当前 HEAD 已部署到 131。",
+    "全局 initWujie/preloadApp 链路以及 Ingress、Service、Job 等其他集群入口仍需独立处理，不能因三类 Workload 主路由已原生化而宣称整个集群工作负载范围已无 V3/Wujie。",
+    "当前制品浏览器的列表、namespace 隔离、Action、错误和完整 V3 等价仍需在可登录环境中验证。"
+  ],
+  "result": "集群级三类 Workload 主路由静态测试 6/6 通过；作为 REA 输入保留。",
+  "rerunDate": "2026-10-24",
+  "rerunResult": "在当前 HEAD d7cf426843f928e8a4458784d4800f862877477e 重新执行，集群级三类 Workload 原生入口测试 6/6 通过"
+}

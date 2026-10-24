@@ -16,7 +16,17 @@ import type {
   DeleteProps,
   DeploymentPatchProps,
   BatchOptProps,
+  CreateWorkloadProps,
+  CreateStatefulSetProps,
 } from './types';
+
+async function settleWorkloadRequests(requests: Promise<unknown>[]) {
+  const results = await Promise.allSettled(requests);
+  for (const result of results) {
+    if (result.status === 'rejected') throw result.reason;
+  }
+  return results;
+}
 
 //TODO: type
 export const getWorkloadVolumes = async (detail: any, setDetail = false) => {
@@ -93,8 +103,19 @@ const workloadStore = (module: string) => {
     module,
     mapper,
   });
-  const { getDetailUrl, getPath, patch } = BaseStore;
+  const { getDetailUrl, getPath, patch, post } = BaseStore;
+  const { post: postService, delete: deleteService } = baseStore({ module: 'services' });
   const { deleteHpa } = hpaStore;
+
+  const deleteRelatedStatefulSetService = (params: DeleteProps) => {
+    const serviceName = params.annotations?.['kubesphere.io/related-service'];
+    if (module !== 'statefulsets' || !serviceName) return undefined;
+    return deleteService({
+      cluster: params.cluster,
+      namespace: params.namespace,
+      name: serviceName,
+    });
+  };
 
   const del = (params: PathParams, k8sVersion?: string) => {
     return request.delete(getDetailUrl(params, k8sVersion), {
@@ -112,14 +133,19 @@ const workloadStore = (module: string) => {
     items.map(item => {
       promises.push(del(item, k8sVersion));
 
+      const deleteServiceRequest = deleteRelatedStatefulSetService(item);
+      if (deleteServiceRequest) promises.push(deleteServiceRequest);
+
       const relateHPA = get(item, "annotations['kubesphere.io/relatedHPA']");
 
       if (relateHPA) {
-        promises.push(deleteHpa({ name: relateHPA, namespace: item.namespace }));
+        promises.push(
+          deleteHpa({ name: relateHPA, cluster: item.cluster, namespace: item.namespace }),
+        );
       }
     });
 
-    return Promise.allSettled(promises);
+    return settleWorkloadRequests(promises);
   };
 
   const getReplica = async (params: PathParams) => {
@@ -140,6 +166,34 @@ const workloadStore = (module: string) => {
     return useMutation(({ params, data }: DeploymentPatchProps) => patch(params, data), {
       onSuccess,
     });
+  };
+
+  const useCreateWorkloadMutation = (options?: SuccessProps) => {
+    return useMutation(({ params, data }: CreateWorkloadProps) => post(params, data), {
+      onSuccess: options?.onSuccess,
+      onError: options?.onError,
+    });
+  };
+
+  const useCreateStatefulSetMutation = (options?: SuccessProps) => {
+    return useMutation(
+      async ({ params, data }: CreateStatefulSetProps) => {
+        const dryRunParams = { ...params, dryRun: true };
+        await Promise.all([
+          post(dryRunParams, data.workload),
+          postService(dryRunParams, data.service),
+        ]);
+        const serviceResult = await postService(params, data.service);
+        try {
+          const workloadResult = await post(params, data.workload);
+          return [workloadResult, serviceResult];
+        } catch (error) {
+          await deleteService({ ...params, name: data.service.metadata.name });
+          throw error;
+        }
+      },
+      { onSuccess: options?.onSuccess, onError: options?.onError },
+    );
   };
 
   const useDeleteDeploymentMutation = (options?: SuccessProps, k8sVersion?: string) => {
@@ -163,9 +217,12 @@ const workloadStore = (module: string) => {
           );
         }
 
+        const deleteServiceRequest = deleteRelatedStatefulSetService(params);
+        if (deleteServiceRequest) reqs.push(deleteServiceRequest);
+
         reqs.push(del(params, k8sVersion));
 
-        return Promise.allSettled(reqs);
+        return settleWorkloadRequests(reqs);
       },
       {
         onSuccess,
@@ -179,7 +236,7 @@ const workloadStore = (module: string) => {
       (params: BatchOptProps) => {
         const { data } = params;
 
-        return Promise.allSettled(data!.map(p => del(p)));
+        return batchDelete(data!);
       },
       {
         onSuccess,
@@ -188,11 +245,16 @@ const workloadStore = (module: string) => {
   };
 
   const stopDeployment = (params: PathParams) => {
-    const patchFiled = {
-      spec: {
-        replicas: 0,
-      },
-    };
+    const patchFiled =
+      module === 'daemonsets'
+        ? {
+            spec: {
+              template: {
+                spec: { nodeSelector: { 'non-existing': 'true' } },
+              },
+            },
+          }
+        : { spec: { replicas: 0 } };
     return request.patch(getDetailUrl(params), patchFiled);
   };
   const useBatchStopDeploymentMutation = (options?: SuccessProps) => {
@@ -200,7 +262,7 @@ const workloadStore = (module: string) => {
     return useMutation(
       (params: BatchOptProps) => {
         const { data } = params;
-        return Promise.allSettled(data!.map(stopDeployment));
+        return settleWorkloadRequests(data!.map(stopDeployment));
       },
       {
         onSuccess,
@@ -283,6 +345,8 @@ const workloadStore = (module: string) => {
     getReplica,
     switchStatus,
     useGetDetail,
+    useCreateWorkloadMutation,
+    useCreateStatefulSetMutation,
     useUpdateDeploymentMutation,
     useDeleteDeploymentMutation,
     useBatchDeleteWorkloadMutation,

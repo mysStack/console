@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-23T03:03:49.677Z",
+  "sourceCommit": "9e2f4148f2abde58b6eec850612d99dc1ac3f0a8",
+  "uncommittedSourceFiles": [],
+  "server": "https://192.168.2.131:6443",
+  "version": "v1.31.13+k3s1",
+  "namespace": "v4-migration-e2e",
+  "mode": "server dry-run; no resource persisted",
+  "residualResources": [],
+  "results": [
+    {
+      "kind": "Deployment",
+      "expected": "accepted",
+      "passed": true,
+      "result": "deployment.apps/v4-security-dryrun-deployment-1792724628587",
+      "error": ""
+    },
+    {
+      "kind": "StatefulSet",
+      "expected": "accepted",
+      "passed": true,
+      "result": "statefulset.apps/v4-security-dryrun-statefulset-1792724628589",
+      "error": ""
+    },
+    {
+      "kind": "DaemonSet",
+      "expected": "accepted",
+      "passed": true,
+      "result": "daemonset.apps/v4-security-dryrun-daemonset-1792724628590",
+      "error": ""
+    }
+  ]
+}

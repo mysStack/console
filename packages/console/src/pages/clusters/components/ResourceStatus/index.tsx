@@ -14,7 +14,8 @@ import {
   hpaStore,
   ReplicaCard,
   getActions,
-  getApiVersion,
+  getHpaLookupKey,
+  loadHpaDetail,
 } from '@ks-console/shared';
 import HpaCard from '../Cards/HpaCard';
 
@@ -31,7 +32,7 @@ const { checkName, fetchDetail } = hpaStore;
 
 const ResourceStatus = ({ detailPropsName }: IProps) => {
   const params = useParams();
-  const { workspace, cluster } = params;
+  const { workspace, cluster, namespace, name } = params;
   const [props, setDetailProps] = useStore(detailPropsName);
   const { detail = {}, module, isLoading } = props;
   const podscardRef = useRef<PodsCardRefType>(null);
@@ -111,21 +112,40 @@ const ResourceStatus = ({ detailPropsName }: IProps) => {
 
   const [hpaDetail, setHpaDetail] = useState<Record<string, any>>({});
 
-  const fetchHpaDetail = async () => {
-    const k8sVersion = globals.clusterConfig?.[params.cluster!]?.k8sVersion;
-    const version = getApiVersion('horizontalpodautoscalers', k8sVersion);
-    const url = `/clusters/${params.cluster}/apis/${version}/namespaces/${params.namespace}/horizontalpodautoscalers/${params.name}`;
-    checkName(detail, {}, url).then(async (resp: any) => {
-      if (resp.exist) {
-        const result = await fetchDetail({ ...detail, ...params }, url);
-        setHpaDetail(result);
-      }
-    });
-  };
+  const hpaLookupKey = getHpaLookupKey(params, detail);
+  const hpaDetailRef = useRef(detail);
+  hpaDetailRef.current = detail;
 
   useEffect(() => {
-    fetchHpaDetail();
-  }, [props]);
+    if (!hpaLookupKey) {
+      return undefined;
+    }
+
+    let active = true;
+    const k8sVersion = globals.clusterConfig?.[cluster!]?.k8sVersion;
+
+    loadHpaDetail({
+      params: { cluster, namespace, name },
+      detail: hpaDetailRef.current,
+      k8sVersion,
+      checkName,
+      fetchDetail,
+    })
+      .then(result => {
+        if (active) {
+          setHpaDetail(result || {});
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setHpaDetail({});
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [cluster, hpaLookupKey, name, namespace]);
 
   const renderPort = () => {
     const { noPorts } = props;

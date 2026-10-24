@@ -6,7 +6,7 @@
 import React from 'react';
 import { RouteObject, Navigate } from 'react-router-dom';
 
-// import Workloads from './Workloads/index';
+import Workloads from './Workloads/index';
 // import Jobs from './Jobs/Job';
 // import CronJobs from './Jobs/CronJob';
 // import Ingress from './Routes/index';
@@ -22,7 +22,6 @@ import ServiceDetail from './Services/Detail/routes';
 import RoutesDetail from './Routes/Detail/routes';
 
 // embed
-import WorkLoadList from '../Workload/Workloads';
 import Job from './Jobs/Embed';
 import Services from './Services/Embed';
 import Ingress from './Routes/Embed';
@@ -35,18 +34,15 @@ const ApplicationWorkloadRoutes = (PATH: string): RouteObject[] => [
   },
   {
     path: `${PATH}/deployments`,
-    // element: <Workloads module="deployments" />,
-    element: <WorkLoadList tab="deployments" />,
+    element: <Workloads module="deployments" />,
   },
   {
     path: `${PATH}/statefulsets`,
-    // element: <Workloads module="statefulsets" />,
-    element: <WorkLoadList tab="statefulsets" />,
+    element: <Workloads module="statefulsets" />,
   },
   {
     path: `${PATH}/daemonsets`,
-    // element: <Workloads module="daemonsets" />,
-    element: <WorkLoadList tab="daemonsets" />,
+    element: <Workloads module="daemonsets" />,
   },
   {
     path: `${PATH}/jobs`,

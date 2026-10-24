@@ -1,0 +1,52 @@
+async (page) => {
+  const base='http://192.168.2.131:30880';
+  const root='/test-workspace/clusters/host/projects/v4-migration-e2e';
+  const fixtures=[['deployments','v4-deploy-edit-ef3'],['statefulsets','v4-pvc-sts-7fa'],['daemonsets','v4-stop-ds-7fa']];
+  const result=[];
+  for (const [module,name] of fixtures) {
+    const path=root+'/'+module+'/'+name+'/config-reference';
+    const api='/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/'+module+'/'+name;
+    await page.goto(base+path);
+    const panel=page.locator('[data-test="config-reference-panel"]');
+    const prefix=panel.getByRole('textbox',{name:'前缀 1',exact:true});
+    await prefix.waitFor();
+    await page.getByTitle('v4-cfg-ref-ef3',{exact:true}).first().waitFor();
+    const read=()=>page.evaluate(async u=>{const r=await fetch(u); const d=await r.json(); if(r.status!==200)throw Error('GET '+r.status); return d.spec.template.spec.containers[0].envFrom;},api);
+    const before=await read();
+    const originalPrefix=await prefix.inputValue();
+    await prefix.fill('CANCEL_');
+    await panel.getByRole('button',{name:'关闭',exact:true}).click();
+    await page.goto(base+path);
+    await prefix.waitFor();
+    if(await prefix.inputValue()!==originalPrefix || JSON.stringify(await read())!==JSON.stringify(before))throw Error(module+' cancel persisted');
+    await prefix.fill('V4_');
+    const saved=page.waitForResponse(r=>r.url()===base+api&&r.request().method()==='PATCH',{timeout:15000});
+    await panel.getByRole('button',{name:'应用引用',exact:true}).click();
+    const r=await saved;
+    if(r.status()!==200)throw Error(module+' PATCH '+r.status());
+    await page.reload();
+    await prefix.waitFor();
+    if(await prefix.inputValue()!=='V4_')throw Error(module+' prefix not refilled');
+    const persisted=await read();
+    const inject=async route=>{ if(route.request().method()==='PATCH')await route.fulfill({status:500,contentType:'application/json',body:JSON.stringify({kind:'Status',message:'VERIFY controlled failure',code:500})}); else await route.continue(); };
+    await page.route(base+api,inject);
+    await prefix.fill('FAIL_');
+    try {
+      const failed=page.waitForResponse(r=>r.url()===base+api&&r.request().method()==='PATCH',{timeout:15000});
+      await panel.getByRole('button',{name:'应用引用',exact:true}).click();
+      const rejected=await failed;
+      await page.getByText('配置引用保存失败。',{exact:true}).last().waitFor();
+      if(rejected.status()!==500)throw Error('missing controlled failure');
+    } finally { await page.unroute(base+api,inject); }
+    if(JSON.stringify(await read())!==JSON.stringify(persisted))throw Error(module+' failed write persisted');
+    await page.reload();
+    await prefix.waitFor();
+    if(await prefix.inputValue()!=='V4_')throw Error(module+' persisted state lost');
+    await prefix.fill('');
+    const restored=page.waitForResponse(r=>r.url()===base+api&&r.request().method()==='PATCH',{timeout:15000});
+    await panel.getByRole('button',{name:'应用引用',exact:true}).click();
+    if((await restored).status()!==200)throw Error(module+' restore failed');
+    result.push({module,name,configMapSaved:true,secretSaved:module==='deployments',cancelUnchanged:true,saveStatus:r.status(),prefixReloaded:true,controlled500Feedback:true,failedWriteUnchanged:true,prefixRestored:true,api});
+  }
+  return ({date:new Date().toISOString(),sourceCommit:'ef3b4f1a83c3b708f5a12b35dd178bf358c99b8d',scenarios:result});
+}

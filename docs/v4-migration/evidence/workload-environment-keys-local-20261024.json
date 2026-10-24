@@ -1,0 +1,120 @@
+{
+  "baseCommit": "49967289db1d5191d05fa773c19f6154e6715f1d",
+  "sourceIdentity": "文件摘要与包含本记录的 Git 提交绑定，不代表部署或浏览器验收",
+  "sourceFiles": [
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/ContainerEnvironment.test.ts",
+      "sha256": "09782f7fbe238337700e54b9ff6a93bde602f7cabfbd76509276ebb0dfccde8b"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/ContainerInput.tsx",
+      "sha256": "9f50819c2bac19b833226c64a9566a721262f06c376ded88fc755dee191b49e4"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/ContainerLifecycle.test.ts",
+      "sha256": "f170ed1691ac6c334cd049ce8898dde161f4c582d7b62f61cef827e9ad40e0ce"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/useWorkloadResourceOptions.test.ts",
+      "sha256": "30b48f634c384cbf69374e4d5e27bc6298a671a05581aa39e33c2724a3f3573b"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/useWorkloadResourceOptions.ts",
+      "sha256": "6841892d9a3772bfc2ff6517d5e89b2995622f7959d8a3a35627db65449ac6fc"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/useWorkloadEnvironmentKeys.ts",
+      "sha256": "3b986d4b818373b99b46b388b560798494de28e908ab6371126a9c47df6cef22"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/useWorkloadEnvironmentKeys.test.ts",
+      "sha256": "c901ed8ab3574fb9f363877b5b7fd07e4754533de0076c5dff51a7a7ee2cd577"
+    }
+  ],
+  "scope": ["Deployment", "StatefulSet", "DaemonSet"],
+  "tdd": {
+    "keyHook": {
+      "redFailed": 2,
+      "greenPassed": 2
+    },
+    "resourceScope": {
+      "redFailed": 1,
+      "greenPassed": 2
+    },
+    "keyDropdown": {
+      "redFailed": 1,
+      "greenPassed": 2
+    },
+    "lifecycle": {
+      "adaptedDependencyMock": true,
+      "passed": 3
+    }
+  },
+  "checks": [
+    {
+      "command": "./scripts/test.sh",
+      "exitCode": 0,
+      "files": 87,
+      "passed": 386,
+      "failed": 0
+    },
+    {
+      "command": "corepack yarn build:packages",
+      "exitCode": 0,
+      "sharedMinified": 633
+    },
+    {
+      "command": "corepack yarn eslint <三个变更生产文件>",
+      "exitCode": 0
+    },
+    {
+      "command": "corepack yarn prettier --check <七个变更源码/测试文件>",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0
+    },
+    {
+      "command": "impeccable detect --json <ContainerInput.tsx>",
+      "exitCode": 0,
+      "findings": []
+    }
+  ],
+  "typecheck": {
+    "configuration": "packages/console/tsconfig.json",
+    "baselineDiagnostics": 1326,
+    "currentDiagnostics": 1326,
+    "fullMessageAdditions": 2,
+    "fullMessageRemovals": 2,
+    "changedExistingDiagnostics": [
+      {
+        "file": "packages/console/src/pages/platform/containers/SettingsLayout/index.tsx",
+        "codes": [6059, 6307],
+        "primaryMessageChanged": false,
+        "addedExplanation": "每条诊断仅增加 Imported via @ks-console/shared from useWorkloadEnvironmentKeys.ts 一行；无删除说明，原有 rootDir/file-list 主错误相同"
+      }
+    ],
+    "newPrimaryDiagnostics": [],
+    "changedFileErrors": [],
+    "fullTypecheckPassed": false
+  },
+  "secretBoundary": "Kubernetes 原始 Secret 响应经过网络；绕过 mapper、不解码，React Query 缓存和控件只保存/展示字符串 key，不输出值",
+  "environment": {
+    "deployedThisIncrement": false,
+    "ciRun": null,
+    "image": null,
+    "digest": null,
+    "podImageID": null,
+    "playwrightOnThisIncrement": "未执行",
+    "readOnlyProbeOnHistorical131Console": {
+      "origin": "http://192.168.2.131:30880",
+      "enableImageSearch": true,
+      "scope": "仅当前 Console 配置布尔值，不证明新代码或 V3 镜像 UI 已验收"
+    }
+  },
+  "remaining": [
+    "当前启用镜像搜索/选择完整交互",
+    "当前 SHA 镜像部署与三类真实 Playwright、RBAC、namespace、缓存及 API 持久化验收"
+  ]
+}

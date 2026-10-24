@@ -4,27 +4,31 @@
  */
 
 import { isEmpty, get } from 'lodash';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Loading, notify } from '@kubed/components';
 import { useCacheStore as useStore } from '@ks-console/shared';
 import { useDisclosure } from '@kubed/hooks';
-import { hasClusterModule, useV3action } from '@ks-console/shared';
+import { hasClusterModule } from '@ks-console/shared';
 
 import {
   Icon,
   RecreateModal,
   DeleteConfirmModal,
   workloadStore,
+  useWebSocket,
   DetailPagee,
   getDisplayName,
   formatTime,
   useCommonActions,
   ClusterAliasName,
   ProjectAliasName,
+  request,
 } from '@ks-console/shared';
 import { useRollbackModal, useBaseInfoModal } from '../../../../../../clusters/hooks/useModal';
 import type { FormattedWorkload } from '@ks-console/shared';
+
+import { WorkloadSettingsModal } from '../../../../../components/WorkloadCreateModal';
 
 const module = 'daemonsets';
 const WORKLOAD_TYPE = 'DAEMONSET';
@@ -40,12 +44,15 @@ const {
 const DaemonSetDetail = () => {
   const authKey = module;
   const params = useParams();
-  const { cluster, namespace, name } = params;
+  const { workspace, cluster, namespace, name } = params;
   const navigate = useNavigate();
+  const [settingsResource, setSettingsResource] = useState<Record<string, any>>();
 
   const listUrl = useMemo(() => {
-    return `/clusters/${cluster}/daemonsets`;
-  }, []);
+    return workspace
+      ? `/${workspace}/clusters/${cluster}/projects/${namespace}/daemonsets`
+      : `/clusters/${cluster}/daemonsets`;
+  }, [workspace, cluster, namespace]);
 
   const {
     data: detail,
@@ -56,6 +63,15 @@ const DaemonSetDetail = () => {
     cluster,
     name,
     namespace,
+  });
+
+  useWebSocket({
+    module,
+    url: store.getWatchListUrl({ cluster, namespace }),
+    params: { fieldSelector: `metadata.name=${name}` },
+    enabled: Boolean(cluster && namespace && name) && !isError,
+    onAdded: () => refetch(),
+    onModified: () => refetch(),
   });
   const [, setDetailProps] = useStore('DaemonSetDetailProps', {
     module,
@@ -104,6 +120,25 @@ const DaemonSetDetail = () => {
     isOpen: recreateModalIsOpen,
   } = useDisclosure();
 
+  const {
+    open: openSettingsModal,
+    close: closeSettingsModal,
+    isOpen: settingsModalIsOpen,
+  } = useDisclosure();
+  const {
+    mutate: mutateSettings,
+    isLoading: settingsIsLoading,
+    error: settingsError,
+    reset: resetSettings,
+  } = store.usePutMutation(undefined, {
+    noGetDetail: true,
+    onSuccess: () => {
+      notify.success(t('UPDATE_SUCCESSFUL'));
+      closeSettingsModal();
+      refetch();
+    },
+  });
+
   const { renderRollbackModal, setRollbackVisible } = useRollbackModal<
     FormattedWorkload['_originData']
   >({
@@ -143,10 +178,13 @@ const DaemonSetDetail = () => {
 
   useEffect(() => {
     setDetailProps({ module, detail, isLoading, isError });
-  }, [detail]);
+  }, [detail, isLoading, isError, setDetailProps]);
 
   const tabs = useMemo(() => {
-    const path = `/clusters/${cluster}/projects/${namespace}/daemonsets/${name}`;
+    const prefix = workspace
+      ? `/${workspace}/clusters/${cluster}/projects/${namespace}`
+      : `/clusters/${cluster}/projects/${namespace}`;
+    const path = `${prefix}/daemonsets/${name}`;
     return cluster && hasClusterModule(cluster, 'whizard-monitoring')
       ? [
           { title: t('RESOURCE_STATUS'), path: `${path}/resource-status` },
@@ -165,7 +203,7 @@ const DaemonSetDetail = () => {
           { title: t('CONFIG_REFERENCE'), path: `${path}/config-reference` },
           { title: t('EVENT_PL'), path: `${path}/events` },
         ];
-  }, []);
+  }, [workspace, cluster, namespace, name]);
 
   const attrs = useMemo(() => {
     if (isEmpty(detail)) {
@@ -200,9 +238,7 @@ const DaemonSetDetail = () => {
         value: creator ? creator : '',
       },
     ];
-  }, [detail]);
-
-  const { open, render: renderV3Modal } = useV3action();
+  }, [detail, cluster, namespace]);
 
   const actions = () => {
     return [
@@ -238,19 +274,18 @@ const DaemonSetDetail = () => {
         icon: <Icon name="storage" />,
         text: t('EDIT_SETTINGS'),
         action: 'edit',
-        onClick: () => {
-          open({
-            module,
-            ...params,
-            detail,
-            v3Module: 'workload',
-            v3StoreParams: module,
-            hasRootStore: true,
-            success: () => {
-              notify.success(t('UPDATE_SUCCESSFUL'));
-              refetch();
-            },
-          });
+        onClick: async () => {
+          try {
+            // 保存原始 resourceVersion；并发修改时由 API 返回 409，不能覆盖新版本。
+            const resource = await request.get<Record<string, any>, Record<string, any>>(
+              store.getDetailUrl({ cluster, namespace, name }),
+            );
+            setSettingsResource(resource);
+            resetSettings();
+            openSettingsModal();
+          } catch {
+            notify.error(t('WORKLOAD_SETTINGS_LOAD_FAILED'));
+          }
         },
       },
       {
@@ -329,6 +364,18 @@ const DaemonSetDetail = () => {
       )}
       {renderBaseInfoModal()}
       {renderRollbackModal()}
+      {settingsModalIsOpen && settingsResource && (
+        <WorkloadSettingsModal
+          visible
+          cluster={cluster!}
+          namespace={namespace!}
+          resource={settingsResource}
+          confirmLoading={settingsIsLoading}
+          error={settingsError}
+          onOk={data => mutateSettings({ params: { cluster, namespace, name }, data })}
+          onCancel={closeSettingsModal}
+        />
+      )}
       {recreateModalIsOpen && (
         <RecreateModal
           name={detail?.name}
@@ -349,7 +396,6 @@ const DaemonSetDetail = () => {
           onCancel={() => closeDeleteModal()}
         ></DeleteConfirmModal>
       )}
-      {renderV3Modal()}
     </>
   );
 };

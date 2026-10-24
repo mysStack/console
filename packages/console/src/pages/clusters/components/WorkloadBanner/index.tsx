@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { get } from 'lodash';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Icon } from '@ks-console/shared';
 import { Banner, Navs } from '@kubed/components';
 
@@ -22,7 +22,6 @@ const WorkloadBanner = ({
   module,
   tabs,
 }: IProps) => {
-  const { cluster } = useParams();
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
@@ -49,11 +48,14 @@ const WorkloadBanner = ({
     cronjobs: 'backup',
   };
 
-  const type: string = pathname?.split('/')[3];
+  const pathParts = pathname.split('/').filter(Boolean);
+  const type: string = pathParts[pathParts.length - 1];
   const iconName = get(ICON_TYPES, type, 'backup');
 
   const handleNavChange = (nav: string) => {
-    navigate(`/clusters/${cluster}/${nav}`);
+    const nextPathParts = [...pathParts];
+    nextPathParts[nextPathParts.length - 1] = nav;
+    navigate(`/${nextPathParts.join('/')}`);
   };
 
   return (

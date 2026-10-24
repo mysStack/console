@@ -136,7 +136,11 @@ const RollbackModal = ({
           <FormItem label={t('CURRENT_REVISION_RECORD')} name={['currentRevision']}>
             <Input disabled />
           </FormItem>
-          <FormItem label={t('TARGET_REVISION_RECORD')} name={['revision']}>
+          <FormItem
+            label={t('TARGET_REVISION_RECORD')}
+            name={['revision']}
+            rules={[{ required: true, message: t('TARGET_REVISION_EMPTY_DESC') }]}
+          >
             <Select>
               {options.map((item, index) => (
                 <Option key={index} value={item.value}>

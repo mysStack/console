@@ -7,6 +7,7 @@ module.exports = {
   // More > Roll Back
   // More > Edit Service
   SELECTOR: 'Selector',
+  WORKLOAD_SERVICE_UPDATE_FAILED: '更新 StatefulSet 服務失敗。',
   // More > Edit Settings > Update Strategy
   // More > Edit Settings > Containers
   // More > Edit Settings > Volumes > Add Persistent Volume Template

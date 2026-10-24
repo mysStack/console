@@ -9,11 +9,25 @@ export { PathParams } from '../../types';
 
 export interface SuccessProps {
   onSuccess?: () => void;
+  onError?: (error: unknown) => void;
 }
 
 export interface DeploymentPatchProps {
   params: PathParams;
   data: Record<string, any>;
+}
+
+export interface CreateWorkloadProps {
+  params: PathParams;
+  data: Record<string, any>;
+}
+
+export interface CreateStatefulSetProps {
+  params: PathParams;
+  data: {
+    workload: Record<string, any>;
+    service: Record<string, any>;
+  };
 }
 
 export interface DeleteProps extends PathParams {

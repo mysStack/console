@@ -1,0 +1,70 @@
+{
+  "schema": "v4-workload-statefulset-service-verify",
+  "date": "2026-10-25",
+  "source": {
+    "branch": "feature/v4-workloads",
+    "commit": "54b863b2ccd611bab088d39bcbebc8b4e9f68500",
+    "artifactTag": "feature-v4-workloads-20261024-220602-54b863b2ccd6",
+    "artifactDigest": "sha256:53299da2a0add86f3c08208b8ed9728d39af31ae5c0ba7b315283dc5bfdc675a"
+  },
+  "browser": {
+    "tool": "Playwright CLI",
+    "session": "workload-rea-current",
+    "origin": "http://192.168.2.131:30880",
+    "route": "/test-workspace/clusters/host/projects/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01/resource-status",
+    "resource": "StatefulSet/v4-watch-sts-20261022-01",
+    "action": "编辑服务",
+    "modal": "通过：名称、Headless 内部访问模式、selector、HTTP 端口 80 和取消/确认按钮正常渲染",
+    "result": "通过：保持原值点击确认，页面发送 namespace 作用域 PATCH 并返回 200，随后重新读取 StatefulSet 页面",
+    "request": {
+      "method": "PATCH",
+      "url": "/clusters/host/api/v1/namespaces/v4-migration-e2e/services/v4-watch-sts-20261022-01",
+      "status": 200
+    },
+    "followUp": {
+      "method": "GET",
+      "url": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01",
+      "status": 200
+    },
+    "settingsFieldPersistence": {
+      "field": "metadata.labels.v4-migration-run",
+      "temporaryValue": "workload-watch-20261025-verify",
+      "temporaryPut": 200,
+      "temporaryReadBack": "通过：Kubernetes API 回读临时标签值，StatefulSet 保持 1/1",
+      "restoreValue": "workload-watch-20261022",
+      "restorePut": 200,
+      "restoreReadBack": "通过：Kubernetes API 回读原始标签值，StatefulSet 保持 1/1"
+    },
+    "consoleErrors": "存在既有扩展初始化错误；按负责人决定暂不纳入 Workload 验收"
+  },
+  "kubernetes": {
+    "context": "default",
+    "namespace": "v4-migration-e2e",
+    "service": "v4-watch-sts-20261022-01",
+    "postCheck": {
+      "type": "ClusterIP",
+      "clusterIP": "None",
+      "ports": [
+        {
+          "name": "http",
+          "port": 80,
+          "protocol": "TCP",
+          "targetPort": 80
+        }
+      ],
+      "selector": {
+        "app": "v4-watch-sts-20261022-01"
+      },
+      "specSha256": "7e87060258da652411d8508a2292c3a11385b1d9ea5e4f2d574622e64667f8a8"
+    },
+    "scope": "namespace 作用域正确，未访问其他 namespace"
+  },
+  "mutation": {
+    "authorized": true,
+    "testResourceOnly": true,
+    "changedBusinessValue": true,
+    "restoredAfterTest": true,
+    "cleanup": "未删除测试资源；原始标签值已恢复"
+  },
+  "conclusion": "StatefulSet 编辑服务的当前制品成功路径已取得浏览器 PATCH 200、回读 200 和 Kubernetes 资源一致性证据；403/404/422、冲突、网络失败和低权限拒绝路径仍未闭环。"
+}

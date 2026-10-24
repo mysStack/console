@@ -1,0 +1,24 @@
+{
+  "server": "https://192.168.2.131:6443",
+  "namespace": "kubesphere-system",
+  "deployment": "ks-console",
+  "replicas": 1,
+  "images": [
+    "ghcr.io/mysstack/ks-console:feature-v4-workloads-20261022-215739-27aaeced74e8@sha256:919492fedf5eae6ee27fca84bb490897e557659ae79860b9e3f035e59c5f9179"
+  ],
+  "pods": [
+    {
+      "name": "ks-console-6b9c55b7b5-2v5fg",
+      "phase": "Running",
+      "containers": [
+        {
+          "name": "ks-console",
+          "ready": true,
+          "imageID": "ghcr.io/mysstack/ks-console@sha256:919492fedf5eae6ee27fca84bb490897e557659ae79860b9e3f035e59c5f9179"
+        }
+      ]
+    }
+  ],
+  "persistedDryRunFixtures": 0,
+  "deploymentChanged": false
+}

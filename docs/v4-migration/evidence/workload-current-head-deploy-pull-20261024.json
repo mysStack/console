@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-24",
+  "module": "workloads",
+  "branch": "feature/v4-workloads",
+  "sourceCommit": "ae500da86a559b378ba7255ee1d21c3d95a3a768",
+  "ci": {
+    "run": "40046932193",
+    "conclusion": "success",
+    "headSha": "ae500da86a559b378ba7255ee1d21c3d95a3a768",
+    "unitTests": "通过",
+    "imageBuild": "通过"
+  },
+  "image": {
+    "tag": "feature-v4-workloads-20261024-085149-ae500da86a55",
+    "reference": "ghcr.io/mysstack/ks-console:feature-v4-workloads-20261024-085149-ae500da86a55@sha256:325f455ab8388f65ab1da254a4ca17d298baa45a118d38b12969c64db175bef5",
+    "digest": "sha256:325f455ab8388f65ab1da254a4ca17d298baa45a118d38b12969c64db175bef5"
+  },
+  "target": "131 / kubesphere-system/ks-console",
+  "before": {
+    "image": "ghcr.io/mysstack/ks-console:feature-v4-workloads-20261024-050150-24c6afa03849@sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76",
+    "podImageId": "ghcr.io/mysstack/ks-console@sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76"
+  },
+  "deployment": {
+    "attempt": "已执行",
+    "rollout": "新 Pod 长时间 ContainerCreating，未形成 Ready Pod；未执行当前制品浏览器验收",
+    "newPod": "ks-console-87f865b86-h7kpp",
+    "newPodImageId": null,
+    "rollback": "已回滚",
+    "rollbackRollout": "通过",
+    "afterRollbackImage": "ghcr.io/mysstack/ks-console:feature-v4-workloads-20261024-050150-24c6afa03849@sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76",
+    "afterRollbackPodImageId": "ghcr.io/mysstack/ks-console@sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76"
+  },
+  "conclusion": "当前 HEAD 制品构建和推送通过；131 拉取/Ready 未完成，浏览器 VERIFY 未执行，模块保持 VERIFY/未完成。"
+}

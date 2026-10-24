@@ -1,0 +1,32 @@
+{
+  "baselineCommit": "0a17b2e27039ecd9ea7c097e64f5683cecbbb963",
+  "method": "TypeScript compiler API; production sources only; current dependencies/config; baseline tracked console source overlaid from Git; emit/composite/incremental disabled",
+  "baselineDiagnostics": 699,
+  "currentDiagnostics": 699,
+  "introduced": [],
+  "changedFileErrors": [],
+  "sources": [
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/ContainerInput.tsx",
+      "sha256": "29ab2771b1e06d0fcc4f739c5a3c5194d361185da35006511157850b6f889b25"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/SecurityContextInput.tsx",
+      "sha256": "b785a7323ab1e597bf4dd72ee82e321b9c82bb9fb9adf6528098e134693383dc"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/WorkloadSettingsModal.tsx",
+      "sha256": "4dc0138b7c541b0f7b187343567b3dc0932c0ee0cdf48346da0afebb65e05c43"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/deployment.ts",
+      "sha256": "b3f442c450a4920de18ca32eac5bcbb6868610fd1d98a9754bfe2d29bfd1a4f6"
+    },
+    {
+      "path": "packages/console/src/pages/projects/components/WorkloadCreateModal/index.tsx",
+      "sha256": "cc55e7a7f028043612ad146a4a5cfe9f31a85a66eeeecea5069ab8d3c74f9eb7"
+    }
+  ],
+  "sourceCommit": "9e2f4148f2abde58b6eec850612d99dc1ac3f0a8",
+  "statement": "项目类型检查仍有既有诊断；基线差异检查不能替代全项目 TypeScript 通过"
+}

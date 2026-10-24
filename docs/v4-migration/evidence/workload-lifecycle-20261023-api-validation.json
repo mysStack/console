@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-23T02:37:25.564Z",
+  "sourceCommit": "da25187d33ca49d21afa0ad748b619e8a2786c64",
+  "uncommittedSourceFiles": [],
+  "server": "https://192.168.2.131:6443",
+  "version": "v1.31.13+k3s1",
+  "namespace": "v4-migration-e2e",
+  "mode": "server dry-run; no resource persisted",
+  "results": [
+    {
+      "kind": "Deployment",
+      "expected": "accepted",
+      "passed": true,
+      "result": "deployment.apps/v4-life-dryrun-deployment-1792723040742",
+      "error": ""
+    },
+    {
+      "kind": "StatefulSet",
+      "expected": "accepted",
+      "passed": true,
+      "result": "statefulset.apps/v4-life-dryrun-statefulset-1792723040745",
+      "error": ""
+    },
+    {
+      "kind": "DaemonSet",
+      "expected": "accepted",
+      "passed": true,
+      "result": "daemonset.apps/v4-life-dryrun-daemonset-1792723040746",
+      "error": ""
+    },
+    {
+      "kind": "Deployment/普通 init 生命周期",
+      "expected": "rejected",
+      "passed": true,
+      "error": "The Deployment \"v4-life-dryrun-deployment-1792723040742\" is invalid: spec.template.spec.initContainers[0].lifecycle: Forbidden: may not be set for init containers without restartPolicy=Always"
+    }
+  ]
+}

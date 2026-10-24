@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-23T04:30:34.236Z",
+  "sourceCommit": "da741a3893f88885df4698a4ea5d265336fb9692",
+  "server": "https://192.168.2.131:6443",
+  "namespace": "v4-migration-e2e",
+  "resource": "daemonset/v4-watch-ds-20261022-01",
+  "mode": "merge patch server dry-run; no resource persisted",
+  "beforeResourceVersion": "134421481",
+  "dryRunResourceVersion": "134421481",
+  "afterResourceVersion": "134421481",
+  "beforeNodeSelector": null,
+  "dryRunNodeSelector": {
+    "non-existing": "true"
+  },
+  "afterNodeSelector": null,
+  "patchAccepted": true,
+  "unchangedAfter": true
+}

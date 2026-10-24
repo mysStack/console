@@ -1,0 +1,105 @@
+{
+  "module": "workloads",
+  "resources": ["Deployment", "StatefulSet", "DaemonSet"],
+  "sourceCommit": "24c6afa03849d5d5c7b84fccd1602639b1fd0eb5",
+  "ci": {
+    "run": 40023514250,
+    "conclusion": "success",
+    "imageTag": "feature-v4-workloads-20261024-050150-24c6afa03849",
+    "digest": "sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76"
+  },
+  "deployment": {
+    "namespace": "kubesphere-system",
+    "name": "ks-console",
+    "rollout": "success",
+    "podReady": true,
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:691f53f4527948a793326cd31525ed013b4edb285119e9680f59de52e1b1ed76"
+  },
+  "browser": {
+    "freshContext": true,
+    "initialCookies": 0,
+    "loginHttp": 200,
+    "authenticatedUI": true,
+    "pageErrors": 0,
+    "navigation": {
+      "deployments": {
+        "fixture": "v4-deploy-edit-ef3",
+        "listDetailRefreshBack": "passed",
+        "apiStatus": 200,
+        "namespace": "v4-migration-e2e",
+        "otherNamespaceItems": false,
+        "legacyRequests": []
+      },
+      "statefulsets": {
+        "fixture": "v4-pvc-sts-7fa",
+        "listDetailRefreshBack": "passed",
+        "apiStatus": 200,
+        "namespace": "v4-migration-e2e",
+        "otherNamespaceItems": false,
+        "legacyRequests": []
+      },
+      "daemonsets": {
+        "fixture": "v4-stop-ds-7fa",
+        "listDetailRefreshBack": "passed",
+        "apiStatus": 200,
+        "namespace": "v4-migration-e2e",
+        "otherNamespaceItems": false,
+        "legacyRequests": []
+      }
+    },
+    "settings": {
+      "deployments": {
+        "status": "passed",
+        "sections": ["更新策略", "容器组设置", "存储设置", "容器组调度规则", "添加元数据"],
+        "nestedConfirmNoApi": true,
+        "outerCancelUnchanged": true,
+        "draftDiscarded": true,
+        "imageSearchVisible": true,
+        "put": 200,
+        "persisted": true,
+        "reloadRefilled": true,
+        "containersPreserved": true,
+        "restore": {
+          "initial": 409,
+          "fallback": 200,
+          "restored": true
+        }
+      },
+      "statefulsets": {
+        "status": "passed",
+        "sections": ["更新策略", "容器组设置", "存储设置", "容器组调度规则", "添加元数据"],
+        "nestedConfirmNoApi": true,
+        "outerCancelUnchanged": true,
+        "draftDiscarded": true,
+        "imageSearchVisible": true,
+        "put": 200,
+        "persisted": true,
+        "reloadRefilled": true,
+        "containersPreserved": true,
+        "restore": {
+          "initial": 200,
+          "restored": true
+        }
+      },
+      "daemonsets": {
+        "status": "passed",
+        "sections": ["更新策略", "容器组设置", "存储设置", "添加元数据"],
+        "nestedConfirmNoApi": true,
+        "outerCancelUnchanged": true,
+        "draftDiscarded": true,
+        "imageSearchVisible": true,
+        "put": 200,
+        "persisted": true,
+        "reloadRefilled": true,
+        "containersPreserved": true,
+        "restore": {
+          "initial": 200,
+          "restored": true
+        }
+      }
+    },
+    "visualReview": "三类原生编辑容器对话框已截图复核；未见 Monaco、iframe 或可见 Wujie 页面。"
+  },
+  "conclusion": "当前精确制品已关闭全局 V3 预加载缺口的本轮浏览器证据；三类 Workload 模块仍未整体验收，完整 Action、RBAC、缓存和逐项 V3 等价清单继续未完成。",
+  "secretsPrinted": false
+}

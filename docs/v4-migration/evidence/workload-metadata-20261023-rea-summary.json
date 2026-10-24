@@ -1,0 +1,32 @@
+{
+  "operation": "analyze_javascript_application",
+  "authority": "shipped-artifact",
+  "confidence": "derived",
+  "parentEvidenceId": "ev_13c097d0d2c92defd26f2b5e69279c813eed0b00456302d0527ddc33851af863",
+  "summaryEvidenceId": "ev_84dbf05c2e42557fd021f6a02370e5aa3f95504b59bb1661e6887696fb22bb4f",
+  "inputDigest": "0935c35c74c0dee394472708a8682a2c7e9fc4cc412d412f96f40a4456feb093",
+  "selectedFactories": [2306],
+  "statistics": {
+    "relevantFiles": 2,
+    "parsedJavascriptFiles": 1,
+    "parseFailures": 0,
+    "visitedAstNodes": 493,
+    "findings": 1
+  },
+  "coverage": {
+    "application": "partial",
+    "semantic": "unknown",
+    "applicationUnknowns": 1,
+    "semanticUnknowns": 121
+  },
+  "observations": [
+    "工厂 2306 是当前 v3dist 的 Workload 容器设置元数据分区，只编辑 spec.template.metadata.annotations。",
+    "该分区使用 PropertiesInput，新增按钮文本为 ADD，并把 globals.config.preservedAnnotations 作为 hiddenKeys。",
+    "当前分区没有 Pod 模板 label 输入；旧源码的 AdvanceSettings 元数据属于另一个入口，不能合并为本次已实现范围。"
+  ],
+  "limitations": [
+    "输入是从固定当前 v3dist 惰性提取的单个工厂，不是整个 V3 应用。",
+    "分析为静态语法和关系候选，没有执行 bundle，也不证明运行时保存、RBAC 或服务端接受。",
+    "应用覆盖为 partial，语义覆盖为 unknown；121 项语义未知不能作为完整语义恢复。"
+  ]
+}

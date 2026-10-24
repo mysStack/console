@@ -1,0 +1,31 @@
+{
+  "operation": "analyze_javascript_application",
+  "authority": "shipped-artifact",
+  "parentEvidenceId": "ev_858febe6f3b01fdf0a3b239369d8c3da0193fc4b25fa3c4a7dfd934e3d5e2604",
+  "summaryEvidenceId": "ev_735b35ebd67592f92ce10c3d4229fe12d79e3a629fdc24c06af4983f810fbd8b",
+  "inputDigest": "0eb20ec8864d139f3e36a7572fef0ad41686322723deb9e9db08cba719ab4be8",
+  "selectedFactories": [1540, 1541, 2276, 2277, 2282, 2298],
+  "statistics": {
+    "relevantFiles": 6,
+    "parsedJavascriptFiles": 6,
+    "parseFailures": 0,
+    "visitedAstNodes": 2996,
+    "findings": 6
+  },
+  "coverage": {
+    "application": "complete",
+    "semantic": "unknown",
+    "semanticUnknowns": 743
+  },
+  "observations": [
+    "工厂 2276 组合容器安全上下文的访问控制、用户和用户组、SELinux、capabilities 四个分区。",
+    "工厂 2277 包含 privileged、allowPrivilegeEscalation、readOnlyRootFilesystem。",
+    "工厂 1540 包含 runAsNonRoot、runAsUser、runAsGroup；1541 包含 SELinux level、role、type、user。",
+    "工厂 2282 包含 capabilities.add 和 capabilities.drop；2298 组合 Pod 用户和用户组及 SELinux 分区。"
+  ],
+  "limitations": [
+    "输入是从固定当前 v3dist 惰性提取的六个工厂，不是整个 V3 应用。",
+    "分析为静态语法和关系候选，没有执行 bundle，也不证明运行时保存、RBAC 或服务端接受。",
+    "semantic coverage 为 unknown，743 项语义未知不能作为完整语义恢复。"
+  ]
+}

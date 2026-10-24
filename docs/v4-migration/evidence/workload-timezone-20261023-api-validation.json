@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-23T04:22:11.470Z",
+  "sourceCommit": "9cf97481c64aa8932f3afe41414057d978391a49",
+  "uncommittedSourceFiles": [],
+  "server": "https://192.168.2.131:6443",
+  "version": "v1.31.13+k3s1",
+  "namespace": "v4-migration-e2e",
+  "mode": "server dry-run; no resource persisted",
+  "residualResources": [],
+  "results": [
+    {
+      "kind": "Deployment",
+      "expected": "accepted",
+      "passed": true,
+      "result": "deployment.apps/v4-timezone-dryrun-deployment-1792729329773",
+      "error": "",
+      "checks": {
+        "hostTimeVolume": true,
+        "readOnlyMount": true
+      }
+    },
+    {
+      "kind": "StatefulSet",
+      "expected": "accepted",
+      "passed": true,
+      "result": "statefulset.apps/v4-timezone-dryrun-statefulset-1792729329773",
+      "error": "",
+      "checks": {
+        "hostTimeVolume": true,
+        "readOnlyMount": true
+      }
+    },
+    {
+      "kind": "DaemonSet",
+      "expected": "accepted",
+      "passed": true,
+      "result": "daemonset.apps/v4-timezone-dryrun-daemonset-1792729329773",
+      "error": "",
+      "checks": {
+        "hostTimeVolume": true,
+        "readOnlyMount": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "date": "2026-10-23T06:03:18.088Z",
+  "sourceCommit": "30c5d0e7446d55e03f295b7a5753bde645c15c30",
+  "uncommittedSourceFiles": [],
+  "server": "https://192.168.2.131:6443",
+  "version": "v1.31.13+k3s1",
+  "namespace": "v4-migration-e2e",
+  "mode": "server dry-run; no resource persisted",
+  "residualResources": [],
+  "results": [
+    {
+      "kind": "Deployment",
+      "expected": "accepted",
+      "passed": true,
+      "result": "deployment.apps/v4-existing-top-deployment-1792735395184",
+      "error": "",
+      "checks": {
+        "systemAppLabelPreserved": true,
+        "editableLabelUpdated": true,
+        "emptyLabelAccepted": true,
+        "creatorAnnotationPreserved": true,
+        "editableAnnotationUpdated": true,
+        "emptyAnnotationAccepted": true,
+        "selectorUnchanged": true,
+        "podTemplateMetadataUnchanged": true
+      }
+    },
+    {
+      "kind": "StatefulSet",
+      "expected": "accepted",
+      "passed": true,
+      "result": "statefulset.apps/v4-existing-top-statefulset-1792735395184",
+      "error": "",
+      "checks": {
+        "systemAppLabelPreserved": true,
+        "editableLabelUpdated": true,
+        "emptyLabelAccepted": true,
+        "creatorAnnotationPreserved": true,
+        "editableAnnotationUpdated": true,
+        "emptyAnnotationAccepted": true,
+        "selectorUnchanged": true,
+        "podTemplateMetadataUnchanged": true
+      }
+    },
+    {
+      "kind": "DaemonSet",
+      "expected": "accepted",
+      "passed": true,
+      "result": "daemonset.apps/v4-existing-top-daemonset-1792735395184",
+      "error": "",
+      "checks": {
+        "systemAppLabelPreserved": true,
+        "editableLabelUpdated": true,
+        "emptyLabelAccepted": true,
+        "creatorAnnotationPreserved": true,
+        "editableAnnotationUpdated": true,
+        "emptyAnnotationAccepted": true,
+        "selectorUnchanged": true,
+        "podTemplateMetadataUnchanged": true
+      }
+    }
+  ]
+}

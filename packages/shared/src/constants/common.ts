@@ -33,7 +33,7 @@ export const API_VERSIONS: Record<string, string> = {
   ippools: 'apis/network.kubesphere.io/v1alpha1',
   ingresses: 'apis/networking.k8s.io/v1',
   validatingwebhookconfigurations: '/apis/admissionregistration.k8s.io/v1',
-  horizontalpodautoscalers: 'apis/autoscaling/v2beta2',
+  horizontalpodautoscalers: 'apis/autoscaling/v2',
   licenses: 'kapis/license.kubesphere.io/v1alpha1',
   resourcequotas: 'api/v1',
   limitranges: 'api/v1',

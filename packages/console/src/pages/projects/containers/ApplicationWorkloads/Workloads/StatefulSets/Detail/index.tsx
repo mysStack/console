@@ -4,7 +4,7 @@
  */
 
 import { isEmpty, get } from 'lodash';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Loading, notify } from '@kubed/components';
 import { useCacheStore as useStore } from '@ks-console/shared';
@@ -14,15 +14,16 @@ import {
   RecreateModal,
   DeleteConfirmModal,
   workloadStore,
+  useWebSocket,
   DetailPagee,
   getDisplayName,
   formatTime,
   useCommonActions,
-  useV3action,
   hasClusterModule,
   hpaStore,
   ClusterAliasName,
   ProjectAliasName,
+  request,
 } from '@ks-console/shared';
 import {
   useWorkloadService,
@@ -31,6 +32,8 @@ import {
 } from '../../../../../../clusters/hooks/useModal';
 import type { FormattedWorkload } from '@ks-console/shared';
 import { Firewall } from '@kubed/icons';
+
+import { WorkloadSettingsModal } from '../../../../../components/WorkloadCreateModal';
 
 const module = 'statefulsets';
 const WORKLOAD_TYPE = 'STATEFULSET';
@@ -46,14 +49,17 @@ const { usePatchHpaMutation } = hpaStore;
 const StatefulSetsDetail = () => {
   const authKey = module;
   const params = useParams();
-  const { cluster, namespace, name } = params;
+  const { workspace, cluster, namespace, name } = params;
   const navigate = useNavigate();
+  const [settingsResource, setSettingsResource] = useState<Record<string, any>>();
 
   const k8sVersion = globals.clusterConfig?.[cluster!]?.k8sVersion;
 
   const listUrl = useMemo(() => {
-    return `/clusters/${cluster}/statefulsets`;
-  }, []);
+    return workspace
+      ? `/${workspace}/clusters/${cluster}/projects/${namespace}/statefulsets`
+      : `/clusters/${cluster}/statefulsets`;
+  }, [workspace, cluster, namespace]);
 
   const {
     data: detail,
@@ -64,6 +70,15 @@ const StatefulSetsDetail = () => {
     cluster,
     name,
     namespace,
+  });
+
+  useWebSocket({
+    module,
+    url: store.getWatchListUrl({ cluster, namespace }),
+    params: { fieldSelector: `metadata.name=${name}` },
+    enabled: Boolean(cluster && namespace && name) && !isError,
+    onAdded: () => refetch(),
+    onModified: () => refetch(),
   });
   const [sharedDetail, setDetailProps] = useStore('StatefulSetDetailProps', {
     module,
@@ -88,6 +103,25 @@ const StatefulSetsDetail = () => {
     store,
     params,
     callback: () => refetch(),
+  });
+
+  const {
+    open: openSettingsModal,
+    close: closeSettingsModal,
+    isOpen: settingsModalIsOpen,
+  } = useDisclosure();
+  const {
+    mutate: mutateSettings,
+    isLoading: settingsIsLoading,
+    error: settingsError,
+    reset: resetSettings,
+  } = store.usePutMutation(undefined, {
+    noGetDetail: true,
+    onSuccess: () => {
+      notify.success(t('UPDATE_SUCCESSFUL'));
+      closeSettingsModal();
+      refetch();
+    },
   });
 
   const { renderRollbackModal, setRollbackVisible } = useRollbackModal<
@@ -138,7 +172,7 @@ const StatefulSetsDetail = () => {
 
   useEffect(() => {
     setDetailProps({ module, detail, isLoading, isError });
-  }, [detail]);
+  }, [detail, isLoading, isError, setDetailProps]);
 
   const { renderAutoScalingModal, setScaleVisible } = useAutoScalingModal<
     FormattedWorkload['_originData']
@@ -174,7 +208,10 @@ const StatefulSetsDetail = () => {
     ),
   });
   const tabs = useMemo(() => {
-    const path = `/clusters/${cluster}/projects/${namespace}/statefulsets/${name}`;
+    const prefix = workspace
+      ? `/${workspace}/clusters/${cluster}/projects/${namespace}`
+      : `/clusters/${cluster}/projects/${namespace}`;
+    const path = `${prefix}/statefulsets/${name}`;
 
     return cluster && hasClusterModule(cluster, 'whizard-monitoring')
       ? [
@@ -194,7 +231,7 @@ const StatefulSetsDetail = () => {
           { title: t('CONFIG_REFERENCE'), path: `${path}/config-reference` },
           { title: t('EVENT_PL'), path: `${path}/events` },
         ];
-  }, []);
+  }, [workspace, cluster, namespace, name]);
 
   const attrs = useMemo(() => {
     if (isEmpty(detail)) {
@@ -229,9 +266,7 @@ const StatefulSetsDetail = () => {
         value: creator ? creator : '',
       },
     ];
-  }, [detail]);
-
-  const { open, render: renderV3Modal } = useV3action();
+  }, [detail, cluster, namespace]);
 
   const isExtensionEnabledInCluster = hasClusterModule(cluster!, 'metrics-server');
   const actions = () => {
@@ -276,19 +311,18 @@ const StatefulSetsDetail = () => {
         icon: <Icon name="storage" />,
         text: t('EDIT_SETTINGS'),
         action: 'edit',
-        onClick: () => {
-          open({
-            module,
-            ...params,
-            detail,
-            v3Module: 'workload',
-            v3StoreParams: module,
-            hasRootStore: true,
-            success: () => {
-              notify.success(t('UPDATE_SUCCESSFUL'));
-              refetch();
-            },
-          });
+        onClick: async () => {
+          try {
+            // 保存原始 resourceVersion；并发修改时由 API 返回 409，不能覆盖新版本。
+            const resource = await request.get<Record<string, any>, Record<string, any>>(
+              store.getDetailUrl({ cluster, namespace, name }),
+            );
+            setSettingsResource(resource);
+            resetSettings();
+            openSettingsModal();
+          } catch {
+            notify.error(t('WORKLOAD_SETTINGS_LOAD_FAILED'));
+          }
         },
       },
       {
@@ -358,6 +392,18 @@ const StatefulSetsDetail = () => {
         />
       )}
       {renderRollbackModal()}
+      {settingsModalIsOpen && settingsResource && (
+        <WorkloadSettingsModal
+          visible
+          cluster={cluster!}
+          namespace={namespace!}
+          resource={settingsResource}
+          confirmLoading={settingsIsLoading}
+          error={settingsError}
+          onOk={data => mutateSettings({ params: { cluster, namespace, name }, data })}
+          onCancel={closeSettingsModal}
+        />
+      )}
       {recreateModalIsOpen && (
         <RecreateModal
           visible={recreateModalIsOpen}
@@ -385,7 +431,6 @@ const StatefulSetsDetail = () => {
           onCancel={() => closeDeleteModal()}
         ></DeleteConfirmModal>
       )}
-      {renderV3Modal()}
       {renderAutoScalingModal()}
     </>
   );
