@@ -43,6 +43,10 @@
 - 直接访问 ConfigMap 页面返回 403；这与 Kubernetes `auth can-i` 对 ConfigMap 的读权限结果不一致，说明 Console 权限键或 KubeSphere role template 仍需定位。
 - 该结果只证明一条 Workload 读路径和一条拒绝路径，不能替代完整低权限 RBAC、配置引用和三类资源操作矩阵。
 
+### 低权限配置引用复验
+
+低权限账号在当前制品上打开 Deployment 配置引用页面成功。ConfigMap、Secret 列表和详情均使用 `v4-migration-e2e` namespace 路径并返回 200，页面不展示 Secret 值，未修改资源。独立 ConfigMap 列表页面仍发起缺少 namespace 的集群级请求并返回 403；该问题已登记为配置资源与共享列表底座依赖，不作为本轮 Workload 分支的业务代码修改。
+
 ### 尚未闭环的场景
 
 - 当前制品的新 Cookie 登录链路未通过，必须重新建立可复现的专用测试会话后，才能完成完整浏览器验收。

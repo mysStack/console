@@ -69,7 +69,9 @@
       "credentials": "未写入证据、日志或截图",
       "projectWorkloadDetail": "通过：Deployment 详情直达和资源状态渲染，Deployment API 200；低权限页面未显示编辑/更多操作入口",
       "configMap403Request": "确认根因方向：当前项目 ConfigMap 页面发起的是集群级 /clusters/host/kapis/resources.kubesphere.io/v1alpha3/configmaps 请求，缺少 /namespaces/v4-migration-e2e 路径，因此收到 403",
-      "scopeFix": "已登记为共享 ListPage/配置资源作用域依赖；本轮不在 Workload 分支夹带 ConfigMap/Secret 模块业务代码"
+      "scopeFix": "已登记为共享 ListPage/配置资源作用域依赖；本轮不在 Workload 分支夹带 ConfigMap/Secret 模块业务代码",
+      "workloadConfigReference": "通过：配置引用页渲染；当前 namespace 的 ConfigMap/Secret 列表、详情和 Deployment 读取均返回 200；页面不展示 Secret 值，应用引用按钮因无变更保持禁用",
+      "scopeConclusion": "Workload 配置引用已证明 namespace 作用域和低权限读取正常；独立 ConfigMap 列表页面的集群级请求缺少 namespace，归入配置资源/共享列表底座依赖，不作为本轮 Workload 代码修改"
     }
   },
   "notClosed": [
@@ -78,8 +80,8 @@
     "低权限 RBAC、完整 namespace 正反隔离和缓存失效需要在当前 HEAD 制品上重新执行，历史证据不继承。",
     "扩展初始化错误仍按负责人决定暂不纳入本模块验收。",
     "低权限 RBAC 已完成 Kubernetes 授权矩阵核对，但该账号当前制品的浏览器登录和 UI 拒绝态尚未闭环。",
-    "低权限浏览器已完成登录和 Workload 列表正向验证，但 ConfigMap 页面返回 403，Console 权限键与 Kubernetes 授权矩阵的差异尚未定位；配置引用低权限场景未闭环。",
-    "低权限 Deployment 详情已通过读取验证，编辑操作入口未显示；ConfigMap 403 的请求路径缺少 namespace，作用域修复仍在依赖记录中。"
+    "低权限 Deployment 详情已通过读取验证，编辑操作入口未显示；ConfigMap 403 的请求路径缺少 namespace，作用域修复仍在依赖记录中。",
+    "独立 ConfigMap 列表页面仍发起缺少 namespace 的集群级请求并返回 403，已确认不影响当前 Workload 配置引用的 namespace 读取；该修复归入共享列表/配置资源依赖。"
   ],
   "conclusion": "当前 HEAD 已完成构建、推送、部署、rollout、Pod digest 核对和已认证浏览器页面复验；Workload 模块保持 VERIFY 进行中，不能标记为已验收或进入 PR。",
   "rbac": {

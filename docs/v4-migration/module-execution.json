@@ -687,11 +687,11 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-current-head-verify-20261024.json",
-        "sha256": "5b1da80c92ce0bd32ef485c4380c90a0499fb63785ea3f28bb08d285ae35e4d2"
+        "sha256": "0f95554a7576fb235281e879a303220e727643634edf6d941c3b43ea9a7d96ce"
       },
       {
         "path": "docs/v4-migration/workload-current-head-verify-20261024.md",
-        "sha256": "60d74261e1a3956b57e60bed9b8aa053a2977653d99378056090125134150fb7"
+        "sha256": "1fec188cf92c1cf8bc0c1830378e2ed90b742226239c1c0cbf669e23d7788abd"
       }
     ],
     "ciRun": "40100881163",
