@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "3f54f3971ec3820ddb558166a91048f2dc33307666e56feb9c6d2101e2615f67"
+        "sha256": "8bbd08f8b0d4f4961b965b6129db1867aa98a0c8c8532fbc96467808fec53fbf"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "a6037fd9db8358f4874f0bf1f24f3fcb9bb1fe7ac9bfd88448340c9bdd0e2719"
+        "sha256": "4b79cd4887c287dda96e81f3f24d60bcdba73b44ab48bf20fe377e48268c1255"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -611,7 +611,7 @@
       },
       {
         "path": "docs/v4-migration/workload-yaml-validation-dev-20261025.md",
-        "sha256": "96c30fa566aae988382659d5d5994f7069e09f59fa565583bb4716c61d6e6c3d"
+        "sha256": "68ed03a334bb6680108a1c7a6de29634650f44526ebf8d9f81945f572ce354e9"
       },
       {
         "path": "docs/v4-migration/evidence/workload-yaml-validation-defect-20261025.json",
@@ -648,7 +648,7 @@
     "documents": [
       {
         "path": "docs/v4-migration/evidence/workload-yaml-validation-common-action-verify-20261025.json",
-        "sha256": "8b2f4ac9159bc1c93a1ca32278d98694606a6f2eb5b5d6aa83e716494a35759f"
+        "sha256": "e8da8de75a6b93f431b06fb1e3c45fd45868530ddbbe09cb1b1783ef877af7b5"
       }
     ],
     "ciRun": "40141436939",

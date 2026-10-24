@@ -104,3 +104,7 @@ Pod imageID:  ghcr.io/mysstack/ks-console@sha256:0bc1da00a76788dad689ca50eace996
 已登录浏览器进入 Deployment 详情页，在编辑 YAML 中保留未闭合的 `spec: [` 后点击确定。页面保持编辑弹窗打开并显示“保存失败，设置尚未保存。请检查网络和权限后重试。”；该操作产生 0 个目标资源 PUT 请求，Deployment 仍为 1/1。结构化证据见 [`workload-yaml-validation-common-action-verify-20261025.json`](./evidence/workload-yaml-validation-common-action-verify-20261025.json)。
 
 本项证明详情页非法 YAML 已在请求前被拦截。页面仍有已登记的扩展初始化错误，扩展错误不纳入本次 YAML 缺陷的通过判定。
+
+## 12. 三类详情页合法 YAML 保存复验
+
+在同一当前制品和已认证浏览器会话中，三类详情页未修改 YAML 直接点击确定，均完成合法 YAML 解析并返回 `PUT 200`：Deployment `v4-deploy-edit-ef3`、StatefulSet `v4-pvc-sts-7fa`、DaemonSet `v4-stop-ds-7fa`。三类资源状态分别保持 Deployment 1/1、StatefulSet 1/1 和 DaemonSet desired/ready/updated 为 1/1/1。结构化结果已补充到 [`workload-yaml-validation-common-action-verify-20261025.json`](./evidence/workload-yaml-validation-common-action-verify-20261025.json)。

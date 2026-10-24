@@ -34,14 +34,36 @@
       "badRequestResponses": 0
     },
     "resourceStateAfterSubmit": "Deployment 1/1，generation 40，availableReplicas 1，updatedReplicas 1",
-    "consoleErrors": "页面仍有已登记的扩展初始化错误；本项不以零 Console 错误作为通过条件"
+    "consoleErrors": "页面仍有已登记的扩展初始化错误；本项不以零 Console 错误作为通过条件",
+    "validYamlNoOp": {
+      "action": "三类详情页打开编辑 YAML，未修改内容直接点击确定",
+      "results": [
+        {
+          "resource": "Deployment/v4-deploy-edit-ef3",
+          "putStatus": 200,
+          "postState": "generation 40, available 1/1"
+        },
+        {
+          "resource": "StatefulSet/v4-pvc-sts-7fa",
+          "putStatus": 200,
+          "postState": "generation 27, ready 1/1"
+        },
+        {
+          "resource": "DaemonSet/v4-stop-ds-7fa",
+          "putStatus": 200,
+          "postState": "generation 29, desired 1, ready 1, updated 1"
+        }
+      ],
+      "conclusion": "三类详情页通用 YAML 编辑路径均可解析合法 YAML 并完成成功保存；本次未改变测试资源业务字段"
+    }
   },
   "result": {
     "invalidYamlBlockedBeforeApi": true,
     "modalKeptOpen": true,
     "visibleError": true,
     "noInvalidPut": true,
-    "status": "当前详情页非法 YAML 缺陷通过本次部署后验证"
+    "status": "当前详情页非法 YAML 缺陷通过本次部署后验证",
+    "validYamlNoOpAllKinds": true
   },
-  "remaining": "三类资源的完整 YAML 合法编辑回读、低权限、错误矩阵和完整 V3 等价性仍属于 Workload 模块 VERIFY 待验收项。"
+  "remaining": "低权限、错误矩阵、缓存切换、完整字段/Action 和逐项 V3 等价性仍属于 Workload 模块 VERIFY 待验收项。"
 }

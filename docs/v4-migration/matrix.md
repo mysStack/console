@@ -1,6 +1,6 @@
 # 当前 Workload 执行路线（2026-10-25）
 
-> **最新状态（2026-10-25，详情页非法 YAML 缺陷已验证）**：提交 `8ae475a52` 已修复详情页通用 `useCommonActions` 的严格 YAML 解析和错误处理；当前制品已完成 CI、131 rollout、Pod imageID 和浏览器验证，非法 YAML 请求前拦截通过。Workload 模块仍处于 `VERIFY / 进行中`，其他验收项不能继承本项结果。
+> **最新状态（2026-10-25，详情页非法 YAML 缺陷已验证）**：提交 `8ae475a52` 已修复详情页通用 `useCommonActions` 的严格 YAML 解析和错误处理；当前制品已完成 CI、131 rollout、Pod imageID 和浏览器验证，非法 YAML 请求前拦截通过。Workload 模块仍处于 `VERIFY / 进行中`，其他验收项不能继承本项结果。 三类详情页合法 YAML 无修改保存也均返回 200，资源保持就绪。
 
 > **退回 DEV 的缺陷记录**：在提交 `4b363c688f1e784acb68fe32117756f03bb55bd2` 制品上发现非法 YAML 会发起 PUT 并返回 400，但页面没有可见错误反馈。该缺陷已记录并完成 DEV 修复，证据见[非法 YAML 缺陷取证](./evidence/workload-yaml-validation-defect-20261025.json)和[DEV 修复记录](./workload-yaml-validation-dev-20261025.md)。
 
