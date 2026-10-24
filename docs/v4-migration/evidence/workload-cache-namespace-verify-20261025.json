@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-25",
+  "module": "workloads",
+  "currentArtifact": {
+    "sourceCommit": "54b863b2ccd611bab088d39bcbebc8b4e9f68500",
+    "image": "ghcr.io/mysstack/ks-console:feature-v4-workloads-20261024-220602-54b863b2ccd6",
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:53299da2a0add86f3c08208b8ed9728d39af31ae5c0ba7b315283dc5bfdc675a"
+  },
+  "namespaceA": {
+    "namespace": "v4-migration-e2e",
+    "route": "/test-workspace/clusters/host/projects/v4-migration-e2e/deployments",
+    "result": "页面未显示 v4-cache-isolation-20261025，未发生跨 namespace 泄漏"
+  },
+  "namespaceB": {
+    "namespace": "v4-migration-e2e-isolation",
+    "route": "/test-workspace/clusters/host/projects/v4-migration-e2e-isolation/deployments",
+    "result": "页面返回 namespace not found；该 namespace 缺少 kubesphere.io/workspace=test-workspace 关联，无法作为当前项目级浏览器缓存 fixture"
+  },
+  "cleanup": "已删除本轮在 namespaceB 创建的 v4-cache-isolation-20261025 Deployment；namespaceB 保留",
+  "conclusion": "当前制品已证明 namespaceA 页面不会显示 namespaceB 的测试资源，但第二 namespace 的项目路由未配置，完整跨 namespace 切换缓存复验未完成，原因属于测试 fixture/workspace 关联缺失。"
+}
