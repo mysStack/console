@@ -260,3 +260,9 @@ rg -n 'editConfigTemplate|editYaml|WorkloadSettingsModal' \
 在当前工作区 HEAD `ca18a3958437bea6357de57abcc04af9fff6d4d0` 上，逐个执行 ConfigReference 目录下 11 个现有测试文件，合计 75 项全部通过。测试覆盖引用解析、前缀和键名预览、环境变量摘要、ConfigMap/Secret 文件挂载双层写回、Reloader 注解、原生编辑提交防重复、错误重试和原生配置引用路由约束。
 
 结构化结果见 [`evidence/workload-config-reference-static-tests-20261024.json`](./evidence/workload-config-reference-static-tests-20261024.json)。该结果只证明当前源码静态行为，不能替代 131 当前分支制品上的浏览器写回、Kubernetes API 回读、低权限 RBAC、namespace 缓存隔离、错误路径和逐项 V3 功能等价验证。配置引用模块继续保持 **REA / 分析中，待复核**。
+
+## Workload REA 定向测试补证（2026-10-24）
+
+在当前工作区 HEAD `1b505477e96cab4999065ce63683f0f3c69a7223` 上，按 Workload 相关目录筛选并逐个执行 34 个现有测试文件，共 211 项全部通过。覆盖配置引用、Workload 设置表单、Deployment/StatefulSet/DaemonSet 资源类型分支、原生详情入口和 Action 静态行为。
+
+证据见 [`evidence/workload-rea-targeted-tests-20261024.json`](./evidence/workload-rea-targeted-tests-20261024.json)。该结果只证明当前源码静态测试通过，不能替代 `release-4.1.5` 制品等价、当前 SHA 构建部署、浏览器写回、RBAC、缓存隔离、错误路径和完整 V3 功能等价验证。模块继续保持 **REA / 分析中，待复核**。
