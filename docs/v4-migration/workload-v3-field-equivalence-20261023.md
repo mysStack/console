@@ -2,6 +2,8 @@
 
 > **2026-10-24 状态校准**：本文按 2026-10-23 的 REA 快照编制，表格中的“入口未接入”“时区未实现”“当前阶段 REA”等结论是当时的分析输入，不能直接作为当前源码或当前制品结论。当前模块阶段以 `module-execution.json` 为准：REA 已通过、DEV 已完成、VERIFY 未完成；源码提交 `31b6d88fc7e8` 的当前制品已在 131 Ready，并已补充三类原生编辑设置入口及终止宽限期保存回读证据。完整字段、RBAC、缓存、错误矩阵和逐项 V3 等价仍未闭环。
 
+> **2026-10-24 截图复核：发现新的编辑设置等价缺口**：固定 V3 制品 `3.bb6cbee4309e765b70c1.js` 的 Workload 编辑设置映射明确包含独立的 `podMode` / `POD_GRACE_PERIOD` 分区；Deployment 还包含 `deploymentMode` / `POD_SCHEDULING_RULES`，StatefulSet 也包含独立的 Pod 调度分区。当前 V4 `WorkloadSettingsModal` 把 `terminationGracePeriodSeconds` 放在“添加元数据”分区，左侧导航没有独立的“容器组优雅终止”入口。截图中的 Deployment 副本数量和更新策略本身适用，但分区结构尚未达到 V3 等价。该缺口已退回 DEV，修复后必须重新构建、部署并用浏览器验收三类资源。
+
 > 本文是 `feature/v4-workloads` 的字段级 REA 证据。它把固定旧源码、当前 V4 源码和已取得的运行时观察分开记录，不把旧源码存在直接当作当前 V4 已实现，也不把旧镜像结果当作当前 SHA 的 VERIFY。
 
 ## 取证边界
