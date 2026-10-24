@@ -117,5 +117,18 @@
       }
     ]
   },
-  "conclusion": "当前部署制品已完成三类 Workload 的删除和重新创建正向浏览器与 API 验证，并完成 Deployment 副本伸缩与回退；失败/取消/权限路径仍需逐项完成。"
+  "deploymentConflict": {
+    "kind": "Deployment",
+    "name": "v4-deploy-edit-ef3",
+    "namespace": "v4-migration-e2e",
+    "browser": "打开原生编辑设置后，使用 Kubernetes API 外部更新资源，再确认旧编辑快照",
+    "request": {
+      "method": "PUT",
+      "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+      "status": 409
+    },
+    "ui": "页面显示资源已被其他操作更新、本次设置未保存，要求取消并重新打开编辑设置",
+    "postCheck": "取消编辑后移除外部冲突标签，原有标签、spec.replicas=1 和 ready=1/1 保持不变"
+  },
+  "conclusion": "当前部署制品已完成三类 Workload 的删除和重新创建正向浏览器与 API 验证，并完成 Deployment 副本伸缩、回退和 409 冲突反馈；低权限、网络失败和逐项功能等价仍需逐项完成。"
 }
