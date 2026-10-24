@@ -114,7 +114,8 @@
       "当前 V4 三类 Workload 均有原生配置引用路由",
       "namespace 路径固定为 v4-migration-e2e",
       "ConfigMap/Secret 引用名称和生成环境变量摘要可渲染",
-      "页面明确不展示 Secret 值"
+      "页面明确不展示 Secret 值",
+      "查看引用摘要时仅显示 APP_MODE/TOKEN 键名，不显示 Secret 值，且没有产生写请求"
     ],
     "partial": [
       "本轮只验证读取和页面渲染，没有验证应用引用后的 PUT/PATCH、回读和缓存失效",
@@ -128,5 +129,14 @@
     ]
   },
   "screenshot": ".playwright-cli/page-2026-10-24T10-58-05-545Z.png",
-  "result": "当前 V4 三类 Workload 配置引用页面的只读渲染和读取请求已补充证据；写回、权限、缓存和完整 V3 等价仍未闭环，REA 不放行 DEV。"
+  "result": "当前 V4 三类 Workload 配置引用页面的只读渲染和读取请求已补充证据；写回、权限、缓存和完整 V3 等价仍未闭环，REA 不放行 DEV。",
+  "viewInteraction": {
+    "resource": "Deployment/v4-deploy-edit-ef3",
+    "action": "只读点击两个引用的“查看”",
+    "configMapGeneratedKeys": ["APP_MODE"],
+    "secretGeneratedKeys": ["TOKEN"],
+    "secretValuesVisible": false,
+    "writeRequests": false,
+    "meaning": "查看功能只显示将生成的环境变量键名，不显示 Secret 值；本轮没有点击应用引用。"
+  }
 }

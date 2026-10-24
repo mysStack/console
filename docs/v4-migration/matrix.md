@@ -159,3 +159,8 @@
 - 基线与当前 V4 的 Deployment 元数据页均显示相同标签和两个关键注解，包括 `kubectl.kubernetes.io/last-applied-configuration`。
 - 当前 V4 编辑设置首屏展示该注解，基线编辑设置首屏不展示，但基线元数据 Tab 同样展示；该项从“元数据来源差异”调整为“Modal 信息组织差异”。
 - 仍需验证编辑设置中的字段清空、保留、非法值和保存回读。证据见 [`Deployment 元数据页对照`](./evidence/workload-metadata-browser-20261024.json)。模块继续保持 `REA / 分析中，待复核`。
+
+## 当前增量（2026-10-24：配置引用查看摘要）
+
+- Deployment 配置引用页的“查看”只显示 ConfigMap 键名 `APP_MODE` 和 Secret 键名 `TOKEN`，不显示 Secret 值，没有产生写请求。
+- 该结果补充了脱敏和摘要渲染证据，但不等同于应用引用保存通过。证据见 [`配置引用 REA 浏览器记录`](./evidence/workload-config-reference-rea-browser-20261024.json)。

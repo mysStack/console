@@ -258,3 +258,8 @@
 - 对照基线和当前 V4 的 Deployment 元数据页后确认：两边均显示相同标签和 `deployment.kubernetes.io/revision`、`kubectl.kubernetes.io/last-applied-configuration` 注解。
 - 因此，当前 V4 编辑设置首屏展示 last-applied 注解属于信息组织差异，不再作为资源元数据来源不一致记录；是否在编辑设置中折叠仍需产品确认。
 - 证据见 [`Deployment 元数据页对照`](./evidence/workload-metadata-browser-20261024.json)。字段写回、权限和错误路径未关闭，模块仍为 `REA / 分析中，待复核`。
+
+# 当前状态补充（2026-10-24：配置引用查看摘要）
+
+- Deployment 配置引用页中只读点击两个“查看”后，ConfigMap 仅显示键名 `APP_MODE`，Secret 仅显示键名 `TOKEN`，没有显示 Secret 值，也没有发出写请求。
+- 该结果补强了配置引用脱敏证据；应用引用保存、回读、权限和缓存仍未验证，模块继续保持 `REA / 分析中，待复核`。

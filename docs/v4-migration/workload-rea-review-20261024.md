@@ -243,3 +243,14 @@ rg -n 'editConfigTemplate|editYaml|WorkloadSettingsModal' \
 因此，前一条“last-applied 注解展示风险”需要修正为：**资源元数据来源已经对齐，差异主要在当前 V4 将它放进编辑设置首屏，基线将它放在元数据 Tab。** 是否在编辑设置中隐藏或折叠仍属于产品交互决策，但不能据此判定当前 V4 数据错误。
 
 证据见 [`evidence/workload-metadata-browser-20261024.json`](./evidence/workload-metadata-browser-20261024.json)。字段保存、清空/保留、权限和错误路径仍未验证。
+
+### 配置引用“查看”摘要补充
+
+本轮在 Deployment 配置引用页只读点击 ConfigMap 和 Secret 引用的“查看”：
+
+- ConfigMap 摘要显示将生成的键名 `APP_MODE`；
+- Secret 摘要显示将生成的键名 `TOKEN`；
+- 页面没有显示 Secret 值；
+- 没有产生写请求，也没有点击“应用引用”。
+
+该结果进一步确认当前 V4 的“查看”只展示环境变量键名摘要。证据已补充到 [`evidence/workload-config-reference-rea-browser-20261024.json`](./evidence/workload-config-reference-rea-browser-20261024.json)。
