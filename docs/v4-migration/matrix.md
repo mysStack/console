@@ -4,6 +4,8 @@
 
 > **低权限增量（当前制品）**：已用临时 viewer 完成新的零 Cookie 登录和三类详情只读复验；编辑、更多操作、删除及配置引用写控件均隐藏或禁用。第二 namespace 项目路由返回页面未找到，完整跨 namespace UI 正反仍待 API 与缓存矩阵继续闭环。证据见[低权限浏览器复验](./evidence/workload-rbac-current-head-verify-20261025.json)。
 
+> **Action 增量（当前制品）**：已复验三类详情 Action 菜单及资源专属入口；Deployment 自动扩缩/YAML、StatefulSet 编辑服务弹窗可打开并取消，DaemonSet 不显示不适用入口。仅关闭入口样本，成功/失败/冲突/网络/RBAC 路径继续留在 VERIFY 清单。证据见[Action 入口复验](./evidence/workload-action-surface-verify-20261025.json)。
+
 > REA 主基线为 `release-4.1.5` 完整前端源码和同版本已部署页面 `192.168.2.131:30881`；同版本 `v3dist` 仅作发布制品校准；`origin/release-3.4` 仅作当前版本无法解释时的历史补充。未闭环的字段、Action、RBAC、缓存、错误和逐项等价性保留在 VERIFY 验收清单，不能标记为已验收。
 
 > 本页下方旧日期段落保留为历史证据；最新阶段只以 `module-execution.json` 为准。

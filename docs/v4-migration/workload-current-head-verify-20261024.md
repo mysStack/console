@@ -24,6 +24,10 @@
 
 第二 namespace 的项目路由返回“页面未找到”，本轮不把它单独认定为完整的第二 namespace UI 正反隔离通过，继续引用已有 Kubernetes API 隔离证据。临时用户及其 WorkspaceRoleBinding、项目 RoleBinding 已清理。结构化证据见 [`workload-rbac-current-head-verify-20261025.json`](./evidence/workload-rbac-current-head-verify-20261025.json)。本轮关闭了当前 SHA 的低权限登录、三类详情只读和配置引用控件可见性样本，完整 403/404/409/422、缓存切换和逐项 V3 等价仍未关闭。
 
+## 2026-10-25 当前 SHA Action 入口复验
+
+在同一当前制品的管理员会话中复验了三类详情的 Action 菜单：Deployment 显示回退、自动扩缩、编辑设置、编辑 YAML、重新创建和删除；StatefulSet 额外显示编辑服务；DaemonSet 不显示副本数、自动扩缩和编辑服务入口。Deployment 的自动扩缩和 YAML 弹窗、StatefulSet 的编辑服务弹窗均能打开并使用取消关闭，未提交资源修改。该记录只关闭入口渲染和资源差异样本，不代表这些 Action 的成功、失败、冲突、网络和 RBAC 组合全部通过。结构化证据见 [`workload-action-surface-verify-20261025.json`](./evidence/workload-action-surface-verify-20261025.json)。
+
 ## 2026-10-25 当前 SHA 宽度修复 VERIFY
 
 | 项目        | 结果                                                                                                  |

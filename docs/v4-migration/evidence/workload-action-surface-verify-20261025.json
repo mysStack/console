@@ -1,0 +1,60 @@
+{
+  "title": "Workload 当前制品 Action 与编辑入口复验",
+  "date": "2026-10-25",
+  "phase": "VERIFY",
+  "source": {
+    "branch": "feature/v4-workloads",
+    "commit": "4b363c688f1e784acb68fe32117756f03bb55bd2",
+    "imageTag": "feature-v4-workloads-20261025-035514-4b363c688f1e",
+    "imageDigest": "sha256:143572eea79151a40036f0d371f847346acdf39e592c584fd8a37ff6e39ac392"
+  },
+  "browser": {
+    "session": "workload-rea-current",
+    "baseUrl": "http://192.168.2.131:30880",
+    "authentication": "已有认证 admin 会话",
+    "mutations": "仅打开菜单/弹窗并使用取消，未提交修改"
+  },
+  "resources": [
+    {
+      "kind": "Deployment",
+      "name": "v4-deploy-edit-ef3",
+      "actions": ["回退", "编辑自动扩缩", "编辑设置", "编辑 YAML", "重新创建", "删除"],
+      "checks": [
+        "自动扩缩弹窗显示资源名称、目标 CPU/内存、最小/最大副本数",
+        "编辑 YAML 弹窗显示当前 Deployment YAML",
+        "两个弹窗均使用取消关闭"
+      ]
+    },
+    {
+      "kind": "StatefulSet",
+      "name": "v4-watch-sts-20261022-01",
+      "actions": ["回退", "编辑自动扩缩", "编辑服务", "编辑设置", "编辑 YAML", "重新创建", "删除"],
+      "checks": [
+        "编辑服务弹窗显示 Headless 内部访问模式、selector、端口协议/容器端口/服务端口",
+        "编辑设置和编辑 YAML 为独立入口",
+        "编辑服务弹窗使用取消关闭"
+      ]
+    },
+    {
+      "kind": "DaemonSet",
+      "name": "v4-stop-ds-7fa",
+      "actions": ["回退", "编辑设置", "编辑 YAML", "重新创建", "删除"],
+      "checks": ["未显示副本数编辑和编辑自动扩缩/编辑服务入口", "编辑设置和编辑 YAML 为独立入口"]
+    }
+  ],
+  "conclusion": {
+    "passed": [
+      "当前三类详情 Action 菜单与资源特有入口样本",
+      "Deployment HPA/YAML 打开及取消",
+      "StatefulSet Service 弹窗打开及取消",
+      "DaemonSet 不显示不适用入口"
+    ],
+    "remaining": [
+      "各 Action 成功/失败/取消/冲突/网络路径完整矩阵",
+      "HPA 实际保存回读",
+      "YAML 实际保存回读",
+      "完整 V3 逐项等价"
+    ],
+    "moduleStatus": "VERIFY / 进行中"
+  }
+}

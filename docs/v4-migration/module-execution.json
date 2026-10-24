@@ -53,11 +53,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "b973033b2483515ee3ef77901b4615afad14591d8f8bd7479b93042d65310c08"
+        "sha256": "157cbd1126b8a7680a408e300cc8efc3694d959e7d2475bc1a6494ef441d246d"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "df9c4ce1425625aaae6777fd996eade81ed327409601b7b5ec632f32c3c85b25"
+        "sha256": "071a94c10a85ee8b79cca37268e29405ccae4e84415db4d9503f8284859ad24e"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -663,11 +663,11 @@
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "df9c4ce1425625aaae6777fd996eade81ed327409601b7b5ec632f32c3c85b25"
+        "sha256": "071a94c10a85ee8b79cca37268e29405ccae4e84415db4d9503f8284859ad24e"
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "b973033b2483515ee3ef77901b4615afad14591d8f8bd7479b93042d65310c08"
+        "sha256": "157cbd1126b8a7680a408e300cc8efc3694d959e7d2475bc1a6494ef441d246d"
       },
       {
         "path": "docs/v4-migration/rea-analysis-summary.md",
@@ -699,7 +699,7 @@
       },
       {
         "path": "docs/v4-migration/workload-current-head-verify-20261024.md",
-        "sha256": "50bb02c4dffdd38c961670b88862a1d63d7d23a85e4a191378b86ea764e6b1c4"
+        "sha256": "330c2b408fabfb4d84243b89cc1557b0eed05c215876cf123a6606649c3cf7d2"
       },
       {
         "path": "docs/v4-migration/evidence/workload-daemonset-stop-recovery-verify-20261025.json",
@@ -748,6 +748,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-rbac-current-head-verify-20261025.json",
         "sha256": "3576158bed29685442e5946ed1175b524ab3b24f6354eba0a7fc9161f5e9afb7"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-action-surface-verify-20261025.json",
+        "sha256": "549e79ead0aac2a566462b405f77bb0f553c7549c9254580639f9f2ce44f3fcb"
       }
     ],
     "ciRun": 40127350345,
@@ -768,10 +772,10 @@
     },
     "browserVerification": {
       "status": "部分完成",
-      "evidence": "docs/v4-migration/evidence/workload-settings-tabs-verify-20261025.json; docs/v4-migration/evidence/workload-rbac-current-head-verify-20261025.json",
+      "evidence": "docs/v4-migration/evidence/workload-settings-tabs-verify-20261025.json; docs/v4-migration/evidence/workload-rbac-current-head-verify-20261025.json; docs/v4-migration/evidence/workload-action-surface-verify-20261025.json",
       "report": "docs/v4-migration/workload-current-head-verify-20261024.md",
-      "freshLogin": "已执行新的零 Cookie 登录尝试，页面返回通用登录失败提示，未建立认证会话；不继承旧会话结论",
-      "authenticatedSessionChecks": "当前制品已验证 Deployment、StatefulSet、DaemonSet 编辑设置分区切换、当前面板唯一可见、资源差异字段和取消路径；临时 viewer 新零 Cookie 登录成功，三类详情只读、配置引用写控件隐藏或禁用；页面仍有已登记扩展初始化错误",
+      "freshLogin": "管理员环境变量登录尝试失败；随后创建并清理临时 viewer 账号，新的零 Cookie viewer 登录成功；不记录任何密码",
+      "authenticatedSessionChecks": "当前制品已验证 Deployment、StatefulSet、DaemonSet 编辑设置分区切换、当前面板唯一可见、资源差异字段、取消路径和 Action 入口；临时 viewer 三类详情只读、配置引用写控件隐藏或禁用；页面仍有已登记扩展初始化错误",
       "moduleAcceptance": "未完成"
     },
     "lastEvidenceUpdate": "2026-10-25"
