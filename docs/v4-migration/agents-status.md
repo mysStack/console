@@ -1,6 +1,6 @@
 # 当前 Workload 执行状态（2026-10-25）
 
-- 当前阶段：`VERIFY / 进行中`。已修复详情页通用 `useCommonActions` 的严格 YAML 解析和错误处理，本地测试与构建通过；待当前提交重新完成 CI、131 部署和浏览器复验。
+- 当前阶段：`VERIFY / 进行中`。详情页通用 `useCommonActions` 的严格 YAML 解析和错误处理已在提交 `8ae475a52` 修复；当前提交已完成 CI、131 rollout、Pod imageID 核对和浏览器非法 YAML 验证，该缺陷通过，但模块仍有其他 VERIFY 项。
 - 上一轮验证制品：代码提交 `2676f00d054e11f6b8569e6f9b889e1cefbfba88`；CI Run `40135662495`；镜像 `feature-v4-workloads-20261025-054831-2676f00d054e`；digest `sha256:44cc6e8a48d1c720e4791fdbba3480a4dbae16bd3c9201e82d401fdf4647c920`；131 rollout 和 Pod imageID 核对成功，Pod `ks-console-5f8c884f5c-dxzjz` 为 `1/1` Ready。以下浏览器结果仅作为退回 DEV 的回归证据。
 - 当前浏览器结果：已认证会话在当前制品上完成 Deployment、StatefulSet、DaemonSet 的编辑设置分区切换复验；每次只显示当前分区，弹窗宽度均为 `1162px`，取消路径通过。低权限正反、缓存、错误和逐项等价性仍未闭环。
 - 本轮已从 `/home/bruce/.bashrc` 加载测试账号环境变量并尝试新的零 Cookie 登录，但页面返回通用登录失败提示，未建立新认证会话；分区验收继续使用已有认证会话。页面仍有已登记的扩展初始化错误，不记录为控制台零错误。结构化证据见 [`workload-settings-tabs-verify-20261025.json`](./evidence/workload-settings-tabs-verify-20261025.json)。
@@ -13,7 +13,7 @@
 - 当前制品已补齐 StatefulSet 与 DaemonSet YAML 测试字段添加、浏览器回读和清除；StatefulSet 保持 1/1，DaemonSet 保持 1/1，测试字段均无 API 残留。非法 YAML、冲突、权限、网络失败和完整 V3 等价仍未完成。证据见 [`workload-yaml-resource-kinds-verify-20261025.json`](./evidence/workload-yaml-resource-kinds-verify-20261025.json)。
 - 当前主基线：`release-4.1.5` 完整前端源码及同版本已部署页面 `192.168.2.131:30881`；源码定位实现，页面核对真实渲染、交互、Network、错误和权限。
 - 制品校准：同版本 `v3dist` tree `1e499d92e11374e26c76f5e13be45251602bd596`；旧 V3 参考 `origin/release-3.4` / `175710fefeeba6ff295c2c0967b4d45b83563d26` 仅在当前版本无法解释时补充使用。
-- 开发路线：REA 输入已经完成当前版本绑定；详情页通用 YAML 编辑路径已在提交 `8ae475a52` 修复，验证阶段必须使用该提交重新构建、部署并完成浏览器验证，旧制品结果不能继承。
+- 开发路线：REA 输入已经完成当前版本绑定；详情页通用 YAML 编辑路径已在提交 `8ae475a52` 修复并完成当前制品验证。当前证据只关闭该缺陷，不能替代低权限、错误矩阵、完整 V3 等价性和三类资源全量验收。
 - 下方历史状态不能覆盖上述当前状态。
 
 # 当前状态补充（2026-10-25：分区显示修复重新进入 VERIFY）

@@ -87,3 +87,20 @@ git diff --check                                                                
 ## 10. 阶段处理
 
 详情页修复已完成 DEV，当前进入 `VERIFY / 进行中`。必须以提交 `8ae475a52` 重新执行 CI 构建、镜像推送、131 rollout、Pod 镜像身份核对和部署后 Playwright 验收。非法 YAML 的通过条件是：解析失败在请求前被阻止、不产生非法 PUT、弹窗保持打开并显示保存失败提示。
+
+## 11. 当前提交的部署后验证
+
+提交 `8ae475a52dfc5fe45e78742e53e2dc9f6e050483` 对应的 CI 制品已部署到 131：
+
+```text
+CI Run:       40141436939
+镜像 tag:     feature-v4-workloads-20261025-070905-e3f30033272c
+镜像 digest:  sha256:0bc1da00a76788dad689ca50eace99649f845cbc1dcf204fae1452331dd00f06
+Deployment:   kubesphere-system/ks-console generation 607
+Pod:          ks-console-ff8b6b7cc-2g4tq，1/1 Ready，重启 0 次
+Pod imageID:  ghcr.io/mysstack/ks-console@sha256:0bc1da00a76788dad689ca50eace99649f845cbc1dcf204fae1452331dd00f06
+```
+
+已登录浏览器进入 Deployment 详情页，在编辑 YAML 中保留未闭合的 `spec: [` 后点击确定。页面保持编辑弹窗打开并显示“保存失败，设置尚未保存。请检查网络和权限后重试。”；该操作产生 0 个目标资源 PUT 请求，Deployment 仍为 1/1。结构化证据见 [`workload-yaml-validation-common-action-verify-20261025.json`](./evidence/workload-yaml-validation-common-action-verify-20261025.json)。
+
+本项证明详情页非法 YAML 已在请求前被拦截。页面仍有已登记的扩展初始化错误，扩展错误不纳入本次 YAML 缺陷的通过判定。

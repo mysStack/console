@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-25",
+  "module": "workloads",
+  "phase": "VERIFY",
+  "sourceCommit": "8ae475a52dfc5fe45e78742e53e2dc9f6e050483",
+  "ci": {
+    "run": "40141436939",
+    "url": "https://github.com/mysStack/console/actions/runs/40141436939",
+    "status": "success",
+    "imageTag": "feature-v4-workloads-20261025-070905-e3f30033272c",
+    "imageDigest": "sha256:0bc1da00a76788dad689ca50eace99649f845cbc1dcf204fae1452331dd00f06"
+  },
+  "deployment": {
+    "namespace": "kubesphere-system",
+    "name": "ks-console",
+    "generation": 607,
+    "image": "ghcr.io/mysstack/ks-console:feature-v4-workloads-20261025-070905-e3f30033272c",
+    "pod": "ks-console-ff8b6b7cc-2g4tq",
+    "podReady": true,
+    "podRestarts": 0,
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:0bc1da00a76788dad689ca50eace99649f845cbc1dcf204fae1452331dd00f06"
+  },
+  "browser": {
+    "session": "workload-verify-fixed-20261025",
+    "url": "http://192.168.2.131:30880/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/resource-status",
+    "authenticatedRole": "platform-admin",
+    "resource": "v4-migration-e2e/v4-deploy-edit-ef3",
+    "action": "详情页打开编辑 YAML，在编辑器内容中保留未闭合的 spec: [，点击确定",
+    "modalAfterSubmit": "仍保持打开",
+    "visibleFeedback": "保存失败，设置尚未保存。请检查网络和权限后重试。",
+    "requestsAfterSubmit": {
+      "matchingResourceGet": 2,
+      "putRequests": 0,
+      "badRequestResponses": 0
+    },
+    "resourceStateAfterSubmit": "Deployment 1/1，generation 40，availableReplicas 1，updatedReplicas 1",
+    "consoleErrors": "页面仍有已登记的扩展初始化错误；本项不以零 Console 错误作为通过条件"
+  },
+  "result": {
+    "invalidYamlBlockedBeforeApi": true,
+    "modalKeptOpen": true,
+    "visibleError": true,
+    "noInvalidPut": true,
+    "status": "当前详情页非法 YAML 缺陷通过本次部署后验证"
+  },
+  "remaining": "三类资源的完整 YAML 合法编辑回读、低权限、错误矩阵和完整 V3 等价性仍属于 Workload 模块 VERIFY 待验收项。"
+}
