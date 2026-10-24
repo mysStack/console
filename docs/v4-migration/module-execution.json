@@ -747,7 +747,7 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-rbac-current-head-verify-20261025.json",
-        "sha256": "a64d9f66b379a13dcfc9a45baad7f5f9b40913df7b9615f5078182793f37cf1c"
+        "sha256": "3576158bed29685442e5946ed1175b524ab3b24f6354eba0a7fc9161f5e9afb7"
       }
     ],
     "ciRun": 40127350345,
