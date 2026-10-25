@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-25",
+  "sourceCommit": "de5ce34297468537b448e91723e4e44b6bff09e1",
+  "image": {
+    "tag": "feature-v4-workloads-20261025-090821-de5ce3429746",
+    "digest": "sha256:1bbb4c4297e590d59ba117c18dc0b83f7e2fc6085439ff4549af87b81ab5ac71",
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:1bbb4c4297e590d59ba117c18dc0b83f7e2fc6085439ff4549af87b81ab5ac71"
+  },
+  "browser": {
+    "session": "workload-verify-20261025",
+    "freshLogin": false,
+    "cluster": "host",
+    "namespace": "v4-migration-e2e",
+    "resources": [
+      {
+        "kind": "Deployment",
+        "name": "v4-deploy-edit-ef3",
+        "url": "http://192.168.2.131:30880/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/config-reference",
+        "rendered": "配置引用页面可见，ConfigMap/Secret 引用和前缀行可读。"
+      },
+      {
+        "kind": "StatefulSet",
+        "name": "v4-watch-sts-20261022-01",
+        "url": "http://192.168.2.131:30880/clusters/host/projects/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01/config-reference",
+        "rendered": "配置引用页面可访问。"
+      },
+      {
+        "kind": "DaemonSet",
+        "name": "v4-stop-ds-7fa",
+        "url": "http://192.168.2.131:30880/clusters/host/projects/v4-migration-e2e/daemonsets/v4-stop-ds-7fa/config-reference",
+        "rendered": "配置引用页面可访问。"
+      }
+    ]
+  },
+  "network": {
+    "observedApi": [
+      "GET /clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3 200",
+      "GET /clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01 200",
+      "GET /clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/daemonsets/v4-stop-ds-7fa 200",
+      "GET /clusters/host/api/v1/namespaces/v4-migration-e2e/configmaps 200",
+      "GET /clusters/host/api/v1/namespaces/v4-migration-e2e/secrets 200"
+    ],
+    "v3Requests": [],
+    "conclusion": "三类配置引用页面只观察到当前 V4 Workload/ConfigMap/Secret API；未观察到 /consolev3、/dist/v3dist 或 workload.template.edit 请求。"
+  },
+  "scope": {
+    "verified": "当前项目 v4-migration-e2e 的三类资源配置引用入口和读取请求",
+    "notVerified": [
+      "写入、取消、冲突、网络失败和低权限拒绝路径",
+      "跨 namespace 缓存切换和完整 V3 功能等价"
+    ]
+  },
+  "status": "当前制品配置引用入口和无 V3 请求已验证；模块整体 VERIFY 未完成"
+}

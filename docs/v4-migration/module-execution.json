@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "5a8cb703e827e66a50b13c02ef3077e6dd4a86588888c0d308c31bf9f032cdaf"
+        "sha256": "90feb83d0a589c84e52d76e854a64eec60bf40e6ed23f5772cc507e27c3de593"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "5fe070988f915fda65d27ede14221c393ff1aadfceb5a2f470da1458e3c62545"
+        "sha256": "3d7c09c316e46f9caf119058d1c383369d81597c7ac231bc49946837ded1665f"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -122,7 +122,7 @@
       },
       {
         "path": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-        "sha256": "e7913b12ec22246a77cd16282b6ca2bcec5274a8847f9a773a4dfce4bff36e6c"
+        "sha256": "7f28581dd2971f9129f94440b2521b1dabb3cd45ca8f78debd3247d9e430b09d"
       },
       {
         "path": "docs/v4-migration/evidence/workload-kind-detail-browser-20261024.json",
@@ -652,7 +652,7 @@
   ],
   "verify": {
     "status": "进行中，待新制品部署复验",
-    "reason": "本次 DEV 修复已提交；旧制品的浏览器证据仅作为历史输入，必须在新镜像完成 rollout、Pod imageID 核对和 Playwright 后重新确认编辑设置边界，并继续保留未闭环的 Action、RBAC、缓存、错误和逐项等价项。",
+    "reason": "本次 DEV 修复已提交；编辑设置边界和配置引用读取/无 V3 请求已在新制品完成部署后复验，继续保留未闭环的配置引用写入、Action、RBAC、缓存、错误和逐项等价项。",
     "sourceCommit": "de5ce34297468537b448e91723e4e44b6bff09e1",
     "documents": [
       {
@@ -662,6 +662,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-settings-v415-verify-20261025.json",
         "sha256": "3e80d90cb6d8d251c0a51c3c77e98c6d68d36ce900cc8a74621672b3f8acbf12"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-config-reference-v415-verify-20261025.json",
+        "sha256": "9fefc3af11e864dd8aa5343be36739ea780777d6d20b6e0b93eeef3d164eee75"
       }
     ],
     "ciRun": "40149330443",
