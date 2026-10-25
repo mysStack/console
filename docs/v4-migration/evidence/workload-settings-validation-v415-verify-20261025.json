@@ -1,0 +1,76 @@
+{
+  "date": "2026-10-25",
+  "module": "workloads",
+  "phase": "VERIFY",
+  "sourceCommit": "8430bb2fe09f33cec37bf433313808be8e4a69fc",
+  "recordHead": "be6469d3fe2a83cb498d664563206a0cc6eb8374",
+  "baseline": {
+    "sourceRef": "release-4.1.5",
+    "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
+    "runtimeUrl": "http://192.168.2.131:30881",
+    "role": "完整源码和同版本已部署页面作为 REA 主基线；origin/release-3.4 仅作历史补充"
+  },
+  "deployment": {
+    "environment": "192.168.2.131:30880",
+    "context": "default",
+    "namespace": "kubesphere-system",
+    "deployment": "ks-console",
+    "ciRun": "40153206692",
+    "imageTag": "feature-v4-workloads-20261025-100820-be6469d3fe2a",
+    "imageDigest": "sha256:a3b9f1eb39cbaa8df197632fe4f79993e3c395997aff6f41a80ad62522697336",
+    "rollout": "成功",
+    "generation": 610,
+    "pod": "ks-console-74d599546f-kfpjl",
+    "podReady": true,
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:a3b9f1eb39cbaa8df197632fe4f79993e3c395997aff6f41a80ad62522697336"
+  },
+  "browser": {
+    "tool": "Playwright CLI",
+    "session": "workload-rea-current",
+    "freshLogin": false,
+    "loginNote": "使用已有认证会话；从 /home/bruce/.bashrc 加载专用账号的新零 Cookie 登录仍返回通用登录失败，本轮不把登录失败伪装成通过。",
+    "uiBaseline": {
+      "Deployment": ["更新策略", "容器", "存储", "容器组调度规则", "容器组优雅终止"],
+      "StatefulSet": ["更新策略", "容器", "存储", "容器组调度规则", "容器组优雅终止"],
+      "DaemonSet": ["更新策略", "容器", "存储", "容器组优雅终止"],
+      "hiddenFields": ["名称", "项目", "副本数量", "ADD_METADATA"]
+    },
+    "flows": [
+      {
+        "kind": "Deployment",
+        "resource": "v4-migration-e2e/v4-deploy-edit-ef3",
+        "sequence": "31 → 30 → 31",
+        "result": "两次保存均关闭弹窗并刷新页面；API 分别回读 30、31；最终副本 1/1。"
+      },
+      {
+        "kind": "StatefulSet",
+        "resource": "v4-migration-e2e/v4-pvc-sts-7fa",
+        "sequence": "30 → 31 → 30",
+        "result": "两次保存均关闭弹窗并刷新页面；API 分别回读 31、30；最终副本 1/1。"
+      },
+      {
+        "kind": "DaemonSet",
+        "resource": "v4-migration-e2e/v4-stop-ds-7fa",
+        "sequence": "30 → 31 → 30",
+        "result": "两次保存均关闭弹窗并刷新页面；API 分别回读 31、30；最终 Ready 1/1。"
+      }
+    ],
+    "consoleErrors": "三类页面均观察到既有扩展初始化错误；本轮不处理扩展问题，也不宣称页面零错误。"
+  },
+  "apiReadback": {
+    "Deployment": { "terminationGracePeriodSeconds": 31, "replicas": 1, "ready": "1/1" },
+    "StatefulSet": { "terminationGracePeriodSeconds": 30, "replicas": 1, "ready": "1/1" },
+    "DaemonSet": { "terminationGracePeriodSeconds": 30, "ready": "1/1" }
+  },
+  "conclusion": {
+    "fixedDefect": "已验证：隐藏副本数不再导致编辑设置提交前校验失败。",
+    "deploymentChain": "构建制品、131 rollout、Pod Ready、digest/imageID 和已部署制品浏览器写回/回读均完成。",
+    "moduleAcceptance": "未完成",
+    "remaining": [
+      "三类资源完整字段逐项保存、清空/保留和 V3 等价仍未全部闭环。",
+      "Action 成功/失败/取消/冲突/网络和完整 RBAC 浏览器矩阵仍未完成。",
+      "跨 namespace/user 缓存组合和低权限列表浏览器证据仍未完整闭环。",
+      "新零 Cookie 登录仍失败，扩展初始化错误按项目决定暂不纳入本模块修复。"
+    ]
+  }
+}

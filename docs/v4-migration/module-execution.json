@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "b0fbc80bbf4c7fb531b32a5dcd773be1a0b67edb445891acd1327e687a34877c"
+        "sha256": "25b61485d1715e14ffe23e6193398b9e2af2903ee8e89f97acb488da6d793230"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "d11499ba35046b8df6d7bbeecb3a62e4f8a0e0f1f33e7b826ff18f8d82b7e1f3"
+        "sha256": "f64036e9adf07652390a5104eddd40ebda77ba644e0410d61a6b8b687a7f93d1"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -686,23 +686,27 @@
       {
         "path": "docs/v4-migration/evidence/workload-action-surface-v415-verify-20261025.json",
         "sha256": "51940eda2d4435ae6b17ff4a514c3ab03fa3ce66240ca70f21d5eec7c216abe7"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-settings-validation-v415-verify-20261025.json",
+        "sha256": "7df838c1f6a36ce5274f06bbf62b6c0f13f318b9022ad63d1c9d3b9aec107162"
       }
     ],
-    "ciRun": "40149330443",
+    "ciRun": "40153206692",
     "ciStatus": "success",
-    "imageTag": "feature-v4-workloads-20261025-090821-de5ce3429746",
-    "imageDigest": "sha256:1bbb4c4297e590d59ba117c18dc0b83f7e2fc6085439ff4549af87b81ab5ac71",
+    "imageTag": "feature-v4-workloads-20261025-100820-be6469d3fe2a",
+    "imageDigest": "sha256:a3b9f1eb39cbaa8df197632fe4f79993e3c395997aff6f41a80ad62522697336",
     "rollout": {
       "deployment": "kubesphere-system/ks-console",
-      "generation": 609,
+      "generation": 610,
       "status": "success",
-      "pod": "ks-console-d76b7f44-72v29",
+      "pod": "ks-console-74d599546f-kfpjl",
       "podReady": true,
-      "podImageID": "ghcr.io/mysstack/ks-console@sha256:1bbb4c4297e590d59ba117c18dc0b83f7e2fc6085439ff4549af87b81ab5ac71"
+      "podImageID": "ghcr.io/mysstack/ks-console@sha256:a3b9f1eb39cbaa8df197632fe4f79993e3c395997aff6f41a80ad62522697336"
     },
     "browserVerification": {
-      "status": "编辑设置边界已验证，整体 VERIFY 未完成",
-      "evidence": "docs/v4-migration/evidence/workload-settings-v415-verify-20261025.json",
+      "status": "隐藏字段校验修复已在三类资源上验证，整体 VERIFY 未完成",
+      "evidence": "docs/v4-migration/evidence/workload-settings-validation-v415-verify-20261025.json",
       "freshLogin": "否；使用已有认证会话完成部署后复验",
       "moduleAcceptance": "未完成"
     },

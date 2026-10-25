@@ -1,6 +1,8 @@
 # 当前 Workload 执行路线（2026-10-25）
 
-> **2026-10-25 DEV 修复已提交并进入 VERIFY：** `8430bb2fe` 修复编辑设置隐藏副本数未参与提交前校验的问题；定向与全量测试、包构建、格式和差异检查通过。当前需以该提交重新构建、部署并用 Playwright 复验三类资源；本地通过不等同于模块验收。证据见 [`workload-settings-validation-dev-20261025.json`](./evidence/workload-settings-validation-dev-20261025.json)。
+> **2026-10-25 新制品 VERIFY：** `8430bb2fe` 对应制品已在 131 rollout 成功，Pod imageID 与 `sha256:a3b9f1eb39cbaa8df197632fe4f79993e3c395997aff6f41a80ad62522697336` 一致。已有认证 Playwright 会话完成 Deployment `31→30→31`、StatefulSet `30→31→30`、DaemonSet `30→31→30` 的编辑设置保存和 Kubernetes API 回读，确认隐藏副本数不再导致提交校验失败。该项已关闭，完整字段、Action、RBAC、缓存、错误矩阵和逐项 V3 等价仍未完成。详见 [`workload-settings-validation-v415-verify-20261025.json`](./evidence/workload-settings-validation-v415-verify-20261025.json)。
+
+> **2026-10-25 DEV 修复已提交并进入 VERIFY：** `8430bb2fe` 修复编辑设置隐藏副本数未参与提交前校验的问题；定向与全量测试、包构建、格式和差异检查通过，部署后复验见上一条记录。本地通过不等同于模块验收。证据见 [`workload-settings-validation-dev-20261025.json`](./evidence/workload-settings-validation-dev-20261025.json)。
 
 > **最新状态（2026-10-25，详情页错误状态已完成部署复验）**：三类详情页不存在资源的真实 404 均已在 131 当前制品跳转 `/404` 并显示资源不存在；浏览器 route mock 的 403 跳转 `/errors/403`、500 显示详情加载失败提示也通过。当前制品为 CI Run `40145235328`、镜像 `feature-v4-workloads-20261025-080541-0fefb30b3360`、digest `sha256:7467bdb6fb1600575af5cab54da59a0f43b9fdce8d4e75ddb382de0cdb36ae68`，rollout generation `608`、Pod imageID 一致。该项已关闭，Workload 其他 RBAC、缓存、Action、逐项等价和完整错误矩阵仍处于 `VERIFY / 未完成`。
 
