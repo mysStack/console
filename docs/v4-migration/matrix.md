@@ -46,6 +46,7 @@
 > **2026-10-25 配置引用复验：** 当前制品的 Deployment、StatefulSet、DaemonSet 配置引用页面和读取 API 已通过，Network 未观察到 `/consolev3`、`/dist/v3dist` 或 `workload.template.edit`；写入和错误路径仍未验收。详见 [`workload-config-reference-v415-verify-20261025.json`](./evidence/workload-config-reference-v415-verify-20261025.json)。
 > **2026-10-25 低权限 API 复验：** 当前制品对应的测试用户在 `v4-migration-e2e` 对 Deployment/StatefulSet/DaemonSet 只读，在 `default` 三类资源均被拒绝；低权限浏览器页面和缓存切换仍未验收。详见 [`workload-rbac-api-v415-verify-20261025.json`](./evidence/workload-rbac-api-v415-verify-20261025.json)。
 > **2026-10-25 当前制品 404 复验：** Deployment、StatefulSet、DaemonSet 直达不存在资源均显示统一 `/404` 页面；该项不扩大为完整错误矩阵通过。详见 [`workload-detail-404-v415-verify-20261025.json`](./evidence/workload-detail-404-v415-verify-20261025.json)。
+> **2026-10-25 Action 入口复验：** 当前制品已确认 Deployment、StatefulSet、DaemonSet 的资源专属 Action 菜单边界；该结果只覆盖入口可见性，不关闭 Action 的写入和错误矩阵。详见 [`workload-action-surface-v415-verify-20261025.json`](./evidence/workload-action-surface-v415-verify-20261025.json)。
 
 > **2026-10-25 编辑设置基线对照：** 以 `release-4.1.5` 完整源码和同版本 131 页面为主基线，发现当前 V4 编辑设置多出基础字段和元数据分区。已按基线调整 `WorkloadSettingsModal`，并以初始值合并保护隐藏字段；当前阶段为 `VERIFY / 进行中`，新制品已完成部署后 Playwright 复验，三类 Workload 不标记为已验收。证据见 [`workload-settings-v415-diff-20261025.json`](./evidence/workload-settings-v415-diff-20261025.json)。
 

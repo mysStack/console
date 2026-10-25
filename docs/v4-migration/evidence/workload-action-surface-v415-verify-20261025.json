@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-25",
+  "sourceCommit": "de5ce34297468537b448e91723e4e44b6bff09e1",
+  "imageTag": "feature-v4-workloads-20261025-090821-de5ce3429746",
+  "imageDigest": "sha256:1bbb4c4297e590d59ba117c18dc0b83f7e2fc6085439ff4549af87b81ab5ac71",
+  "browser": {
+    "session": "workload-verify-20261025",
+    "freshLogin": false,
+    "namespace": "v4-migration-e2e",
+    "actions": {
+      "Deployment": ["回退", "编辑自动扩缩", "编辑设置", "编辑 YAML", "重新创建", "删除"],
+      "StatefulSet": [
+        "回退",
+        "编辑自动扩缩",
+        "编辑服务",
+        "编辑设置",
+        "编辑 YAML",
+        "重新创建",
+        "删除"
+      ],
+      "DaemonSet": ["回退", "编辑设置", "编辑 YAML", "重新创建", "删除"]
+    },
+    "resourceUrls": {
+      "Deployment": "/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/resource-status",
+      "StatefulSet": "/clusters/host/projects/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01/resource-status",
+      "DaemonSet": "/clusters/host/projects/v4-migration-e2e/daemonsets/v4-stop-ds-7fa/resource-status"
+    },
+    "operation": "只打开菜单并记录入口，没有点击会触发写入的操作。"
+  },
+  "result": {
+    "resourceSpecificActionVisibility": "通过",
+    "daemonSetNoReplicaScale": "通过",
+    "moduleAcceptance": "未完成",
+    "remaining": ["Action 的成功、失败、取消、冲突、低权限和网络失败路径仍需逐项验证。"]
+  }
+}
