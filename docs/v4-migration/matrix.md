@@ -1,5 +1,7 @@
 # 当前 Workload 执行路线（2026-10-25）
 
+> **2026-10-25 DEV 修复已提交：** `8430bb2fe` 修复编辑设置隐藏副本数未参与提交前校验的问题；定向与全量测试、包构建、格式和差异检查通过。当前阶段仍为 `DEV`，待该提交重新构建、部署并用 Playwright 复验三类资源后恢复 `VERIFY`。证据见 [`workload-settings-validation-dev-20261025.json`](./evidence/workload-settings-validation-dev-20261025.json)。
+
 > **最新状态（2026-10-25，详情页错误状态已完成部署复验）**：三类详情页不存在资源的真实 404 均已在 131 当前制品跳转 `/404` 并显示资源不存在；浏览器 route mock 的 403 跳转 `/errors/403`、500 显示详情加载失败提示也通过。当前制品为 CI Run `40145235328`、镜像 `feature-v4-workloads-20261025-080541-0fefb30b3360`、digest `sha256:7467bdb6fb1600575af5cab54da59a0f43b9fdce8d4e75ddb382de0cdb36ae68`，rollout generation `608`、Pod imageID 一致。该项已关闭，Workload 其他 RBAC、缓存、Action、逐项等价和完整错误矩阵仍处于 `VERIFY / 未完成`。
 
 > **本轮证据**：DEV 修复见 [`workload-detail-error-state-dev-20261025.json`](./evidence/workload-detail-error-state-dev-20261025.json)，部署后浏览器复验见 [`workload-detail-error-state-verify-20261025.json`](./evidence/workload-detail-error-state-verify-20261025.json)。403/500 本轮为浏览器 route mock，只证明页面状态处理，不替代真实低权限 RBAC 和网络环境证据。

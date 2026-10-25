@@ -6,7 +6,7 @@
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
   "phase": "DEV",
-  "phaseReason": "当前制品浏览器复验发现编辑设置隐藏副本数导致提交前校验失败，已确认根因并退回 DEV；修复后需重新构建、部署和 Playwright 复验。",
+  "phaseReason": "编辑设置隐藏副本数导致提交前校验失败的根因已修复并提交；当前仍处 DEV，需重新构建、部署和 Playwright 复验后才能恢复 VERIFY。",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "dd85fa6c4b91aa12f8fb99fdabaaf8e2646eea6ab853d0867506c1c6aeb5b66f"
+        "sha256": "b0db05a062a7c0a2b8baa78eb2f86e4bab125a8360927045ba2852751914fa54"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "33b0188f614bef1220e7dfe642875218de719dafcc147cea99cff770721456e1"
+        "sha256": "5c004d9c9168f20e0abc6b833a865292514ce8d44cc3ef2b7eb9f62a10e31548"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -325,9 +325,9 @@
     "coverageNotes": "已核对表示当前版本主基线和证据入口已覆盖该维度，不表示运行时验证或功能等价已经通过；运行时缺口转入 DEV/VERIFY 验收清单。"
   },
   "dev": {
-    "status": "进行中",
-    "reason": "对照 release-4.1.5 的编辑设置边界修复已部署，但当前制品发现隐藏副本数未参与提交前校验，终止宽限期修改被错误阻止；已记录根因，待补充校验合并和回归。",
-    "sourceCommit": "e4667ebff9a0686ef2dfcee3fcc7074783108b84",
+    "status": "已完成",
+    "reason": "已修复隐藏副本数未参与提交前校验的问题；定向测试、全量测试、包构建、格式检查和差异检查均通过。待以该提交重新构建部署并执行 VERIFY。",
+    "sourceCommit": "8430bb2fe",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
@@ -644,6 +644,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-settings-validation-defect-20261025.json",
         "sha256": "5fa9264f8c32963820b15dcbda4447f21926641f1af5610e5f723d2833df0707"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-settings-validation-dev-20261025.json",
+        "sha256": "863ad1648f1dddfa8201dadd77a6ac8436a6b4cb9830009258ca505346f1f236"
       }
     ]
   },

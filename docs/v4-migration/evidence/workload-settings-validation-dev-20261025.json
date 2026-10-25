@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-25",
+  "module": "workloads",
+  "phase": "DEV",
+  "sourceCommit": "8430bb2fe",
+  "change": "编辑设置隐藏名称、项目和副本数后，提交前校验与最终写回统一合并初始设置值，避免副本数缺失导致合法设置修改被错误拦截。",
+  "rootCause": "release-4.1.5 对照要求编辑设置不展示基础字段；移除 replicas 表单项后，validateWorkloadSettings 仍直接读取表单值，Deployment/StatefulSet 的 replicas 变成 undefined。",
+  "implementation": {
+    "file": "packages/console/src/pages/projects/components/WorkloadCreateModal/WorkloadSettingsModal.tsx",
+    "function": "mergeWorkloadSettingsValues",
+    "validation": "validateWorkloadSettings 使用 initialValues 与当前表单值合并后的对象",
+    "submit": "buildDeploymentSettingsResource 使用同一合并结果"
+  },
+  "tests": [
+    {
+      "command": "./node_modules/.bin/esno packages/console/src/pages/projects/components/WorkloadCreateModal/WorkloadSettingsModal.test.ts",
+      "result": "通过：7/7"
+    },
+    {
+      "command": "./node_modules/.bin/esno packages/console/src/pages/projects/components/WorkloadCreateModal/index.test.ts",
+      "result": "通过：5/5"
+    },
+    {
+      "command": "./node_modules/.bin/esno packages/console/src/pages/projects/components/WorkloadCreateModal/deployment.test.ts",
+      "result": "通过：73/73"
+    },
+    {
+      "command": "./node_modules/.bin/esno packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/Deployments/Detail/native.test.ts && ./node_modules/.bin/esno packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/StatefulSets/Detail/native.test.ts && ./node_modules/.bin/esno packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/DaemonSets/Detail/native.test.ts",
+      "result": "通过：Deployment 3/3，StatefulSet 2/2，DaemonSet 2/2"
+    },
+    {
+      "command": "./scripts/test.sh",
+      "result": "通过：94 个文件，421 项测试"
+    },
+    {
+      "command": "corepack yarn build:packages",
+      "result": "通过；存在既有 circular dependency warning，无构建失败"
+    },
+    {
+      "command": "./node_modules/.bin/prettier --check packages/console/src/pages/projects/components/WorkloadCreateModal/WorkloadSettingsModal.tsx packages/console/src/pages/projects/components/WorkloadCreateModal/WorkloadSettingsModal.test.ts && git diff --check",
+      "result": "通过"
+    }
+  ],
+  "deployment": "未执行；需在 DEV 提交记录完成后进入 VERIFY，重新构建、部署并执行 Playwright。",
+  "browserVerification": "未执行；此前 de5ce342 制品的校验失败证据仍有效，不能继承为修复通过。",
+  "status": "DEV 修复已提交，待部署后 VERIFY"
+}
