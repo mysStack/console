@@ -1,3 +1,9 @@
+# 当前状态补充（2026-10-25：三类 Workload 当前制品批量删除成功复验）
+
+- 当前制品源码提交 `2c81983cf7cc013f90609f002d1423e6c647817a` 已在 131 rollout 成功；CI Run `40167476566`、镜像 `feature-v4-workloads-20261025-140042-2c81983cf7cc`、digest `sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b`、Pod imageID 和 rollout generation `613` 已核对一致。
+- Playwright 项目列表批量删除 Deployment、StatefulSet、DaemonSet 专用 fixture 均成功；三类资源 API 回读均为 NotFound，列表页均恢复为 2 条。StatefulSet fixture 带有原生创建流程登记的 `kubesphere.io/related-service`，关联 Headless Service 也已回读为 NotFound。专用 fixture 已清理，namespace 保留，既有测试资源未删除。
+- 证据见 [`workload-batch-delete-current-artifact-verify-20261025.json`](./evidence/workload-batch-delete-current-artifact-verify-20261025.json)。本轮只关闭批量删除成功路径和关联 Service 清理样本；完整 Action 错误/冲突/低权限/网络矩阵、字段清空/保留、低权限缓存组合和逐项 V3 等价仍未完成，模块保持 `VERIFY / 进行中`，PR #2 保持 Draft。
+
 # 当前状态补充（2026-10-25：低权限项目列表和详情只读复验）
 
 - 当前制品已使用临时低权限用户完成零 Cookie 登录和三类 Workload 浏览器复验。项目级 Deployment、StatefulSet、DaemonSet 列表均只显示 `v4-migration-e2e` 的 2 条测试资源；集群级 StatefulSet 列表显示 403；直达 `dev-biz` 没有显示其他项目资源。

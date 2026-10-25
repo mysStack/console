@@ -1,3 +1,9 @@
+## 当前增量（2026-10-25：三类 Workload 当前制品批量删除成功复验）
+
+- 当前制品源码提交 `2c81983cf7cc013f90609f002d1423e6c647817a` 已在 131 部署成功；CI Run `40167476566`、镜像 `feature-v4-workloads-20261025-140042-2c81983cf7cc`、digest `sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b`、rollout generation `613` 和 Pod imageID 已核对一致。
+- 已认证 Playwright 在项目级 Workload 列表完成 Deployment、StatefulSet、DaemonSet 三类专用 fixture 的批量删除；三类 API 回读均为 NotFound，列表均从 3 条恢复为 2 条。StatefulSet 使用带 `kubesphere.io/related-service` 关联标记的原生创建形态，配套 Headless Service 同步回读为 NotFound。
+- 证据见 [`workload-batch-delete-current-artifact-verify-20261025.json`](./evidence/workload-batch-delete-current-artifact-verify-20261025.json)。本轮关闭批量删除成功路径及 StatefulSet 关联 Service 清理样本；Action 错误/冲突/低权限/网络组合、完整字段、低权限缓存组合和逐项 V3 等价仍未闭环，模块保持 `VERIFY / 进行中`。
+
 ## 当前增量（2026-10-25：低权限项目列表和详情只读复验）
 
 - 当前制品 `feature-v4-workloads-20261025-140042-2c81983cf7cc` 已使用临时低权限用户完成零 Cookie 浏览器登录。该用户只绑定 `test-workspace` 的 Workspace viewer 和 `v4-migration-e2e` 的项目 viewer，验证结束后用户及绑定已删除。

@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "39128ccc533d229a05a07e90283491903d7e8f21719a4b1106b9be09604a3810"
+        "sha256": "0edddfd3d6dfa38d71619cb395e5a6d7967188e639f75885d65feaa86262e38a"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "2d67d930afa07747e92ad5b5fa902354c3f13de5518decfa80be7103055c3175"
+        "sha256": "cb4d9fcfdd61bbe58e1a8faa7199c6cd46ed92d26bc685066a131b479c35cb74"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -672,7 +672,7 @@
   ],
   "verify": {
     "status": "进行中",
-    "reason": "删除失败反馈、StatefulSet 冲突、DaemonSet 网络失败、负值边界、三类 YAML 非法输入错误路径、集群级项目筛选刷新和低权限项目列表/详情只读样本已在当前制品复验；负值复核确认请求体和 API 回读为 0，与 release-4.1.5 对照一致；非法 YAML 均未产生写请求且资源未变化。服务端 422/409 逐项映射、完整字段、Action、低权限缓存、完整缓存和逐项 V3 等价仍未闭环。",
+    "reason": "删除失败反馈、StatefulSet 关联 Service 清理、StatefulSet/DaemonSet 成功 Action、负值边界、三类 YAML 非法输入错误路径、集群级项目筛选刷新、低权限项目列表/详情只读和三类项目级批量删除已在当前制品复验；非法 YAML 未产生写请求且资源未变化，批量删除三类资源均回读 NotFound，带关联标记的 StatefulSet Headless Service 同步清理。服务端 422/409 逐项映射、完整字段、Action 错误/冲突/低权限/网络矩阵、低权限缓存和逐项 V3 等价仍未闭环。",
     "sourceCommit": "2c81983cf7cc013f90609f002d1423e6c647817a",
     "documents": [
       {
@@ -742,6 +742,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-low-privilege-list-cache-verify-20261025.json",
         "sha256": "caef91a873164611f18264aa539dda79c78ca651c9faf8d73ae44b7086823414"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-batch-delete-current-artifact-verify-20261025.json",
+        "sha256": "53a809613db20f1bd5c18c53849ade21e6ca06f4d56cd8275cb62950a5790111"
       }
     ],
     "ciRun": "40167476566",
@@ -752,7 +756,7 @@
       "ciRun": "40167476566",
       "imageTag": "feature-v4-workloads-20261025-140042-2c81983cf7cc",
       "imageDigest": "sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b",
-      "status": "已部署并完成删除失败、设置错误路径、负值边界、YAML 非法输入、集群列表缓存和低权限只读浏览器复验；其他验收项仍未闭环"
+      "status": "已部署并完成删除失败、批量删除、StatefulSet 关联 Service 清理、设置错误路径、负值边界、YAML 非法输入、集群列表缓存和低权限只读浏览器复验；其他验收项仍未闭环"
     },
     "rollout": {
       "deployment": "kubesphere-system/ks-console",
@@ -763,12 +767,13 @@
       "podImageID": "ghcr.io/mysstack/ks-console@sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b"
     },
     "browserVerification": {
-      "status": "已完成删除失败、设置错误路径、负值边界、YAML 非法输入、集群列表缓存和低权限只读复验；未发现负值或非法 YAML 写回，整体 VERIFY 未完成。",
+      "status": "已完成删除失败、批量删除、StatefulSet 关联 Service 清理、设置错误路径、负值边界、YAML 非法输入、集群列表缓存和低权限只读复验；未发现批量删除残留，整体 VERIFY 未完成。",
       "evidence": "docs/v4-migration/evidence/workload-negative-grace-reverify-20261025.json",
       "freshLogin": "否；使用已有认证 Playwright 会话完成部署后浏览器验收",
       "moduleAcceptance": "未完成"
     },
-    "lastEvidenceUpdate": "2026-10-25"
+    "lastEvidenceUpdate": "2026-10-25",
+    "evidence": "docs/v4-migration/evidence/workload-batch-delete-current-artifact-verify-20261025.json"
   },
   "routeAdjustment": {
     "date": "2026-10-24",

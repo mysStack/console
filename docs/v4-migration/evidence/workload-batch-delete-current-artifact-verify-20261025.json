@@ -1,0 +1,87 @@
+{
+  "module": "workloads",
+  "stage": "VERIFY",
+  "date": "2026-10-25",
+  "sourceCommit": "2c81983cf7cc013f90609f002d1423e6c647817a",
+  "baseline": {
+    "source": "release-4.1.5",
+    "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
+    "runtime": "http://192.168.2.131:30881",
+    "role": "当前版本源码和同版本已部署页面作为 REA 主基线；origin/release-3.4 仅作历史补充"
+  },
+  "artifact": {
+    "ciRun": "40167476566",
+    "imageTag": "feature-v4-workloads-20261025-140042-2c81983cf7cc",
+    "imageDigest": "sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b",
+    "deployment": "kubesphere-system/ks-console",
+    "generation": 613,
+    "pod": "ks-console-654b89bc97-jbj5h",
+    "podReady": true,
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b"
+  },
+  "scenario": {
+    "name": "三类 Workload 项目列表批量删除及 StatefulSet 关联 Headless Service 清理",
+    "method": "已认证 Playwright 浏览器打开当前制品项目级列表，选择本轮专用 fixture，输入精确资源名确认删除；随后用 kubectl 回读资源和关联 Service，并回读列表页数量。",
+    "namespace": "v4-migration-e2e",
+    "fixtures": [
+      {
+        "kind": "Deployment",
+        "name": "v4-batch-current-deploy-1025",
+        "relation": "无关联资源"
+      },
+      {
+        "kind": "StatefulSet",
+        "name": "v4-batch-current-sts-1025",
+        "relation": "Headless Service v4-batch-current-sts-1025；StatefulSet annotation kubesphere.io/related-service=v4-batch-current-sts-1025"
+      },
+      {
+        "kind": "DaemonSet",
+        "name": "v4-batch-current-ds-1025",
+        "relation": "无关联资源"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "kind": "Deployment",
+      "path": "/test-workspace/clusters/host/projects/v4-migration-e2e/deploy",
+      "action": "项目列表选中后批量删除",
+      "deleteRequest": "DELETE /clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-batch-current-deploy-1025",
+      "apiReadback": "Deployment 不存在（NotFound）",
+      "listReadback": "页面总数从 3 条回到 2 条",
+      "result": "通过"
+    },
+    {
+      "kind": "StatefulSet",
+      "path": "/test-workspace/clusters/host/projects/v4-migration-e2e/statefulsets",
+      "action": "项目列表选中后批量删除",
+      "deleteRequest": "DELETE /clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/statefulsets/v4-batch-current-sts-1025",
+      "apiReadback": "StatefulSet 不存在（NotFound）",
+      "relatedServiceReadback": "Service v4-batch-current-sts-1025 不存在（NotFound）",
+      "listReadback": "页面总数从 3 条回到 2 条",
+      "result": "通过：关联 Headless Service 已清理"
+    },
+    {
+      "kind": "DaemonSet",
+      "path": "/test-workspace/clusters/host/projects/v4-migration-e2e/daemonsets",
+      "action": "项目列表选中后批量删除",
+      "deleteRequest": "DELETE /clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/daemonsets/v4-batch-current-ds-1025",
+      "apiReadback": "DaemonSet 不存在（NotFound）",
+      "listReadback": "页面总数从 3 条回到 2 条",
+      "result": "通过"
+    }
+  ],
+  "cleanup": {
+    "dedicatedFixtures": "三类批量删除 fixture 均已由浏览器操作删除；kubectl 回读确认无残留",
+    "namespace": "v4-migration-e2e 保留",
+    "otherResources": "未删除既有测试资源"
+  },
+  "result": "通过：当前部署制品的三类 Workload 批量删除成功；StatefulSet 仅对带有原生创建关联标记的 Headless Service 执行同步清理。该证据只关闭批量删除成功路径和该关联清理样本，不代表 Workload 模块整体验收通过。",
+  "unclosed": [
+    "完整字段清空/保留语义",
+    "YAML 服务端 422/409 详细界面映射",
+    "全部 Action 成功/失败/冲突/取消/低权限/网络矩阵",
+    "低权限列表刷新、返回和缓存组合",
+    "逐项 V3 功能等价性"
+  ]
+}
