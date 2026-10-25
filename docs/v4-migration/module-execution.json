@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "37180c650f149d56e9afc8a0646d5943b58b28eeb127e7b90727de1fa0950f06"
+        "sha256": "1f5764265968096ba00cb0a340e031b4ac02a06e7ff3064f9ece492d7690f4e1"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "0ad235bce9ae38df57311e6743d6fcc1b9406183219ebce72c8f6722f5724fbe"
+        "sha256": "9cc942e30cea172742583acad216cfb56b9649f029aea26823c0103d3ad58bd6"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -122,7 +122,7 @@
       },
       {
         "path": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-        "sha256": "b443014dd9056449302fc90ffb4f62aa72a1617badea7ade42e413a16c795c86"
+        "sha256": "d91aff4fec9b32ec04deb0fe9c08590549d5f1c07b1ecf9949c190e37bd65e33"
       },
       {
         "path": "docs/v4-migration/evidence/workload-kind-detail-browser-20261024.json",
@@ -327,7 +327,7 @@
   "dev": {
     "status": "进行中",
     "reason": "对照 release-4.1.5 发现编辑设置多出基础字段和 ADD_METADATA 分区；已按基线调整分区和字段边界，并以 initialValues 合并保护隐藏字段。当前工作树已通过定向回归，提交、构建、部署和浏览器复验待完成。",
-    "sourceCommit": "f4e0ee0ee0bcc1bf4ef07e1c145c585c680178ae",
+    "sourceCommit": "e4667ebff9a0686ef2dfcee3fcc7074783108b84",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
@@ -639,7 +639,7 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-settings-v415-diff-20261025.json",
-        "sha256": "d813618b6069eac1aed1c19958743dbaa260dd30e47cd42ded9b5abbced3a13b"
+        "sha256": "1a40d8788991f8efcabf9aadc2ea2a33497fdf02934433456cfb75f90a64e9df"
       }
     ]
   },
