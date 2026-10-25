@@ -660,7 +660,7 @@
   ],
   "verify": {
     "status": "进行中",
-    "reason": "DEV 修复提交已完成本地验证；此前制品的浏览器证据只作为历史输入，必须以新制品完成 rollout、Pod imageID 和浏览器写回/回读复验后更新本记录。",
+    "reason": "当前提交已完成新制品 rollout、Pod imageID 核对和三类 Workload 的浏览器写回/回读复验；隐藏副本数校验缺陷已关闭。完整字段、配置引用写入、Action 错误/取消、低权限浏览器矩阵、缓存组合及逐项 V3 等价仍未闭环，模块保持 VERIFY 进行中。",
     "sourceCommit": "8430bb2fe09f33cec37bf433313808be8e4a69fc",
     "documents": [
       {
