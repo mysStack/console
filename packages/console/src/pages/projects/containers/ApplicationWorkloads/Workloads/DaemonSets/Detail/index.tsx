@@ -124,6 +124,8 @@ const DaemonSetDetail = () => {
     isOpen: deleteModalIsOpen,
   } = useDisclosure();
 
+  const [deleteError, setDeleteError] = useState(false);
+
   const {
     open: openRecreateModal,
     close: closeRecreateModal,
@@ -181,10 +183,12 @@ const DaemonSetDetail = () => {
   const { mutate: mutateDeleteOpt, isLoading: deleteIsLoading } = useDeleteDeploymentMutation({
     onSuccess: () => {
       notify.success(t('DELETED_SUCCESSFULLY'));
+      setDeleteError(false);
       closeDeleteModal();
       navigate(listUrl);
     },
     onError: () => {
+      setDeleteError(true);
       notify.error(t('OPERATION_FAILED'));
     },
   });
@@ -320,7 +324,10 @@ const DaemonSetDetail = () => {
         icon: <Icon name="trash" />,
         text: t('DELETE'),
         action: 'delete',
-        onClick: () => openDeleteModal(),
+        onClick: () => {
+          setDeleteError(false);
+          openDeleteModal();
+        },
       },
     ];
   };
@@ -407,10 +414,14 @@ const DaemonSetDetail = () => {
         <DeleteConfirmModal
           type={WORKLOAD_TYPE}
           resource={detail.name}
+          desc={deleteError ? <p role="alert">{t('OPERATION_FAILED')}</p> : null}
           visible={deleteModalIsOpen}
           confirmLoading={deleteIsLoading}
           onOk={handleDelete}
-          onCancel={() => closeDeleteModal()}
+          onCancel={() => {
+            setDeleteError(false);
+            closeDeleteModal();
+          }}
         ></DeleteConfirmModal>
       )}
     </>

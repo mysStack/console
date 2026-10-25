@@ -193,6 +193,8 @@ const DeploymentDetail = () => {
     isOpen: deleteModalIsOpen,
   } = useDisclosure();
 
+  const [deleteError, setDeleteError] = useState(false);
+
   const { mutate: mutateRecreateOpt, isLoading: recreateIsLoading } = useUpdateDeploymentMutation({
     onSuccess: () => {
       notify.success(t('RECREATE_SUCCESS_DESC'));
@@ -217,10 +219,12 @@ const DeploymentDetail = () => {
     {
       onSuccess: () => {
         notify.success(t('DELETED_SUCCESSFULLY'));
+        setDeleteError(false);
         closeDeleteModal();
         navigate(listUrl);
       },
       onError: () => {
+        setDeleteError(true);
         notify.error(t('OPERATION_FAILED'));
       },
     },
@@ -366,7 +370,10 @@ const DeploymentDetail = () => {
         text: t('DELETE'),
         action: 'delete',
         show: !detail.isFedManaged,
-        onClick: () => openDeleteModal(),
+        onClick: () => {
+          setDeleteError(false);
+          openDeleteModal();
+        },
       },
     ];
   };
@@ -451,6 +458,7 @@ const DeploymentDetail = () => {
           visible={deleteModalIsOpen}
           type={WORKLOAD_TYPE}
           resource={detail.name}
+          desc={deleteError ? <p role="alert">{t('OPERATION_FAILED')}</p> : null}
           confirmLoading={deleteIsLoading}
           onOk={() => {
             mutateDeleteOpt({
@@ -460,7 +468,10 @@ const DeploymentDetail = () => {
               annotations: detail.annotations,
             });
           }}
-          onCancel={() => closeDeleteModal()}
+          onCancel={() => {
+            setDeleteError(false);
+            closeDeleteModal();
+          }}
         ></DeleteConfirmModal>
       )}
     </>

@@ -21,4 +21,6 @@ test('DaemonSet 删除请求失败时显示错误提示并保留确认弹窗', (
     source,
     /useDeleteDeploymentMutation\([\s\S]*?onError:\s*\(\)\s*=>\s*\{[\s\S]*?notify\.error\(t\('OPERATION_FAILED'\)\)/,
   );
+  assert.match(source, /deleteError/);
+  assert.match(source, /role="alert"/);
 });
