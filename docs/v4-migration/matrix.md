@@ -1,5 +1,7 @@
 # 当前 Workload 执行路线（2026-10-25）
 
+> **2026-10-25 StatefulSet/DaemonSet Action VERIFY：** 当前制品完成 StatefulSet Headless Service 保持原值编辑确认和 API 回读（PATCH/GET 200），以及 DaemonSet 停止成功路径（PATCH 200、状态 0/0、不可调度 selector 写回）；停止夹具随后按原值恢复并 rollout 到 1/1。证据见 [`workload-service-stop-v415-verify-20261025.json`](./evidence/workload-service-stop-v415-verify-20261025.json)。本轮只关闭两项成功路径，Action 的错误、取消、冲突、低权限和完整资源等价仍未完成。
+
 > **2026-10-25 配置引用写回 VERIFY：** 在当前制品 `feature-v4-workloads-20261025-100820-be6469d3fe2a` 上，使用已有认证 Playwright 会话分别对 Deployment、StatefulSet、DaemonSet 增加 ConfigMap 引用前缀并应用，Kubernetes API 均可读回；随后逐项删除引用或清空前缀并确认资源恢复，三类资源保持 Ready。未读取或记录 Secret 值。证据见 [`workload-config-reference-v415-write-verify-20261025.json`](./evidence/workload-config-reference-v415-write-verify-20261025.json)。本轮只关闭配置引用成功写回和恢复，冲突、低权限拒绝、网络失败、取消、跨 namespace 缓存和文件挂载引用仍未完成。
 
 > **2026-10-25 新制品 VERIFY：** `8430bb2fe` 对应制品已在 131 rollout 成功，Pod imageID 与 `sha256:a3b9f1eb39cbaa8df197632fe4f79993e3c395997aff6f41a80ad62522697336` 一致。已有认证 Playwright 会话完成 Deployment `31→30→31`、StatefulSet `30→31→30`、DaemonSet `30→31→30` 的编辑设置保存和 Kubernetes API 回读，确认隐藏副本数不再导致提交校验失败。该项已关闭，完整字段、Action、RBAC、缓存、错误矩阵和逐项 V3 等价仍未完成。详见 [`workload-settings-validation-v415-verify-20261025.json`](./evidence/workload-settings-validation-v415-verify-20261025.json)。

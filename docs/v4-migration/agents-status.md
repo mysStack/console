@@ -1,5 +1,7 @@
 # 当前 Workload 执行状态（2026-10-25）
 
+- **2026-10-25 StatefulSet/DaemonSet Action VERIFY 已补齐成功路径。** 当前制品在 131 完成 StatefulSet Headless Service 编辑确认与 API 回读，以及 DaemonSet 停止、状态回读和测试夹具恢复；StatefulSet 与 DaemonSet 均保持 Ready。证据见 [`workload-service-stop-v415-verify-20261025.json`](./evidence/workload-service-stop-v415-verify-20261025.json)。错误、取消、冲突、低权限和完整资源等价仍未关闭。
+
 - **2026-10-25 配置引用写回 VERIFY 已完成。** 当前制品 `feature-v4-workloads-20261025-100820-be6469d3fe2a` 在 131 使用已有认证 Playwright 会话分别验证 Deployment、StatefulSet、DaemonSet 的 ConfigMap 引用前缀写回、API 回读和恢复；三类资源均保持 Ready，未读取或记录 Secret 值。证据见 [`workload-config-reference-v415-write-verify-20261025.json`](./evidence/workload-config-reference-v415-write-verify-20261025.json)。冲突、低权限拒绝、网络失败、取消、跨 namespace 缓存和文件挂载引用仍未关闭。
 
 - **2026-10-25 新制品校验修复 VERIFY 已完成。** CI Run `40153206692`、镜像 `feature-v4-workloads-20261025-100820-be6469d3fe2a`、digest `sha256:a3b9f1eb39cbaa8df197632fe4f79993e3c395997aff6f41a80ad62522697336` 成功；131 `ks-console` rollout generation `610`，Pod `ks-console-74d599546f-kfpjl` Ready，imageID 与 digest 一致。使用已有认证 Playwright 会话在三类资源执行设置写回和 API 回读：Deployment `31→30→31`、StatefulSet `30→31→30`、DaemonSet `30→31→30` 均成功，确认隐藏副本数不再导致提交前校验失败。证据见 [`workload-settings-validation-v415-verify-20261025.json`](./evidence/workload-settings-validation-v415-verify-20261025.json)。本轮只关闭该缺陷，完整 Workload 仍未验收。

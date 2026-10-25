@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-25",
+  "recordedAt": "2026-10-25T11:02:26+08:00",
+  "module": "workloads",
+  "sourceCommit": "8430bb2fe09f33cec37bf433313808be8e4a69fc",
+  "image": {
+    "tag": "feature-v4-workloads-20261025-100820-be6469d3fe2a",
+    "digest": "sha256:a3b9f1eb39cbaa8df197632fe4f79993e3c395997aff6f41a80ad62522697336",
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:a3b9f1eb39cbaa8df197632fe4f79993e3c395997aff6f41a80ad62522697336"
+  },
+  "environment": {
+    "cluster": "host",
+    "namespace": "v4-migration-e2e",
+    "console": "http://192.168.2.131:30880",
+    "browserSession": "workload-rea-current",
+    "freshLogin": false,
+    "consoleErrors": "页面存在已登记的扩展初始化错误，本轮只记录目标 Action 结果。"
+  },
+  "statefulSetService": {
+    "kind": "StatefulSet",
+    "name": "v4-watch-sts-20261022-01",
+    "route": "/test-workspace/clusters/host/projects/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01/resource-status",
+    "browser": "更多操作 → 编辑服务；名称、Headless 内部访问模式、selector、HTTP 端口 80 和取消/确认控件正常渲染；保持原值确认。",
+    "network": [
+      "GET .../api/v1/namespaces/v4-migration-e2e/services/v4-watch-sts-20261022-01 200",
+      "PATCH .../api/v1/namespaces/v4-migration-e2e/services/v4-watch-sts-20261022-01 200",
+      "GET .../apis/apps/v1/namespaces/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01 200"
+    ],
+    "apiReadback": {
+      "serviceName": "v4-watch-sts-20261022-01",
+      "clusterIP": "None",
+      "selector": { "app": "v4-watch-sts-20261022-01" },
+      "port": 80,
+      "protocol": "TCP"
+    },
+    "resourceState": "StatefulSet 1/1 Ready，Headless Service 保持原值"
+  },
+  "daemonSetStop": {
+    "kind": "DaemonSet",
+    "name": "v4-stop-ds-7fa",
+    "route": "/test-workspace/clusters/host/projects/v4-migration-e2e/daemonsets",
+    "browser": "项目级列表选中测试 DaemonSet，点击停止，输入资源名后确认。停止确认弹窗正常渲染，停止后列表状态为 0/0。",
+    "network": ["PATCH .../apis/apps/v1/namespaces/v4-migration-e2e/daemonsets/v4-stop-ds-7fa 200"],
+    "stoppedReadback": {
+      "nodeSelector": {
+        "kubernetes.io/os": "linux",
+        "non-existing": "true"
+      },
+      "desired": 0,
+      "ready": 0
+    },
+    "fixtureRestore": {
+      "operation": "仅移除本轮停止动作添加的 non-existing nodeSelector，保留原 linux selector；不属于产品恢复 Action。",
+      "rollout": "成功",
+      "nodeSelector": { "kubernetes.io/os": "linux" },
+      "desired": 1,
+      "ready": 1
+    }
+  },
+  "checks": {
+    "testNamespaceOnly": true,
+    "businessDataDeleted": false,
+    "secretValuesReadOrRecorded": false,
+    "v3RequestsObserved": false,
+    "moduleAcceptance": "未完成"
+  },
+  "scope": {
+    "verified": [
+      "当前制品 StatefulSet Headless Service 编辑成功路径和 API 回读",
+      "当前制品 DaemonSet 停止成功路径、nodeSelector 停止状态和夹具恢复",
+      "StatefulSet 与 DaemonSet 资源在验证后保持 Ready"
+    ],
+    "notVerified": [
+      "Service/Stop 的 403、404、409、422、网络失败和取消路径",
+      "低权限浏览器 Action 矩阵",
+      "StatefulSet PVC 模板、完整 Action 矩阵和逐项 V3 等价"
+    ]
+  },
+  "status": "当前制品 StatefulSet Service 和 DaemonSet Stop 成功路径已验证；模块整体 VERIFY 未完成"
+}
