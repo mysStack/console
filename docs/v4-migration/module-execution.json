@@ -26,7 +26,7 @@
       },
       {
         "path": "docs/v4-migration/workload-kind-capability-matrix.md",
-        "sha256": "ef7b913bd1780ac1a654907d4bd9bb131d84522618677ce4ceae9506253fa00b"
+        "sha256": "3b06a14ac7ad6db0386ff28b5dabe4b29e9ec0b96af4f18a8b67851e171d48af"
       },
       {
         "path": "docs/v4-migration/evidence/workload-edit-factories-20261023-provenance.json",
@@ -114,7 +114,7 @@
       },
       {
         "path": "docs/v4-migration/workload-rea-review-20261024.md",
-        "sha256": "d423148f95958d39f4ae18e88f64ad3bfb4eed90bb883f57b7360834de4c98be"
+        "sha256": "fe729c7b22190a49601ac11b35a939655c7d4032e8978d4748b8bca42f76d3ad"
       },
       {
         "path": "docs/v4-migration/evidence/workload-v415-baseline-browser-20261024.json",
@@ -689,7 +689,7 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-settings-validation-v415-verify-20261025.json",
-        "sha256": "7df838c1f6a36ce5274f06bbf62b6c0f13f318b9022ad63d1c9d3b9aec107162"
+        "sha256": "7702567bdea4dac487ba5cc354f62014e2381edd7b1f005cd6c38b9fa26d16cb"
       }
     ],
     "ciRun": "40153206692",
