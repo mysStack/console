@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "a134b335287ee561741e360ef2863121d39d24916a41f72fa8e3cd7a9ddbdf0c"
+        "sha256": "f97be5784b19e6ab73f7101db4f761389f9d00bfba3bb1aec0e4a6e7bada7b9d"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "54351711da5b985b657da16e1a1676f3a2df6229427ab9f3985342a941f99d53"
+        "sha256": "5d15de364b037bf8e0b54a198e2d6ceb153a637d0acd20689e35e2c2b06dc9b9"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -122,7 +122,7 @@
       },
       {
         "path": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-        "sha256": "b7d5619681fc118020f63473de7a7b3cc78325a2923a7c38af461d39f46f8c72"
+        "sha256": "57cd9388fed148cda022586c16bcc11b8ad07a148afbc129bdb4a4cf1177158c"
       },
       {
         "path": "docs/v4-migration/evidence/workload-kind-detail-browser-20261024.json",
@@ -652,7 +652,7 @@
   ],
   "verify": {
     "status": "进行中，待新制品部署复验",
-    "reason": "本次 DEV 修复已提交；编辑设置边界、配置引用读取/无 V3 请求和 Kubernetes API RBAC/namespace 矩阵已在新制品完成复验，继续保留低权限浏览器控件、写入错误、缓存、Action 和逐项等价项。",
+    "reason": "本次 DEV 修复已提交；编辑设置边界、配置引用读取/无 V3 请求、Kubernetes API RBAC/namespace 矩阵和当前制品真实 404 已完成复验，继续保留低权限浏览器控件、写入错误、缓存、Action 和逐项等价项。",
     "sourceCommit": "de5ce34297468537b448e91723e4e44b6bff09e1",
     "documents": [
       {
@@ -669,7 +669,11 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-rbac-api-v415-verify-20261025.json",
-        "sha256": "26408f68c05c59a7ba5d8a4c6cfeecd14a6a29f0eb2647637c9dadcc45e33bed"
+        "sha256": "9d63ea7e245e3a116184d8805ec6a3b4d74a08d0c20b2d7067f21995de111969"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-detail-404-v415-verify-20261025.json",
+        "sha256": "e8695f37491582cc4c9797facc5e3c11a2f62364183c0624da53b58656e5fb62"
       }
     ],
     "ciRun": "40149330443",

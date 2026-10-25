@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-25",
+  "sourceCommit": "de5ce34297468537b448e91723e4e44b6bff09e1",
+  "imageTag": "feature-v4-workloads-20261025-090821-de5ce3429746",
+  "imageDigest": "sha256:1bbb4c4297e590d59ba117c18dc0b83f7e2fc6085439ff4549af87b81ab5ac71",
+  "browser": {
+    "session": "workload-verify-20261025",
+    "freshLogin": false,
+    "baseUrl": "http://192.168.2.131:30880",
+    "cases": [
+      {
+        "kind": "Deployment",
+        "requestedName": "v4-nonexistent-20261025",
+        "resultUrl": "/404",
+        "heading": "页面未找到",
+        "detail": "NotFound"
+      },
+      {
+        "kind": "StatefulSet",
+        "requestedName": "v4-nonexistent-20261025",
+        "resultUrl": "/404",
+        "heading": "页面未找到",
+        "detail": "NotFound"
+      },
+      {
+        "kind": "DaemonSet",
+        "requestedName": "v4-nonexistent-20261025",
+        "resultUrl": "/404",
+        "heading": "页面未找到",
+        "detail": "NotFound"
+      }
+    ]
+  },
+  "status": "三类当前制品真实不存在资源均渲染统一 404；不代表完整错误、权限、网络和冲突矩阵已完成"
+}
