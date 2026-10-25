@@ -1,15 +1,12 @@
 # Workload V4 原生化迁移实施计划
 
-> **2026-10-25 部署后复验：** 新制品 `feature-v4-workloads-20261025-090821-de5ce3429746@sha256:1bbb4c4297e590d59ba117c18dc0b83f7e2fc6085439ff4549af87b81ab5ac71` 已在 131 rollout 成功，Pod imageID 一致。已有认证 Playwright 会话确认三类资源的编辑设置分区与 `release-4.1.5` 一致；证据见 [`workload-settings-v415-verify-20261025.json`](./evidence/workload-settings-v415-verify-20261025.json)。零 Cookie 新登录、完整 Action/RBAC/缓存和逐项等价仍未完成。
+> **最新状态（2026-10-25）：** 模块当前处于 `VERIFY / 进行中`。当前制品已在 131 完成 rollout、Pod imageID 核对和三类资源的浏览器复验。已关闭编辑设置隐藏字段校验、配置引用成功写回/恢复、StatefulSet Headless Service、DaemonSet 停止/夹具恢复、低权限详情只读、三类资源实际 PUT 403、更新策略非法值 PUT 422，以及编辑设置 409/网络失败样本。模块尚未完成验收。
 
-> **2026-10-25 基线差异修复：** 对照 `release-4.1.5` 已部署页面发现编辑设置弹窗边界不一致：当前 V4 多显示名称、项目、副本数量和元数据分区。该问题已补充回归测试并完成本地修复，阶段退回 `DEV / 修复中`；新制品尚未完成部署后浏览器复验。详见 [`workload-settings-v415-diff-20261025.json`](./evidence/workload-settings-v415-diff-20261025.json)。
+> **当前制品：** 源提交 `8430bb2fe09f33cec37bf433313808be8e4a69fc`，镜像 `feature-v4-workloads-20261025-100820-be6469d3fe2a`，digest `sha256:a3b9f1eb39cbaa8df197632fe4f79993e3c395997aff6f41a80ad62522697336`，131 Pod imageID 与 digest 一致。错误路径证据见 [`workload-settings-errors-v415-verify-20261025.json`](./evidence/workload-settings-errors-v415-verify-20261025.json)，低权限证据见 [`workload-rbac-v415-browser-verify-20261025.json`](./evidence/workload-rbac-v415-browser-verify-20261025.json)。
 
-> **当前状态（2026-10-25）：** `DEV / 修复中`。当前制品发现隐藏副本数导致编辑设置提交校验失败，已确认根因并退回 DEV；配置引用、RBAC、404 和 Action 入口证据保留为历史输入，修复后必须重新部署和浏览器复验。
-> **2026-10-25 编辑设置提交校验缺陷：** 当前制品修改终止宽限期时出现更新策略校验错误，资源没有变化。隐藏基础字段后，提交前校验也必须合并 `initialValues`；该缺陷已退回 DEV，详见 [`workload-settings-validation-defect-20261025.json`](./evidence/workload-settings-validation-defect-20261025.json)。
-> **2026-10-25 Action 入口复验：** 当前制品已复验三类资源的资源专属 Action 入口和 DaemonSet 不显示副本伸缩；本轮未触发状态变更，Action 成功、失败、取消、冲突和低权限路径仍待完成。详见 [`workload-action-surface-v415-verify-20261025.json`](./evidence/workload-action-surface-v415-verify-20261025.json)。
-> **2026-10-25 当前制品 404 复验：** 三类 Workload 直达不存在资源均跳转 `/404` 并显示 NotFound；该项已在当前制品关闭，其他错误、权限、网络和冲突路径继续验证。详见 [`workload-detail-404-v415-verify-20261025.json`](./evidence/workload-detail-404-v415-verify-20261025.json)。
-> **2026-10-25 低权限 API 复验：** 当前集群授权矩阵已对三类资源完成 impersonation 检查：测试 namespace 允许读取并拒绝写入，`default` namespace 读取全部拒绝；该结果不替代低权限浏览器控件复验。详见 [`workload-rbac-api-v415-verify-20261025.json`](./evidence/workload-rbac-api-v415-verify-20261025.json)。
-> **2026-10-25 配置引用复验：** 当前部署制品已在三类 Workload 的项目配置引用页面完成读取和请求核对，未观察到 V3/Wujie 配置引用请求；写入、冲突、失败、低权限和缓存路径继续保留在 VERIFY 清单。详见 [`workload-config-reference-v415-verify-20261025.json`](./evidence/workload-config-reference-v415-verify-20261025.json)。
+> **REA 主基线：** `release-4.1.5` 完整前端源码和同版本已部署页面 `http://192.168.2.131:30881`；同版本 `v3dist` 用于制品校准；`origin/release-3.4` 只作为当前版本无法解释时的历史补充。不能把旧 V3 源码或当前分支改动当作 `release-4.1.5` 的逆向基线。
+
+> **仍待完成：** 编辑 YAML 的详细 422 反馈、负值字段边界、完整字段清空/保留、全部 Action 错误/取消/冲突、低权限列表缓存和更多角色组合、缓存组合、逐项 V3 等价及 PR 门禁。扩展运行时错误按项目决策延期，不纳入本模块验收。
 
 > **给执行者：** 必须按任务顺序执行。REA 未完成负责人复核前，不得修改业务代码；进入 DEV 后每个任务都要先补充或复用测试，再修改实现。
 
