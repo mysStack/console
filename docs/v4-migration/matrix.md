@@ -1,6 +1,6 @@
 # 当前 Workload 执行路线（2026-10-25）
 
-> **2026-10-25 DEV 修复已提交：** `8430bb2fe` 修复编辑设置隐藏副本数未参与提交前校验的问题；定向与全量测试、包构建、格式和差异检查通过。当前阶段仍为 `DEV`，待该提交重新构建、部署并用 Playwright 复验三类资源后恢复 `VERIFY`。证据见 [`workload-settings-validation-dev-20261025.json`](./evidence/workload-settings-validation-dev-20261025.json)。
+> **2026-10-25 DEV 修复已提交并进入 VERIFY：** `8430bb2fe` 修复编辑设置隐藏副本数未参与提交前校验的问题；定向与全量测试、包构建、格式和差异检查通过。当前需以该提交重新构建、部署并用 Playwright 复验三类资源；本地通过不等同于模块验收。证据见 [`workload-settings-validation-dev-20261025.json`](./evidence/workload-settings-validation-dev-20261025.json)。
 
 > **最新状态（2026-10-25，详情页错误状态已完成部署复验）**：三类详情页不存在资源的真实 404 均已在 131 当前制品跳转 `/404` 并显示资源不存在；浏览器 route mock 的 403 跳转 `/errors/403`、500 显示详情加载失败提示也通过。当前制品为 CI Run `40145235328`、镜像 `feature-v4-workloads-20261025-080541-0fefb30b3360`、digest `sha256:7467bdb6fb1600575af5cab54da59a0f43b9fdce8d4e75ddb382de0cdb36ae68`，rollout generation `608`、Pod imageID 一致。该项已关闭，Workload 其他 RBAC、缓存、Action、逐项等价和完整错误矩阵仍处于 `VERIFY / 未完成`。
 
@@ -60,12 +60,12 @@
 > **2026-10-24 Workload 当前 VERIFY 结果**：精确制品 `24c6afa03849d5d5c7b84fccd1602639b1fd0eb5` 已完成三类原生路由、配置引用、低权限拒绝、第二 namespace 正反隔离、Action 菜单/取消、重新创建和 DaemonSet 批量停止的浏览器复验。批量删除、伸缩确认结果、完整错误矩阵和逐项 V3 等价仍未闭环；Deployment 回退确认写入已完成独立复验，状态保持 `VERIFY / 未完成`，不得进入 PR 合并或标记模块已验收。详见 [131 VERIFY](./workload-131-verify-20261024.md)、[配置引用证据](./evidence/workload-config-reference-browser-verify-20261024.json)、[Action 证据](./evidence/workload-action-browser-verify-20261024.json)。
 
 > 2026-10-24 当前进展：DEV 源提交 `3e1d40eae` 的 400 项本地回归通过；构建提交 `3d255eaf8` 的 CI Run 40000821377 和首次 131 rollout 成功。新 context 登录未通过后已回滚旧镜像；专用测试凭据在旧镜像也被拒绝，当前浏览器 VERIFY 阻塞。三类资源均未整体验收，旧 SHA 结果不继承。详见 [部署与回滚](./workload-131-verify-20261024.md#当前增量部署与登录阻塞0229-上海时间)。
-> 检查日期：2026-10-24
+> 检查日期：2026-10-25
 >
 > 迁移集成分支：`feature/v4-migration`
 >
 > 基线：`release-4.1.5` / `fc1253cbedd5ade51a6c87bfff4e1f3b38536a84`
-> Workload 当前阶段 `DEV`，REA 已通过；当前制品发现编辑设置隐藏副本数导致提交校验失败，已退回 DEV 修复，三类资源均未整体验收。唯一当前状态见 [module-execution.json](./module-execution.json)，当前结果与未完成项见本页最新日期记录。
+> Workload 当前阶段 `VERIFY`，REA 已通过；编辑设置隐藏副本数校验缺陷已在 `8430bb2fe` 修复，待新制品部署和 Playwright 复验，三类资源均未整体验收。唯一当前状态见 [module-execution.json](./module-execution.json)，当前结果与未完成项见本页最新日期记录。
 
 > 2026-10-24 DEV 增量：镜像凭据元数据选择、GPU、应用层协议已补；继续补上设置侧栏分区及容器二级编辑，局部确认只回写草稿，外层确认才调用 API。尚未部署/浏览器验收；环境引用回填/修改/删除/optional 和配置引用 RBAC 已补本地代码；key 下拉与资源选项作用域隔离已补，镜像搜索/选择/标签/详情已补本地实现和回归；全部增量的新镜像验证仍待完成。详见 [增量记录](./workload-settings-dev-20261023.md#设置分区与容器二级编辑2026-10-24dev-增量)。
 

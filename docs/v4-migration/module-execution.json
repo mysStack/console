@@ -5,8 +5,8 @@
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-  "phase": "DEV",
-  "phaseReason": "编辑设置隐藏副本数导致提交前校验失败的根因已修复并提交；当前仍处 DEV，需重新构建、部署和 Playwright 复验后才能恢复 VERIFY。",
+  "phase": "VERIFY",
+  "phaseReason": "DEV 修复已提交并完成本地验证；现按门禁重新构建、部署和 Playwright 验证三类 Workload，未因本地通过自动标记模块验收。",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "b0db05a062a7c0a2b8baa78eb2f86e4bab125a8360927045ba2852751914fa54"
+        "sha256": "b0fbc80bbf4c7fb531b32a5dcd773be1a0b67edb445891acd1327e687a34877c"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "5c004d9c9168f20e0abc6b833a865292514ce8d44cc3ef2b7eb9f62a10e31548"
+        "sha256": "d11499ba35046b8df6d7bbeecb3a62e4f8a0e0f1f33e7b826ff18f8d82b7e1f3"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -327,7 +327,7 @@
   "dev": {
     "status": "已完成",
     "reason": "已修复隐藏副本数未参与提交前校验的问题；定向测试、全量测试、包构建、格式检查和差异检查均通过。待以该提交重新构建部署并执行 VERIFY。",
-    "sourceCommit": "8430bb2fe",
+    "sourceCommit": "8430bb2fe09f33cec37bf433313808be8e4a69fc",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
@@ -643,7 +643,7 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-settings-validation-defect-20261025.json",
-        "sha256": "5fa9264f8c32963820b15dcbda4447f21926641f1af5610e5f723d2833df0707"
+        "sha256": "963c405e772b834a2bbbf53050c98bb9096624bcc745ea74a67b5b48bd6583c0"
       },
       {
         "path": "docs/v4-migration/evidence/workload-settings-validation-dev-20261025.json",
@@ -659,9 +659,9 @@
     "WL-05：release-4.1.5 编辑设置首屏分区、基础字段边界和隐藏字段写回保护"
   ],
   "verify": {
-    "status": "已退回 DEV",
-    "reason": "当前制品的编辑设置边界、配置引用读取/无 V3 请求、API RBAC/namespace、404 和 Action 入口已留存证据；新增提交校验缺陷，修复并重新部署前不恢复 VERIFY 结论。",
-    "sourceCommit": "de5ce34297468537b448e91723e4e44b6bff09e1",
+    "status": "进行中",
+    "reason": "DEV 修复提交已完成本地验证；此前制品的浏览器证据只作为历史输入，必须以新制品完成 rollout、Pod imageID 和浏览器写回/回读复验后更新本记录。",
+    "sourceCommit": "8430bb2fe09f33cec37bf433313808be8e4a69fc",
     "documents": [
       {
         "path": "docs/v4-migration/evidence/workload-detail-error-state-verify-20261025.json",
