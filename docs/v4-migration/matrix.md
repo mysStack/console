@@ -1,6 +1,6 @@
 # 当前 Workload 执行路线（2026-10-25）
 
-> **2026-10-25 删除网络失败缺陷：** 在当前制品的 Deployment 详情页真实浏览器测试中，删除确认后的 DELETE 因网络中断失败，确认弹窗保持打开但页面没有任何可见错误提示。已恢复网络并取消弹窗，资源未改变。该问题影响 Deployment、StatefulSet、DaemonSet 共用的删除错误反馈；已完成 DEV 修复、全量回归和包构建，当前进入 `VERIFY / 待重新部署`，必须以 `68458971247820770e3fa2931a9adc56e2f9d4cd` 对应制品重新部署并用浏览器复验三类详情页。此前 VERIFY 证据保留为历史输入，不继承为当前修复通过。
+> **2026-10-25 删除网络失败缺陷继续追踪：** 以 `6abe6515343e010c33872cdd6397ba73ab5fa759` 对应制品部署后，真实浏览器再次确认 DELETE 因网络中断失败时确认弹窗保持打开但没有可见错误提示。详情页已传入 `onError`，继续追踪发现 `useDeleteDeploymentMutation` 丢弃了该回调，只传递 `onSuccess`。已恢复网络并取消弹窗，资源未改变；当前按规则退回 `DEV / 进行中`，先补 Store 失败测试和最小修复，再重新构建、部署和浏览器复验三类详情页。此前 VERIFY 证据不继承为当前修复通过。
 
 > **2026-10-25 编辑设置错误路径 VERIFY：** 当前制品在 Deployment 编辑设置中复验了真实 409 冲突和浏览器离线失败。409 时 PUT 返回 `409`，弹窗保留草稿并显示冲突提示；离线时 PUT 返回 `net::ERR_INTERNET_DISCONNECTED`，弹窗保留草稿并显示保存失败提示。两次均取消且确认终止宽限期、副本数和 Ready 状态恢复原值。证据见 [`workload-settings-errors-v415-verify-20261025.json`](./evidence/workload-settings-errors-v415-verify-20261025.json)。StatefulSet/DaemonSet 相同错误路径、403/422 和全部 Action 错误矩阵仍未完成。
 

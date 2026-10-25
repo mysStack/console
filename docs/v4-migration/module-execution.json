@@ -5,8 +5,8 @@
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-  "phase": "VERIFY",
-  "phaseReason": "删除失败反馈缺陷已完成 DEV 修复、全量测试和包构建；现等待推送当前代码并按门禁重新部署 131，随后用 Playwright 复验三类详情页错误反馈。",
+  "phase": "DEV",
+  "phaseReason": "新制品浏览器复验确认删除请求网络失败时仍无可见错误提示；继续追踪发现 Store 丢弃详情页传入的 onError 回调，按执行规则退回 DEV，先补 Store 失败测试和最小修复，再重新构建、部署并执行 VERIFY。",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "b3c5c8850a02d067e8dd7e5a61be98a16d9bdf7831a62f5c922603e70c122f82"
+        "sha256": "d053dedae7c513e1a4658cec7f1e0d264fc614268ca25ca2beb70ad4d3cdb9a7"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "1715bd6d441adf20198c60e90a358d6025819ab6d34d730e565b3c2717d4f2af"
+        "sha256": "41376b72fe3de4acb026ee23d81cb1d1c4f043c0c56afb009eb1a31bd90aff98"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -325,8 +325,8 @@
     "coverageNotes": "已核对表示当前版本主基线和证据入口已覆盖该维度，不表示运行时验证或功能等价已经通过；运行时缺口转入 DEV/VERIFY 验收清单。"
   },
   "dev": {
-    "status": "已完成",
-    "reason": "本轮 VERIFY 发现三类详情页删除网络失败时没有可见错误反馈；已按 TDD 先补失败测试，再增加删除 mutation 的 onError 可见提示。定向测试、全量回归、包构建、Prettier 和 git diff --check 均通过。",
+    "status": "进行中",
+    "reason": "三类详情页已增加删除失败提示，但部署后浏览器复验仍无提示；根因是 useDeleteDeploymentMutation 只传递 onSuccess、没有传递 onError。当前退回 DEV，补 Store 失败测试和修复后重新完成本地检查。",
     "sourceCommit": "68458971247820770e3fa2931a9adc56e2f9d4cd",
     "documents": [
       {
