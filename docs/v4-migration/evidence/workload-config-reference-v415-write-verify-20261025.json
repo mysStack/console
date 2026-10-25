@@ -1,0 +1,92 @@
+{
+  "date": "2026-10-25",
+  "recordedAt": "2026-10-25T10:54:28+08:00",
+  "module": "workloads",
+  "sourceCommit": "8430bb2fe09f33cec37bf433313808be8e4a69fc",
+  "baseline": {
+    "source": "release-4.1.5 完整前端源码",
+    "runtime": "http://192.168.2.131:30881",
+    "v3Source": "origin/release-3.4 仅作历史补充",
+    "currentImage": {
+      "tag": "feature-v4-workloads-20261025-100820-be6469d3fe2a",
+      "digest": "sha256:a3b9f1eb39cbaa8df197632fe4f79993e3c395997aff6f41a80ad62522697336",
+      "podImageID": "ghcr.io/mysstack/ks-console@sha256:a3b9f1eb39cbaa8df197632fe4f79993e3c395997aff6f41a80ad62522697336"
+    }
+  },
+  "environment": {
+    "cluster": "host",
+    "namespace": "v4-migration-e2e",
+    "console": "http://192.168.2.131:30880",
+    "browserSession": "workload-rea-current",
+    "freshLogin": false,
+    "knownConsoleErrors": "页面仍记录已登记的扩展初始化错误；本轮只核对 Workload 配置引用交互和 API 写回，不将其归因于配置引用功能。"
+  },
+  "fixtures": [
+    {
+      "kind": "Deployment",
+      "name": "v4-deploy-edit-ef3",
+      "url": "http://192.168.2.131:30880/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/config-reference",
+      "before": [
+        { "kind": "configMap", "name": "v4-cfg-ref-ef3", "prefix": "" },
+        { "kind": "secret", "name": "v4-sec-ref-ef3", "prefix": "" }
+      ],
+      "browserWrite": { "prefix": "V4_", "result": "页面应用成功并重新读取详情" },
+      "network": [
+        "PATCH .../deployments/v4-deploy-edit-ef3 200",
+        "GET .../deployments/v4-deploy-edit-ef3 200"
+      ],
+      "apiReadback": { "configMapPrefix": "V4_", "secretPrefix": "" },
+      "restore": { "prefix": "", "apiReadback": { "configMapPrefix": "", "secretPrefix": "" } },
+      "podState": "1/1 Ready"
+    },
+    {
+      "kind": "StatefulSet",
+      "name": "v4-watch-sts-20261022-01",
+      "url": "http://192.168.2.131:30880/clusters/host/projects/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01/config-reference",
+      "before": [],
+      "browserWrite": {
+        "reference": "ConfigMap/v4-cfg-ref-ef3",
+        "prefix": "STS_",
+        "result": "页面应用成功并重新读取详情"
+      },
+      "apiReadback": { "configMap": "v4-cfg-ref-ef3", "prefix": "STS_" },
+      "restore": { "references": [], "apiReadback": { "envFrom": null } },
+      "podState": "1/1 Ready"
+    },
+    {
+      "kind": "DaemonSet",
+      "name": "v4-stop-ds-7fa",
+      "url": "http://192.168.2.131:30880/clusters/host/projects/v4-migration-e2e/daemonsets/v4-stop-ds-7fa/config-reference",
+      "before": [{ "kind": "configMap", "name": "v4-cfg-ref-ef3", "prefix": "" }],
+      "browserWrite": { "prefix": "DS_", "result": "页面应用成功并重新读取详情" },
+      "apiReadback": { "configMap": "v4-cfg-ref-ef3", "prefix": "DS_" },
+      "restore": { "references": [], "apiReadback": { "envFrom": null } },
+      "network": [
+        "PATCH .../daemonsets/v4-stop-ds-7fa 200",
+        "GET .../daemonsets/v4-stop-ds-7fa 200"
+      ],
+      "podState": "1/1 Ready"
+    }
+  ],
+  "checks": {
+    "configMapSecretValuesPrinted": false,
+    "secretValuesWrittenToEvidence": false,
+    "v3RequestsObserved": false,
+    "namespace": "所有读写均限定在 v4-migration-e2e",
+    "finalFixturesRestored": true
+  },
+  "scope": {
+    "verified": [
+      "Deployment、StatefulSet、DaemonSet 的配置引用页面均可通过浏览器新增/修改/删除引用并应用",
+      "ConfigMap 引用前缀写回后 API 可读回，恢复后无残留",
+      "三类资源均保持 Ready，未改变副本或停止语义",
+      "Secret 只验证名称引用，不读取或记录 Secret 数据值"
+    ],
+    "notVerified": [
+      "冲突、低权限拒绝、网络失败和取消路径",
+      "跨 namespace 缓存组合",
+      "文件挂载引用和完整 V3 逐项等价"
+    ]
+  },
+  "status": "当前制品三类 Workload 配置引用的浏览器写回、API 回读和恢复已验证；模块整体 VERIFY 未完成"
+}

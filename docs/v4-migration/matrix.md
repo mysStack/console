@@ -1,5 +1,7 @@
 # 当前 Workload 执行路线（2026-10-25）
 
+> **2026-10-25 配置引用写回 VERIFY：** 在当前制品 `feature-v4-workloads-20261025-100820-be6469d3fe2a` 上，使用已有认证 Playwright 会话分别对 Deployment、StatefulSet、DaemonSet 增加 ConfigMap 引用前缀并应用，Kubernetes API 均可读回；随后逐项删除引用或清空前缀并确认资源恢复，三类资源保持 Ready。未读取或记录 Secret 值。证据见 [`workload-config-reference-v415-write-verify-20261025.json`](./evidence/workload-config-reference-v415-write-verify-20261025.json)。本轮只关闭配置引用成功写回和恢复，冲突、低权限拒绝、网络失败、取消、跨 namespace 缓存和文件挂载引用仍未完成。
+
 > **2026-10-25 新制品 VERIFY：** `8430bb2fe` 对应制品已在 131 rollout 成功，Pod imageID 与 `sha256:a3b9f1eb39cbaa8df197632fe4f79993e3c395997aff6f41a80ad62522697336` 一致。已有认证 Playwright 会话完成 Deployment `31→30→31`、StatefulSet `30→31→30`、DaemonSet `30→31→30` 的编辑设置保存和 Kubernetes API 回读，确认隐藏副本数不再导致提交校验失败。该项已关闭，完整字段、Action、RBAC、缓存、错误矩阵和逐项 V3 等价仍未完成。详见 [`workload-settings-validation-v415-verify-20261025.json`](./evidence/workload-settings-validation-v415-verify-20261025.json)。
 
 > **2026-10-25 DEV 修复已提交并进入 VERIFY：** `8430bb2fe` 修复编辑设置隐藏副本数未参与提交前校验的问题；定向与全量测试、包构建、格式和差异检查通过，部署后复验见上一条记录。本地通过不等同于模块验收。证据见 [`workload-settings-validation-dev-20261025.json`](./evidence/workload-settings-validation-dev-20261025.json)。
@@ -47,7 +49,7 @@
 # V4 迁移矩阵
 
 > **2026-10-25 编辑设置部署后复验：** 新制品已在 131 rollout 成功，Pod imageID 与 `sha256:1bbb4c4297e590d59ba117c18dc0b83f7e2fc6085439ff4549af87b81ab5ac71` 一致；已有认证 Playwright 会话确认 Deployment/StatefulSet 五分区、DaemonSet 四分区与 `release-4.1.5` 基线一致，基础字段和 `ADD_METADATA` 已不再出现在编辑设置弹窗。该证据只关闭本次 UI 边界差异，完整 Workload 验收仍为 `测试中`。详见 [`workload-settings-v415-verify-20261025.json`](./evidence/workload-settings-v415-verify-20261025.json)。
-> **2026-10-25 配置引用复验：** 当前制品的 Deployment、StatefulSet、DaemonSet 配置引用页面和读取 API 已通过，Network 未观察到 `/consolev3`、`/dist/v3dist` 或 `workload.template.edit`；写入和错误路径仍未验收。详见 [`workload-config-reference-v415-verify-20261025.json`](./evidence/workload-config-reference-v415-verify-20261025.json)。
+> **2026-10-25 配置引用复验：** 当前制品的 Deployment、StatefulSet、DaemonSet 配置引用页面、读取 API 和成功写回/恢复已通过，Network 未观察到 `/consolev3`、`/dist/v3dist` 或 `workload.template.edit`；冲突、低权限拒绝、网络失败、取消、跨 namespace 缓存和文件挂载引用仍未验收。详见 [`workload-config-reference-v415-verify-20261025.json`](./evidence/workload-config-reference-v415-verify-20261025.json) 和 [`workload-config-reference-v415-write-verify-20261025.json`](./evidence/workload-config-reference-v415-write-verify-20261025.json)。
 > **2026-10-25 低权限 API 复验：** 当前制品对应的测试用户在 `v4-migration-e2e` 对 Deployment/StatefulSet/DaemonSet 只读，在 `default` 三类资源均被拒绝；低权限浏览器页面和缓存切换仍未验收。详见 [`workload-rbac-api-v415-verify-20261025.json`](./evidence/workload-rbac-api-v415-verify-20261025.json)。
 > **2026-10-25 当前制品 404 复验：** Deployment、StatefulSet、DaemonSet 直达不存在资源均显示统一 `/404` 页面；该项不扩大为完整错误矩阵通过。详见 [`workload-detail-404-v415-verify-20261025.json`](./evidence/workload-detail-404-v415-verify-20261025.json)。
 > **2026-10-25 Action 入口复验：** 当前制品已确认 Deployment、StatefulSet、DaemonSet 的资源专属 Action 菜单边界；该结果只覆盖入口可见性，不关闭 Action 的写入和错误矩阵。详见 [`workload-action-surface-v415-verify-20261025.json`](./evidence/workload-action-surface-v415-verify-20261025.json)。

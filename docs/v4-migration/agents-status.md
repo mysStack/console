@@ -1,5 +1,7 @@
 # 当前 Workload 执行状态（2026-10-25）
 
+- **2026-10-25 配置引用写回 VERIFY 已完成。** 当前制品 `feature-v4-workloads-20261025-100820-be6469d3fe2a` 在 131 使用已有认证 Playwright 会话分别验证 Deployment、StatefulSet、DaemonSet 的 ConfigMap 引用前缀写回、API 回读和恢复；三类资源均保持 Ready，未读取或记录 Secret 值。证据见 [`workload-config-reference-v415-write-verify-20261025.json`](./evidence/workload-config-reference-v415-write-verify-20261025.json)。冲突、低权限拒绝、网络失败、取消、跨 namespace 缓存和文件挂载引用仍未关闭。
+
 - **2026-10-25 新制品校验修复 VERIFY 已完成。** CI Run `40153206692`、镜像 `feature-v4-workloads-20261025-100820-be6469d3fe2a`、digest `sha256:a3b9f1eb39cbaa8df197632fe4f79993e3c395997aff6f41a80ad62522697336` 成功；131 `ks-console` rollout generation `610`，Pod `ks-console-74d599546f-kfpjl` Ready，imageID 与 digest 一致。使用已有认证 Playwright 会话在三类资源执行设置写回和 API 回读：Deployment `31→30→31`、StatefulSet `30→31→30`、DaemonSet `30→31→30` 均成功，确认隐藏副本数不再导致提交前校验失败。证据见 [`workload-settings-validation-v415-verify-20261025.json`](./evidence/workload-settings-validation-v415-verify-20261025.json)。本轮只关闭该缺陷，完整 Workload 仍未验收。
 
 - **2026-10-25 编辑设置校验修复已完成 DEV，现已完成对应 VERIFY。** 提交 `8430bb2fe` 将 `initialValues` 与当前表单值统一合并后再执行 `validateWorkloadSettings` 和资源写回，修复隐藏副本数导致合法终止宽限期修改被错误拦截的问题。定向测试 7/7、5/5、73/73、Deployment 3/3、StatefulSet 2/2、DaemonSet 2/2，全量 `./scripts/test.sh` 为 94 个文件/421 项通过，`corepack yarn build:packages`、Prettier 和 `git diff --check` 通过；部署后写回/回读见最新 VERIFY 证据。证据见 [`workload-settings-validation-dev-20261025.json`](./evidence/workload-settings-validation-dev-20261025.json)。
