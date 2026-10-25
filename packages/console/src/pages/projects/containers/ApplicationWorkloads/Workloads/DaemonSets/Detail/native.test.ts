@@ -15,3 +15,10 @@ test('DaemonSet 详情请求失败时提供明确错误处理', () => {
   assert.match(source, /navigate\(detailErrorPath, \{ replace: true \}\)/);
   assert.match(source, /WORKLOAD_DETAIL_LOAD_FAILED/);
 });
+
+test('DaemonSet 删除请求失败时显示错误提示并保留确认弹窗', () => {
+  assert.match(
+    source,
+    /useDeleteDeploymentMutation\([\s\S]*?onError:\s*\(\)\s*=>\s*\{[\s\S]*?notify\.error\(t\('OPERATION_FAILED'\)\)/,
+  );
+});

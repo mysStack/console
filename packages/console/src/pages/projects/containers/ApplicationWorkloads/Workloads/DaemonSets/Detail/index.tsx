@@ -184,6 +184,9 @@ const DaemonSetDetail = () => {
       closeDeleteModal();
       navigate(listUrl);
     },
+    onError: () => {
+      notify.error(t('OPERATION_FAILED'));
+    },
   });
 
   useEffect(() => {

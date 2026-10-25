@@ -5,8 +5,8 @@
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-  "phase": "VERIFY",
-  "phaseReason": "DEV 修复已提交并完成本地验证；现按门禁重新构建、部署和 Playwright 验证三类 Workload，未因本地通过自动标记模块验收。",
+  "phase": "DEV",
+  "phaseReason": "VERIFY 期间发现三类详情页删除请求在网络失败时没有可见错误反馈；按执行规则退回 DEV，先完成错误回调修复和本地验证，再重新构建、部署并执行 VERIFY。",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "c1e812f762a69b07627c276ef75966d6bcfe423b38dfd7dc2bc444a72ad22c76"
+        "sha256": "2c53da1ece74b34de0dc1826e44aaeb4f5d892c8aab8f5cd150db9d48b8873fe"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "c6b37ccb5e44b6cd3165b820e1574f159eed783796485dcffd157fd27e762988"
+        "sha256": "7cf31301709d975f316d1624a9064019f469484147bbdba58686d37163c57dd8"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -325,8 +325,8 @@
     "coverageNotes": "已核对表示当前版本主基线和证据入口已覆盖该维度，不表示运行时验证或功能等价已经通过；运行时缺口转入 DEV/VERIFY 验收清单。"
   },
   "dev": {
-    "status": "已完成",
-    "reason": "已修复隐藏副本数未参与提交前校验的问题；定向测试、全量测试、包构建、格式检查和差异检查均通过。待以该提交重新构建部署并执行 VERIFY。",
+    "status": "进行中",
+    "reason": "此前隐藏副本数校验修复已完成本地验证；本轮 VERIFY 又发现三类详情页删除网络失败时没有可见错误反馈，已补失败测试和最小错误提示修复，待提交后重新完成 DEV 检查、构建、部署和 VERIFY。",
     "sourceCommit": "8430bb2fe09f33cec37bf433313808be8e4a69fc",
     "documents": [
       {
@@ -660,7 +660,7 @@
   ],
   "verify": {
     "status": "进行中",
-    "reason": "当前提交已完成新制品 rollout、Pod imageID 核对、三类 Workload 设置写回/回读、配置引用成功写回/恢复、StatefulSet Headless Service 成功路径、DaemonSet 停止/夹具恢复、低权限浏览器读权限和三类资源实际 PUT 403、三类资源更新策略非法值 PUT 422、三类资源删除取消和编辑设置错误路径样本；隐藏副本数校验缺陷、上述成功路径及已覆盖错误路径已关闭。编辑 YAML 422 可见反馈、负值字段边界、完整字段、Action 成功/失败/冲突/低权限/网络错误、低权限列表缓存和更多角色组合、缓存组合及逐项 V3 等价仍未闭环，模块保持 VERIFY 进行中。",
+    "reason": "此前制品已完成 rollout、Pod imageID 核对、三类 Workload 设置写回/回读、配置引用成功写回/恢复、StatefulSet Headless Service 成功路径、DaemonSet 停止/夹具恢复、低权限浏览器读权限和三类资源实际 PUT 403、三类资源更新策略非法值 PUT 422、三类资源删除取消及编辑设置错误路径样本；本轮 VERIFY 发现删除请求网络失败时确认弹窗没有可见错误反馈，已按规则退回 DEV，当前 VERIFY 证据待新修复制品重新验证。编辑 YAML 422 可见反馈、负值字段边界、完整字段、Action 成功/失败/冲突/低权限/网络错误、低权限列表缓存和更多角色组合、缓存组合及逐项 V3 等价仍未闭环。",
     "sourceCommit": "8430bb2fe09f33cec37bf433313808be8e4a69fc",
     "documents": [
       {

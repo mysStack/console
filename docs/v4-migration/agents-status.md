@@ -1,5 +1,11 @@
 # 当前 Workload 执行状态（2026-10-25）
 
+# 当前状态补充（2026-10-25：删除网络失败错误反馈缺陷）
+
+- 在当前制品的 Deployment 详情页真实浏览器测试中，删除请求因网络中断失败，确认弹窗保留但没有可见错误提示；网络恢复后已取消弹窗，测试资源未改变。
+- 根因为三类详情页的 `useDeleteDeploymentMutation` 只配置 `onSuccess`，没有配置 `onError`。已按 TDD 先补失败测试，再为 Deployment、StatefulSet、DaemonSet 增加 `notify.error(t('OPERATION_FAILED'))`。
+- 当前阶段已按模块执行规则从 `VERIFY` 退回 `DEV / 进行中`。本地修复测试和全量回归已通过；提交后必须以新 SHA 重新构建、部署和 Playwright 验证，不能继承旧制品 VERIFY 结论。
+
 # 当前状态补充（2026-10-25：三类 Workload 删除取消路径）
 
 - 当前制品在 131 通过浏览器分别打开 Deployment、StatefulSet、DaemonSet 的删除确认弹窗，确认资源名称提示和取消行为；取消后弹窗关闭，三类资源均没有 DELETE、PUT、PATCH 或 POST 请求，测试资源保留。

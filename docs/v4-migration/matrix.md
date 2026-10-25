@@ -1,5 +1,7 @@
 # 当前 Workload 执行路线（2026-10-25）
 
+> **2026-10-25 删除网络失败缺陷：** 在当前制品的 Deployment 详情页真实浏览器测试中，删除确认后的 DELETE 因网络中断失败，确认弹窗保持打开但页面没有任何可见错误提示。已恢复网络并取消弹窗，资源未改变。该问题影响 Deployment、StatefulSet、DaemonSet 共用的删除错误反馈，已退回 `DEV / 进行中`；补充失败测试和最小错误提示修复后，必须重新构建、部署和浏览器复验。此前 VERIFY 证据保留为历史输入，不继承为当前修复通过。
+
 > **2026-10-25 编辑设置错误路径 VERIFY：** 当前制品在 Deployment 编辑设置中复验了真实 409 冲突和浏览器离线失败。409 时 PUT 返回 `409`，弹窗保留草稿并显示冲突提示；离线时 PUT 返回 `net::ERR_INTERNET_DISCONNECTED`，弹窗保留草稿并显示保存失败提示。两次均取消且确认终止宽限期、副本数和 Ready 状态恢复原值。证据见 [`workload-settings-errors-v415-verify-20261025.json`](./evidence/workload-settings-errors-v415-verify-20261025.json)。StatefulSet/DaemonSet 相同错误路径、403/422 和全部 Action 错误矩阵仍未完成。
 
 > **2026-10-25 低权限浏览器 VERIFY：** 当前制品使用临时项目 viewer 完成新的零 Cookie 登录；Deployment、StatefulSet、DaemonSet 详情均可读但不显示编辑信息、更多操作、编辑设置和删除入口，配置引用的新增、编辑、删除和应用控件均禁用。Kubernetes 授权同时确认当前 namespace 仅允许 get、拒绝 patch，`default` namespace 三类资源均拒绝 get/patch。临时用户和项目 RoleBinding 已删除，未修改测试资源。证据见 [`workload-rbac-v415-browser-verify-20261025.json`](./evidence/workload-rbac-v415-browser-verify-20261025.json)。低权限列表缓存组合、实际浏览器 403 写请求和完整错误矩阵仍未完成。
