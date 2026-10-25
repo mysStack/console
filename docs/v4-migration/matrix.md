@@ -278,3 +278,8 @@ StatefulSet 与 DaemonSet 的 YAML 测试字段写入、页面回读和清除也
 - 当前制品 feature-v4-workloads-20261025-100820-be6469d3fe2a 已在 131 通过同一已有认证浏览器会话完成三类资源的编辑设置错误路径复验。Deployment 已有 409 冲突和离线失败样本；本轮补充 StatefulSet v4-watch-sts-20261022-01 的 PUT 409 冲突提示与取消保持，以及 DaemonSet v4-stop-ds-7fa 的离线 PUT 失败提示与取消保持。
 - StatefulSet 最终宽限期为 30、副本/就绪为 1/1，DaemonSet 最终宽限期为 30、期望/就绪为 1/1；临时冲突 annotation 已清理，离线状态已恢复为 online。证据见 workload-settings-errors-v415-verify-20261025.json。
 - 本轮只关闭三类资源各一条编辑设置错误路径样本，不关闭 422、实际低权限 403 写请求、Action 错误/取消/冲突、完整字段、缓存组合和逐项 V3 等价；模块继续保持 VERIFY / 进行中。
+
+## 当前增量（2026-10-25：低权限浏览器实际写入拒绝）
+
+- 当前制品上，临时项目 viewer 通过零 Cookie 浏览器会话登录成功。对 Deployment、StatefulSet、DaemonSet 先执行 GET，再在同一浏览器上下文发起原生 PUT；三类资源均返回 GET 200、PUT 403，没有产生资源变更。
+- 临时账号及绑定已删除，密码未写入证据。该结果关闭当前制品三类 Workload 的实际 API 写入拒绝样本；低权限列表缓存、更多角色组合、Action 错误矩阵和完整 V3 等价仍未完成。证据见 workload-rbac-v415-browser-verify-20261025.json。

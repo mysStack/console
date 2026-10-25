@@ -1,5 +1,10 @@
 # 当前 Workload 执行状态（2026-10-25）
 
+# 当前状态补充（2026-10-25：低权限浏览器实际写入拒绝）
+
+- 当前制品 feature-v4-workloads-20261025-100820-be6469d3fe2a 已补齐低权限浏览器上下文的实际写入拒绝：临时项目 viewer 零 Cookie 登录成功，在三类资源详情来源页面分别 GET 资源后发起原生 PUT，Deployment、StatefulSet、DaemonSet 均为 GET 200、PUT 403。没有通过页面控件提交变更，三类资源未修改。
+- 临时账号、WorkspaceRoleBinding、项目 RoleBinding、密码临时文件和浏览器会话均已清理。该结果关闭当前制品三类 Workload 的实际 API 写入拒绝样本；低权限列表缓存、更多角色组合、Action 403/422/网络失败和逐项 V3 等价仍未闭环。证据见 workload-rbac-v415-browser-verify-20261025.json。
+
 # 当前状态补充（2026-10-25：三类 Workload 编辑设置错误路径）
 
 - 当前制品 feature-v4-workloads-20261025-100820-be6469d3fe2a 在 131 已完成 StatefulSet 冲突和 DaemonSet 网络失败的浏览器验证。StatefulSet v4-watch-sts-20261022-01 的 PUT 返回 409，弹窗保留并显示冲突提示，取消后宽限期仍为 30、资源保持 1/1；DaemonSet v4-stop-ds-7fa 离线确认时 PUT 返回 net::ERR_INTERNET_DISCONNECTED，弹窗保留并显示保存失败提示，恢复网络后取消，资源仍为宽限期 30、期望/就绪 1/1。

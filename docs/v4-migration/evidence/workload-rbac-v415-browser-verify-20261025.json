@@ -36,25 +36,65 @@
       "result": "页面可读；添加引用、引用类型、引用资源、前缀、删除和应用引用控件均为 disabled；Secret 值未展示"
     },
     "writes": "未点击确认、应用、删除、停止、伸缩或其他写入操作",
-    "knownConsoleErrors": "页面存在已登记的扩展初始化错误，不作为本轮 Workload 权限结论"
+    "knownConsoleErrors": "页面存在已登记的扩展初始化错误，不作为本轮 Workload 权限结论",
+    "mutations": "未通过页面控件提交写操作；在已认证浏览器上下文内对三类当前资源先 GET，再使用同一资源体发起原生 PUT，三次写请求均被 API 拒绝为 403",
+    "api403": [
+      {
+        "kind": "Deployment",
+        "resource": "v4-deploy-edit-ef3",
+        "get": 200,
+        "put": 403
+      },
+      {
+        "kind": "StatefulSet",
+        "resource": "v4-watch-sts-20261022-01",
+        "get": 200,
+        "put": 403
+      },
+      {
+        "kind": "DaemonSet",
+        "resource": "v4-stop-ds-7fa",
+        "get": 200,
+        "put": 403
+      }
+    ]
   },
   "apiAuthorization": {
     "v4-migration-e2e": {
-      "deployments": { "get": true, "patch": false },
-      "statefulsets": { "get": true, "patch": false },
-      "daemonsets": { "get": true, "patch": false }
+      "deployments": {
+        "get": true,
+        "patch": false
+      },
+      "statefulsets": {
+        "get": true,
+        "patch": false
+      },
+      "daemonsets": {
+        "get": true,
+        "patch": false
+      }
     },
     "default": {
-      "deployments": { "get": false, "patch": false },
-      "statefulsets": { "get": false, "patch": false },
-      "daemonsets": { "get": false, "patch": false }
+      "deployments": {
+        "get": false,
+        "patch": false
+      },
+      "statefulsets": {
+        "get": false,
+        "patch": false
+      },
+      "daemonsets": {
+        "get": false,
+        "patch": false
+      }
     }
   },
   "cleanup": {
     "user": "v4-wl-viewer-20261025b 已删除",
     "roleBinding": "v4-wl-viewer-20261025b-viewer 已删除",
     "testResourcesChanged": false,
-    "passwordRecorded": false
+    "passwordRecorded": false,
+    "browserSession": "workload-rbac-403 已关闭；临时用户、WorkspaceRoleBinding、项目 RoleBinding 已删除"
   },
   "scope": {
     "verified": [
@@ -62,11 +102,11 @@
       "三类 Workload 详情只读和写入口隐藏",
       "配置引用控件禁用",
       "当前 namespace 允许 get、禁止 patch",
-      "default namespace 三类资源 get/patch 均拒绝"
+      "default namespace 三类资源 get/patch 均拒绝",
+      "当前制品低权限浏览器上下文对三类资源的实际 GET 200 / PUT 403 写入拒绝"
     ],
     "notVerified": [
       "低权限列表缓存切换、刷新和返回组合",
-      "浏览器实际 403 写请求路径",
       "完整 403/404/409/422 和网络失败矩阵",
       "逐项 V3 功能等价"
     ]
