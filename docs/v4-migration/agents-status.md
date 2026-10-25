@@ -1,3 +1,8 @@
+# 当前状态补充（2026-10-25：低权限项目列表和详情只读复验）
+
+- 当前制品已使用临时低权限用户完成零 Cookie 登录和三类 Workload 浏览器复验。项目级 Deployment、StatefulSet、DaemonSet 列表均只显示 `v4-migration-e2e` 的 2 条测试资源；集群级 StatefulSet 列表显示 403；直达 `dev-biz` 没有显示其他项目资源。
+- 三类详情均可读但不显示编辑信息、更多操作、编辑设置和删除入口；三类配置引用页可读，添加引用、删除、引用选择和应用引用控件均禁用。用户、WorkspaceRoleBinding、项目 RoleBinding 已清理，测试 namespace 保留。证据见 [`workload-low-privilege-list-cache-verify-20261025.json`](./evidence/workload-low-privilege-list-cache-verify-20261025.json)。低权限缓存组合、更多角色和逐项 V3 等价仍未完成，模块保持 `VERIFY / 进行中`。
+
 # 当前状态补充（2026-10-25：集群级 StatefulSet/DaemonSet 项目筛选和缓存复验）
 
 - 当前制品已在 131 完成集群级 StatefulSet、DaemonSet 的项目筛选、切换和刷新样本。StatefulSet 在 `v4-migration-e2e` 显示 2 条，切换 `dev-biz` 显示 0 条，再切回恢复 2 条；DaemonSet 测试项目显示 2 条，刷新后保持 2 条。

@@ -1,3 +1,10 @@
+## 当前增量（2026-10-25：低权限项目列表和详情只读复验）
+
+- 当前制品 `feature-v4-workloads-20261025-140042-2c81983cf7cc` 已使用临时低权限用户完成零 Cookie 浏览器登录。该用户只绑定 `test-workspace` 的 Workspace viewer 和 `v4-migration-e2e` 的项目 viewer，验证结束后用户及绑定已删除。
+- 项目级 Deployment、StatefulSet、DaemonSet 列表均只显示 `v4-migration-e2e` 项目资源，各显示 2 条；集群级 StatefulSet 列表返回 403；直达 `dev-biz` 项目路由没有显示其他项目资源。
+- 三类详情页均可读取资源，但编辑信息、更多操作、编辑设置和删除入口不显示；配置引用可读，但添加、删除、引用选择和应用引用控件均禁用。证据见 [`workload-low-privilege-list-cache-verify-20261025.json`](./evidence/workload-low-privilege-list-cache-verify-20261025.json)。
+- 本轮关闭当前制品低权限项目列表、详情只读和配置引用控件样本；角色组合、低权限刷新/返回缓存和逐项 V3 等价继续未闭环。
+
 ## 当前增量（2026-10-25：集群级 StatefulSet/DaemonSet 项目筛选和缓存复验）
 
 - 当前制品在 131 使用已认证 Playwright 会话完成集群级 StatefulSet、DaemonSet 列表的项目筛选、切换和刷新样本。StatefulSet 选择 `v4-migration-e2e` 显示 2 条，切换 `dev-biz` 显示 0 条，再切回恢复 2 条；DaemonSet 选择测试项目显示 2 条，刷新后仍为 2 条。

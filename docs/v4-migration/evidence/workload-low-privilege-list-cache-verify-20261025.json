@@ -1,0 +1,78 @@
+{
+  "module": "workloads",
+  "stage": "VERIFY",
+  "date": "2026-10-25",
+  "sourceCommit": "2c81983cf7cc013f90609f002d1423e6c647817a",
+  "recordCommit": "c57aed0bbd8be5c8df7d1b4641bc670ecf32f55b",
+  "baseline": {
+    "source": "release-4.1.5",
+    "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
+    "runtime": "http://192.168.2.131:30881/consolev3"
+  },
+  "artifact": {
+    "ciRun": "40167476566",
+    "imageTag": "feature-v4-workloads-20261025-140042-2c81983cf7cc",
+    "imageDigest": "sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b",
+    "deployment": "kubesphere-system/ks-console",
+    "generation": 613,
+    "pod": "ks-console-654b89bc97-jbj5h",
+    "podReady": true,
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b"
+  },
+  "account": {
+    "name": "v4-wl-list-20261025",
+    "scope": "test-workspace 的 test-workspace-viewer，以及 v4-migration-e2e 项目 viewer",
+    "credentialSource": "临时测试密码仅在本次浏览器命令中使用，未写入证据、日志或仓库",
+    "freshLogin": "成功；零 Cookie Playwright 会话进入 Console",
+    "cleanup": "用户、WorkspaceRoleBinding、项目 RoleBinding 均已删除；测试 namespace 保留"
+  },
+  "cases": [
+    {
+      "kind": "StatefulSet",
+      "projectPath": "/test-workspace/clusters/host/projects/v4-migration-e2e/statefulsets",
+      "result": "可读",
+      "visibleResources": ["v4-pvc-sts-7fa", "v4-watch-sts-20261022-01"],
+      "visibleCount": 2
+    },
+    {
+      "kind": "DaemonSet",
+      "projectPath": "/test-workspace/clusters/host/projects/v4-migration-e2e/daemonsets",
+      "result": "可读",
+      "visibleResources": ["v4-stop-ds-7fa", "v4-watch-ds-20261022-01"],
+      "visibleCount": 2
+    },
+    {
+      "kind": "Deployment",
+      "projectPath": "/test-workspace/clusters/host/projects/v4-migration-e2e/deployments",
+      "result": "可读",
+      "visibleResources": ["v4-deploy-edit-ef3", "v4-watch-20261022-02"],
+      "visibleCount": 2
+    }
+  ],
+  "permissionChecks": [
+    {
+      "path": "/clusters/host/statefulsets",
+      "result": "拒绝访问，页面显示 403"
+    },
+    {
+      "path": "/test-workspace/clusters/host/projects/dev-biz/deployments",
+      "result": "页面未找到，页面提示 namespace dev-biz not found；没有显示其他项目资源"
+    },
+    {
+      "scope": "三类项目详情页",
+      "result": "资源可读；编辑信息、更多操作、编辑设置和删除入口均未显示"
+    },
+    {
+      "scope": "三类配置引用页",
+      "result": "资源引用可读；添加引用、删除、引用选择和应用引用控件均为 disabled"
+    }
+  ],
+  "result": "通过：当前制品低权限用户可在授权项目内读取 Deployment、StatefulSet、DaemonSet 列表和详情；无权访问集群级 Workload 列表；没有其他项目资源泄漏；三类详情和配置引用均保持只读。该证据关闭当前制品的低权限项目列表、详情控件和配置引用控件样本，不代表所有角色组合、列表刷新/返回缓存和完整 V3 等价已完成。",
+  "unclosed": [
+    "更多低权限角色组合和真实页面 403 写请求矩阵",
+    "低权限用户在列表切换、刷新、浏览器返回和直达 URL 上的完整缓存矩阵",
+    "完整字段清空/保留",
+    "全部 Action 成功/失败/冲突/取消矩阵",
+    "逐项 V3 功能等价性"
+  ]
+}
