@@ -1,8 +1,8 @@
-# 当前状态补充（2026-10-25：终止宽限时间负值边界发现缺陷，退回 DEV）
+# 当前状态补充（2026-10-25：负值边界复核纠正）
 
-- 当前制品浏览器实测 Deployment 编辑设置允许输入 `-1`，确认后页面显示“更新成功”，Deployment PUT 返回 200；新 Pod 短暂进入 `ContainerCreating`。该行为违反当前 V4 表单边界要求。
-- 已立即通过浏览器恢复 Deployment `terminationGracePeriodSeconds=30`，并确认 Deployment `1/1 Ready`；StatefulSet、DaemonSet 保持 `30` 和 Ready。证据见 [`workload-negative-grace-defect-verify-20261025.json`](./evidence/workload-negative-grace-defect-verify-20261025.json)。
-- 按规则模块从 `VERIFY` 退回 `DEV / 进行中`。下一步补三类资源负值边界回归测试和提交前阻断，修复后重新构建、部署、rollout 和 Playwright 验收。
+- 重新使用当前制品和真实浏览器验证 Deployment `v4-deploy-edit-ef3`：用户输入 `-1` 后点击确认，实际 PUT 请求体为 `terminationGracePeriodSeconds=0`，API 回读也是 `0`，没有负值写回。此前记录将输入值误记为请求体值，已由 [`workload-negative-grace-reverify-20261025.json`](./evidence/workload-negative-grace-reverify-20261025.json) 纠正。
+- `release-4.1.5` 同版本页面复核显示相同边界处理：负值输入立即归一为 `0`，确认按钮禁用。V4 当前制品未发现该项业务缺陷；Deployment 已通过浏览器恢复为 `terminationGracePeriodSeconds=30` 并确认 `1/1 Ready`，StatefulSet、DaemonSet 保持 `30` 和 Ready。
+- 本项不需要业务代码修复，模块状态恢复为 `VERIFY / 进行中`。完整字段、Action、RBAC、缓存、错误矩阵和逐项 V3 等价仍未闭环，PR #2 保持 Draft。
 
 # 当前状态补充（2026-10-25：三类 Workload 删除失败可见错误态 VERIFY 通过）
 

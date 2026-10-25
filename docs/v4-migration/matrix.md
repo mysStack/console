@@ -1,8 +1,8 @@
-## 当前增量（2026-10-25：终止宽限时间负值边界发现缺陷，退回 DEV）
+## 当前增量（2026-10-25：复核负值边界并纠正证据）
 
-- 在当前部署制品 `feature-v4-workloads-20261025-140042-2c81983cf7cc` 上，使用浏览器打开 Deployment 原生编辑设置，将终止宽限时间填写为 `-1` 并确认。页面显示“更新成功”，PUT 返回 200，随后出现新 Pod，证明非法值实际写回。
-- 已通过同一浏览器将 Deployment 恢复为 `terminationGracePeriodSeconds=30`，API 回读 `replicas=1`、`readyReplicas=1`；StatefulSet 和 DaemonSet 当前值仍为 30 且 Ready。证据见 [`workload-negative-grace-defect-verify-20261025.json`](./evidence/workload-negative-grace-defect-verify-20261025.json)。
-- 该结果关闭“负值边界已验证”的假设并触发状态机 `VERIFY → DEV`。修复要求为三类资源负值输入在提交前阻断、弹窗保留并显示校验错误、不能产生 PUT；修复后必须重新构建、部署和 Playwright 验证。
+- 对当前制品 `feature-v4-workloads-20261025-140042-2c81983cf7cc` 重新执行浏览器边界验证：输入框可暂时显示 `-1`，点击确认时控件将值归一为 `0`，真实 PUT 请求体和 Kubernetes API 回读均为 `0`，没有负值写入。
+- 对 `release-4.1.5` 同版本页面执行同一输入验证，输入负值后页面立即归一为 `0`，确认按钮保持禁用。当前 V4 的最终值处理与主基线一致；前一份证据把用户输入值误记为请求体值，已由 [`workload-negative-grace-reverify-20261025.json`](./evidence/workload-negative-grace-reverify-20261025.json) 纠正。
+- 已通过 V4 浏览器将 Deployment 恢复为 `terminationGracePeriodSeconds=30`，API 回读 `replicas=1`、`readyReplicas=1`；未修改其他测试资源。本次不需要业务代码修复，模块继续处于 `VERIFY / 进行中`，其余验收清单不因本项关闭而自动通过。
 
 ## 当前增量（2026-10-25：三类 Workload 删除失败可见错误态 VERIFY 通过）
 

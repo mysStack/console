@@ -1,0 +1,52 @@
+{
+  "module": "workloads",
+  "stage": "VERIFY",
+  "date": "2026-10-25",
+  "purpose": "复核前一份负值缺陷记录，区分用户输入值、实际请求体和 Kubernetes 回读值",
+  "sourceCommit": "2c81983cf7cc013f90609f002d1423e6c647817a",
+  "artifact": {
+    "ciRun": "40167476566",
+    "imageTag": "feature-v4-workloads-20261025-140042-2c81983cf7cc",
+    "imageDigest": "sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b",
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b"
+  },
+  "environment": {
+    "cluster": "host",
+    "namespace": "v4-migration-e2e",
+    "browserSession": "workload-rea-fresh",
+    "resource": "Deployment/v4-deploy-edit-ef3",
+    "v4Url": "http://192.168.2.131:30880/test-workspace/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/resource-status",
+    "release415Url": "http://192.168.2.131:30881/test-workspace/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/resource-status"
+  },
+  "v4Observed": {
+    "inputValueBeforeSubmit": -1,
+    "request": {
+      "method": "PUT",
+      "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+      "status": 200,
+      "terminationGracePeriodSeconds": 0
+    },
+    "apiReadbackAfterSubmit": 0,
+    "visibleFeedback": "更新成功",
+    "normalization": "点击确认时 InputNumber 将负值归一为 0；请求体中没有 -1。"
+  },
+  "release415Observed": {
+    "inputValueAfterNegativeFill": 0,
+    "confirmButton": "disabled",
+    "normalization": "同版本对照页面在输入负值后立即归一为 0，未允许负值进入提交。"
+  },
+  "restore": {
+    "method": "通过 V4 浏览器编辑设置恢复",
+    "terminationGracePeriodSeconds": 30,
+    "replicas": 1,
+    "readyReplicas": 1,
+    "resourceRestored": true
+  },
+  "conclusion": {
+    "status": "前一份缺陷结论已纠正，未发现负值写回缺陷",
+    "supersedes": "docs/v4-migration/evidence/workload-negative-grace-defect-verify-20261025.json 中将用户输入 -1 误记为请求体值的结论",
+    "scope": "本记录只关闭负值实际写回这一项，不代表 Workload 模块整体验收完成。",
+    "remaining": "继续验证三类资源的完整字段、Action、RBAC、缓存、错误矩阵和逐项 V3 功能等价。"
+  },
+  "safety": "专用 Deployment 已恢复 terminationGracePeriodSeconds=30 且保持 1/1 Ready；未修改其他业务资源。"
+}
