@@ -1,5 +1,7 @@
 # 当前 Workload 执行路线（2026-10-25）
 
+> **2026-10-25 低权限浏览器 VERIFY：** 当前制品使用临时项目 viewer 完成新的零 Cookie 登录；Deployment、StatefulSet、DaemonSet 详情均可读但不显示编辑信息、更多操作、编辑设置和删除入口，配置引用的新增、编辑、删除和应用控件均禁用。Kubernetes 授权同时确认当前 namespace 仅允许 get、拒绝 patch，`default` namespace 三类资源均拒绝 get/patch。临时用户和项目 RoleBinding 已删除，未修改测试资源。证据见 [`workload-rbac-v415-browser-verify-20261025.json`](./evidence/workload-rbac-v415-browser-verify-20261025.json)。低权限列表缓存组合、实际浏览器 403 写请求和完整错误矩阵仍未完成。
+
 > **2026-10-25 StatefulSet/DaemonSet Action VERIFY：** 当前制品完成 StatefulSet Headless Service 保持原值编辑确认和 API 回读（PATCH/GET 200），以及 DaemonSet 停止成功路径（PATCH 200、状态 0/0、不可调度 selector 写回）；停止夹具随后按原值恢复并 rollout 到 1/1。证据见 [`workload-service-stop-v415-verify-20261025.json`](./evidence/workload-service-stop-v415-verify-20261025.json)。本轮只关闭两项成功路径，Action 的错误、取消、冲突、低权限和完整资源等价仍未完成。
 
 > **2026-10-25 配置引用写回 VERIFY：** 在当前制品 `feature-v4-workloads-20261025-100820-be6469d3fe2a` 上，使用已有认证 Playwright 会话分别对 Deployment、StatefulSet、DaemonSet 增加 ConfigMap 引用前缀并应用，Kubernetes API 均可读回；随后逐项删除引用或清空前缀并确认资源恢复，三类资源保持 Ready。未读取或记录 Secret 值。证据见 [`workload-config-reference-v415-write-verify-20261025.json`](./evidence/workload-config-reference-v415-write-verify-20261025.json)。本轮只关闭配置引用成功写回和恢复，冲突、低权限拒绝、网络失败、取消、跨 namespace 缓存和文件挂载引用仍未完成。

@@ -1,5 +1,7 @@
 # 当前 Workload 执行状态（2026-10-25）
 
+- **2026-10-25 低权限浏览器 VERIFY 已补齐当前制品样本。** 使用临时项目 viewer 完成零 Cookie 登录，三类 Workload 详情均为只读，配置引用写控件禁用；Kubernetes 授权确认当前 namespace 允许 get、拒绝 patch，`default` namespace 三类资源均拒绝 get/patch。临时用户和项目 RoleBinding 已清理，未修改测试资源。证据见 [`workload-rbac-v415-browser-verify-20261025.json`](./evidence/workload-rbac-v415-browser-verify-20261025.json)。低权限列表缓存组合、实际浏览器 403 写请求和完整错误矩阵仍未关闭。
+
 - **2026-10-25 StatefulSet/DaemonSet Action VERIFY 已补齐成功路径。** 当前制品在 131 完成 StatefulSet Headless Service 编辑确认与 API 回读，以及 DaemonSet 停止、状态回读和测试夹具恢复；StatefulSet 与 DaemonSet 均保持 Ready。证据见 [`workload-service-stop-v415-verify-20261025.json`](./evidence/workload-service-stop-v415-verify-20261025.json)。错误、取消、冲突、低权限和完整资源等价仍未关闭。
 
 - **2026-10-25 配置引用写回 VERIFY 已完成。** 当前制品 `feature-v4-workloads-20261025-100820-be6469d3fe2a` 在 131 使用已有认证 Playwright 会话分别验证 Deployment、StatefulSet、DaemonSet 的 ConfigMap 引用前缀写回、API 回读和恢复；三类资源均保持 Ready，未读取或记录 Secret 值。证据见 [`workload-config-reference-v415-write-verify-20261025.json`](./evidence/workload-config-reference-v415-write-verify-20261025.json)。冲突、低权限拒绝、网络失败、取消、跨 namespace 缓存和文件挂载引用仍未关闭。

@@ -1,0 +1,75 @@
+{
+  "date": "2026-10-25",
+  "module": "workloads",
+  "sourceCommit": "8430bb2fe09f33cec37bf433313808be8e4a69fc",
+  "image": {
+    "tag": "feature-v4-workloads-20261025-100820-be6469d3fe2a",
+    "digest": "sha256:a3b9f1eb39cbaa8df197632fe4f79993e3c395997aff6f41a80ad62522697336",
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:a3b9f1eb39cbaa8df197632fe4f79993e3c395997aff6f41a80ad62522697336"
+  },
+  "environment": {
+    "cluster": "host",
+    "namespace": "v4-migration-e2e",
+    "console": "http://192.168.2.131:30880",
+    "browserSession": "workload-rbac-latest",
+    "credentialSource": "临时测试账号使用命令内随机密码；密码未写入证据、日志或截图",
+    "temporaryAccount": "v4-wl-viewer-20261025b",
+    "role": "v4-migration-e2e 项目 viewer"
+  },
+  "browser": {
+    "login": "新的零 Cookie 会话登录成功并进入 /dashboard",
+    "resources": [
+      {
+        "kind": "Deployment",
+        "result": "详情可读；编辑信息、更多操作、编辑设置和删除入口未显示"
+      },
+      {
+        "kind": "StatefulSet",
+        "result": "详情可读；编辑信息、更多操作、编辑设置和删除入口未显示"
+      },
+      {
+        "kind": "DaemonSet",
+        "result": "详情可读；编辑信息、更多操作、编辑设置和删除入口未显示"
+      }
+    ],
+    "configReference": {
+      "result": "页面可读；添加引用、引用类型、引用资源、前缀、删除和应用引用控件均为 disabled；Secret 值未展示"
+    },
+    "writes": "未点击确认、应用、删除、停止、伸缩或其他写入操作",
+    "knownConsoleErrors": "页面存在已登记的扩展初始化错误，不作为本轮 Workload 权限结论"
+  },
+  "apiAuthorization": {
+    "v4-migration-e2e": {
+      "deployments": { "get": true, "patch": false },
+      "statefulsets": { "get": true, "patch": false },
+      "daemonsets": { "get": true, "patch": false }
+    },
+    "default": {
+      "deployments": { "get": false, "patch": false },
+      "statefulsets": { "get": false, "patch": false },
+      "daemonsets": { "get": false, "patch": false }
+    }
+  },
+  "cleanup": {
+    "user": "v4-wl-viewer-20261025b 已删除",
+    "roleBinding": "v4-wl-viewer-20261025b-viewer 已删除",
+    "testResourcesChanged": false,
+    "passwordRecorded": false
+  },
+  "scope": {
+    "verified": [
+      "当前制品低权限登录",
+      "三类 Workload 详情只读和写入口隐藏",
+      "配置引用控件禁用",
+      "当前 namespace 允许 get、禁止 patch",
+      "default namespace 三类资源 get/patch 均拒绝"
+    ],
+    "notVerified": [
+      "低权限列表缓存切换、刷新和返回组合",
+      "浏览器实际 403 写请求路径",
+      "完整 403/404/409/422 和网络失败矩阵",
+      "逐项 V3 功能等价"
+    ]
+  },
+  "status": "当前制品低权限浏览器读权限和写入口隐藏已验证；模块整体 VERIFY 未完成"
+}
