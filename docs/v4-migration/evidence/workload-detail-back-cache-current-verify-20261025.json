@@ -1,0 +1,66 @@
+{
+  "module": "workloads",
+  "stage": "VERIFY",
+  "date": "2026-10-25",
+  "sourceCommit": "2c81983cf7cc013f90609f002d1423e6c647817a",
+  "artifact": {
+    "ciRun": "40167476566",
+    "imageTag": "feature-v4-workloads-20261025-140042-2c81983cf7cc",
+    "imageDigest": "sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b",
+    "deployment": "kubesphere-system/ks-console",
+    "generation": 613,
+    "pod": "ks-console-654b89bc97-jbj5h",
+    "podReady": true,
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b"
+  },
+  "environment": {
+    "url": "http://192.168.2.131:30880",
+    "workspace": "test-workspace",
+    "cluster": "host",
+    "namespace": "v4-migration-e2e",
+    "browser": "已认证 Playwright 管理员会话"
+  },
+  "method": "对三类项目级列表分别等待列表完成渲染，进入第一条资源详情，确认详情页路径和资源名称渲染；使用浏览器返回回到原列表并核对列表内容，再刷新列表并再次核对内容。仅执行 GET 和页面导航，没有资源写操作。",
+  "cases": [
+    {
+      "kind": "Deployment",
+      "listPath": "/test-workspace/clusters/host/projects/v4-migration-e2e/deploy",
+      "listResources": ["v4-app-template-20261019"],
+      "detailPath": "/test-workspace/clusters/host/projects/v4-migration-e2e/deploy/v4-app-template-20261019/resource-status",
+      "detailRendered": true,
+      "backPath": "/test-workspace/clusters/host/projects/v4-migration-e2e/deploy",
+      "backResources": ["v4-app-template-20261019"],
+      "reloadResources": ["v4-app-template-20261019"],
+      "result": "通过"
+    },
+    {
+      "kind": "StatefulSet",
+      "listPath": "/test-workspace/clusters/host/projects/v4-migration-e2e/statefulsets",
+      "listResources": ["v4-pvc-sts-7fa", "v4-watch-sts-20261022-01"],
+      "detailPath": "/test-workspace/clusters/host/projects/v4-migration-e2e/statefulsets/v4-pvc-sts-7fa/resource-status",
+      "detailRendered": true,
+      "backPath": "/test-workspace/clusters/host/projects/v4-migration-e2e/statefulsets",
+      "backResources": ["v4-pvc-sts-7fa", "v4-watch-sts-20261022-01"],
+      "reloadResources": ["v4-pvc-sts-7fa", "v4-watch-sts-20261022-01"],
+      "result": "通过"
+    },
+    {
+      "kind": "DaemonSet",
+      "listPath": "/test-workspace/clusters/host/projects/v4-migration-e2e/daemonsets",
+      "listResources": ["v4-stop-ds-7fa", "v4-watch-ds-20261022-01"],
+      "detailPath": "/test-workspace/clusters/host/projects/v4-migration-e2e/daemonsets/v4-stop-ds-7fa/resource-status",
+      "detailRendered": true,
+      "backPath": "/test-workspace/clusters/host/projects/v4-migration-e2e/daemonsets",
+      "backResources": ["v4-stop-ds-7fa", "v4-watch-ds-20261022-01"],
+      "reloadResources": ["v4-stop-ds-7fa", "v4-watch-ds-20261022-01"],
+      "result": "通过"
+    }
+  ],
+  "result": "通过：当前制品三类项目级 Workload 均可从列表进入详情，浏览器返回后列表内容恢复，刷新后内容保持一致。该证据只关闭管理员正向详情返回/刷新样本，不代表低权限缓存、集群/项目切换缓存或完整 V3 等价已完成。",
+  "unclosed": [
+    "低权限列表切换、刷新、返回和直达 URL 的完整缓存矩阵",
+    "集群级与项目级组合缓存矩阵",
+    "完整 Action 错误/冲突/低权限/网络矩阵",
+    "逐项 V3 功能等价性"
+  ]
+}

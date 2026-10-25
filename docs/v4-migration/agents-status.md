@@ -1,3 +1,8 @@
+## 当前增量（2026-10-25：三类 Workload 详情返回与刷新缓存复验）
+
+- 当前制品 `feature-v4-workloads-20261025-140042-2c81983cf7cc` 在 131 使用已认证 Playwright 管理员会话完成三类项目级 Workload 的列表→详情→浏览器返回→刷新链路。Deployment、StatefulSet、DaemonSet 均能进入原生详情页，返回后列表内容恢复，刷新后内容保持一致。
+- 本轮只执行页面导航和读取，没有资源写操作。证据见 [`workload-detail-back-cache-current-verify-20261025.json`](./evidence/workload-detail-back-cache-current-verify-20261025.json)。本轮关闭管理员正向详情返回/刷新样本；低权限缓存、集群/项目切换的完整组合、Action 错误矩阵和逐项 V3 等价仍未闭环。
+
 # 当前状态补充（2026-10-25：三类 Workload 当前制品批量删除成功复验）
 
 - 当前制品源码提交 `2c81983cf7cc013f90609f002d1423e6c647817a` 已在 131 rollout 成功；CI Run `40167476566`、镜像 `feature-v4-workloads-20261025-140042-2c81983cf7cc`、digest `sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b`、Pod imageID 和 rollout generation `613` 已核对一致。
