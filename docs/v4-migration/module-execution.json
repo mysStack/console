@@ -5,8 +5,8 @@
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-  "phase": "VERIFY",
-  "phaseReason": "Store 失败回调透传缺陷已完成最小修复、TDD 回归、全量测试和包构建；最终制品已构建并推送，现进入 VERIFY，待门禁部署到 131 后用 Playwright 复验三类详情页删除网络失败的可见错误反馈。",
+  "phase": "DEV",
+  "phaseReason": "Store 透传 onError 的修复部署后仍没有可见错误提示；对照 release-4.1.5 当前版本源码后确认需要补齐当前 V4 的删除弹窗内联错误态。按规则退回 DEV，先补三类详情页回归测试和最小 UI 修复。",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "b137a715fc8b719afea1f3b72185401c10d7bed64e637c5ac220d03c857cc0ae"
+        "sha256": "e78ed34e3c3d253be08061bd8598b4e123187f12ad10b75e7b8ee87adc4dd92c"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "47ee4dd181132494bb2cfa9ac2cc730b236ef22e7736db1d36530b41c9c84a55"
+        "sha256": "7d5a5a5ff55dec96e175732cd38972128673b1e91bbed324d9c4ff7b0ee5fe7d"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -325,9 +325,9 @@
     "coverageNotes": "已核对表示当前版本主基线和证据入口已覆盖该维度，不表示运行时验证或功能等价已经通过；运行时缺口转入 DEV/VERIFY 验收清单。"
   },
   "dev": {
-    "status": "已完成",
-    "reason": "已定位并修复共享 Store 丢弃 onError 的根因；新增 Store 失败回调透传回归测试，完成定向测试、全量测试、包构建、格式和差异检查。最终业务代码提交已推送，等待部署后浏览器复验。",
-    "sourceCommit": "3a628c528975cc27305e94b0776fccfda55edec9",
+    "status": "进行中",
+    "reason": "Store 失败回调透传修复已完成，但部署后浏览器仍无可见错误文本；当前补齐三类详情页删除弹窗内联错误反馈，并按 TDD 重新验证。",
+    "sourceCommit": "5b44a389ffb0ce9d4e722e4488d160176fe36315",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
@@ -664,8 +664,8 @@
   ],
   "verify": {
     "status": "进行中",
-    "reason": "既有 VERIFY 证据继续保留；首次删除错误修复制品浏览器复验失败后已定位为 Store 丢弃 onError，最终修复已完成本地验证并构建推送。待当前候选制品部署后重新验证 Deployment、StatefulSet、DaemonSet 的网络失败可见错误反馈；编辑 YAML 422、负值字段边界、完整字段、Action 完整矩阵、低权限列表缓存和逐项 V3 等价仍未闭环。",
-    "sourceCommit": "3a628c528975cc27305e94b0776fccfda55edec9",
+    "reason": "此前 Workload VERIFY 证据继续保留；Store onError 透传修复部署后仍无可见错误文本，已退回 DEV 补齐删除弹窗内联错误态。编辑 YAML 422、负值字段边界、完整字段、Action 完整矩阵、低权限列表缓存和逐项 V3 等价仍未闭环。",
+    "sourceCommit": "5b44a389ffb0ce9d4e722e4488d160176fe36315",
     "documents": [
       {
         "path": "docs/v4-migration/evidence/workload-detail-error-state-verify-20261025.json",
