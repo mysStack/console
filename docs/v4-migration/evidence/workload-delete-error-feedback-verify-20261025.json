@@ -1,0 +1,77 @@
+{
+  "module": "workloads",
+  "stage": "VERIFY",
+  "date": "2026-10-25",
+  "sourceCommit": "2c81983cf7cc013f90609f002d1423e6c647817a",
+  "baseline": {
+    "source": "release-4.1.5",
+    "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
+    "runtime": "http://192.168.2.131:30881",
+    "role": "当前版本源码和同版本已部署页面作为 REA 主基线；origin/release-3.4 仅作历史补充"
+  },
+  "artifact": {
+    "ciRun": "40167476566",
+    "imageTag": "feature-v4-workloads-20261025-140042-2c81983cf7cc",
+    "imageDigest": "sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b",
+    "deployment": "kubesphere-system/ks-console",
+    "generation": 613,
+    "pod": "ks-console-654b89bc97-jbj5h",
+    "podReady": true,
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b"
+  },
+  "scenario": {
+    "name": "三类 Workload 详情页删除确认后的网络失败反馈",
+    "method": "已认证 Playwright 浏览器打开原生详情页，输入精确资源名，切换浏览器 offline，点击确认；恢复 online 后取消弹窗。",
+    "destructiveRequest": "没有删除资源；DELETE 请求因浏览器离线失败。"
+  },
+  "cases": [
+    {
+      "kind": "Deployment",
+      "resource": "v4-deploy-edit-ef3",
+      "url": "/test-workspace/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/resource-status",
+      "deleteRequest": "DELETE /clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+      "requestResult": "net::ERR_INTERNET_DISCONNECTED",
+      "visibleError": "操作失败",
+      "alertTexts": ["操作失败"],
+      "dialogCountAfterFailure": 2,
+      "resourceAfter": "Deployment 存在，spec.replicas=1，status.readyReplicas=1"
+    },
+    {
+      "kind": "StatefulSet",
+      "resource": "v4-watch-sts-20261022-01",
+      "url": "/test-workspace/clusters/host/projects/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01/resource-status",
+      "deleteRequest": "DELETE /clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01",
+      "requestResult": "net::ERR_INTERNET_DISCONNECTED",
+      "visibleError": "操作失败",
+      "alertTexts": ["操作失败"],
+      "dialogCountAfterFailure": 2,
+      "resourceAfter": "StatefulSet 存在，spec.replicas=1，status.readyReplicas=1"
+    },
+    {
+      "kind": "DaemonSet",
+      "resource": "v4-stop-ds-7fa",
+      "url": "/test-workspace/clusters/host/projects/v4-migration-e2e/daemonsets/v4-stop-ds-7fa/resource-status",
+      "deleteRequest": "DELETE /clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/daemonsets/v4-stop-ds-7fa",
+      "requestResult": "net::ERR_INTERNET_DISCONNECTED",
+      "visibleError": "操作失败",
+      "alertTexts": ["操作失败"],
+      "dialogCountAfterFailure": 2,
+      "resourceAfter": "DaemonSet 存在，desiredNumberScheduled=1，numberReady=1"
+    }
+  ],
+  "expectedBehavior": [
+    "删除失败时弹窗保持打开",
+    "弹窗内出现 role=alert 的“操作失败”文本",
+    "资源不被删除",
+    "恢复网络后取消弹窗，未产生资源变更"
+  ],
+  "result": "通过：三类资源均满足预期。该结果只关闭删除网络失败反馈这一项，不代表 Workload 模块整体验收通过。",
+  "unclosed": [
+    "编辑 YAML 详细 422 反馈",
+    "负值字段边界",
+    "完整字段清空/保留",
+    "全部 Action 成功/失败/冲突/低权限/网络矩阵",
+    "低权限列表与缓存组合",
+    "逐项 V3 功能等价性"
+  ]
+}

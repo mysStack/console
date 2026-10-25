@@ -1,3 +1,9 @@
+# 当前状态补充（2026-10-25：三类 Workload 删除失败可见错误态 VERIFY 通过）
+
+- 当前制品源提交 `2c81983cf7cc013f90609f002d1423e6c647817a` 已构建、推送并部署到 131；CI Run `40167476566`、镜像 digest `sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b`、Pod imageID 和 rollout generation `613` 已绑定。
+- 浏览器实测 Deployment、StatefulSet、DaemonSet 删除请求在 offline 下均为 `net::ERR_INTERNET_DISCONNECTED`；三类弹窗均显示 `操作失败`，确认弹窗保持打开，恢复 online 后取消；资源仍存在且 Ready。证据见 [`workload-delete-error-feedback-verify-20261025.json`](./evidence/workload-delete-error-feedback-verify-20261025.json)。
+- 该项 VERIFY 已通过并记录为模块验收清单中的已关闭项；Workload 整体仍为 `VERIFY / 进行中`。编辑 YAML 422、字段完整性、全部 Action 错误矩阵、低权限列表/缓存组合和逐项 V3 等价继续未完成。
+
 # 当前状态补充（2026-10-25：删除失败内联错误态修复进入 VERIFY）
 
 - 本轮按当前 REA 口径继续使用 `release-4.1.5` 完整前端源码定位实现、同版本已部署页面核对真实行为；`origin/release-3.4` 只作历史补充，不直接复制为 V4 实现。

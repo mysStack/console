@@ -1,3 +1,9 @@
+## 当前增量（2026-10-25：三类 Workload 删除失败可见错误态 VERIFY 通过）
+
+- 当前最终制品源提交 `2c81983cf7cc013f90609f002d1423e6c647817a`，CI Run `40167476566` 成功，镜像 `feature-v4-workloads-20261025-140042-2c81983cf7cc`，digest `sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b`。131 `ks-console` rollout generation `613` 成功，Pod `ks-console-654b89bc97-jbj5h` Ready，实际 imageID 与该 digest 一致。
+- 使用已认证浏览器在 Deployment `v4-deploy-edit-ef3`、StatefulSet `v4-watch-sts-20261022-01`、DaemonSet `v4-stop-ds-7fa` 详情页执行删除确认；浏览器离线使 DELETE 请求失败，三类页面都显示 `操作失败`，`role=alert` 存在，删除弹窗保持打开。恢复网络后取消弹窗，三类资源均保留且 Ready。证据见 [`workload-delete-error-feedback-verify-20261025.json`](./evidence/workload-delete-error-feedback-verify-20261025.json)。
+- 本轮关闭“删除网络失败时没有可见错误反馈”这一项。编辑 YAML 422、完整字段、全部 Action/RBAC/缓存组合和逐项 V3 等价仍未闭环，Workload 模块保持 `VERIFY / 进行中`，不能标记已验收。
+
 ## 当前增量（2026-10-25：删除失败内联错误态 DEV 修复进入 VERIFY）
 
 - `release-4.1.5` 完整源码和同版本已部署页面继续作为本模块 REA 主基线；`origin/release-3.4` 仅作历史补充，不作为 V4 实现来源。

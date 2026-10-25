@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "77ed5eecb9a213c3cc2c4894ba1ca3deddbd3ce74defecfd43376d0c7cdb49ea"
+        "sha256": "65662857113ba56826521b034bcca4e98f2051ae65dd9a0d395920d457cb7353"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "4eade0b05afc606ccbd8498c977b72f8c5f6e8944eae4a2b9f59bfe173708d1e"
+        "sha256": "cdb648a43531ee6d26a20d6f5225e663a4ad3df6df791a4c79f09b66f0611685"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -665,8 +665,12 @@
   "verify": {
     "status": "进行中",
     "reason": "代码修复 c2de55c12 已推送，CI 构建成功；由于模块记录更新会改变当前 HEAD，必须以最终文档提交后的 HEAD 重建镜像，再部署并通过 Playwright 验证删除失败可见错误态。既有 VERIFY 证据保留，其他错误矩阵、缓存组合和逐项 V3 等价仍未闭环。",
-    "sourceCommit": "c2de55c127c2cde86c02925a4aaf82c852e2abbc",
+    "sourceCommit": "2c81983cf7cc013f90609f002d1423e6c647817a",
     "documents": [
+      {
+        "path": "docs/v4-migration/evidence/workload-delete-error-feedback-verify-20261025.json",
+        "sha256": "1a66fd45b5c46a40980f4cd5776a39e334cc49e66891b32f442d0408ae461d20"
+      },
       {
         "path": "docs/v4-migration/evidence/workload-detail-error-state-verify-20261025.json",
         "sha256": "abcd75f5d38fa50df7b539cb8d818faf93d1a4292694bc5aa39b2bd350af3148"
@@ -724,15 +728,20 @@
       "ciRun": "40166838329",
       "imageTag": "feature-v4-workloads-20261025-134946-c2de55c127c2",
       "imageDigest": "sha256:e85140433277b2c9e96b71a39490bdc93609c7f4f623f317278fe938d8b63eb8",
-      "status": "已构建并推送；文档提交后需按最终 HEAD 重建"
+      "status": "已部署并完成删除失败错误态浏览器复验；其他验收项仍未闭环"
     },
     "rollout": {
-      "status": "未部署；门禁因记录仍为 DEV 阻止部署"
+      "deployment": "kubesphere-system/ks-console",
+      "generation": 613,
+      "status": "success",
+      "pod": "ks-console-654b89bc97-jbj5h",
+      "podReady": true,
+      "podImageID": "ghcr.io/mysstack/ks-console@sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b"
     },
     "browserVerification": {
-      "status": "代码修复已完成，最终文档 HEAD 的镜像尚未部署；待部署后复验三类详情页删除网络失败时的可见内联错误态",
-      "evidence": "docs/v4-migration/evidence/workload-delete-error-feedback-dev-20261025.json",
-      "freshLogin": "否；使用已有认证会话完成部署后复验",
+      "status": "通过：Deployment、StatefulSet、DaemonSet 删除网络失败时均显示“操作失败”，确认弹窗保持打开，恢复网络后取消，资源保持存在且 Ready。",
+      "evidence": "docs/v4-migration/evidence/workload-delete-error-feedback-verify-20261025.json",
+      "freshLogin": "否；使用已有认证 Playwright 会话完成部署后浏览器验收",
       "moduleAcceptance": "未完成"
     },
     "lastEvidenceUpdate": "2026-10-25"
