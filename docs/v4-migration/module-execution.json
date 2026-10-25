@@ -6,7 +6,7 @@
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
   "phase": "VERIFY",
-  "phaseReason": "三类详情页 403/404/其他错误状态已完成 DEV 修复和本地/CI 验证，待 131 部署后重新执行浏览器验收。",
+  "phaseReason": "三类详情页真实 404、浏览器 route mock 的 403/500 错误状态已完成 131 部署后复验；其余 Workload VERIFY 清单继续进行。",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "58fce46febfb0ba65e9242334160688160f612230ef4e9331205bfdaa4565e91"
+        "sha256": "a5b9424da9f1cd569f8c1411c284ea842873eb064662c5f8642744bd8066d2fb"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "6ae7e956ea0520ed5055fdd8f03b5755a2da007f2a09cb47f2034fa6676a8320"
+        "sha256": "840e13713b5f4c4feddef8bbb1e0513b6edbc53d029fafdccded41d36a5c8006"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -122,7 +122,7 @@
       },
       {
         "path": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-        "sha256": "7389e3ab02baa5a71288ed158dd6d479ce432cb77fc841aa7faacd733b83f0fe"
+        "sha256": "7501c439a0f9d412df6811dd9543d25f4e03d46238b8d20508be7643365161cd"
       },
       {
         "path": "docs/v4-migration/evidence/workload-kind-detail-browser-20261024.json",
@@ -650,21 +650,33 @@
     "WL-04：移除普通 Workload 配置引用的 useV3action、Wujie Shadow DOM 和 V3 编辑器桥接"
   ],
   "verify": {
-    "status": "进行中，待部署验证",
-    "reason": "错误状态修复已完成并通过本地/CI；必须在对应镜像部署后验证 403、404、其他错误和浏览器渲染。",
-    "sourceCommit": "9ba28a3c1ebcbd12e7a9fda27d311a7906be71bd",
-    "documents": [],
+    "status": "进行中，错误状态项已验证",
+    "reason": "三类真实 404 已在 131 当前制品显示 NotFound；403/500 route mock 也完成页面状态验证。真实低权限 RBAC、网络环境和其他 Workload VERIFY 清单仍未完成。",
+    "sourceCommit": "0fefb30b33600279b1282b340f7518b438763555",
+    "documents": [
+      {
+        "path": "docs/v4-migration/evidence/workload-detail-error-state-verify-20261025.json",
+        "sha256": "abcd75f5d38fa50df7b539cb8d818faf93d1a4292694bc5aa39b2bd350af3148"
+      }
+    ],
     "ciRun": "40144460294",
     "ciStatus": "success；待部署后浏览器验证",
     "imageTag": "feature-v4-workloads-20261025-075354-9ba28a3c1ebc",
     "imageDigest": "sha256:6de47bbf6df74253073b15eb0372de643696ea045ee424835159e91beffe0abc",
-    "rollout": {},
+    "rollout": {
+      "deployment": "kubesphere-system/ks-console",
+      "generation": 608,
+      "status": "success",
+      "pod": "ks-console-6ffb586f6c-bwzn8",
+      "podReady": true,
+      "podImageID": "ghcr.io/mysstack/ks-console@sha256:7467bdb6fb1600575af5cab54da59a0f43b9fdce8d4e75ddb382de0cdb36ae68"
+    },
     "browserVerification": {
-      "status": "待部署验证",
+      "status": "错误状态项已验证，整体 VERIFY 未完成",
       "evidence": "docs/v4-migration/evidence/workload-detail-404-verify-20261025.json",
       "report": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-      "freshLogin": "待本轮镜像部署后使用已认证 Playwright 会话验证；不记录凭据",
-      "authenticatedSessionChecks": "上一轮证据确认不存在资源 404 后为空白 Loading；本轮代码已修复，尚未在新制品浏览器复验",
+      "freshLogin": "已使用已认证 Playwright 会话完成本轮验证；不记录凭据",
+      "authenticatedSessionChecks": "Deployment、StatefulSet、DaemonSet 真实 404 均跳转 /404；403/500 route mock 分别到 /errors/403 和可见 alert",
       "moduleAcceptance": "未完成"
     },
     "lastEvidenceUpdate": "2026-10-25"

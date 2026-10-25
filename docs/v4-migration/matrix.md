@@ -1,8 +1,8 @@
 # 当前 Workload 执行路线（2026-10-25）
 
-> **最新状态（2026-10-25，详情页错误状态修复后进入 VERIFY）**：三类详情页已补齐 403 跳转无权限页、404 跳转 NotFound 页和其他请求错误提示；本地 94 个测试文件/418 个测试、目标 ESLint、`build:packages` 和 CI Run `40144460294` 已通过。镜像 `feature-v4-workloads-20261025-075354-9ba28a3c1ebc` 的 digest 为 `sha256:6de47bbf6df74253073b15eb0372de643696ea045ee424835159e91beffe0abc`，当前处于 `VERIFY / 待部署验证`，尚未把部署后浏览器验收记为通过。
+> **最新状态（2026-10-25，详情页错误状态已完成部署复验）**：三类详情页不存在资源的真实 404 均已在 131 当前制品跳转 `/404` 并显示资源不存在；浏览器 route mock 的 403 跳转 `/errors/403`、500 显示详情加载失败提示也通过。当前制品为 CI Run `40145235328`、镜像 `feature-v4-workloads-20261025-080541-0fefb30b3360`、digest `sha256:7467bdb6fb1600575af5cab54da59a0f43b9fdce8d4e75ddb382de0cdb36ae68`，rollout generation `608`、Pod imageID 一致。该项已关闭，Workload 其他 RBAC、缓存、Action、逐项等价和完整错误矩阵仍处于 `VERIFY / 未完成`。
 
-> **本轮 DEV 修复证据**：[`workload-detail-error-state-dev-20261025.json`](./evidence/workload-detail-error-state-dev-20261025.json)。部署后必须重新验证 Deployment、StatefulSet、DaemonSet 的不存在资源 404、低权限 403、网络失败、浏览器返回和页面渲染；在这些证据完成前，三类模块均不标记为已验收。
+> **本轮证据**：DEV 修复见 [`workload-detail-error-state-dev-20261025.json`](./evidence/workload-detail-error-state-dev-20261025.json)，部署后浏览器复验见 [`workload-detail-error-state-verify-20261025.json`](./evidence/workload-detail-error-state-verify-20261025.json)。403/500 本轮为浏览器 route mock，只证明页面状态处理，不替代真实低权限 RBAC 和网络环境证据。
 
 > **退回 DEV 的缺陷记录**：在提交 `4b363c688f1e784acb68fe32117756f03bb55bd2` 制品上发现非法 YAML 会发起 PUT 并返回 400，但页面没有可见错误反馈。该缺陷已记录并完成 DEV 修复，证据见[非法 YAML 缺陷取证](./evidence/workload-yaml-validation-defect-20261025.json)和[DEV 修复记录](./workload-yaml-validation-dev-20261025.md)。
 

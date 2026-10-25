@@ -1,0 +1,67 @@
+{
+  "date": "2026-10-25 08:18:19 Asia/Shanghai",
+  "phase": "VERIFY",
+  "sourceCommit": "0fefb30b33600279b1282b340f7518b438763555",
+  "artifact": {
+    "ciRun": "40145235328",
+    "imageTag": "feature-v4-workloads-20261025-080541-0fefb30b3360",
+    "imageDigest": "sha256:7467bdb6fb1600575af5cab54da59a0f43b9fdce8d4e75ddb382de0cdb36ae68",
+    "deployment": "kubesphere-system/ks-console",
+    "generation": 608,
+    "rollout": "success",
+    "pod": "ks-console-6ffb586f6c-bwzn8",
+    "podReady": true,
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:7467bdb6fb1600575af5cab54da59a0f43b9fdce8d4e75ddb382de0cdb36ae68"
+  },
+  "browser": {
+    "session": "workload-verify-20261025",
+    "role": "admin / platform-admin",
+    "baseUrl": "http://192.168.2.131:30880",
+    "credentials": "从 /home/bruce/.bashrc 环境加载；不记录账号或密码",
+    "extensionErrors": "页面仍有已登记的扩展初始化错误；本轮按项目决定不纳入 Workload 修复验收"
+  },
+  "actual404": [
+    {
+      "kind": "Deployment",
+      "url": "/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-missing-20261025/resource-status",
+      "apiStatus": 404,
+      "renderedUrl": "/404",
+      "visibleResult": "页面未找到；deployments.apps \"v4-deploy-missing-20261025\" not found"
+    },
+    {
+      "kind": "StatefulSet",
+      "url": "/clusters/host/projects/v4-migration-e2e/statefulsets/v4-sts-missing-20261025/resource-status",
+      "apiStatus": 404,
+      "renderedUrl": "/404",
+      "visibleResult": "页面未找到；statefulsets.apps \"v4-sts-missing-20261025\" not found"
+    },
+    {
+      "kind": "DaemonSet",
+      "url": "/clusters/host/projects/v4-migration-e2e/daemonsets/v4-ds-missing-20261025/resource-status",
+      "apiStatus": 404,
+      "renderedUrl": "/404",
+      "visibleResult": "页面未找到；daemonsets.apps \"v4-ds-missing-20261025\" not found"
+    }
+  ],
+  "simulatedBrowserStates": [
+    {
+      "kind": "Deployment",
+      "apiStatus": 403,
+      "mock": true,
+      "renderedUrl": "/errors/403",
+      "visibleResult": "拒绝访问；无法访问此页面"
+    },
+    {
+      "kind": "Deployment",
+      "apiStatus": 500,
+      "mock": true,
+      "renderedUrl": "/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/resource-status",
+      "visibleResult": "alert：无法加载工作负载详情，请刷新后重试。"
+    }
+  ],
+  "boundary": {
+    "actualRbac": "本证据未将管理员和浏览器 route mock 解释为低权限 RBAC 通过；真实低权限组合继续保留在 VERIFY 清单",
+    "moduleAcceptance": "本缺陷已通过部署后浏览器验证；Workload 三类资源整体仍未验收"
+  },
+  "conclusion": "三类详情页不存在资源的真实 404 不再停留在空白 Loading；403 和其他请求错误也有可见/可达状态。"
+}
