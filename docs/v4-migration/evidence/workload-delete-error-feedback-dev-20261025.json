@@ -1,0 +1,45 @@
+{
+  "module": "workloads",
+  "stage": "DEV",
+  "date": "2026-10-25",
+  "sourceCommit": "68458971247820770e3fa2931a9adc56e2f9d4cd",
+  "baseline": {
+    "source": "release-4.1.5",
+    "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
+    "runtime": "http://192.168.2.131:30881"
+  },
+  "defect": {
+    "scenario": "Deployment 详情页删除确认后网络中断",
+    "observed": "DELETE 请求失败，确认弹窗保持打开，但页面没有可见错误反馈；资源未被删除。",
+    "scope": ["Deployment", "StatefulSet", "DaemonSet"],
+    "rootCause": "三类详情页的 useDeleteDeploymentMutation 仅配置 onSuccess，没有配置 onError。"
+  },
+  "tdd": {
+    "red": {
+      "command": "./node_modules/.bin/esno packages/console/src/pages/projects/containers/{Deployments,StatefulSets,DaemonSets}/Detail/native.test.ts",
+      "result": "失败：新增的删除失败反馈测试未通过，现有三类详情页缺少 onError/notify.error。"
+    },
+    "green": {
+      "result": "通过：Deployment 4/4、StatefulSet 3/3、DaemonSet 3/3。"
+    }
+  },
+  "implementation": {
+    "files": [
+      "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/Deployments/Detail/index.tsx",
+      "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/StatefulSets/Detail/index.tsx",
+      "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/DaemonSets/Detail/index.tsx"
+    ],
+    "behavior": "删除 mutation 失败时调用 notify.error(t('OPERATION_FAILED'))，保留确认弹窗和资源状态。"
+  },
+  "verification": {
+    "fullTest": "./scripts/test.sh：94 个测试文件、424 项通过",
+    "build": "corepack yarn build:packages：通过",
+    "format": "Prettier 目标文件检查通过",
+    "diffCheck": "git diff --check：通过",
+    "commit": "68458971247820770e3fa2931a9adc56e2f9d4cd"
+  },
+  "notVerified": [
+    "当前修复制品尚未重新构建镜像并部署到 131",
+    "三类详情页删除网络失败的部署后 Playwright 可见错误提示尚未复验"
+  ]
+}

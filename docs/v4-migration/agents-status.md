@@ -4,7 +4,7 @@
 
 - 在当前制品的 Deployment 详情页真实浏览器测试中，删除请求因网络中断失败，确认弹窗保留但没有可见错误提示；网络恢复后已取消弹窗，测试资源未改变。
 - 根因为三类详情页的 `useDeleteDeploymentMutation` 只配置 `onSuccess`，没有配置 `onError`。已按 TDD 先补失败测试，再为 Deployment、StatefulSet、DaemonSet 增加 `notify.error(t('OPERATION_FAILED'))`。
-- 当前阶段已按模块执行规则从 `VERIFY` 退回 `DEV / 进行中`。本地修复测试和全量回归已通过；提交后必须以新 SHA 重新构建、部署和 Playwright 验证，不能继承旧制品 VERIFY 结论。
+- 当前阶段已按模块执行规则完成 `DEV` 修复并进入 `VERIFY / 待重新部署`。修复提交为 `68458971247820770e3fa2931a9adc56e2f9d4cd`，本地修复测试、全量回归和包构建已通过；必须以该 SHA 重新构建、部署和 Playwright 验证，不能继承旧制品 VERIFY 结论。
 
 # 当前状态补充（2026-10-25：三类 Workload 删除取消路径）
 
