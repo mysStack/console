@@ -1,3 +1,9 @@
+## 当前增量（2026-10-25：终止宽限时间负值边界发现缺陷，退回 DEV）
+
+- 在当前部署制品 `feature-v4-workloads-20261025-140042-2c81983cf7cc` 上，使用浏览器打开 Deployment 原生编辑设置，将终止宽限时间填写为 `-1` 并确认。页面显示“更新成功”，PUT 返回 200，随后出现新 Pod，证明非法值实际写回。
+- 已通过同一浏览器将 Deployment 恢复为 `terminationGracePeriodSeconds=30`，API 回读 `replicas=1`、`readyReplicas=1`；StatefulSet 和 DaemonSet 当前值仍为 30 且 Ready。证据见 [`workload-negative-grace-defect-verify-20261025.json`](./evidence/workload-negative-grace-defect-verify-20261025.json)。
+- 该结果关闭“负值边界已验证”的假设并触发状态机 `VERIFY → DEV`。修复要求为三类资源负值输入在提交前阻断、弹窗保留并显示校验错误、不能产生 PUT；修复后必须重新构建、部署和 Playwright 验证。
+
 ## 当前增量（2026-10-25：三类 Workload 删除失败可见错误态 VERIFY 通过）
 
 - 当前最终制品源提交 `2c81983cf7cc013f90609f002d1423e6c647817a`，CI Run `40167476566` 成功，镜像 `feature-v4-workloads-20261025-140042-2c81983cf7cc`，digest `sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b`。131 `ks-console` rollout generation `613` 成功，Pod `ks-console-654b89bc97-jbj5h` Ready，实际 imageID 与该 digest 一致。

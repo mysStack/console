@@ -1,3 +1,9 @@
+# 当前状态补充（2026-10-25：终止宽限时间负值边界发现缺陷，退回 DEV）
+
+- 当前制品浏览器实测 Deployment 编辑设置允许输入 `-1`，确认后页面显示“更新成功”，Deployment PUT 返回 200；新 Pod 短暂进入 `ContainerCreating`。该行为违反当前 V4 表单边界要求。
+- 已立即通过浏览器恢复 Deployment `terminationGracePeriodSeconds=30`，并确认 Deployment `1/1 Ready`；StatefulSet、DaemonSet 保持 `30` 和 Ready。证据见 [`workload-negative-grace-defect-verify-20261025.json`](./evidence/workload-negative-grace-defect-verify-20261025.json)。
+- 按规则模块从 `VERIFY` 退回 `DEV / 进行中`。下一步补三类资源负值边界回归测试和提交前阻断，修复后重新构建、部署、rollout 和 Playwright 验收。
+
 # 当前状态补充（2026-10-25：三类 Workload 删除失败可见错误态 VERIFY 通过）
 
 - 当前制品源提交 `2c81983cf7cc013f90609f002d1423e6c647817a` 已构建、推送并部署到 131；CI Run `40167476566`、镜像 digest `sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b`、Pod imageID 和 rollout generation `613` 已绑定。

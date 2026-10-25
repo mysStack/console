@@ -5,8 +5,8 @@
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-  "phase": "VERIFY",
-  "phaseReason": "DEV 修复已完成并提交 c2de55c12；下一步以最终文档对应的当前 HEAD 重建制品、部署到 131，并用浏览器复验三类 Workload 删除网络失败时的可见内联错误态。",
+  "phase": "DEV",
+  "phaseReason": "131 当前制品浏览器发现编辑设置允许负数终止宽限时间并以 200 写回；测试资源已恢复为 30/Ready。按规则退回 DEV，先补三类资源负值校验回归测试和最小修复，再重新构建、部署和浏览器复验。",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "65662857113ba56826521b034bcca4e98f2051ae65dd9a0d395920d457cb7353"
+        "sha256": "284c49852260828c03a6cf4116d265a74bc15cdcde9608d33fb908e02021397e"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "cdb648a43531ee6d26a20d6f5225e663a4ad3df6df791a4c79f09b66f0611685"
+        "sha256": "b248b9d668bc356db77230e6d41dc757d38327b3312785e15aad8db4bb9fe14a"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -325,10 +325,14 @@
     "coverageNotes": "已核对表示当前版本主基线和证据入口已覆盖该维度，不表示运行时验证或功能等价已经通过；运行时缺口转入 DEV/VERIFY 验收清单。"
   },
   "dev": {
-    "status": "已完成",
-    "reason": "已按 TDD 补齐 Deployment、StatefulSet、DaemonSet 删除失败内联错误态；Store onError 透传和三类详情页错误显示均已完成本地验证，代码提交 c2de55c12。",
-    "sourceCommit": "c2de55c127c2cde86c02925a4aaf82c852e2abbc",
+    "status": "进行中",
+    "reason": "当前制品真实浏览器发现 Deployment 编辑设置可提交 terminationGracePeriodSeconds=-1 并返回 200；已通过浏览器恢复为 30。待补三类资源负值边界测试和提交前阻断。",
+    "sourceCommit": "2c81983cf7cc013f90609f002d1423e6c647817a",
     "documents": [
+      {
+        "path": "docs/v4-migration/evidence/workload-negative-grace-defect-verify-20261025.json",
+        "sha256": "374cf4a16b9d8c838ac82c3230c37ea73791f909a8ecab04dcc6ff6a951907ac"
+      },
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
         "sha256": "c6a06b6f66157209958049073324558e8e344a9c2639d99cc4474df1ea98be47"
@@ -664,7 +668,7 @@
   ],
   "verify": {
     "status": "进行中",
-    "reason": "代码修复 c2de55c12 已推送，CI 构建成功；由于模块记录更新会改变当前 HEAD，必须以最终文档提交后的 HEAD 重建镜像，再部署并通过 Playwright 验证删除失败可见错误态。既有 VERIFY 证据保留，其他错误矩阵、缓存组合和逐项 V3 等价仍未闭环。",
+    "reason": "删除失败反馈、StatefulSet 冲突和 DaemonSet 网络失败已在当前制品复验；新增负值终止宽限时间缺陷导致模块退回 DEV，待修复后重建部署。",
     "sourceCommit": "2c81983cf7cc013f90609f002d1423e6c647817a",
     "documents": [
       {
@@ -739,8 +743,8 @@
       "podImageID": "ghcr.io/mysstack/ks-console@sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b"
     },
     "browserVerification": {
-      "status": "通过：Deployment、StatefulSet、DaemonSet 删除网络失败时均显示“操作失败”，确认弹窗保持打开，恢复网络后取消，资源保持存在且 Ready。",
-      "evidence": "docs/v4-migration/evidence/workload-delete-error-feedback-verify-20261025.json",
+      "status": "已完成部分错误路径复验；负值字段边界发现缺陷，当前模块退回 DEV，整体 VERIFY 未完成。",
+      "evidence": "docs/v4-migration/evidence/workload-negative-grace-defect-verify-20261025.json",
       "freshLogin": "否；使用已有认证 Playwright 会话完成部署后浏览器验收",
       "moduleAcceptance": "未完成"
     },

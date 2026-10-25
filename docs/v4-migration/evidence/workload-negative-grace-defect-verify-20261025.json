@@ -1,0 +1,46 @@
+{
+  "module": "workloads",
+  "stage": "VERIFY",
+  "date": "2026-10-25",
+  "sourceCommit": "2c81983cf7cc013f90609f002d1423e6c647817a",
+  "artifact": {
+    "ciRun": "40167476566",
+    "imageTag": "feature-v4-workloads-20261025-140042-2c81983cf7cc",
+    "imageDigest": "sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b",
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b"
+  },
+  "environment": {
+    "cluster": "host",
+    "namespace": "v4-migration-e2e",
+    "browserSession": "workload-rea-fresh",
+    "resource": "Deployment/v4-deploy-edit-ef3",
+    "url": "http://192.168.2.131:30880/test-workspace/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/resource-status"
+  },
+  "steps": [
+    "在已认证浏览器中打开 Deployment 原生编辑设置，切换到“容器组优雅终止”。",
+    "将输入框填写为 -1，点击“确定”。",
+    "页面显示“更新成功”，弹窗关闭。",
+    "Network 发起 PUT，返回 200；随后 Deployment 新 Pod 进入 ContainerCreating，说明非法值被实际写回。",
+    "重新打开原生编辑设置，将值改回 30 保存。"
+  ],
+  "request": {
+    "method": "PUT",
+    "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+    "status": 200,
+    "invalidValue": -1,
+    "visibleFeedback": "更新成功"
+  },
+  "finalReadback": {
+    "terminationGracePeriodSeconds": 30,
+    "replicas": 1,
+    "readyReplicas": 1,
+    "resourceRestored": true
+  },
+  "conclusion": {
+    "status": "发现缺陷，退回 DEV",
+    "impact": "编辑设置允许负值绕过前端校验并提交，可能造成非法或异常工作负载状态。",
+    "requiredFix": "三类资源编辑设置必须在提交前拒绝负数终止宽限时间；提交按钮不得发起 PUT，弹窗保持打开并显示校验错误。",
+    "verification": "修复后以当前最终 SHA 构建、部署到 131，分别验证 Deployment、StatefulSet、DaemonSet 的负值输入、无 PUT、错误反馈和资源回读。"
+  },
+  "safety": "测试资源已恢复 terminationGracePeriodSeconds=30；未修改其他业务资源。"
+}
