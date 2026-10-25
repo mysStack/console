@@ -12,8 +12,12 @@ function nodes(node: any): any[] {
   if (!React.isValidElement(node)) return [];
   return [node, ...React.Children.toArray((node.props as any).children).flatMap(nodes)];
 }
-function render(kind: string) {
-  const resource = {
+function render(
+  kind: string,
+  submittedValues?: Record<string, any>,
+  resourceOverride?: Record<string, any>,
+) {
+  const resource = resourceOverride || {
     kind,
     metadata: { name: 'web', namespace: 'v4-migration-e2e' },
     spec: {
@@ -55,7 +59,7 @@ function render(kind: string) {
               {
                 getFieldValue: (key: string) => values[key],
                 getFieldsValue: () => values,
-                validateFields: () => Promise.resolve(values),
+                validateFields: () => Promise.resolve(submittedValues || values),
               },
             ],
             useWatch: (key: string) => values[key],
@@ -118,9 +122,6 @@ test('三类设置均提供分区导航，字段保留挂载并区分 DaemonSet 
       'volumes',
       'podSecurityContext',
       'terminationGracePeriodSeconds',
-      'workloadLabels',
-      'workloadAnnotations',
-      'podAnnotations',
     ]) {
       assert.ok(
         all.find(node => node.props.name === field),
@@ -170,4 +171,73 @@ test('编辑设置弹窗使用 release-4.1.5 对照页面的宽度', () => {
   const { tree } = render('Deployment');
 
   assert.equal(tree.props.width, 1162);
+});
+
+test('编辑设置首屏沿用 release-4.1.5 的设置边界，不重复显示基础信息和副本数', () => {
+  const { tree } = render('Deployment');
+  const all = nodes(tree);
+  const nav = all.find(node => node.type === 'nav');
+  assert.ok(nav);
+
+  const sectionLabels = nodes(nav)
+    .filter(node => node.type === 'button')
+    .map(node => node.props.children);
+  assert.deepEqual(sectionLabels, [
+    'UPDATE_STRATEGY',
+    'CONTAINER_PL',
+    'STORAGE',
+    'POD_SCHEDULING_RULES',
+    'WORKLOAD_TERMINATION_GRACE_PERIOD',
+  ]);
+
+  for (const field of ['name', 'namespace', 'replicas']) {
+    assert.equal(
+      all.some(node => node.props.name === field),
+      false,
+      `release-4.1.5 编辑设置不应显示 ${field} 字段`,
+    );
+  }
+});
+
+test('编辑设置隐藏基础字段时，提交仍保留未展示的副本数和元数据', async () => {
+  const resource = {
+    kind: 'Deployment',
+    metadata: {
+      name: 'web',
+      namespace: 'v4-migration-e2e',
+      labels: { app: 'web', 'example.com/owner': 'before' },
+      annotations: { 'example.com/owner': 'before' },
+    },
+    spec: {
+      replicas: 2,
+      template: {
+        metadata: { annotations: { 'example.com/pod': 'before' } },
+        spec: { containers: [{ name: 'web', image: 'nginx' }] },
+      },
+    },
+  };
+  const values = dependency('./deployment').parseDeploymentSettings(resource);
+  const { tree, saved } = render(
+    'Deployment',
+    {
+      containers: values.containers,
+      initContainers: values.initContainers,
+      volumes: values.volumes,
+      updateStrategy: values.updateStrategy,
+      podScheduling: values.podScheduling,
+      podSecurityContext: values.podSecurityContext,
+      terminationGracePeriodSeconds: values.terminationGracePeriodSeconds,
+    },
+    resource,
+  );
+
+  await tree.props.onOk();
+  await Promise.resolve();
+  assert.equal(saved.length, 1);
+  assert.equal(saved[0].spec.replicas, 2);
+  assert.deepEqual(saved[0].metadata.labels, resource.metadata.labels);
+  assert.deepEqual(saved[0].metadata.annotations, resource.metadata.annotations);
+  assert.deepEqual(saved[0].spec.template.metadata.annotations, {
+    'example.com/pod': 'before',
+  });
 });

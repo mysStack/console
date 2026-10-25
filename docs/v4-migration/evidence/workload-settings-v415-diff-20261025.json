@@ -1,0 +1,69 @@
+{
+  "date": "2026-10-25",
+  "subject": "编辑设置弹窗与 release-4.1.5 运行时基线差异",
+  "primaryBaseline": {
+    "sourceRef": "release-4.1.5",
+    "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
+    "artifactTree": "1e499d92e11374e26c76f5e13be45251602bd596",
+    "runtimeUrl": "http://192.168.2.131:30881",
+    "deployment": "kubesphere-system/ks-console-v415-rea",
+    "podImageID": "crpi-p97knjjid10efrly.cn-shanghai.personal.cr.aliyuncs.com/ecochain/ks-console@sha256:2595b31de4dc01ae67b72b97b857ef40cd1c1ec2a0d406cada177982f380f455"
+  },
+  "currentArtifactBeforeFix": {
+    "sourceCommit": "0fefb30b33600279b1282b340f7518b438763555",
+    "runtimeUrl": "http://192.168.2.131:30880",
+    "imageTag": "feature-v4-workloads-20261025-080541-0fefb30b3360",
+    "imageDigest": "sha256:7467bdb6fb1600575af5cab54da59a0f43b9fdce8d4e75ddb382de0cdb36ae68",
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:7467bdb6fb1600575af5cab54da59a0f43b9fdce8d4e75ddb382de0cdb36ae68"
+  },
+  "browserEvidence": {
+    "baselineSession": "workload-release415-rea-20261025",
+    "currentSession": "workload-verify-20261025",
+    "freshLogin": false,
+    "baselineModal": {
+      "title": "编辑设置",
+      "sections": ["更新策略", "容器", "存储", "容器组调度规则", "容器组优雅终止"],
+      "topFields": [],
+      "observation": "左侧分区切换；未显示名称、项目、副本数量顶部字段。"
+    },
+    "currentModalBeforeFix": {
+      "sections": [
+        "UPDATE_STRATEGY",
+        "POD_SETTINGS",
+        "STORAGE_SETTINGS",
+        "POD_SCHEDULING_RULES",
+        "WORKLOAD_TERMINATION_GRACE_PERIOD",
+        "ADD_METADATA"
+      ],
+      "topFields": ["名称", "项目", "副本数量"],
+      "observation": "当前 V4 弹窗同时显示基础字段和元数据分区，边界与 release-4.1.5 不一致。"
+    },
+    "screenshots": [
+      ".playwright-cli/page-2026-10-25T00-40-52-521Z.png",
+      ".playwright-cli/page-2026-10-25T00-40-52-490Z.png"
+    ]
+  },
+  "rootCause": "WorkloadSettingsModal 沿用了当前 V4 自定义设置边界，没有按 release-4.1.5 的编辑设置运行时分区复现；提交逻辑也直接使用表单返回值，隐藏字段可能被写成缺省值。",
+  "fix": {
+    "file": "packages/console/src/pages/projects/components/WorkloadCreateModal/WorkloadSettingsModal.tsx",
+    "changes": [
+      "按 release-4.1.5 保留更新策略、容器、存储、容器组调度规则和容器组优雅终止五个分区。",
+      "移除编辑设置弹窗中的名称、项目、副本数量顶部展示和 ADD_METADATA 分区。",
+      "提交时将 initialValues 与可见字段合并，保留隐藏的副本数和元数据，避免因 UI 边界调整丢失资源字段。"
+    ],
+    "reverifyRequired": true
+  },
+  "tests": {
+    "redBeforeFix": [
+      "WorkloadSettingsModal.test.ts：基线分区断言失败，实际包含 POD_SETTINGS、STORAGE_SETTINGS、ADD_METADATA。",
+      "WorkloadSettingsModal.test.ts：隐藏字段部分提交因必填字段缺失未生成资源。"
+    ],
+    "greenAfterFix": [
+      "esno packages/console/src/pages/projects/components/WorkloadCreateModal/WorkloadSettingsModal.test.ts：6/6 通过",
+      "esno packages/console/src/pages/projects/components/WorkloadCreateModal/index.test.ts：5/5 通过",
+      "esno packages/console/src/pages/projects/containers/ApplicationWorkloads/Deployment/deployment.test.ts：73/73 通过",
+      "git diff --check：通过"
+    ]
+  },
+  "status": "DEV 修复中；新代码尚未重新构建、部署和完成部署后浏览器复验"
+}

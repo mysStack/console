@@ -45,9 +45,9 @@ test('创建表单按资源类型渲染 StatefulSet/DaemonSet 字段并调用对
   assert.match(source, /withService=\{kind === 'StatefulSet'\}/);
 });
 
-test('三类 Workload 设置表单区分工作负载元数据和 Pod 模板注解', () => {
-  assert.match(settingsSource, /name="workloadLabels"/);
-  assert.match(settingsSource, /name="workloadAnnotations"/);
-  assert.match(settingsSource, /name="podAnnotations"/);
-  assert.match(settingsSource, /hiddenKeys=\{\['app'\]\}/);
+test('编辑设置沿用基线边界并通过初始值保留未展示字段', () => {
+  assert.doesNotMatch(settingsSource, /name="workloadLabels"/);
+  assert.doesNotMatch(settingsSource, /name="workloadAnnotations"/);
+  assert.doesNotMatch(settingsSource, /name="podAnnotations"/);
+  assert.match(settingsSource, /\.\.\.initialValues/);
 });

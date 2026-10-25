@@ -4,23 +4,13 @@
  */
 
 import React, { useRef, useState } from 'react';
-import {
-  Button,
-  Form,
-  FormItem,
-  Input,
-  InputNumber,
-  Modal,
-  useForm,
-  useWatch,
-} from '@kubed/components';
-import { ArrayInput, PropertiesInput } from '@ks-console/shared';
+import { Button, Form, FormItem, InputNumber, Modal, useForm, useWatch } from '@kubed/components';
+import { ArrayInput } from '@ks-console/shared';
 import ContainerSettingsInput from './ContainerSettingsInput';
 import VolumeInput from './VolumeInput';
 import PersistentVolumeClaimTemplateInput from './PersistentVolumeClaimTemplateInput';
 import WorkloadUpdateStrategyInput from './WorkloadUpdateStrategyInput';
 import SecurityContextInput from './SecurityContextInput';
-import PodAnnotationsInput from './PodAnnotationsInput';
 import PodSchedulingInput from './PodSchedulingInput';
 import useWorkloadResourceOptions from './useWorkloadResourceOptions';
 import useWorkloadTargetOptions from './useWorkloadTargetOptions';
@@ -61,11 +51,10 @@ export default function WorkloadSettingsModal({
   const kind: WorkloadKind = resource.kind || 'Deployment';
   const sections = [
     { id: 'updateStrategy', label: 'UPDATE_STRATEGY' },
-    { id: 'podTemplate', label: 'POD_SETTINGS' },
-    { id: 'volumeSettings', label: 'STORAGE_SETTINGS' },
+    { id: 'podTemplate', label: 'CONTAINER_PL' },
+    { id: 'volumeSettings', label: 'STORAGE' },
     ...(kind !== 'DaemonSet' ? [{ id: 'podMode', label: 'POD_SCHEDULING_RULES' }] : []),
     { id: 'podGracePeriod', label: 'WORKLOAD_TERMINATION_GRACE_PERIOD' },
-    { id: 'metadata', label: 'ADD_METADATA' },
   ];
   const [activeSection, setActiveSection] = useState('updateStrategy');
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
@@ -132,7 +121,13 @@ export default function WorkloadSettingsModal({
 
   const submit = () => {
     form.validateFields().then(
-      values => onOk(buildDeploymentSettingsResource(resource, values)),
+      values =>
+        onOk(
+          buildDeploymentSettingsResource(resource, {
+            ...initialValues,
+            ...values,
+          }),
+        ),
       () => {},
     );
   };
@@ -195,22 +190,6 @@ export default function WorkloadSettingsModal({
                 )}
               </div>
             )}
-            <FormItem name="name" label={t('NAME')}>
-              <Input disabled />
-            </FormItem>
-            <FormItem name="namespace" label={t('PROJECT')}>
-              <Input disabled />
-            </FormItem>
-            {kind !== 'DaemonSet' && (
-              <FormItem
-                name="replicas"
-                label={t('REPLICAS')}
-                rules={[{ required: true }, { validator: validateSettings }]}
-              >
-                <InputNumber min={0} precision={0} />
-              </FormItem>
-            )}
-
             <section
               id="workload-settings-updateStrategy"
               aria-label={t('UPDATE_STRATEGY')}
@@ -236,14 +215,14 @@ export default function WorkloadSettingsModal({
             </section>
             <section
               id="workload-settings-podTemplate"
-              aria-label={t('POD_SETTINGS')}
+              aria-label={t('CONTAINER_PL')}
               role="tabpanel"
               hidden={activeSection !== 'podTemplate'}
               ref={node => {
                 sectionRefs.current.podTemplate = node;
               }}
             >
-              <h3>{t('POD_SETTINGS')}</h3>
+              <h3>{t('CONTAINER_PL')}</h3>
               <FormItem name="podSecurityContext" rules={[{ validator: validateSettings }]}>
                 <SecurityContextInput kind="pod" />
               </FormItem>
@@ -286,14 +265,14 @@ export default function WorkloadSettingsModal({
             </section>
             <section
               id="workload-settings-volumeSettings"
-              aria-label={t('STORAGE_SETTINGS')}
+              aria-label={t('STORAGE')}
               role="tabpanel"
               hidden={activeSection !== 'volumeSettings'}
               ref={node => {
                 sectionRefs.current.volumeSettings = node;
               }}
             >
-              <h3>{t('STORAGE_SETTINGS')}</h3>
+              <h3>{t('STORAGE')}</h3>
               {resources.isLoading && <div role="status">{t('LOADING')}</div>}
               {resources.isError && <div role="alert">{t('WORKLOAD_RESOURCE_OPTIONS_FAILED')}</div>}
               <FormItem
@@ -364,39 +343,6 @@ export default function WorkloadSettingsModal({
                 rules={[{ required: true }, { validator: validateSettings }]}
               >
                 <InputNumber min={0} precision={0} />
-              </FormItem>
-            </section>
-            <section
-              id="workload-settings-metadata"
-              aria-label={t('ADD_METADATA')}
-              role="tabpanel"
-              hidden={activeSection !== 'metadata'}
-              ref={node => {
-                sectionRefs.current.metadata = node;
-              }}
-            >
-              <h3>{t('ADD_METADATA')}</h3>
-              <FormItem
-                name="workloadLabels"
-                label={t('LABEL_PL')}
-                rules={[{ validator: validateSettings }]}
-              >
-                <PropertiesInput hiddenKeys={['app']} addText={t('ADD')} />
-              </FormItem>
-              <FormItem
-                name="workloadAnnotations"
-                label={t('ANNOTATION_PL')}
-                rules={[{ validator: validateSettings }]}
-              >
-                <PodAnnotationsInput />
-              </FormItem>
-              <h3>{t('POD_TEMPLATE_METADATA')}</h3>
-              <FormItem
-                name="podAnnotations"
-                label={t('ANNOTATION_PL')}
-                rules={[{ validator: validateSettings }]}
-              >
-                <PodAnnotationsInput />
               </FormItem>
             </section>
           </Form>

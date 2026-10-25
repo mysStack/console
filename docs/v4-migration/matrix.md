@@ -42,6 +42,8 @@
 
 # V4 迁移矩阵
 
+> **2026-10-25 编辑设置基线对照：** 以 `release-4.1.5` 完整源码和同版本 131 页面为主基线，发现当前 V4 编辑设置多出基础字段和元数据分区。已按基线调整 `WorkloadSettingsModal`，并以初始值合并保护隐藏字段；当前阶段为 `DEV / 修复中`，待新制品部署后用 Playwright 复验，三类 Workload 不标记为已验收。证据见 [`workload-settings-v415-diff-20261025.json`](./evidence/workload-settings-v415-diff-20261025.json)。
+
 > **2026-10-24 制品边界校准**：源码提交 `ae500da86a55` 的首次部署曾因新 Pod 长时间处于 `ContainerCreating` 而回滚，后续源码提交 `31b6d88fc7e8` 的精确制品已完成 131 Ready、digest/imageID 核对及当前制品设置入口复验。旧精确制品与旧部署尝试仍只作为历史证据；当前 31b6 制品的完整字段、登录、RBAC、缓存、错误和逐项等价性仍未闭环。历史文档中“仍打开 YAML”的描述属于旧 REA 快照，已由[原生设置证据](./evidence/workload-native-settings-old-artifact-20261024.json)校准。
 
 > **2026-10-24 当前制品设置复验**：源码提交 `31b6d88fc7e8`（之后仅有记录提交）已完成精确部署和 Pod imageID 核对；在已有认证态中三类详情的“编辑设置”均打开原生设置弹窗，未跳转 YAML，并完成终止宽限期 `30 → 31 → 30` 的保存与 API 回读。零 Cookie 新 context 登录仍返回账号或密码错误。该结果只关闭入口形态和一个字段保存场景，当前制品完整字段、RBAC、缓存、错误和逐项 V3 等价仍未闭环。详见[当前制品原生设置复验](./evidence/workload-native-settings-current-head-20261024.json)。
