@@ -37,6 +37,13 @@ interface Props {
   onCancel: () => void;
 }
 
+export function mergeWorkloadSettingsValues(
+  initialValues: WorkloadSettingsValues,
+  values: Partial<WorkloadSettingsValues>,
+) {
+  return { ...initialValues, ...values };
+}
+
 export default function WorkloadSettingsModal({
   visible,
   cluster,
@@ -115,7 +122,10 @@ export default function WorkloadSettingsModal({
     _value: unknown,
     callback: (error?: string) => void,
   ) => {
-    const error = validateWorkloadSettings(resource, form.getFieldsValue());
+    const error = validateWorkloadSettings(
+      resource,
+      mergeWorkloadSettingsValues(initialValues, form.getFieldsValue()),
+    );
     callback(error ? t(error) : undefined);
   };
 
@@ -123,10 +133,10 @@ export default function WorkloadSettingsModal({
     form.validateFields().then(
       values =>
         onOk(
-          buildDeploymentSettingsResource(resource, {
-            ...initialValues,
-            ...values,
-          }),
+          buildDeploymentSettingsResource(
+            resource,
+            mergeWorkloadSettingsValues(initialValues, values),
+          ),
         ),
       () => {},
     );

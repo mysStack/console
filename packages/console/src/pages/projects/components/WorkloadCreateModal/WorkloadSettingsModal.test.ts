@@ -87,6 +87,7 @@ function render(
       onOk: (next: any) => saved.push(next),
     }),
     saved,
+    mergeWorkloadSettingsValues: loaded.exports.mergeWorkloadSettingsValues,
   };
 }
 
@@ -240,4 +241,20 @@ test('编辑设置隐藏基础字段时，提交仍保留未展示的副本数�
   assert.deepEqual(saved[0].spec.template.metadata.annotations, {
     'example.com/pod': 'before',
   });
+});
+
+test('编辑设置校验隐藏基础字段时仍合并初始副本数', () => {
+  const { mergeWorkloadSettingsValues } = render('Deployment');
+  assert.equal(typeof mergeWorkloadSettingsValues, 'function');
+  const values = mergeWorkloadSettingsValues(
+    { replicas: 2, terminationGracePeriodSeconds: 30 },
+    { terminationGracePeriodSeconds: 31 },
+  );
+  assert.equal(values.replicas, 2);
+
+  const source = readFileSync(path.join(__dirname, 'WorkloadSettingsModal.tsx'), 'utf8');
+  assert.match(
+    source,
+    /validateWorkloadSettings\(\s*resource,\s*mergeWorkloadSettingsValues\(initialValues,\s*form\.getFieldsValue\(\)\s*\)\s*,?\s*\)/s,
+  );
 });
