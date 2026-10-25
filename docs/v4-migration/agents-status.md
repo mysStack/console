@@ -1,3 +1,9 @@
+# 当前状态补充（2026-10-25：三类 Workload YAML 非法输入错误路径复验）
+
+- 当前制品 `feature-v4-workloads-20261025-140042-2c81983cf7cc` 已在 131 完成三类 Workload YAML 非法输入浏览器验证；CI Run `40167476566`、digest `sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b`、Pod imageID 和 rollout generation `613` 已核对。
+- Deployment、StatefulSet、DaemonSet 的非法 `kind` 提交均显示保存失败提示、保留编辑弹窗、未发出写请求且资源未变化；DaemonSet 的 `minReadySeconds=-1` 结构化输入同样在客户端校验阶段拒绝，资源保持 `1/1 Ready`。证据见 [`workload-yaml-invalid-verify-20261025.json`](./evidence/workload-yaml-invalid-verify-20261025.json)。
+- 该项只关闭客户端非法 YAML 的反馈和无写入保护，不代表服务端 422/409 映射、完整字段、Action、低权限列表/缓存和逐项 V3 等价已完成；模块仍为 `VERIFY / 进行中`，PR #2 保持 Draft。
+
 # 当前状态补充（2026-10-25：负值边界复核纠正）
 
 - 重新使用当前制品和真实浏览器验证 Deployment `v4-deploy-edit-ef3`：用户输入 `-1` 后点击确认，实际 PUT 请求体为 `terminationGracePeriodSeconds=0`，API 回读也是 `0`，没有负值写回。此前记录将输入值误记为请求体值，已由 [`workload-negative-grace-reverify-20261025.json`](./evidence/workload-negative-grace-reverify-20261025.json) 纠正。

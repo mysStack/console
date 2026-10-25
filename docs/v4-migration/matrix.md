@@ -1,3 +1,9 @@
+## 当前增量（2026-10-25：三类 Workload YAML 非法输入错误路径复验）
+
+- 当前制品 `feature-v4-workloads-20261025-140042-2c81983cf7cc` 已在 131 完成 Deployment、StatefulSet、DaemonSet 的 YAML 非法输入浏览器验证；CI Run `40167476566`、镜像 digest `sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b`、Pod imageID 和 rollout generation `613` 已绑定。
+- 三类资源将 YAML 的 `kind` 改为 `Invalid` 后，页面均显示“保存失败，设置尚未保存。请检查网络和权限后重试。”，编辑弹窗保留，未观察到 PUT/PATCH/POST，API 回读确认资源仍存在且 Ready。DaemonSet 另以 `minReadySeconds=-1` 的合法结构提交，当前页面同样在客户端校验阶段拒绝，未产生写请求，资源未变化。
+- 本轮关闭 YAML 非法内容的基础错误反馈和无写入保护；这不是完整服务端 422 响应矩阵。服务端 422/409 逐项映射、字段清空/保留、全部 Action 错误矩阵、低权限列表/缓存组合和逐项 V3 等价继续未闭环。证据见 [`workload-yaml-invalid-verify-20261025.json`](./evidence/workload-yaml-invalid-verify-20261025.json)。
+
 ## 当前增量（2026-10-25：复核负值边界并纠正证据）
 
 - 对当前制品 `feature-v4-workloads-20261025-140042-2c81983cf7cc` 重新执行浏览器边界验证：输入框可暂时显示 `-1`，点击确认时控件将值归一为 `0`，真实 PUT 请求体和 Kubernetes API 回读均为 `0`，没有负值写入。
