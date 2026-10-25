@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "a205deafa1a87cde12e26a29d5ed2756f2a7bccac0f0c799939bd5a63b6a361b"
+        "sha256": "8f9b3b00c880e2912d6fb1ccfae4fa9db44b4ad1d932fe3cb3b8105dd3b785fa"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "7b09cc1ba0205e9a57b6ea7574966aae10589f97389624d7ddfa807b5145cf7c"
+        "sha256": "a98b5e651d6b7ed24c4d174baa6220861450740b4e19e2fc8f8e906d1dede6dd"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -660,7 +660,7 @@
   ],
   "verify": {
     "status": "进行中",
-    "reason": "当前提交已完成新制品 rollout、Pod imageID 核对、三类 Workload 设置写回/回读、配置引用成功写回/恢复、StatefulSet Headless Service 成功路径、DaemonSet 停止/夹具恢复和低权限浏览器读权限样本；隐藏副本数校验缺陷、上述成功路径与低权限入口可见性已关闭。完整字段、Action 错误/取消/冲突、低权限列表缓存和实际 403 浏览器矩阵、缓存组合及逐项 V3 等价仍未闭环，模块保持 VERIFY 进行中。",
+    "reason": "当前提交已完成新制品 rollout、Pod imageID 核对、三类 Workload 设置写回/回读、配置引用成功写回/恢复、StatefulSet Headless Service 成功路径、DaemonSet 停止/夹具恢复、低权限浏览器读权限样本和 Deployment 设置 409/网络失败路径；隐藏副本数校验缺陷、上述成功路径及已覆盖错误路径已关闭。StatefulSet/DaemonSet 错误路径、完整字段、Action 错误/取消/冲突、低权限列表缓存和实际 403 浏览器矩阵、缓存组合及逐项 V3 等价仍未闭环，模块保持 VERIFY 进行中。",
     "sourceCommit": "8430bb2fe09f33cec37bf433313808be8e4a69fc",
     "documents": [
       {
@@ -702,6 +702,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-rbac-v415-browser-verify-20261025.json",
         "sha256": "4e1c9da200ea7323644750e7b5be7b1d1459dd01da29087a11cbc57e6b4528a3"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-settings-errors-v415-verify-20261025.json",
+        "sha256": "783c2ebc4b1fdedf2fe47616df2fbe7bccfca5c8cd134d3f6d5c3fb114878da4"
       }
     ],
     "ciRun": "40153206692",
@@ -717,8 +721,8 @@
       "podImageID": "ghcr.io/mysstack/ks-console@sha256:a3b9f1eb39cbaa8df197632fe4f79993e3c395997aff6f41a80ad62522697336"
     },
     "browserVerification": {
-      "status": "设置隐藏字段校验、配置引用写回/恢复、StatefulSet Service、DaemonSet Stop 和低权限详情只读成功路径已验证，整体 VERIFY 未完成",
-      "evidence": "docs/v4-migration/evidence/workload-rbac-v415-browser-verify-20261025.json",
+      "status": "设置隐藏字段校验、配置引用、StatefulSet Service、DaemonSet Stop、低权限详情只读和 Deployment 设置冲突/网络失败路径已验证，整体 VERIFY 未完成",
+      "evidence": "docs/v4-migration/evidence/workload-settings-errors-v415-verify-20261025.json",
       "freshLogin": "否；使用已有认证会话完成部署后复验",
       "moduleAcceptance": "未完成"
     },

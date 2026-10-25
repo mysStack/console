@@ -1,0 +1,59 @@
+{
+  "date": "2026-10-25",
+  "module": "workloads",
+  "sourceCommit": "8430bb2fe09f33cec37bf433313808be8e4a69fc",
+  "image": {
+    "tag": "feature-v4-workloads-20261025-100820-be6469d3fe2a",
+    "digest": "sha256:a3b9f1eb39cbaa8df197632fe4f79993e3c395997aff6f41a80ad62522697336",
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:a3b9f1eb39cbaa8df197632fe4f79993e3c395997aff6f41a80ad62522697336"
+  },
+  "environment": {
+    "cluster": "host",
+    "namespace": "v4-migration-e2e",
+    "resource": "Deployment/v4-deploy-edit-ef3",
+    "browserSession": "workload-rea-current",
+    "freshLogin": false,
+    "url": "http://192.168.2.131:30880/test-workspace/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/resource-status"
+  },
+  "conflict409": {
+    "flow": "打开当前制品原生编辑设置，将终止宽限期草稿改为 30；通过 Kubernetes API 给 Deployment 增加临时 annotation，使 resourceVersion 外部变化；回到浏览器确认。",
+    "request": {
+      "method": "PUT",
+      "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+      "status": 409
+    },
+    "ui": "编辑设置弹窗保持打开，显示“资源已被其他操作更新，本次设置未保存。请取消并重新打开编辑设置。”",
+    "draftValue": 30,
+    "cancel": "取消后草稿未写入；临时冲突 annotation 已删除。"
+  },
+  "networkFailure": {
+    "flow": "重新打开编辑设置，将终止宽限期草稿改为 30；Playwright 网络状态切换为 offline 后确认。",
+    "request": {
+      "method": "PUT",
+      "path": "/clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+      "result": "FAILED net::ERR_INTERNET_DISCONNECTED"
+    },
+    "ui": "编辑设置弹窗保持打开，显示“保存失败，设置尚未保存。请检查网络和权限后重试。”",
+    "cancel": "恢复 online 后取消；草稿未写入。"
+  },
+  "finalReadback": {
+    "terminationGracePeriodSeconds": 31,
+    "replicas": 1,
+    "readyReplicas": 1,
+    "temporaryConflictAnnotation": false,
+    "secretValuesReadOrRecorded": false
+  },
+  "scope": {
+    "verified": [
+      "当前制品 Workload Settings 的 409 冲突反馈和取消保持",
+      "当前制品 Workload Settings 的网络失败反馈和取消保持",
+      "错误路径未覆盖写入成功，测试资源最终恢复原状态"
+    ],
+    "notVerified": [
+      "StatefulSet 和 DaemonSet 的相同冲突/网络错误路径",
+      "低权限浏览器实际写请求 403 页面反馈",
+      "422 校验错误、删除/回退/Service 等 Action 的完整错误矩阵"
+    ]
+  },
+  "status": "当前制品 Deployment 编辑设置的冲突和网络失败路径已验证；模块整体 VERIFY 未完成"
+}

@@ -1,5 +1,7 @@
 # 当前 Workload 执行路线（2026-10-25）
 
+> **2026-10-25 编辑设置错误路径 VERIFY：** 当前制品在 Deployment 编辑设置中复验了真实 409 冲突和浏览器离线失败。409 时 PUT 返回 `409`，弹窗保留草稿并显示冲突提示；离线时 PUT 返回 `net::ERR_INTERNET_DISCONNECTED`，弹窗保留草稿并显示保存失败提示。两次均取消且确认终止宽限期、副本数和 Ready 状态恢复原值。证据见 [`workload-settings-errors-v415-verify-20261025.json`](./evidence/workload-settings-errors-v415-verify-20261025.json)。StatefulSet/DaemonSet 相同错误路径、403/422 和全部 Action 错误矩阵仍未完成。
+
 > **2026-10-25 低权限浏览器 VERIFY：** 当前制品使用临时项目 viewer 完成新的零 Cookie 登录；Deployment、StatefulSet、DaemonSet 详情均可读但不显示编辑信息、更多操作、编辑设置和删除入口，配置引用的新增、编辑、删除和应用控件均禁用。Kubernetes 授权同时确认当前 namespace 仅允许 get、拒绝 patch，`default` namespace 三类资源均拒绝 get/patch。临时用户和项目 RoleBinding 已删除，未修改测试资源。证据见 [`workload-rbac-v415-browser-verify-20261025.json`](./evidence/workload-rbac-v415-browser-verify-20261025.json)。低权限列表缓存组合、实际浏览器 403 写请求和完整错误矩阵仍未完成。
 
 > **2026-10-25 StatefulSet/DaemonSet Action VERIFY：** 当前制品完成 StatefulSet Headless Service 保持原值编辑确认和 API 回读（PATCH/GET 200），以及 DaemonSet 停止成功路径（PATCH 200、状态 0/0、不可调度 selector 写回）；停止夹具随后按原值恢复并 rollout 到 1/1。证据见 [`workload-service-stop-v415-verify-20261025.json`](./evidence/workload-service-stop-v415-verify-20261025.json)。本轮只关闭两项成功路径，Action 的错误、取消、冲突、低权限和完整资源等价仍未完成。
