@@ -1,3 +1,10 @@
+# 当前状态补充（2026-10-25：删除失败内联错误态修复进入 VERIFY）
+
+- 本轮按当前 REA 口径继续使用 `release-4.1.5` 完整前端源码定位实现、同版本已部署页面核对真实行为；`origin/release-3.4` 只作历史补充，不直接复制为 V4 实现。
+- 已提交 `c2de55c127c2cde86c02925a4aaf82c852e2abbc`，补齐 Deployment、StatefulSet、DaemonSet 删除失败后的弹窗内联错误反馈。定向测试、全量 `./scripts/test.sh`（94 文件/425 项）、包构建、Prettier 和差异检查通过。
+- CI Run `40166838329` 成功，候选镜像为 `feature-v4-workloads-20261025-134946-c2de55c127c2`，digest 为 `sha256:e85140433277b2c9e96b71a39490bdc93609c7f4f623f317278fe938d8b63eb8`。
+- 当前已从 DEV 进入 VERIFY；最终文档提交后必须重建镜像，再完成 131 部署和 Playwright 验证。其他 Action 错误矩阵、字段完整性、缓存组合和逐项 V3 等价仍未闭环，模块不能标记已验收。
+
 # 当前 Workload 执行状态（2026-10-25）
 
 # 当前状态补充（2026-10-25：删除失败可见错误态再次退回 DEV）

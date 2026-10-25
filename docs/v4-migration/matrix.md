@@ -1,3 +1,10 @@
+## 当前增量（2026-10-25：删除失败内联错误态 DEV 修复进入 VERIFY）
+
+- `release-4.1.5` 完整源码和同版本已部署页面继续作为本模块 REA 主基线；`origin/release-3.4` 仅作历史补充，不作为 V4 实现来源。
+- 已定位 Store 丢弃 `onError` 后仍无法形成可见错误反馈的运行时缺口。当前在 Deployment、StatefulSet、DaemonSet 三类详情页增加删除确认弹窗内联错误态，并保留错误弹窗、阻止误关闭；新增静态回归断言。
+- 代码提交 `c2de55c127c2cde86c02925a4aaf82c852e2abbc`；定向测试、全量 `./scripts/test.sh`（94 文件/425 项）、`corepack yarn build:packages`、Prettier 和 `git diff --check` 已通过。CI Run `40166838329` 成功，镜像 `feature-v4-workloads-20261025-134946-c2de55c127c2`，digest `sha256:e85140433277b2c9e96b71a39490bdc93609c7f4f623f317278fe938d8b63eb8`。
+- 本轮已按规则从 DEV 进入 VERIFY；由于记录提交会改变 HEAD，需以最终文档 HEAD 重建镜像，完成 131 rollout、Pod imageID 核对和 Playwright 浏览器复验后，才能关闭该缺口。模块暂不标记已验收。
+
 # 当前 Workload 执行路线（2026-10-25）
 
 > **2026-10-25 删除错误反馈再次退回 DEV：** Store 透传 `onError` 的修复已在本地测试通过，但部署后 Playwright 仍没有可见错误提示；对照当前 `release-4.1.5` 源码确认其同样没有该错误处理。为完成当前 V4 的可见错误态，三类详情页将增加删除弹窗内联错误信息，并重新执行 DEV→VERIFY。此前 `3a628c528`/`5b44a389f` 的 VERIFY 记录仅作为失败证据，不能标记通过。
