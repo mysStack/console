@@ -1,0 +1,49 @@
+{
+  "module": "workloads",
+  "stage": "VERIFY",
+  "date": "2026-10-25",
+  "sourceCommit": "48026b0b198eb630a0f64ed93cf3cd60132685cb",
+  "artifact": {
+    "ciRun": "40167476566",
+    "imageTag": "feature-v4-workloads-20261025-140042-2c81983cf7cc",
+    "imageDigest": "sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b",
+    "deployment": "kubesphere-system/ks-console",
+    "generation": 613,
+    "pod": "ks-console-654b89bc97-jbj5h",
+    "podReady": true,
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b"
+  },
+  "scenario": {
+    "name": "集群级 StatefulSet/DaemonSet 项目筛选、切换和刷新",
+    "method": "已认证 Playwright 浏览器打开当前 V4 集群级列表，选择项目筛选，切换到 dev-biz，再切回 v4-migration-e2e 并刷新。",
+    "destructiveRequest": "只读列表和刷新，没有创建、编辑、删除或其他资源变更。"
+  },
+  "cases": [
+    {
+      "kind": "StatefulSet",
+      "path": "/clusters/host/statefulsets",
+      "selectedProject": "v4-migration-e2e",
+      "visibleResources": ["v4-pvc-sts-7fa", "v4-watch-sts-20261022-01"],
+      "visibleCount": 2,
+      "switchProject": { "project": "dev-biz", "visibleCount": 0 },
+      "switchBack": { "project": "v4-migration-e2e", "visibleCount": 2 },
+      "apiReadback": "v4-pvc-sts-7fa=1/1; v4-watch-sts-20261022-01=1/1"
+    },
+    {
+      "kind": "DaemonSet",
+      "path": "/clusters/host/daemonsets",
+      "selectedProject": "v4-migration-e2e",
+      "visibleResources": ["v4-stop-ds-7fa", "v4-watch-ds-20261022-01"],
+      "visibleCount": 2,
+      "refresh": { "project": "v4-migration-e2e", "visibleCount": 2 },
+      "apiReadback": "v4-stop-ds-7fa=1/1; v4-watch-ds-20261022-01=1/1"
+    }
+  ],
+  "result": "通过当前已认证会话的正向项目筛选、项目切换和刷新样本：StatefulSet 切换到 dev-biz 显示 0 条，切回测试项目恢复 2 条；DaemonSet 测试项目显示 2 条，刷新后仍为 2 条。该证据只关闭集群级列表的部分项目筛选和刷新样本，不代表低权限列表、所有资源类型、浏览器返回和完整用户/项目缓存矩阵已完成。",
+  "unclosed": [
+    "低权限账号的列表正反和缓存切换",
+    "Deployment、StatefulSet、DaemonSet 全部用户/项目/刷新/返回组合",
+    "详情页返回和直达 URL 的缓存恢复",
+    "逐项 V3 功能等价性"
+  ]
+}

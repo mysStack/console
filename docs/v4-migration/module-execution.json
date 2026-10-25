@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "eba2c4350e58dee446882b27a7e442766b3996f508aa8766d5b6fd92c98732d7"
+        "sha256": "76dbddc2bb83ea0856c4f486432d93285c1ea8c8a4c7eaaf0eb47f972e8fb5ea"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "2b69c4622d986178e933fb9e9da702bcbd3138d717d6e19b7186330fad1156c0"
+        "sha256": "9c25ac3b3c3621b148bdccb01e380a2410cb3b4bb2d6244b692c2ccd838d5e49"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -672,7 +672,7 @@
   ],
   "verify": {
     "status": "进行中",
-    "reason": "删除失败反馈、StatefulSet 冲突、DaemonSet 网络失败、负值边界和三类 YAML 非法输入错误路径已在当前制品复验；负值复核确认请求体和 API 回读为 0，与 release-4.1.5 对照一致；非法 YAML 均未产生写请求且资源未变化。服务端 422/409 逐项映射、完整字段、Action、RBAC、缓存和逐项 V3 等价仍未闭环。",
+    "reason": "删除失败反馈、StatefulSet 冲突、DaemonSet 网络失败、负值边界、三类 YAML 非法输入错误路径和 StatefulSet/DaemonSet 集群级项目筛选刷新样本已在当前制品复验；负值复核确认请求体和 API 回读为 0，与 release-4.1.5 对照一致；非法 YAML 均未产生写请求且资源未变化。服务端 422/409 逐项映射、完整字段、Action、低权限列表、完整缓存和逐项 V3 等价仍未闭环。",
     "sourceCommit": "2c81983cf7cc013f90609f002d1423e6c647817a",
     "documents": [
       {
@@ -734,6 +734,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-yaml-invalid-verify-20261025.json",
         "sha256": "1c5d5107e830f4931806cbf73e96aff5a3f6b65bc2f1cd35ea9602606de733f8"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-list-namespace-cache-verify-20261025.json",
+        "sha256": "2136275a85532198a9d9fca3beea77d412ea578f3b1953ab168aebc9b9c343da"
       }
     ],
     "ciRun": "40167476566",
@@ -744,7 +748,7 @@
       "ciRun": "40167476566",
       "imageTag": "feature-v4-workloads-20261025-140042-2c81983cf7cc",
       "imageDigest": "sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b",
-      "status": "已部署并完成删除失败、设置错误路径、负值边界和 YAML 非法输入浏览器复验；其他验收项仍未闭环"
+      "status": "已部署并完成删除失败、设置错误路径、负值边界、YAML 非法输入和部分集群列表缓存浏览器复验；其他验收项仍未闭环"
     },
     "rollout": {
       "deployment": "kubesphere-system/ks-console",
@@ -755,7 +759,7 @@
       "podImageID": "ghcr.io/mysstack/ks-console@sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b"
     },
     "browserVerification": {
-      "status": "已完成删除失败、设置错误路径、负值边界和 YAML 非法输入复验；未发现负值或非法 YAML 写回，整体 VERIFY 未完成。",
+      "status": "已完成删除失败、设置错误路径、负值边界、YAML 非法输入和部分集群列表缓存复验；未发现负值或非法 YAML 写回，整体 VERIFY 未完成。",
       "evidence": "docs/v4-migration/evidence/workload-negative-grace-reverify-20261025.json",
       "freshLogin": "否；使用已有认证 Playwright 会话完成部署后浏览器验收",
       "moduleAcceptance": "未完成"

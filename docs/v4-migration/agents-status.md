@@ -1,3 +1,8 @@
+# 当前状态补充（2026-10-25：集群级 StatefulSet/DaemonSet 项目筛选和缓存复验）
+
+- 当前制品已在 131 完成集群级 StatefulSet、DaemonSet 的项目筛选、切换和刷新样本。StatefulSet 在 `v4-migration-e2e` 显示 2 条，切换 `dev-biz` 显示 0 条，再切回恢复 2 条；DaemonSet 测试项目显示 2 条，刷新后保持 2 条。
+- API 回读确认四个测试资源均保持 `1/1`，没有发生资源变更。证据见 [`workload-list-namespace-cache-verify-20261025.json`](./evidence/workload-list-namespace-cache-verify-20261025.json)。低权限列表、完整用户/项目/返回缓存矩阵和逐项 V3 等价仍未完成；模块保持 `VERIFY / 进行中`。
+
 # 当前状态补充（2026-10-25：三类 Workload YAML 非法输入错误路径复验）
 
 - 当前制品 `feature-v4-workloads-20261025-140042-2c81983cf7cc` 已在 131 完成三类 Workload YAML 非法输入浏览器验证；CI Run `40167476566`、digest `sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b`、Pod imageID 和 rollout generation `613` 已核对。
