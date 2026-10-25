@@ -659,10 +659,10 @@
         "sha256": "abcd75f5d38fa50df7b539cb8d818faf93d1a4292694bc5aa39b2bd350af3148"
       }
     ],
-    "ciRun": "40144460294",
-    "ciStatus": "success；待部署后浏览器验证",
-    "imageTag": "feature-v4-workloads-20261025-075354-9ba28a3c1ebc",
-    "imageDigest": "sha256:6de47bbf6df74253073b15eb0372de643696ea045ee424835159e91beffe0abc",
+    "ciRun": "40145235328",
+    "ciStatus": "success；131 rollout 和错误状态浏览器复验完成，其他 VERIFY 清单继续",
+    "imageTag": "feature-v4-workloads-20261025-080541-0fefb30b3360",
+    "imageDigest": "sha256:7467bdb6fb1600575af5cab54da59a0f43b9fdce8d4e75ddb382de0cdb36ae68",
     "rollout": {
       "deployment": "kubesphere-system/ks-console",
       "generation": 608,
@@ -673,7 +673,7 @@
     },
     "browserVerification": {
       "status": "错误状态项已验证，整体 VERIFY 未完成",
-      "evidence": "docs/v4-migration/evidence/workload-detail-404-verify-20261025.json",
+      "evidence": "docs/v4-migration/evidence/workload-detail-error-state-verify-20261025.json",
       "report": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
       "freshLogin": "已使用已认证 Playwright 会话完成本轮验证；不记录凭据",
       "authenticatedSessionChecks": "Deployment、StatefulSet、DaemonSet 真实 404 均跳转 /404；403/500 route mock 分别到 /errors/403 和可见 alert",
