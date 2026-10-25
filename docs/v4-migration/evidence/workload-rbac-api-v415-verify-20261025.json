@@ -1,0 +1,94 @@
+{
+  "date": "2026-10-25",
+  "sourceCommit": "de5ce34297468537b448e91723e4e44b6bff09e1",
+  "image": {
+    "tag": "feature-v4-workloads-20261025-090821-de5ce3429746",
+    "digest": "sha256:1bbb4c4297e590d59ba117c18dc0b83f7e2fc6085439ff4549af87b81ab5ac71",
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:1bbb4c4297e590d59ba117c18dc0b83f7e2fc6085439ff4549af87b81ab5ac71"
+  },
+  "cluster": {
+    "context": "default",
+    "identity": "system:admin",
+    "testUser": "v4-workload-viewer-20261023",
+    "namespaceAllowed": "v4-migration-e2e",
+    "namespaceDenied": "default"
+  },
+  "authorization": {
+    "v4-migration-e2e": {
+      "deployments": {
+        "get": true,
+        "list": true,
+        "watch": true,
+        "create": false,
+        "update": false,
+        "patch": false,
+        "delete": false
+      },
+      "statefulsets": {
+        "get": true,
+        "list": true,
+        "watch": true,
+        "create": false,
+        "update": false,
+        "patch": false,
+        "delete": false
+      },
+      "daemonsets": {
+        "get": true,
+        "list": true,
+        "watch": true,
+        "create": false,
+        "update": false,
+        "patch": false,
+        "delete": false
+      }
+    },
+    "default": {
+      "deployments": {
+        "get": false,
+        "list": false,
+        "watch": false,
+        "create": false,
+        "update": false,
+        "patch": false,
+        "delete": false
+      },
+      "statefulsets": {
+        "get": false,
+        "list": false,
+        "watch": false,
+        "create": false,
+        "update": false,
+        "patch": false,
+        "delete": false
+      },
+      "daemonsets": {
+        "get": false,
+        "list": false,
+        "watch": false,
+        "create": false,
+        "update": false,
+        "patch": false,
+        "delete": false
+      }
+    }
+  },
+  "apiRead": {
+    "v4-migration-e2e": {
+      "deployments": ["v4-deploy-edit-ef3", "v4-watch-20261022-02"],
+      "statefulsets": ["v4-pvc-sts-7fa", "v4-watch-sts-20261022-01"],
+      "daemonsets": ["v4-stop-ds-7fa", "v4-watch-ds-20261022-01"]
+    },
+    "default": "三个资源列表均返回 Forbidden"
+  },
+  "browser": {
+    "freshLogin": false,
+    "status": "本证据为 Kubernetes API impersonation；低权限浏览器新登录和页面控件复验不计入本条通过。"
+  },
+  "result": {
+    "apiRbac": "通过",
+    "namespaceApiIsolation": "通过",
+    "moduleAcceptance": "未完成",
+    "remaining": ["低权限浏览器页面正反控件、缓存切换和完整 Action 403 反馈仍需当前制品复验。"]
+  }
+}

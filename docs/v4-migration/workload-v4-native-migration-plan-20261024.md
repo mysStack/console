@@ -5,6 +5,7 @@
 > **2026-10-25 基线差异修复：** 对照 `release-4.1.5` 已部署页面发现编辑设置弹窗边界不一致：当前 V4 多显示名称、项目、副本数量和元数据分区。该问题已补充回归测试并完成本地修复，阶段退回 `DEV / 修复中`；新制品尚未完成部署后浏览器复验。详见 [`workload-settings-v415-diff-20261025.json`](./evidence/workload-settings-v415-diff-20261025.json)。
 
 > **当前状态（2026-10-25）：** `VERIFY / 进行中`。编辑设置弹窗边界差异已完成本地修复、全量测试、构建、131 部署和已有认证会话的三类页面复验；旧制品的 YAML、错误状态、RBAC、缓存和 Action 结果保留为历史输入，不能直接继承为当前阶段通过。
+> **2026-10-25 低权限 API 复验：** 当前集群授权矩阵已对三类资源完成 impersonation 检查：测试 namespace 允许读取并拒绝写入，`default` namespace 读取全部拒绝；该结果不替代低权限浏览器控件复验。详见 [`workload-rbac-api-v415-verify-20261025.json`](./evidence/workload-rbac-api-v415-verify-20261025.json)。
 > **2026-10-25 配置引用复验：** 当前部署制品已在三类 Workload 的项目配置引用页面完成读取和请求核对，未观察到 V3/Wujie 配置引用请求；写入、冲突、失败、低权限和缓存路径继续保留在 VERIFY 清单。详见 [`workload-config-reference-v415-verify-20261025.json`](./evidence/workload-config-reference-v415-verify-20261025.json)。
 
 > **给执行者：** 必须按任务顺序执行。REA 未完成负责人复核前，不得修改业务代码；进入 DEV 后每个任务都要先补充或复用测试，再修改实现。
