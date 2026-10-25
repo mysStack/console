@@ -1,5 +1,12 @@
 # 当前 Workload 执行状态（2026-10-25）
 
+# 当前状态补充（2026-10-25：Store 删除失败回调修复进入 VERIFY）
+
+- 已按当前 REA 口径执行：`release-4.1.5` 完整前端源码负责定位当前版本实现，同版本已部署页面负责校对真实渲染、交互、Network 和错误表现；`origin/release-3.4` 只作历史补充，不能直接作为 V4 实现来源。
+- 已定位并修复共享 `useDeleteDeploymentMutation` 只透传 `onSuccess`、丢弃 `onError` 的根因。提交 `3a628c528975cc27305e94b0776fccfda55edec9` 已推送；Store 失败回调测试 28/28、Deployment 4/4、StatefulSet 3/3、DaemonSet 3/3、全量 `./scripts/test.sh` 94 文件/425 项、`corepack yarn build:packages`、Prettier 和 `git diff --check` 均通过。
+- CI Run `40164088025` 成功，候选镜像为 `feature-v4-workloads-20261025-130418-3a628c528975`，digest 为 `sha256:849a330837a99f591c3df5bb2e3534701fa628d6999a120ee1d87f21a7824c60`；模块已从 DEV 进入 VERIFY，下一步先通过门禁部署到 131，再用浏览器复验三类详情页删除网络失败的可见错误反馈。
+- 首次修复制品仍保留为失败证据：详情页已传入 `onError` 但 Store 丢弃回调，不能把本地测试或旧制品浏览器结果当作最终通过。其他 Workload 字段、Action、RBAC、缓存和逐项 V3 等价缺口继续保持未关闭。
+
 # 当前状态补充（2026-10-25：删除网络失败错误反馈缺陷）
 
 - 在当前制品的 Deployment 详情页真实浏览器测试中，删除请求因网络中断失败，确认弹窗保留但没有可见错误提示；网络恢复后已取消弹窗，测试资源未改变。

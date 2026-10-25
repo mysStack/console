@@ -1,5 +1,7 @@
 # 当前 Workload 执行路线（2026-10-25）
 
+> **2026-10-25 删除网络失败反馈修复进入 VERIFY：** 已确认 `release-4.1.5` 完整前端源码和同版本已部署页面继续作为 REA 主基线；本轮不是照抄旧 V3 实现，而是按当前版本源码定位 Store、用同版本页面校对渲染和交互。共享 `useDeleteDeploymentMutation` 丢弃 `onError` 的缺陷已在 `3a628c528` 修复，Store 失败回调测试 28/28、全量测试 94 文件/425 项、包构建通过。CI Run `40164088025` 已推送候选镜像 `feature-v4-workloads-20261025-130418-3a628c528975`，digest 为 `sha256:849a330837a99f591c3df5bb2e3534701fa628d6999a120ee1d87f21a7824c60`；待部署到 131 后用 Playwright 复验三类详情页的错误提示。整体 Workload 仍为 `VERIFY / 进行中`，其他字段、Action、RBAC、缓存和逐项 V3 等价缺口不因本修复自动关闭。
+
 > **2026-10-25 删除网络失败缺陷继续追踪：** 以 `6abe6515343e010c33872cdd6397ba73ab5fa759` 对应制品部署后，真实浏览器再次确认 DELETE 因网络中断失败时确认弹窗保持打开但没有可见错误提示。详情页已传入 `onError`，继续追踪发现 `useDeleteDeploymentMutation` 丢弃了该回调，只传递 `onSuccess`。已恢复网络并取消弹窗，资源未改变；当前按规则退回 `DEV / 进行中`，先补 Store 失败测试和最小修复，再重新构建、部署和浏览器复验三类详情页。此前 VERIFY 证据不继承为当前修复通过。
 
 > **2026-10-25 编辑设置错误路径 VERIFY：** 当前制品在 Deployment 编辑设置中复验了真实 409 冲突和浏览器离线失败。409 时 PUT 返回 `409`，弹窗保留草稿并显示冲突提示；离线时 PUT 返回 `net::ERR_INTERNET_DISCONNECTED`，弹窗保留草稿并显示保存失败提示。两次均取消且确认终止宽限期、副本数和 Ready 状态恢复原值。证据见 [`workload-settings-errors-v415-verify-20261025.json`](./evidence/workload-settings-errors-v415-verify-20261025.json)。StatefulSet/DaemonSet 相同错误路径、403/422 和全部 Action 错误矩阵仍未完成。

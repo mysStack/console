@@ -2,44 +2,68 @@
   "module": "workloads",
   "stage": "DEV",
   "date": "2026-10-25",
-  "sourceCommit": "68458971247820770e3fa2931a9adc56e2f9d4cd",
+  "sourceCommit": "3a628c528975cc27305e94b0776fccfda55edec9",
   "baseline": {
     "source": "release-4.1.5",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
     "runtime": "http://192.168.2.131:30881"
   },
   "defect": {
-    "scenario": "Deployment 详情页删除确认后网络中断",
-    "observed": "DELETE 请求失败，确认弹窗保持打开，但页面没有可见错误反馈；资源未被删除。",
+    "scenario": "Deployment、StatefulSet、DaemonSet 详情页删除确认后网络中断",
+    "observed": "首次修复制品的 DELETE 请求失败时确认弹窗保持打开，但页面没有可见错误反馈；网络恢复后取消弹窗，资源未被删除。",
     "scope": ["Deployment", "StatefulSet", "DaemonSet"],
-    "rootCause": "三类详情页的 useDeleteDeploymentMutation 仅配置 onSuccess，没有配置 onError。"
+    "rootCause": "详情页已经传入 onError，但共享 Store 的 useDeleteDeploymentMutation 只将 onSuccess 传给 React Query，丢弃了调用方的 onError，因此页面错误提示回调没有执行。"
   },
   "tdd": {
     "red": {
-      "command": "./node_modules/.bin/esno packages/console/src/pages/projects/containers/{Deployments,StatefulSets,DaemonSets}/Detail/native.test.ts",
-      "result": "失败：新增的删除失败反馈测试未通过，现有三类详情页缺少 onError/notify.error。"
+      "command": "./node_modules/.bin/esno packages/shared/src/stores/workload/index.test.ts",
+      "result": "失败：27/28 通过；新增的 Store 失败回调透传测试中 reportedError 未被设置，复现 Store 丢弃 onError 的根因。"
     },
     "green": {
-      "result": "通过：Deployment 4/4、StatefulSet 3/3、DaemonSet 3/3。"
+      "command": "./node_modules/.bin/esno packages/shared/src/stores/workload/index.test.ts",
+      "result": "通过：28/28；Store 失败回调透传测试和既有删除、批量删除、停止、关联 HPA/Service 清理测试全部通过。"
     }
   },
   "implementation": {
     "files": [
+      "packages/shared/src/stores/workload/index.ts",
+      "packages/shared/src/stores/workload/index.test.ts",
       "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/Deployments/Detail/index.tsx",
+      "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/Deployments/Detail/native.test.ts",
       "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/StatefulSets/Detail/index.tsx",
-      "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/DaemonSets/Detail/index.tsx"
+      "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/StatefulSets/Detail/native.test.ts",
+      "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/DaemonSets/Detail/index.tsx",
+      "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/DaemonSets/Detail/native.test.ts"
     ],
-    "behavior": "删除 mutation 失败时调用 notify.error(t('OPERATION_FAILED'))，保留确认弹窗和资源状态。"
+    "behavior": "删除 mutation 失败时由 Store 透传 onError，详情页调用 notify.error(t('OPERATION_FAILED'))，确认弹窗保持打开且资源状态不变。",
+    "minimalFix": "在 useDeleteDeploymentMutation 的 React Query options 中增加 onError: options?.onError。"
   },
   "verification": {
-    "fullTest": "./scripts/test.sh：94 个测试文件、424 项通过",
-    "build": "corepack yarn build:packages：通过",
-    "format": "Prettier 目标文件检查通过",
+    "storeTest": "./node_modules/.bin/esno packages/shared/src/stores/workload/index.test.ts：28/28 通过",
+    "detailTests": "Deployment 4/4、StatefulSet 3/3、DaemonSet 3/3 通过",
+    "fullTest": "./scripts/test.sh：94 个测试文件、425 项通过",
+    "build": "corepack yarn build:packages：通过；仅保留既有 circular dependency 警告",
+    "format": "Prettier 目标文件检查通过；提交钩子完成 lint-staged",
     "diffCheck": "git diff --check：通过",
-    "commit": "68458971247820770e3fa2931a9adc56e2f9d4cd"
+    "commit": "3a628c528975cc27305e94b0776fccfda55edec9"
+  },
+  "deployment": {
+    "ciRun": "40164088025",
+    "imageTag": "feature-v4-workloads-20261025-130418-3a628c528975",
+    "imageDigest": "sha256:849a330837a99f591c3df5bb2e3534701fa628d6999a120ee1d87f21a7824c60",
+    "status": "已构建并推送，待通过模块门禁部署到 131 后复验"
+  },
+  "browserRegression": {
+    "previousArtifact": {
+      "imageTag": "feature-v4-workloads-20261025-123859-6abe6515343e",
+      "imageDigest": "sha256:035b472a47b8b6e423f2a8d3c54d1411b20b3b58219414584c9e67cec90551ee",
+      "result": "失败：三类详情页删除网络失败时仍无可见错误反馈；资源未改变。该结果促成 Store 根因修复。"
+    },
+    "currentArtifact": "尚未部署，需在 131 使用 Playwright 重新验证三类详情页的网络失败可见错误反馈。"
   },
   "notVerified": [
-    "当前修复制品尚未重新构建镜像并部署到 131",
-    "三类详情页删除网络失败的部署后 Playwright 可见错误提示尚未复验"
+    "当前最终修复制品尚未部署到 131",
+    "三类详情页删除网络失败的部署后 Playwright 可见错误提示尚未复验",
+    "本缺陷修复不关闭 Workload 其他字段、Action、RBAC、缓存和逐项 V3 等价验收缺口"
   ]
 }
