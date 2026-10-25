@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-25",
+  "sourceCommit": "de5ce34297468537b448e91723e4e44b6bff09e1",
+  "ci": {
+    "run": "40149330443",
+    "status": "success",
+    "imageTag": "feature-v4-workloads-20261025-090821-de5ce3429746",
+    "imageDigest": "sha256:1bbb4c4297e590d59ba117c18dc0b83f7e2fc6085439ff4549af87b81ab5ac71"
+  },
+  "deployment": {
+    "context": "default",
+    "deployment": "kubesphere-system/ks-console",
+    "serviceUrl": "http://192.168.2.131:30880",
+    "rolloutGeneration": 609,
+    "pod": "ks-console-d76b7f44-72v29",
+    "podReady": true,
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:1bbb4c4297e590d59ba117c18dc0b83f7e2fc6085439ff4549af87b81ab5ac71"
+  },
+  "baseline": {
+    "sourceRef": "release-4.1.5",
+    "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
+    "runtimeUrl": "http://192.168.2.131:30881",
+    "deployment": "kubesphere-system/ks-console-v415-rea",
+    "editSettingsSections": ["更新策略", "容器", "存储", "容器组调度规则", "容器组优雅终止"],
+    "topFields": []
+  },
+  "browser": {
+    "session": "workload-verify-20261025",
+    "freshLogin": false,
+    "loginNote": "使用已有认证会话完成部署后页面复验；本轮未把已有会话等同于新的登录验收。",
+    "deployment": {
+      "url": "http://192.168.2.131:30880/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/resource-status",
+      "sections": ["更新策略", "容器", "存储", "容器组调度规则", "容器组优雅终止"],
+      "topFields": [],
+      "containerTab": "切换后只显示容器组安全上下文、容器和初始化容器，没有顶部名称、项目、副本数量和 ADD_METADATA 分区。"
+    },
+    "statefulSet": {
+      "url": "http://192.168.2.131:30880/clusters/host/projects/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01/resource-status",
+      "sections": ["更新策略", "容器", "存储", "容器组调度规则", "容器组优雅终止"],
+      "topFields": [],
+      "resourceSpecificObserved": "更新策略分区显示容器组副本分组序号。"
+    },
+    "daemonSet": {
+      "url": "http://192.168.2.131:30880/clusters/host/projects/v4-migration-e2e/daemonsets/v4-stop-ds-7fa/resource-status",
+      "sections": ["更新策略", "容器", "存储", "容器组优雅终止"],
+      "topFields": [],
+      "resourceSpecificObserved": "按基线不显示副本调度分区；编辑设置入口和 YAML 入口均为原生操作。"
+    },
+    "consoleErrors": "页面仍记录已知扩展初始化错误；本次只确认 Workload 设置页面渲染和交互，不宣称控制台零错误。"
+  },
+  "result": {
+    "baselineBoundary": "通过",
+    "deploymentRollout": "通过",
+    "podImageIdentity": "通过",
+    "workloadSettingsBrowserParity": "Deployment、StatefulSet、DaemonSet 的分区和基础字段边界通过",
+    "moduleAcceptance": "未完成",
+    "remaining": [
+      "新制品上的完整字段写回、Action 成功/失败矩阵、RBAC 正反、缓存隔离和逐项 V3 等价仍需继续验证。",
+      "零 Cookie 新登录本轮未重新建立，freshLogin 保持 false。"
+    ]
+  }
+}

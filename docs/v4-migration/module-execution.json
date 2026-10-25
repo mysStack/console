@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "308490d6bfc78392170c9fcbb5ab3106ba19babe2e79bb8ea5811e002728ab41"
+        "sha256": "5a8cb703e827e66a50b13c02ef3077e6dd4a86588888c0d308c31bf9f032cdaf"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "e95029025d4c297e9b88c8dae5426aa3c5dbe7681b0e24b93fecda10328b5cee"
+        "sha256": "5fe070988f915fda65d27ede14221c393ff1aadfceb5a2f470da1458e3c62545"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -122,7 +122,7 @@
       },
       {
         "path": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-        "sha256": "a73acaf6c2684f69124706a368916543c96d580ab2a926f60e5df50775b3a491"
+        "sha256": "e7913b12ec22246a77cd16282b6ca2bcec5274a8847f9a773a4dfce4bff36e6c"
       },
       {
         "path": "docs/v4-migration/evidence/workload-kind-detail-browser-20261024.json",
@@ -653,31 +653,33 @@
   "verify": {
     "status": "进行中，待新制品部署复验",
     "reason": "本次 DEV 修复已提交；旧制品的浏览器证据仅作为历史输入，必须在新镜像完成 rollout、Pod imageID 核对和 Playwright 后重新确认编辑设置边界，并继续保留未闭环的 Action、RBAC、缓存、错误和逐项等价项。",
-    "sourceCommit": "0fefb30b33600279b1282b340f7518b438763555",
+    "sourceCommit": "de5ce34297468537b448e91723e4e44b6bff09e1",
     "documents": [
       {
         "path": "docs/v4-migration/evidence/workload-detail-error-state-verify-20261025.json",
         "sha256": "abcd75f5d38fa50df7b539cb8d818faf93d1a4292694bc5aa39b2bd350af3148"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-settings-v415-verify-20261025.json",
+        "sha256": "3e80d90cb6d8d251c0a51c3c77e98c6d68d36ce900cc8a74621672b3f8acbf12"
       }
     ],
-    "ciRun": "40145235328",
-    "ciStatus": "success；131 rollout 和错误状态浏览器复验完成，其他 VERIFY 清单继续",
-    "imageTag": "feature-v4-workloads-20261025-080541-0fefb30b3360",
-    "imageDigest": "sha256:7467bdb6fb1600575af5cab54da59a0f43b9fdce8d4e75ddb382de0cdb36ae68",
+    "ciRun": "40149330443",
+    "ciStatus": "success",
+    "imageTag": "feature-v4-workloads-20261025-090821-de5ce3429746",
+    "imageDigest": "sha256:1bbb4c4297e590d59ba117c18dc0b83f7e2fc6085439ff4549af87b81ab5ac71",
     "rollout": {
       "deployment": "kubesphere-system/ks-console",
-      "generation": 608,
+      "generation": 609,
       "status": "success",
-      "pod": "ks-console-6ffb586f6c-bwzn8",
+      "pod": "ks-console-d76b7f44-72v29",
       "podReady": true,
-      "podImageID": "ghcr.io/mysstack/ks-console@sha256:7467bdb6fb1600575af5cab54da59a0f43b9fdce8d4e75ddb382de0cdb36ae68"
+      "podImageID": "ghcr.io/mysstack/ks-console@sha256:1bbb4c4297e590d59ba117c18dc0b83f7e2fc6085439ff4549af87b81ab5ac71"
     },
     "browserVerification": {
-      "status": "错误状态项已验证，整体 VERIFY 未完成",
-      "evidence": "docs/v4-migration/evidence/workload-detail-error-state-verify-20261025.json",
-      "report": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-      "freshLogin": "已使用已认证 Playwright 会话完成本轮验证；不记录凭据",
-      "authenticatedSessionChecks": "Deployment、StatefulSet、DaemonSet 真实 404 均跳转 /404；403/500 route mock 分别到 /errors/403 和可见 alert",
+      "status": "编辑设置边界已验证，整体 VERIFY 未完成",
+      "evidence": "docs/v4-migration/evidence/workload-settings-v415-verify-20261025.json",
+      "freshLogin": "否；使用已有认证会话完成部署后复验",
       "moduleAcceptance": "未完成"
     },
     "lastEvidenceUpdate": "2026-10-25"
