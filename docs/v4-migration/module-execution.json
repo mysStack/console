@@ -720,14 +720,14 @@
         "sha256": "133757839f733830b99193fba3a828c69e8258241e28212e67a58bdfe25e8252"
       }
     ],
-    "ciRun": "40166838329",
+    "ciRun": "40167476566",
     "ciStatus": "success",
-    "imageTag": "feature-v4-workloads-20261025-134946-c2de55c127c2",
-    "imageDigest": "sha256:e85140433277b2c9e96b71a39490bdc93609c7f4f623f317278fe938d8b63eb8",
+    "imageTag": "feature-v4-workloads-20261025-140042-2c81983cf7cc",
+    "imageDigest": "sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b",
     "candidate": {
-      "ciRun": "40166838329",
-      "imageTag": "feature-v4-workloads-20261025-134946-c2de55c127c2",
-      "imageDigest": "sha256:e85140433277b2c9e96b71a39490bdc93609c7f4f623f317278fe938d8b63eb8",
+      "ciRun": "40167476566",
+      "imageTag": "feature-v4-workloads-20261025-140042-2c81983cf7cc",
+      "imageDigest": "sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b",
       "status": "已部署并完成删除失败错误态浏览器复验；其他验收项仍未闭环"
     },
     "rollout": {
