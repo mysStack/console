@@ -227,6 +227,7 @@ const workloadStore = (module: string) => {
       },
       {
         onSuccess,
+        onError: options?.onError,
       },
     );
   };

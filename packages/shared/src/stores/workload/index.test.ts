@@ -109,6 +109,22 @@ for (const resource of ['deployments', 'statefulsets', 'daemonsets']) {
   });
 }
 
+test('Workload 单项删除 mutation 透传失败回调', async () => {
+  const error = Object.assign(new Error('Network Error'), { response: { status: 0 } });
+  const store = loadStore('deployments', async () => {
+    throw error;
+  });
+  let reportedError: unknown;
+  const mutation = store.useDeleteDeploymentMutation({
+    onError: reason => {
+      reportedError = reason;
+    },
+  });
+
+  await assert.rejects(mutation.mutate(item), reason => reason === error);
+  assert.equal(reportedError, error);
+});
+
 test('single delete rejects when related HPA cleanup fails', async () => {
   const error = new Error('HPA forbidden');
   const store = loadStore('deployments', async name => {
