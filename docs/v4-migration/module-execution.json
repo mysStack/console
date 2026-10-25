@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "56edfa74fdd719b737d7a13e58e698506e378569cf2a80df46ea085a342ee70f"
+        "sha256": "5a3b94d5ca67911f720da8446b61d3002e01fb4c56601023abd2605ddedbb41e"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "ca631987dcc47294bf0c146442d0591eb4bb1a5f2b234868a52efd0971e7edb9"
+        "sha256": "6b159ffcd3c4e50577e176a9d3564508e050dd9f051e1acd20992009d20bf501"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -660,7 +660,7 @@
   ],
   "verify": {
     "status": "进行中",
-    "reason": "当前提交已完成新制品 rollout、Pod imageID 核对、三类 Workload 设置写回/回读、配置引用成功写回/恢复、StatefulSet Headless Service 成功路径、DaemonSet 停止/夹具恢复、低权限浏览器读权限和三类资源实际 PUT 403 样本、三类资源编辑设置错误路径样本；隐藏副本数校验缺陷、上述成功路径及已覆盖错误路径已关闭。422 校验、完整字段、Action 错误/取消/冲突、低权限列表缓存和更多角色组合、缓存组合及逐项 V3 等价仍未闭环，模块保持 VERIFY 进行中。",
+    "reason": "当前提交已完成新制品 rollout、Pod imageID 核对、三类 Workload 设置写回/回读、配置引用成功写回/恢复、StatefulSet Headless Service 成功路径、DaemonSet 停止/夹具恢复、低权限浏览器读权限和三类资源实际 PUT 403、三类资源更新策略非法值 PUT 422 样本、三类资源编辑设置错误路径样本；隐藏副本数校验缺陷、上述成功路径及已覆盖错误路径已关闭。编辑 YAML 422 可见反馈、负值字段边界、完整字段、Action 错误/取消/冲突、低权限列表缓存和更多角色组合、缓存组合及逐项 V3 等价仍未闭环，模块保持 VERIFY 进行中。",
     "sourceCommit": "8430bb2fe09f33cec37bf433313808be8e4a69fc",
     "documents": [
       {
@@ -705,7 +705,7 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-settings-errors-v415-verify-20261025.json",
-        "sha256": "240ae6383ddf9fea6efb4b9804d80c08dc7b3559dab2b9b671642695af1ec518"
+        "sha256": "544764bb7821ab8ccbf5544b3fa45593877e549ce2490e72d4142852f9a73cca"
       }
     ],
     "ciRun": "40153206692",
@@ -721,7 +721,7 @@
       "podImageID": "ghcr.io/mysstack/ks-console@sha256:a3b9f1eb39cbaa8df197632fe4f79993e3c395997aff6f41a80ad62522697336"
     },
     "browserVerification": {
-      "status": "设置隐藏字段校验、配置引用、StatefulSet Service、DaemonSet Stop、低权限详情只读和三类资源实际 PUT 403、编辑设置错误路径样本已验证，整体 VERIFY 未完成",
+      "status": "设置隐藏字段校验、配置引用、StatefulSet Service、DaemonSet Stop、低权限详情只读和三类资源 PUT 403/422、编辑设置错误路径样本已验证，整体 VERIFY 未完成",
       "evidence": "docs/v4-migration/evidence/workload-settings-errors-v415-verify-20261025.json",
       "freshLogin": "否；使用已有认证会话完成部署后复验",
       "moduleAcceptance": "未完成"

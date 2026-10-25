@@ -1,5 +1,10 @@
 # 当前 Workload 执行状态（2026-10-25）
 
+# 当前状态补充（2026-10-25：三类资源 422 API 错误路径）
+
+- 当前制品在同一已认证浏览器上下文内对三类资源的更新策略提交非法值：Deployment 的 spec.strategy.type、StatefulSet/DaemonSet 的 spec.updateStrategy.type 均返回 PUT 422；随后 API 回读确认策略仍为 RollingUpdate，三类资源 Ready 状态保持不变。
+- 另观察到直接 API 提交负数 terminationGracePeriodSeconds 返回 200，已立即恢复 Deployment=31、StatefulSet=30、DaemonSet=30。该结果登记为字段边界风险，不能推断表单或 YAML 编辑器的负值校验已通过。证据见 workload-settings-errors-v415-verify-20261025.json。
+
 # 当前状态补充（2026-10-25：低权限浏览器实际写入拒绝）
 
 - 当前制品 feature-v4-workloads-20261025-100820-be6469d3fe2a 已补齐低权限浏览器上下文的实际写入拒绝：临时项目 viewer 零 Cookie 登录成功，在三类资源详情来源页面分别 GET 资源后发起原生 PUT，Deployment、StatefulSet、DaemonSet 均为 GET 200、PUT 403。没有通过页面控件提交变更，三类资源未修改。

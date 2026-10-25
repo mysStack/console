@@ -84,12 +84,52 @@
       "当前制品 Workload Settings 的网络失败反馈和取消保持",
       "当前制品 StatefulSet Workload Settings 的 409 冲突反馈和资源恢复",
       "当前制品 DaemonSet Workload Settings 的网络失败反馈和资源恢复",
-      "错误路径未覆盖写入成功，测试资源最终恢复原状态"
+      "错误路径未覆盖写入成功，测试资源最终恢复原状态",
+      "当前制品三类资源更新策略非法值的浏览器 API 422 与资源未变更"
     ],
     "notVerified": [
       "低权限浏览器实际写请求 403 页面反馈",
-      "422 校验错误、删除/回退/Service 等 Action 的完整错误矩阵"
+      "编辑 YAML 弹窗对 422 的可见详细反馈、负值字段边界和 Action 的完整错误矩阵"
     ]
   },
-  "status": "当前制品 Deployment/StatefulSet/DaemonSet 已分别覆盖至少一条编辑设置冲突或网络失败路径；模块整体 VERIFY 未完成"
+  "status": "当前制品已覆盖三类资源编辑设置冲突/网络失败、低权限 PUT 403 和更新策略非法值 PUT 422 API 路径；模块整体 VERIFY 未完成",
+  "validation422": {
+    "flow": "在同一已认证浏览器上下文内分别读取三类资源，将资源专属更新策略 type 改为 Invalid 后发起原生 PUT；请求失败后读取 Kubernetes 资源确认未发生写入。",
+    "requests": [
+      {
+        "kind": "Deployment",
+        "resource": "v4-deploy-edit-ef3",
+        "get": 200,
+        "put": 422,
+        "field": "spec.strategy.type"
+      },
+      {
+        "kind": "StatefulSet",
+        "resource": "v4-watch-sts-20261022-01",
+        "get": 200,
+        "put": 422,
+        "field": "spec.updateStrategy.type"
+      },
+      {
+        "kind": "DaemonSet",
+        "resource": "v4-stop-ds-7fa",
+        "get": 200,
+        "put": 422,
+        "field": "spec.updateStrategy.type"
+      }
+    ],
+    "finalReadback": {
+      "deploymentStrategy": "RollingUpdate",
+      "statefulSetStrategy": "RollingUpdate",
+      "daemonSetStrategy": "RollingUpdate",
+      "deploymentReady": 1,
+      "statefulSetReady": 1,
+      "daemonSetReady": 1,
+      "resourceMutation": false
+    },
+    "uiScope": "本轮验证浏览器 API 的 422 返回和资源未变更；没有把 API 结果扩展为编辑 YAML 弹窗已显示详细 422 文案。"
+  },
+  "additionalObservation": {
+    "negativeTerminationGrace": "同一浏览器上下文直接 PUT 负数 terminationGracePeriodSeconds 时，三类 Kubernetes API 均返回 200；随后立即恢复 Deployment=31、StatefulSet=30、DaemonSet=30 并确认三类资源 Ready。该观察表明接口层没有拒绝该值，不能据此推断 Workload 表单或 YAML 编辑器已通过负值校验；负值边界仍保留为字段验收风险。"
+  }
 }

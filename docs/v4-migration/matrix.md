@@ -283,3 +283,9 @@ StatefulSet 与 DaemonSet 的 YAML 测试字段写入、页面回读和清除也
 
 - 当前制品上，临时项目 viewer 通过零 Cookie 浏览器会话登录成功。对 Deployment、StatefulSet、DaemonSet 先执行 GET，再在同一浏览器上下文发起原生 PUT；三类资源均返回 GET 200、PUT 403，没有产生资源变更。
 - 临时账号及绑定已删除，密码未写入证据。该结果关闭当前制品三类 Workload 的实际 API 写入拒绝样本；低权限列表缓存、更多角色组合、Action 错误矩阵和完整 V3 等价仍未完成。证据见 workload-rbac-v415-browser-verify-20261025.json。
+
+## 当前增量（2026-10-25：三类资源 422 API 错误路径）
+
+- 当前制品使用已认证浏览器上下文对三类资源提交非法更新策略：Deployment spec.strategy.type=Invalid、StatefulSet/DaemonSet spec.updateStrategy.type=Invalid，三次 PUT 均返回 422。
+- 回读确认 Deployment、StatefulSet、DaemonSet 的更新策略仍为 RollingUpdate，三类资源均保持 Ready。另发现直接 API 提交负数终止宽限期会返回 200，测试后已恢复原值；负值字段边界和编辑 YAML 的详细 422 反馈继续保留。
+- 本轮关闭三类资源更新策略非法值的 API 422 样本，不关闭完整 Action 错误矩阵、字段边界、缓存和逐项 V3 等价。证据见 workload-settings-errors-v415-verify-20261025.json。
