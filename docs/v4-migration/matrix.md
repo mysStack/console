@@ -272,3 +272,9 @@ StatefulSet 与 DaemonSet 的 YAML 测试字段写入、页面回读和清除也
 在当前 HEAD `8d561743f22586f23ff75f70a2fad43f8c33e42a` 上重新执行 34 个 Workload 定向测试文件，共 211/211 通过；另外执行集群级三类 Workload 原生入口测试，共 6/6 通过。此次重跑没有修改业务代码、没有构建、没有部署，仅更新证据绑定到当前 HEAD。
 
 证据见 [`Workload 定向静态测试`](./evidence/workload-rea-targeted-tests-20261024.json) 和 [`集群级原生入口静态测试`](./evidence/workload-cluster-native-static-tests-20261024.json)。这些结果仍不能替代当前制品浏览器、RBAC、缓存、错误和逐项 V3 等价验证；模块保持 `REA / 分析中，待复核`。
+
+## 当前增量（2026-10-25：三类 Workload 编辑设置错误路径）
+
+- 当前制品 feature-v4-workloads-20261025-100820-be6469d3fe2a 已在 131 通过同一已有认证浏览器会话完成三类资源的编辑设置错误路径复验。Deployment 已有 409 冲突和离线失败样本；本轮补充 StatefulSet v4-watch-sts-20261022-01 的 PUT 409 冲突提示与取消保持，以及 DaemonSet v4-stop-ds-7fa 的离线 PUT 失败提示与取消保持。
+- StatefulSet 最终宽限期为 30、副本/就绪为 1/1，DaemonSet 最终宽限期为 30、期望/就绪为 1/1；临时冲突 annotation 已清理，离线状态已恢复为 online。证据见 workload-settings-errors-v415-verify-20261025.json。
+- 本轮只关闭三类资源各一条编辑设置错误路径样本，不关闭 422、实际低权限 403 写请求、Action 错误/取消/冲突、完整字段、缓存组合和逐项 V3 等价；模块继续保持 VERIFY / 进行中。

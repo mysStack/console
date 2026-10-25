@@ -1,5 +1,10 @@
 # 当前 Workload 执行状态（2026-10-25）
 
+# 当前状态补充（2026-10-25：三类 Workload 编辑设置错误路径）
+
+- 当前制品 feature-v4-workloads-20261025-100820-be6469d3fe2a 在 131 已完成 StatefulSet 冲突和 DaemonSet 网络失败的浏览器验证。StatefulSet v4-watch-sts-20261022-01 的 PUT 返回 409，弹窗保留并显示冲突提示，取消后宽限期仍为 30、资源保持 1/1；DaemonSet v4-stop-ds-7fa 离线确认时 PUT 返回 net::ERR_INTERNET_DISCONNECTED，弹窗保留并显示保存失败提示，恢复网络后取消，资源仍为宽限期 30、期望/就绪 1/1。
+- 三类资源现在分别有编辑设置冲突或网络失败样本，但这不代表完整错误矩阵通过。422 校验、低权限实际 403 写请求、删除/回退/Service 等 Action 错误与取消、字段完整性、缓存组合和逐项 V3 等价仍未闭环。证据见 workload-settings-errors-v415-verify-20261025.json。
+
 - **2026-10-25 编辑设置错误路径 VERIFY 已补齐 Deployment 样本。** 当前制品真实验证了 409 并发冲突和浏览器离线失败：页面保留草稿并显示对应错误，取消后资源恢复原值；测试 annotation 已清理，Deployment 保持 `1/1`。证据见 [`workload-settings-errors-v415-verify-20261025.json`](./evidence/workload-settings-errors-v415-verify-20261025.json)。StatefulSet/DaemonSet、403/422 和全部 Action 错误矩阵仍未关闭。
 
 - **2026-10-25 低权限浏览器 VERIFY 已补齐当前制品样本。** 使用临时项目 viewer 完成零 Cookie 登录，三类 Workload 详情均为只读，配置引用写控件禁用；Kubernetes 授权确认当前 namespace 允许 get、拒绝 patch，`default` namespace 三类资源均拒绝 get/patch。临时用户和项目 RoleBinding 已清理，未修改测试资源。证据见 [`workload-rbac-v415-browser-verify-20261025.json`](./evidence/workload-rbac-v415-browser-verify-20261025.json)。低权限列表缓存组合、实际浏览器 403 写请求和完整错误矩阵仍未关闭。
