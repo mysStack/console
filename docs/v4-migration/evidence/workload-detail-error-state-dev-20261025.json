@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-25",
+  "phase": "DEV",
+  "scope": "Deployment、StatefulSet、DaemonSet 项目级详情页错误状态",
+  "sourceCommit": "9ba28a3c1ebcbd12e7a9fda27d311a7906be71bd",
+  "implementation": {
+    "status": "已完成",
+    "summary": "三类详情页从 isLoading || isError 空白分支改为区分加载、403、404 和其他请求错误。403 跳转 /errors/403，404 跳转 /404，其他错误显示可见的详情加载失败提示。",
+    "files": [
+      "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/Deployments/Detail/index.tsx",
+      "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/StatefulSets/Detail/index.tsx",
+      "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/DaemonSets/Detail/index.tsx",
+      "packages/console/src/pages/projects/containers/ApplicationWorkloads/Workloads/detailError.ts"
+    ]
+  },
+  "tests": {
+    "unit": "./scripts/test.sh：94 个测试文件、418 个测试通过",
+    "targeted": "detailError.test.ts 3/3；三类 native.test.ts 6/6；settingsAction.test.ts 6/6",
+    "eslint": "目标详情页、错误路由辅助函数和测试 ESLint 通过",
+    "build": "corepack yarn build:packages 通过，退出码 0；仅保留既有循环依赖和 Node.js 警告",
+    "diffCheck": "git diff --check 通过"
+  },
+  "ci": {
+    "run": "40144460294",
+    "status": "success",
+    "url": "https://github.com/mysStack/console/actions/runs/40144460294",
+    "imageTag": "feature-v4-workloads-20261025-075354-9ba28a3c1ebc",
+    "imageDigest": "sha256:6de47bbf6df74253073b15eb0372de643696ea045ee424835159e91beffe0abc"
+  },
+  "verifyBoundary": {
+    "status": "待部署",
+    "notYetVerified": [
+      "131 rollout、Pod Ready、实际 Pod imageID",
+      "部署后 Playwright 直达不存在 Deployment/StatefulSet/DaemonSet 的 404 页面",
+      "部署后 403、网络失败和浏览器返回行为"
+    ]
+  },
+  "conclusion": "DEV 修复和本地/CI 验证完成，进入 VERIFY 前置部署；未将本证据解释为浏览器验收或模块完成。"
+}

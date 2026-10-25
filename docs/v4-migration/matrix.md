@@ -1,6 +1,8 @@
 # 当前 Workload 执行路线（2026-10-25）
 
-> **最新状态（2026-10-25，详情页 404 缺陷退回 DEV）**：YAML 严格解析、非法 YAML 请求前拦截和三类合法 YAML 保存已在当前制品验证通过；新增直达不存在 Deployment 时 API 404 但页面为空白 Loading 的缺陷，已退回 `DEV / 进行中`，待补齐三类详情页 403/404/网络错误处理。
+> **最新状态（2026-10-25，详情页错误状态修复后进入 VERIFY）**：三类详情页已补齐 403 跳转无权限页、404 跳转 NotFound 页和其他请求错误提示；本地 94 个测试文件/418 个测试、目标 ESLint、`build:packages` 和 CI Run `40144460294` 已通过。镜像 `feature-v4-workloads-20261025-075354-9ba28a3c1ebc` 的 digest 为 `sha256:6de47bbf6df74253073b15eb0372de643696ea045ee424835159e91beffe0abc`，当前处于 `VERIFY / 待部署验证`，尚未把部署后浏览器验收记为通过。
+
+> **本轮 DEV 修复证据**：[`workload-detail-error-state-dev-20261025.json`](./evidence/workload-detail-error-state-dev-20261025.json)。部署后必须重新验证 Deployment、StatefulSet、DaemonSet 的不存在资源 404、低权限 403、网络失败、浏览器返回和页面渲染；在这些证据完成前，三类模块均不标记为已验收。
 
 > **退回 DEV 的缺陷记录**：在提交 `4b363c688f1e784acb68fe32117756f03bb55bd2` 制品上发现非法 YAML 会发起 PUT 并返回 400，但页面没有可见错误反馈。该缺陷已记录并完成 DEV 修复，证据见[非法 YAML 缺陷取证](./evidence/workload-yaml-validation-defect-20261025.json)和[DEV 修复记录](./workload-yaml-validation-dev-20261025.md)。
 

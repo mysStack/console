@@ -5,8 +5,8 @@
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-  "phase": "DEV",
-  "phaseReason": "当前制品发现三类详情页直达不存在资源时 API 404 但页面为空白 Loading；已退回 DEV，待修复 403/404/网络错误状态。",
+  "phase": "VERIFY",
+  "phaseReason": "三类详情页 403/404/其他错误状态已完成 DEV 修复和本地/CI 验证，待 131 部署后重新执行浏览器验收。",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "bea227354ead13cfc7696a85f1c1642c595443205bbef81a7fa3d3a008673495"
+        "sha256": "58fce46febfb0ba65e9242334160688160f612230ef4e9331205bfdaa4565e91"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "3abc8041f91bacde70c6aa5450d60cea659b09c2f8639a66e0b016ab9295864b"
+        "sha256": "6ae7e956ea0520ed5055fdd8f03b5755a2da007f2a09cb47f2034fa6676a8320"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -122,7 +122,7 @@
       },
       {
         "path": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-        "sha256": "5a26d4106043b125c3eda06b92714964ad009a24b8b6349c2e138bd49d9dc203"
+        "sha256": "7389e3ab02baa5a71288ed158dd6d479ce432cb77fc841aa7faacd733b83f0fe"
       },
       {
         "path": "docs/v4-migration/evidence/workload-kind-detail-browser-20261024.json",
@@ -325,9 +325,9 @@
     "coverageNotes": "已核对表示当前版本主基线和证据入口已覆盖该维度，不表示运行时验证或功能等价已经通过；运行时缺口转入 DEV/VERIFY 验收清单。"
   },
   "dev": {
-    "status": "进行中",
-    "reason": "YAML 缺陷已完成当前制品验证；新增三类详情页 404 错误反馈缺陷，需补充错误路由/状态和测试后重新 VERIFY。",
-    "sourceCommit": "8ae475a52dfc5fe45e78742e53e2dc9f6e050483",
+    "status": "已完成",
+    "reason": "YAML 严格解析和详情页错误状态缺陷均已完成 DEV 修复；三类详情页已补齐 403/404/其他错误处理，并通过本地测试、构建和 CI。",
+    "sourceCommit": "9ba28a3c1ebcbd12e7a9fda27d311a7906be71bd",
     "documents": [
       {
         "path": "docs/v4-migration/workload-settings-dev-20261023.md",
@@ -632,12 +632,16 @@
       {
         "path": "docs/v4-migration/evidence/workload-detail-404-verify-20261025.json",
         "sha256": "e6453e4c79d84154ef7f7877e0ee4fd83cb5708bff3586496c7e15a2c453da07"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-detail-error-state-dev-20261025.json",
+        "sha256": "20395af8747e820fdaeca75f601eddf5f4daeda3bcd14bc472ec36dd28111de5"
       }
     ],
-    "ciRun": "40141436939",
-    "ciStatus": "当前 YAML 修复制品验证发现详情 404 渲染缺陷，已退回 DEV",
-    "imageTag": "feature-v4-workloads-20261025-070905-e3f30033272c",
-    "imageDigest": "sha256:0bc1da00a76788dad689ca50eace99649f845cbc1dcf204fae1452331dd00f06"
+    "ciRun": "40144460294",
+    "ciStatus": "DEV 修复制品 CI 成功；待部署后重新 VERIFY",
+    "imageTag": "feature-v4-workloads-20261025-075354-9ba28a3c1ebc",
+    "imageDigest": "sha256:6de47bbf6df74253073b15eb0372de643696ea045ee424835159e91beffe0abc"
   },
   "devAcceptanceChecklist": [
     "WL-01：三类资源项目/集群入口、详情 Tab、原生编辑设置分区和路由替代矩阵",
@@ -646,21 +650,21 @@
     "WL-04：移除普通 Workload 配置引用的 useV3action、Wujie Shadow DOM 和 V3 编辑器桥接"
   ],
   "verify": {
-    "status": "已退回 DEV，待错误状态修复后重新 VERIFY",
-    "reason": "当前制品直达不存在资源返回 404 后详情页为空白 Loading；修复后必须重新 CI、部署和浏览器验证。",
-    "sourceCommit": "8ae475a52dfc5fe45e78742e53e2dc9f6e050483",
+    "status": "进行中，待部署验证",
+    "reason": "错误状态修复已完成并通过本地/CI；必须在对应镜像部署后验证 403、404、其他错误和浏览器渲染。",
+    "sourceCommit": "9ba28a3c1ebcbd12e7a9fda27d311a7906be71bd",
     "documents": [],
-    "ciRun": "",
-    "ciStatus": "待 DEV 修复后重新 CI",
-    "imageTag": "",
-    "imageDigest": "",
+    "ciRun": "40144460294",
+    "ciStatus": "success；待部署后浏览器验证",
+    "imageTag": "feature-v4-workloads-20261025-075354-9ba28a3c1ebc",
+    "imageDigest": "sha256:6de47bbf6df74253073b15eb0372de643696ea045ee424835159e91beffe0abc",
     "rollout": {},
     "browserVerification": {
-      "status": "未通过，已退回 DEV",
+      "status": "待部署验证",
       "evidence": "docs/v4-migration/evidence/workload-detail-404-verify-20261025.json",
       "report": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-      "freshLogin": "已使用已认证 Playwright 会话完成当前制品验证；不记录凭据",
-      "authenticatedSessionChecks": "不存在 Deployment GET 返回 404，页面详情区域为空白 Loading，没有 404 反馈",
+      "freshLogin": "待本轮镜像部署后使用已认证 Playwright 会话验证；不记录凭据",
+      "authenticatedSessionChecks": "上一轮证据确认不存在资源 404 后为空白 Loading；本轮代码已修复，尚未在新制品浏览器复验",
       "moduleAcceptance": "未完成"
     },
     "lastEvidenceUpdate": "2026-10-25"
