@@ -289,3 +289,8 @@ StatefulSet 与 DaemonSet 的 YAML 测试字段写入、页面回读和清除也
 - 当前制品使用已认证浏览器上下文对三类资源提交非法更新策略：Deployment spec.strategy.type=Invalid、StatefulSet/DaemonSet spec.updateStrategy.type=Invalid，三次 PUT 均返回 422。
 - 回读确认 Deployment、StatefulSet、DaemonSet 的更新策略仍为 RollingUpdate，三类资源均保持 Ready。另发现直接 API 提交负数终止宽限期会返回 200，测试后已恢复原值；负值字段边界和编辑 YAML 的详细 422 反馈继续保留。
 - 本轮关闭三类资源更新策略非法值的 API 422 样本，不关闭完整 Action 错误矩阵、字段边界、缓存和逐项 V3 等价。证据见 workload-settings-errors-v415-verify-20261025.json。
+
+## 当前增量（2026-10-25：三类 Workload 删除取消路径）
+
+- 当前制品通过浏览器打开三类 Workload 的删除确认弹窗并取消。Deployment、StatefulSet、DaemonSet 均显示资源名称确认提示；取消后弹窗关闭，没有产生 DELETE、PUT、PATCH 或 POST 请求，测试资源保持存在。
+- 本轮只关闭删除取消路径样本，删除成功、失败、冲突、低权限、网络失败及其他 Action 的完整矩阵仍未完成。证据见 workload-action-cancel-v415-verify-20261025.json。

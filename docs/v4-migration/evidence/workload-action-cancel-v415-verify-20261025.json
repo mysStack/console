@@ -1,0 +1,58 @@
+{
+  "date": "2026-10-25",
+  "module": "workloads",
+  "sourceCommit": "8430bb2fe09f33cec37bf433313808be8e4a69fc",
+  "image": {
+    "tag": "feature-v4-workloads-20261025-100820-be6469d3fe2a",
+    "digest": "sha256:a3b9f1eb39cbaa8df197632fe4f79993e3c395997aff6f41a80ad62522697336",
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:a3b9f1eb39cbaa8df197632fe4f79993e3c395997aff6f41a80ad62522697336"
+  },
+  "environment": {
+    "cluster": "host",
+    "namespace": "v4-migration-e2e",
+    "browserSession": "workload-rea-current",
+    "freshLogin": false,
+    "resources": {
+      "Deployment": "v4-deploy-edit-ef3",
+      "StatefulSet": "v4-watch-sts-20261022-01",
+      "DaemonSet": "v4-stop-ds-7fa"
+    }
+  },
+  "deleteCancel": {
+    "flow": "三类详情页打开更多操作，选择删除，在确认弹窗出现后直接取消。",
+    "results": [
+      {
+        "kind": "Deployment",
+        "dialog": "删除部署请输入部署名称 v4-deploy-edit-ef3 以确认您了解此操作的风险。取消确认",
+        "writeRequests": [],
+        "dialogClosed": true
+      },
+      {
+        "kind": "StatefulSet",
+        "dialog": "删除有状态副本集请输入有状态副本集名称 v4-watch-sts-20261022-01 以确认您了解此操作的风险。取消确认",
+        "writeRequests": [],
+        "dialogClosed": true
+      },
+      {
+        "kind": "DaemonSet",
+        "dialog": "删除守护进程集请输入守护进程集名称 v4-stop-ds-7fa 以确认您了解此操作的风险。取消确认",
+        "writeRequests": [],
+        "dialogClosed": true
+      }
+    ],
+    "resourceMutation": false
+  },
+  "scope": {
+    "verified": [
+      "当前制品三类 Workload 删除确认弹窗可见",
+      "当前制品三类 Workload 删除取消后没有 DELETE、PUT、PATCH 或 POST 请求",
+      "取消后确认弹窗关闭且测试资源保留"
+    ],
+    "notVerified": [
+      "删除成功、失败、冲突、低权限和网络失败",
+      "回退、重新创建、自动扩缩和 StatefulSet Service 的完整取消/错误矩阵",
+      "逐项 V3 功能等价"
+    ]
+  },
+  "status": "当前制品三类 Workload 删除取消路径已验证；Action 整体 VERIFY 未完成"
+}

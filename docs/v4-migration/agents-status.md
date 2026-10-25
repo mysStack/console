@@ -1,5 +1,10 @@
 # 当前 Workload 执行状态（2026-10-25）
 
+# 当前状态补充（2026-10-25：三类 Workload 删除取消路径）
+
+- 当前制品在 131 通过浏览器分别打开 Deployment、StatefulSet、DaemonSet 的删除确认弹窗，确认资源名称提示和取消行为；取消后弹窗关闭，三类资源均没有 DELETE、PUT、PATCH 或 POST 请求，测试资源保留。
+- 该结果只关闭删除取消样本，删除成功/失败/冲突/低权限/网络失败及其他 Action 的完整矩阵仍未闭环。证据见 workload-action-cancel-v415-verify-20261025.json。
+
 # 当前状态补充（2026-10-25：三类资源 422 API 错误路径）
 
 - 当前制品在同一已认证浏览器上下文内对三类资源的更新策略提交非法值：Deployment 的 spec.strategy.type、StatefulSet/DaemonSet 的 spec.updateStrategy.type 均返回 PUT 422；随后 API 回读确认策略仍为 RollingUpdate，三类资源 Ready 状态保持不变。
