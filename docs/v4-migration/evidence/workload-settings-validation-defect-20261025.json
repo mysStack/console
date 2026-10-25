@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-25",
+  "sourceCommit": "de5ce34297468537b448e91723e4e44b6bff09e1",
+  "imageTag": "feature-v4-workloads-20261025-090821-de5ce3429746",
+  "imageDigest": "sha256:1bbb4c4297e590d59ba117c18dc0b83f7e2fc6085439ff4549af87b81ab5ac71",
+  "browser": {
+    "session": "workload-verify-20261025",
+    "freshLogin": false,
+    "resource": "Deployment/v4-migration-e2e/v4-deploy-edit-ef3",
+    "operation": "编辑设置 → 容器组优雅终止，将 31 改为 30 后点击确定",
+    "visibleError": "更新策略、数量或时间设置无效。请填写非负整数或有效百分比；滚动更新的不可用数量与新增数量不能同时为零。",
+    "modalRemainedOpen": true
+  },
+  "api": {
+    "terminationGracePeriodBefore": 31,
+    "terminationGracePeriodAfter": 31,
+    "resourceUnchanged": true,
+    "strategy": { "type": "RollingUpdate", "maxUnavailable": "25%", "maxSurge": "25%" }
+  },
+  "rootCause": "编辑设置隐藏副本数后，validateSettings 仍直接使用 form.getFieldsValue()；实际表单值不含未展示的 replicas，校验在提交前把 replicas 判定为缺失。提交函数虽合并 initialValues，但校验先失败。",
+  "status": "已确认缺陷，Workload 从 VERIFY 退回 DEV；未对业务资源造成变更"
+}

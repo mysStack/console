@@ -5,8 +5,8 @@
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-  "phase": "VERIFY",
-  "phaseReason": "编辑设置基线差异已完成 DEV 修复、全量测试、构建和提交；待按模块门禁构建制品、部署 131 并完成 Playwright 复验。",
+  "phase": "DEV",
+  "phaseReason": "当前制品浏览器复验发现编辑设置隐藏副本数导致提交前校验失败，已确认根因并退回 DEV；修复后需重新构建、部署和 Playwright 复验。",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "8a47b19626c507a51d14e2b08e9dfca362ba85dae6900b3e7a4303956a670413"
+        "sha256": "dd85fa6c4b91aa12f8fb99fdabaaf8e2646eea6ab853d0867506c1c6aeb5b66f"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "b7c44b66ec0884aef73f15b9f710681b3335230295667329b0886b21dd7c4500"
+        "sha256": "33b0188f614bef1220e7dfe642875218de719dafcc147cea99cff770721456e1"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -122,7 +122,7 @@
       },
       {
         "path": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-        "sha256": "eb48702958542bd59840c16b4eb6d686805046e00e27a7808e52b59254ccf629"
+        "sha256": "47e589630eb59c935f411e89a7a4e530fcdb36ef51edda67ef253dd1117761af"
       },
       {
         "path": "docs/v4-migration/evidence/workload-kind-detail-browser-20261024.json",
@@ -325,8 +325,8 @@
     "coverageNotes": "已核对表示当前版本主基线和证据入口已覆盖该维度，不表示运行时验证或功能等价已经通过；运行时缺口转入 DEV/VERIFY 验收清单。"
   },
   "dev": {
-    "status": "已完成",
-    "reason": "对照 release-4.1.5 发现编辑设置多出基础字段和 ADD_METADATA 分区；已按基线调整分区和字段边界，并以 initialValues 合并保护隐藏字段。94 个测试文件、420 项测试、build:packages、Prettier 和 git diff --check 已通过，代码提交 e4667ebff9a0686ef2dfcee3fcc7074783108b84。",
+    "status": "进行中",
+    "reason": "对照 release-4.1.5 的编辑设置边界修复已部署，但当前制品发现隐藏副本数未参与提交前校验，终止宽限期修改被错误阻止；已记录根因，待补充校验合并和回归。",
     "sourceCommit": "e4667ebff9a0686ef2dfcee3fcc7074783108b84",
     "documents": [
       {
@@ -640,6 +640,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-settings-v415-diff-20261025.json",
         "sha256": "1a40d8788991f8efcabf9aadc2ea2a33497fdf02934433456cfb75f90a64e9df"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-settings-validation-defect-20261025.json",
+        "sha256": "5fa9264f8c32963820b15dcbda4447f21926641f1af5610e5f723d2833df0707"
       }
     ]
   },
@@ -651,8 +655,8 @@
     "WL-05：release-4.1.5 编辑设置首屏分区、基础字段边界和隐藏字段写回保护"
   ],
   "verify": {
-    "status": "进行中，待新制品部署复验",
-    "reason": "本次 DEV 修复已提交；编辑设置边界、配置引用读取/无 V3 请求、Kubernetes API RBAC/namespace 矩阵、真实 404 和三类资源 Action 入口已完成当前制品复验，继续保留 Action 写入/错误、低权限浏览器、缓存和逐项等价项。",
+    "status": "已退回 DEV",
+    "reason": "当前制品的编辑设置边界、配置引用读取/无 V3 请求、API RBAC/namespace、404 和 Action 入口已留存证据；新增提交校验缺陷，修复并重新部署前不恢复 VERIFY 结论。",
     "sourceCommit": "de5ce34297468537b448e91723e4e44b6bff09e1",
     "documents": [
       {
@@ -677,7 +681,7 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-action-surface-v415-verify-20261025.json",
-        "sha256": "43b10acb25d6add2a7fb84b4a1e1cff808a0ba4e4ee8a520bc42adf4d6db035e"
+        "sha256": "51940eda2d4435ae6b17ff4a514c3ab03fa3ce66240ca70f21d5eec7c216abe7"
       }
     ],
     "ciRun": "40149330443",

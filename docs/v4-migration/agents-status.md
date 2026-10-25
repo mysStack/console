@@ -4,7 +4,8 @@
 
 - **2026-10-25 编辑设置基线差异：已退回 DEV。** 使用 `release-4.1.5` 完整源码和同版本已部署页面作为主 REA 基线，对照发现基线编辑设置弹窗只有“更新策略、容器、存储、容器组调度规则、容器组优雅终止”五个左侧分区，不展示名称、项目、副本数量顶部字段；当前 V4 制品多出 `ADD_METADATA` 和三个顶部字段。已在 [`workload-settings-v415-diff-20261025.json`](./evidence/workload-settings-v415-diff-20261025.json) 固化源码、镜像、Pod imageID、浏览器会话和差异。`WorkloadSettingsModal` 已按基线调整，并在提交时合并 `initialValues` 保护隐藏字段；当前分支仍需重新构建、部署和 Playwright 复验，不能继承旧 VERIFY 结论。
 
-- 当前阶段：`VERIFY / 进行中`。编辑设置弹窗边界差异已按 `release-4.1.5` 完成本地修复，并在新制品部署后用已有认证 Playwright 会话完成三类资源分区复验；完整字段、Action、RBAC、缓存、逐项等价和零 Cookie 新登录仍未闭环。
+- 当前阶段：`DEV / 修复中`。当前制品编辑设置隐藏副本数后提交校验失败，已完成根因确认；旧制品的设置、配置引用、RBAC、404 和 Action 入口证据保留为历史输入，待修复后重新构建部署复验。
+- **2026-10-25 编辑设置提交校验缺陷：退回 DEV。** 当前制品在 Deployment 编辑设置中修改终止宽限期时，页面提示更新策略无效且弹窗保持打开，Deployment API 未变化。根因是隐藏副本数未并入提交前校验；证据见 [`workload-settings-validation-defect-20261025.json`](./evidence/workload-settings-validation-defect-20261025.json)。
 - **2026-10-25 Action 入口复验。** 当前制品浏览器菜单按资源类型显示：Deployment 包含自动扩缩，StatefulSet 包含自动扩缩和 Service，DaemonSet 不显示副本伸缩；三类均有设置、YAML、回退、重新创建和删除入口。本轮只打开菜单，不触发写入。证据见 [`workload-action-surface-v415-verify-20261025.json`](./evidence/workload-action-surface-v415-verify-20261025.json)。
 - **2026-10-25 当前制品 404 复验。** 使用部署后当前制品和已有认证会话分别直达不存在的 Deployment、StatefulSet、DaemonSet，三类均跳转 `/404` 并显示“页面未找到 / NotFound”；证据见 [`workload-detail-404-v415-verify-20261025.json`](./evidence/workload-detail-404-v415-verify-20261025.json)。
 - **2026-10-25 低权限 API 矩阵复验。** 使用 `v4-workload-viewer-20261023` 做 Kubernetes API impersonation：在 `v4-migration-e2e` 三类资源均允许 get/list/watch 且拒绝 create/update/patch/delete；在 `default` 三类资源全部拒绝，实际列表请求返回 Forbidden。该结果证明当前制品对应的 API 授权和 namespace 边界，低权限浏览器控件仍需单独复验。证据见 [`workload-rbac-api-v415-verify-20261025.json`](./evidence/workload-rbac-api-v415-verify-20261025.json)。

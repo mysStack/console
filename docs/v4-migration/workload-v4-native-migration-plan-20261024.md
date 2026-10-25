@@ -4,7 +4,8 @@
 
 > **2026-10-25 基线差异修复：** 对照 `release-4.1.5` 已部署页面发现编辑设置弹窗边界不一致：当前 V4 多显示名称、项目、副本数量和元数据分区。该问题已补充回归测试并完成本地修复，阶段退回 `DEV / 修复中`；新制品尚未完成部署后浏览器复验。详见 [`workload-settings-v415-diff-20261025.json`](./evidence/workload-settings-v415-diff-20261025.json)。
 
-> **当前状态（2026-10-25）：** `VERIFY / 进行中`。编辑设置弹窗边界差异已完成本地修复、全量测试、构建、131 部署和已有认证会话的三类页面复验；旧制品的 YAML、错误状态、RBAC、缓存和 Action 结果保留为历史输入，不能直接继承为当前阶段通过。
+> **当前状态（2026-10-25）：** `DEV / 修复中`。当前制品发现隐藏副本数导致编辑设置提交校验失败，已确认根因并退回 DEV；配置引用、RBAC、404 和 Action 入口证据保留为历史输入，修复后必须重新部署和浏览器复验。
+> **2026-10-25 编辑设置提交校验缺陷：** 当前制品修改终止宽限期时出现更新策略校验错误，资源没有变化。隐藏基础字段后，提交前校验也必须合并 `initialValues`；该缺陷已退回 DEV，详见 [`workload-settings-validation-defect-20261025.json`](./evidence/workload-settings-validation-defect-20261025.json)。
 > **2026-10-25 Action 入口复验：** 当前制品已复验三类资源的资源专属 Action 入口和 DaemonSet 不显示副本伸缩；本轮未触发状态变更，Action 成功、失败、取消、冲突和低权限路径仍待完成。详见 [`workload-action-surface-v415-verify-20261025.json`](./evidence/workload-action-surface-v415-verify-20261025.json)。
 > **2026-10-25 当前制品 404 复验：** 三类 Workload 直达不存在资源均跳转 `/404` 并显示 NotFound；该项已在当前制品关闭，其他错误、权限、网络和冲突路径继续验证。详见 [`workload-detail-404-v415-verify-20261025.json`](./evidence/workload-detail-404-v415-verify-20261025.json)。
 > **2026-10-25 低权限 API 复验：** 当前集群授权矩阵已对三类资源完成 impersonation 检查：测试 namespace 允许读取并拒绝写入，`default` namespace 读取全部拒绝；该结果不替代低权限浏览器控件复验。详见 [`workload-rbac-api-v415-verify-20261025.json`](./evidence/workload-rbac-api-v415-verify-20261025.json)。
