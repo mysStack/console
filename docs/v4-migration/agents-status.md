@@ -2,7 +2,7 @@
 
 - **2026-10-25 编辑设置基线差异：已退回 DEV。** 使用 `release-4.1.5` 完整源码和同版本已部署页面作为主 REA 基线，对照发现基线编辑设置弹窗只有“更新策略、容器、存储、容器组调度规则、容器组优雅终止”五个左侧分区，不展示名称、项目、副本数量顶部字段；当前 V4 制品多出 `ADD_METADATA` 和三个顶部字段。已在 [`workload-settings-v415-diff-20261025.json`](./evidence/workload-settings-v415-diff-20261025.json) 固化源码、镜像、Pod imageID、浏览器会话和差异。`WorkloadSettingsModal` 已按基线调整，并在提交时合并 `initialValues` 保护隐藏字段；当前分支仍需重新构建、部署和 Playwright 复验，不能继承旧 VERIFY 结论。
 
-- 当前阶段：`DEV / 修复中`。对照 `release-4.1.5` 发现编辑设置弹窗边界差异，已按基线完成本地修复和回归；旧制品的 404、403、500、RBAC、缓存和 Action 结果保留为历史输入，必须在本次修复制品上重新核对，不能继承为当前阶段通过。
+- 当前阶段：`VERIFY / 待新制品部署复验`。对照 `release-4.1.5` 发现的编辑设置弹窗边界差异已按基线完成本地修复、全量测试、构建和提交；旧制品的 404、403、500、RBAC、缓存和 Action 结果保留为历史输入，必须在本次修复制品上重新核对，不能继承为当前阶段通过。
 - 本轮部署：源码记录 Head `0fefb30b33600279b1282b340f7518b438763555`；CI Run `40145235328`；镜像 `feature-v4-workloads-20261025-080541-0fefb30b3360`；digest `sha256:7467bdb6fb1600575af5cab54da59a0f43b9fdce8d4e75ddb382de0cdb36ae68`；`ks-console` rollout generation `608`，Pod `ks-console-6ffb586f6c-bwzn8` Ready，Pod imageID 与 digest 一致。证据见 [`workload-detail-error-state-verify-20261025.json`](./evidence/workload-detail-error-state-verify-20261025.json)。
 - 上一轮验证制品：代码提交 `2676f00d054e11f6b8569e6f9b889e1cefbfba88`；CI Run `40135662495`；镜像 `feature-v4-workloads-20261025-054831-2676f00d054e`；digest `sha256:44cc6e8a48d1c720e4791fdbba3480a4dbae16bd3c9201e82d401fdf4647c920`；131 rollout 和 Pod imageID 核对成功，Pod `ks-console-5f8c884f5c-dxzjz` 为 `1/1` Ready。以下浏览器结果仅作为退回 DEV 的回归证据。
 - 当前浏览器结果：已认证会话在当前制品上完成 Deployment、StatefulSet、DaemonSet 的编辑设置分区切换复验；每次只显示当前分区，弹窗宽度均为 `1162px`，取消路径通过。低权限正反、缓存、错误和逐项等价性仍未闭环。
