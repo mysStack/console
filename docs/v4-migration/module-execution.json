@@ -5,8 +5,8 @@
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-  "phase": "VERIFY",
-  "phaseReason": "负值边界已在当前 V4 制品和 release-4.1.5 对照页面重新验证：用户输入 -1 未进入请求体，实际归一为 0；测试资源已恢复 30/Ready。当前不需要业务代码修复，继续完成其余 VERIFY 清单。",
+  "phase": "DEV",
+  "phaseReason": "2026-10-25 当前制品在 Deployment、StatefulSet、DaemonSet YAML 编辑路径真实触发服务端 422；弹窗保留且显示通用失败提示，资源未改变，但页面未显示字段级返回原因。按部署后浏览器缺陷必须退回 DEV，先补失败测试和内联错误反馈，再重新构建、部署和 VERIFY。",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "a2d4130736a88d37530b623ef2a2fd2440db6c9b74d6abaeef187b9eba8c2536"
+        "sha256": "88c9d8f47394f8758c2a1503190802a54b90b2e1b39d7a3441a13edc61d35dc1"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "b6847a8a9522bacfc781526ca7f25af33259e87136634e83c1d815d8eddadb2a"
+        "sha256": "058f6f9667944923a1dd6b11d4b93ad8b7a109d9f04ca205aef0ecb10b60152e"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -325,8 +325,8 @@
     "coverageNotes": "已核对表示当前版本主基线和证据入口已覆盖该维度，不表示运行时验证或功能等价已经通过；运行时缺口转入 DEV/VERIFY 验收清单。"
   },
   "dev": {
-    "status": "已完成",
-    "reason": "前一份负值缺陷记录已通过请求体和 API 回读复核纠正：当前制品将负值归一为 0，与 release-4.1.5 对照行为一致；没有产生负值写回，因此本项不需要业务代码修复。",
+    "status": "进行中",
+    "reason": "服务端 422 的通用错误提示已有基础覆盖，但字段级原因未在编辑弹窗中可见；当前实现需要补充可重复的内联错误状态并重新完成 DEV 验证。",
     "sourceCommit": "2c81983cf7cc013f90609f002d1423e6c647817a",
     "documents": [
       {
@@ -660,6 +660,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-negative-grace-reverify-20261025.json",
         "sha256": "a89f28baf30bb6aa3d1b5789101b131dea887c7f6e34a46d53a8ec4779d4591d"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-yaml-server-422-current-verify-20261025.json",
+        "sha256": "e6ec2d99bb8703e58b6f84a6bade400894637b523f6b30516e2089c1749ba94a"
       }
     ]
   },
@@ -671,8 +675,8 @@
     "WL-05：release-4.1.5 编辑设置首屏分区、基础字段边界和隐藏字段写回保护"
   ],
   "verify": {
-    "status": "进行中",
-    "reason": "删除失败反馈、StatefulSet 关联 Service 清理、StatefulSet/DaemonSet 成功 Action、三类项目级批量删除、管理员详情返回/刷新、负值边界、三类 YAML 非法输入错误路径、集群级项目筛选刷新、低权限项目列表/详情只读已在当前制品复验；非法 YAML 未产生写请求且资源未变化，批量删除三类资源均回读 NotFound，带关联标记的 StatefulSet Headless Service 同步清理，三类项目级列表返回和刷新内容一致。服务端 422/409 逐项映射、完整字段、Action 错误/冲突/低权限/网络矩阵、低权限缓存和逐项 V3 等价仍未闭环。",
+    "status": "未完成",
+    "reason": "三类 YAML 编辑路径已真实触发服务端 422，资源未改变且弹窗保留；当前只关闭通用失败反馈样本，字段级错误原因、其他 422/409/403/网络组合、完整字段、Action、低权限缓存和逐项 V3 等价仍未闭环。该缺陷已退回 DEV。",
     "sourceCommit": "2c81983cf7cc013f90609f002d1423e6c647817a",
     "documents": [
       {
@@ -750,6 +754,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-detail-back-cache-current-verify-20261025.json",
         "sha256": "61e946c58e6ce5b7f9261bff4a0979d73ddd6a4f676e5892494549ec32e08694"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-yaml-server-422-current-verify-20261025.json",
+        "sha256": "e6ec2d99bb8703e58b6f84a6bade400894637b523f6b30516e2089c1749ba94a"
       }
     ],
     "ciRun": "40167476566",

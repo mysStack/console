@@ -1,3 +1,10 @@
+## 当前增量（2026-10-25：YAML 服务端 422 错误反馈缺口，退回 DEV）
+
+- 当前制品 `feature-v4-workloads-20261025-140042-2c81983cf7cc` 在 131 的 Deployment、StatefulSet、DaemonSet 原生详情页中，使用 YAML 编辑器将更新策略类型改为 `Invalid`，三类真实 PUT 均返回 Kubernetes `422 Invalid`；API 回读确认策略仍为 `RollingUpdate`，三类资源保持 `1/1 Ready`。
+- 三类弹窗都保持打开并显示通用“保存失败，设置尚未保存”提示，但没有呈现 Kubernetes 返回的 `spec.strategy`/`spec.updateStrategy` 字段级原因。`release-4.1.5` 同版本页面执行同一 DaemonSet 对照时也未显示字段级原因；该对照不能替代当前 V4 的验收要求。
+- 证据见 [`workload-yaml-server-422-current-verify-20261025.json`](./evidence/workload-yaml-server-422-current-verify-20261025.json)。这是已确认的 UI 错误反馈缺口，模块已从 VERIFY 退回 DEV；先补失败测试和内联错误状态，再重新构建、部署和 Playwright 验收。
+- 当前模块仍不得标记已验收；完整字段保存、全部 Action 错误矩阵、低权限缓存和逐项 V3 等价仍未闭环。
+
 ## 当前增量（2026-10-25：三类 Workload 详情返回与刷新缓存复验）
 
 - 当前制品 `feature-v4-workloads-20261025-140042-2c81983cf7cc` 在 131 使用已认证 Playwright 管理员会话完成三类项目级 Workload 的列表→详情→浏览器返回→刷新链路。Deployment、StatefulSet、DaemonSet 均能进入原生详情页，返回后列表内容恢复，刷新后内容保持一致。

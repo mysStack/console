@@ -1,0 +1,76 @@
+{
+  "module": "workloads",
+  "stage": "VERIFY",
+  "date": "2026-10-25",
+  "sourceCommit": "2c81983cf7cc013f90609f002d1423e6c647817a",
+  "artifact": {
+    "ciRun": "40167476566",
+    "imageTag": "feature-v4-workloads-20261025-140042-2c81983cf7cc",
+    "imageDigest": "sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b",
+    "deployment": "kubesphere-system/ks-console",
+    "generation": 613,
+    "pod": "ks-console-654b89bc97-jbj5h",
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b"
+  },
+  "environment": {
+    "currentUrl": "http://192.168.2.131:30880",
+    "baselineUrl": "http://192.168.2.131:30881",
+    "baselineSourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
+    "cluster": "host",
+    "namespace": "v4-migration-e2e",
+    "browser": "已有认证 Playwright 管理员会话"
+  },
+  "method": "在三类 Workload 原生详情页打开编辑 YAML，将现有 RollingUpdate 策略类型改为 Invalid，等待真实 PUT 响应；观察页面反馈、弹窗和 Kubernetes API 回读，随后取消弹窗。对 release-4.1.5 同版本 DaemonSet 页面执行同一输入作运行时对照。未提交有效资源变更。",
+  "cases": [
+    {
+      "kind": "Deployment",
+      "resource": "v4-deploy-edit-ef3",
+      "field": "spec.strategy.type",
+      "request": "PUT /clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+      "response": 422,
+      "responseReason": "Invalid",
+      "responseField": "spec.strategy",
+      "visibleFeedback": "保存失败，设置尚未保存。请检查网络和权限后重试。",
+      "dialogRetained": true,
+      "apiReadback": "spec.strategy.type=RollingUpdate，status.readyReplicas/status.replicas=1/1"
+    },
+    {
+      "kind": "StatefulSet",
+      "resource": "v4-watch-sts-20261022-01",
+      "field": "spec.updateStrategy.type",
+      "request": "PUT /clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/statefulsets/v4-watch-sts-20261022-01",
+      "response": 422,
+      "responseReason": "Invalid",
+      "visibleFeedback": "保存失败，设置尚未保存。请检查网络和权限后重试。",
+      "dialogRetained": true,
+      "apiReadback": "spec.updateStrategy.type=RollingUpdate，status.readyReplicas/status.replicas=1/1"
+    },
+    {
+      "kind": "DaemonSet",
+      "resource": "v4-stop-ds-7fa",
+      "field": "spec.updateStrategy.type",
+      "request": "PUT /clusters/host/apis/apps/v1/namespaces/v4-migration-e2e/daemonsets/v4-stop-ds-7fa",
+      "response": 422,
+      "responseReason": "Invalid",
+      "visibleFeedback": "保存失败，设置尚未保存。请检查网络和权限后重试。",
+      "dialogRetained": true,
+      "apiReadback": "spec.updateStrategy.type=RollingUpdate，status.numberReady/status.desiredNumberScheduled=1/1"
+    }
+  ],
+  "baselineComparison": {
+    "kind": "DaemonSet",
+    "resource": "v4-stop-ds-7fa",
+    "response": 422,
+    "responseReason": "Invalid",
+    "dialogRetained": true,
+    "visibleFailureTextObserved": false,
+    "apiReadback": "spec.updateStrategy.type=RollingUpdate，status.numberReady/status.desiredNumberScheduled=1/1",
+    "scope": "仅对照这一条服务端 422 输入；不能据此认定全部错误行为等价。"
+  },
+  "result": "三类当前 V4 YAML 详情路径均真实触发服务端 422，弹窗保留且有通用保存失败提示，资源未改变。该结果关闭三类 YAML 更新策略非法值的基础服务端 422 反馈样本；页面未显示 Kubernetes 返回的字段级原因，不能记为字段级错误映射通过。",
+  "unclosed": [
+    "其他字段的服务端 422 与 409、403、网络失败组合仍需逐项验证",
+    "如验收要求字段级错误原因，当前仅通用提示，需要先明确期望并按 DEV 缺陷处理",
+    "完整字段保存和清空/保留、Action 错误矩阵、低权限缓存和逐项 V3 功能等价仍未闭环"
+  ]
+}

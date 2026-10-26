@@ -1,3 +1,10 @@
+# 当前状态补充（2026-10-25：YAML 服务端 422 错误反馈缺口，退回 DEV）
+
+- 在当前制品 `feature-v4-workloads-20261025-140042-2c81983cf7cc` 上，三类原生 Workload YAML 编辑均真实触发 Kubernetes `422 Invalid`；Deployment、StatefulSet、DaemonSet 资源均未改变，弹窗保持打开。
+- 当前页面只有通用保存失败提示，没有显示 Kubernetes 返回的字段级原因。该结果已经过 Deployment、StatefulSet、DaemonSet 三类浏览器路径验证，不能继续留在 VERIFY 作为“已通过”。
+- 模块阶段已调整为 `DEV / 进行中`。下一步补充失败测试和可见内联错误状态，完成本地测试、构建、部署和三类浏览器复验；PR #2 保持 Draft。
+- 证据：[`workload-yaml-server-422-current-verify-20261025.json`](./evidence/workload-yaml-server-422-current-verify-20261025.json)。
+
 ## 当前增量（2026-10-25：三类 Workload 详情返回与刷新缓存复验）
 
 - 当前制品 `feature-v4-workloads-20261025-140042-2c81983cf7cc` 在 131 使用已认证 Playwright 管理员会话完成三类项目级 Workload 的列表→详情→浏览器返回→刷新链路。Deployment、StatefulSet、DaemonSet 均能进入原生详情页，返回后列表内容恢复，刷新后内容保持一致。
