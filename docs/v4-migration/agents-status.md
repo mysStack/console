@@ -473,3 +473,11 @@
 在当前 HEAD `8d561743f22586f23ff75f70a2fad43f8c33e42a` 上重新执行 34 个 Workload 定向测试文件，共 211/211 通过；另外执行集群级三类 Workload 原生入口测试，共 6/6 通过。此次重跑没有修改业务代码、没有构建、没有部署，仅更新证据绑定到当前 HEAD。
 
 证据见 [`Workload 定向静态测试`](./evidence/workload-rea-targeted-tests-20261024.json) 和 [`集群级原生入口静态测试`](./evidence/workload-cluster-native-static-tests-20261024.json)。这些结果仍不能替代当前制品浏览器、RBAC、缓存、错误和逐项 V3 等价验证；模块保持 `REA / 分析中，待复核`。
+
+## 2026-10-26 Workload YAML 内联错误修复制品部署
+
+- 当前负责人：Codex 单会话；分支 `feature/v4-workloads`；Worktree `/home/bruce/code/ks-develop/console-workloads`；未启动子 Agent。
+- CI Run `40262836786` 成功，源码提交 `884c0a0ec0d2715297cca67bf0abe7b8abe5db56`，镜像 tag `feature-v4-workloads-20261026-111309-884c0a0ec0d2`。
+- 已执行 `python3 scripts/v4-module-gate.py workloads deploy --phase VERIFY --tag feature-v4-workloads-20261026-111309-884c0a0ec0d2` 并通过；131 `ks-console` rollout 成功，Pod `ks-console-64d87b4b9-q8rg4` Ready，imageID 为 `ghcr.io/mysstack/ks-console@sha256:efec7e903a98589cff39ff2205cf200dc0016e472a7baf6bf376734d1f9c450a`。
+- 浏览器打开 30880 可到 `/login`，但本轮使用 `/home/bruce/.bashrc` 中环境变量登录被服务端拒绝，未进入 Workload 页面，三类 YAML 422 内联错误均为未验证；不把登录失败写成前端功能结论。
+- 证据见 [`YAML 422 内联错误部署复验记录`](./evidence/workload-yaml-server-422-inline-error-verify-20261026.json)。模块仍为 `VERIFY / 进行中`，等待测试账号环境恢复后继续浏览器验收。

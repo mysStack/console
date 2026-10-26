@@ -364,3 +364,10 @@ StatefulSet 与 DaemonSet 的 YAML 测试字段写入、页面回读和清除也
 
 - 当前制品通过浏览器打开三类 Workload 的删除确认弹窗并取消。Deployment、StatefulSet、DaemonSet 均显示资源名称确认提示；取消后弹窗关闭，没有产生 DELETE、PUT、PATCH 或 POST 请求，测试资源保持存在。
 - 本轮只关闭删除取消路径样本，删除成功、失败、冲突、低权限、网络失败及其他 Action 的完整矩阵仍未完成。证据见 workload-action-cancel-v415-verify-20261025.json。
+
+## 当前增量（2026-10-26：YAML 内联错误修复制品部署）
+
+- 当前分支提交 `884c0a0ec0d2715297cca67bf0abe7b8abe5db56` 已通过 CI Run `40262836786`，镜像 tag 为 `feature-v4-workloads-20261026-111309-884c0a0ec0d2`。
+- 已通过 `workloads deploy --phase VERIFY` 门禁；131 `kubesphere-system/ks-console` 从 generation 613 更新到 614，rollout 成功，Pod `ks-console-64d87b4b9-q8rg4` Ready，实际 imageID 为 `ghcr.io/mysstack/ks-console@sha256:efec7e903a98589cff39ff2205cf200dc0016e472a7baf6bf376734d1f9c450a`。
+- 未认证入口返回 302 到 `/login`，按约定从 `/home/bruce/.bashrc` 加载的专用测试账号被服务端拒绝，尚未进入三类 Workload 页面；因此 YAML 422 内联错误不能标记为已验证。
+- 证据见 [`YAML 422 内联错误部署复验记录`](./evidence/workload-yaml-server-422-inline-error-verify-20261026.json)。模块保持 `VERIFY / 进行中`，扩展运行时错误按负责人决定暂不处理。

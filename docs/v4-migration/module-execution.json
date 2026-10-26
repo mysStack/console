@@ -6,7 +6,7 @@
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
   "phase": "VERIFY",
-  "phaseReason": "2026-10-26 已完成 YAML 服务端 422 内联错误提示 DEV 修复；必须以当前提交重新构建部署，并在 Deployment、StatefulSet、DaemonSet 三类页面完成浏览器复验后，才能关闭该缺口。",
+  "phaseReason": "2026-10-26 YAML 服务端 422 内联错误修复制品已完成构建并部署；三类资源浏览器复验因专用测试账号登录被拒绝而未开始，账号恢复后继续。",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -54,11 +54,11 @@
       },
       {
         "path": "docs/v4-migration/matrix.md",
-        "sha256": "d46df0c0e4fb4e069053cf1c421a2e877a7425677b37b0218df8bfba1dc356b6"
+        "sha256": "ebe74f84bf42b3a9eea59d72ae6bab281ac1339df5d42ee3a52d72f42332c811"
       },
       {
         "path": "docs/v4-migration/agents-status.md",
-        "sha256": "129a05ac7cf5f5697a22e63ac7cbaeac863f142b685087f7d20fc64788915caa"
+        "sha256": "6b2d2f6328534681cc010815d336d4da1c84c18f43459762a698ef1e380cdea8"
       },
       {
         "path": "docs/v4-migration/evidence/workload-strategy-20261023-provenance.json",
@@ -676,12 +676,12 @@
   ],
   "verify": {
     "status": "进行中",
-    "reason": "当前制品三类 YAML 服务端 422 的基础反馈已确认，资源未改变；新的内联错误提示 DEV 修复已完成，待以 sourceCommit 94ea4951 重新构建部署，并完成三类浏览器复验。其他 422/409/403/网络组合、完整字段、Action、低权限缓存和逐项 V3 等价仍未闭环。",
+    "reason": "当前修复制品已完成 CI、部署和 Pod Ready；浏览器登录被 131 服务端拒绝，YAML 422 内联错误尚未在 Deployment、StatefulSet、DaemonSet 页面复验。其他 422/409/403/网络组合、完整字段、Action、低权限缓存和逐项 V3 等价仍未闭环。",
     "sourceCommit": "94ea495150f157caa34bf3d3ee9036d6416fae86",
     "documents": [
       {
         "path": "docs/v4-migration/evidence/workload-delete-error-feedback-verify-20261025.json",
-        "sha256": "1a66fd45b5c46a40980f4cd5776a39e334cc49e66891b32f442d0408ae461d20"
+        "sha256": "4a20a2eda118b9f7b63682a48ccaade6762718629fd4e8280701cadf99e64bbe"
       },
       {
         "path": "docs/v4-migration/evidence/workload-detail-error-state-verify-20261025.json",
@@ -741,7 +741,7 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-list-namespace-cache-verify-20261025.json",
-        "sha256": "2136275a85532198a9d9fca3beea77d412ea578f3b1953ab168aebc9b9c343da"
+        "sha256": "17d2fde7deebbd852cede25dc5153d99e9bfa20f247b36cf6ae0b2f80c0a6060"
       },
       {
         "path": "docs/v4-migration/evidence/workload-low-privilege-list-cache-verify-20261025.json",
@@ -758,34 +758,42 @@
       {
         "path": "docs/v4-migration/evidence/workload-yaml-server-422-current-verify-20261025.json",
         "sha256": "e6ec2d99bb8703e58b6f84a6bade400894637b523f6b30516e2089c1749ba94a"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-yaml-server-422-inline-error-verify-20261026.json",
+        "sha256": "a5b23d8dd9a417bbf3fb663d5015419ae673ed05c013742313687ed0767879c4"
       }
     ],
-    "ciRun": "40167476566",
+    "ciRun": "40262836786",
     "ciStatus": "success",
-    "imageTag": "feature-v4-workloads-20261025-140042-2c81983cf7cc",
-    "imageDigest": "sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b",
+    "imageTag": "feature-v4-workloads-20261026-111309-884c0a0ec0d2",
+    "imageDigest": "sha256:efec7e903a98589cff39ff2205cf200dc0016e472a7baf6bf376734d1f9c450a",
     "candidate": {
-      "ciRun": "40167476566",
-      "imageTag": "feature-v4-workloads-20261025-140042-2c81983cf7cc",
-      "imageDigest": "sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b",
-      "status": "已部署并完成删除失败、批量删除、StatefulSet 关联 Service 清理、管理员详情返回/刷新、设置错误路径、负值边界、YAML 非法输入、集群列表缓存和低权限只读浏览器复验；其他验收项仍未闭环"
+      "ciRun": "40262836786",
+      "imageTag": "feature-v4-workloads-20261026-111309-884c0a0ec0d2",
+      "imageDigest": "sha256:efec7e903a98589cff39ff2205cf200dc0016e472a7baf6bf376734d1f9c450a",
+      "deployment": "kubesphere-system/ks-console",
+      "generation": 614,
+      "pod": "ks-console-64d87b4b9-q8rg4",
+      "podImageID": "ghcr.io/mysstack/ks-console@sha256:efec7e903a98589cff39ff2205cf200dc0016e472a7baf6bf376734d1f9c450a",
+      "status": "已部署；浏览器登录被拒，三类 YAML 422 内联提示待验收"
     },
     "rollout": {
       "deployment": "kubesphere-system/ks-console",
-      "generation": 613,
+      "generation": 614,
       "status": "success",
-      "pod": "ks-console-654b89bc97-jbj5h",
+      "pod": "ks-console-64d87b4b9-q8rg4",
       "podReady": true,
-      "podImageID": "ghcr.io/mysstack/ks-console@sha256:11038f6ccbb59016dd066ff54cb23f760954e4037260addc654eb70ca7fc3f5b"
+      "podImageID": "ghcr.io/mysstack/ks-console@sha256:efec7e903a98589cff39ff2205cf200dc0016e472a7baf6bf376734d1f9c450a"
     },
     "browserVerification": {
-      "status": "已完成删除失败、批量删除、StatefulSet 关联 Service 清理、管理员详情返回/刷新、设置错误路径、负值边界、YAML 非法输入、集群列表缓存和低权限只读复验；整体 VERIFY 未完成。",
-      "evidence": "docs/v4-migration/evidence/workload-negative-grace-reverify-20261025.json",
-      "freshLogin": "否；使用已有认证 Playwright 会话完成部署后浏览器验收",
+      "status": "未开始三类页面复验：登录被 131 服务端拒绝",
+      "evidence": "docs/v4-migration/evidence/workload-yaml-server-422-inline-error-verify-20261026.json",
+      "freshLogin": "否，环境变量账号登录失败",
       "moduleAcceptance": "未完成"
     },
-    "lastEvidenceUpdate": "2026-10-25",
-    "evidence": "docs/v4-migration/evidence/workload-detail-back-cache-current-verify-20261025.json"
+    "lastEvidenceUpdate": "2026-10-26",
+    "evidence": "docs/v4-migration/evidence/workload-yaml-server-422-inline-error-verify-20261026.json"
   },
   "routeAdjustment": {
     "date": "2026-10-24",

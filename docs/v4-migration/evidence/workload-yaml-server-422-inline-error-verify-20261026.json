@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-26",
+  "module": "workloads",
+  "phase": "VERIFY",
+  "purpose": "记录 YAML 服务端 422 内联错误修复制品的部署结果和浏览器登录阻塞；不将未登录页面可达性记为功能验收。",
+  "sourceCommit": "884c0a0ec0d2715297cca67bf0abe7b8abe5db56",
+  "ci": {
+    "run": "40262836786",
+    "status": "success",
+    "workflow": "Build Personal Console Image",
+    "imageTag": "feature-v4-workloads-20261026-111309-884c0a0ec0d2",
+    "imageDigest": "sha256:efec7e903a98589cff39ff2205cf200dc0016e472a7baf6bf376734d1f9c450a",
+    "digestSource": "131 Pod imageID; registry manifest digest未在本轮记录"
+  },
+  "deployment": {
+    "context": "default",
+    "namespace": "kubesphere-system",
+    "deployment": "ks-console",
+    "generation": 614,
+    "rollout": "success",
+    "pod": "ks-console-64d87b4b9-q8rg4",
+    "podReady": true,
+    "podImage": "ghcr.io/mysstack/ks-console:feature-v4-workloads-20261026-111309-884c0a0ec0d2",
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:efec7e903a98589cff39ff2205cf200dc0016e472a7baf6bf376734d1f9c450a"
+  },
+  "preflight": {
+    "deploymentGate": "passed",
+    "command": "python3 scripts/v4-module-gate.py workloads deploy --phase VERIFY --tag feature-v4-workloads-20261026-111309-884c0a0ec0d2",
+    "unauthenticatedHttp": "GET / -> 302 /login"
+  },
+  "browser": {
+    "status": "blocked",
+    "url": "http://192.168.2.131:30880/login",
+    "login": "专用测试账号登录被服务端拒绝；未进入 Workload 页面",
+    "inlineErrorVisible": null,
+    "dialogRetained": null,
+    "deployment": "未验证",
+    "statefulSet": "未验证",
+    "daemonSet": "未验证",
+    "reason": "需要更新 /home/bruce/.bashrc 中当前可用的专用测试账号，或恢复已认证浏览器会话；不记录用户名密码。"
+  },
+  "conclusion": "制品部署链路已完成；YAML 422 内联提示尚未完成部署后浏览器验收，模块保持 VERIFY/进行中。"
+}
