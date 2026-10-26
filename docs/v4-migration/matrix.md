@@ -1,3 +1,11 @@
+## 当前增量（2026-10-26：YAML 服务端 422 内联错误修复进入 VERIFY）
+
+- 按 `release-4.1.5` 完整源码和同版本部署页面复核，当前 V4 Deployment、StatefulSet、DaemonSet YAML 编辑在非法更新策略时均真实收到 Kubernetes `422 Invalid`；原资源未改变，原编辑弹窗保持打开。
+- 缺陷已确认：旧实现只有通用通知，错误原因没有显示在编辑弹窗内容中。已在共享 `useCommonActions` 的 YAML 编辑内容中加入内联错误状态，失败时保留弹窗并显示错误提示；未引入 V3/Wujie。
+- DEV 提交 `94ea495150f157caa34bf3d3ee9036d6416fae86`；新增失败回归先红后绿。`./scripts/test.sh` 为 94 文件/426 项通过，`corepack yarn build:packages`、目标 ESLint、Prettier 和 `git diff --check` 均通过。
+- 当前模块已从 DEV 进入 VERIFY；必须使用该提交重新构建、部署到 131，并用浏览器复验三类资源的真实 422 内联提示。证据见 [`workload-yaml-server-422-inline-error-dev-20261026.json`](./evidence/workload-yaml-server-422-inline-error-dev-20261026.json)。
+- 当前仍不能标记模块已验收；完整字段、全部 Action 错误矩阵、低权限缓存和逐项 V3 等价继续未闭环。
+
 ## 当前增量（2026-10-25：YAML 服务端 422 错误反馈缺口，退回 DEV）
 
 - 当前制品 `feature-v4-workloads-20261025-140042-2c81983cf7cc` 在 131 的 Deployment、StatefulSet、DaemonSet 原生详情页中，使用 YAML 编辑器将更新策略类型改为 `Invalid`，三类真实 PUT 均返回 Kubernetes `422 Invalid`；API 回读确认策略仍为 `RollingUpdate`，三类资源保持 `1/1 Ready`。

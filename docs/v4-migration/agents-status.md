@@ -1,3 +1,10 @@
+# 当前状态补充（2026-10-26：YAML 服务端 422 内联错误修复进入 VERIFY）
+
+- 当前 V4 三类 Workload YAML 编辑真实收到服务端 `422 Invalid`；资源未改变，但旧实现只显示通用通知，弹窗内容中没有可见失败状态。
+- 已完成 DEV 修复：共享 YAML 编辑内容增加内联错误状态，失败时保留弹窗并显示提示；失败测试先红后绿，94 个测试文件/426 项、包构建、ESLint、Prettier 和差异检查通过。提交：`94ea495150f157caa34bf3d3ee9036d6416fae86`。
+- 模块阶段恢复为 `VERIFY / 进行中`。下一步用新提交构建镜像、执行门禁部署并在 131 浏览器分别复验 Deployment、StatefulSet、DaemonSet；PR #2 保持 Draft。
+- 证据：[`workload-yaml-server-422-inline-error-dev-20261026.json`](./evidence/workload-yaml-server-422-inline-error-dev-20261026.json)。
+
 # 当前状态补充（2026-10-25：YAML 服务端 422 错误反馈缺口，退回 DEV）
 
 - 在当前制品 `feature-v4-workloads-20261025-140042-2c81983cf7cc` 上，三类原生 Workload YAML 编辑均真实触发 Kubernetes `422 Invalid`；Deployment、StatefulSet、DaemonSet 资源均未改变，弹窗保持打开。
