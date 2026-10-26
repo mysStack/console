@@ -3,8 +3,9 @@
  * https://github.com/kubesphere/console/blob/master/LICENSE
  */
 
-import React, { createRef } from 'react';
+import React, { createRef, useImperativeHandle, useState } from 'react';
 import {
+  Alert,
   Form,
   FormItem,
   Input,
@@ -18,6 +19,7 @@ import { Eye, Pen } from '@kubed/icons';
 import { CodeEditor, CodeEditorRef } from '@kubed/code-editor';
 
 import yaml from '../../utils/yaml';
+// eslint-disable-next-line max-len
 import type { DeleteConfirmContentProps } from '../../components/Modals/DeleteConfirm/DeleteConfirm';
 import { DeleteConfirmContent } from '../../components/Modals/DeleteConfirm/DeleteConfirm';
 import type { PathParams } from '../../types';
@@ -47,10 +49,58 @@ interface CommonActionProps {
   params?: PathParams;
 }
 
+interface YamlEditorContentRef {
+  showError: (message: string) => void;
+  clearError: () => void;
+}
+
+interface YamlEditorContentProps {
+  editorRef: React.RefObject<CodeEditorRef>;
+  mode: string;
+  acceptFileTypes: string[];
+  fileName: string;
+  readOnly?: boolean;
+  value: string;
+}
+
+const YamlEditorContent = React.forwardRef<YamlEditorContentRef, YamlEditorContentProps>(
+  ({ editorRef, mode, acceptFileTypes, fileName, readOnly, value }, ref) => {
+    const [error, setError] = useState('');
+
+    useImperativeHandle(
+      ref,
+      () => ({
+        showError: setError,
+        clearError: () => setError(''),
+      }),
+      [],
+    );
+
+    return (
+      <div>
+        {error && (
+          <Alert className="mb12" type="error">
+            {error}
+          </Alert>
+        )}
+        <CodeEditor
+          ref={editorRef}
+          mode={mode}
+          acceptFileTypes={acceptFileTypes}
+          fileName={fileName}
+          readOnly={readOnly}
+          value={value}
+        />
+      </div>
+    );
+  },
+);
+
 const useCommonActions = ({ store, callback = () => {}, params = {} }: CommonActionProps) => {
   const modal = useModal();
   const [form] = useForm();
   const codeEditorRef = createRef<CodeEditorRef>();
+  const yamlEditorContentRef = createRef<YamlEditorContentRef>();
 
   const editBaseInfo = (props: BaseInfoProps, k8sVersion = '') => {
     form.resetFields();
@@ -139,8 +189,9 @@ const useCommonActions = ({ store, callback = () => {}, params = {} }: CommonAct
       title,
       titleIcon: icon,
       content: (
-        <CodeEditor
-          ref={codeEditorRef}
+        <YamlEditorContent
+          ref={yamlEditorContentRef}
+          editorRef={codeEditorRef}
           mode="yaml"
           acceptFileTypes={['.yaml', '.yml']}
           fileName="config.yaml"
@@ -155,12 +206,15 @@ const useCommonActions = ({ store, callback = () => {}, params = {} }: CommonAct
       onAsyncOk: async () => {
         if (!onOk) return;
         try {
+          yamlEditorContentRef.current?.clearError();
           // @ts-ignore
           const newYaml = codeEditorRef.current?.getValue();
           await onOk(newYaml, initialValues);
           return true;
         } catch (error) {
-          notify.error(t('WORKLOAD_SETTINGS_SAVE_FAILED'));
+          const message = t('WORKLOAD_SETTINGS_SAVE_FAILED');
+          yamlEditorContentRef.current?.showError(message);
+          notify.error(message);
           return false;
         }
       },
