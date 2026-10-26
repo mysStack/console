@@ -37,7 +37,28 @@
     "deployment": "未验证",
     "statefulSet": "未验证",
     "daemonSet": "未验证",
-    "reason": "需要更新 /home/bruce/.bashrc 中当前可用的专用测试账号，或恢复已认证浏览器会话；不记录用户名密码。"
+    "reason": "需要更新 /home/bruce/.bashrc 中当前可用的专用测试账号，或恢复已认证浏览器会话；不记录用户名密码。",
+    "serverDiagnosis": {
+      "consolePod": "ks-console-64d87b4b9-q8rg4",
+      "consoleHandler": "POST /login -> OAuth password grant",
+      "backendService": "http://ks-apiserver/oauth/token",
+      "v4LogTime": "2026-10-26T05:06:16Z",
+      "v4BackendError": {
+        "code": 400,
+        "error": "invalid_grant",
+        "error_description": "Invalid username or password.",
+        "statusText": "Bad Request"
+      },
+      "baselinePod": "ks-console-v415-rea-6dd59bf5fc-jn5hz",
+      "baselineLogTime": "2026-10-26T05:10:11Z",
+      "baselineBackendError": {
+        "code": 400,
+        "error": "invalid_grant",
+        "error_description": "Invalid username or password.",
+        "statusText": "Bad Request"
+      },
+      "conclusion": "请求已到达同一 ks-apiserver OAuth 接口；不是 Workload 代码、NodePort 或单个前端镜像问题。当前服务端拒绝这组用户名/密码，尚未执行密码重置。"
+    }
   },
-  "conclusion": "制品部署链路已完成；YAML 422 内联提示尚未完成部署后浏览器验收，模块保持 VERIFY/进行中。"
+  "conclusion": "已定位登录阻塞到 ks-apiserver OAuth password grant 返回 invalid_grant；V4 与 release-4.1.5 均受影响。未修改账号或密码，Workload 浏览器验收仍待登录条件恢复。"
 }

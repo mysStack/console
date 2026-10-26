@@ -371,3 +371,10 @@ StatefulSet 与 DaemonSet 的 YAML 测试字段写入、页面回读和清除也
 - 已通过 `workloads deploy --phase VERIFY` 门禁；131 `kubesphere-system/ks-console` 从 generation 613 更新到 614，rollout 成功，Pod `ks-console-64d87b4b9-q8rg4` Ready，实际 imageID 为 `ghcr.io/mysstack/ks-console@sha256:efec7e903a98589cff39ff2205cf200dc0016e472a7baf6bf376734d1f9c450a`。
 - 未认证入口返回 302 到 `/login`，按约定从 `/home/bruce/.bashrc` 加载的专用测试账号被服务端拒绝，尚未进入三类 Workload 页面；因此 YAML 422 内联错误不能标记为已验证。
 - 证据见 [`YAML 422 内联错误部署复验记录`](./evidence/workload-yaml-server-422-inline-error-verify-20261026.json)。模块保持 `VERIFY / 进行中`，扩展运行时错误按负责人决定暂不处理。
+
+## 当前增量（2026-10-26：登录阻塞定位到 ks-apiserver）
+
+- 对 V4 `30880` 和 `release-4.1.5` `30881` 分别使用 `.bashrc` 环境变量发起登录，两个前端均停留在 `/login`。
+- 两个 Console Pod 日志均显示登录请求已进入 OAuth password grant，并由同一 `ks-apiserver/oauth/token` 返回 `400 invalid_grant`、`Invalid username or password.`；因此问题不属于 Workload 页面、NodePort 或当前 V4 镜像。
+- 本轮只读检查了 `admin` 用户状态为 `Active` 和密码变更时间，没有读取或输出密码、密码哈希，也没有重置账号。证据已补充到 [`YAML 422 内联错误部署复验记录`](./evidence/workload-yaml-server-422-inline-error-verify-20261026.json)。
+- Workload 三类页面验收仍未开始；需要负责人决定是否在 131 测试环境恢复该测试账号的有效密码，或提供当前可用的原账号凭证。

@@ -481,3 +481,10 @@
 - 已执行 `python3 scripts/v4-module-gate.py workloads deploy --phase VERIFY --tag feature-v4-workloads-20261026-111309-884c0a0ec0d2` 并通过；131 `ks-console` rollout 成功，Pod `ks-console-64d87b4b9-q8rg4` Ready，imageID 为 `ghcr.io/mysstack/ks-console@sha256:efec7e903a98589cff39ff2205cf200dc0016e472a7baf6bf376734d1f9c450a`。
 - 浏览器打开 30880 可到 `/login`，但本轮使用 `/home/bruce/.bashrc` 中环境变量登录被服务端拒绝，未进入 Workload 页面，三类 YAML 422 内联错误均为未验证；不把登录失败写成前端功能结论。
 - 证据见 [`YAML 422 内联错误部署复验记录`](./evidence/workload-yaml-server-422-inline-error-verify-20261026.json)。模块仍为 `VERIFY / 进行中`，等待测试账号环境恢复后继续浏览器验收。
+
+## 2026-10-26 登录阻塞根因定位
+
+- 对 V4 `30880` 和 `release-4.1.5` `30881` 使用同一 `.bashrc` 环境变量登录，两个浏览器均返回登录页。
+- V4 Console `ks-console-64d87b4b9-q8rg4` 日志记录 `POST /login` 已调用 OAuth password grant，`ks-apiserver` 返回 `400 invalid_grant` / `Invalid username or password.`；基线 Console `ks-console-v415-rea-6dd59bf5fc-jn5hz` 在独立尝试中记录相同错误。
+- 只读核对 `admin` 用户为 `Active`，未读取或输出密码、密码哈希，未修改用户和认证配置。根因范围已经从“浏览器或前端制品”收窄为“131 当前 OAuth 凭证不接受 `.bashrc` 这组用户名/密码”。
+- Workload 当前制品仍为已部署状态，但三类资源的部署后浏览器验收未开始；证据见 [`YAML 422 内联错误部署复验记录`](./evidence/workload-yaml-server-422-inline-error-verify-20261026.json)。
