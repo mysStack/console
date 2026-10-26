@@ -1,12 +1,12 @@
 # Workload V4 原生化迁移实施计划
 
-> **最新状态（2026-10-25）：** 模块当前处于 `VERIFY / 进行中`。当前制品已在 131 完成 rollout、Pod imageID 核对和三类资源的浏览器复验。已关闭编辑设置隐藏字段校验、配置引用成功写回/恢复、StatefulSet Headless Service、DaemonSet 停止/夹具恢复、低权限详情只读、三类资源实际 PUT 403、更新策略非法值 PUT 422，以及编辑设置 409/网络失败样本。模块尚未完成验收。
+> **最新状态（2026-10-26）：** 模块当前处于 `VERIFY / 进行中`。当前修复制品已在 131 完成 rollout、Pod imageID 核对和门禁检查；三类资源的部署后浏览器复验因专用测试账号登录被 131 服务端拒绝，尚未开始。历史制品已经完成的错误路径、低权限和只读证据继续保留，但不能直接替代当前修复制品验收。
 
-> **当前制品：** 源提交 `8430bb2fe09f33cec37bf433313808be8e4a69fc`，镜像 `feature-v4-workloads-20261025-100820-be6469d3fe2a`，digest `sha256:a3b9f1eb39cbaa8df197632fe4f79993e3c395997aff6f41a80ad62522697336`，131 Pod imageID 与 digest 一致。错误路径证据见 [`workload-settings-errors-v415-verify-20261025.json`](./evidence/workload-settings-errors-v415-verify-20261025.json)，低权限证据见 [`workload-rbac-v415-browser-verify-20261025.json`](./evidence/workload-rbac-v415-browser-verify-20261025.json)。
+> **当前制品：** 源提交 `884c0a0ec0d2715297cca67bf0abe7b8abe5db56`，镜像 `feature-v4-workloads-20261026-111309-884c0a0ec0d2`，131 Pod imageID 为 `ghcr.io/mysstack/ks-console@sha256:efec7e903a98589cff39ff2205cf200dc0016e472a7baf6bf376734d1f9c450a`，Deployment generation 为 `614`，Pod `ks-console-64d87b4b9-q8rg4` Ready。当前部署记录见 [`YAML 422 内联错误部署复验记录`](./evidence/workload-yaml-server-422-inline-error-verify-20261026.json)。
 
 > **REA 主基线：** `release-4.1.5` 完整前端源码和同版本已部署页面 `http://192.168.2.131:30881`；同版本 `v3dist` 用于制品校准；`origin/release-3.4` 只作为当前版本无法解释时的历史补充。不能把旧 V3 源码或当前分支改动当作 `release-4.1.5` 的逆向基线。
 
-> **仍待完成：** 编辑 YAML 的详细 422 反馈、负值字段边界、完整字段清空/保留、全部 Action 错误/取消/冲突、低权限列表缓存和更多角色组合、缓存组合、逐项 V3 等价及 PR 门禁。扩展运行时错误按项目决策延期，不纳入本模块验收。
+> **仍待完成：** 当前修复制品三类页面的 YAML 422 内联反馈、完整字段清空/保留、全部 Action 错误/取消/冲突、低权限列表缓存和更多角色组合、缓存组合、逐项 V3 等价及 PR 门禁。扩展运行时错误按项目决策延期，不纳入本模块验收。
 
 > **给执行者：** 必须按任务顺序执行。REA 未完成负责人复核前，不得修改业务代码；进入 DEV 后每个任务都要先补充或复用测试，再修改实现。
 
