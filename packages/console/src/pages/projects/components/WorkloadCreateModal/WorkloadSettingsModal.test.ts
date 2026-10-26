@@ -174,6 +174,14 @@ test('编辑设置弹窗使用 release-4.1.5 对照页面的宽度', () => {
   assert.equal(tree.props.width, 1162);
 });
 
+test('编辑设置使用与 release-4.1.5 一致的面板层级和策略说明容器', () => {
+  const { tree } = render('Deployment');
+  const all = nodes(tree);
+
+  assert.ok(all.find(node => node.props['data-test'] === 'workload-settings-nav'));
+  assert.ok(all.find(node => node.props['data-test'] === 'workload-settings-panel'));
+});
+
 test('编辑设置首屏沿用 release-4.1.5 的设置边界，不重复显示基础信息和副本数', () => {
   const { tree } = render('Deployment');
   const all = nodes(tree);

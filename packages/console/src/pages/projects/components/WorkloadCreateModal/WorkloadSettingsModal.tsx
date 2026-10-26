@@ -153,7 +153,18 @@ export default function WorkloadSettingsModal({
       bodyStyle={{ padding: 20 }}
     >
       <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
-        <nav aria-label={t('EDIT_SETTINGS')} role="tablist" style={{ width: 160, flexShrink: 0 }}>
+        <nav
+          aria-label={t('EDIT_SETTINGS')}
+          role="tablist"
+          data-test="workload-settings-nav"
+          style={{
+            width: 160,
+            flexShrink: 0,
+            padding: 8,
+            background: '#f1f5f9',
+            borderRadius: 4,
+          }}
+        >
           {sections.map(section => (
             <Button
               key={section.id}
@@ -168,6 +179,9 @@ export default function WorkloadSettingsModal({
                 textAlign: 'left',
                 marginBottom: 8,
                 fontWeight: activeSection === section.id ? 600 : 400,
+                background: activeSection === section.id ? '#36435c' : 'transparent',
+                color: activeSection === section.id ? '#fff' : '#36435c',
+                borderRadius: 20,
               }}
               onClick={() => {
                 setActiveSection(section.id);
@@ -178,7 +192,18 @@ export default function WorkloadSettingsModal({
             </Button>
           ))}
         </nav>
-        <div style={{ flex: 1, minWidth: 0, maxHeight: '68vh', overflowY: 'auto' }}>
+        <div
+          data-test="workload-settings-panel"
+          style={{
+            flex: 1,
+            minWidth: 0,
+            maxHeight: '68vh',
+            overflowY: 'auto',
+            border: '1px solid #d9e2ec',
+            borderRadius: 4,
+            padding: 20,
+          }}
+        >
           <Form form={form} initialValues={initialValues}>
             {!!saveError && (
               <div

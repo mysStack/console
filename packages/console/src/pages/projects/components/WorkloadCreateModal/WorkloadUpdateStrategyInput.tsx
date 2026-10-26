@@ -20,57 +20,76 @@ export default function WorkloadUpdateStrategyInput({
 }: Props) {
   const update = (patch: Partial<WorkloadSettingsValues['updateStrategy']>) =>
     onChange?.({ ...value, ...patch });
+  const description =
+    value.type === 'RollingUpdate'
+      ? 'ROLLINGUPDATE_DESC'
+      : value.type === 'Recreate'
+        ? 'SIMULTANEOUS_UPDATE_DESC'
+        : 'ONDELETE_DESC';
   return (
     <div style={{ display: 'grid', gap: 12, width: '100%' }}>
-      <Select
-        aria-label={t('UPDATE_STRATEGY')}
-        value={value.type}
-        options={[
-          { label: t('ROLLING_UPDATE_RECOMMENDED'), value: 'RollingUpdate' },
-          kind === 'Deployment'
-            ? { label: t('SIMULTANEOUS_UPDATE'), value: 'Recreate' }
-            : { label: t('ONDELETE'), value: 'OnDelete' },
-        ]}
-        onChange={type => update({ type })}
-      />
-      {value.type === 'RollingUpdate' &&
-        (kind === 'StatefulSet' ? (
-          <label>
-            {t('PARTITION_ORDINAL')}
-            <InputNumber
-              aria-label={t('PARTITION_ORDINAL')}
-              value={value.partition}
-              min={0}
-              precision={0}
-              onChange={partition =>
-                update({
-                  partition: partition === null || partition === '' ? undefined : Number(partition),
-                })
-              }
-            />
-          </label>
-        ) : (
-          <>
+      <div
+        data-test="workload-update-strategy-card"
+        style={{ border: '1px solid #d9e2ec', borderRadius: 4, padding: 16 }}
+      >
+        <Select
+          aria-label={t('UPDATE_STRATEGY')}
+          value={value.type}
+          options={[
+            { label: t('ROLLING_UPDATE_RECOMMENDED'), value: 'RollingUpdate' },
+            kind === 'Deployment'
+              ? { label: t('SIMULTANEOUS_UPDATE'), value: 'Recreate' }
+              : { label: t('ONDELETE'), value: 'OnDelete' },
+          ]}
+          onChange={type => update({ type })}
+        />
+        <p style={{ color: '#79879c', margin: '8px 0 0' }}>{t(description)}</p>
+      </div>
+      {value.type === 'RollingUpdate' && (
+        <div
+          data-test="workload-update-strategy-settings"
+          style={{ border: '1px solid #d9e2ec', borderRadius: 4, padding: 16 }}
+        >
+          {kind === 'StatefulSet' ? (
             <label>
-              {t('MAX_UNAVAILABLE_PODS')}
-              <Input
-                aria-label={t('MAX_UNAVAILABLE_PODS')}
-                value={value.maxUnavailable ?? ''}
-                onChange={event => update({ maxUnavailable: event.target.value })}
+              {t('PARTITION_ORDINAL')}
+              <InputNumber
+                aria-label={t('PARTITION_ORDINAL')}
+                value={value.partition}
+                min={0}
+                precision={0}
+                onChange={partition =>
+                  update({
+                    partition:
+                      partition === null || partition === '' ? undefined : Number(partition),
+                  })
+                }
               />
             </label>
-            {kind === 'Deployment' && (
+          ) : (
+            <>
               <label>
-                {t('MAX_EXTRA_PODS')}
+                {t('MAX_UNAVAILABLE_PODS')}
                 <Input
-                  aria-label={t('MAX_EXTRA_PODS')}
-                  value={value.maxSurge ?? ''}
-                  onChange={event => update({ maxSurge: event.target.value })}
+                  aria-label={t('MAX_UNAVAILABLE_PODS')}
+                  value={value.maxUnavailable ?? ''}
+                  onChange={event => update({ maxUnavailable: event.target.value })}
                 />
               </label>
-            )}
-          </>
-        ))}
+              {kind === 'Deployment' && (
+                <label>
+                  {t('MAX_EXTRA_PODS')}
+                  <Input
+                    aria-label={t('MAX_EXTRA_PODS')}
+                    value={value.maxSurge ?? ''}
+                    onChange={event => update({ maxSurge: event.target.value })}
+                  />
+                </label>
+              )}
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }

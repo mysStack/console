@@ -51,6 +51,10 @@ test('Deployment 策略切换和数量输入传递草稿，保留其他未编辑
   assert.equal(changed.maxSurge, '2');
   assert.equal(changed.maxUnavailable, '25%');
   assert.equal(value.maxSurge, '25%');
+  assert.ok(fields(tree).find(node => node.props['data-test'] === 'workload-update-strategy-card'));
+  assert.ok(
+    fields(tree).find(node => node.props['data-test'] === 'workload-update-strategy-settings'),
+  );
   const recreate = Input({ kind: 'Deployment', value: { ...value, type: 'Recreate' } });
   assert.equal(inputByLabel(recreate, 'MAX_EXTRA_PODS'), undefined);
 });
