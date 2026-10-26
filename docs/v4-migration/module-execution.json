@@ -5,8 +5,8 @@
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-  "phase": "VERIFY",
-  "phaseReason": "2026-10-26 已完成 YAML 服务端 422 内联错误修复制品构建部署；V4 与 release-4.1.5 登录均由 ks-apiserver OAuth 返回 invalid_grant，三类浏览器复验待恢复原测试账号有效登录后继续。",
+  "phase": "DEV",
+  "phaseReason": "2026-10-26 基线浏览器对照确认编辑设置视觉和字段边界仍有差异；重新进入 DEV，先修复已确认的原生编辑设置差异，再重新完成本模块 VERIFY。已保留 YAML 422 内联错误证据和当前制品信息。",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
