@@ -5,8 +5,8 @@
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-  "phase": "DEV",
-  "phaseReason": "2026-10-27 用户指出 30880 与 30881 同一 URL 的编辑设置整体不一致（弹窗尺寸/位置、导航样式、标题字号、策略卡片、折叠区背景）。已抓取 V3 渲染样式规格，回到 DEV 做整体视觉对齐。",
+  "phase": "VERIFY",
+  "phaseReason": "2026-10-27 五个分区整体视觉与内容已按 V3 编辑设置改造：弹窗尺寸/位置、标题图标、导航、策略卡、容器卡、存储虚线卡、调度卡和优雅终止折叠卡；单元测试 430 个用例通过，进入 VERIFY 做部署后 30880 与 30881 同 URL 对比。",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -326,8 +326,8 @@
   },
   "dev": {
     "status": "已完成",
-    "reason": "2026-10-27 更新策略字段布局 DEV 增量 eececa404 已完成：按 V3 form-item 结构改为标签在上、必填星号、字段说明、details 折叠区块和两列布局；左侧导航补 V3 分区图标。sh scripts/test.sh 94 个测试文件 428 个用例全部通过，CI Run 40463274104 的 Unit tests 与镜像构建成功；业务验收仍在 VERIFY。",
-    "sourceCommit": "eececa40422bc696d15951f849d26d90ed508675",
+    "reason": "2026-10-27 增量 c5f3f73e3 完成 V3 整体视觉对齐：新增卡片列表与虚线新增入口，容器卡、存储双虚线卡、调度规则卡、优雅终止折叠卡，弹窗与面板尺寸按 V3 实测值；sh scripts/test.sh 95 个文件 430 个用例全部通过。",
+    "sourceCommit": "c5f3f73e3ed80204a41971250407f851c3f93b4c",
     "documents": [
       {
         "path": "docs/v4-migration/evidence/workload-settings-layout-20261027.json",
@@ -672,6 +672,10 @@
       {
         "path": "docs/v4-migration/workload-settings-panel-dev-20261027.md",
         "sha256": "8f84c49fecfc51e84d14deb3e447bbb903e61d6478a840afda53fe5e4cff5c04"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-settings-parity-dev-20261027.json",
+        "sha256": "6cf403fbe0d02515f6d56850828f1fe4e85a38aae54dffa90a08bed5a7c8e79d"
       }
     ]
   },
@@ -684,7 +688,7 @@
   ],
   "verify": {
     "status": "进行中",
-    "reason": "2026-10-27 在 30880 部署制品（Run 40464188987，Pod sha256:36b7ce7a…）复验编辑设置更新策略分区：折叠区块、标签在上、必填星号、字段说明、两列布局、分区图标与 V3 一致，Deployment/StatefulSet/DaemonSet 均无 Wujie 或 iframe；策略卡片视觉、其余四分区字段等价和导航告警图标仍未闭环。",
+    "reason": "2026-10-27 等待新制品部署后，在 30880 与 30881 同一 URL 对比五个分区的弹窗尺寸、导航、卡片与折叠行为。",
     "sourceCommit": "86c1f6d689cb1e7c61a44c8d259d394a7c4f2da7",
     "documents": [
       {

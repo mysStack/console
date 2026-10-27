@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-27",
+  "scope": "Workload 编辑设置五个分区整体视觉与内容对齐 V3（Deployment、StatefulSet、DaemonSet）",
+  "phase": "DEV",
+  "commits": {
+    "code": "c5f3f73e3",
+    "previousVerify": "86c1f6d689cb1e7c61a44c8d259d394a7c4f2da7"
+  },
+  "v3Baseline": {
+    "url": "http://192.168.2.131:30881/dev-workspace/clusters/host/projects/dev-wms/deployments/wms-admin-server/resource-status",
+    "capturedAt": "2026-10-27",
+    "modal": {
+      "width": 1162,
+      "top": 152,
+      "height": 594,
+      "bodyPadding": "27px 20px 9px",
+      "titleIcon": "20px 设置图标",
+      "footerButtons": "取消 72x32 圆角 100，确定 72x32 圆角 100"
+    },
+    "nav": {
+      "width": 172,
+      "height": 428,
+      "itemHeight": 38,
+      "itemRadius": 18,
+      "selectedBackground": "#36435c",
+      "icons": ["dashboard", "container", "storage", "group", "forbid-right-duotone"]
+    },
+    "panel": {
+      "width": 930,
+      "height": 428,
+      "padding": "12px 12px 38px",
+      "border": "1px solid #e3e9ef",
+      "background": "#fff"
+    },
+    "sections": {
+      "更新策略": "标题 12px/400 在上；策略卡片含 40px 图标、标题、说明与下拉箭头；滚动更新设置为整行折叠卡，展开字段区背景 #f9fbfd",
+      "容器": "标题“容器”；容器卡显示 40px 容器图标、容器名、镜像行和“无资源上限”；下方虚线卡“添加容器 / 自定义容器的设置以创建容器。”",
+      "存储": "标题“存储设置”；无卷时并排两张虚线卡“挂载卷 / 为容器挂载持久卷、临时卷或 HostPath 卷。”与“挂载配置字典或保密字典 / 为容器挂载配置字典或保密字典。”",
+      "容器组调度规则": "外层卡片显示标题“容器组调度规则”与说明“设置容器组副本调度到节点的规则。”，内层为“默认规则 / 按照默认的规则将容器组副本调度到节点。”选择卡",
+      "容器组优雅终止": "单个折叠卡，标题“容器组优雅终止”与说明“设置容器终止前等待的时间，超时后容器将强制终止。”"
+    }
+  },
+  "changes": [
+    "WorkloadSettingsModal 使用 V3 弹窗尺寸、顶部位置、标题图标、导航宽度与面板内边距",
+    "新增 WorkloadCardListInput：卡片条目、虚线新增卡、整卡删除入口；存储分区并排两张虚线新增卡",
+    "ContainerSettingsInput 改为 V3 容器卡：容器图标、名称、镜像行、资源上限摘要，整卡打开二级编辑",
+    "PodSchedulingInput 改为 V3 调度规则选择卡，保留默认/自定义规则行为",
+    "容器组优雅终止改为 V3 折叠卡，字段标签使用“终止宽限时间 (s)”",
+    "容器组安全上下文与初始化容器仅在已有取值时显示，避免空状态出现 V3 没有的分区内容"
+  ],
+  "tests": {
+    "command": "sh scripts/test.sh",
+    "result": "files: 95 ok, 0 failed; tests: 430 passed, 0 failed",
+    "focused": [
+      "WorkloadCardListInput.test.ts 2/2",
+      "WorkloadSettingsModal.test.ts 8/8",
+      "WorkloadUpdateStrategyInput.test.ts 4/4",
+      "ContainerSettingsInput.test.ts 2/2",
+      "PodSchedulingInput.test.ts 1/1"
+    ],
+    "typecheck": "tsc --noEmit -p packages/console/tsconfig.json 无本次改动文件错误，仅仓库既有 Network Policies 与 rootDir 报错"
+  },
+  "notVerified": [
+    "三类资源部署后的浏览器视觉与交互验收",
+    "容器、存储、调度规则、优雅终止四个分区与 V3 的逐项等价",
+    "初始化容器与容器组安全上下文空状态下不再提供新增入口，需要 VERIFY 确认是否为可接受差异"
+  ]
+}
