@@ -5,8 +5,8 @@
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-  "phase": "VERIFY",
-  "phaseReason": "2026-10-27 已按 V3 结构完成编辑设置更新策略字段布局 DEV 修正（eececa404），单元测试 428/428 通过，CI Run 40463274104 构建镜像 feature-v4-workloads-20261027-144952-eececa40422b；待部署到 30880 后做浏览器复验。",
+  "phase": "DEV",
+  "phaseReason": "2026-10-27 用户指出 30880 与 30881 同一 URL 的编辑设置整体不一致（弹窗尺寸/位置、导航样式、标题字号、策略卡片、折叠区背景）。已抓取 V3 渲染样式规格，回到 DEV 做整体视觉对齐。",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
