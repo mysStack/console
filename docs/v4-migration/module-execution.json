@@ -5,8 +5,8 @@
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-  "phase": "VERIFY",
-  "phaseReason": "2026-10-27 五个分区整体视觉与内容已按 V3 编辑设置改造：弹窗尺寸/位置、标题图标、导航、策略卡、容器卡、存储虚线卡、调度卡和优雅终止折叠卡；单元测试 430 个用例通过，进入 VERIFY 做部署后 30880 与 30881 同 URL 对比。",
+  "phase": "DEV",
+  "phaseReason": "2026-10-27 部署后对比发现容器新增卡文案仍为“添加工作容器”、优雅终止分区缺四语言文案、卡片删除按钮常显。回到 DEV 修正文案与悬停样式。",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -326,7 +326,7 @@
   },
   "dev": {
     "status": "已完成",
-    "reason": "2026-10-27 增量 c5f3f73e3 完成 V3 整体视觉对齐：新增卡片列表与虚线新增入口，容器卡、存储双虚线卡、调度规则卡、优雅终止折叠卡，弹窗与面板尺寸按 V3 实测值；sh scripts/test.sh 95 个文件 430 个用例全部通过。",
+    "reason": "2026-10-27 部署后视觉对比发现三处差异：新增卡应使用 V3“添加容器”文案；POD_GRACE_PERIOD 等键缺四语言翻译；卡片删除按钮应在悬停时显示。修正后重跑测试并重新构建。",
     "sourceCommit": "c5f3f73e3ed80204a41971250407f851c3f93b4c",
     "documents": [
       {
@@ -688,7 +688,7 @@
   ],
   "verify": {
     "status": "进行中",
-    "reason": "2026-10-27 等待新制品部署后，在 30880 与 30881 同一 URL 对比五个分区的弹窗尺寸、导航、卡片与折叠行为。",
+    "reason": "2026-10-27 30880 首个对齐制品已部署（generation 618），五个分区结构与 V3 一致；容器新增卡文案、优雅终止文案和删除按钮显示时机待修正后复验。",
     "sourceCommit": "86c1f6d689cb1e7c61a44c8d259d394a7c4f2da7",
     "documents": [
       {
