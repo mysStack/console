@@ -780,10 +780,10 @@
         "sha256": "955e9f000abd0c626b0322c65cba4655b87f0eb276b710f747994fad1e759e2b"
       }
     ],
-    "ciRun": "40457329956",
+    "ciRun": "40470932163",
     "ciStatus": "success",
-    "imageTag": "feature-v4-workloads-20261027-134915-875d0bd26aa2",
-    "imageDigest": "sha256:827f3e125f0012d9fddb3495dc79cabf253afce7b33e58c6d6efd9d4dc66d2cc",
+    "imageTag": "feature-v4-workloads-20261027-160525-65960cd18346",
+    "imageDigest": "sha256:f1ae0b86de8e01b8e18e3b35a0f4c14c23886a1a0a097810a69888a10191141b",
     "candidate": {
       "ciRun": "40262836786",
       "imageTag": "feature-v4-workloads-20261027-134915-875d0bd26aa2",
