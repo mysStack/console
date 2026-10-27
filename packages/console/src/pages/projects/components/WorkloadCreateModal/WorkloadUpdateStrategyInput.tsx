@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { ChevronDown } from '@kubed/icons';
 import { Input, InputNumber, Select } from '@kubed/components';
 import type { WorkloadKind, WorkloadSettingsValues } from './deployment';
 
@@ -11,6 +12,34 @@ interface Props {
   kind: WorkloadKind;
   value?: WorkloadSettingsValues['updateStrategy'];
   onChange?: (value: WorkloadSettingsValues['updateStrategy']) => void;
+}
+
+interface StrategyFieldProps {
+  htmlFor: string;
+  label: string;
+  description: string;
+  children: React.ReactNode;
+}
+
+// 与 V3 表单一致：标签在输入框上方并带必填标记，字段说明在输入框下方。
+function StrategyField({ htmlFor, label, description, children }: StrategyFieldProps) {
+  return (
+    <div>
+      <label
+        htmlFor={htmlFor}
+        style={{ display: 'block', marginBottom: 8, color: '#36435c', fontWeight: 600 }}
+      >
+        {label}
+        <span aria-hidden="true" style={{ color: '#ca2621', marginLeft: 4 }}>
+          *
+        </span>
+      </label>
+      {children}
+      <p style={{ color: '#79879c', margin: '8px 0 0', fontSize: 12, lineHeight: 1.6 }}>
+        {description}
+      </p>
+    </div>
+  );
 }
 
 export default function WorkloadUpdateStrategyInput({
@@ -26,6 +55,7 @@ export default function WorkloadUpdateStrategyInput({
       : value.type === 'Recreate'
         ? 'SIMULTANEOUS_UPDATE_DESC'
         : 'ONDELETE_DESC';
+  const columns = kind === 'Deployment' ? '1fr 1fr' : '1fr';
   return (
     <div style={{ display: 'grid', gap: 12, width: '100%' }}>
       <div
@@ -46,49 +76,86 @@ export default function WorkloadUpdateStrategyInput({
         <p style={{ color: '#79879c', margin: '8px 0 0' }}>{t(description)}</p>
       </div>
       {value.type === 'RollingUpdate' && (
-        <div
+        <details
           data-test="workload-update-strategy-settings"
           style={{ border: '1px solid #d9e2ec', borderRadius: 4, padding: 16 }}
         >
-          {kind === 'StatefulSet' ? (
-            <label>
-              {t('PARTITION_ORDINAL')}
-              <InputNumber
-                aria-label={t('PARTITION_ORDINAL')}
-                value={value.partition}
-                min={0}
-                precision={0}
-                onChange={partition =>
-                  update({
-                    partition:
-                      partition === null || partition === '' ? undefined : Number(partition),
-                  })
-                }
-              />
-            </label>
-          ) : (
-            <>
-              <label>
-                {t('MAX_UNAVAILABLE_PODS')}
-                <Input
-                  aria-label={t('MAX_UNAVAILABLE_PODS')}
-                  value={value.maxUnavailable ?? ''}
-                  onChange={event => update({ maxUnavailable: event.target.value })}
+          <summary
+            data-test="workload-update-strategy-toggle"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              color: '#36435c',
+              fontWeight: 600,
+              cursor: 'pointer',
+              listStyle: 'none',
+            }}
+          >
+            <ChevronDown size={20} />
+            {t('ROLLING_UPDATE_SETTINGS')}
+          </summary>
+          <div
+            data-test="workload-update-strategy-fields"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: columns,
+              gap: '16px 20px',
+              marginTop: 16,
+            }}
+          >
+            {kind === 'StatefulSet' ? (
+              <StrategyField
+                htmlFor="workload-partition-ordinal"
+                label={t('PARTITION_ORDINAL')}
+                description={t('PARTITION_ORDINAL_DESC')}
+              >
+                <InputNumber
+                  id="workload-partition-ordinal"
+                  aria-label={t('PARTITION_ORDINAL')}
+                  value={value.partition}
+                  min={0}
+                  precision={0}
+                  onChange={partition =>
+                    update({
+                      partition:
+                        partition === null || partition === '' ? undefined : Number(partition),
+                    })
+                  }
                 />
-              </label>
-              {kind === 'Deployment' && (
-                <label>
-                  {t('MAX_EXTRA_PODS')}
+              </StrategyField>
+            ) : (
+              <>
+                <StrategyField
+                  htmlFor="workload-max-unavailable-pods"
+                  label={t('MAX_UNAVAILABLE_PODS')}
+                  description={t('MAX_UNAVAILABLE_PODS_DESC')}
+                >
                   <Input
-                    aria-label={t('MAX_EXTRA_PODS')}
-                    value={value.maxSurge ?? ''}
-                    onChange={event => update({ maxSurge: event.target.value })}
+                    id="workload-max-unavailable-pods"
+                    aria-label={t('MAX_UNAVAILABLE_PODS')}
+                    value={value.maxUnavailable ?? ''}
+                    onChange={event => update({ maxUnavailable: event.target.value })}
                   />
-                </label>
-              )}
-            </>
-          )}
-        </div>
+                </StrategyField>
+                {kind === 'Deployment' && (
+                  <StrategyField
+                    htmlFor="workload-max-extra-pods"
+                    label={t('MAX_EXTRA_PODS')}
+                    description={t('MAX_EXTRA_PODS_DESC')}
+                  >
+                    <Input
+                      id="workload-max-extra-pods"
+                      aria-label={t('MAX_EXTRA_PODS')}
+                      value={value.maxSurge ?? ''}
+                      onChange={event => update({ maxSurge: event.target.value })}
+                    />
+                  </StrategyField>
+                )}
+              </>
+            )}
+          </div>
+        </details>
       )}
     </div>
   );

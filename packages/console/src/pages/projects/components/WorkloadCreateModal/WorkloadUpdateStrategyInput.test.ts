@@ -59,6 +59,48 @@ test('Deployment 策略切换和数量输入传递草稿，保留其他未编辑
   assert.equal(inputByLabel(recreate, 'MAX_EXTRA_PODS'), undefined);
 });
 
+test('滚动更新字段按 V3 结构渲染：折叠区块、标签在上、必填星号与字段说明', () => {
+  const Input = loadInput();
+  const tree = Input({
+    kind: 'Deployment',
+    value: { type: 'RollingUpdate', maxUnavailable: '25%', maxSurge: '25%' },
+  });
+  const nodes = fields(tree);
+  const settings = nodes.find(
+    node => node.props['data-test'] === 'workload-update-strategy-settings',
+  );
+  assert.equal(settings.type, 'details');
+  assert.equal(settings.props.open, undefined);
+  const toggle = nodes.find(node => node.props['data-test'] === 'workload-update-strategy-toggle');
+  assert.equal(toggle.type, 'summary');
+  const grid = nodes.find(node => node.props['data-test'] === 'workload-update-strategy-fields');
+  assert.equal(nodes.indexOf(grid) > nodes.indexOf(toggle), true);
+  assert.equal(React.Children.toArray(settings.props.children).length, 2);
+  assert.match(grid.props.style.gridTemplateColumns, /1fr/);
+
+  const fieldConfigs = nodes.filter(node => typeof node.type === 'function' && node.props.htmlFor);
+  assert.deepEqual(
+    fieldConfigs.map(node => node.props.label),
+    ['MAX_UNAVAILABLE_PODS', 'MAX_EXTRA_PODS'],
+  );
+  assert.deepEqual(
+    fieldConfigs.map(node => node.props.description),
+    ['MAX_UNAVAILABLE_PODS_DESC', 'MAX_EXTRA_PODS_DESC'],
+  );
+  for (const config of fieldConfigs) {
+    const rendered = config.type(config.props);
+    const label = React.Children.toArray(rendered.props.children)[0];
+    assert.equal(label.type, 'label');
+    assert.equal(label.props.htmlFor, config.props.htmlFor);
+    const [text, required] = React.Children.toArray(label.props.children);
+    assert.equal(text, config.props.label);
+    assert.equal(required.props.children, '*');
+    const description = React.Children.toArray(rendered.props.children)[2];
+    assert.equal(description.type, 'p');
+    assert.equal(description.props.children, config.props.description);
+  }
+});
+
 test('StatefulSet 只提供 partition 和 OnDelete，不混入 Deployment 滚动字段', () => {
   const Input = loadInput();
   let changed: any;

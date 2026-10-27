@@ -5,6 +5,7 @@
 
 import React, { useRef, useState } from 'react';
 import { Button, Form, FormItem, InputNumber, Modal, useForm, useWatch } from '@kubed/components';
+import { Container, Dashboard, ForbidRightDuotone, Group, Storage } from '@kubed/icons';
 import { ArrayInput } from '@ks-console/shared';
 import ContainerSettingsInput from './ContainerSettingsInput';
 import VolumeInput from './VolumeInput';
@@ -56,12 +57,15 @@ export default function WorkloadSettingsModal({
 }: Props) {
   const [form] = useForm<WorkloadSettingsValues>();
   const kind: WorkloadKind = resource.kind || 'Deployment';
+  // 图标与 V3 编辑设置左侧导航保持一致。
   const sections = [
-    { id: 'updateStrategy', label: 'UPDATE_STRATEGY' },
-    { id: 'podTemplate', label: 'CONTAINER_PL' },
-    { id: 'volumeSettings', label: 'STORAGE' },
-    ...(kind !== 'DaemonSet' ? [{ id: 'podMode', label: 'POD_SCHEDULING_RULES' }] : []),
-    { id: 'podGracePeriod', label: 'WORKLOAD_TERMINATION_GRACE_PERIOD' },
+    { id: 'updateStrategy', label: 'UPDATE_STRATEGY', Icon: Dashboard },
+    { id: 'podTemplate', label: 'CONTAINER_PL', Icon: Container },
+    { id: 'volumeSettings', label: 'STORAGE', Icon: Storage },
+    ...(kind !== 'DaemonSet'
+      ? [{ id: 'podMode', label: 'POD_SCHEDULING_RULES', Icon: Group }]
+      : []),
+    { id: 'podGracePeriod', label: 'WORKLOAD_TERMINATION_GRACE_PERIOD', Icon: ForbidRightDuotone },
   ];
   const [activeSection, setActiveSection] = useState('updateStrategy');
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
@@ -174,7 +178,9 @@ export default function WorkloadSettingsModal({
               aria-controls={`workload-settings-${section.id}`}
               role="tab"
               style={{
-                display: 'block',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
                 width: '100%',
                 textAlign: 'left',
                 marginBottom: 8,
@@ -188,6 +194,7 @@ export default function WorkloadSettingsModal({
                 sectionRefs.current[section.id]?.scrollIntoView({ block: 'start' });
               }}
             >
+              <section.Icon size={20} color={activeSection === section.id ? '#fff' : '#36435c'} />
               {t(section.label)}
             </Button>
           ))}

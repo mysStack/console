@@ -102,7 +102,8 @@ test('三类设置均提供分区导航，字段保留挂载并区分 DaemonSet 
     assert.ok(
       all.find(
         node =>
-          node.type === 'button' && node.props.children === 'WORKLOAD_TERMINATION_GRACE_PERIOD',
+          node.type === 'button' &&
+          React.Children.toArray(node.props.children).includes('WORKLOAD_TERMINATION_GRACE_PERIOD'),
       ),
       `${kind} 缺少独立的容器组优雅终止导航`,
     );
@@ -188,9 +189,11 @@ test('编辑设置首屏沿用 release-4.1.5 的设置边界，不重复显示�
   const nav = all.find(node => node.type === 'nav');
   assert.ok(nav);
 
-  const sectionLabels = nodes(nav)
-    .filter(node => node.type === 'button')
-    .map(node => node.props.children);
+  const sectionButtons = nodes(nav).filter(node => node.type === 'button');
+  const sectionLabels = sectionButtons.map(
+    node =>
+      React.Children.toArray(node.props.children).filter(child => typeof child === 'string')[0],
+  );
   assert.deepEqual(sectionLabels, [
     'UPDATE_STRATEGY',
     'CONTAINER_PL',
@@ -198,6 +201,12 @@ test('编辑设置首屏沿用 release-4.1.5 的设置边界，不重复显示�
     'POD_SCHEDULING_RULES',
     'WORKLOAD_TERMINATION_GRACE_PERIOD',
   ]);
+  assert.ok(
+    sectionButtons.every(node =>
+      React.isValidElement(React.Children.toArray(node.props.children)[0]),
+    ),
+    '分区导航需要与 release-4.1.5 一致的分区图标',
+  );
 
   for (const field of ['name', 'namespace', 'replicas']) {
     assert.equal(
