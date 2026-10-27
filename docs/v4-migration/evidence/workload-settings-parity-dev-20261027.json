@@ -3,7 +3,7 @@
   "scope": "Workload 编辑设置五个分区整体视觉与内容对齐 V3（Deployment、StatefulSet、DaemonSet）",
   "phase": "DEV",
   "commits": {
-    "code": "c5f3f73e3",
+    "code": "3336c15986f949615d17b912882d116465842ba3",
     "previousVerify": "86c1f6d689cb1e7c61a44c8d259d394a7c4f2da7"
   },
   "v3Baseline": {
@@ -46,17 +46,19 @@
     "ContainerSettingsInput 改为 V3 容器卡：容器图标、名称、镜像行、资源上限摘要，整卡打开二级编辑",
     "PodSchedulingInput 改为 V3 调度规则选择卡，保留默认/自定义规则行为",
     "容器组优雅终止改为 V3 折叠卡，字段标签使用“终止宽限时间 (s)”",
-    "容器组安全上下文与初始化容器仅在已有取值时显示，避免空状态出现 V3 没有的分区内容"
+    "容器组安全上下文与初始化容器仅在已有取值时显示，避免空状态出现 V3 没有的分区内容",
+    "部署后对比补充：新增卡文案改为 V3“添加容器”；POD_GRACE_PERIOD、POD_GRACE_PERIOD_DESC、TERMINATION_GRACEPERIOD_SECONDS 补齐 en/es/tc/zh 四语言文案；卡片删除按钮改为悬停或聚焦时显示"
   ],
   "tests": {
     "command": "sh scripts/test.sh",
-    "result": "files: 95 ok, 0 failed; tests: 430 passed, 0 failed",
+    "result": "files: 95 ok, 0 failed; tests: 431 passed, 0 failed",
     "focused": [
       "WorkloadCardListInput.test.ts 2/2",
       "WorkloadSettingsModal.test.ts 8/8",
       "WorkloadUpdateStrategyInput.test.ts 4/4",
       "ContainerSettingsInput.test.ts 2/2",
-      "PodSchedulingInput.test.ts 1/1"
+      "PodSchedulingInput.test.ts 1/1",
+      "deployment.locale.test.ts 4/4"
     ],
     "typecheck": "tsc --noEmit -p packages/console/tsconfig.json 无本次改动文件错误，仅仓库既有 Network Policies 与 rootDir 报错"
   },
@@ -64,5 +66,14 @@
     "三类资源部署后的浏览器视觉与交互验收",
     "容器、存储、调度规则、优雅终止四个分区与 V3 的逐项等价",
     "初始化容器与容器组安全上下文空状态下不再提供新增入口，需要 VERIFY 确认是否为可接受差异"
-  ]
+  ],
+  "followUp": {
+    "trigger": "2026-10-27 30880 首版对齐制品（generation 618）浏览器对比",
+    "observed": [
+      "容器新增卡仍显示“添加工作容器”",
+      "优雅终止分区显示 POD_GRACE_PERIOD 等键名",
+      "容器卡删除按钮常显"
+    ],
+    "fixedBy": "3336c15986f949615d17b912882d116465842ba3"
+  }
 }
