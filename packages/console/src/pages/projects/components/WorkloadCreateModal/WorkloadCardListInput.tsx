@@ -99,8 +99,17 @@ export default function WorkloadCardListInput({
 
   return (
     <div style={{ display: 'grid', gap: 8, width: '100%' }}>
+      <style>
+        {
+          '.workload-card-item .workload-card-delete{opacity:0;transition:opacity .2s}.workload-card-item:hover .workload-card-delete,.workload-card-item:focus-within .workload-card-delete{opacity:1}'
+        }
+      </style>
       {items.map((item, index) => (
-        <div key={index} style={{ position: 'relative', ...itemStyle }}>
+        <div
+          key={index}
+          className="workload-card-item"
+          style={{ position: 'relative', ...itemStyle }}
+        >
           {React.cloneElement(children, {
             index,
             value: item,
@@ -113,6 +122,7 @@ export default function WorkloadCardListInput({
           })}
           <Button
             variant="text"
+            className="workload-card-delete"
             aria-label={t('DELETE')}
             onClick={() => onChange?.(items.filter((_, currentIndex) => currentIndex !== index))}
             style={{ position: 'absolute', top: 8, right: 8, padding: 4 }}

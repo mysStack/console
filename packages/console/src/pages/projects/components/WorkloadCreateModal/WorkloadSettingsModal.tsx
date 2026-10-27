@@ -290,7 +290,7 @@ export default function WorkloadSettingsModal({
                 <WorkloadCardListInput
                   adds={[
                     {
-                      text: t('WORKLOAD_ADD_CONTAINER'),
+                      text: t('ADD_CONTAINER'),
                       description: t('ADD_CONTAINER_DESC'),
                       icon: <Container size={24} color="#36435c" />,
                       createValue: () => ({}),

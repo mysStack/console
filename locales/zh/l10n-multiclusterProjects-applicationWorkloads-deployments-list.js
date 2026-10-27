@@ -207,4 +207,7 @@ module.exports = {
   CLUSTER_DIFF_PORT_SETTINGS_DESC: '为不同集群中的容器设置不同的端口。',
   CLUSTER_DIFF_ENVIRONMENT_VARIABLES_DESC: '为不同集群中的容器设置不同的环境变量。',
   CONTAINER_IMAGE: '容器镜像',
+  POD_GRACE_PERIOD: '容器组优雅终止',
+  POD_GRACE_PERIOD_DESC: '设置容器终止前等待的时间，超时后容器将强制终止。',
+  TERMINATION_GRACEPERIOD_SECONDS: '终止宽限时间 (s)',
 };

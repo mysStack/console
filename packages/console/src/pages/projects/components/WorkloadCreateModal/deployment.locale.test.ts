@@ -146,3 +146,32 @@ test('原生镜像搜索、分页和失败提示均有四语言文案', () => {
     }
   }
 });
+
+test('编辑设置卡片新增的分区与字段文案具备四语言文案', () => {
+  for (const language of ['en', 'es', 'tc', 'zh']) {
+    const locale = require(
+      path.join(
+        localeRoot,
+        language,
+        'l10n-multiclusterProjects-applicationWorkloads-deployments-list.js',
+      ),
+    );
+    for (const key of [
+      'ADD_CONTAINER',
+      'ADD_CONTAINER_DESC',
+      'NO_RESOURCE_LIMIT',
+      'MOUNT_VOLUME',
+      'WORKLOAD_MOUNT_VOLUME_DESC',
+      'MOUNT_CONFIGMAP_OR_SECRET',
+      'MOUNT_CONFIGMAP_OR_SECRET_DESC',
+      'POD_SCHEDULING_RULES_DESC',
+      'DEFAULT_RULES_DESC',
+      'POD_GRACE_PERIOD',
+      'POD_GRACE_PERIOD_DESC',
+      'TERMINATION_GRACEPERIOD_SECONDS',
+    ]) {
+      assert.equal(typeof locale[key], 'string', `${language}: ${key}`);
+      assert.notEqual(locale[key], key);
+    }
+  }
+});

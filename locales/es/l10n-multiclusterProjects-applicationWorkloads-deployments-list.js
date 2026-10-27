@@ -236,4 +236,8 @@ module.exports = {
   CLUSTER_DIFF_ENVIRONMENT_VARIABLES_DESC:
     'Se pueden configurar diferentes entornos de contenedores en diferentes grupos',
   CONTAINER_IMAGE: 'Container Image',
+  POD_GRACE_PERIOD: 'Terminación correcta del pod',
+  POD_GRACE_PERIOD_DESC:
+    'Establezca el tiempo de espera antes de terminar los contenedores. Tras el tiempo de espera, los contenedores se terminan de forma forzosa.',
+  TERMINATION_GRACEPERIOD_SECONDS: 'Período de gracia de terminación (s)',
 };
