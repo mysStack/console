@@ -35,11 +35,24 @@ export const shouldKeepConsoleV3Alive = (
   nextScopeKey: string,
 ): boolean => activeScopeKey === undefined || activeScopeKey === nextScopeKey;
 
+/**
+ * Whether the shared `consolev3` app still has rendered content.
+ *
+ * Wujie clears the host ShadowRoot when another caller unmounts the app, and a
+ * caller that does not use `alive` leaves nothing behind. Reusing such an
+ * instance renders a blank page, so the mount must be verified against the
+ * real DOM instead of trusting module bookkeeping.
+ */
+export const isConsoleV3InstanceMounted = (
+  doc: Document | undefined = typeof document === 'undefined' ? undefined : document,
+): boolean => {
+  const host = doc?.querySelector('wujie-app[data-wujie-id="consolev3"]');
+  const shadowRoot = (host as HTMLElement | null)?.shadowRoot;
+
+  return Boolean(shadowRoot && shadowRoot.childElementCount > 0);
+};
+
 export interface ConsoleV3RebuildInput {
-  activeScopeKey: string | undefined;
-  scopeKey: string;
-  resourceUrl: string;
-  mountedResourceUrl: string | undefined;
   cacheExpired: boolean;
   deactivated: boolean;
   mountedRevision: string | undefined;
@@ -47,25 +60,16 @@ export interface ConsoleV3RebuildInput {
 }
 
 /**
- * The shared `consolev3` name is also used by project overview and detail
- * pages. Reusing that instance across scopes can leave an empty ShadowRoot
- * when the previous caller did not use `alive`. Only reuse a mounted instance
- * for the same list scope; every scope switch starts from a clean instance.
+ * Reuse the live instance across resource scopes: the app is alive, and the
+ * activated lifecycle syncs it to the new list route. Rebuild only when the
+ * cache expired or a mutation changed the list the user is returning to.
  */
 export const shouldRebuildConsoleV3Instance = ({
-  activeScopeKey,
-  scopeKey,
-  resourceUrl,
-  mountedResourceUrl,
   cacheExpired,
   deactivated,
   mountedRevision,
   revision,
-}: ConsoleV3RebuildInput): boolean => {
-  const sameMountedScope = activeScopeKey === scopeKey && mountedResourceUrl === resourceUrl;
-
-  return !sameMountedScope || cacheExpired || (deactivated && mountedRevision !== revision);
-};
+}: ConsoleV3RebuildInput): boolean => cacheExpired || (deactivated && mountedRevision !== revision);
 
 export const isConsoleV3ListCacheExpired = (
   lastUsedAt: number | undefined,
