@@ -19,3 +19,10 @@ test('resource host reuses the consolev3 app and exposes activation lifecycle ma
   assert.match(source, /const isReady = resolvedUrl\.includes\('\/consolev3\/'\)/);
   assert.match(source, /normalizeConsoleV3Url/);
 });
+
+test('activation records the rendered revision so the first return reuses the app', () => {
+  const activation = source.match(/phase === 'activated'[\s\S]*?phase === 'deactivated'/);
+  assert.ok(activation, 'activation branch not found');
+  assert.match(activation[0], /mountedRevisions\.set\(scopeKey, revision\)/);
+  assert.match(activation[0], /mountedResourceUrls\.set\(scopeKey, resourceUrl\)/);
+});

@@ -93,6 +93,11 @@ export default function ConsoleV3ResourceList({
                 : phase === 'activated'
                   ? (appWindow?: Window) => {
                       deactivatedScopes.delete(scopeKey);
+                      // The first mount of a scope can activate without
+                      // `afterMount`; record the rendered revision here too, or
+                      // the first return to that scope rebuilds the app.
+                      mountedResourceUrls.set(scopeKey, resourceUrl);
+                      mountedRevisions.set(scopeKey, revision);
                       if (appWindow) {
                         scheduleConsoleV3ListRouteSync(appWindow, resourceUrl);
                       }
