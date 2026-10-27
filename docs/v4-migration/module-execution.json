@@ -688,7 +688,7 @@
   ],
   "verify": {
     "status": "进行中",
-    "reason": "2026-10-27 文案与删除按钮修正后等待新制品部署，随后在 30880 与 30881 同一 URL 对比五个分区。",
+    "reason": "2026-10-27 在 30880 部署 Run 40473992527 制品（generation 619，Pod imageID sha256:e36d931d…），Playwright 与 30881 同一 URL 对比：更新策略、容器、存储、调度规则、优雅终止五个分区文案与卡片结构一致，弹窗 1162x594、顶部 152、导航 172x428、面板 428 高一致；Deployment 交互冒烟通过。StatefulSet、DaemonSet 与保存写入仍未复验。",
     "sourceCommit": "86c1f6d689cb1e7c61a44c8d259d394a7c4f2da7",
     "documents": [
       {
@@ -778,39 +778,42 @@
       {
         "path": "docs/v4-migration/evidence/workload-settings-panel-verify-20261027.json",
         "sha256": "955e9f000abd0c626b0322c65cba4655b87f0eb276b710f747994fad1e759e2b"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-settings-parity-verify-20261027.json",
+        "sha256": "f79801fec6675d28679905426f60e76fd78d7f01aca37d61678a6b720f0d6c39"
       }
     ],
-    "ciRun": "40470932163",
+    "ciRun": "40473992527",
     "ciStatus": "success",
-    "imageTag": "feature-v4-workloads-20261027-160525-65960cd18346",
-    "imageDigest": "sha256:f1ae0b86de8e01b8e18e3b35a0f4c14c23886a1a0a097810a69888a10191141b",
+    "imageTag": "feature-v4-workloads-20261027-163225-e40408154dc9",
+    "imageDigest": "sha256:e36d931df138da6e9e6b39d7506126508efe35cf12c6cd04e9d4be9090fc3c3d",
     "candidate": {
-      "ciRun": "40262836786",
-      "imageTag": "feature-v4-workloads-20261027-134915-875d0bd26aa2",
-      "imageDigest": "sha256:827f3e125f0012d9fddb3495dc79cabf253afce7b33e58c6d6efd9d4dc66d2cc",
+      "ciRun": "40473992527",
+      "imageTag": "feature-v4-workloads-20261027-163225-e40408154dc9",
+      "imageDigest": "sha256:e36d931df138da6e9e6b39d7506126508efe35cf12c6cd04e9d4be9090fc3c3d",
       "deployment": "kubesphere-system/ks-console",
-      "generation": 616,
-      "pod": "ks-console-7d86866bfc-7qqtm",
-      "podImageID": "ghcr.io/mysstack/ks-console@sha256:827f3e125f0012d9fddb3495dc79cabf253afce7b33e58c6d6efd9d4dc66d2cc",
-      "status": "已部署；首屏编辑设置面板 Playwright 复验通过，字段区差异待 DEV 修正"
+      "generation": 619,
+      "pod": "ks-console-5468c78488-qrtsf",
+      "podImageID": "ghcr.io/mysstack/ks-console@sha256:e36d931df138da6e9e6b39d7506126508efe35cf12c6cd04e9d4be9090fc3c3d",
+      "status": "已部署；Deployment 五分区与 V3 对比一致，交互冒烟通过"
     },
     "rollout": {
       "deployment": "kubesphere-system/ks-console",
-      "generation": 616,
+      "generation": 619,
       "status": "success",
-      "pod": "ks-console-7d86866bfc-7qqtm",
+      "pod": "ks-console-5468c78488-qrtsf",
       "podReady": true,
-      "podImageID": "ghcr.io/mysstack/ks-console@sha256:827f3e125f0012d9fddb3495dc79cabf253afce7b33e58c6d6efd9d4dc66d2cc"
+      "podImageID": "ghcr.io/mysstack/ks-console@sha256:e36d931df138da6e9e6b39d7506126508efe35cf12c6cd04e9d4be9090fc3c3d"
     },
     "browserVerification": {
-      "status": "已完成编辑设置首屏面板复验（三类资源中的 Deployment；StatefulSet、DaemonSet 待复验）",
-      "evidence": "docs/v4-migration/evidence/workload-settings-panel-verify-20261027.json",
+      "status": "Deployment 五分区已复验；StatefulSet、DaemonSet 待复验",
+      "evidence": "docs/v4-migration/evidence/workload-settings-parity-verify-20261027.json",
       "freshLogin": "是，使用环境变量测试账号新建登录",
-      "moduleAcceptance": "未完成",
-      "loginDiagnosis": "V4 与 release-4.1.5 Console 日志均记录 /oauth/token 返回 400 invalid_grant；未修改账号或认证配置"
+      "moduleAcceptance": "未完成"
     },
     "lastEvidenceUpdate": "2026-10-27",
-    "evidence": "docs/v4-migration/evidence/workload-settings-panel-verify-20261027.json"
+    "evidence": "docs/v4-migration/evidence/workload-settings-parity-verify-20261027.json"
   },
   "routeAdjustment": {
     "date": "2026-10-24",

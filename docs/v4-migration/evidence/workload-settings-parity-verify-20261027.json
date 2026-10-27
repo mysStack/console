@@ -1,0 +1,88 @@
+{
+  "date": "2026-10-27",
+  "scope": "Workload 编辑设置五分区在 30880 与 30881 同一 URL 的部署后对比（Deployment）",
+  "phase": "VERIFY",
+  "commits": {
+    "deployed": "e40408154dc984602f5bd05b9ee95ad80e4f1f3a",
+    "code": "3336c15986f949615d17b912882d116465842ba3"
+  },
+  "artifact": {
+    "ciRun": "40473992527",
+    "imageTag": "feature-v4-workloads-20261027-163225-e40408154dc9",
+    "imageDigest": "sha256:e36d931df138da6e9e6b39d7506126508efe35cf12c6cd04e9d4be9090fc3c3d",
+    "deployment": "kubesphere-system/ks-console",
+    "generation": 619,
+    "pod": "ks-console-5468c78488-qrtsf",
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:e36d931df138da6e9e6b39d7506126508efe35cf12c6cd04e9d4be9090fc3c3d"
+  },
+  "browser": {
+    "tool": "Playwright 1.63.0 headless Chromium 1440x900",
+    "freshLogin": "是，使用环境变量测试账号新建登录",
+    "url": "http://192.168.2.131:30880/dev-workspace/clusters/host/projects/dev-wms/deployments/wms-admin-server/resource-status",
+    "baselineUrl": "http://192.168.2.131:30881/dev-workspace/clusters/host/projects/dev-wms/deployments/wms-admin-server/resource-status"
+  },
+  "geometry": {
+    "v4": {
+      "modal": { "x": 139, "y": 152, "w": 1162, "h": 594 },
+      "nav": { "x": 159, "y": 240, "w": 172, "h": 428 },
+      "navItem": { "w": 172, "h": 38, "radius": "18px", "padding": "8px 12px" },
+      "panel": { "x": 343, "y": 240, "w": 938, "h": 428, "padding": "12px 12px 38px" }
+    },
+    "v3": {
+      "nav": { "x": 163, "y": 239, "w": 172, "h": 428 },
+      "navItem": { "w": 172, "h": 38, "radius": "18px", "padding": "8px 12px" },
+      "panel": { "w": 930, "h": 428, "padding": "12px 12px 38px" }
+    },
+    "conclusion": "弹窗宽度 1162、顶部 152、导航 172x428、导航项 38 高圆角 18 与 V3 一致；面板宽度差 8px 来自 V4 内边距分配"
+  },
+  "sections": [
+    {
+      "name": "更新策略",
+      "v4Text": "更新策略 滚动更新（推荐） 用新容器组副本逐步替换旧容器组副本。升级过程中业务流量会负载均衡到新旧容器组副本上，业务不会中断。 滚动更新设置",
+      "v3Text": "更新策略 滚动更新（推荐） 用新容器组副本逐步替换旧容器组副本。升级过程中业务流量会负载均衡到新旧容器组副本上，业务不会中断。 滚动更新设置",
+      "result": "一致；展开后字段为“最大不可用容器组数量*”“最大多余容器组数量*”，两个输入框"
+    },
+    {
+      "name": "容器",
+      "v4Text": "容器 wms-admin-server 镜像: crpi-... 无资源上限 添加容器 自定义容器的设置以创建容器。",
+      "v3Text": "容器 wms-admin-server 镜像: crpi-... 无资源上限 添加容器 自定义容器的设置以创建容器。",
+      "result": "文案与卡片结构一致；容器卡整卡打开二级编辑，删除按钮悬停或聚焦时显示"
+    },
+    {
+      "name": "存储",
+      "v4Text": "存储设置 挂载卷 为容器挂载持久卷、临时卷或 HostPath 卷。 挂载配置字典或保密字典 为容器挂载配置字典或保密字典。",
+      "v3Text": "存储设置 挂载卷 为容器挂载持久卷、临时卷或 HostPath 卷。 挂载配置字典或保密字典 为容器挂载配置字典或保密字典。",
+      "result": "空状态并排虚线卡与 V3 一致；点击后在卡片下方内联新增卷行"
+    },
+    {
+      "name": "容器组调度规则",
+      "v4Text": "容器组调度规则 设置容器组副本调度到节点的规则。 默认规则 按照默认的规则将容器组副本调度到节点。",
+      "v3Text": "容器组调度规则 设置容器组副本调度到节点的规则。 默认规则 按照默认的规则将容器组副本调度到节点。",
+      "result": "一致；点击卡片展开默认、分散、集中、自定义规则选项"
+    },
+    {
+      "name": "容器组优雅终止",
+      "v4Text": "容器组优雅终止 设置容器终止前等待的时间，超时后容器将强制终止。",
+      "v3Text": "容器组优雅终止 设置容器终止前等待的时间，超时后容器将强制终止。",
+      "result": "一致；展开后显示“终止宽限时间 (s)”输入框"
+    }
+  ],
+  "interactions": {
+    "rollingUpdate": "展开折叠区，2 个字段输入框",
+    "containerEditor": "点击容器卡打开编辑容器弹窗，Escape 关闭",
+    "storageAdd": "点击挂载卷新增 1 行卷编辑行，两张新增卡片仍保留",
+    "scheduling": "点击调度卡出现 3 个规则选项",
+    "gracePeriod": "展开后“终止宽限时间 (s)”可见，默认值 30"
+  },
+  "remainingDifferences": [
+    "V3 容器二级编辑为三步容器设置页，V4 为单页编辑容器弹窗；字段覆盖仍需单独核对",
+    "V3 点击挂载卷打开新建卷弹窗，V4 为卡片下方内联卷编辑行",
+    "容器组安全上下文与初始化容器在空状态下不显示，与 V3 空状态一致，但 V4 不再提供空状态新增入口",
+    "导航与卡片图标使用 @kubed/icons 字型，与 V3 图标字型不完全相同"
+  ],
+  "notVerified": [
+    "StatefulSet、DaemonSet 的部署后五分区对比",
+    "真实保存提交后的编辑设置写入行为",
+    "初始化容器已存在时的分区展示"
+  ]
+}
