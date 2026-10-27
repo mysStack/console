@@ -5,6 +5,7 @@ import {
   getConsoleV3ScopeKey,
   isConsoleV3ListCacheExpired,
   markConsoleV3Phase,
+  normalizeConsoleV3Url,
   shouldRebuildConsoleV3Instance,
   shouldKeepConsoleV3Alive,
 } from './metrics';
@@ -73,6 +74,23 @@ test('ConsoleV3 rebuilds a stale cached scope after mutation or TTL expiry', () 
     shouldRebuildConsoleV3Instance({ ...input, cacheExpired: true, deactivated: false }),
     true,
   );
+});
+
+test('ConsoleV3 restores a bare project path to the absolute app URL', () => {
+  assert.equal(
+    normalizeConsoleV3Url('/dev-workspace/clusters/host/projects/dev-wes/pods', 'ks.test:30881'),
+    '//ks.test:30881/consolev3/dev-workspace/clusters/host/projects/dev-wes/pods',
+  );
+});
+
+test('ConsoleV3 keeps an already absolute app URL unchanged', () => {
+  const url = '//ks.test:30881/consolev3/dev-workspace/clusters/host/projects/dev-wes/pods';
+
+  assert.equal(normalizeConsoleV3Url(url, 'ks.test:30881'), url);
+});
+
+test('ConsoleV3 leaves an unresolved URL untouched instead of guessing', () => {
+  assert.equal(normalizeConsoleV3Url('undefined/pods', 'ks.test:30881'), 'undefined/pods');
 });
 
 test('ConsoleV3 list cache expires after the configured TTL', () => {

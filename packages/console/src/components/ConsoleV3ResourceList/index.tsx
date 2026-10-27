@@ -7,6 +7,7 @@ import {
   getConsoleV3ScopeKey,
   isConsoleV3ListCacheExpired,
   markConsoleV3Phase,
+  normalizeConsoleV3Url,
   shouldRebuildConsoleV3Instance,
 } from './metrics';
 import { scheduleConsoleV3ListRouteSync } from './route';
@@ -38,16 +39,19 @@ export default function ConsoleV3ResourceList({
   // The project layout writes the Wujie URL prefix in an effect. Avoid an
   // initial mount with `undefined/...`; that mount would create a non-reusable
   // Wujie instance before the real resource URL is available.
-  const isReady = url.includes('/consolev3/');
+  // A prefix race can deliver the bare project path; normalize it before the
+  // readiness gate, so a single wrong write cannot blank the whole list.
+  const resolvedUrl = normalizeConsoleV3Url(url, window.location.host);
+  const isReady = resolvedUrl.includes('/consolev3/');
   const revision = getResourceListCacheVersion(resource);
   const user = globals?.user?.username || 'anonymous';
-  const scopeKey = isReady ? getConsoleV3ScopeKey(resource, url, user) : '';
+  const scopeKey = isReady ? getConsoleV3ScopeKey(resource, resolvedUrl, user) : '';
   const now = Date.now();
   const lastUsedAt = lastScopeUseAt.get(scopeKey);
   const cacheExpired = isConsoleV3ListCacheExpired(lastUsedAt, now, cacheTtlMs);
   // Keep the iframe URL stable. The revision is used only to decide whether a
   // deactivated instance must be rebuilt after a resource mutation.
-  const resourceUrl = url;
+  const resourceUrl = resolvedUrl;
   const shouldRebuild = shouldRebuildConsoleV3Instance({
     activeScopeKey,
     scopeKey,

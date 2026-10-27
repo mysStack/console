@@ -43,3 +43,4 @@ export * from './licenses.LicenseTip';
 export * as uiState from './uiState';
 export * from './table';
 export * from './resourceListInvalidation';
+export * from './consoleV3';

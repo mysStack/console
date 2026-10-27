@@ -19,6 +19,17 @@ const getPathname = (url: string): string => {
 export const getConsoleV3ScopeKey = (resource: string, url: string, user: string): string =>
   `${user}:${resource}:${getPathname(url)}`;
 
+/**
+ * A writer race can hand the list the bare project path, without the
+ * `/consolev3/` marker. Wujie then resolves it against the host origin and
+ * mounts nothing, leaving the list blank for good. Restore the absolute URL.
+ */
+export const normalizeConsoleV3Url = (url: string, host: string): string => {
+  if (url.includes('/consolev3/')) return url;
+  if (url.startsWith('/')) return `//${host}/consolev3${url}`;
+  return url;
+};
+
 export const shouldKeepConsoleV3Alive = (
   activeScopeKey: string | undefined,
   nextScopeKey: string,
