@@ -10,22 +10,10 @@ const render = require('koa-ejs');
 const serve = require('koa-static');
 const fs = require('fs-extra');
 const path = require('path');
-const compression = require('compression');
-const c2k = require('koa-connect');
 
 const { getServerConfig, root, cwdResolve } = require('../libs/utils');
 
 const serverConfig = getServerConfig().server;
-
-const shouldCompress = (req, res) => {
-  const url = req.url;
-  const [, query] = url.split('?');
-  const queryParams = qs.parse(query);
-  const responseContentType = res.getHeader('Content-Type');
-  const isFollow = queryParams.follow === 'true' && responseContentType === 'text/plain';
-
-  return !isFollow;
-};
 
 module.exports = function (app) {
   // compress middleware
@@ -37,9 +25,17 @@ module.exports = function (app) {
     }),
   );
 
-  // For compatibility with http-proxy
-  // because http-proxy can only be code with connect's req res method
-  app.use(c2k(compression({ filter: shouldCompress })));
+  // The connect `compression` middleware used to run here for http-proxy
+  // compatibility. It only knows gzip/deflate and runs before koa-compress, so
+  // every browser request (which accepts gzip *and* br) was encoded as gzip and
+  // koa-compress skipped the already encoded body. Keep its one custom rule:
+  // never compress a `follow=true` plain-text stream.
+  app.use(async (ctx, next) => {
+    await next();
+    const [, query] = ctx.url.split('?');
+    const isFollow = qs.parse(query).follow === 'true' && ctx.response.type === 'text/plain';
+    if (isFollow) ctx.compress = false;
+  });
 
   // serve static files
   const httpStatic = serverConfig.http.static[process.env.NODE_ENV];
