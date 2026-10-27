@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-27",
+  "scope": "Workload 编辑设置更新策略分区与左侧导航对齐 V3 结构（Deployment、StatefulSet、DaemonSet）",
+  "phase": "DEV",
+  "commits": {
+    "code": "eececa40422bc696d15951f849d26d90ed508675",
+    "previousVerify": "d7c4b805b052009473b243642e8c5541fb9e52b3"
+  },
+  "v3Baseline": {
+    "url": "http://192.168.2.131:30881/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+    "capturedAt": "2026-10-27",
+    "navIcons": {
+      "更新策略": "icon-dashboard",
+      "容器": "icon-container",
+      "存储": "icon-storage",
+      "容器组调度规则": "icon-group",
+      "容器组优雅终止": "icon-forbid-right-duotone"
+    },
+    "rollingUpdateSettings": "form-group-title 折叠区块，标题“滚动更新设置”，默认折叠，展开后两列字段",
+    "fieldMarkup": "<label class=\"form-item-label\" for=\"spec.strategy.rollingUpdate.maxUnavailable\">最大不可用容器组数量<span class=\"form-item-required\">*</span></label>，输入框下方 form-item-desc 说明"
+  },
+  "changes": [
+    "WorkloadUpdateStrategyInput 使用 details/summary 渲染“滚动更新设置”折叠区块，默认折叠",
+    "字段改为标签在输入框上方、必填星号、字段说明在输入框下方",
+    "Deployment 最大不可用/最大多余两列布局，其他资源单列",
+    "WorkloadSettingsModal 左侧导航增加与 V3 一致的分区图标"
+  ],
+  "tests": {
+    "command": "sh scripts/test.sh",
+    "result": "files: 94 ok, 0 failed; tests: 428 passed, 0 failed",
+    "focused": ["WorkloadUpdateStrategyInput.test.ts 4/4", "WorkloadSettingsModal.test.ts 8/8"]
+  },
+  "notVerified": ["三类资源的部署后浏览器验收", "容器、存储、调度规则、优雅终止四个分区的字段等价"]
+}

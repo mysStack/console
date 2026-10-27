@@ -5,8 +5,8 @@
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-  "phase": "DEV",
-  "phaseReason": "2026-10-27 复验发现编辑设置更新策略分区与 V3 不一致：字段标签内联堆叠、缺少必填星号与字段说明、缺少“滚动更新设置”折叠区块、导航缺少图标。已回到 DEV 按 V3 结构修正后再部署复验。",
+  "phase": "VERIFY",
+  "phaseReason": "2026-10-27 已按 V3 结构完成编辑设置更新策略字段布局 DEV 修正（eececa404），单元测试 428/428 通过，CI Run 40463274104 构建镜像 feature-v4-workloads-20261027-144952-eececa40422b；待部署到 30880 后做浏览器复验。",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -326,9 +326,13 @@
   },
   "dev": {
     "status": "已完成",
-    "reason": "本次首屏面板 DEV 增量 fcb919c94 已完成 TDD、22 个相关测试文件回归、Prettier、git diff --check，CI Run 40300396915 的 Unit tests 和镜像构建成功；业务验收仍在 VERIFY。",
-    "sourceCommit": "fcb919c94145b1c60bc43f48a1551cd4233d9731",
+    "reason": "2026-10-27 更新策略字段布局 DEV 增量 eececa404 已完成：按 V3 form-item 结构改为标签在上、必填星号、字段说明、details 折叠区块和两列布局；左侧导航补 V3 分区图标。sh scripts/test.sh 94 个测试文件 428 个用例全部通过，CI Run 40463274104 的 Unit tests 与镜像构建成功；业务验收仍在 VERIFY。",
+    "sourceCommit": "eececa40422bc696d15951f849d26d90ed508675",
     "documents": [
+      {
+        "path": "docs/v4-migration/evidence/workload-settings-layout-20261027.json",
+        "sha256": "a10dc25d3d5c704d33ddedb262179aae31780c03292b7b478ce7ee9a4c45c4ee"
+      },
       {
         "path": "docs/v4-migration/evidence/workload-negative-grace-defect-verify-20261025.json",
         "sha256": "374cf4a16b9d8c838ac82c3230c37ea73791f909a8ecab04dcc6ff6a951907ac"
