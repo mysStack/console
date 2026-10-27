@@ -5,9 +5,18 @@
 
 import React, { useRef, useState } from 'react';
 import { Button, Form, FormItem, InputNumber, Modal, useForm, useWatch } from '@kubed/components';
-import { Container, Dashboard, ForbidRightDuotone, Group, Storage } from '@kubed/icons';
+import {
+  Check,
+  Cogwheel,
+  Container,
+  Dashboard,
+  ForbidRightDuotone,
+  Group,
+  Storage,
+} from '@kubed/icons';
 import { ArrayInput } from '@ks-console/shared';
 import ContainerSettingsInput from './ContainerSettingsInput';
+import WorkloadCardListInput from './WorkloadCardListInput';
 import VolumeInput from './VolumeInput';
 import PersistentVolumeClaimTemplateInput from './PersistentVolumeClaimTemplateInput';
 import WorkloadUpdateStrategyInput from './WorkloadUpdateStrategyInput';
@@ -72,6 +81,8 @@ export default function WorkloadSettingsModal({
 
   const volumes = useWatch('volumes', form);
   const volumeClaimTemplates = useWatch('volumeClaimTemplates', form);
+  const podSecurityContext = useWatch('podSecurityContext', form);
+  const initContainers = useWatch('initContainers', form);
   const resources = useWorkloadResourceOptions(cluster, namespace);
   const workloadTargets = useWorkloadTargetOptions(kind, cluster, namespace);
   const initialValues = parseDeploymentSettings(resource);
@@ -149,24 +160,25 @@ export default function WorkloadSettingsModal({
   return (
     <Modal
       title={t('EDIT_SETTINGS')}
+      titleIcon={<Cogwheel size={20} color="#36435c" />}
       width={1162}
       visible={visible}
+      centered={false}
+      style={{ top: 152 }}
       confirmLoading={confirmLoading}
       onOk={submit}
       onCancel={onCancel}
-      bodyStyle={{ padding: 20 }}
+      bodyStyle={{ padding: '27px 20px 9px' }}
     >
-      <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', alignItems: 'stretch', height: 428 }}>
         <nav
           aria-label={t('EDIT_SETTINGS')}
           role="tablist"
           data-test="workload-settings-nav"
           style={{
-            width: 160,
+            width: 172,
             flexShrink: 0,
-            padding: 8,
-            background: '#f1f5f9',
-            borderRadius: 4,
+            marginRight: 12,
           }}
         >
           {sections.map(section => (
@@ -180,21 +192,25 @@ export default function WorkloadSettingsModal({
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 8,
+                gap: 9,
                 width: '100%',
+                height: 38,
+                padding: '8px 12px',
                 textAlign: 'left',
-                marginBottom: 8,
-                fontWeight: activeSection === section.id ? 600 : 400,
+                marginTop: 4,
+                fontSize: 12,
+                fontWeight: 500,
+                border: `1px solid ${activeSection === section.id ? '#404e68' : 'transparent'}`,
                 background: activeSection === section.id ? '#36435c' : 'transparent',
-                color: activeSection === section.id ? '#fff' : '#36435c',
-                borderRadius: 20,
+                color: activeSection === section.id ? '#fff' : '#4a5974',
+                borderRadius: 18,
               }}
               onClick={() => {
                 setActiveSection(section.id);
                 sectionRefs.current[section.id]?.scrollIntoView({ block: 'start' });
               }}
             >
-              <section.Icon size={20} color={activeSection === section.id ? '#fff' : '#36435c'} />
+              <section.Icon size={20} color={activeSection === section.id ? '#fff' : '#4a5974'} />
               {t(section.label)}
             </Button>
           ))}
@@ -204,11 +220,12 @@ export default function WorkloadSettingsModal({
           style={{
             flex: 1,
             minWidth: 0,
-            maxHeight: '68vh',
+            height: '100%',
             overflowY: 'auto',
-            border: '1px solid #d9e2ec',
+            background: '#fff',
+            border: '1px solid #e3e9ef',
             borderRadius: 4,
-            padding: 20,
+            padding: '12px 12px 38px',
           }}
         >
           <Form form={form} initialValues={initialValues}>
@@ -241,7 +258,7 @@ export default function WorkloadSettingsModal({
                 sectionRefs.current.updateStrategy = node;
               }}
             >
-              <h3>{t('UPDATE_STRATEGY')}</h3>
+              <div style={{ color: '#36435c', marginBottom: 12 }}>{t('UPDATE_STRATEGY')}</div>
               <FormItem name="updateStrategy" rules={[{ validator: validateSettings }]}>
                 <WorkloadUpdateStrategyInput kind={kind} />
               </FormItem>
@@ -264,46 +281,64 @@ export default function WorkloadSettingsModal({
                 sectionRefs.current.podTemplate = node;
               }}
             >
-              <h3>{t('CONTAINER_PL')}</h3>
-              <FormItem name="podSecurityContext" rules={[{ validator: validateSettings }]}>
-                <SecurityContextInput kind="pod" />
-              </FormItem>
+              <div style={{ color: '#36435c', marginBottom: 12 }}>{t('CONTAINER_PL')}</div>
               <FormItem
                 name="containers"
-                label={t('CONTAINERS')}
                 dependencies={['initContainers', 'volumes']}
                 rules={[{ validator: validateContainerFields }]}
               >
-                <ArrayInput
-                  itemType="object"
-                  addText={t('WORKLOAD_ADD_CONTAINER')}
-                  checkItemValid={() => true}
+                <WorkloadCardListInput
+                  adds={[
+                    {
+                      text: t('WORKLOAD_ADD_CONTAINER'),
+                      description: t('ADD_CONTAINER_DESC'),
+                      icon: <Container size={24} color="#36435c" />,
+                      createValue: () => ({}),
+                    },
+                  ]}
                 >
                   <ContainerSettingsInput
                     kind="CONTAINER"
                     resourceOptions={resources.options}
                     volumeNames={volumeNames}
                   />
-                </ArrayInput>
+                </WorkloadCardListInput>
               </FormItem>
-              <FormItem
-                name="initContainers"
-                label={t('INIT_CONTAINER')}
-                dependencies={['containers', 'volumes']}
-                rules={[{ validator: validateContainerFields }]}
+              <div
+                style={{
+                  marginTop: 12,
+                  display: podSecurityContext === undefined ? 'none' : undefined,
+                }}
               >
-                <ArrayInput
-                  itemType="object"
-                  addText={t('WORKLOAD_ADD_INIT_CONTAINER')}
-                  checkItemValid={() => true}
+                <FormItem name="podSecurityContext" rules={[{ validator: validateSettings }]}>
+                  <SecurityContextInput kind="pod" />
+                </FormItem>
+              </div>
+              <div style={{ display: (initContainers || []).length > 0 ? undefined : 'none' }}>
+                <div style={{ color: '#36435c', margin: '16px 0 12px' }}>{t('INIT_CONTAINER')}</div>
+                <FormItem
+                  name="initContainers"
+                  dependencies={['containers', 'volumes']}
+                  rules={[{ validator: validateContainerFields }]}
                 >
-                  <ContainerSettingsInput
-                    kind="INIT_CONTAINER"
-                    resourceOptions={resources.options}
-                    volumeNames={volumeNames}
-                  />
-                </ArrayInput>
-              </FormItem>
+                  <WorkloadCardListInput
+                    adds={[
+                      {
+                        text: t('WORKLOAD_ADD_INIT_CONTAINER'),
+                        description: t('ADD_CONTAINER_DESC'),
+                        icon: <Container size={24} color="#36435c" />,
+                        createValue: () => ({}),
+                      },
+                    ]}
+                  >
+                    <ContainerSettingsInput
+                      kind="INIT_CONTAINER"
+                      resourceOptions={resources.options}
+                      volumeNames={volumeNames}
+                    />
+                  </WorkloadCardListInput>
+                </FormItem>
+              </div>
             </section>
             <section
               id="workload-settings-volumeSettings"
@@ -314,22 +349,37 @@ export default function WorkloadSettingsModal({
                 sectionRefs.current.volumeSettings = node;
               }}
             >
-              <h3>{t('STORAGE')}</h3>
+              <div style={{ color: '#36435c', marginBottom: 12 }}>{t('STORAGE_SETTINGS')}</div>
               {resources.isLoading && <div role="status">{t('LOADING')}</div>}
               {resources.isError && <div role="alert">{t('WORKLOAD_RESOURCE_OPTIONS_FAILED')}</div>}
               <FormItem
                 name="volumes"
-                label={t('VOLUME_PL')}
                 dependencies={['containers', 'initContainers']}
                 rules={[{ validator: validateVolumeFields }]}
               >
-                <ArrayInput
-                  itemType="object"
-                  addText={t('WORKLOAD_ADD_VOLUME')}
+                <WorkloadCardListInput
+                  adds={[
+                    {
+                      text: t('MOUNT_VOLUME'),
+                      description: t('WORKLOAD_MOUNT_VOLUME_DESC'),
+                      createValue: () => ({ name: '', type: 'emptyDir' }),
+                    },
+                    {
+                      text: t('MOUNT_CONFIGMAP_OR_SECRET'),
+                      description: t('MOUNT_CONFIGMAP_OR_SECRET_DESC'),
+                      createValue: () => ({ name: '', type: 'configMap' }),
+                    },
+                  ]}
                   checkItemValid={() => true}
+                  itemStyle={{
+                    padding: '12px 44px 12px 12px',
+                    border: '1px solid #e3e9ef',
+                    borderRadius: 4,
+                    background: '#fff',
+                  }}
                 >
                   <VolumeInput resourceOptions={resources.options} />
-                </ArrayInput>
+                </WorkloadCardListInput>
               </FormItem>
               {kind === 'StatefulSet' && (
                 <FormItem
@@ -359,14 +409,35 @@ export default function WorkloadSettingsModal({
                   sectionRefs.current.podMode = node;
                 }}
               >
-                <h3>{t('POD_SCHEDULING_RULES')}</h3>
-                {workloadTargets.isLoading && <div role="status">{t('LOADING')}</div>}
-                {workloadTargets.isError && (
-                  <div role="alert">{t('WORKLOAD_TARGET_OPTIONS_FAILED')}</div>
-                )}
-                <FormItem name="podScheduling" rules={[{ validator: validateSettings }]}>
-                  <PodSchedulingInput targets={workloadTargets.options} />
-                </FormItem>
+                <div
+                  style={{
+                    padding: 12,
+                    border: '1px solid #e3e9ef',
+                    borderRadius: 4,
+                    background: '#fff',
+                  }}
+                >
+                  <div style={{ color: '#36435c', fontWeight: 600 }}>
+                    {t('POD_SCHEDULING_RULES')}
+                  </div>
+                  <p
+                    style={{
+                      color: '#79879c',
+                      margin: '4px 0 12px',
+                      fontSize: 12,
+                      lineHeight: 1.67,
+                    }}
+                  >
+                    {t('POD_SCHEDULING_RULES_DESC')}
+                  </p>
+                  {workloadTargets.isLoading && <div role="status">{t('LOADING')}</div>}
+                  {workloadTargets.isError && (
+                    <div role="alert">{t('WORKLOAD_TARGET_OPTIONS_FAILED')}</div>
+                  )}
+                  <FormItem name="podScheduling" rules={[{ validator: validateSettings }]}>
+                    <PodSchedulingInput targets={workloadTargets.options} />
+                  </FormItem>
+                </div>
               </section>
             )}
             <section
@@ -378,14 +449,46 @@ export default function WorkloadSettingsModal({
                 sectionRefs.current.podGracePeriod = node;
               }}
             >
-              <h3>{t('WORKLOAD_TERMINATION_GRACE_PERIOD')}</h3>
-              <FormItem
-                name="terminationGracePeriodSeconds"
-                label={t('WORKLOAD_TERMINATION_GRACE_SECONDS')}
-                rules={[{ required: true }, { validator: validateSettings }]}
+              <details
+                data-test="workload-grace-period-card"
+                style={{
+                  border: '1px solid #e3e9ef',
+                  borderRadius: 4,
+                  padding: 12,
+                  background: '#fff',
+                }}
               >
-                <InputNumber min={0} precision={0} />
-              </FormItem>
+                <summary
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 8,
+                    cursor: 'pointer',
+                    listStyle: 'none',
+                  }}
+                >
+                  <Check size={16} color="#36435c" style={{ marginTop: 2 }} />
+                  <span>
+                    <span style={{ display: 'block', color: '#36435c', fontWeight: 600 }}>
+                      {t('POD_GRACE_PERIOD')}
+                    </span>
+                    <span
+                      style={{ display: 'block', marginTop: 4, color: '#79879c', fontWeight: 400 }}
+                    >
+                      {t('POD_GRACE_PERIOD_DESC')}
+                    </span>
+                  </span>
+                </summary>
+                <div style={{ marginTop: 12 }}>
+                  <FormItem
+                    name="terminationGracePeriodSeconds"
+                    label={t('TERMINATION_GRACEPERIOD_SECONDS')}
+                    rules={[{ required: true }, { validator: validateSettings }]}
+                  >
+                    <InputNumber min={0} precision={0} />
+                  </FormItem>
+                </div>
+              </details>
             </section>
           </Form>
         </div>

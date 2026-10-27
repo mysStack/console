@@ -5,7 +5,8 @@
 
 import React, { useState } from 'react';
 import { cloneDeep } from 'lodash';
-import { Button, Modal } from '@kubed/components';
+import { Modal } from '@kubed/components';
+import { Container } from '@kubed/icons';
 import ContainerInput from './ContainerInput';
 import { ContainerCreateValues, validateContainers } from './deployment';
 
@@ -41,15 +42,45 @@ export default function ContainerSettingsInput({
     close();
   };
 
+  const limits = value.resources?.limits || {};
+  const limitLabel =
+    Object.values(limits).filter(Boolean).length > 0
+      ? Object.entries(limits)
+          .filter(([, quantity]) => quantity)
+          .map(([resource, quantity]) => `${resource.toUpperCase()} ${quantity}`)
+          .join(' / ')
+      : t('NO_RESOURCE_LIMIT');
+
   return (
     <div style={{ width: '100%', minWidth: 0 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ flex: 1, minWidth: 0, overflowWrap: 'anywhere' }}>
-          <strong>{value.name || `${t(kind)} ${index + 1}`}</strong>
-          <div>{value.image || t('CONTAINER_IMAGE')}</div>
-        </div>
-        <Button onClick={() => setDraft(cloneDeep(value))}>{t('EDIT_CONTAINER')}</Button>
-      </div>
+      <button
+        type="button"
+        aria-label={`${t('EDIT_CONTAINER')} ${value.name}`}
+        onClick={() => setDraft(cloneDeep(value))}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          width: '100%',
+          padding: '12px 44px 12px 12px',
+          border: '1px solid #e3e9ef',
+          borderRadius: 4,
+          background: '#fff',
+          textAlign: 'left',
+          cursor: 'pointer',
+        }}
+      >
+        <Container size={40} color="#36435c" />
+        <span style={{ flex: 1, minWidth: 0, overflowWrap: 'anywhere' }}>
+          <strong style={{ display: 'block', color: '#36435c' }}>
+            {value.name || `${t(kind)} ${index + 1}`}
+          </strong>
+          <span style={{ display: 'block', marginTop: 4, color: '#79879c' }}>
+            {t('IMAGE')}: {value.image || t('CONTAINER_IMAGE')}
+          </span>
+        </span>
+        <span style={{ color: '#79879c', whiteSpace: 'nowrap' }}>{limitLabel}</span>
+      </button>
       {draft && (
         <Modal
           visible

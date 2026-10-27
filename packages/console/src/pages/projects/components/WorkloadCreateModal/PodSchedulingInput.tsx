@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { Select } from '@kubed/components';
+import { ChevronDown } from '@kubed/icons';
 import { ArrayInput, ObjectInput } from '@ks-console/shared';
 import type { PodSchedulingRuleValues, PodSchedulingValues } from './deployment';
 
@@ -40,14 +41,46 @@ export default function PodSchedulingInput({
     { label: t('CUSTOM_RULES'), value: 'custom' },
   ];
 
+  const selectedLabel = modeOptions.find(option => option.value === value.mode)?.label;
+  const selectedDescription =
+    value.mode === 'default'
+      ? t('DEFAULT_RULES_DESC')
+      : value.mode === 'custom'
+        ? t('CUSTOM_RULES_DESC')
+        : undefined;
+
   return (
     <div style={{ display: 'grid', gap: 12, width: '100%' }}>
-      <Select
-        aria-label={t('POD_SCHEDULING_RULES')}
-        value={value.mode}
-        options={modeOptions}
-        onChange={setMode}
-      />
+      <div
+        data-test="workload-pod-scheduling-card"
+        style={{
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          padding: '8px 12px',
+          border: '1px solid #e3e9ef',
+          borderRadius: 4,
+          background: '#fff',
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ color: '#36435c', fontWeight: 600 }}>{selectedLabel}</div>
+          {selectedDescription && (
+            <p style={{ color: '#79879c', margin: '4px 0 0', fontSize: 12, lineHeight: 1.67 }}>
+              {selectedDescription}
+            </p>
+          )}
+        </div>
+        <ChevronDown size={20} color="#36435c" />
+        <Select
+          aria-label={t('POD_SCHEDULING_RULES')}
+          value={value.mode}
+          options={modeOptions}
+          onChange={setMode}
+          style={{ position: 'absolute', inset: 0, width: '100%', opacity: 0, cursor: 'pointer' }}
+        />
+      </div>
       {value.mode === 'custom' && (
         <ArrayInput
           value={value.rules || []}

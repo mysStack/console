@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { ChevronDown } from '@kubed/icons';
+import { ChevronDown, Update } from '@kubed/icons';
 import { Input, InputNumber, Select } from '@kubed/components';
 import type { WorkloadKind, WorkloadSettingsValues } from './deployment';
 
@@ -27,7 +27,7 @@ function StrategyField({ htmlFor, label, description, children }: StrategyFieldP
     <div>
       <label
         htmlFor={htmlFor}
-        style={{ display: 'block', marginBottom: 8, color: '#36435c', fontWeight: 600 }}
+        style={{ display: 'block', marginBottom: 4, color: '#36435c', fontWeight: 400 }}
       >
         {label}
         <span aria-hidden="true" style={{ color: '#ca2621', marginLeft: 4 }}>
@@ -35,7 +35,7 @@ function StrategyField({ htmlFor, label, description, children }: StrategyFieldP
         </span>
       </label>
       {children}
-      <p style={{ color: '#79879c', margin: '8px 0 0', fontSize: 12, lineHeight: 1.6 }}>
+      <p style={{ color: '#79879c', margin: '4px 0 0', fontSize: 12, lineHeight: 1.67 }}>
         {description}
       </p>
     </div>
@@ -56,29 +56,53 @@ export default function WorkloadUpdateStrategyInput({
         ? 'SIMULTANEOUS_UPDATE_DESC'
         : 'ONDELETE_DESC';
   const columns = kind === 'Deployment' ? '1fr 1fr' : '1fr';
+  const options = [
+    { label: t('ROLLING_UPDATE_RECOMMENDED'), value: 'RollingUpdate' },
+    kind === 'Deployment'
+      ? { label: t('SIMULTANEOUS_UPDATE'), value: 'Recreate' }
+      : { label: t('ONDELETE'), value: 'OnDelete' },
+  ];
+  const selectedLabel = options.find(option => option.value === value.type)?.label;
   return (
     <div style={{ display: 'grid', gap: 12, width: '100%' }}>
       <div
         data-test="workload-update-strategy-card"
-        style={{ border: '1px solid #d9e2ec', borderRadius: 4, padding: 16 }}
+        style={{
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          border: '1px solid #e3e9ef',
+          borderRadius: 4,
+          padding: '8px 12px',
+          background: '#fff',
+        }}
       >
+        <Update size={40} color="#36435c" />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ color: '#36435c', fontWeight: 600 }}>{selectedLabel}</div>
+          <p style={{ color: '#79879c', margin: '4px 0 0', fontSize: 12, lineHeight: 1.67 }}>
+            {t(description)}
+          </p>
+        </div>
+        <ChevronDown size={20} color="#36435c" />
         <Select
           aria-label={t('UPDATE_STRATEGY')}
           value={value.type}
-          options={[
-            { label: t('ROLLING_UPDATE_RECOMMENDED'), value: 'RollingUpdate' },
-            kind === 'Deployment'
-              ? { label: t('SIMULTANEOUS_UPDATE'), value: 'Recreate' }
-              : { label: t('ONDELETE'), value: 'OnDelete' },
-          ]}
+          options={options}
           onChange={type => update({ type })}
+          style={{ position: 'absolute', inset: 0, width: '100%', opacity: 0, cursor: 'pointer' }}
         />
-        <p style={{ color: '#79879c', margin: '8px 0 0' }}>{t(description)}</p>
       </div>
       {value.type === 'RollingUpdate' && (
         <details
           data-test="workload-update-strategy-settings"
-          style={{ border: '1px solid #d9e2ec', borderRadius: 4, padding: 16 }}
+          style={{
+            border: '1px solid #e3e9ef',
+            borderRadius: 4,
+            padding: '8px 12px',
+            background: '#fff',
+          }}
         >
           <summary
             data-test="workload-update-strategy-toggle"
@@ -86,7 +110,9 @@ export default function WorkloadUpdateStrategyInput({
               display: 'flex',
               alignItems: 'center',
               gap: 8,
+              padding: '4px 0',
               color: '#36435c',
+              fontSize: 12,
               fontWeight: 600,
               cursor: 'pointer',
               listStyle: 'none',
@@ -101,7 +127,10 @@ export default function WorkloadUpdateStrategyInput({
               display: 'grid',
               gridTemplateColumns: columns,
               gap: '16px 20px',
-              marginTop: 16,
+              marginTop: 8,
+              padding: 12,
+              background: '#f9fbfd',
+              borderRadius: 4,
             }}
           >
             {kind === 'StatefulSet' ? (
