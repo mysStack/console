@@ -684,8 +684,8 @@
   ],
   "verify": {
     "status": "进行中",
-    "reason": "2026-10-27 首屏面板已在 131 部署制品上复验：五分区、浅色导航加深色选中项、策略说明通过；字段标签布局、必填星号、字段说明、滚动更新折叠结构仍与 V3 不同，其余四分区和三类资源等价未闭环。",
-    "sourceCommit": "875d0bd26aa21d51b8d77bf885e50ec111b81045",
+    "reason": "2026-10-27 在 30880 部署制品（Run 40464188987，Pod sha256:36b7ce7a…）复验编辑设置更新策略分区：折叠区块、标签在上、必填星号、字段说明、两列布局、分区图标与 V3 一致，Deployment/StatefulSet/DaemonSet 均无 Wujie 或 iframe；策略卡片视觉、其余四分区字段等价和导航告警图标仍未闭环。",
+    "sourceCommit": "86c1f6d689cb1e7c61a44c8d259d394a7c4f2da7",
     "documents": [
       {
         "path": "docs/v4-migration/evidence/workload-delete-error-feedback-verify-20261025.json",
@@ -773,7 +773,7 @@
       },
       {
         "path": "docs/v4-migration/evidence/workload-settings-panel-verify-20261027.json",
-        "sha256": "963cd7d2d36601f378ea61e9e1c15931ff097f712fd6b5d713b126d0d3f3bbcf"
+        "sha256": "955e9f000abd0c626b0322c65cba4655b87f0eb276b710f747994fad1e759e2b"
       }
     ],
     "ciRun": "40457329956",
