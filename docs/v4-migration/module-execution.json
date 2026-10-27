@@ -5,8 +5,8 @@
   "resources": ["Deployment", "StatefulSet", "DaemonSet"],
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
-  "phase": "DEV",
-  "phaseReason": "2026-10-26 基线浏览器对照确认编辑设置视觉和字段边界仍有差异；重新进入 DEV，先修复已确认的原生编辑设置差异，再重新完成本模块 VERIFY。已保留 YAML 422 内联错误证据和当前制品信息。",
+  "phase": "VERIFY",
+  "phaseReason": "2026-10-27 已对 release-4.1.5 运行时基线确认的编辑设置首屏面板差异完成 DEV 增量和 CI 构建；进入 VERIFY，待部署到 131 并用 Playwright 对三类资源复验。其余字段和操作等价继续跟踪。",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -326,8 +326,8 @@
   },
   "dev": {
     "status": "已完成",
-    "reason": "已补充 YAML 编辑器失败时的可见内联错误状态；失败测试先红后绿，全量测试、包构建、ESLint、Prettier 和 git diff --check 通过，尚未用新制品部署复验。",
-    "sourceCommit": "94ea495150f157caa34bf3d3ee9036d6416fae86",
+    "reason": "本次首屏面板 DEV 增量 fcb919c94 已完成 TDD、22 个相关测试文件回归、Prettier、git diff --check，CI Run 40300396915 的 Unit tests 和镜像构建成功；业务验收仍在 VERIFY。",
+    "sourceCommit": "fcb919c94145b1c60bc43f48a1551cd4233d9731",
     "documents": [
       {
         "path": "docs/v4-migration/evidence/workload-negative-grace-defect-verify-20261025.json",
@@ -664,6 +664,10 @@
       {
         "path": "docs/v4-migration/evidence/workload-yaml-server-422-inline-error-dev-20261026.json",
         "sha256": "ac0fd97935aa8f2be9b8be1a4f59a5d66fbbe378d2dd93934a0bd80bfacd2c13"
+      },
+      {
+        "path": "docs/v4-migration/workload-settings-panel-dev-20261027.md",
+        "sha256": "8f84c49fecfc51e84d14deb3e447bbb903e61d6478a840afda53fe5e4cff5c04"
       }
     ]
   },
@@ -676,7 +680,7 @@
   ],
   "verify": {
     "status": "进行中",
-    "reason": "当前修复制品已完成 CI、部署和 Pod Ready；V4 与 release-4.1.5 的登录请求均到达 ks-apiserver OAuth password grant，但返回 invalid_grant，YAML 422 内联错误尚未在 Deployment、StatefulSet、DaemonSet 页面复验。其他 422/409/403/网络组合、完整字段、Action、低权限缓存和逐项 V3 等价仍未闭环。",
+    "reason": "2026-10-27 编辑设置首屏面板新制品待部署和浏览器复验；历史 YAML 422 及其他证据保留。三类资源完整字段、Action、RBAC、缓存和 V3 等价尚未闭环。",
     "sourceCommit": "94ea495150f157caa34bf3d3ee9036d6416fae86",
     "documents": [
       {
