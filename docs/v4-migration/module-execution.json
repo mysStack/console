@@ -6,7 +6,7 @@
   "developmentModel": "公共 Workload 能力共用实现，三类资源分别记录 REA、VERIFY 和验收结论",
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
   "phase": "VERIFY",
-  "phaseReason": "2026-10-27 已对 release-4.1.5 运行时基线确认的编辑设置首屏面板差异完成 DEV 增量和 CI 构建；进入 VERIFY，待部署到 131 并用 Playwright 对三类资源复验。其余字段和操作等价继续跟踪。",
+  "phaseReason": "2026-10-27 已部署编辑设置首屏面板增量制品并用 Playwright 对照 V3 复验：面板层级、选中态和策略说明通过；字段布局、必填标记、字段说明和折叠结构仍有差异，需回到 DEV。三类资源其余字段和操作等价继续跟踪。",
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -680,8 +680,8 @@
   ],
   "verify": {
     "status": "进行中",
-    "reason": "2026-10-27 编辑设置首屏面板新制品待部署和浏览器复验；历史 YAML 422 及其他证据保留。三类资源完整字段、Action、RBAC、缓存和 V3 等价尚未闭环。",
-    "sourceCommit": "94ea495150f157caa34bf3d3ee9036d6416fae86",
+    "reason": "2026-10-27 首屏面板已在 131 部署制品上复验：五分区、浅色导航加深色选中项、策略说明通过；字段标签布局、必填星号、字段说明、滚动更新折叠结构仍与 V3 不同，其余四分区和三类资源等价未闭环。",
+    "sourceCommit": "875d0bd26aa21d51b8d77bf885e50ec111b81045",
     "documents": [
       {
         "path": "docs/v4-migration/evidence/workload-delete-error-feedback-verify-20261025.json",
@@ -766,39 +766,43 @@
       {
         "path": "docs/v4-migration/evidence/workload-yaml-server-422-inline-error-verify-20261026.json",
         "sha256": "7021106c839bff6d9b9b933ab3c8e319faed8462005532b8053d535b823a673e"
+      },
+      {
+        "path": "docs/v4-migration/evidence/workload-settings-panel-verify-20261027.json",
+        "sha256": "963cd7d2d36601f378ea61e9e1c15931ff097f712fd6b5d713b126d0d3f3bbcf"
       }
     ],
-    "ciRun": "40262836786",
+    "ciRun": "40457329956",
     "ciStatus": "success",
-    "imageTag": "feature-v4-workloads-20261026-111309-884c0a0ec0d2",
-    "imageDigest": "sha256:efec7e903a98589cff39ff2205cf200dc0016e472a7baf6bf376734d1f9c450a",
+    "imageTag": "feature-v4-workloads-20261027-134915-875d0bd26aa2",
+    "imageDigest": "sha256:827f3e125f0012d9fddb3495dc79cabf253afce7b33e58c6d6efd9d4dc66d2cc",
     "candidate": {
       "ciRun": "40262836786",
-      "imageTag": "feature-v4-workloads-20261026-111309-884c0a0ec0d2",
-      "imageDigest": "sha256:efec7e903a98589cff39ff2205cf200dc0016e472a7baf6bf376734d1f9c450a",
+      "imageTag": "feature-v4-workloads-20261027-134915-875d0bd26aa2",
+      "imageDigest": "sha256:827f3e125f0012d9fddb3495dc79cabf253afce7b33e58c6d6efd9d4dc66d2cc",
       "deployment": "kubesphere-system/ks-console",
-      "generation": 614,
-      "pod": "ks-console-64d87b4b9-q8rg4",
-      "podImageID": "ghcr.io/mysstack/ks-console@sha256:efec7e903a98589cff39ff2205cf200dc0016e472a7baf6bf376734d1f9c450a",
-      "status": "已部署；浏览器登录被拒，三类 YAML 422 内联提示待验收"
+      "generation": 616,
+      "pod": "ks-console-7d86866bfc-7qqtm",
+      "podImageID": "ghcr.io/mysstack/ks-console@sha256:827f3e125f0012d9fddb3495dc79cabf253afce7b33e58c6d6efd9d4dc66d2cc",
+      "status": "已部署；首屏编辑设置面板 Playwright 复验通过，字段区差异待 DEV 修正"
     },
     "rollout": {
       "deployment": "kubesphere-system/ks-console",
-      "generation": 614,
+      "generation": 616,
       "status": "success",
-      "pod": "ks-console-64d87b4b9-q8rg4",
+      "pod": "ks-console-7d86866bfc-7qqtm",
       "podReady": true,
-      "podImageID": "ghcr.io/mysstack/ks-console@sha256:efec7e903a98589cff39ff2205cf200dc0016e472a7baf6bf376734d1f9c450a"
+      "podImageID": "ghcr.io/mysstack/ks-console@sha256:827f3e125f0012d9fddb3495dc79cabf253afce7b33e58c6d6efd9d4dc66d2cc"
     },
     "browserVerification": {
-      "status": "未开始三类页面复验：V4 与 release-4.1.5 登录均被 ks-apiserver OAuth 拒绝",
-      "evidence": "docs/v4-migration/evidence/workload-yaml-server-422-inline-error-verify-20261026.json",
-      "freshLogin": "否，环境变量账号登录失败",
+      "status": "已完成编辑设置首屏面板复验（三类资源中的 Deployment；StatefulSet、DaemonSet 待复验）",
+      "evidence": "docs/v4-migration/evidence/workload-settings-panel-verify-20261027.json",
+      "freshLogin": "是，使用环境变量测试账号新建登录",
       "moduleAcceptance": "未完成",
       "loginDiagnosis": "V4 与 release-4.1.5 Console 日志均记录 /oauth/token 返回 400 invalid_grant；未修改账号或认证配置"
     },
-    "lastEvidenceUpdate": "2026-10-26",
-    "evidence": "docs/v4-migration/evidence/workload-yaml-server-422-inline-error-verify-20261026.json"
+    "lastEvidenceUpdate": "2026-10-27",
+    "evidence": "docs/v4-migration/evidence/workload-settings-panel-verify-20261027.json"
   },
   "routeAdjustment": {
     "date": "2026-10-24",

@@ -1,0 +1,70 @@
+{
+  "date": "2026-10-27",
+  "scope": "Workload 编辑设置首屏面板视觉与分区对照（Deployment v4-deploy-edit-ef3）",
+  "sourceCommit": "875d0bd26aa21d51b8d77bf885e50ec111b81045",
+  "ci": {
+    "workflow": "build-personal-images.yml",
+    "run": "40457329956",
+    "status": "success",
+    "headSha": "875d0bd26aa21d51b8d77bf885e50ec111b81045",
+    "imageTag": "feature-v4-workloads-20261027-134915-875d0bd26aa2"
+  },
+  "deployment": {
+    "context": "default",
+    "deployment": "kubesphere-system/ks-console",
+    "serviceUrl": "http://192.168.2.131:30880",
+    "rolloutGeneration": 616,
+    "observedGeneration": 616,
+    "pod": "ks-console-7d86866bfc-7qqtm",
+    "podReady": true,
+    "podImage": "ghcr.io/mysstack/ks-console:feature-v4-workloads-20261027-134915-875d0bd26aa2",
+    "podImageID": "ghcr.io/mysstack/ks-console@sha256:827f3e125f0012d9fddb3495dc79cabf253afce7b33e58c6d6efd9d4dc66d2cc"
+  },
+  "browser": {
+    "tool": "playwright 1.63.0 chromium headless 1440x900",
+    "login": "新浏览器上下文，测试账号来自环境变量",
+    "v4": {
+      "url": "http://192.168.2.131:30880/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3/resource-status",
+      "entry": "更多操作 > 编辑设置",
+      "modal": {
+        "nav": { "width": 160, "height": 216, "backgroundColor": "rgb(241, 245, 249)" },
+        "panel": { "width": 942, "height": 299 },
+        "sections": ["更新策略", "容器", "存储", "容器组调度规则", "容器组优雅终止"],
+        "topFields": [],
+        "selectedItem": "更新策略（深色胶囊选中态）",
+        "strategyCard": "滚动更新（推荐）用新容器组副本逐步替换旧容器组副本。升级过程中业务流量会负载均衡到新旧容器组副本上，业务不会中断。",
+        "strategySettingsBlock": "独立边框区块，默认展开，含最大不可用容器组数量、最大多余容器组数量",
+        "pageErrors": []
+      }
+    },
+    "v3Baseline": {
+      "url": "http://192.168.2.131:30881/clusters/host/projects/v4-migration-e2e/deployments/v4-deploy-edit-ef3",
+      "entry": "更多操作 > 编辑设置",
+      "modal": {
+        "sections": ["更新策略", "容器", "存储", "容器组调度规则", "容器组优雅终止"],
+        "topFields": [],
+        "navIcons": true,
+        "strategyCard": "带策略图标的滚动更新卡片，含同一段策略说明",
+        "strategySettings": "可折叠的“滚动更新设置”区块，默认折叠；展开后两列字段，标签在输入框上方，带必填星号与字段说明",
+        "pageErrors": ["common is not defined"]
+      }
+    },
+    "equivalence": {
+      "closed": [
+        "五分区导航与名称一致",
+        "导航浅色底 + 深色选中项",
+        "白色设置面板与边框层级",
+        "策略说明文案一致",
+        "编辑设置入口不展示名称、项目、副本数量"
+      ],
+      "remaining": [
+        "V4 字段为标签内联、单列换行；V3 为标签在上、两列布局",
+        "V4 缺少必填星号与字段说明文案",
+        "V4 缺少“滚动更新设置”折叠标题，V3 默认折叠、可展开",
+        "V4 导航项缺少图标",
+        "容器、存储、调度规则、优雅终止四个分区的字段等价未在本轮验证"
+      ]
+    }
+  },
+  "conclusion": "首屏面板层级、选中态和策略说明已在部署制品上复验通过；字段布局、必填标记、字段说明和折叠结构仍与 V3 不同，需回到 DEV 修正后再复验。"
+}
