@@ -7,6 +7,19 @@
   "implementationPlan": "docs/v4-migration/workload-v4-native-migration-plan-20261024.md",
   "phase": "VERIFY",
   "phaseReason": "2026-10-27 文案与悬停删除修正完成，单元测试 431 个用例通过；等待重新构建并部署后做 30880 与 30881 五分区最终对比。",
+  "executionStatus": "已暂停",
+  "pause": {
+    "at": "2026-10-27",
+    "head": "73c40370b764fd2b510acf9bd19b82485c647a79",
+    "reason": "负责人决定暂停 V4 Workload 模块，转向 release-4.1.5 修复分支（fix/v4-v3-bridge-sync，测试环境 30881）继续优化；主计划 console-v4-migration-plan.md 已记录本次策略调整。",
+    "resumeFrom": [
+      "StatefulSet、DaemonSet 编辑设置五分区部署后对比",
+      "编辑设置真实保存写入验证",
+      "容器、存储二级编辑器与 V3 字段覆盖核对",
+      "PR 创建与 feature/v4-migration 合入"
+    ],
+    "preserved": "分支、Worktree、REA/DEV 记录和证据文档全部保留，不删除、不改写历史；恢复时以本文件未闭环项为准。"
+  },
   "rea": {
     "status": "已通过",
     "sourceCommit": "fc1253cbedd5ade51a6c87bfff4e1f3b38536a84",
@@ -688,7 +701,7 @@
   ],
   "verify": {
     "status": "进行中",
-    "reason": "2026-10-27 在 30880 部署 Run 40473992527 制品（generation 619，Pod imageID sha256:e36d931d…），Playwright 与 30881 同一 URL 对比：更新策略、容器、存储、调度规则、优雅终止五个分区文案与卡片结构一致，弹窗 1162x594、顶部 152、导航 172x428、面板 428 高一致；Deployment 交互冒烟通过。StatefulSet、DaemonSet 与保存写入仍未复验。",
+    "reason": "2026-10-27 在 30880 部署 Run 40473992527 制品（generation 619，Pod imageID sha256:e36d931d…），Playwright 与 30881 同一 URL 对比：更新策略、容器、存储、调度规则、优雅终止五个分区文案与卡片结构一致，弹窗 1162x594、顶部 152、导航 172x428、面板 428 高一致；Deployment 交互冒烟通过。StatefulSet、DaemonSet 与保存写入仍未复验。2026-10-27 起模块暂停，未完成项见 pause.resumeFrom。",
     "sourceCommit": "86c1f6d689cb1e7c61a44c8d259d394a7c4f2da7",
     "documents": [
       {
