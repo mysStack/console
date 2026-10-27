@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
   getConsoleV3MarkName,
   getConsoleV3ScopeKey,
+  isConsoleV3InstanceMounted,
   isConsoleV3ListCacheExpired,
   markConsoleV3Phase,
   normalizeConsoleV3Url,
@@ -41,28 +42,20 @@ test('ConsoleV3 scope guard distinguishes resource scopes', () => {
   assert.equal(shouldKeepConsoleV3Alive(listScope, otherNamespace), false);
 });
 
-test('ConsoleV3 rebuilds the shared app when switching resource scopes', () => {
+test('ConsoleV3 reuses the live app when switching resource scopes', () => {
   assert.equal(
     shouldRebuildConsoleV3Instance({
-      activeScopeKey: 'admin:deployments:/consolev3/test-wes/deployments',
-      scopeKey: 'admin:services:/consolev3/test-wes/services',
-      resourceUrl: '/consolev3/test-wes/services',
-      mountedResourceUrl: undefined,
       cacheExpired: false,
       deactivated: false,
       mountedRevision: undefined,
       revision: '0:0',
     }),
-    true,
+    false,
   );
 });
 
 test('ConsoleV3 rebuilds a stale cached scope after mutation or TTL expiry', () => {
   const input = {
-    activeScopeKey: 'admin:services:/consolev3/test-wes/services',
-    scopeKey: 'admin:services:/consolev3/test-wes/services',
-    resourceUrl: '/consolev3/test-wes/services',
-    mountedResourceUrl: '/consolev3/test-wes/services',
     cacheExpired: false,
     deactivated: true,
     mountedRevision: '0:0',
@@ -74,6 +67,24 @@ test('ConsoleV3 rebuilds a stale cached scope after mutation or TTL expiry', () 
     shouldRebuildConsoleV3Instance({ ...input, cacheExpired: true, deactivated: false }),
     true,
   );
+});
+
+test('ConsoleV3 treats a rendered ShadowRoot as a mounted app', () => {
+  const doc = {
+    querySelector: () => ({ shadowRoot: { childElementCount: 1 } }),
+  } as unknown as Document;
+
+  assert.equal(isConsoleV3InstanceMounted(doc), true);
+});
+
+test('ConsoleV3 treats an emptied ShadowRoot as unmounted', () => {
+  const emptied = {
+    querySelector: () => ({ shadowRoot: { childElementCount: 0 } }),
+  } as unknown as Document;
+  const missing = { querySelector: () => null } as unknown as Document;
+
+  assert.equal(isConsoleV3InstanceMounted(emptied), false);
+  assert.equal(isConsoleV3InstanceMounted(missing), false);
 });
 
 test('ConsoleV3 restores a bare project path to the absolute app URL', () => {
