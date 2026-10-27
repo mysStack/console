@@ -33,7 +33,7 @@ module.exports = function (app) {
     compress({
       threshold: 2048,
       flush: require('zlib').Z_SYNC_FLUSH,
-      br: false,
+      br: true,
     }),
   );
 
