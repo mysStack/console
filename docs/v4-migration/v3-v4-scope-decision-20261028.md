@@ -83,6 +83,28 @@
 补充：`dev-workspace-viewer` 的规则为 `['*']/['*']/get,list,watch`，按 KubeSphere 语义可读工作空间内所有项目资源；
 做“最小权限”验证时应用 `dev-workspace-regular` + 目标项目 `viewer`，否则会误判为越权。
 
+## 6.1 未知页抽样验证（2026-10-28/29，部署制品 `oci-repo-20261028-b0f2f08`）
+
+抽样覆盖集群、工作空间、项目、平台四类的高频页，判定标准为“页面能否通过 V3 嵌入正常渲染”。
+
+| 页面 | 路由 | 实测结果 | 结论 |
+| --- | --- | --- | --- |
+| 集群容器组列表 | `/clusters/host/pods` | 10 行，列头与数据正常 | 能做，保持嵌入 |
+| 集群部署列表 | `/clusters/host/deployments` | 10 行正常 | 能做，保持嵌入 |
+| 项目概览 | `…/projects/dev-wms/overview` | 卡片、配额、成员信息完整渲染 | 能做，保持嵌入 |
+| 项目自定义监控 | `…/projects/dev-wms/custom-monitoring` | 渲染“未发现自定义监控面板”空态 + 创建按钮 | 能做，保持嵌入 |
+| 项目日志收集 | `…/projects/dev-wms/log-collections` | 页面与说明正常渲染（未配置时为空态） | 能做，保持嵌入 |
+| 项目容器组详情 | `…/projects/dev-wms/pods/<pod>` | 属性、资源状态、容器、存储区块完整；日志/终端入口未点击验证 | 能做；交互项待补 |
+| 平台通知配置 | `/settings/notification-configuration` → `/settings/silent-policy` | 表格与空态正常 | 能做，保持嵌入 |
+| 集群概览 | `/clusters/host/overview` | 页面无 `consolev3` 宿主，为 V4 原生实现 | 不在迁移范围 |
+| 工作空间概览 | `/workspaces/dev-workspace/overview` → `…/usage` | 同上，V4 原生 | 不在迁移范围 |
+
+测量说明与偏差：
+
+- 这些页面的内容不在 `shadowRoot.innerText` 中（返回 0），早期用文本长度判定会误报“空白”；本次改用元素计数 + 截图复核。**后续自动化验收不要再用 innerText 判定 V3 嵌入页是否渲染。**
+- 一次容器组详情显示 `NotFound`，原因是选中的 CronJob Pod 已被回收，属数据问题，不是页面缺陷；换用 Deployment 的常驻 Pod 后渲染正常。
+- 结论只覆盖上表页面；盘点表里其余约 30 个“未知”页（各资源详情、集群设置、联邦项目等）仍未逐页验证，`需要做` 列也仍待业务填写。
+
 ## 7. 建议
 
 **选 B**，但需要三个前置条件：
