@@ -44,6 +44,7 @@ Playwright 1.63.0 headless Chromium，30881，`dev-wms`，SPA 内跳转（`pushS
 | `ab8fc1ea2` | `fetchRules` 改为规则快照比较，仅规则真正变化时清空失效代次；监听共享 ShadowRoot，将 `sandbox.alive` 恢复为 `true`（非保活卸载走 deactivate），并清理不持有 body 的模板空壳 |
 | `8e546908d` | 模板追加（即其他嵌入的非保活激活）后按 `sandbox.url` 触发一次 `replaceState` + `popstate`，把保活的子应用路由带到目标路由（**未生效**，见下）                               |
 | `f27c26ee7` | 激活路由同步改为无条件派发 `popstate`，仅在路径不同时补 `replaceState`；保活项目列表的恢复逻辑保持原短路行为                                                                |
+| `403af1ecc` | 没有子窗口句柄且 DOM 中没有已渲染实例时先 `destroyApp` 再挂载，按基线冷启动（`161dff607` → `e8bc9635e` 在 release 分支上收敛为 `c42a13b1c`）                                |
 
 `packages/console/src/components/ConsoleV3ResourceList/keepAlive.ts` 承载生命周期守卫，`metrics.ts` 增加从 DOM 解析共享 sandbox 的入口。
 
@@ -126,6 +127,14 @@ Playwright 1.63.0 headless Chromium，30881，`dev-wms`，首次进入 `/cluster
 同一脚本在 release 制品（`7c308ad90`）上首行为 11.0 s，重新跑一次 9.1 s。基线（`fc1253cbe`）在同一路径上是「首次使用即 `destroyApp` + 冷启动」约 4 秒，因此这是保活改造引入的退化：空壳实例被当成可用实例。
 
 `161dff607` 在没有子窗口句柄且 DOM 中没有已渲染实例时按基线处理（先 `destroyApp` 再挂载），stale 场景仍走就地重渲染。
+
+两种做法的实测对比（release 制品，同一脚本）：
+
+| 做法 | 首行 | 备注 |
+| --- | --- | --- |
+| 无子窗口句柄时 `destroyApp` + 冷启动（最终采用） | 3981～4437 ms | 销毁仍存活的 sandbox 时 wujie 内部异步收尾打印一条 `Cannot read properties of null (reading '_cacheListeners')`，渲染正常 |
+| 无子窗口句柄时 `reviveConsoleV3Instance` 就地重渲染 | 9730 ms | 需要 6.5 秒在已有 iframe 内重新执行应用，反而更慢，已回退 |
+| 不处理（`7c308ad` 行为） | 9066～11014 ms | 空壳激活 + 3 秒校验 + 就地重渲染 |
 
 ### 详情页嵌入
 
