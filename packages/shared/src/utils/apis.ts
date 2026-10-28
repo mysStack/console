@@ -9,7 +9,7 @@ import { getActions } from './nav';
 import { PathParams } from '../types';
 import { safeParseJSON } from './parser';
 import { Constants } from '../constants';
-import { clearResourceListRevisions } from './resourceListInvalidation';
+import { clearResourceListRevisions, ruleSnapshots } from './resourceListInvalidation';
 
 export const getUserModule = ({ cluster, workspace, namespace, devops }: PathParams = {}) => {
   if (namespace || devops) {
@@ -30,9 +30,6 @@ export const getUserModule = ({ cluster, workspace, namespace, devops }: PathPar
 type Rules = Record<string, any>;
 
 export const fetchRules = async (params: PathParams): Promise<Rules> => {
-  // Permission changes invalidate resource list snapshots. The next list mount
-  // must not reuse a V3 app initialized under the previous rule set.
-  clearResourceListRevisions();
   let module = 'globalroles';
   let urlParams = '';
   if (params.namespace || params.devops) {
@@ -138,6 +135,17 @@ export const fetchRules = async (params: PathParams): Promise<Rules> => {
       break;
     }
     default:
+  }
+
+  // Permission changes invalidate resource list snapshots, so the next list
+  // mount does not reuse a V3 app initialized under the previous rule set.
+  // A repeated fetch with unchanged rules (every layout entry) must not, or
+  // every cross-layout return rebuilds the shared app.
+  const scope = [module, params.cluster, params.workspace, params.namespace, params.devops]
+    .map(value => value || '')
+    .join('|');
+  if (ruleSnapshots.record(scope, rules)) {
+    clearResourceListRevisions();
   }
 
   return rules;

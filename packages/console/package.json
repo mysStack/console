@@ -24,6 +24,7 @@
     "react-markdown": "^7.1.1",
     "react-table": "^7.7.0",
     "react-textarea-autosize": "^8.3.2",
+    "wujie": "^1.0.25",
     "wujie-react": "^1.0.22"
   },
   "devDependencies": {
