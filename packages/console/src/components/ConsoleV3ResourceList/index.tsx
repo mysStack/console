@@ -3,6 +3,7 @@ import WujieReact from 'wujie-react';
 
 import { getResourceListCacheVersion } from '@ks-console/shared';
 
+import { watchConsoleV3Sandbox } from './keepAlive';
 import type { ConsoleV3AppWindow } from './metrics';
 import {
   getConsoleV3InstanceState,
@@ -90,6 +91,7 @@ export default function ConsoleV3ResourceList({
             phase === 'afterMount'
               ? (appWindow?: Window) => {
                   lastConsoleV3AppWindow = appWindow ?? lastConsoleV3AppWindow;
+                  watchConsoleV3Sandbox(lastConsoleV3AppWindow?.__WUJIE);
                   mountedResourceUrls.set(scopeKey, resourceUrl);
                   mountedRevisions.set(scopeKey, revision);
                   markConsoleV3Phase('afterMount', resourceUrl);
@@ -101,6 +103,7 @@ export default function ConsoleV3ResourceList({
                 : phase === 'activated'
                   ? (appWindow?: Window) => {
                       lastConsoleV3AppWindow = appWindow ?? lastConsoleV3AppWindow;
+                      watchConsoleV3Sandbox(lastConsoleV3AppWindow?.__WUJIE);
                       deactivatedScopes.delete(scopeKey);
                       // The first mount of a scope can activate without
                       // `afterMount`; record the rendered revision here too, or

@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
   getConsoleV3InstanceState,
   getConsoleV3MarkName,
+  getConsoleV3Sandbox,
   getConsoleV3ScopeKey,
   isConsoleV3InstanceMounted,
   isConsoleV3ListCacheExpired,
@@ -112,6 +113,21 @@ test('ConsoleV3 tells a destroyed sandbox from a cleared one', () => {
       __WUJIE: { mountFlag: true, shadowRoot: { childElementCount: 0 } },
     }),
     'stale',
+  );
+});
+
+test('ConsoleV3 resolves the live sandbox from the host ShadowRoot', () => {
+  const sandbox = { alive: true, mountFlag: true };
+  const doc = {
+    querySelector: () => ({
+      shadowRoot: { firstElementChild: { ownerDocument: { defaultView: { __WUJIE: sandbox } } } },
+    }),
+  } as unknown as Document;
+
+  assert.equal(getConsoleV3Sandbox(doc), sandbox);
+  assert.equal(
+    getConsoleV3Sandbox({ querySelector: () => null } as unknown as Document),
+    undefined,
   );
 });
 

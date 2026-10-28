@@ -1,3 +1,5 @@
+import type { ConsoleV3RouteWindow } from './route';
+
 export type ConsoleV3Phase =
   | 'beforeMount'
   | 'afterMount'
@@ -54,13 +56,48 @@ export const isConsoleV3InstanceMounted = (
 
 export type ConsoleV3InstanceState = 'missing' | 'stale' | 'ready';
 
+/** One `<html>` template Wujie appended to the shared ShadowRoot. */
+export interface ConsoleV3TemplateElement {
+  tagName?: string;
+  contains(node: unknown): boolean;
+  remove(): void;
+}
+
+export interface ConsoleV3ShadowRootLike {
+  childElementCount: number;
+  /** The canonical body Wujie moved into the newest template. */
+  body?: unknown;
+  children?: ArrayLike<ConsoleV3TemplateElement>;
+}
+
 export interface ConsoleV3SandboxLike {
+  alive?: boolean;
   mountFlag?: boolean | null;
-  shadowRoot?: { childElementCount: number } | null;
+  /** The URL the activating embed asked for. */
+  url?: string;
+  iframe?: { contentWindow?: ConsoleV3RouteWindow } | null;
+  shadowRoot?: ConsoleV3ShadowRootLike | null;
 }
 
 /** The child window Wujie hands to lifecycle callbacks, with its sandbox. */
 export type ConsoleV3AppWindow = Window & { __WUJIE?: ConsoleV3SandboxLike };
+
+/**
+ * The shared sandbox, resolved from the DOM.
+ *
+ * Lifecycle callbacks hand it over while the app is activating, but a caller
+ * that only learns about an activation afterwards (or never receives the
+ * callback) still needs a handle on the failing sandbox.
+ */
+export const getConsoleV3Sandbox = (
+  doc: Document | undefined = typeof document === 'undefined' ? undefined : document,
+): ConsoleV3SandboxLike | undefined => {
+  const host = doc?.querySelector('wujie-app[data-wujie-id="consolev3"]') as HTMLElement | null;
+  const element = host?.shadowRoot?.firstElementChild;
+  const appWindow = element?.ownerDocument?.defaultView as ConsoleV3AppWindow | null | undefined;
+
+  return appWindow?.__WUJIE;
+};
 
 /**
  * Where the shared `consolev3` sandbox stands, read from the child window that
