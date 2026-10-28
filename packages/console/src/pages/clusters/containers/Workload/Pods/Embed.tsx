@@ -4,15 +4,24 @@
  */
 
 import React from 'react';
-import WujieReact from 'wujie-react';
 import { useLocation, useParams } from 'react-router-dom';
+import ConsoleV3ResourceList from '../../../../../components/ConsoleV3ResourceList';
 
+/**
+ * Cluster-level list. It shares the `consolev3` app with the project lists, so
+ * it uses the same host component: rendering WujieReact directly without
+ * `alive` destroyed the shared app and left the next list blank while it
+ * booted again.
+ */
 export default function Embed() {
   const location = useLocation();
-
   const params: Record<string, any> = useParams();
   const { cluster } = params;
 
-  const url = `//${window.location.host}/consolev3/clusters/${cluster}/pods${location.search}`;
-  return <WujieReact width="100%" height="100%" name="consolev3" url={url} sync={false} />;
+  return (
+    <ConsoleV3ResourceList
+      resource="pods"
+      url={`//${window.location.host}/consolev3/clusters/${cluster}/pods${location.search}`}
+    />
+  );
 }
