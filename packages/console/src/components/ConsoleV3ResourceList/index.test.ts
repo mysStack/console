@@ -26,10 +26,11 @@ test('resource host renders a cleared instance again instead of booting it', () 
     /if \(!isReady\) return;[\s\S]*?\[isReady, resourceUrl, shouldRebuild\]/,
   );
   assert.ok(mountEffect, 'mount effect not found');
-  assert.match(mountEffect[0], /getConsoleV3InstanceState\(lastConsoleV3AppWindow\) !== 'stale'/);
+  // A cleared ShadowRoot keeps its host: no rebuild, render it in place.
+  assert.match(mountEffect[0], /if \(isConsoleV3InstanceMounted\(\)\)/);
 });
 
-test('resource host boots a clean app when it never saw the shared sandbox', () => {
+test('resource host boots a clean app when an empty host was left behind', () => {
   // Entering a V3-only page directly (cluster list/detail) creates the app
   // without `alive`; its unmount clears the ShadowRoot and no child window is
   // kept here. Activating that husk renders nothing, so start from zero.
@@ -37,12 +38,23 @@ test('resource host boots a clean app when it never saw the shared sandbox', () 
     /if \(!isReady\) return;[\s\S]*?\[isReady, resourceUrl, shouldRebuild\]/,
   );
   assert.ok(mountEffect, 'mount effect not found');
-  assert.match(mountEffect[0], /!lastConsoleV3AppWindow && !isConsoleV3InstanceMounted\(\)/);
-  const coldStart = mountEffect[0].match(/!lastConsoleV3AppWindow[\s\S]*?return;/);
-  assert.ok(coldStart, 'cold start branch not found');
-  // `destroyApp` is a no-op without an instance and a cold boot is 4.4 s here,
-  // while rendering the cleared sandbox again measured 9.7 s.
-  assert.match(coldStart[0], /WujieReact\.destroyApp\('consolev3'\)/);
+  const coldStart = mountEffect[0].match(/if \(!lastConsoleV3AppWindow && hasConsoleV3Host\(\)\) \{[\s\S]*?return;/);
+  assert.ok(coldStart, 'empty-host branch not found');
+  // Only a host left in the DOM can be a cleared embed.
+  assert.match(coldStart[0], /destroyApp\('consolev3'\)/);
+});
+
+test('resource host renders a preloaded app in place when no host exists', () => {
+  // `initWujie` preloads `consolev3`, and Wujie's `alive` start only activates
+  // an existing sandbox, never mounts it: a cold entry would stay blank and
+  // destroying the preload first rejected inside Wujie's teardown.
+  const mountEffect = source.match(
+    /if \(!isReady\) return;[\s\S]*?\[isReady, resourceUrl, shouldRebuild\]/,
+  );
+  assert.ok(mountEffect, 'mount effect not found');
+  const tail = mountEffect[0].slice(mountEffect[0].indexOf('hasConsoleV3Host'));
+  assert.ok(tail.length > 0, 'hasConsoleV3Host guard not found');
+  assert.match(tail, /reviveConsoleV3Instance\(resourceUrl\)\.then/);
 });
 
 test('resource host keeps the child window of the shared sandbox', () => {

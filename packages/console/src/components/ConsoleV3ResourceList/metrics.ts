@@ -54,6 +54,17 @@ export const isConsoleV3InstanceMounted = (
   return Boolean(shadowRoot && shadowRoot.childElementCount > 0);
 };
 
+/**
+ * Whether the shared app still owns a host element in the document.
+ *
+ * `preloadApp` creates a sandbox without rendering anything, so a cold entry has
+ * a sandbox but no host. A host that renders nothing is what a non-alive embed
+ * leaves behind, and only that has to be cleared before mounting.
+ */
+export const hasConsoleV3Host = (
+  doc: Document | undefined = typeof document === 'undefined' ? undefined : document,
+): boolean => Boolean(doc?.querySelector('wujie-app[data-wujie-id="consolev3"]'));
+
 export type ConsoleV3InstanceState = 'missing' | 'stale' | 'ready';
 
 /** One `<html>` template Wujie appended to the shared ShadowRoot. */

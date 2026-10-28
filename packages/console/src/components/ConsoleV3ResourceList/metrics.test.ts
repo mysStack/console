@@ -6,6 +6,7 @@ import {
   getConsoleV3MarkName,
   getConsoleV3Sandbox,
   getConsoleV3ScopeKey,
+  hasConsoleV3Host,
   isConsoleV3InstanceMounted,
   markConsoleV3Phase,
   normalizeConsoleV3Url,
@@ -82,8 +83,7 @@ test('ConsoleV3 reuses a scope the user left idle instead of rebuilding it', () 
   );
 });
 
-test('ConsoleV3 treats a rendered ShadowRoot as a mounted app', () => {
-  const doc = {
+test('ConsoleV3 treats a rendered ShadowRoot as a mounted app', () => {  const doc = {
     querySelector: () => ({ shadowRoot: { childElementCount: 1 } }),
   } as unknown as Document;
 
@@ -98,6 +98,16 @@ test('ConsoleV3 treats an emptied ShadowRoot as unmounted', () => {
 
   assert.equal(isConsoleV3InstanceMounted(emptied), false);
   assert.equal(isConsoleV3InstanceMounted(missing), false);
+});
+
+test('ConsoleV3 tells a preloaded sandbox from a host left in the DOM', () => {
+  // A preloaded sandbox renders nothing, so a cold entry has no host. Only a
+  // host without content is a cleared embed that has to be destroyed.
+  assert.equal(
+    hasConsoleV3Host({ querySelector: () => ({ shadowRoot: { childElementCount: 0 } }) } as unknown as Document),
+    true,
+  );
+  assert.equal(hasConsoleV3Host({ querySelector: () => null } as unknown as Document), false);
 });
 
 test('ConsoleV3 tells a destroyed sandbox from a cleared one', () => {

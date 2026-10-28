@@ -8,6 +8,7 @@ import type { ConsoleV3AppWindow } from './metrics';
 import {
   getConsoleV3InstanceState,
   getConsoleV3ScopeKey,
+  hasConsoleV3Host,
   isConsoleV3InstanceMounted,
   markConsoleV3Phase,
   normalizeConsoleV3Url,
@@ -133,21 +134,23 @@ export default function ConsoleV3ResourceList({
       setInstanceReady(true);
       return;
     }
-    // An embed without `alive` (cluster and other V3-only routes) clears the
-    // shared ShadowRoot on unmount but leaves the sandbox and its scripts
-    // loaded. Render the app again in place instead of booting it from zero.
-    // Entering such a route first leaves no child window here, and the cleared
-    // sandbox renders nothing when activated: boot a clean app, as the plain
-    // mount always did, instead of waiting for the verify timer below.
-    if (!lastConsoleV3AppWindow && !isConsoleV3InstanceMounted()) {
+    // Something is rendered: Wujie's activation reuses it.
+    if (isConsoleV3InstanceMounted()) {
+      setInstanceReady(true);
+      return;
+    }
+    // An embed without `alive` (cluster and other V3-only routes) leaves an
+    // empty host behind and no child window here. Activating that shell renders
+    // nothing, so boot a clean app, as the plain mount always did.
+    if (!lastConsoleV3AppWindow && hasConsoleV3Host()) {
       WujieReact.destroyApp('consolev3');
       setInstanceReady(true);
       return;
     }
-    if (getConsoleV3InstanceState(lastConsoleV3AppWindow) !== 'stale') {
-      setInstanceReady(true);
-      return;
-    }
+    // Nothing rendered and no host: `initWujie` preloaded the app, and Wujie
+    // never mounts a preloaded sandbox when the embed asks for `alive`, so an
+    // activation would show an empty page. Render it in place first; destroying
+    // it instead costs the cold boot and rejects inside Wujie's own teardown.
     let cancelled = false;
     reviveConsoleV3Instance(resourceUrl).then(() => {
       if (!cancelled) setInstanceReady(true);
