@@ -77,6 +77,8 @@ export interface ConsoleV3SandboxLike {
   url?: string;
   iframe?: { contentWindow?: ConsoleV3RouteWindow } | null;
   shadowRoot?: ConsoleV3ShadowRootLike | null;
+  /** Wujie's own unmount, asynchronous: it awaits the child unmount hook. */
+  unmount?: () => Promise<unknown> | unknown;
 }
 
 /** The child window Wujie hands to lifecycle callbacks, with its sandbox. */
@@ -98,6 +100,31 @@ export const getConsoleV3Sandbox = (
 
   return appWindow?.__WUJIE;
 };
+
+/** How long a host lets a boot it asked for finish before rebuilding. */
+export const CONSOLE_V3_BOOT_GRACE_MS = 15_000;
+
+/**
+ * Whether the shared app was started so recently that its boot may still run.
+ *
+ * `startApp` loads the V3 bundle and only then mounts it, so the ShadowRoot
+ * stays empty for seconds. The project layout writes the Wujie prefix in more
+ * than one effect, and a host that sees the newer URL during that window used
+ * to destroy the booting sandbox. Wujie 1.0.25 tears a sandbox down without
+ * awaiting its unmount, which leaves the page reporting `null._cacheListeners`.
+ * Let the boot finish instead: `wujie-react` queues the newer `startApp`
+ * behind the running one and activates the app with the newest URL.
+ */
+export const isConsoleV3BootInFlight = (
+  bootStartedAt: number,
+  now: number = Date.now(),
+  mounted: boolean = isConsoleV3InstanceMounted(),
+  sandbox: ConsoleV3SandboxLike | undefined = getConsoleV3Sandbox(),
+): boolean =>
+  Boolean(bootStartedAt) &&
+  now - bootStartedAt < CONSOLE_V3_BOOT_GRACE_MS &&
+  Boolean(sandbox) &&
+  !mounted;
 
 /**
  * Where the shared `consolev3` sandbox stands, read from the child window that

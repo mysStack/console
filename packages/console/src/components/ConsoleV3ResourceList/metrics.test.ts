@@ -2,10 +2,12 @@ import assert from 'node:assert';
 import test from 'node:test';
 import * as metrics from './metrics';
 import {
+  CONSOLE_V3_BOOT_GRACE_MS,
   getConsoleV3InstanceState,
   getConsoleV3MarkName,
   getConsoleV3Sandbox,
   getConsoleV3ScopeKey,
+  isConsoleV3BootInFlight,
   isConsoleV3InstanceMounted,
   markConsoleV3Phase,
   normalizeConsoleV3Url,
@@ -63,10 +65,7 @@ test('ConsoleV3 rebuilds a stale cached scope after a mutation', () => {
   };
 
   assert.equal(shouldRebuildConsoleV3Instance(input), true);
-  assert.equal(
-    shouldRebuildConsoleV3Instance({ ...input, deactivated: false }),
-    false,
-  );
+  assert.equal(shouldRebuildConsoleV3Instance({ ...input, deactivated: false }), false);
 });
 
 test('ConsoleV3 reuses a scope the user left idle instead of rebuilding it', () => {
@@ -163,4 +162,21 @@ test('ConsoleV3 keeps no time-based list cache', () => {
   // The TTL forced a destroyApp + cold boot whenever a detour lasted 30 s. It
   // is gone: reuse is bounded by mutations (`mountedRevision`), not by a clock.
   assert.equal('isConsoleV3ListCacheExpired' in metrics, false);
+});
+
+test('ConsoleV3 treats a young, unmounted sandbox as a boot in flight', () => {
+  const sandbox = { mountFlag: false };
+
+  assert.equal(isConsoleV3BootInFlight(1_000, 2_000, false, sandbox), true);
+  // Mounted: the boot finished, nothing left to protect.
+  assert.equal(isConsoleV3BootInFlight(1_000, 2_000, true, sandbox), false);
+  // No sandbox at all: `destroyApp` would be a no-op, the branch is cold anyway.
+  assert.equal(isConsoleV3BootInFlight(1_000, 2_000, false, undefined), false);
+  // No host asked for a boot yet.
+  assert.equal(isConsoleV3BootInFlight(0, 2_000, false, sandbox), false);
+  // A boot that never finished stops shielding the sandbox after the grace.
+  assert.equal(
+    isConsoleV3BootInFlight(1_000, 1_000 + CONSOLE_V3_BOOT_GRACE_MS, false, sandbox),
+    false,
+  );
 });
