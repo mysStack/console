@@ -5,7 +5,6 @@ import { getResourceListCacheVersion } from '@ks-console/shared';
 
 import {
   getConsoleV3ScopeKey,
-  getConsoleV3VerifyDelayMs,
   isConsoleV3InstanceMounted,
   isConsoleV3ListCacheExpired,
   markConsoleV3Phase,
@@ -20,9 +19,6 @@ const mountedRevisions = new Map<string, string>();
 const deactivatedScopes = new Set<string>();
 export const DEFAULT_CONSOLE_V3_LIST_CACHE_TTL = 30_000;
 const VERIFY_MOUNT_DELAY_MS = 3_000;
-// Set once any list mount rendered. A later empty ShadowRoot means another
-// caller destroyed the shared app, not that the app is still booting.
-let hasRenderedConsoleV3 = false;
 
 export interface ConsoleV3ResourceListProps {
   resource: string;
@@ -97,7 +93,6 @@ export default function ConsoleV3ResourceList({
                 : phase === 'activated'
                   ? (appWindow?: Window) => {
                       deactivatedScopes.delete(scopeKey);
-                      hasRenderedConsoleV3 = true;
                       // The first mount of a scope can activate without
                       // `afterMount`; record the rendered revision here too, or
                       // the first return to that scope rebuilds the app.
@@ -143,16 +138,13 @@ export default function ConsoleV3ResourceList({
   // so the fast activation path stays available.
   useEffect(() => {
     if (!instanceReady) return;
-    const timer = window.setTimeout(
-      () => {
-        if (isConsoleV3InstanceMounted()) return;
-        if (retriedUrlRef.current === resourceUrl) return;
-        retriedUrlRef.current = resourceUrl;
-        WujieReact.destroyApp('consolev3');
-        setRetryCount(count => count + 1);
-      },
-      getConsoleV3VerifyDelayMs(hasRenderedConsoleV3, VERIFY_MOUNT_DELAY_MS),
-    );
+    const timer = window.setTimeout(() => {
+      if (isConsoleV3InstanceMounted()) return;
+      if (retriedUrlRef.current === resourceUrl) return;
+      retriedUrlRef.current = resourceUrl;
+      WujieReact.destroyApp('consolev3');
+      setRetryCount(count => count + 1);
+    }, VERIFY_MOUNT_DELAY_MS);
     return () => window.clearTimeout(timer);
   }, [instanceReady, resourceUrl, retryCount]);
 

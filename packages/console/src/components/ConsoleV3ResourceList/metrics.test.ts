@@ -3,7 +3,6 @@ import test from 'node:test';
 import {
   getConsoleV3MarkName,
   getConsoleV3ScopeKey,
-  getConsoleV3VerifyDelayMs,
   isConsoleV3InstanceMounted,
   isConsoleV3ListCacheExpired,
   markConsoleV3Phase,
@@ -109,10 +108,4 @@ test('ConsoleV3 list cache expires after the configured TTL', () => {
   assert.equal(isConsoleV3ListCacheExpired(undefined, 30_000, 30_000), false);
   assert.equal(isConsoleV3ListCacheExpired(0, 30_000, 30_000), false);
   assert.equal(isConsoleV3ListCacheExpired(0, 30_001, 30_000), true);
-});
-
-test('ConsoleV3 verifies a reused instance earlier than a cold mount', () => {
-  assert.equal(getConsoleV3VerifyDelayMs(false, 3000), 3000);
-  assert.equal(getConsoleV3VerifyDelayMs(true, 3000), 1000);
-  assert.equal(getConsoleV3VerifyDelayMs(true, 500), 500);
 });
