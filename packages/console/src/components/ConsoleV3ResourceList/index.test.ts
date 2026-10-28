@@ -10,8 +10,7 @@ test('resource host reuses the consolev3 app and exposes activation lifecycle ma
   assert.match(source, /destroyApp\('consolev3'\)/);
   assert.match(source, /isConsoleV3InstanceMounted/);
   assert.match(source, /shouldRebuildConsoleV3Instance/);
-  assert.match(source, /DEFAULT_CONSOLE_V3_LIST_CACHE_TTL = 30_000/);
-  assert.match(source, /cacheTtlMs/);
+  assert.doesNotMatch(source, /DEFAULT_CONSOLE_V3_LIST_CACHE_TTL|cacheTtlMs/);
   assert.match(source, /markConsoleV3Phase/);
   assert.match(source, /activated/);
   assert.match(source, /render/);

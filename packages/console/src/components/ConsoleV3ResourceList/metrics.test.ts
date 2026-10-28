@@ -1,12 +1,12 @@
 import assert from 'node:assert';
 import test from 'node:test';
+import * as metrics from './metrics';
 import {
   getConsoleV3InstanceState,
   getConsoleV3MarkName,
   getConsoleV3Sandbox,
   getConsoleV3ScopeKey,
   isConsoleV3InstanceMounted,
-  isConsoleV3ListCacheExpired,
   markConsoleV3Phase,
   normalizeConsoleV3Url,
   shouldRebuildConsoleV3Instance,
@@ -47,7 +47,6 @@ test('ConsoleV3 scope guard distinguishes resource scopes', () => {
 test('ConsoleV3 reuses the live app when switching resource scopes', () => {
   assert.equal(
     shouldRebuildConsoleV3Instance({
-      cacheExpired: false,
       deactivated: false,
       mountedRevision: undefined,
       revision: '0:0',
@@ -56,9 +55,8 @@ test('ConsoleV3 reuses the live app when switching resource scopes', () => {
   );
 });
 
-test('ConsoleV3 rebuilds a stale cached scope after mutation or TTL expiry', () => {
+test('ConsoleV3 rebuilds a stale cached scope after a mutation', () => {
   const input = {
-    cacheExpired: false,
     deactivated: true,
     mountedRevision: '0:0',
     revision: '1:1',
@@ -66,8 +64,21 @@ test('ConsoleV3 rebuilds a stale cached scope after mutation or TTL expiry', () 
 
   assert.equal(shouldRebuildConsoleV3Instance(input), true);
   assert.equal(
-    shouldRebuildConsoleV3Instance({ ...input, cacheExpired: true, deactivated: false }),
-    true,
+    shouldRebuildConsoleV3Instance({ ...input, deactivated: false }),
+    false,
+  );
+});
+
+test('ConsoleV3 reuses a scope the user left idle instead of rebuilding it', () => {
+  // Returning after a long detour used to trip the 30 s list cache TTL and pay
+  // a ~5 s cold boot. The app re-fetches on activation, so idling is not staleness.
+  assert.equal(
+    shouldRebuildConsoleV3Instance({
+      deactivated: true,
+      mountedRevision: '0:0',
+      revision: '0:0',
+    }),
+    false,
   );
 });
 
@@ -148,8 +159,8 @@ test('ConsoleV3 leaves an unresolved URL untouched instead of guessing', () => {
   assert.equal(normalizeConsoleV3Url('undefined/pods', 'ks.test:30881'), 'undefined/pods');
 });
 
-test('ConsoleV3 list cache expires after the configured TTL', () => {
-  assert.equal(isConsoleV3ListCacheExpired(undefined, 30_000, 30_000), false);
-  assert.equal(isConsoleV3ListCacheExpired(0, 30_000, 30_000), false);
-  assert.equal(isConsoleV3ListCacheExpired(0, 30_001, 30_000), true);
+test('ConsoleV3 keeps no time-based list cache', () => {
+  // The TTL forced a destroyApp + cold boot whenever a detour lasted 30 s. It
+  // is gone: reuse is bounded by mutations (`mountedRevision`), not by a clock.
+  assert.equal('isConsoleV3ListCacheExpired' in metrics, false);
 });

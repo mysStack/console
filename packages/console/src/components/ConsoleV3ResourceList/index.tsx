@@ -9,7 +9,6 @@ import {
   getConsoleV3InstanceState,
   getConsoleV3ScopeKey,
   isConsoleV3InstanceMounted,
-  isConsoleV3ListCacheExpired,
   markConsoleV3Phase,
   normalizeConsoleV3Url,
   shouldRebuildConsoleV3Instance,
@@ -17,20 +16,17 @@ import {
 import { reviveConsoleV3Instance } from './revive';
 import { scheduleConsoleV3ListRouteSync } from './route';
 
-const lastScopeUseAt = new Map<string, number>();
 const mountedResourceUrls = new Map<string, string>();
 const mountedRevisions = new Map<string, string>();
 const deactivatedScopes = new Set<string>();
 // The child window is the only handle on the shared sandbox once its host
 // element is detached, and it is what tells a reusable app from a cleared one.
 let lastConsoleV3AppWindow: ConsoleV3AppWindow | undefined;
-export const DEFAULT_CONSOLE_V3_LIST_CACHE_TTL = 30_000;
 const VERIFY_MOUNT_DELAY_MS = 3_000;
 
 export interface ConsoleV3ResourceListProps {
   resource: string;
   url: string;
-  cacheTtlMs?: number;
 }
 
 /**
@@ -41,7 +37,6 @@ export interface ConsoleV3ResourceListProps {
 export default function ConsoleV3ResourceList({
   resource,
   url,
-  cacheTtlMs = DEFAULT_CONSOLE_V3_LIST_CACHE_TTL,
 }: ConsoleV3ResourceListProps): JSX.Element {
   const [instanceReady, setInstanceReady] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
@@ -57,23 +52,16 @@ export default function ConsoleV3ResourceList({
   const revision = getResourceListCacheVersion(resource);
   const user = globals?.user?.username || 'anonymous';
   const scopeKey = isReady ? getConsoleV3ScopeKey(resource, resolvedUrl, user) : '';
-  const now = Date.now();
-  const lastUsedAt = lastScopeUseAt.get(scopeKey);
-  const cacheExpired = isConsoleV3ListCacheExpired(lastUsedAt, now, cacheTtlMs);
   // Keep the iframe URL stable. The revision is used only to decide whether a
   // deactivated instance must be rebuilt after a resource mutation.
   const resourceUrl = resolvedUrl;
   // Reuse the live app across resource scopes: activation syncs the new list
   // route. The mount effect below rebuilds only if the reused app stays empty.
   const shouldRebuild = shouldRebuildConsoleV3Instance({
-    cacheExpired,
     deactivated: deactivatedScopes.has(scopeKey),
     mountedRevision: mountedRevisions.get(scopeKey),
     revision,
   });
-  if (isReady) {
-    lastScopeUseAt.set(scopeKey, now);
-  }
   const lifecycle = useMemo(
     () =>
       (
