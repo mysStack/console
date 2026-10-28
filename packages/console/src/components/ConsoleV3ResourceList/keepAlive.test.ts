@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   keepConsoleV3SandboxAlive,
   pruneConsoleV3Templates,
+  scheduleConsoleV3ActivationRoute,
   watchConsoleV3Sandbox,
 } from './keepAlive';
 
@@ -99,4 +100,76 @@ test('a rebuilt sandbox gets its own watcher', () => {
 
   assert.equal(watchConsoleV3Sandbox({ alive: true, shadowRoot }, FakeObserver), true);
   assert.equal(watchConsoleV3Sandbox({ alive: true, shadowRoot }, FakeObserver), false);
+});
+
+const childWindow = (pathname: string) => {
+  const replaced: string[] = [];
+  const events: string[] = [];
+  return {
+    replaced,
+    events,
+    window: {
+      location: { pathname, search: '', hash: '' },
+      history: { state: null, replaceState: (_state, _title, url) => replaced.push(String(url)) },
+      dispatchEvent: event => events.push(event.type),
+      requestAnimationFrame: callback => {
+        callback(0);
+        return 0;
+      },
+    },
+  };
+};
+
+test('moves a kept-alive child router to the activating route', () => {
+  const child = childWindow('/consolev3/clusters/host/pods');
+  const sandbox = {
+    url: '//ks.test:30881/consolev3/clusters/host/deployments',
+    iframe: { contentWindow: child.window },
+  };
+
+  assert.equal(scheduleConsoleV3ActivationRoute(sandbox), true);
+  assert.deepEqual(child.replaced, ['/consolev3/clusters/host/deployments']);
+  assert.deepEqual(child.events, ['popstate']);
+});
+
+test('leaves a child router that already sits on the activating route alone', () => {
+  const child = childWindow('/consolev3/clusters/host/pods');
+  const sandbox = {
+    url: '//ks.test:30881/consolev3/clusters/host/pods',
+    iframe: { contentWindow: child.window },
+  };
+
+  assert.equal(scheduleConsoleV3ActivationRoute(sandbox), true);
+  assert.deepEqual(child.replaced, []);
+  assert.deepEqual(child.events, []);
+});
+
+test('cannot route a sandbox without a child window', () => {
+  assert.equal(scheduleConsoleV3ActivationRoute(undefined), false);
+  assert.equal(scheduleConsoleV3ActivationRoute({ url: '//ks.test/consolev3/pods' }), false);
+});
+
+test('a new template routes the app; pruning a shell does not', () => {
+  const callbacks: Array<(records: MutationRecord[]) => void> = [];
+  const FakeObserver = class {
+    constructor(callback: (records: MutationRecord[]) => void) {
+      callbacks.push(callback);
+    }
+    observe() {}
+  } as unknown as typeof MutationObserver;
+  const child = childWindow('/consolev3/clusters/host/pods');
+  const shadowRoot = { childElementCount: 1, body, children: [template(true)] };
+  const sandbox = {
+    alive: true,
+    url: '//ks.test:30881/consolev3/clusters/host/deployments',
+    iframe: { contentWindow: child.window },
+    shadowRoot,
+  };
+
+  watchConsoleV3Sandbox(sandbox, FakeObserver);
+  callbacks[0]([{ addedNodes: [{}] } as unknown as MutationRecord]);
+  assert.deepEqual(child.events, ['popstate']);
+
+  callbacks[0]([{ addedNodes: [], removedNodes: [{}] } as unknown as MutationRecord]);
+  assert.deepEqual(child.events, ['popstate']);
 });

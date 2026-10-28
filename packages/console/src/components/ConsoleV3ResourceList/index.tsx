@@ -3,6 +3,7 @@ import WujieReact from 'wujie-react';
 
 import { getResourceListCacheVersion } from '@ks-console/shared';
 
+import { watchConsoleV3Sandbox } from './keepAlive';
 import type { ConsoleV3AppWindow } from './metrics';
 import {
   getConsoleV3InstanceState,
@@ -13,7 +14,6 @@ import {
   normalizeConsoleV3Url,
   shouldRebuildConsoleV3Instance,
 } from './metrics';
-import { watchConsoleV3Sandbox } from './keepAlive';
 import { reviveConsoleV3Instance } from './revive';
 import { scheduleConsoleV3ListRouteSync } from './route';
 

@@ -1,4 +1,5 @@
 import type { ConsoleV3SandboxLike, ConsoleV3ShadowRootLike } from './metrics';
+import { scheduleConsoleV3ListRouteSync } from './route';
 
 /**
  * Wujie treats `sandbox.alive` as the owner's decision for the whole app, not
@@ -34,10 +35,27 @@ export const pruneConsoleV3Templates = (shadowRoot?: ConsoleV3ShadowRootLike | n
   return removed;
 };
 
+/**
+ * Wujie syncs the activating embed's URL into the child with
+ * `history.replaceState`, which a child router never observes. A non-alive
+ * embed survives that because Wujie unmounts and mounts the child around it;
+ * a kept-alive app keeps its router state, so the host has to move the router
+ * to the route the embed asked for.
+ */
+export const scheduleConsoleV3ActivationRoute = (
+  sandbox?: ConsoleV3SandboxLike | null,
+): boolean => {
+  const appWindow = sandbox?.iframe?.contentWindow;
+  if (!appWindow || !sandbox?.url) return false;
+
+  scheduleConsoleV3ListRouteSync(appWindow, sandbox.url);
+  return true;
+};
+
 const watchedShadowRoots = new WeakSet<object>();
 
 /**
- * Apply both guards now and after every template change of this ShadowRoot.
+ * Apply the guards now and after every template change of this ShadowRoot.
  *
  * Returns whether a watcher was attached. A ShadowRoot is watched once; a
  * rebuilt sandbox brings a new ShadowRoot and gets its own watcher.
@@ -54,9 +72,14 @@ export const watchConsoleV3Sandbox = (
   }
 
   watchedShadowRoots.add(shadowRoot);
-  const synchronize = () => {
+  const synchronize = (records?: MutationRecord[]) => {
     keepConsoleV3SandboxAlive(sandbox);
     pruneConsoleV3Templates(shadowRoot);
+    // Only an appended template marks another caller's non-alive activation;
+    // pruning our own shell must not re-trigger the route sync.
+    if (records?.some(record => record.addedNodes.length > 0)) {
+      scheduleConsoleV3ActivationRoute(sandbox);
+    }
   };
   synchronize();
   new MutationObserverCtor(synchronize).observe(shadowRoot as unknown as Node, {

@@ -1,3 +1,5 @@
+import type { ConsoleV3RouteWindow } from './route';
+
 export type ConsoleV3Phase =
   | 'beforeMount'
   | 'afterMount'
@@ -71,6 +73,9 @@ export interface ConsoleV3ShadowRootLike {
 export interface ConsoleV3SandboxLike {
   alive?: boolean;
   mountFlag?: boolean | null;
+  /** The URL the activating embed asked for. */
+  url?: string;
+  iframe?: { contentWindow?: ConsoleV3RouteWindow } | null;
   shadowRoot?: ConsoleV3ShadowRootLike | null;
 }
 
