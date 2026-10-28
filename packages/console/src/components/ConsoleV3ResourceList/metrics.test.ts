@@ -1,6 +1,7 @@
 import assert from 'node:assert';
 import test from 'node:test';
 import {
+  getConsoleV3InstanceState,
   getConsoleV3MarkName,
   getConsoleV3ScopeKey,
   isConsoleV3InstanceMounted,
@@ -85,6 +86,33 @@ test('ConsoleV3 treats an emptied ShadowRoot as unmounted', () => {
 
   assert.equal(isConsoleV3InstanceMounted(emptied), false);
   assert.equal(isConsoleV3InstanceMounted(missing), false);
+});
+
+test('ConsoleV3 tells a destroyed sandbox from a cleared one', () => {
+  assert.equal(getConsoleV3InstanceState(undefined), 'missing');
+  assert.equal(getConsoleV3InstanceState({}), 'missing');
+  assert.equal(
+    getConsoleV3InstanceState({ __WUJIE: { mountFlag: true, shadowRoot: null } }),
+    'missing',
+  );
+  assert.equal(
+    getConsoleV3InstanceState({
+      __WUJIE: { mountFlag: true, shadowRoot: { childElementCount: 1 } },
+    }),
+    'ready',
+  );
+  assert.equal(
+    getConsoleV3InstanceState({
+      __WUJIE: { mountFlag: false, shadowRoot: { childElementCount: 0 } },
+    }),
+    'stale',
+  );
+  assert.equal(
+    getConsoleV3InstanceState({
+      __WUJIE: { mountFlag: true, shadowRoot: { childElementCount: 0 } },
+    }),
+    'stale',
+  );
 });
 
 test('ConsoleV3 restores a bare project path to the absolute app URL', () => {
