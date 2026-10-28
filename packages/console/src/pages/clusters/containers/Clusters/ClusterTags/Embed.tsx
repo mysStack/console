@@ -3,18 +3,10 @@
  * https://github.com/kubesphere/console/blob/master/LICENSE
  */
 
+import WujieReact from 'wujie-react';
 import React from 'react';
-import ConsoleV3ResourceList from '../../../../../components/ConsoleV3ResourceList';
 
-/**
- * Shares the `consolev3` app with the other V3 lists; rendering WujieReact
- * directly without `alive` destroyed it for the next page.
- */
 export default function Embed() {
-  return (
-    <ConsoleV3ResourceList
-      resource="clusterTags"
-      url={`//${window.location.host}/consolev3/clusters/tags`}
-    />
-  );
+  const url = `//${window.location.host}/consolev3/clusters/tags`;
+  return <WujieReact width="100%" height="100%" name="consolev3" url={url} sync={false} />;
 }

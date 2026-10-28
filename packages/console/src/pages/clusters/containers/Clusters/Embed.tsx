@@ -4,14 +4,10 @@
  */
 
 import React, { useEffect } from 'react';
+import WujieReact from 'wujie-react';
 import { isMultiCluster } from '@ks-console/shared';
 import { useNavigate } from 'react-router-dom';
-import ConsoleV3ResourceList from '../../../../components/ConsoleV3ResourceList';
 
-/**
- * Shares the `consolev3` app with the other V3 lists; rendering WujieReact
- * directly without `alive` destroyed it for the next page.
- */
 export default function Embed() {
   const navigate = useNavigate();
 
@@ -25,10 +21,6 @@ export default function Embed() {
     return null;
   }
 
-  return (
-    <ConsoleV3ResourceList
-      resource="clusters"
-      url={`//${window.location.host}/consolev3/clusters`}
-    />
-  );
+  const url = `//${window.location.host}/consolev3/clusters`;
+  return <WujieReact width="100%" height="100%" name="consolev3" url={url} sync={false} />;
 }
