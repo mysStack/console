@@ -110,6 +110,27 @@ Playwright 1.63.0 headless Chromium，30881，`dev-wms`，SPA 内跳转，每 10
 
 独立 V3 同样受 `customresourcedefinitions`（1250～1466 ms）拖慢。进入集群页桥接内比独立控制台更快（复用实例，368/446 ms 对 1355 ms）；返回项目时 ProjectLayout 重新引导是 V3 应用自身的跨布局开销，桥接内与独立控制台处于同一量级，不再出现实例销毁、ShadowRoot 清空或整页空白。
 
+### 直连集群页后进入项目列表（冷启动交接）
+
+不经项目列表、直接打开集群页时，共享实例由非保活的集群嵌入创建，其卸载清空 ShadowRoot，`ConsoleV3ResourceList` 也没有子窗口句柄。此时 alive 挂载只会激活空壳，内容要等 3 秒校验后走就地重渲染：
+
+Playwright 1.63.0 headless Chromium，30881，`dev-wms`，首次进入 `/clusters/host/pods`（整页加载 9 秒）后再 SPA 跳转 `/dev-workspace/clusters/host/projects/dev-wms/pods`：
+
+| 时间（跳转后） | `wujie-app` 数 | 模板数 | 首行 | 说明                                        |
+| -------------- | -------------- | ------ | ---- | ------------------------------------------- |
+| 0.3 s          | 0              | -      | -    | 旧宿主已卸载                                |
+| 0.8～6.9 s     | 1              | 0      | 0    | 空壳（`activated` 已触发，但 ShadowRoot 空） |
+| 7.5 s          | 1              | 1      | 0    | 就地重渲染完成（`beforeMount`/`afterMount`） |
+| 9.1～11.0 s    | 1              | 1      | 9    | 出首行                                     |
+
+同一脚本在 release 制品（`7c308ad90`）上首行为 11.0 s，重新跑一次 9.1 s。基线（`fc1253cbe`）在同一路径上是「首次使用即 `destroyApp` + 冷启动」约 4 秒，因此这是保活改造引入的退化：空壳实例被当成可用实例。
+
+`161dff607` 在没有子窗口句柄且 DOM 中没有已渲染实例时按基线处理（先 `destroyApp` 再挂载），stale 场景仍走就地重渲染。
+
+### 详情页嵌入
+
+集群容器组 → 集群容器组详情（`/clusters/host/projects/dev-wms/pods/:name`，原始 `WujieReact`、`sync={false}`、无 `alive`）：子应用路由带 V4 追加的 `/resource-status`，拉取到 `/api/v1/namespaces/dev-wms/pods/:name`，`alive=true`、模板数 1；返回项目容器组首行 1917 ms，无重建。
+
 ### 连续多轮跳转
 
 项目 → 集群容器组 → 集群部署 → 项目，连续 3 轮，每轮 100 ms 采样 30 次：`childCount` 恒为 1，`alive=true`，内容区无整页空白帧（返回项目时为加载指示器转 1.4～2.1 s 后出表），无 `beforeMount` / `afterMount` 重建标记。
