@@ -101,6 +101,11 @@ export default function ConsoleV3ResourceList({
                   ? (appWindow?: Window) => {
                       lastConsoleV3AppWindow = appWindow ?? lastConsoleV3AppWindow;
                       watchConsoleV3Sandbox(lastConsoleV3AppWindow?.__WUJIE);
+                      // Activation ends the boot: a reused instance activates
+                      // without `afterMount`. Closing the window here lets the
+                      // verify timer rebuild a boot that activated but left the
+                      // ShadowRoot empty.
+                      consoleV3BootStartedAt = 0;
                       deactivatedScopes.delete(scopeKey);
                       // The first mount of a scope can activate without
                       // `afterMount`; record the rendered revision here too, or

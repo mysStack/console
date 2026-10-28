@@ -87,4 +87,8 @@ test('activation records the rendered revision so the first return reuses the ap
   assert.ok(activation, 'activation branch not found');
   assert.match(activation[0], /mountedRevisions\.set\(scopeKey, revision\)/);
   assert.match(activation[0], /mountedResourceUrls\.set\(scopeKey, resourceUrl\)/);
+  // A reused instance activates without `afterMount`; the boot window must
+  // close here too, or a husk that activated but rendered nothing would only
+  // be rebuilt when the grace window expires.
+  assert.match(activation[0], /consoleV3BootStartedAt = 0;/);
 });
