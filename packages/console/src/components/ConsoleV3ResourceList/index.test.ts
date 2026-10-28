@@ -30,6 +30,20 @@ test('resource host renders a cleared instance again instead of booting it', () 
   assert.match(mountEffect[0], /getConsoleV3InstanceState\(lastConsoleV3AppWindow\) !== 'stale'/);
 });
 
+test('resource host boots a clean app when it never saw the shared sandbox', () => {
+  // Entering a V3-only page directly (cluster list/detail) creates the app
+  // without `alive`; its unmount clears the ShadowRoot and no child window is
+  // kept here. Activating that husk renders nothing, so start from zero.
+  const mountEffect = source.match(
+    /if \(!isReady\) return;[\s\S]*?\[isReady, resourceUrl, shouldRebuild\]/,
+  );
+  assert.ok(mountEffect, 'mount effect not found');
+  assert.match(mountEffect[0], /!lastConsoleV3AppWindow && !isConsoleV3InstanceMounted\(\)/);
+  const coldStart = mountEffect[0].match(/!lastConsoleV3AppWindow[\s\S]*?return;/);
+  assert.ok(coldStart, 'cold start branch not found');
+  assert.match(coldStart[0], /WujieReact\.destroyApp\('consolev3'\)/);
+});
+
 test('resource host keeps the child window of the shared sandbox', () => {
   assert.match(source, /let lastConsoleV3AppWindow: ConsoleV3AppWindow \| undefined;/);
   assert.match(source, /lastConsoleV3AppWindow = appWindow \?\? lastConsoleV3AppWindow/);

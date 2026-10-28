@@ -148,6 +148,14 @@ export default function ConsoleV3ResourceList({
     // An embed without `alive` (cluster and other V3-only routes) clears the
     // shared ShadowRoot on unmount but leaves the sandbox and its scripts
     // loaded. Render the app again in place instead of booting it from zero.
+    // Entering such a route first leaves no child window here, and the cleared
+    // sandbox renders nothing when activated: boot a clean app, as the plain
+    // mount always did, instead of waiting for the verify timer below.
+    if (!lastConsoleV3AppWindow && !isConsoleV3InstanceMounted()) {
+      WujieReact.destroyApp('consolev3');
+      setInstanceReady(true);
+      return;
+    }
     if (getConsoleV3InstanceState(lastConsoleV3AppWindow) !== 'stale') {
       setInstanceReady(true);
       return;
