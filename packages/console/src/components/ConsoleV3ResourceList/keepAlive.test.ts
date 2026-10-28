@@ -69,6 +69,7 @@ test('watches a shadow root once and guards it immediately', () => {
     constructor(callback: () => void) {
       callbacks.push(callback);
     }
+
     observe(target: unknown) {
       observed.push(target);
     }
@@ -132,16 +133,18 @@ test('moves a kept-alive child router to the activating route', () => {
   assert.deepEqual(child.events, ['popstate']);
 });
 
-test('leaves a child router that already sits on the activating route alone', () => {
-  const child = childWindow('/consolev3/clusters/host/pods');
+test('notifies a child router Wujie already moved to the activating route', () => {
+  // Wujie writes the embed URL with `replaceState`, so the location already
+  // matches while the router still renders the previous list.
+  const child = childWindow('/consolev3/clusters/host/deployments');
   const sandbox = {
-    url: '//ks.test:30881/consolev3/clusters/host/pods',
+    url: '//ks.test:30881/consolev3/clusters/host/deployments',
     iframe: { contentWindow: child.window },
   };
 
   assert.equal(scheduleConsoleV3ActivationRoute(sandbox), true);
   assert.deepEqual(child.replaced, []);
-  assert.deepEqual(child.events, []);
+  assert.deepEqual(child.events, ['popstate']);
 });
 
 test('cannot route a sandbox without a child window', () => {
@@ -155,6 +158,7 @@ test('a new template routes the app; pruning a shell does not', () => {
     constructor(callback: (records: MutationRecord[]) => void) {
       callbacks.push(callback);
     }
+
     observe() {}
   } as unknown as typeof MutationObserver;
   const child = childWindow('/consolev3/clusters/host/pods');

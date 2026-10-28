@@ -1,5 +1,5 @@
 import type { ConsoleV3SandboxLike, ConsoleV3ShadowRootLike } from './metrics';
-import { scheduleConsoleV3ListRouteSync } from './route';
+import { scheduleConsoleV3RouteNotification } from './route';
 
 /**
  * Wujie treats `sandbox.alive` as the owner's decision for the whole app, not
@@ -48,7 +48,7 @@ export const scheduleConsoleV3ActivationRoute = (
   const appWindow = sandbox?.iframe?.contentWindow;
   if (!appWindow || !sandbox?.url) return false;
 
-  scheduleConsoleV3ListRouteSync(appWindow, sandbox.url);
+  scheduleConsoleV3RouteNotification(appWindow, sandbox.url);
   return true;
 };
 
