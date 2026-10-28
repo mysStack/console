@@ -71,6 +71,21 @@ export const shouldRebuildConsoleV3Instance = ({
   revision,
 }: ConsoleV3RebuildInput): boolean => cacheExpired || (deactivated && mountedRevision !== revision);
 
+/**
+ * How long to wait before checking that a reused instance actually rendered.
+ *
+ * A destroyed app re-mounts with an empty ShadowRoot and only the rebuild
+ * repairs it. Waiting the full cold-start delay leaves the list blank for
+ * seconds after a cluster, workspace or platform embed destroyed the shared
+ * app. Once any `consolev3` mount has rendered, an empty ShadowRoot that late
+ * is a destroyed instance rather than a slow boot, so the check can run
+ * earlier; the cold path keeps the long delay.
+ */
+export const CONSOLE_V3_REUSED_VERIFY_DELAY_MS = 1_000;
+
+export const getConsoleV3VerifyDelayMs = (hasRendered: boolean, coldDelayMs: number): number =>
+  hasRendered ? Math.min(CONSOLE_V3_REUSED_VERIFY_DELAY_MS, coldDelayMs) : coldDelayMs;
+
 export const isConsoleV3ListCacheExpired = (
   lastUsedAt: number | undefined,
   now: number,
