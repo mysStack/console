@@ -20,6 +20,21 @@ test('resource host reuses the consolev3 app and exposes activation lifecycle ma
   assert.match(source, /normalizeConsoleV3Url/);
 });
 
+test('resource host renders a cleared instance again instead of booting it', () => {
+  assert.match(source, /getConsoleV3InstanceState/);
+  assert.match(source, /reviveConsoleV3Instance\(resourceUrl\)/);
+  const mountEffect = source.match(
+    /if \(!isReady\) return;[\s\S]*?\[isReady, resourceUrl, shouldRebuild\]/,
+  );
+  assert.ok(mountEffect, 'mount effect not found');
+  assert.match(mountEffect[0], /getConsoleV3InstanceState\(lastConsoleV3AppWindow\) !== 'stale'/);
+});
+
+test('resource host keeps the child window of the shared sandbox', () => {
+  assert.match(source, /let lastConsoleV3AppWindow: ConsoleV3AppWindow \| undefined;/);
+  assert.match(source, /lastConsoleV3AppWindow = appWindow \?\? lastConsoleV3AppWindow/);
+});
+
 test('activation records the rendered revision so the first return reuses the app', () => {
   const activation = source.match(/phase === 'activated'[\s\S]*?phase === 'deactivated'/);
   assert.ok(activation, 'activation branch not found');

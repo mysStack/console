@@ -52,6 +52,38 @@ export const isConsoleV3InstanceMounted = (
   return Boolean(shadowRoot && shadowRoot.childElementCount > 0);
 };
 
+export type ConsoleV3InstanceState = 'missing' | 'stale' | 'ready';
+
+export interface ConsoleV3SandboxLike {
+  mountFlag?: boolean | null;
+  shadowRoot?: { childElementCount: number } | null;
+}
+
+/** The child window Wujie hands to lifecycle callbacks, with its sandbox. */
+export type ConsoleV3AppWindow = Window & { __WUJIE?: ConsoleV3SandboxLike };
+
+/**
+ * Where the shared `consolev3` sandbox stands, read from the child window that
+ * Wujie exposes on `__WUJIE`.
+ *
+ * - `missing`: no sandbox yet, or it was destroyed; a cold start is required.
+ * - `stale`: the sandbox and its loaded scripts survive, but a non-alive embed
+ *   unmounted and cleared the ShadowRoot. Activating it with `alive` would
+ *   render nothing, so it must be rendered again in place.
+ * - `ready`: the app still owns rendered content and an `alive` activation
+ *   reuses it.
+ */
+export const getConsoleV3InstanceState = (
+  appWindow?: ConsoleV3AppWindow,
+): ConsoleV3InstanceState => {
+  const sandbox = appWindow?.__WUJIE;
+  const shadowRoot = sandbox?.shadowRoot;
+
+  if (!sandbox || !shadowRoot) return 'missing';
+  if (sandbox.mountFlag && shadowRoot.childElementCount > 0) return 'ready';
+  return 'stale';
+};
+
 export interface ConsoleV3RebuildInput {
   cacheExpired: boolean;
   deactivated: boolean;
