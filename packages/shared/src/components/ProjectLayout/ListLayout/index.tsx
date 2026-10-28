@@ -15,7 +15,7 @@ import NavTitle from '../../Layouts/NavTitle';
 import { FavoriteHistory } from '../../FavoriteHistory';
 import ListPageSide from '../../Layouts/ListPageSide';
 import { ListPageMain } from '../../Layouts/ListPageMain';
-import { getActions } from '../../../utils';
+import { getActions, getConsoleV3UrlPrefix } from '../../../utils';
 import type { FormattedNamespace } from '../../../types';
 import { useGlobalStore, workspaceStore, permissionStore, projectNewStore } from '../../../stores';
 
@@ -109,7 +109,7 @@ function ListLayout(): JSX.Element {
   }, []);
 
   useEffect(() => {
-    setWujieUrlPrefix(`//${window.location.host}/consolev3${prefix}`);
+    setWujieUrlPrefix(getConsoleV3UrlPrefix(prefix));
   }, [prefix]);
 
   const title = projectDetail?.aliasName

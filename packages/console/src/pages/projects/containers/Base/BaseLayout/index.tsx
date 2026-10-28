@@ -9,7 +9,13 @@ import { useCacheStore as useStore } from '@ks-console/shared';
 import { Loading } from '@kubed/components';
 import { useQueries, useQuery } from 'react-query';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import { apis, ClusterDetail, clusterStore, projectStore } from '@ks-console/shared';
+import {
+  apis,
+  ClusterDetail,
+  clusterStore,
+  getConsoleV3UrlPrefix,
+  projectStore,
+} from '@ks-console/shared';
 
 const { fetchDetail: fetchProjectDetail } = projectStore;
 const { fetchDetail: fetchClusterDetail } = clusterStore;
@@ -60,7 +66,10 @@ function BaseLayout(): JSX.Element {
 
   useEffect(() => {
     const basePrefix = `/${workspace}/clusters/${cluster}/projects/${namespace}`;
-    setUrlPrefixStable(basePrefix);
+    // Detail routes mount outside ProjectListLayout, so this layout is the only
+    // writer of the prefix for them. It must emit the same absolute value, or a
+    // layout remount writes the bare path and every V3 embed stays unmounted.
+    setUrlPrefixStable(getConsoleV3UrlPrefix(basePrefix));
   }, [cluster, namespace, setUrlPrefixStable, workspace]);
 
   if (

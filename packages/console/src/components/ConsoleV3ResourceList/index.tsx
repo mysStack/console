@@ -1,27 +1,32 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import WujieReact from 'wujie-react';
 
 import { getResourceListCacheVersion } from '@ks-console/shared';
 
+import { watchConsoleV3Sandbox } from './keepAlive';
+import type { ConsoleV3AppWindow } from './metrics';
 import {
+  getConsoleV3InstanceState,
   getConsoleV3ScopeKey,
-  isConsoleV3ListCacheExpired,
+  isConsoleV3InstanceMounted,
   markConsoleV3Phase,
+  normalizeConsoleV3Url,
   shouldRebuildConsoleV3Instance,
 } from './metrics';
+import { reviveConsoleV3Instance } from './revive';
 import { scheduleConsoleV3ListRouteSync } from './route';
 
-let activeScopeKey: string | undefined;
-const lastScopeUseAt = new Map<string, number>();
 const mountedResourceUrls = new Map<string, string>();
 const mountedRevisions = new Map<string, string>();
 const deactivatedScopes = new Set<string>();
-export const DEFAULT_CONSOLE_V3_LIST_CACHE_TTL = 30_000;
+// The child window is the only handle on the shared sandbox once its host
+// element is detached, and it is what tells a reusable app from a cleared one.
+let lastConsoleV3AppWindow: ConsoleV3AppWindow | undefined;
+const VERIFY_MOUNT_DELAY_MS = 3_000;
 
 export interface ConsoleV3ResourceListProps {
   resource: string;
   url: string;
-  cacheTtlMs?: number;
 }
 
 /**
@@ -32,36 +37,31 @@ export interface ConsoleV3ResourceListProps {
 export default function ConsoleV3ResourceList({
   resource,
   url,
-  cacheTtlMs = DEFAULT_CONSOLE_V3_LIST_CACHE_TTL,
 }: ConsoleV3ResourceListProps): JSX.Element {
   const [instanceReady, setInstanceReady] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const retriedUrlRef = useRef('');
+  const revivedUrlRef = useRef('');
   // The project layout writes the Wujie URL prefix in an effect. Avoid an
   // initial mount with `undefined/...`; that mount would create a non-reusable
   // Wujie instance before the real resource URL is available.
-  const isReady = url.includes('/consolev3/');
+  // A prefix race can deliver the bare project path; normalize it before the
+  // readiness gate, so a single wrong write cannot blank the whole list.
+  const resolvedUrl = normalizeConsoleV3Url(url, window.location.host);
+  const isReady = resolvedUrl.includes('/consolev3/');
   const revision = getResourceListCacheVersion(resource);
   const user = globals?.user?.username || 'anonymous';
-  const scopeKey = isReady ? getConsoleV3ScopeKey(resource, url, user) : '';
-  const now = Date.now();
-  const lastUsedAt = lastScopeUseAt.get(scopeKey);
-  const cacheExpired = isConsoleV3ListCacheExpired(lastUsedAt, now, cacheTtlMs);
+  const scopeKey = isReady ? getConsoleV3ScopeKey(resource, resolvedUrl, user) : '';
   // Keep the iframe URL stable. The revision is used only to decide whether a
   // deactivated instance must be rebuilt after a resource mutation.
-  const resourceUrl = url;
+  const resourceUrl = resolvedUrl;
+  // Reuse the live app across resource scopes: activation syncs the new list
+  // route. The mount effect below rebuilds only if the reused app stays empty.
   const shouldRebuild = shouldRebuildConsoleV3Instance({
-    activeScopeKey,
-    scopeKey,
-    resourceUrl,
-    mountedResourceUrl: mountedResourceUrls.get(scopeKey),
-    cacheExpired,
     deactivated: deactivatedScopes.has(scopeKey),
     mountedRevision: mountedRevisions.get(scopeKey),
     revision,
   });
-  if (isReady) {
-    activeScopeKey = scopeKey;
-    lastScopeUseAt.set(scopeKey, now);
-  }
   const lifecycle = useMemo(
     () =>
       (
@@ -77,7 +77,9 @@ export default function ConsoleV3ResourceList({
         (callbacks, phase) => {
           callbacks[phase] =
             phase === 'afterMount'
-              ? () => {
+              ? (appWindow?: Window) => {
+                  lastConsoleV3AppWindow = appWindow ?? lastConsoleV3AppWindow;
+                  watchConsoleV3Sandbox(lastConsoleV3AppWindow?.__WUJIE);
                   mountedResourceUrls.set(scopeKey, resourceUrl);
                   mountedRevisions.set(scopeKey, revision);
                   markConsoleV3Phase('afterMount', resourceUrl);
@@ -88,7 +90,14 @@ export default function ConsoleV3ResourceList({
                   }
                 : phase === 'activated'
                   ? (appWindow?: Window) => {
+                      lastConsoleV3AppWindow = appWindow ?? lastConsoleV3AppWindow;
+                      watchConsoleV3Sandbox(lastConsoleV3AppWindow?.__WUJIE);
                       deactivatedScopes.delete(scopeKey);
+                      // The first mount of a scope can activate without
+                      // `afterMount`; record the rendered revision here too, or
+                      // the first return to that scope rebuilds the app.
+                      mountedResourceUrls.set(scopeKey, resourceUrl);
+                      mountedRevisions.set(scopeKey, revision);
                       if (appWindow) {
                         scheduleConsoleV3ListRouteSync(appWindow, resourceUrl);
                       }
@@ -120,9 +129,57 @@ export default function ConsoleV3ResourceList({
     if (!isReady) return;
     if (shouldRebuild) {
       WujieReact.destroyApp('consolev3');
+      lastConsoleV3AppWindow = undefined;
+      setInstanceReady(true);
+      return;
     }
-    setInstanceReady(true);
+    // An embed without `alive` (cluster and other V3-only routes) clears the
+    // shared ShadowRoot on unmount but leaves the sandbox and its scripts
+    // loaded. Render the app again in place instead of booting it from zero.
+    // Entering such a route first leaves no child window here, and the cleared
+    // sandbox renders nothing when activated: boot a clean app, as the plain
+    // mount always did, instead of waiting for the verify timer below.
+    if (!lastConsoleV3AppWindow && !isConsoleV3InstanceMounted()) {
+      WujieReact.destroyApp('consolev3');
+      setInstanceReady(true);
+      return;
+    }
+    if (getConsoleV3InstanceState(lastConsoleV3AppWindow) !== 'stale') {
+      setInstanceReady(true);
+      return;
+    }
+    let cancelled = false;
+    reviveConsoleV3Instance(resourceUrl).then(() => {
+      if (!cancelled) setInstanceReady(true);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [isReady, resourceUrl, shouldRebuild]);
+
+  // A reused instance can be an empty ShadowRoot when another caller destroyed
+  // it without `alive`. Verify the real DOM once per URL; render the app again
+  // in the surviving sandbox first, and rebuild only if that leaves it empty.
+  useEffect(() => {
+    if (!instanceReady) return;
+    const timer = window.setTimeout(() => {
+      if (isConsoleV3InstanceMounted()) return;
+      if (retriedUrlRef.current === resourceUrl) return;
+      if (
+        revivedUrlRef.current !== resourceUrl &&
+        getConsoleV3InstanceState(lastConsoleV3AppWindow) === 'stale'
+      ) {
+        revivedUrlRef.current = resourceUrl;
+        reviveConsoleV3Instance(resourceUrl).then(() => setRetryCount(count => count + 1));
+        return;
+      }
+      retriedUrlRef.current = resourceUrl;
+      WujieReact.destroyApp('consolev3');
+      lastConsoleV3AppWindow = undefined;
+      setRetryCount(count => count + 1);
+    }, VERIFY_MOUNT_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [instanceReady, resourceUrl, retryCount]);
 
   if (!isReady || !instanceReady) {
     return <></>;
@@ -132,6 +189,7 @@ export default function ConsoleV3ResourceList({
     <WujieReact
       width="100%"
       height="100%"
+      key={retryCount}
       name="consolev3"
       url={resourceUrl}
       alive
