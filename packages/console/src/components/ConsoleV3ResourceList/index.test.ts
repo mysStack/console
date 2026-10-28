@@ -29,37 +29,37 @@ test('resource host renders a cleared instance again instead of booting it', () 
   assert.match(mountEffect[0], /getConsoleV3InstanceState\(lastConsoleV3AppWindow\) !== 'stale'/);
 });
 
-test('resource host boots a clean app when it never saw the shared sandbox', () => {
+test('resource host boots on the existing instance when it never saw the shared sandbox', () => {
   // Entering a V3-only page directly (cluster list/detail) creates the app
   // without `alive`; its unmount clears the ShadowRoot and no child window is
-  // kept here. Activating that husk renders nothing, so start from zero.
+  // kept here. `destroyApp` cannot be used to clear that husk on a cold load:
+  // it also destroys the instance `preloadApp` is still filling in, and wujie
+  // 1.0.25 reports `null._cacheListeners` from the half-built sandbox. Boot on
+  // the existing instance and let wujie-react await the running preload.
   const mountEffect = source.match(
     /if \(!isReady\) return;[\s\S]*?\[isReady, resourceUrl, shouldRebuild\]/,
   );
   assert.ok(mountEffect, 'mount effect not found');
   assert.match(mountEffect[0], /!lastConsoleV3AppWindow && !isConsoleV3InstanceMounted\(\)/);
   const coldStart = mountEffect[0].match(
-    /!lastConsoleV3AppWindow && !isConsoleV3InstanceMounted\(\)\) \{[\s\S]*?WujieReact\.destroyApp\('consolev3'\)/,
+    /!lastConsoleV3AppWindow && !isConsoleV3InstanceMounted\(\)\) \{[\s\S]*?\n    \}/,
   );
   assert.ok(coldStart, 'cold start branch not found');
-  // `destroyApp` is a no-op without an instance and a cold boot is 4.4 s here,
-  // while rendering the cleared sandbox again measured 9.7 s.
-  assert.match(coldStart[0], /WujieReact\.destroyApp\('consolev3'\)/);
+  assert.doesNotMatch(coldStart[0], /destroyApp|destroyConsoleV3Instance/);
+  assert.match(coldStart[0], /consoleV3BootStartedAt = Date\.now\(\)/);
+  assert.match(coldStart[0], /setInstanceReady\(true\)/);
 });
 
 test('resource host lets a boot in flight finish instead of destroying it', () => {
   // The project layout writes the Wujie prefix twice. The second write used to
   // destroy the sandbox that was still loading the V3 bundle, and wujie 1.0.25
   // reported `null._cacheListeners` from that teardown.
-  const coldStart = source.match(
-    /!lastConsoleV3AppWindow && !isConsoleV3InstanceMounted\(\)\) \{[\s\S]*?WujieReact\.destroyApp\('consolev3'\)/,
+  const mountEffect = source.match(
+    /if \(!isReady\) return;[\s\S]*?\[isReady, resourceUrl, shouldRebuild\]/,
   );
-  assert.ok(coldStart, 'cold start branch not found');
-  assert.match(coldStart[0], /isConsoleV3BootInFlight\(consoleV3BootStartedAt\)/);
-  assert.match(
-    coldStart[0],
-    /setInstanceReady\(true\);[\s\S]*?return;[\s\S]*?destroyConsoleV3Instance/,
-  );
+  assert.ok(mountEffect, 'mount effect not found');
+  assert.match(mountEffect[0], /isConsoleV3BootInFlight\(consoleV3BootStartedAt\)/);
+  assert.match(mountEffect[0], /if \(!isConsoleV3BootInFlight\(consoleV3BootStartedAt\)\) \{/);
 
   const verify = source.match(/const verify = \(\) => \{[\s\S]*?VERIFY_MOUNT_DELAY_MS\);/);
   assert.ok(verify, 'verify timer not found');

@@ -147,29 +147,22 @@ export default function ConsoleV3ResourceList({
     // shared ShadowRoot on unmount but leaves the sandbox and its scripts
     // loaded. Render the app again in place instead of booting it from zero.
     // Entering such a route first leaves no child window here, and the cleared
-    // sandbox renders nothing when activated: boot a clean app, as the plain
-    // mount always did, instead of waiting for the verify timer below.
+    // sandbox renders nothing when activated. `destroyApp` cannot clear that
+    // husk on a cold page load either: it also destroys the instance `preloadApp`
+    // is still filling in. Wujie 1.0.25 `destroy()` does not await the sandbox
+    // unmount, so the rest of that preload runs against a nulled document and
+    // the page reports `null._cacheListeners`. Boot on the existing instance
+    // instead; wujie-react awaits the running preload, and the verify timer
+    // below rebuilds only if this route really left an empty husk.
     if (!lastConsoleV3AppWindow && !isConsoleV3InstanceMounted()) {
       // The project layout writes the Wujie prefix more than once; the second
       // write can arrive while the first boot is still loading the V3 bundle.
-      // Tearing that sandbox down reports `null._cacheListeners` from wujie
-      // 1.0.25, and wujie-react already queues the newer `startApp` behind the
-      // running one. Let the boot finish and let that queue move the app.
-      if (isConsoleV3BootInFlight(consoleV3BootStartedAt)) {
-        setInstanceReady(true);
-        return;
-      }
-      let cancelled = false;
-      destroyConsoleV3Instance(getConsoleV3Sandbox(), () =>
-        WujieReact.destroyApp('consolev3'),
-      ).then(() => {
-        if (cancelled) return;
+      // wujie-react already queues the newer `startApp` behind the running one.
+      if (!isConsoleV3BootInFlight(consoleV3BootStartedAt)) {
         consoleV3BootStartedAt = Date.now();
-        setInstanceReady(true);
-      });
-      return () => {
-        cancelled = true;
-      };
+      }
+      setInstanceReady(true);
+      return;
     }
     if (getConsoleV3InstanceState(lastConsoleV3AppWindow) !== 'stale') {
       setInstanceReady(true);
