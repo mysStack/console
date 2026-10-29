@@ -72,6 +72,20 @@ test('resource host destroys the shared app only after its unmount', () => {
   assert.match(source, /consoleV3BootStartedAt = 0;/);
 });
 
+test('resource host opens a boot window for the rebuild it starts', () => {
+  // The rebuild branch destroys the app and renders a fresh boot in the same
+  // commit. Without a window opened here, the verify timer destroyed that boot
+  // three seconds in and the list restarted instead of rendering.
+  const mountEffect = source.match(
+    /if \(!isReady\) return;[\s\S]*?\[isReady, resourceUrl, shouldRebuild\]/,
+  );
+  assert.ok(mountEffect, 'mount effect not found');
+  const rebuild = mountEffect[0].match(/if \(shouldRebuild\) \{[\s\S]*?\n    \}/);
+  assert.ok(rebuild, 'rebuild branch not found');
+  assert.match(rebuild[0], /consoleV3BootStartedAt = Date\.now\(\);/);
+  assert.doesNotMatch(rebuild[0], /consoleV3BootStartedAt = 0;/);
+});
+
 test('resource host keeps the child window of the shared sandbox', () => {
   assert.match(source, /let lastConsoleV3AppWindow: ConsoleV3AppWindow \| undefined;/);
   assert.match(source, /lastConsoleV3AppWindow = appWindow \?\? lastConsoleV3AppWindow/);

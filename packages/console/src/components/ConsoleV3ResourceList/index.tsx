@@ -142,7 +142,9 @@ export default function ConsoleV3ResourceList({
   useEffect(() => {
     if (!isReady) return;
     if (shouldRebuild) {
-      consoleV3BootStartedAt = 0;
+      // The rebuild starts a fresh boot below. Open its window here, or the
+      // verify timer would destroy the sandbox while it is still loading.
+      consoleV3BootStartedAt = Date.now();
       destroyConsoleV3Instance(getConsoleV3Sandbox(), () => WujieReact.destroyApp('consolev3'));
       lastConsoleV3AppWindow = undefined;
       setInstanceReady(true);
