@@ -3,9 +3,15 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 
 import {
+  getSpringCloudProbeCluster,
+  getSpringCloudProbeUrl,
+  primeSpringCloudProbeCache,
+  primeSpringCloudProbeCacheForRoute,
   SPRINGCLOUD_CRD_NAME,
   SPRINGCLOUD_PROBE_CACHE_SOURCE,
   SPRINGCLOUD_PROBE_CACHE_TTL_MS,
+  SPRINGCLOUD_PROBE_SEEDS_KEY,
+  type SpringCloudProbeRecord,
 } from './springcloudProbeCache';
 
 const PROBE_URL = `/kapis/clusters/host/resources.kubesphere.io/v1alpha3/customresourcedefinitions?name=${SPRINGCLOUD_CRD_NAME}`;
@@ -15,12 +21,15 @@ interface FetchCall {
   url: string;
 }
 
-function createSandbox(options: { status?: number; body?: string } = {}) {
+function createSandbox(
+  options: { status?: number; body?: string; seeds?: Record<string, SpringCloudProbeRecord> } = {},
+) {
   const calls: FetchCall[] = [];
   let clock = 0;
   const win: Record<string, any> = {
     Date: { now: () => clock },
     Response,
+    parent: options.seeds ? { [SPRINGCLOUD_PROBE_SEEDS_KEY]: options.seeds } : {},
     fetch: (input: string | { url: string }) => {
       const url = typeof input === 'string' ? input : input.url;
       calls.push({ url });
@@ -112,8 +121,9 @@ test('initWujie loads the probe cache into the shared V3 app before its scripts'
 
   assert.match(
     source,
-    /import \{ createConsoleV3SpringCloudProbeCachePlugin \} from '\.\/springcloudProbeCache'/,
+    /import \{[\s\S]{0,160}createConsoleV3SpringCloudProbeCachePlugin[\s\S]{0,160}\} from '\.\/springcloudProbeCache'/,
   );
+  assert.match(source, /primeSpringCloudProbeCacheForRoute\(\);/);
   assert.match(
     source,
     /const consoleV3Plugins = \[createConsoleV3SpringCloudProbeCachePlugin\(\)\]/,
@@ -127,4 +137,121 @@ test('initWujie loads the probe cache into the shared V3 app before its scripts'
   const setup = source.match(/setupApp\(\{\n    name: 'consolev3',[\s\S]*?\n  \}\);/);
   assert.ok(setup, 'consolev3 setup not found');
   assert.match(setup[0], /plugins: consoleV3Plugins/);
+});
+
+function seedRecord(overrides: Partial<SpringCloudProbeRecord> = {}): SpringCloudProbeRecord {
+  return {
+    at: 0,
+    body: EMPTY_LIST,
+    status: 200,
+    statusText: 'OK',
+    headers: { 'content-type': 'application/json' },
+    ...overrides,
+  };
+}
+
+const SANDBOX_PROBE_URL = `/clusters/host/kapis/resources.kubesphere.io/v1alpha3/customresourcedefinitions?name=${SPRINGCLOUD_CRD_NAME}`;
+
+test('the first probe is answered from the host seed without a request', async () => {
+  const sandbox = createSandbox({ seeds: { host: seedRecord() } });
+  const response = await sandbox.win.fetch(SANDBOX_PROBE_URL);
+
+  assert.equal(sandbox.calls.length, 0);
+  assert.equal(await response.text(), EMPTY_LIST);
+
+  // The seeded answer is cached, so later switches stay local too.
+  await sandbox.win.fetch(SANDBOX_PROBE_URL);
+  assert.equal(sandbox.calls.length, 0);
+});
+
+test('a seed for another cluster or an expired seed is ignored', async () => {
+  const otherCluster = createSandbox({ seeds: { 'dev-biz': seedRecord() } });
+  await otherCluster.win.fetch(SANDBOX_PROBE_URL);
+  assert.equal(otherCluster.calls.length, 1);
+
+  const expired = createSandbox({
+    seeds: { host: seedRecord({ at: -SPRINGCLOUD_PROBE_CACHE_TTL_MS - 1 }) },
+  });
+  await expired.win.fetch(SANDBOX_PROBE_URL);
+  assert.equal(expired.calls.length, 1);
+});
+
+test('the probe cluster comes from the route, falling back to the host cluster', () => {
+  assert.equal(
+    getSpringCloudProbeCluster('/dev-workspace/clusters/host/projects/dev-wms/pods'),
+    'host',
+  );
+  assert.equal(getSpringCloudProbeCluster('/clusters/dev-biz/pods'), 'dev-biz');
+  assert.equal(getSpringCloudProbeCluster('/dev-workspace/projects/dev-wms/pods'), 'host');
+  assert.equal(getSpringCloudProbeCluster('/workspaces/dev-workspace'), undefined);
+  assert.match(
+    getSpringCloudProbeUrl('dev-biz'),
+    /^\/kapis\/clusters\/dev-biz\/resources\.kubesphere\.io/,
+  );
+});
+
+test('priming stores the probe answer for the sandbox', async () => {
+  const store: Record<string, SpringCloudProbeRecord> = {};
+  let calls = 0;
+  const fetchImpl = (() => {
+    calls += 1;
+    return Promise.resolve(new Response(EMPTY_LIST, { status: 200 }));
+  }) as unknown as typeof fetch;
+
+  await primeSpringCloudProbeCache('host', { store, fetchImpl, now: 1000 });
+
+  assert.equal(calls, 1);
+  assert.equal(store.host.status, 200);
+  assert.equal(store.host.at, 1000);
+  assert.equal(store.host.body, EMPTY_LIST);
+});
+
+test('priming skips a fresh seed and ignores a failed probe', async () => {
+  let calls = 0;
+  const fetchImpl = (() => {
+    calls += 1;
+    return Promise.resolve(new Response('nope', { status: 500 }));
+  }) as unknown as typeof fetch;
+
+  const store: Record<string, SpringCloudProbeRecord> = { host: seedRecord({ at: 900 }) };
+  await primeSpringCloudProbeCache('host', { store, fetchImpl, now: 1000 });
+  assert.equal(calls, 0);
+
+  const empty: Record<string, SpringCloudProbeRecord> = {};
+  await primeSpringCloudProbeCache('host', { store: empty, fetchImpl, now: 1000 });
+  assert.equal(calls, 1);
+  assert.equal(empty.host, undefined);
+});
+
+test('priming shares one request between concurrent callers', async () => {
+  let calls = 0;
+  const fetchImpl = (() => {
+    calls += 1;
+    return Promise.resolve(new Response(EMPTY_LIST, { status: 200 }));
+  }) as unknown as typeof fetch;
+
+  const store: Record<string, SpringCloudProbeRecord> = {};
+  await Promise.all([
+    primeSpringCloudProbeCache('dev-wes', { store, fetchImpl }),
+    primeSpringCloudProbeCache('dev-wes', { store, fetchImpl }),
+  ]);
+  assert.equal(calls, 1);
+  assert.equal(store['dev-wes'].body, EMPTY_LIST);
+});
+
+test('route priming skips login and routes without a cluster', async () => {
+  const store: Record<string, SpringCloudProbeRecord> = {};
+  const fetchImpl = (() =>
+    Promise.resolve(new Response(EMPTY_LIST, { status: 200 }))) as unknown as typeof fetch;
+
+  primeSpringCloudProbeCacheForRoute('/login', { store, fetchImpl });
+  primeSpringCloudProbeCacheForRoute('/workspaces/dev-workspace', { store, fetchImpl });
+  assert.deepEqual(Object.keys(store), []);
+
+  primeSpringCloudProbeCacheForRoute('/dev-workspace/clusters/host/projects/dev-wms/pods', {
+    store,
+    fetchImpl,
+  });
+  await new Promise(resolve => setTimeout(resolve, 0));
+  assert.equal(store.host?.body, EMPTY_LIST);
 });

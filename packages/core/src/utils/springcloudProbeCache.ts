@@ -22,6 +22,15 @@ export const SPRINGCLOUD_PROBE_CACHE_TTL_MS = 300_000;
 export const SPRINGCLOUD_CRD_NAME = 'configurations.springcloud.kubesphere.io';
 
 const PROBE_CACHE_FLAG = '__KS_SPRINGCLOUD_PROBE_CACHE__';
+export const SPRINGCLOUD_PROBE_SEEDS_KEY = '__KS_SPRINGCLOUD_PROBE_SEEDS__';
+
+export interface SpringCloudProbeRecord {
+  at: number;
+  body: string;
+  status: number;
+  statusText: string;
+  headers: Record<string, string>;
+}
 
 /**
  * Runs as an inline script inside the Wujie sandbox before the V3 bundle, so
@@ -46,6 +55,25 @@ export const SPRINGCLOUD_PROBE_CACHE_SOURCE = `(function (win) {
     return (win.Date || Date).now();
   }
 
+  // The host starts the same query at bootstrap, in parallel with the V3
+  // bundle load, and publishes the answer on its own window. Reading it here
+  // turns the first probe of a page load into a local answer too; without a
+  // fresh seed the probe still goes to the network as before.
+  function seedFor(url) {
+    var seeds = null;
+    try {
+      seeds = win.parent && win.parent['${SPRINGCLOUD_PROBE_SEEDS_KEY}'];
+    } catch (e) {
+      return null;
+    }
+    if (!seeds) return null;
+    var matched = /\\/clusters\\/([^/?#]+)\\//.exec(url);
+    var record = seeds[matched ? matched[1] : 'host'];
+    if (!record || record.status < 200 || !record.body) return null;
+    if (now() - record.at >= TTL) return null;
+    return record;
+  }
+
   function build(record) {
     if (!win.Response) return null;
     try {
@@ -68,6 +96,12 @@ export const SPRINGCLOUD_PROBE_CACHE_SOURCE = `(function (win) {
     if (hit && now() - hit.at < TTL) {
       var rebuilt = build(hit);
       if (rebuilt) return Promise.resolve(rebuilt);
+    }
+    var seed = seedFor(url);
+    if (seed) {
+      cache[url] = seed;
+      var seeded = build(seed);
+      if (seeded) return Promise.resolve(seeded);
     }
     var inflight = cache['#' + url];
     if (!inflight) {
@@ -112,4 +146,98 @@ export const SPRINGCLOUD_PROBE_CACHE_SOURCE = `(function (win) {
  */
 export function createConsoleV3SpringCloudProbeCachePlugin() {
   return { jsBeforeLoaders: [{ content: SPRINGCLOUD_PROBE_CACHE_SOURCE }] };
+}
+
+export function getSpringCloudProbeCluster(pathname: string): string | undefined {
+  const matched = /\/clusters\/([^/?#]+)(?:\/|$)/.exec(pathname);
+  if (matched) {
+    return matched[1];
+  }
+  // V3 resolves a missing cluster segment to the host cluster.
+  return pathname.includes('/projects/') ? 'host' : undefined;
+}
+
+export function getSpringCloudProbeUrl(cluster: string): string {
+  return `/kapis/clusters/${cluster}/resources.kubesphere.io/v1alpha3/customresourcedefinitions?name=${SPRINGCLOUD_CRD_NAME}`;
+}
+
+export function getSpringCloudProbeSeedStore(): Record<string, SpringCloudProbeRecord> {
+  const host = window as unknown as Record<string, unknown>;
+  const store = (host[SPRINGCLOUD_PROBE_SEEDS_KEY] ||= {}) as Record<
+    string,
+    SpringCloudProbeRecord
+  >;
+  return store;
+}
+
+interface PrimeDeps {
+  fetchImpl?: typeof fetch;
+  store?: Record<string, SpringCloudProbeRecord>;
+  now?: number;
+}
+
+const priming = new Map<string, Promise<void>>();
+
+/**
+ * Starts the probe from the host as soon as the console boots, so the answer is
+ * already on the parent window when V3 asks for it during its first mount. The
+ * request is the same one V3 would issue, from the same session, so a failure
+ * only restores the old behaviour.
+ */
+export function primeSpringCloudProbeCache(cluster: string, deps: PrimeDeps = {}): Promise<void> {
+  const store = deps.store ?? getSpringCloudProbeSeedStore();
+  const now = deps.now ?? Date.now();
+  const cached = store[cluster];
+  if (cached && now - cached.at < SPRINGCLOUD_PROBE_CACHE_TTL_MS) {
+    return Promise.resolve();
+  }
+  const running = priming.get(cluster);
+  if (running) {
+    return running;
+  }
+  const fetchImpl = deps.fetchImpl ?? window.fetch.bind(window);
+  const task = fetchImpl(getSpringCloudProbeUrl(cluster), {
+    headers: { accept: 'application/json' },
+  })
+    .then(async response => {
+      if (!response?.ok) {
+        return;
+      }
+      const headers: Record<string, string> = {};
+      response.headers.forEach((value, key) => {
+        headers[key] = value;
+      });
+      store[cluster] = {
+        at: deps.now ?? Date.now(),
+        body: await response.clone().text(),
+        status: response.status,
+        statusText: response.statusText,
+        headers,
+      };
+    })
+    .catch(() => undefined)
+    .then(() => {
+      priming.delete(cluster);
+    });
+  priming.set(cluster, task);
+  return task;
+}
+
+/**
+ * Cold loads reach this before React renders, which leaves the probe in flight
+ * while the V3 bundle is still downloading. Login and workspace routes never
+ * mount a V3 resource page and are skipped.
+ */
+export function primeSpringCloudProbeCacheForRoute(
+  pathname: string = window.location.pathname,
+  deps: PrimeDeps = {},
+): void {
+  if (pathname.startsWith('/login')) {
+    return;
+  }
+  const cluster = getSpringCloudProbeCluster(pathname);
+  if (!cluster) {
+    return;
+  }
+  void primeSpringCloudProbeCache(cluster, deps);
 }

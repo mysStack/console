@@ -7,7 +7,10 @@ import WujieReact from 'wujie-react';
 
 import { useEventEmitter } from '@ks-console/shared';
 import { setGlobalConsoleV3LoadCompleted } from '../utils/globals.consoleV3LoadCompleted';
-import { createConsoleV3SpringCloudProbeCachePlugin } from './springcloudProbeCache';
+import {
+  createConsoleV3SpringCloudProbeCachePlugin,
+  primeSpringCloudProbeCacheForRoute,
+} from './springcloudProbeCache';
 
 const { setupApp, preloadApp, bus } = WujieReact;
 
@@ -17,6 +20,10 @@ const { setupApp, preloadApp, bus } = WujieReact;
 const consoleV3Plugins = [createConsoleV3SpringCloudProbeCachePlugin()];
 
 export function initWujie() {
+  // Runs before the V3 bundle download starts; the answer to V3's first
+  // springcloud probe is usually ready by the time it mounts.
+  primeSpringCloudProbeCacheForRoute();
+
   setupApp({
     name: 'consolev3',
     url: `//${window.location.host}/consolev3/`,
