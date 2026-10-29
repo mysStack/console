@@ -7,14 +7,21 @@ import WujieReact from 'wujie-react';
 
 import { useEventEmitter } from '@ks-console/shared';
 import { setGlobalConsoleV3LoadCompleted } from '../utils/globals.consoleV3LoadCompleted';
+import { createConsoleV3SpringCloudProbeCachePlugin } from './springcloudProbeCache';
 
 const { setupApp, preloadApp, bus } = WujieReact;
+
+// The springcloud probe cache has to exist before the V3 bundle runs, both in
+// the preload sandbox and on a fresh mount, so it is attached to the app
+// options instead of a lifecycle callback.
+const consoleV3Plugins = [createConsoleV3SpringCloudProbeCachePlugin()];
 
 export function initWujie() {
   setupApp({
     name: 'consolev3',
     url: `//${window.location.host}/consolev3/`,
     exec: true,
+    plugins: consoleV3Plugins,
     afterMount: appWindow => {
       const { $emit } = useEventEmitter();
       $emit('afterMountConsoleV3', appWindow);
@@ -48,5 +55,6 @@ export function initWujie() {
   preloadApp({
     name: 'consolev3',
     url: `//${window.location.host}/consolev3/dashboard`,
+    plugins: consoleV3Plugins,
   });
 }
