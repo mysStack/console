@@ -3,7 +3,6 @@
  * https://github.com/kubesphere/console/blob/master/LICENSE
  */
 
-const qs = require('qs');
 const compress = require('koa-compress');
 const mount = require('koa-mount');
 const render = require('koa-ejs');
@@ -28,14 +27,9 @@ module.exports = function (app) {
   // The connect `compression` middleware used to run here for http-proxy
   // compatibility. It only knows gzip/deflate and runs before koa-compress, so
   // every browser request (which accepts gzip *and* br) was encoded as gzip and
-  // koa-compress skipped the already encoded body. Keep its one custom rule:
-  // never compress a `follow=true` plain-text stream.
-  app.use(async (ctx, next) => {
-    await next();
-    const [, query] = ctx.url.split('?');
-    const isFollow = qs.parse(query).follow === 'true' && ctx.response.type === 'text/plain';
-    if (isFollow) ctx.compress = false;
-  });
+  // koa-compress skipped the already encoded body. Proxied responses are now
+  // encoded by server/middlewares/proxyCompression.js, which leaves
+  // `follow`/`watch` streams and binary bodies on the plain pipe.
 
   // serve static files
   const httpStatic = serverConfig.http.static[process.env.NODE_ENV];
