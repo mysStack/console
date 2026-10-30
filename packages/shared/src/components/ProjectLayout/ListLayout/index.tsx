@@ -15,7 +15,11 @@ import NavTitle from '../../Layouts/NavTitle';
 import { FavoriteHistory } from '../../FavoriteHistory';
 import ListPageSide from '../../Layouts/ListPageSide';
 import { ListPageMain } from '../../Layouts/ListPageMain';
-import { getActions, getConsoleV3UrlPrefix } from '../../../utils';
+import {
+  assignConsoleV3UrlPrefixIfChanged,
+  getActions,
+  getConsoleV3UrlPrefix,
+} from '../../../utils';
 import type { FormattedNamespace } from '../../../types';
 import { useGlobalStore, workspaceStore, permissionStore, projectNewStore } from '../../../stores';
 
@@ -43,7 +47,7 @@ function ListLayout(): JSX.Element {
   const { getNav, setNav } = useGlobalStore();
   const { cluster, workspace, namespace } = useParams();
   const [defaultProjectDetail] = useStore<FormattedNamespace>('project');
-  const [, setWujieUrlPrefix] = useStore<string>('wujieUrlPrefix');
+  const [wujieUrlPrefix, setWujieUrlPrefix] = useStore<string>('wujieUrlPrefix');
   const prefix = useMemo(
     () => `/${workspace}/clusters/${cluster}/projects/${namespace}`,
     [cluster, workspace, namespace],
@@ -109,8 +113,12 @@ function ListLayout(): JSX.Element {
   }, []);
 
   useEffect(() => {
-    setWujieUrlPrefix(getConsoleV3UrlPrefix(prefix));
-  }, [prefix]);
+    assignConsoleV3UrlPrefixIfChanged(
+      wujieUrlPrefix,
+      getConsoleV3UrlPrefix(prefix),
+      setWujieUrlPrefix,
+    );
+  }, [prefix, setWujieUrlPrefix, wujieUrlPrefix]);
 
   const title = projectDetail?.aliasName
     ? `${projectDetail?.aliasName}（${projectDetail?.name}）`
