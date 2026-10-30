@@ -6,12 +6,24 @@
 import assert from 'node:assert';
 import test from 'node:test';
 
-import { resolveConsoleV3PreloadPath, resolveConsoleV3PreloadUrl } from './consoleV3PreloadUrl';
+import {
+  isConsoleV3ProjectListPath,
+  resolveConsoleV3PreloadPath,
+  resolveConsoleV3PreloadUrl,
+} from './consoleV3PreloadUrl';
 
 test('maps a project list pathname onto the matching consolev3 preload path', () => {
   assert.equal(
     resolveConsoleV3PreloadPath('/dev-workspace/clusters/host/projects/dev-wes/deployments'),
     '/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments',
+  );
+  assert.equal(
+    isConsoleV3ProjectListPath('/dev-workspace/clusters/host/projects/dev-wes/deployments'),
+    true,
+  );
+  assert.equal(
+    isConsoleV3ProjectListPath('/dev-workspace/clusters/host/projects/dev-wes/overview'),
+    false,
   );
 });
 

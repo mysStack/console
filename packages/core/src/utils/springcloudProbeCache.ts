@@ -20,9 +20,13 @@
  */
 export const SPRINGCLOUD_PROBE_CACHE_TTL_MS = 300_000;
 export const SPRINGCLOUD_CRD_NAME = 'configurations.springcloud.kubesphere.io';
+/** Survives hard refresh so the first V3 probe does not wait on ks-apiserver. */
+export const SPRINGCLOUD_PROBE_SESSION_KEY = '__KS_SPRINGCLOUD_PROBE_SEEDS_V1__';
 
 const PROBE_CACHE_FLAG = '__KS_SPRINGCLOUD_PROBE_CACHE__';
 export const SPRINGCLOUD_PROBE_SEEDS_KEY = '__KS_SPRINGCLOUD_PROBE_SEEDS__';
+
+type ProbeSessionStorage = Pick<Storage, 'getItem' | 'setItem'>;
 
 export interface SpringCloudProbeRecord {
   at: number;
@@ -184,10 +188,62 @@ export function getSpringCloudProbeSeedStore(): Record<string, SpringCloudProbeR
   return store;
 }
 
+const defaultSessionStorage = (): ProbeSessionStorage | null => {
+  try {
+    if (typeof sessionStorage === 'undefined') return null;
+    return sessionStorage;
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * Restore probe answers saved by a previous page load in this tab. Hard refresh
+ * otherwise restarts the 1–2 s ks-apiserver CRD probe before V3 can paint.
+ */
+export function hydrateSpringCloudProbeSeedsFromSession(
+  store: Record<string, SpringCloudProbeRecord> = getSpringCloudProbeSeedStore(),
+  storage: ProbeSessionStorage | null = defaultSessionStorage(),
+  now: number = Date.now(),
+): number {
+  if (!storage) return 0;
+  try {
+    const raw = storage.getItem(SPRINGCLOUD_PROBE_SESSION_KEY);
+    if (!raw) return 0;
+    const parsed = JSON.parse(raw) as Record<string, SpringCloudProbeRecord>;
+    let loaded = 0;
+    Object.entries(parsed || {}).forEach(([cluster, record]) => {
+      if (!record || record.status < 200 || !record.body) return;
+      if (now - record.at >= SPRINGCLOUD_PROBE_CACHE_TTL_MS) return;
+      const existing = store[cluster];
+      if (!existing || existing.at < record.at) {
+        store[cluster] = record;
+        loaded += 1;
+      }
+    });
+    return loaded;
+  } catch {
+    return 0;
+  }
+}
+
+export function persistSpringCloudProbeSeeds(
+  store: Record<string, SpringCloudProbeRecord> = getSpringCloudProbeSeedStore(),
+  storage: ProbeSessionStorage | null = defaultSessionStorage(),
+): void {
+  if (!storage) return;
+  try {
+    storage.setItem(SPRINGCLOUD_PROBE_SESSION_KEY, JSON.stringify(store));
+  } catch {
+    // Quota / private mode — priming still works in-memory for this page.
+  }
+}
+
 interface PrimeDeps {
   fetchImpl?: typeof fetch;
   store?: Record<string, SpringCloudProbeRecord>;
   now?: number;
+  storage?: ProbeSessionStorage | null;
 }
 
 const priming = new Map<string, Promise<void>>();
@@ -200,6 +256,7 @@ const priming = new Map<string, Promise<void>>();
  */
 export function primeSpringCloudProbeCache(cluster: string, deps: PrimeDeps = {}): Promise<void> {
   const store = deps.store ?? getSpringCloudProbeSeedStore();
+  const storage = deps.storage === undefined ? defaultSessionStorage() : deps.storage;
   const now = deps.now ?? Date.now();
   const cached = store[cluster];
   if (cached && now - cached.at < SPRINGCLOUD_PROBE_CACHE_TTL_MS) {
@@ -228,6 +285,7 @@ export function primeSpringCloudProbeCache(cluster: string, deps: PrimeDeps = {}
         statusText: response.statusText,
         headers,
       };
+      persistSpringCloudProbeSeeds(store, storage);
     })
     .catch(() => undefined)
     .then(() => {
@@ -253,5 +311,8 @@ export function primeSpringCloudProbeCacheForRoute(
   if (!cluster) {
     return;
   }
-  void primeSpringCloudProbeCache(cluster, deps);
+  const store = deps.store ?? getSpringCloudProbeSeedStore();
+  const storage = deps.storage === undefined ? defaultSessionStorage() : deps.storage;
+  hydrateSpringCloudProbeSeedsFromSession(store, storage, deps.now ?? Date.now());
+  void primeSpringCloudProbeCache(cluster, { ...deps, store, storage });
 }

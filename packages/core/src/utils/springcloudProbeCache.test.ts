@@ -5,12 +5,15 @@ import test from 'node:test';
 import {
   getSpringCloudProbeCluster,
   getSpringCloudProbeUrl,
+  hydrateSpringCloudProbeSeedsFromSession,
+  persistSpringCloudProbeSeeds,
   primeSpringCloudProbeCache,
   primeSpringCloudProbeCacheForRoute,
   SPRINGCLOUD_CRD_NAME,
   SPRINGCLOUD_PROBE_CACHE_SOURCE,
   SPRINGCLOUD_PROBE_CACHE_TTL_MS,
   SPRINGCLOUD_PROBE_SEEDS_KEY,
+  SPRINGCLOUD_PROBE_SESSION_KEY,
   type SpringCloudProbeRecord,
 } from './springcloudProbeCache';
 
@@ -258,4 +261,55 @@ test('route priming skips login and routes without a cluster', async () => {
   });
   await new Promise(resolve => setTimeout(resolve, 0));
   assert.equal(store.host?.body, EMPTY_LIST);
+});
+
+test('session storage hydrates a fresh seed across hard refresh', () => {
+  const memory: Record<string, string> = {};
+  const storage = {
+    getItem: (key: string) => memory[key] ?? null,
+    setItem: (key: string, value: string) => {
+      memory[key] = value;
+    },
+  };
+  const persisted: Record<string, SpringCloudProbeRecord> = {
+    host: seedRecord({ at: 5_000, body: EMPTY_LIST }),
+  };
+  persistSpringCloudProbeSeeds(persisted, storage as Storage);
+
+  const store: Record<string, SpringCloudProbeRecord> = {};
+  const loaded = hydrateSpringCloudProbeSeedsFromSession(store, storage as Storage, 6_000);
+  assert.equal(loaded, 1);
+  assert.equal(store.host.body, EMPTY_LIST);
+  assert.equal(memory[SPRINGCLOUD_PROBE_SESSION_KEY] !== undefined, true);
+});
+
+test('session hydration ignores expired probe seeds', () => {
+  const memory: Record<string, string> = {
+    [SPRINGCLOUD_PROBE_SESSION_KEY]: JSON.stringify({
+      host: seedRecord({ at: 0 }),
+    }),
+  };
+  const storage = {
+    getItem: (key: string) => memory[key] ?? null,
+    setItem: () => undefined,
+  };
+  const store: Record<string, SpringCloudProbeRecord> = {};
+  const loaded = hydrateSpringCloudProbeSeedsFromSession(
+    store,
+    storage as Storage,
+    SPRINGCLOUD_PROBE_CACHE_TTL_MS + 1,
+  );
+  assert.equal(loaded, 0);
+  assert.deepEqual(store, {});
+});
+
+test('initWujie defers actions dashboard preload on project list routes', () => {
+  const source = readFileSync(__filename.replace(/[^/]+$/, 'wujie.ts'), 'utf8');
+  assert.match(source, /isConsoleV3ProjectListPath/);
+  assert.match(source, /consoleV3Actions/);
+  // List landings must not kick dashboard actions preload in the same turn as
+  // the aligned list preload — that double HTML+bundle work shows up as ~1s
+  // of contending `/consolev3/dashboard` on hard refresh.
+  assert.match(source, /requestIdleCallback|setTimeout/);
+  assert.match(source, /isConsoleV3ProjectListPath\(window\.location\.pathname\)/);
 });

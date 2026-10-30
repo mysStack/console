@@ -14,7 +14,7 @@ import {
   installConsoleV3ListSeedPrimer,
   primeConsoleV3ListSeedForRoute,
 } from './consoleV3ListSeed';
-import { resolveConsoleV3PreloadUrl } from './consoleV3PreloadUrl';
+import { isConsoleV3ProjectListPath, resolveConsoleV3PreloadUrl } from './consoleV3PreloadUrl';
 import {
   createConsoleV3SpringCloudProbeCachePlugin,
   ensureSpringCloudProbeCacheInChild,
@@ -77,18 +77,29 @@ export function initWujie() {
     },
   });
 
-  // Actions stay on dashboard; the shared list app preloads the landing route
-  // when the host URL is already a project embed, so activation does not pay
-  // for a dashboard → list navigation.
-  preloadApp({
-    name: 'consoleV3Actions',
-    props: { actions: true },
-    url: `//${window.location.host}/consolev3/dashboard`,
-  });
-
+  // Shared list app preloads the landing route when the host URL is already a
+  // project embed, so activation does not pay for a dashboard → list navigation.
   preloadApp({
     name: 'consolev3',
     url: preloadUrl,
     plugins: consoleV3Plugins,
   });
+
+  // Actions stay on dashboard. On a list hard refresh, kicking that preload in
+  // the same turn races the aligned list fiber for HTML + v3dist bandwidth.
+  const preloadActions = () =>
+    preloadApp({
+      name: 'consoleV3Actions',
+      props: { actions: true },
+      url: `//${window.location.host}/consolev3/dashboard`,
+    });
+  if (isConsoleV3ProjectListPath(window.location.pathname)) {
+    const defer =
+      typeof window.requestIdleCallback === 'function'
+        ? (cb: () => void) => window.requestIdleCallback(cb, { timeout: 3000 })
+        : (cb: () => void) => window.setTimeout(cb, 1500);
+    defer(preloadActions);
+  } else {
+    preloadActions();
+  }
 }
