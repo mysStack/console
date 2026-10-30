@@ -11,6 +11,7 @@ import { useQueries, useQuery } from 'react-query';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import {
   apis,
+  assignConsoleV3UrlPrefixIfChanged,
   ClusterDetail,
   clusterStore,
   getConsoleV3UrlPrefix,
@@ -24,8 +25,10 @@ function BaseLayout(): JSX.Element {
   const navigate = useNavigate();
   const userName = globals.user.username;
   const { cluster, namespace, workspace } = useParams<'workspace' | 'namespace' | 'cluster'>();
-  const [, setUrlPrefix] = useStore<string>('wujieUrlPrefix');
+  const [wujieUrlPrefix, setUrlPrefix] = useStore<string>('wujieUrlPrefix');
   const setUrlPrefixStable = useRef(setUrlPrefix).current;
+  const wujieUrlPrefixRef = useRef(wujieUrlPrefix);
+  wujieUrlPrefixRef.current = wujieUrlPrefix;
   const [, setProject] = useStore<any>('project');
   const [, setCluster] = useStore<ClusterDetail>('cluster');
   const [projectResult, clusterResult, workspaceRuleResult] = useQueries([
@@ -69,7 +72,12 @@ function BaseLayout(): JSX.Element {
     // Detail routes mount outside ProjectListLayout, so this layout is the only
     // writer of the prefix for them. It must emit the same absolute value, or a
     // layout remount writes the bare path and every V3 embed stays unmounted.
-    setUrlPrefixStable(getConsoleV3UrlPrefix(basePrefix));
+    // Skip identical writes: BaseLayout and ListLayout both publish this store.
+    assignConsoleV3UrlPrefixIfChanged(
+      wujieUrlPrefixRef.current,
+      getConsoleV3UrlPrefix(basePrefix),
+      setUrlPrefixStable,
+    );
   }, [cluster, namespace, setUrlPrefixStable, workspace]);
 
   if (

@@ -16,3 +16,20 @@ export function getConsoleV3UrlPrefix(
 ): string {
   return `//${host}/consolev3${projectPrefix}`;
 }
+
+/**
+ * Write the Wujie URL prefix only when it changes.
+ *
+ * Project BaseLayout and ListLayout both publish `wujieUrlPrefix`. Identical
+ * re-writes still wake every ConsoleV3ResourceList subscriber and used to look
+ * like a new boot while the ShadowRoot was still empty.
+ */
+export function assignConsoleV3UrlPrefixIfChanged(
+  current: string | undefined,
+  next: string,
+  setPrefix: (value: string) => void,
+): boolean {
+  if (current === next) return false;
+  setPrefix(next);
+  return true;
+}

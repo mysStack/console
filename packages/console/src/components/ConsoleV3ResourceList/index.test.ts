@@ -46,44 +46,46 @@ test('resource host boots on the existing instance when it never saw the shared 
   );
   assert.ok(coldStart, 'cold start branch not found');
   assert.doesNotMatch(coldStart[0], /destroyApp|destroyConsoleV3Instance/);
-  assert.match(coldStart[0], /consoleV3BootStartedAt = Date\.now\(\)/);
+  assert.match(coldStart[0], /markConsoleV3BootStarted\(\)/);
   assert.match(coldStart[0], /setInstanceReady\(true\)/);
 });
 
 test('resource host lets a boot in flight finish instead of destroying it', () => {
-  // The project layout writes the Wujie prefix twice. The second write used to
-  // destroy the sandbox that was still loading the V3 bundle, and wujie 1.0.25
-  // reported `null._cacheListeners` from that teardown.
+  // Prefix re-writes remount the host while the first boot still loads. The
+  // host must stay in `booting` until afterMount/activated, not a wall clock.
+  assert.match(source, /from '\.\/bootPhase'/);
+  assert.doesNotMatch(source, /consoleV3BootStartedAt/);
+  assert.doesNotMatch(source, /CONSOLE_V3_BOOT_GRACE_MS/);
+
   const mountEffect = source.match(
     /if \(!isReady\) return;[\s\S]*?\[isReady, resourceUrl, shouldRebuild\]/,
   );
   assert.ok(mountEffect, 'mount effect not found');
-  assert.match(mountEffect[0], /isConsoleV3BootInFlight\(consoleV3BootStartedAt\)/);
-  assert.match(mountEffect[0], /if \(!isConsoleV3BootInFlight\(consoleV3BootStartedAt\)\) \{/);
+  assert.match(mountEffect[0], /isConsoleV3BootInFlight\(\)/);
+  assert.match(mountEffect[0], /if \(!isConsoleV3BootInFlight\(\)\) \{/);
 
   const verify = source.match(/const verify = \(\) => \{[\s\S]*?VERIFY_MOUNT_DELAY_MS\);/);
   assert.ok(verify, 'verify timer not found');
-  assert.match(verify[0], /isConsoleV3BootInFlight\(consoleV3BootStartedAt\)/);
+  assert.match(verify[0], /isConsoleV3BootInFlight\(\)/);
 });
 
 test('resource host destroys the shared app only after its unmount', () => {
   assert.match(source, /import \{ destroyConsoleV3Instance \} from '\.\/destroy'/);
   assert.doesNotMatch(source, /^\s*WujieReact\.destroyApp\('consolev3'\);/m);
-  assert.match(source, /consoleV3BootStartedAt = 0;/);
+  assert.match(source, /markConsoleV3BootMounted\(\)/);
 });
 
-test('resource host opens a boot window for the rebuild it starts', () => {
+test('resource host opens a boot phase for the rebuild it starts', () => {
   // The rebuild branch destroys the app and renders a fresh boot in the same
-  // commit. Without a window opened here, the verify timer destroyed that boot
-  // three seconds in and the list restarted instead of rendering.
+  // commit. Without entering `booting` here, the verify timer destroyed that
+  // boot three seconds in and the list restarted instead of rendering.
   const mountEffect = source.match(
     /if \(!isReady\) return;[\s\S]*?\[isReady, resourceUrl, shouldRebuild\]/,
   );
   assert.ok(mountEffect, 'mount effect not found');
   const rebuild = mountEffect[0].match(/if \(shouldRebuild\) \{[\s\S]*?\n    \}/);
   assert.ok(rebuild, 'rebuild branch not found');
-  assert.match(rebuild[0], /consoleV3BootStartedAt = Date\.now\(\);/);
-  assert.doesNotMatch(rebuild[0], /consoleV3BootStartedAt = 0;/);
+  assert.match(rebuild[0], /markConsoleV3BootStarted\(\);/);
 });
 
 test('resource host keeps the child window of the shared sandbox', () => {
@@ -96,13 +98,10 @@ test('resource host keeps the shared sandbox alive for non-alive embeds', () => 
   assert.match(source, /watchConsoleV3Sandbox\(lastConsoleV3AppWindow\?\.__WUJIE\)/);
 });
 
-test('activation records the rendered revision so the first return reuses the app', () => {
+test('activation settles the boot phase so empty husks can be rebuilt', () => {
   const activation = source.match(/phase === 'activated'[\s\S]*?phase === 'deactivated'/);
   assert.ok(activation, 'activation branch not found');
   assert.match(activation[0], /mountedRevisions\.set\(scopeKey, revision\)/);
   assert.match(activation[0], /mountedResourceUrls\.set\(scopeKey, resourceUrl\)/);
-  // A reused instance activates without `afterMount`; the boot window must
-  // close here too, or a husk that activated but rendered nothing would only
-  // be rebuilt when the grace window expires.
-  assert.match(activation[0], /consoleV3BootStartedAt = 0;/);
+  assert.match(activation[0], /markConsoleV3BootMounted\(\)/);
 });

@@ -3,6 +3,11 @@ import WujieReact from 'wujie-react';
 
 import { getResourceListCacheVersion } from '@ks-console/shared';
 
+import {
+  isConsoleV3BootInFlight,
+  markConsoleV3BootMounted,
+  markConsoleV3BootStarted,
+} from './bootPhase';
 import { destroyConsoleV3Instance } from './destroy';
 import { watchConsoleV3Sandbox } from './keepAlive';
 import type { ConsoleV3AppWindow } from './metrics';
@@ -10,7 +15,6 @@ import {
   getConsoleV3InstanceState,
   getConsoleV3Sandbox,
   getConsoleV3ScopeKey,
-  isConsoleV3BootInFlight,
   isConsoleV3InstanceMounted,
   markConsoleV3Phase,
   normalizeConsoleV3Url,
@@ -25,11 +29,6 @@ const deactivatedScopes = new Set<string>();
 // The child window is the only handle on the shared sandbox once its host
 // element is detached, and it is what tells a reusable app from a cleared one.
 let lastConsoleV3AppWindow: ConsoleV3AppWindow | undefined;
-// When a host asked Wujie to start the shared app. A boot loads the V3 bundle
-// before it mounts, and the project layout can write the Wujie prefix again
-// while that load runs; the later host must let the boot finish instead of
-// tearing down a half-built sandbox.
-let consoleV3BootStartedAt = 0;
 const VERIFY_MOUNT_DELAY_MS = 3_000;
 
 export interface ConsoleV3ResourceListProps {
@@ -87,7 +86,7 @@ export default function ConsoleV3ResourceList({
             phase === 'afterMount'
               ? (appWindow?: Window) => {
                   lastConsoleV3AppWindow = appWindow ?? lastConsoleV3AppWindow;
-                  consoleV3BootStartedAt = 0;
+                  markConsoleV3BootMounted();
                   watchConsoleV3Sandbox(lastConsoleV3AppWindow?.__WUJIE);
                   mountedResourceUrls.set(scopeKey, resourceUrl);
                   mountedRevisions.set(scopeKey, revision);
@@ -102,10 +101,9 @@ export default function ConsoleV3ResourceList({
                       lastConsoleV3AppWindow = appWindow ?? lastConsoleV3AppWindow;
                       watchConsoleV3Sandbox(lastConsoleV3AppWindow?.__WUJIE);
                       // Activation ends the boot: a reused instance activates
-                      // without `afterMount`. Closing the window here lets the
-                      // verify timer rebuild a boot that activated but left the
-                      // ShadowRoot empty.
-                      consoleV3BootStartedAt = 0;
+                      // without `afterMount`. Settling here lets verify rebuild
+                      // a boot that activated but left the ShadowRoot empty.
+                      markConsoleV3BootMounted();
                       deactivatedScopes.delete(scopeKey);
                       // The first mount of a scope can activate without
                       // `afterMount`; record the rendered revision here too, or
@@ -142,9 +140,9 @@ export default function ConsoleV3ResourceList({
   useEffect(() => {
     if (!isReady) return;
     if (shouldRebuild) {
-      // The rebuild starts a fresh boot below. Open its window here, or the
+      // The rebuild starts a fresh boot below. Enter `booting` here, or the
       // verify timer would destroy the sandbox while it is still loading.
-      consoleV3BootStartedAt = Date.now();
+      markConsoleV3BootStarted();
       destroyConsoleV3Instance(getConsoleV3Sandbox(), () => WujieReact.destroyApp('consolev3'));
       lastConsoleV3AppWindow = undefined;
       setInstanceReady(true);
@@ -162,11 +160,11 @@ export default function ConsoleV3ResourceList({
     // instead; wujie-react awaits the running preload, and the verify timer
     // below rebuilds only if this route really left an empty husk.
     if (!lastConsoleV3AppWindow && !isConsoleV3InstanceMounted()) {
-      // The project layout writes the Wujie prefix more than once; the second
-      // write can arrive while the first boot is still loading the V3 bundle.
-      // wujie-react already queues the newer `startApp` behind the running one.
-      if (!isConsoleV3BootInFlight(consoleV3BootStartedAt)) {
-        consoleV3BootStartedAt = Date.now();
+      // Prefix re-writes can remount this host while the first boot still loads
+      // the V3 bundle. Stay in `booting` instead of treating the empty
+      // ShadowRoot as a failed mount; wujie-react queues the newer startApp.
+      if (!isConsoleV3BootInFlight()) {
+        markConsoleV3BootStarted();
       }
       setInstanceReady(true);
       return;
@@ -194,9 +192,9 @@ export default function ConsoleV3ResourceList({
     const verify = () => {
       if (cancelled) return;
       if (isConsoleV3InstanceMounted()) return;
-      // A boot is still loading the V3 bundle: wujie-react activates the app
-      // when it finishes, so re-check instead of rebooting that sandbox.
-      if (isConsoleV3BootInFlight(consoleV3BootStartedAt)) {
+      // Lifecycle has not settled yet: keep waiting. Protection ends on
+      // afterMount/activated (or the hung-boot watchdog), not on a wall clock.
+      if (isConsoleV3BootInFlight()) {
         timer = window.setTimeout(verify, VERIFY_MOUNT_DELAY_MS);
         return;
       }
@@ -210,6 +208,7 @@ export default function ConsoleV3ResourceList({
         return;
       }
       retriedUrlRef.current = resourceUrl;
+      markConsoleV3BootStarted();
       destroyConsoleV3Instance(getConsoleV3Sandbox(), () =>
         WujieReact.destroyApp('consolev3'),
       ).then(() => {
