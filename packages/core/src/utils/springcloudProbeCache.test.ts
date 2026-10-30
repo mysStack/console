@@ -303,13 +303,14 @@ test('session hydration ignores expired probe seeds', () => {
   assert.deepEqual(store, {});
 });
 
-test('initWujie defers actions dashboard preload on project list routes', () => {
+test('initWujie defers actions dashboard preload until consolev3 is ready', () => {
   const source = readFileSync(__filename.replace(/[^/]+$/, 'wujie.ts'), 'utf8');
   assert.match(source, /isConsoleV3ProjectListPath/);
   assert.match(source, /consoleV3Actions/);
-  // List landings must not kick dashboard actions preload in the same turn as
-  // the aligned list preload — that double HTML+bundle work shows up as ~1s
-  // of contending `/consolev3/dashboard` on hard refresh.
-  assert.match(source, /setTimeout\(preloadActions,\s*2500\)/);
-  assert.match(source, /isConsoleV3ProjectListPath\(window\.location\.pathname\)/);
+  // List landings wait for consolev3 `loadCompleted`, not a magic timer.
+  assert.doesNotMatch(source, /setTimeout\(preloadActions/);
+  assert.doesNotMatch(source, /requestIdleCallback/);
+  assert.match(source, /loadCompleted/);
+  assert.match(source, /preloadActionsOnce/);
+  assert.match(source, /deferActionsUntilListReady/);
 });

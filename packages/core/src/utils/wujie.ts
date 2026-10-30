@@ -44,6 +44,28 @@ export function initWujie() {
   primeConsoleV3ListSeedForRoute();
 
   const preloadUrl = resolveConsoleV3PreloadUrl(window.location.pathname);
+  const deferActionsUntilListReady = isConsoleV3ProjectListPath(window.location.pathname);
+
+  let actionsPreloaded = false;
+  const preloadActionsOnce = () => {
+    if (actionsPreloaded) return;
+    actionsPreloaded = true;
+    preloadApp({
+      name: 'consoleV3Actions',
+      props: { actions: true },
+      url: `//${window.location.host}/consolev3/dashboard`,
+    });
+  };
+
+  // Listen before any preload so list landings can start actions only after
+  // the shared consolev3 app has finished loading (not on a wall-clock delay).
+  bus.$on('loadCompleted', (name: string) => {
+    if (name !== 'consolev3') return;
+    setGlobalConsoleV3LoadCompleted({ value: true });
+    if (deferActionsUntilListReady) {
+      preloadActionsOnce();
+    }
+  });
 
   setupApp({
     name: 'consolev3',
@@ -68,13 +90,6 @@ export function initWujie() {
     url: `//${window.location.host}/consolev3/`,
     exec: true,
     props: { actions: true },
-    afterMount: () => {
-      bus.$on('loadCompleted', (name: string) => {
-        if (name === 'consolev3') {
-          setGlobalConsoleV3LoadCompleted({ value: true });
-        }
-      });
-    },
   });
 
   // Shared list app preloads the landing route when the host URL is already a
@@ -85,19 +100,8 @@ export function initWujie() {
     plugins: consoleV3Plugins,
   });
 
-  // Actions stay on dashboard. On a list hard refresh, kicking that preload in
-  // the same turn races the aligned list fiber for HTML + v3dist bandwidth.
-  const preloadActions = () =>
-    preloadApp({
-      name: 'consoleV3Actions',
-      props: { actions: true },
-      url: `//${window.location.host}/consolev3/dashboard`,
-    });
-  if (isConsoleV3ProjectListPath(window.location.pathname)) {
-    // Fixed delay — requestIdleCallback often fires during the same cold-boot
-    // idle gaps and still races the list fiber for `/consolev3/dashboard`.
-    window.setTimeout(preloadActions, 2500);
-  } else {
-    preloadActions();
+  // Non-list routes keep the previous behaviour: warm actions immediately.
+  if (!deferActionsUntilListReady) {
+    preloadActionsOnce();
   }
 }
