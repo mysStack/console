@@ -310,6 +310,6 @@ test('initWujie defers actions dashboard preload on project list routes', () => 
   // List landings must not kick dashboard actions preload in the same turn as
   // the aligned list preload — that double HTML+bundle work shows up as ~1s
   // of contending `/consolev3/dashboard` on hard refresh.
-  assert.match(source, /requestIdleCallback|setTimeout/);
+  assert.match(source, /setTimeout\(preloadActions,\s*2500\)/);
   assert.match(source, /isConsoleV3ProjectListPath\(window\.location\.pathname\)/);
 });

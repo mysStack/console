@@ -94,11 +94,9 @@ export function initWujie() {
       url: `//${window.location.host}/consolev3/dashboard`,
     });
   if (isConsoleV3ProjectListPath(window.location.pathname)) {
-    const defer =
-      typeof window.requestIdleCallback === 'function'
-        ? (cb: () => void) => window.requestIdleCallback(cb, { timeout: 3000 })
-        : (cb: () => void) => window.setTimeout(cb, 1500);
-    defer(preloadActions);
+    // Fixed delay — requestIdleCallback often fires during the same cold-boot
+    // idle gaps and still races the list fiber for `/consolev3/dashboard`.
+    window.setTimeout(preloadActions, 2500);
   } else {
     preloadActions();
   }
