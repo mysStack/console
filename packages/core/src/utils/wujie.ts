@@ -15,6 +15,7 @@ import {
   primeConsoleV3ListSeedForRoute,
 } from './consoleV3ListSeed';
 import { isConsoleV3ProjectListPath, resolveConsoleV3PreloadUrl } from './consoleV3PreloadUrl';
+import { installConsoleV3ProjectWarmup } from './consoleV3ProjectWarmup';
 import {
   createConsoleV3SpringCloudProbeCachePlugin,
   ensureSpringCloudProbeCacheInChild,
@@ -42,6 +43,12 @@ export function initWujie() {
   installConsoleV3ListSeedPrimer();
   bindConsoleV3ListSeedEnsure(ensureChildFetchGuards);
   primeConsoleV3ListSeedForRoute();
+  // Project layouts call this via window to prime CRD/seed and (off overview)
+  // preload the deployments list without importing core from console.
+  installConsoleV3ProjectWarmup({
+    preloadApp,
+    plugins: consoleV3Plugins,
+  });
 
   const preloadUrl = resolveConsoleV3PreloadUrl(window.location.pathname);
   const deferActionsUntilListReady = isConsoleV3ProjectListPath(window.location.pathname);

@@ -8,7 +8,7 @@ import { set } from 'lodash';
 import { useCacheStore as useStore } from '@ks-console/shared';
 import { Loading } from '@kubed/components';
 import { useQueries, useQuery } from 'react-query';
-import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   apis,
   assignConsoleV3UrlPrefixIfChanged,
@@ -23,6 +23,7 @@ const { fetchDetail: fetchClusterDetail } = clusterStore;
 
 function BaseLayout(): JSX.Element {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const userName = globals.user.username;
   const { cluster, namespace, workspace } = useParams<'workspace' | 'namespace' | 'cluster'>();
   const [wujieUrlPrefix, setUrlPrefix] = useStore<string>('wujieUrlPrefix');
@@ -79,6 +80,18 @@ function BaseLayout(): JSX.Element {
       setUrlPrefixStable,
     );
   }, [cluster, namespace, setUrlPrefixStable, workspace]);
+
+  // Project-domain warmup: prime CRD/list-seed for deployments; off overview,
+  // also preloadApp that list URL (installed by initWujie on window).
+  useEffect(() => {
+    if (!workspace || !cluster || !namespace) return;
+    const scheduler = (window as unknown as Record<string, unknown>)[
+      '__KS_SCHEDULE_CONSOLE_V3_PROJECT_WARMUP__'
+    ];
+    if (typeof scheduler === 'function') {
+      (scheduler as (path: string) => void)(pathname);
+    }
+  }, [cluster, namespace, pathname, workspace]);
 
   if (
     projectResult.isLoading ||

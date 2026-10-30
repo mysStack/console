@@ -133,7 +133,8 @@ test('initWujie loads the probe cache into the shared V3 app before its scripts'
     source,
     /const consoleV3Plugins = \[\n  createConsoleV3SpringCloudProbeCachePlugin\(\),\n  createConsoleV3ListSeedPlugin\(\),\n\]/,
   );
-  assert.equal(source.match(/plugins: consoleV3Plugins/g)?.length, 2);
+  // setupApp + initial preloadApp + project-warmup install all share plugins.
+  assert.equal(source.match(/plugins: consoleV3Plugins/g)?.length, 3);
 
   const preload = source.match(/preloadApp\(\{\n    name: 'consolev3',[\s\S]*?\n  \}\);/);
   assert.ok(preload, 'consolev3 preload not found');
@@ -313,4 +314,5 @@ test('initWujie defers actions dashboard preload until consolev3 is ready', () =
   assert.match(source, /loadCompleted/);
   assert.match(source, /preloadActionsOnce/);
   assert.match(source, /deferActionsUntilListReady/);
+  assert.match(source, /installConsoleV3ProjectWarmup/);
 });
