@@ -10,6 +10,7 @@ import { PathParams } from '../types';
 import { safeParseJSON } from './parser';
 import { Constants } from '../constants';
 import { clearResourceListRevisions, ruleSnapshots } from './resourceListInvalidation';
+import { applySystemWorkspaceProjectRules } from './systemWorkspaceRules';
 
 export const getUserModule = ({ cluster, workspace, namespace, devops }: PathParams = {}) => {
   if (namespace || devops) {
@@ -113,9 +114,12 @@ export const fetchRules = async (params: PathParams): Promise<Rules> => {
           module: 'projects',
         });
 
-        if (params.workspace === globals.config?.systemWorkspace) {
-          rules = globals.config?.systemWorkspaceProjectRules;
-        }
+        rules = applySystemWorkspaceProjectRules(
+          rules,
+          params.workspace,
+          globals.config?.systemWorkspace,
+          globals.config?.systemWorkspaceProjectRules,
+        );
 
         set(globals.user, `projectRules[${params.cluster}][${params.namespace}]`, {
           ...rules,
