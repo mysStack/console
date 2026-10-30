@@ -36,6 +36,7 @@ export interface ConsoleV3ProjectWarmupDeps {
 let installed: ConsoleV3ProjectWarmupDeps | null = null;
 const warmedProjects = new Set<string>();
 let intentBound = false;
+let shellRouteBound = false;
 
 export function getConsoleV3ProjectBasePath(pathname: string): string | undefined {
   const path = (pathname || '/').split(/[?#]/)[0] || '/';
@@ -144,7 +145,7 @@ export function scheduleConsoleV3ProjectListWarmup(
   return { projectKey, primed: true, preloadScheduled: true };
 }
 
-/** After shell/dashboard preload finishes, warm the last project list ahead of navigation. */
+/** Warm the last project list ahead of the next shell → list navigation. */
 export function warmLastConsoleV3Project(deps: ConsoleV3ProjectWarmupDeps = {}): {
   projectKey?: string;
   primed: boolean;
@@ -152,6 +153,8 @@ export function warmLastConsoleV3Project(deps: ConsoleV3ProjectWarmupDeps = {}):
 } {
   const base = readLastConsoleV3ProjectBase(deps);
   if (!base) return { primed: false, preloadScheduled: false };
+  // Allow re-preload when returning from overview/other routes.
+  warmedProjects.delete(base);
   return scheduleConsoleV3ProjectListWarmup(`${base}/deployments`, deps);
 }
 
@@ -188,10 +191,43 @@ function bindProjectLinkIntent(deps: ConsoleV3ProjectWarmupDeps): void {
   );
 }
 
+function isShellPath(pathname: string): boolean {
+  return !getConsoleV3ProjectBasePath(pathname);
+}
+
+/**
+ * When the SPA returns to dashboard/workbench, warm the remembered project.
+ * First loadCompleted is often too early (session has no last project yet).
+ */
+function bindShellRouteWarmLast(deps: ConsoleV3ProjectWarmupDeps): void {
+  if (shellRouteBound) return;
+  if (typeof window === 'undefined' || deps.document === null) return;
+  shellRouteBound = true;
+
+  const maybeWarm = () => {
+    const path = currentPathname({ ...installed, ...deps });
+    if (!isShellPath(path)) return;
+    warmLastConsoleV3Project(deps);
+  };
+
+  window.addEventListener('popstate', maybeWarm);
+  const wrap = (method: 'pushState' | 'replaceState') => {
+    const original = history[method].bind(history);
+    history[method] = ((...args: Parameters<History['pushState']>) => {
+      const result = original(...args);
+      queueMicrotask(maybeWarm);
+      return result;
+    }) as History['pushState'];
+  };
+  wrap('pushState');
+  wrap('replaceState');
+}
+
 /** Test helper: forget which projects already scheduled a list preload. */
 export function resetConsoleV3ProjectWarmupState(): void {
   warmedProjects.clear();
   intentBound = false;
+  shellRouteBound = false;
   installed = null;
 }
 
@@ -205,6 +241,7 @@ export function installConsoleV3ProjectWarmup(deps: ConsoleV3ProjectWarmupDeps):
     host[REMEMBER_HOST_KEY] = (pathname: string) => rememberConsoleV3ProjectBase(pathname);
   }
   bindProjectLinkIntent(deps);
+  bindShellRouteWarmLast(deps);
 }
 
 export function requestConsoleV3ProjectListWarmup(
