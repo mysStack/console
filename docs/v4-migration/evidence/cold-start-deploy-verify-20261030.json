@@ -1,44 +1,79 @@
 {
   "date": "2026-10-30",
+  "branch": "fix/release-4.1.5-v3-cold-start",
+  "code_tip": "37bcace39",
+  "docs_tip": "dde93a9ad",
   "image": "ghcr.io/mysstack/ks-console:release-4.1.5-cold-start-20261030-37bcace",
-  "imageID": "ghcr.io/mysstack/ks-console@sha256:a493e0407bfa9ba91c417fca81398e3481fcd98b2a5eb8567f688d320a5909d4",
-  "note": "digest may match prior build if layers shared; tag 37bcace is the preload-scope fix tip",
+  "imageID": "ghcr.io/mysstack/ks-console@sha256:a15365cfcdc457eb6cb9b1d9e72d95dd3a13819ddccdf14285e180bf7953ded8",
   "deploy": "ks-console-v415-rea @ 192.168.2.131:30881",
+  "pod": "ks-console-v415-rea-6b54586469-hn8ms",
+  "conclusion": "Cold-start optimization works at the host dedupe + prime layer; list-visible time remains bound by V3 sandbox boot.",
   "baseline_before": {
     "hard_refresh_first_list_api_host_ms": 2413,
     "hard_refresh_second_list_api_host_ms": 3560,
-    "iframe_list_network_count": 2
+    "iframe_list_network_count": 2,
+    "spa_overview_to_deployments_visible_ms_approx": 10000
   },
-  "after": {
+  "after_independent_retest": {
+    "hard_refresh_deployments": {
+      "seed_present": true,
+      "list_get_count": 1,
+      "list_get_start_ms": 948,
+      "list_get_duration_ms": 73,
+      "list_visible_ms": 3950,
+      "rows": 4
+    },
+    "hard_refresh_configmaps": {
+      "seed_present": true,
+      "list_get_count": 1,
+      "list_get_start_ms": 365,
+      "list_get_duration_ms": 284,
+      "rows": 11
+    },
+    "hard_refresh_overview": {
+      "seeds": [],
+      "preload": ["/consolev3/dashboard"],
+      "note": "no mistaken /consolev3/.../overview preload"
+    },
+    "spa_overview_to_deployments": {
+      "host_list_prime_since_click_ms": { "start": 64, "end": 156, "duration": 92 },
+      "list_visible_ms": 9000,
+      "note": "Visible time only ~1s better than prior ~10s; saved duplicate list fetch, not V3 boot"
+    }
+  },
+  "agent_smoke_after_deploy": {
     "hard_refresh_deployments": {
       "host_list_prime_ms": { "start": 930, "end": 1073, "duration": 143 },
       "iframe_list_network_count": 0,
-      "seed_keys": [
-        "/clusters/host/kapis/resources.kubesphere.io/v1alpha3/namespaces/dev-wes/deployments"
-      ],
-      "preload": ["/consolev3/dashboard", "/consolev3/.../deployments"],
       "list_visible": true
     },
     "spa_overview_to_deployments": {
       "host_list_prime_since_click_ms": { "start": 55, "end": 211 },
-      "list_visible": true
+      "list_visible": true,
+      "visible_ms_not_measured_in_smoke": true
     },
     "hard_refresh_overview": {
       "preload": ["/consolev3/dashboard"],
-      "seeds": [],
-      "note": "no mistaken /consolev3/.../overview preload after scope fix"
+      "seeds": []
     },
     "hard_refresh_configmaps": {
       "host_list_prime_ms": { "start": 500, "end": 592, "duration": 92 },
       "iframe_list_network_count": 0,
       "list_visible": true
-    }
+    },
+    "imageID_correction": "Previous draft wrongly recorded sha256:a493e040… (b906b01 build). Live pod digest is sha256:a15365cf… for tag 37bcace."
   },
   "side_effect_assessment": {
-    "extra_host_fetch_on_v3_list_routes": "one parallel list GET (~100ms); overlaps v3dist download",
+    "extra_host_fetch_on_v3_list_routes": "one parallel list GET; overlaps v3dist download",
     "overview_workbench_login": "no list seed; preload stays dashboard",
     "actions_preload": "still dashboard (unchanged)",
-    "bandwidth_contention": "possible slight contention with v3dist on slow links; list body is small (~3.5KB)",
-    "stale_list_risk": "15s seed TTL; SPA remount within 15s may show briefly stale list"
-  }
+    "bandwidth_contention": "not measured; list body small",
+    "stale_list_risk": "15s seed TTL; not retested",
+    "v3_boot_bound": "list-visible remains ~4s hard refresh / ~9s SPA; host prime does not remove V3 startup tax"
+  },
+  "not_verified": [
+    "seed 15s TTL stale display on fast re-enter",
+    "bandwidth contention with v3dist",
+    "other resources / namespaces / non-admin"
+  ]
 }
