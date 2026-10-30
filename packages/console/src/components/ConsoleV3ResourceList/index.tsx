@@ -3,11 +3,14 @@ import WujieReact from 'wujie-react';
 
 import { getResourceListCacheVersion } from '@ks-console/shared';
 
+import { destroyConsoleV3Instance } from './destroy';
 import { watchConsoleV3Sandbox } from './keepAlive';
 import type { ConsoleV3AppWindow } from './metrics';
 import {
   getConsoleV3InstanceState,
+  getConsoleV3Sandbox,
   getConsoleV3ScopeKey,
+  isConsoleV3BootInFlight,
   isConsoleV3InstanceMounted,
   markConsoleV3Phase,
   normalizeConsoleV3Url,
@@ -22,6 +25,11 @@ const deactivatedScopes = new Set<string>();
 // The child window is the only handle on the shared sandbox once its host
 // element is detached, and it is what tells a reusable app from a cleared one.
 let lastConsoleV3AppWindow: ConsoleV3AppWindow | undefined;
+// When a host asked Wujie to start the shared app. A boot loads the V3 bundle
+// before it mounts, and the project layout can write the Wujie prefix again
+// while that load runs; the later host must let the boot finish instead of
+// tearing down a half-built sandbox.
+let consoleV3BootStartedAt = 0;
 const VERIFY_MOUNT_DELAY_MS = 3_000;
 
 export interface ConsoleV3ResourceListProps {
@@ -79,6 +87,7 @@ export default function ConsoleV3ResourceList({
             phase === 'afterMount'
               ? (appWindow?: Window) => {
                   lastConsoleV3AppWindow = appWindow ?? lastConsoleV3AppWindow;
+                  consoleV3BootStartedAt = 0;
                   watchConsoleV3Sandbox(lastConsoleV3AppWindow?.__WUJIE);
                   mountedResourceUrls.set(scopeKey, resourceUrl);
                   mountedRevisions.set(scopeKey, revision);
@@ -92,6 +101,11 @@ export default function ConsoleV3ResourceList({
                   ? (appWindow?: Window) => {
                       lastConsoleV3AppWindow = appWindow ?? lastConsoleV3AppWindow;
                       watchConsoleV3Sandbox(lastConsoleV3AppWindow?.__WUJIE);
+                      // Activation ends the boot: a reused instance activates
+                      // without `afterMount`. Closing the window here lets the
+                      // verify timer rebuild a boot that activated but left the
+                      // ShadowRoot empty.
+                      consoleV3BootStartedAt = 0;
                       deactivatedScopes.delete(scopeKey);
                       // The first mount of a scope can activate without
                       // `afterMount`; record the rendered revision here too, or
@@ -128,7 +142,10 @@ export default function ConsoleV3ResourceList({
   useEffect(() => {
     if (!isReady) return;
     if (shouldRebuild) {
-      WujieReact.destroyApp('consolev3');
+      // The rebuild starts a fresh boot below. Open its window here, or the
+      // verify timer would destroy the sandbox while it is still loading.
+      consoleV3BootStartedAt = Date.now();
+      destroyConsoleV3Instance(getConsoleV3Sandbox(), () => WujieReact.destroyApp('consolev3'));
       lastConsoleV3AppWindow = undefined;
       setInstanceReady(true);
       return;
@@ -137,10 +154,20 @@ export default function ConsoleV3ResourceList({
     // shared ShadowRoot on unmount but leaves the sandbox and its scripts
     // loaded. Render the app again in place instead of booting it from zero.
     // Entering such a route first leaves no child window here, and the cleared
-    // sandbox renders nothing when activated: boot a clean app, as the plain
-    // mount always did, instead of waiting for the verify timer below.
+    // sandbox renders nothing when activated. `destroyApp` cannot clear that
+    // husk on a cold page load either: it also destroys the instance `preloadApp`
+    // is still filling in. Wujie 1.0.25 `destroy()` does not await the sandbox
+    // unmount, so the rest of that preload runs against a nulled document and
+    // the page reports `null._cacheListeners`. Boot on the existing instance
+    // instead; wujie-react awaits the running preload, and the verify timer
+    // below rebuilds only if this route really left an empty husk.
     if (!lastConsoleV3AppWindow && !isConsoleV3InstanceMounted()) {
-      WujieReact.destroyApp('consolev3');
+      // The project layout writes the Wujie prefix more than once; the second
+      // write can arrive while the first boot is still loading the V3 bundle.
+      // wujie-react already queues the newer `startApp` behind the running one.
+      if (!isConsoleV3BootInFlight(consoleV3BootStartedAt)) {
+        consoleV3BootStartedAt = Date.now();
+      }
       setInstanceReady(true);
       return;
     }
@@ -162,8 +189,17 @@ export default function ConsoleV3ResourceList({
   // in the surviving sandbox first, and rebuild only if that leaves it empty.
   useEffect(() => {
     if (!instanceReady) return;
-    const timer = window.setTimeout(() => {
+    let cancelled = false;
+    let timer = 0;
+    const verify = () => {
+      if (cancelled) return;
       if (isConsoleV3InstanceMounted()) return;
+      // A boot is still loading the V3 bundle: wujie-react activates the app
+      // when it finishes, so re-check instead of rebooting that sandbox.
+      if (isConsoleV3BootInFlight(consoleV3BootStartedAt)) {
+        timer = window.setTimeout(verify, VERIFY_MOUNT_DELAY_MS);
+        return;
+      }
       if (retriedUrlRef.current === resourceUrl) return;
       if (
         revivedUrlRef.current !== resourceUrl &&
@@ -174,11 +210,19 @@ export default function ConsoleV3ResourceList({
         return;
       }
       retriedUrlRef.current = resourceUrl;
-      WujieReact.destroyApp('consolev3');
-      lastConsoleV3AppWindow = undefined;
-      setRetryCount(count => count + 1);
-    }, VERIFY_MOUNT_DELAY_MS);
-    return () => window.clearTimeout(timer);
+      destroyConsoleV3Instance(getConsoleV3Sandbox(), () =>
+        WujieReact.destroyApp('consolev3'),
+      ).then(() => {
+        if (cancelled) return;
+        lastConsoleV3AppWindow = undefined;
+        setRetryCount(count => count + 1);
+      });
+    };
+    timer = window.setTimeout(verify, VERIFY_MOUNT_DELAY_MS);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
   }, [instanceReady, resourceUrl, retryCount]);
 
   if (!isReady || !instanceReady) {
