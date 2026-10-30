@@ -8,15 +8,23 @@ import WujieReact from 'wujie-react';
 import { useEventEmitter } from '@ks-console/shared';
 import { setGlobalConsoleV3LoadCompleted } from '../utils/globals.consoleV3LoadCompleted';
 import {
+  bindConsoleV3ListSeedEnsure,
   createConsoleV3ListSeedPlugin,
+  ensureConsoleV3ListSeedInChild,
   installConsoleV3ListSeedPrimer,
   primeConsoleV3ListSeedForRoute,
 } from './consoleV3ListSeed';
 import { resolveConsoleV3PreloadUrl } from './consoleV3PreloadUrl';
 import {
   createConsoleV3SpringCloudProbeCachePlugin,
+  ensureSpringCloudProbeCacheInChild,
   primeSpringCloudProbeCacheForRoute,
 } from './springcloudProbeCache';
+
+const ensureChildFetchGuards = (appWindow: Window | undefined | null): void => {
+  ensureConsoleV3ListSeedInChild(appWindow);
+  ensureSpringCloudProbeCacheInChild(appWindow);
+};
 
 const { setupApp, preloadApp, bus } = WujieReact;
 
@@ -32,6 +40,7 @@ export function initWujie() {
   // springcloud probe and first resource-list GET are usually ready by mount.
   primeSpringCloudProbeCacheForRoute();
   installConsoleV3ListSeedPrimer();
+  bindConsoleV3ListSeedEnsure(ensureChildFetchGuards);
   primeConsoleV3ListSeedForRoute();
 
   const preloadUrl = resolveConsoleV3PreloadUrl(window.location.pathname);
@@ -42,6 +51,9 @@ export function initWujie() {
     exec: true,
     plugins: consoleV3Plugins,
     afterMount: appWindow => {
+      // List/SPA fibers sometimes skip jsBeforeLoaders; patch fetch before V3
+      // issues its first list/probe GET.
+      ensureChildFetchGuards(appWindow);
       const { $emit } = useEventEmitter();
       $emit('afterMountConsoleV3', appWindow);
     },

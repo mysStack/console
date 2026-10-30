@@ -10,6 +10,7 @@ import {
   CONSOLE_V3_LIST_SEED_SOURCE,
   CONSOLE_V3_LIST_SEEDS_KEY,
   CONSOLE_V3_LIST_SEED_TTL_MS,
+  ensureConsoleV3ListSeedInChild,
   getConsoleV3ListPathKey,
   getConsoleV3ListSeedUrl,
   primeConsoleV3ListSeed,
@@ -52,6 +53,20 @@ test('primes the host seed store from a successful list response', async () => {
   assert.equal(store[key]?.body, body);
   assert.equal(store[key]?.at, 1_000);
   assert.ok(CONSOLE_V3_LIST_SEED_TTL_MS >= 10_000);
+});
+
+test('ensureConsoleV3ListSeedInChild installs the fetch wrapper when missing', () => {
+  const win: Record<string, unknown> = {
+    Date,
+    URL,
+    Response,
+    location: { href: 'http://ks.local/consolev3/x' },
+    parent: {},
+    fetch: async () => new Response('{}', { status: 200 }),
+  };
+  assert.equal(ensureConsoleV3ListSeedInChild(win as unknown as Window), true);
+  assert.equal(ensureConsoleV3ListSeedInChild(win as unknown as Window), false);
+  assert.ok(CONSOLE_V3_LIST_SEED_SOURCE.includes('__KS_CONSOLE_V3_LIST_SEED_CACHE__'));
 });
 
 test('sandbox fetch answers the first matching list GET from the host seed', async () => {

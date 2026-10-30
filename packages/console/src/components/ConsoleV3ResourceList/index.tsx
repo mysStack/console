@@ -86,6 +86,12 @@ export default function ConsoleV3ResourceList({
             phase === 'afterMount'
               ? (appWindow?: Window) => {
                   lastConsoleV3AppWindow = appWindow ?? lastConsoleV3AppWindow;
+                  const ensure = (window as unknown as Record<string, unknown>)[
+                    '__KS_ENSURE_CONSOLE_V3_LIST_SEED__'
+                  ];
+                  if (typeof ensure === 'function') {
+                    (ensure as (w?: Window) => void)(appWindow);
+                  }
                   markConsoleV3BootMounted();
                   watchConsoleV3Sandbox(lastConsoleV3AppWindow?.__WUJIE);
                   mountedResourceUrls.set(scopeKey, resourceUrl);
@@ -99,6 +105,12 @@ export default function ConsoleV3ResourceList({
                 : phase === 'activated'
                   ? (appWindow?: Window) => {
                       lastConsoleV3AppWindow = appWindow ?? lastConsoleV3AppWindow;
+                      const ensure = (window as unknown as Record<string, unknown>)[
+                        '__KS_ENSURE_CONSOLE_V3_LIST_SEED__'
+                      ];
+                      if (typeof ensure === 'function') {
+                        (ensure as (w?: Window) => void)(appWindow);
+                      }
                       watchConsoleV3Sandbox(lastConsoleV3AppWindow?.__WUJIE);
                       // Activation ends the boot: a reused instance activates
                       // without `afterMount`. Settling here lets verify rebuild

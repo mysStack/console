@@ -148,6 +148,20 @@ export function createConsoleV3SpringCloudProbeCachePlugin() {
   return { jsBeforeLoaders: [{ content: SPRINGCLOUD_PROBE_CACHE_SOURCE }] };
 }
 
+/** Patch a child window that skipped `jsBeforeLoaders` (SPA list fiber). */
+export function ensureSpringCloudProbeCacheInChild(appWindow: Window | undefined | null): boolean {
+  if (!appWindow || typeof appWindow.fetch !== 'function') return false;
+  const child = appWindow as unknown as Record<string, unknown>;
+  if (child[PROBE_CACHE_FLAG]) return false;
+  try {
+    const install = new Function('window', SPRINGCLOUD_PROBE_CACHE_SOURCE) as (w: Window) => void;
+    install(appWindow);
+    return !!child[PROBE_CACHE_FLAG];
+  } catch {
+    return false;
+  }
+}
+
 export function getSpringCloudProbeCluster(pathname: string): string | undefined {
   const matched = /\/clusters\/([^/?#]+)(?:\/|$)/.exec(pathname);
   if (matched) {

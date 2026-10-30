@@ -236,6 +236,26 @@ export function primeConsoleV3ListSeedForRoute(
 }
 
 const PRIMER_KEY = '__KS_PRIME_CONSOLE_V3_LIST_SEED__';
+const ENSURE_KEY = '__KS_ENSURE_CONSOLE_V3_LIST_SEED__';
+
+/**
+ * SPA activations sometimes get a child window that never ran `jsBeforeLoaders`
+ * (preload was dashboard; the list fiber is a different iframe). Patch fetch in
+ * that window so the host seed is still consumed.
+ */
+export function ensureConsoleV3ListSeedInChild(appWindow: Window | undefined | null): boolean {
+  if (!appWindow || typeof appWindow.fetch !== 'function') return false;
+  const child = appWindow as unknown as Record<string, unknown>;
+  if (child[LIST_SEED_FLAG]) return false;
+  try {
+    // Same ES5 source used as jsBeforeLoaders; `this`/window must be the child.
+    const install = new Function('window', CONSOLE_V3_LIST_SEED_SOURCE) as (w: Window) => void;
+    install(appWindow);
+    return !!child[LIST_SEED_FLAG];
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Expose priming on the host window so SPA navigations into a V3 list (after
@@ -246,6 +266,14 @@ export function installConsoleV3ListSeedPrimer(
   host: Record<string, unknown> = window as unknown as Record<string, unknown>,
 ): void {
   host[PRIMER_KEY] = primeConsoleV3ListSeedForRoute;
+  host[ENSURE_KEY] = ensureConsoleV3ListSeedInChild;
+}
+
+export function bindConsoleV3ListSeedEnsure(
+  ensure: (appWindow: Window | undefined | null) => void,
+  host: Record<string, unknown> = window as unknown as Record<string, unknown>,
+): void {
+  host[ENSURE_KEY] = ensure;
 }
 
 export function requestConsoleV3ListSeedForRoute(
