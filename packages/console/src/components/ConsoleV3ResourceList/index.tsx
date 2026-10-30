@@ -112,10 +112,6 @@ export default function ConsoleV3ResourceList({
                         (ensure as (w?: Window) => void)(appWindow);
                       }
                       watchConsoleV3Sandbox(lastConsoleV3AppWindow?.__WUJIE);
-                      // Activation ends the boot: a reused instance activates
-                      // without `afterMount`. Settling here lets verify rebuild
-                      // a boot that activated but left the ShadowRoot empty.
-                      markConsoleV3BootMounted();
                       deactivatedScopes.delete(scopeKey);
                       // The first mount of a scope can activate without
                       // `afterMount`; record the rendered revision here too, or
@@ -138,6 +134,23 @@ export default function ConsoleV3ResourceList({
                           markConsoleV3Phase('render', resourceUrl),
                         );
                       }
+                      // A non-alive peer (or cleared preload husk) can activate
+                      // with an empty ShadowRoot. Settling `mounted` then lets
+                      // the 3s verify timer wait before destroy — SPA visible
+                      // time jumps to ~8s. Rebuild immediately instead.
+                      if (!isConsoleV3InstanceMounted()) {
+                        if (retriedUrlRef.current === resourceUrl) return;
+                        retriedUrlRef.current = resourceUrl;
+                        markConsoleV3BootStarted();
+                        void destroyConsoleV3Instance(getConsoleV3Sandbox(), () =>
+                          WujieReact.destroyApp('consolev3'),
+                        ).then(() => {
+                          lastConsoleV3AppWindow = undefined;
+                          setRetryCount(count => count + 1);
+                        });
+                        return;
+                      }
+                      markConsoleV3BootMounted();
                     }
                   : phase === 'deactivated'
                     ? () => {

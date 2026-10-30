@@ -103,10 +103,14 @@ test('resource host keeps the shared sandbox alive for non-alive embeds', () => 
   assert.match(source, /watchConsoleV3Sandbox\(lastConsoleV3AppWindow\?\.__WUJIE\)/);
 });
 
-test('activation settles the boot phase so empty husks can be rebuilt', () => {
+test('activation settles the boot phase only when the ShadowRoot has content', () => {
   const activation = source.match(/phase === 'activated'[\s\S]*?phase === 'deactivated'/);
   assert.ok(activation, 'activation branch not found');
   assert.match(activation[0], /mountedRevisions\.set\(scopeKey, revision\)/);
   assert.match(activation[0], /mountedResourceUrls\.set\(scopeKey, resourceUrl\)/);
+  // An empty activate must not end `booting`, or verify waits 3s then rebuilds
+  // into an ~8s SPA cold start. Rebuild immediately when the husk is empty.
+  assert.match(activation[0], /isConsoleV3InstanceMounted\(\)/);
   assert.match(activation[0], /markConsoleV3BootMounted\(\)/);
+  assert.match(activation[0], /destroyConsoleV3Instance|markConsoleV3BootStarted/);
 });
