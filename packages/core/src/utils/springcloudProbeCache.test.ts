@@ -124,15 +124,19 @@ test('initWujie loads the probe cache into the shared V3 app before its scripts'
     /import \{[\s\S]{0,160}createConsoleV3SpringCloudProbeCachePlugin[\s\S]{0,160}\} from '\.\/springcloudProbeCache'/,
   );
   assert.match(source, /primeSpringCloudProbeCacheForRoute\(\);/);
+  assert.match(source, /primeConsoleV3ListSeedForRoute\(\);/);
+  assert.match(source, /resolveConsoleV3PreloadUrl\(window\.location\.pathname\)/);
   assert.match(
     source,
-    /const consoleV3Plugins = \[createConsoleV3SpringCloudProbeCachePlugin\(\)\]/,
+    /const consoleV3Plugins = \[\n  createConsoleV3SpringCloudProbeCachePlugin\(\),\n  createConsoleV3ListSeedPlugin\(\),\n\]/,
   );
   assert.equal(source.match(/plugins: consoleV3Plugins/g)?.length, 2);
 
   const preload = source.match(/preloadApp\(\{\n    name: 'consolev3',[\s\S]*?\n  \}\);/);
   assert.ok(preload, 'consolev3 preload not found');
   assert.match(preload[0], /plugins: consoleV3Plugins/);
+  assert.match(preload[0], /url: preloadUrl/);
+  assert.doesNotMatch(preload[0], /consolev3\/dashboard/);
 
   const setup = source.match(/setupApp\(\{\n    name: 'consolev3',[\s\S]*?\n  \}\);/);
   assert.ok(setup, 'consolev3 setup not found');

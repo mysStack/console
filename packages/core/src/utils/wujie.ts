@@ -8,21 +8,33 @@ import WujieReact from 'wujie-react';
 import { useEventEmitter } from '@ks-console/shared';
 import { setGlobalConsoleV3LoadCompleted } from '../utils/globals.consoleV3LoadCompleted';
 import {
+  createConsoleV3ListSeedPlugin,
+  installConsoleV3ListSeedPrimer,
+  primeConsoleV3ListSeedForRoute,
+} from './consoleV3ListSeed';
+import { resolveConsoleV3PreloadUrl } from './consoleV3PreloadUrl';
+import {
   createConsoleV3SpringCloudProbeCachePlugin,
   primeSpringCloudProbeCacheForRoute,
 } from './springcloudProbeCache';
 
 const { setupApp, preloadApp, bus } = WujieReact;
 
-// The springcloud probe cache has to exist before the V3 bundle runs, both in
-// the preload sandbox and on a fresh mount, so it is attached to the app
-// options instead of a lifecycle callback.
-const consoleV3Plugins = [createConsoleV3SpringCloudProbeCachePlugin()];
+// The springcloud probe cache and list seed have to exist before the V3 bundle
+// runs, both in the preload sandbox and on a fresh mount.
+const consoleV3Plugins = [
+  createConsoleV3SpringCloudProbeCachePlugin(),
+  createConsoleV3ListSeedPlugin(),
+];
 
 export function initWujie() {
-  // Runs before the V3 bundle download starts; the answer to V3's first
-  // springcloud probe is usually ready by the time it mounts.
+  // Runs before the V3 bundle download starts; the answers to V3's first
+  // springcloud probe and first resource-list GET are usually ready by mount.
   primeSpringCloudProbeCacheForRoute();
+  installConsoleV3ListSeedPrimer();
+  primeConsoleV3ListSeedForRoute();
+
+  const preloadUrl = resolveConsoleV3PreloadUrl(window.location.pathname);
 
   setupApp({
     name: 'consolev3',
@@ -53,6 +65,9 @@ export function initWujie() {
     },
   });
 
+  // Actions stay on dashboard; the shared list app preloads the landing route
+  // when the host URL is already a project embed, so activation does not pay
+  // for a dashboard → list navigation.
   preloadApp({
     name: 'consoleV3Actions',
     props: { actions: true },
@@ -61,7 +76,7 @@ export function initWujie() {
 
   preloadApp({
     name: 'consolev3',
-    url: `//${window.location.host}/consolev3/dashboard`,
+    url: preloadUrl,
     plugins: consoleV3Plugins,
   });
 }

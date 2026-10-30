@@ -37,25 +37,40 @@ export function syncConsoleV3ListRoute(
   return true;
 }
 
+export interface NotifyConsoleV3ActivationRouteOptions {
+  /**
+   * When the child location already matches, still emit `popstate` so a router
+   * that missed Wujie's `replaceState` can catch up. Cold-start list embeds that
+   * preloaded the same URL already rendered that route; forcing `popstate` then
+   * refetches the list. Callers that only need a real navigation pass `false`.
+   */
+  notifyIfUnchanged?: boolean;
+}
+
 /**
  * Move a kept-alive child router onto the route of an embed that did not use
  * `alive`.
  *
  * Wujie writes that route with `history.replaceState`, which a router never
  * observes, so the location already matches when the activation finishes. The
- * router still holds the previous route and needs the notification anyway.
+ * router still holds the previous route and needs the notification anyway
+ * unless the caller knows the child already rendered this path (preload align).
  */
 export function notifyConsoleV3ActivationRoute(
   appWindow: ConsoleV3RouteWindow,
   resourceUrl: string,
+  options: NotifyConsoleV3ActivationRouteOptions = {},
 ): boolean {
+  const notifyIfUnchanged = options.notifyIfUnchanged !== false;
   const path = getRoutePath(resourceUrl);
   const moved = getCurrentPath(appWindow) !== path;
 
   if (moved) {
     appWindow.history.replaceState(appWindow.history.state, '', path);
   }
-  appWindow.dispatchEvent(createPopStateEvent(appWindow));
+  if (moved || notifyIfUnchanged) {
+    appWindow.dispatchEvent(createPopStateEvent(appWindow));
+  }
   return moved;
 }
 
@@ -78,6 +93,8 @@ export function scheduleConsoleV3ListRouteSync(
   appWindow: ConsoleV3FrameWindow,
   resourceUrl: string,
 ): void {
+  // syncConsoleV3ListRoute no-ops (no popstate) when already on resourceUrl,
+  // which avoids a redundant list refetch after an aligned preload.
   afterActivation(appWindow, () => syncConsoleV3ListRoute(appWindow, resourceUrl));
 }
 

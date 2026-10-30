@@ -111,6 +111,9 @@ export default function ConsoleV3ResourceList({
                       mountedResourceUrls.set(scopeKey, resourceUrl);
                       mountedRevisions.set(scopeKey, revision);
                       if (appWindow) {
+                        // Only sync when the child is on another path. A cold
+                        // start that already preloaded `resourceUrl` is already
+                        // there; forcing popstate refetches the list.
                         scheduleConsoleV3ListRouteSync(appWindow, resourceUrl);
                       }
                       markConsoleV3Phase('activated', resourceUrl);
@@ -136,6 +139,18 @@ export default function ConsoleV3ResourceList({
       ),
     [resourceUrl, revision, scopeKey],
   );
+
+  useEffect(() => {
+    if (!isReady) return;
+    // SPA entries (overview → list) miss initWujie route priming; kick the
+    // host list seed as soon as the embed URL is known.
+    const primer = (window as unknown as Record<string, unknown>)[
+      '__KS_PRIME_CONSOLE_V3_LIST_SEED__'
+    ];
+    if (typeof primer === 'function') {
+      (primer as (pathname: string) => void)(window.location.pathname);
+    }
+  }, [isReady, resourceUrl]);
 
   useEffect(() => {
     if (!isReady) return;

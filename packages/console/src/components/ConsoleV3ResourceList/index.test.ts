@@ -4,6 +4,10 @@ import test from 'node:test';
 
 const source = readFileSync(__filename.replace(/[^/]+$/, 'index.tsx'), 'utf8');
 
+test('resource host primes the list seed when the embed URL becomes ready', () => {
+  assert.match(source, /__KS_PRIME_CONSOLE_V3_LIST_SEED__/);
+});
+
 test('resource host reuses the consolev3 app and exposes activation lifecycle marks', () => {
   assert.match(source, /name="consolev3"/);
   assert.match(source, /alive/);
