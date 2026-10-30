@@ -81,13 +81,17 @@ function BaseLayout(): JSX.Element {
     );
   }, [cluster, namespace, setUrlPrefixStable, workspace]);
 
-  // Project-domain warmup: prime CRD/list-seed for deployments; off overview,
-  // also preloadApp that list URL (installed by initWujie on window).
+  // Remember project + schedule warmup (seed/CRD always; preloadApp when the
+  // host is not on overview). Last project is also warmed from dashboard after
+  // consolev3 loadCompleted so shell→list has a real head start.
   useEffect(() => {
     if (!workspace || !cluster || !namespace) return;
-    const scheduler = (window as unknown as Record<string, unknown>)[
-      '__KS_SCHEDULE_CONSOLE_V3_PROJECT_WARMUP__'
-    ];
+    const host = window as unknown as Record<string, unknown>;
+    const remember = host['__KS_REMEMBER_CONSOLE_V3_PROJECT_BASE__'];
+    if (typeof remember === 'function') {
+      (remember as (path: string) => void)(pathname);
+    }
+    const scheduler = host['__KS_SCHEDULE_CONSOLE_V3_PROJECT_WARMUP__'];
     if (typeof scheduler === 'function') {
       (scheduler as (path: string) => void)(pathname);
     }

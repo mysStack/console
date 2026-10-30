@@ -315,4 +315,5 @@ test('initWujie defers actions dashboard preload until consolev3 is ready', () =
   assert.match(source, /preloadActionsOnce/);
   assert.match(source, /deferActionsUntilListReady/);
   assert.match(source, /installConsoleV3ProjectWarmup/);
+  assert.match(source, /warmLastConsoleV3Project/);
 });
