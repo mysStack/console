@@ -13,12 +13,15 @@ const WARMUP_HOST_KEY = '__KS_SCHEDULE_CONSOLE_V3_PROJECT_WARMUP__';
 export type ConsoleV3ProjectWarmupPreload = (options: {
   name: string;
   url: string;
-  plugins?: unknown[];
+  // Wujie plugin shapes differ by package version; keep host-agnostic.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  plugins?: any[];
 }) => void;
 
 export interface ConsoleV3ProjectWarmupDeps {
   preloadApp?: ConsoleV3ProjectWarmupPreload;
-  plugins?: unknown[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  plugins?: any[];
   primeListSeed?: (pathname: string) => void;
   primeProbe?: (pathname: string) => void;
   scheduleIdle?: (fn: () => void) => void;

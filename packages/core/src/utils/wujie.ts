@@ -46,7 +46,9 @@ export function initWujie() {
   // Project layouts call this via window to prime CRD/seed and (off overview)
   // preload the deployments list without importing core from console.
   installConsoleV3ProjectWarmup({
-    preloadApp,
+    preloadApp: ({ name, url, plugins }) => {
+      preloadApp({ name, url, plugins });
+    },
     plugins: consoleV3Plugins,
   });
 
