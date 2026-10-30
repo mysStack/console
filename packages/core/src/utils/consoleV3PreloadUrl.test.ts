@@ -15,10 +15,18 @@ test('maps a project list pathname onto the matching consolev3 preload path', ()
   );
 });
 
-test('keeps dashboard preload for login and non-project host routes', () => {
+test('keeps dashboard preload for login, native V4 project pages, and other routes', () => {
   assert.equal(resolveConsoleV3PreloadPath('/login'), '/consolev3/dashboard');
   assert.equal(resolveConsoleV3PreloadPath('/workspaces'), '/consolev3/dashboard');
   assert.equal(resolveConsoleV3PreloadPath('/clusters/host/nodes'), '/consolev3/dashboard');
+  assert.equal(
+    resolveConsoleV3PreloadPath('/dev-workspace/clusters/host/projects/dev-wes/overview'),
+    '/consolev3/dashboard',
+  );
+  assert.equal(
+    resolveConsoleV3PreloadPath('/dev-workspace/clusters/host/projects/dev-wes/base-info'),
+    '/consolev3/dashboard',
+  );
 });
 
 test('builds an absolute wujie preload URL for the current host', () => {
