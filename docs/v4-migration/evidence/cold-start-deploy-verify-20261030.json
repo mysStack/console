@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-30",
+  "image": "ghcr.io/mysstack/ks-console:release-4.1.5-cold-start-20261030-37bcace",
+  "imageID": "ghcr.io/mysstack/ks-console@sha256:a493e0407bfa9ba91c417fca81398e3481fcd98b2a5eb8567f688d320a5909d4",
+  "note": "digest may match prior build if layers shared; tag 37bcace is the preload-scope fix tip",
+  "deploy": "ks-console-v415-rea @ 192.168.2.131:30881",
+  "baseline_before": {
+    "hard_refresh_first_list_api_host_ms": 2413,
+    "hard_refresh_second_list_api_host_ms": 3560,
+    "iframe_list_network_count": 2
+  },
+  "after": {
+    "hard_refresh_deployments": {
+      "host_list_prime_ms": { "start": 930, "end": 1073, "duration": 143 },
+      "iframe_list_network_count": 0,
+      "seed_keys": [
+        "/clusters/host/kapis/resources.kubesphere.io/v1alpha3/namespaces/dev-wes/deployments"
+      ],
+      "preload": ["/consolev3/dashboard", "/consolev3/.../deployments"],
+      "list_visible": true
+    },
+    "spa_overview_to_deployments": {
+      "host_list_prime_since_click_ms": { "start": 55, "end": 211 },
+      "list_visible": true
+    },
+    "hard_refresh_overview": {
+      "preload": ["/consolev3/dashboard"],
+      "seeds": [],
+      "note": "no mistaken /consolev3/.../overview preload after scope fix"
+    },
+    "hard_refresh_configmaps": {
+      "host_list_prime_ms": { "start": 500, "end": 592, "duration": 92 },
+      "iframe_list_network_count": 0,
+      "list_visible": true
+    }
+  },
+  "side_effect_assessment": {
+    "extra_host_fetch_on_v3_list_routes": "one parallel list GET (~100ms); overlaps v3dist download",
+    "overview_workbench_login": "no list seed; preload stays dashboard",
+    "actions_preload": "still dashboard (unchanged)",
+    "bandwidth_contention": "possible slight contention with v3dist on slow links; list body is small (~3.5KB)",
+    "stale_list_risk": "15s seed TTL; SPA remount within 15s may show briefly stale list"
+  }
+}
