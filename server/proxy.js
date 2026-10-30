@@ -14,6 +14,7 @@ const NEED_OMIT_HEADERS = ['cookie', 'referer'];
 const k8sResourceProxy = {
   target,
   changeOrigin: true,
+  compressResponse: true,
   events: {
     proxyReq(proxyReq, req) {
       // Set authorization
@@ -30,6 +31,7 @@ const marketplaceApiProxy = {
   target,
   changeOrigin: true,
   agent,
+  compressResponse: true,
   events: {
     proxyReq(proxyReq, req) {
       if (req.token) {
