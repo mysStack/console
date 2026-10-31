@@ -263,44 +263,88 @@ test('route priming skips login and routes without a cluster', async () => {
   assert.equal(store.host?.body, EMPTY_LIST);
 });
 
-test('session storage hydrates a fresh seed across hard refresh', () => {
-  const memory: Record<string, string> = {};
-  const storage = {
+function memoryStorage(memory: Record<string, string> = {}) {
+  return {
+    memory,
     getItem: (key: string) => memory[key] ?? null,
     setItem: (key: string, value: string) => {
       memory[key] = value;
     },
   };
+}
+
+test('session storage hydrates a fresh seed across hard refresh', () => {
+  const storage = memoryStorage();
   const persisted: Record<string, SpringCloudProbeRecord> = {
     host: seedRecord({ at: 5_000, body: EMPTY_LIST }),
   };
-  persistSpringCloudProbeSeeds(persisted, storage as Storage);
+  persistSpringCloudProbeSeeds(persisted, storage);
 
   const store: Record<string, SpringCloudProbeRecord> = {};
-  const loaded = hydrateSpringCloudProbeSeedsFromSession(store, storage as Storage, 6_000);
+  const loaded = hydrateSpringCloudProbeSeedsFromSession(store, storage, 6_000);
   assert.equal(loaded, 1);
   assert.equal(store.host.body, EMPTY_LIST);
-  assert.equal(memory[SPRINGCLOUD_PROBE_SESSION_KEY] !== undefined, true);
+  assert.equal(storage.memory[SPRINGCLOUD_PROBE_SESSION_KEY] !== undefined, true);
 });
 
 test('session hydration ignores expired probe seeds', () => {
-  const memory: Record<string, string> = {
+  const storage = memoryStorage({
     [SPRINGCLOUD_PROBE_SESSION_KEY]: JSON.stringify({
       host: seedRecord({ at: 0 }),
     }),
-  };
-  const storage = {
-    getItem: (key: string) => memory[key] ?? null,
-    setItem: () => undefined,
-  };
+  });
   const store: Record<string, SpringCloudProbeRecord> = {};
   const loaded = hydrateSpringCloudProbeSeedsFromSession(
     store,
-    storage as Storage,
+    storage,
     SPRINGCLOUD_PROBE_CACHE_TTL_MS + 1,
   );
   assert.equal(loaded, 0);
   assert.deepEqual(store, {});
+});
+
+test('default persist writes localStorage so a new tab can skip the CRD probe', () => {
+  const local = memoryStorage();
+  const session = memoryStorage();
+  const persisted: Record<string, SpringCloudProbeRecord> = {
+    host: seedRecord({ at: 5_000, body: EMPTY_LIST }),
+  };
+
+  persistSpringCloudProbeSeeds(persisted, undefined, {
+    localStorage: local,
+    sessionStorage: session,
+  });
+
+  assert.equal(local.memory[SPRINGCLOUD_PROBE_SESSION_KEY] !== undefined, true);
+  assert.equal(session.memory[SPRINGCLOUD_PROBE_SESSION_KEY] !== undefined, true);
+
+  // New tab: sessionStorage empty, localStorage still has the seed.
+  const store: Record<string, SpringCloudProbeRecord> = {};
+  const loaded = hydrateSpringCloudProbeSeedsFromSession(store, undefined, 6_000, {
+    localStorage: local,
+    sessionStorage: memoryStorage(),
+  });
+  assert.equal(loaded, 1);
+  assert.equal(store.host.body, EMPTY_LIST);
+});
+
+test('hydrating prefers a fresher localStorage seed over a stale session seed', () => {
+  const local = memoryStorage({
+    [SPRINGCLOUD_PROBE_SESSION_KEY]: JSON.stringify({
+      host: seedRecord({ at: 8_000, body: '{"items":[],"totalItems":0,"via":"local"}' }),
+    }),
+  });
+  const session = memoryStorage({
+    [SPRINGCLOUD_PROBE_SESSION_KEY]: JSON.stringify({
+      host: seedRecord({ at: 1_000, body: '{"items":[],"totalItems":0,"via":"session"}' }),
+    }),
+  });
+  const store: Record<string, SpringCloudProbeRecord> = {};
+  hydrateSpringCloudProbeSeedsFromSession(store, undefined, 9_000, {
+    localStorage: local,
+    sessionStorage: session,
+  });
+  assert.match(store.host.body, /via":"local"/);
 });
 
 test('initWujie defers actions dashboard preload until consolev3 is ready', () => {
