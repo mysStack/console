@@ -1,9 +1,9 @@
 /*
- * Please refer to the LICENSE file in the root directory of the project.
+ * Please refer to the LICENSE file in the root of the project.
  * https://github.com/kubesphere/console/blob/master/LICENSE
  */
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import WujieReact from 'wujie-react';
 
 import { watchConsoleV3Sandbox } from '../ConsoleV3ResourceList/keepAlive';
@@ -25,6 +25,10 @@ export interface ConsoleV3AliveEmbedProps {
  * Leaving a non-alive embed clears the ShadowRoot. The next list or overview
  * activate then hits an empty husk and pays a full cold boot. Keep the sandbox
  * alive and sync the child router onto this embed's URL on mount/activate.
+ *
+ * Wujie only runs `afterUnmount` when `!alive`. Alive embeds emit `deactivated`
+ * instead, so callers that clean up bridges (ConfigReference listeners, etc.)
+ * must run on deactivated and on React unmount.
  */
 export default function ConsoleV3AliveEmbed({
   url,
@@ -34,6 +38,16 @@ export default function ConsoleV3AliveEmbed({
   afterUnmount,
   activated,
 }: ConsoleV3AliveEmbedProps): JSX.Element {
+  const afterUnmountRef = useRef(afterUnmount);
+  afterUnmountRef.current = afterUnmount;
+
+  useEffect(
+    () => () => {
+      afterUnmountRef.current?.();
+    },
+    [],
+  );
+
   const bindSandbox = useCallback(
     (appWindow?: Window) => {
       const child = appWindow as ConsoleV3AppWindow | undefined;
@@ -64,6 +78,9 @@ export default function ConsoleV3AliveEmbed({
         if (appWindow) {
           activated?.(appWindow);
         }
+      }}
+      deactivated={appWindow => {
+        afterUnmount?.(appWindow);
       }}
       afterUnmount={afterUnmount}
     />

@@ -10,11 +10,19 @@
  * `.../namespaces/{ns}/{resource}?sortBy=updateTime&limit=10`. Starting the
  * same request from the host in parallel with `preloadApp` removes that wait
  * from the first (and often second identical) list fetch.
+ *
+ * The child fetch wrapper only answers host-primed seeds (exact path + query),
+ * once. It does not write network responses into a shared cache — pathname-only
+ * write-through would serve the wrong query, detail, or pod log body.
  */
 
 export const CONSOLE_V3_LIST_SEED_TTL_MS = 15_000;
 export const CONSOLE_V3_LIST_SEEDS_KEY = '__KS_CONSOLE_V3_LIST_SEEDS__';
 const LIST_SEED_FLAG = '__KS_CONSOLE_V3_LIST_SEED_CACHE__';
+
+/** Path segments V3 project lists may ask for (no detail/log/exec). */
+const LIST_RESOURCE_SEGMENT =
+  'deployments|statefulsets|daemonsets|pods|services|ingresses|jobs|cronjobs|configmaps|secrets|persistentvolumeclaims|serviceaccounts|roles';
 
 export interface ConsoleV3ListSeedRecord {
   at: number;
@@ -22,7 +30,7 @@ export interface ConsoleV3ListSeedRecord {
   status: number;
   statusText: string;
   headers: Record<string, string>;
-  /** Pathname form used for matching (no origin, query stripped). */
+  /** Pathname + search used for exact seed matching. */
   pathKey: string;
 }
 
@@ -44,6 +52,7 @@ const RESOURCE_ALIASES: Record<string, string> = {
   roles: 'roles',
 };
 
+/** Pathname only (legacy helper for callers that strip query). */
 export function getConsoleV3ListPathKey(url: string): string | undefined {
   try {
     const parsed = new URL(url, 'http://ks.local');
@@ -51,6 +60,20 @@ export function getConsoleV3ListPathKey(url: string): string | undefined {
   } catch {
     const path = String(url || '').split('?')[0];
     return path || undefined;
+  }
+}
+
+/**
+ * Exact seed key: pathname + search. Query is part of the identity so a
+ * primed `sortBy=updateTime&limit=10` never answers a different page/sort/log.
+ */
+export function getConsoleV3ListSeedKey(url: string): string | undefined {
+  try {
+    const parsed = new URL(url, 'http://ks.local');
+    return `${parsed.pathname}${parsed.search}`;
+  } catch {
+    const raw = String(url || '');
+    return raw || undefined;
   }
 }
 
@@ -83,23 +106,28 @@ export function getConsoleV3ListSeedStore(): Record<string, ConsoleV3ListSeedRec
 export const CONSOLE_V3_LIST_SEED_SOURCE = `(function (win) {
   if (!win || typeof win.fetch !== 'function' || win.${LIST_SEED_FLAG}) return;
   var TTL = ${CONSOLE_V3_LIST_SEED_TTL_MS};
+  var LIST_PATH = /\\/kapis\\/resources\\.kubesphere\\.io\\/[^/?#]+\\/namespaces\\/[^/?#]+\\/(${LIST_RESOURCE_SEGMENT})$/;
   var original = win.fetch;
   var cache = {};
   win.${LIST_SEED_FLAG} = cache;
 
-  function pathKey(input) {
+  function requestKey(input) {
     if (!input) return '';
     var url = typeof input === 'string' ? input : input.url || '';
     try {
-      return new (win.URL || URL)(url, win.location && win.location.href || 'http://ks.local').pathname;
+      var parsed = new (win.URL || URL)(url, win.location && win.location.href || 'http://ks.local');
+      return parsed.pathname + (parsed.search || '');
     } catch (e) {
-      return String(url).split('?')[0];
+      return String(url);
     }
   }
 
   function matches(input) {
-    var key = pathKey(input);
-    return key.indexOf('/kapis/resources.kubesphere.io/') !== -1 && key.indexOf('/namespaces/') !== -1;
+    var key = requestKey(input);
+    var path = String(key).split('?')[0];
+    if (!path) return false;
+    if (/\\/(log|exec)(\\/|$)/.test(path)) return false;
+    return LIST_PATH.test(path);
   }
 
   function now() {
@@ -117,6 +145,9 @@ export const CONSOLE_V3_LIST_SEED_SOURCE = `(function (win) {
     var record = seeds[key];
     if (!record || record.status < 200 || !record.body) return null;
     if (now() - record.at >= TTL) return null;
+    try {
+      delete seeds[key];
+    } catch (e) {}
     return record;
   }
 
@@ -137,7 +168,7 @@ export const CONSOLE_V3_LIST_SEED_SOURCE = `(function (win) {
     if (!matches(input)) return original.apply(win, arguments);
     var method = (init && init.method) || 'GET';
     if (String(method).toUpperCase() !== 'GET') return original.apply(win, arguments);
-    var key = pathKey(input);
+    var key = requestKey(input);
     var hit = cache[key];
     if (hit && now() - hit.at < TTL) {
       var rebuilt = build(hit);
@@ -149,26 +180,7 @@ export const CONSOLE_V3_LIST_SEED_SOURCE = `(function (win) {
       var seeded = build(seed);
       if (seeded) return Promise.resolve(seeded);
     }
-    return original.apply(win, arguments).then(function (response) {
-      if (!response || !response.clone || !response.ok) return response;
-      var headers = {};
-      try {
-        response.headers.forEach(function (value, k) {
-          headers[k] = value;
-        });
-      } catch (e) {}
-      return response.clone().text().then(function (body) {
-        cache[key] = {
-          at: now(),
-          body: body,
-          status: response.status,
-          statusText: response.statusText,
-          headers: headers,
-          pathKey: key,
-        };
-        return response;
-      });
-    });
+    return original.apply(win, arguments);
   };
 })(window);`;
 
@@ -188,7 +200,7 @@ export function primeConsoleV3ListSeed(pathname: string, deps: PrimeDeps = {}): 
   const listUrl = getConsoleV3ListSeedUrl(pathname);
   if (!listUrl) return Promise.resolve();
 
-  const pathKey = getConsoleV3ListPathKey(listUrl);
+  const pathKey = getConsoleV3ListSeedKey(listUrl);
   if (!pathKey) return Promise.resolve();
 
   const store = deps.store ?? getConsoleV3ListSeedStore();

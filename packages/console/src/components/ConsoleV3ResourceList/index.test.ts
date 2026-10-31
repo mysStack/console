@@ -113,4 +113,14 @@ test('activation settles the boot phase only when the ShadowRoot has content', (
   assert.match(activation[0], /isConsoleV3InstanceMounted\(\)/);
   assert.match(activation[0], /markConsoleV3BootMounted\(\)/);
   assert.match(activation[0], /destroyConsoleV3Instance|markConsoleV3BootStarted/);
+  // Immediate rebuild must not share retriedUrlRef with the verify path.
+  assert.match(activation[0], /activatedRebuildRef/);
+  assert.match(activation[0], /markConsoleV3BootFailed/);
+  assert.match(activation[0], /resolveConsoleV3Sandbox/);
+  assert.doesNotMatch(activation[0], /retriedUrlRef\.current = resourceUrl/);
+});
+
+test('empty husk destroy prefers lastConsoleV3AppWindow over DOM lookup', () => {
+  assert.match(source, /lastConsoleV3AppWindow\?\.__WUJIE \?\? getConsoleV3Sandbox\(\)/);
+  assert.match(source, /resolveConsoleV3Sandbox/);
 });

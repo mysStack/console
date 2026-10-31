@@ -5,6 +5,7 @@ import { getResourceListCacheVersion } from '@ks-console/shared';
 
 import {
   isConsoleV3BootInFlight,
+  markConsoleV3BootFailed,
   markConsoleV3BootMounted,
   markConsoleV3BootStarted,
 } from './bootPhase';
@@ -31,6 +32,9 @@ const deactivatedScopes = new Set<string>();
 let lastConsoleV3AppWindow: ConsoleV3AppWindow | undefined;
 const VERIFY_MOUNT_DELAY_MS = 3_000;
 
+/** Prefer the last known `__WUJIE`; DOM lookup fails when ShadowRoot is empty. */
+const resolveConsoleV3Sandbox = () => lastConsoleV3AppWindow?.__WUJIE ?? getConsoleV3Sandbox();
+
 export interface ConsoleV3ResourceListProps {
   resource: string;
   url: string;
@@ -47,7 +51,12 @@ export default function ConsoleV3ResourceList({
 }: ConsoleV3ResourceListProps): JSX.Element {
   const [instanceReady, setInstanceReady] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
+  // Verify-path rebuild gate. Must stay separate from activatedRebuildRef:
+  // an empty activate already consumes one immediate rebuild; verify is the
+  // last insurance and must not share that token (or a second empty husk
+  // blanks the URL for the rest of the page lifetime).
   const retriedUrlRef = useRef('');
+  const activatedRebuildRef = useRef('');
   const revivedUrlRef = useRef('');
   // The project layout writes the Wujie URL prefix in an effect. Avoid an
   // initial mount with `undefined/...`; that mount would create a non-reusable
@@ -139,10 +148,15 @@ export default function ConsoleV3ResourceList({
                       // the 3s verify timer wait before destroy — SPA visible
                       // time jumps to ~8s. Rebuild immediately instead.
                       if (!isConsoleV3InstanceMounted()) {
-                        if (retriedUrlRef.current === resourceUrl) return;
-                        retriedUrlRef.current = resourceUrl;
+                        if (activatedRebuildRef.current === resourceUrl) {
+                          // Immediate rebuild already failed once; stop spinning
+                          // and leave verify free to try its own path once.
+                          markConsoleV3BootFailed();
+                          return;
+                        }
+                        activatedRebuildRef.current = resourceUrl;
                         markConsoleV3BootStarted();
-                        void destroyConsoleV3Instance(getConsoleV3Sandbox(), () =>
+                        void destroyConsoleV3Instance(resolveConsoleV3Sandbox(), () =>
                           WujieReact.destroyApp('consolev3'),
                         ).then(() => {
                           lastConsoleV3AppWindow = undefined;
@@ -183,7 +197,7 @@ export default function ConsoleV3ResourceList({
       // The rebuild starts a fresh boot below. Enter `booting` here, or the
       // verify timer would destroy the sandbox while it is still loading.
       markConsoleV3BootStarted();
-      destroyConsoleV3Instance(getConsoleV3Sandbox(), () => WujieReact.destroyApp('consolev3'));
+      destroyConsoleV3Instance(resolveConsoleV3Sandbox(), () => WujieReact.destroyApp('consolev3'));
       lastConsoleV3AppWindow = undefined;
       setInstanceReady(true);
       return;
@@ -249,7 +263,7 @@ export default function ConsoleV3ResourceList({
       }
       retriedUrlRef.current = resourceUrl;
       markConsoleV3BootStarted();
-      destroyConsoleV3Instance(getConsoleV3Sandbox(), () =>
+      destroyConsoleV3Instance(resolveConsoleV3Sandbox(), () =>
         WujieReact.destroyApp('consolev3'),
       ).then(() => {
         if (cancelled) return;
