@@ -16,7 +16,6 @@ for (const [resource, route] of detailFiles) {
       'utf8',
     );
     assert.match(source, new RegExp(`url=.*\\/${route}\\/`));
-    assert.match(source, /name="consolev3"/);
-    assert.match(source, /alive/);
+    assert.match(source, /ConsoleV3AliveEmbed/);
   });
 }
