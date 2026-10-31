@@ -12,11 +12,11 @@ import { scheduleConsoleV3ListRouteSync } from '../ConsoleV3ResourceList/route';
 
 export interface ConsoleV3AliveEmbedProps {
   url: string;
-  width?: string | number;
-  height?: string | number;
-  afterMount?: (appWindow?: Window) => void;
+  width?: string;
+  height?: string;
+  afterMount?: (appWindow: Window) => void;
   afterUnmount?: (appWindow?: Window) => void;
-  activated?: (appWindow?: Window) => void;
+  activated?: (appWindow: Window) => void;
 }
 
 /**
@@ -55,11 +55,15 @@ export default function ConsoleV3AliveEmbed({
       sync={false}
       afterMount={appWindow => {
         bindSandbox(appWindow);
-        afterMount?.(appWindow);
+        if (appWindow) {
+          afterMount?.(appWindow);
+        }
       }}
       activated={appWindow => {
         bindSandbox(appWindow);
-        activated?.(appWindow);
+        if (appWindow) {
+          activated?.(appWindow);
+        }
       }}
       afterUnmount={afterUnmount}
     />
