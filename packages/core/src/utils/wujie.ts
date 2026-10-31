@@ -15,7 +15,6 @@ import {
   primeConsoleV3ListSeedForRoute,
 } from './consoleV3ListSeed';
 import { isConsoleV3ProjectListPath, resolveConsoleV3PreloadUrl } from './consoleV3PreloadUrl';
-import { installConsoleV3ProjectWarmup, warmLastConsoleV3Project } from './consoleV3ProjectWarmup';
 import {
   createConsoleV3SpringCloudProbeCachePlugin,
   ensureSpringCloudProbeCacheInChild,
@@ -43,14 +42,6 @@ export function initWujie() {
   installConsoleV3ListSeedPrimer();
   bindConsoleV3ListSeedEnsure(ensureChildFetchGuards);
   primeConsoleV3ListSeedForRoute();
-  // Project layouts call this via window to prime CRD/seed and (off overview)
-  // preload the deployments list without importing core from console.
-  installConsoleV3ProjectWarmup({
-    preloadApp: ({ name, url, plugins }) => {
-      preloadApp({ name, url, plugins });
-    },
-    plugins: consoleV3Plugins,
-  });
 
   const preloadUrl = resolveConsoleV3PreloadUrl(window.location.pathname);
   const deferActionsUntilListReady = isConsoleV3ProjectListPath(window.location.pathname);
@@ -73,11 +64,6 @@ export function initWujie() {
     setGlobalConsoleV3LoadCompleted({ value: true });
     if (deferActionsUntilListReady) {
       preloadActionsOnce();
-    }
-    // Shell landed on dashboard/workbench: switch the warm sandbox to the last
-    // project's deployments so the next SPA jump does not start from dashboard.
-    if (!deferActionsUntilListReady) {
-      warmLastConsoleV3Project();
     }
   });
 

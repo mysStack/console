@@ -8,7 +8,7 @@ import { set } from 'lodash';
 import { useCacheStore as useStore } from '@ks-console/shared';
 import { Loading } from '@kubed/components';
 import { useQueries, useQuery } from 'react-query';
-import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import {
   apis,
   assignConsoleV3UrlPrefixIfChanged,
@@ -23,7 +23,6 @@ const { fetchDetail: fetchClusterDetail } = clusterStore;
 
 function BaseLayout(): JSX.Element {
   const navigate = useNavigate();
-  const { pathname } = useLocation();
   const userName = globals.user.username;
   const { cluster, namespace, workspace } = useParams<'workspace' | 'namespace' | 'cluster'>();
   const [wujieUrlPrefix, setUrlPrefix] = useStore<string>('wujieUrlPrefix');
@@ -80,22 +79,6 @@ function BaseLayout(): JSX.Element {
       setUrlPrefixStable,
     );
   }, [cluster, namespace, setUrlPrefixStable, workspace]);
-
-  // Remember project + schedule warmup (seed/CRD always; preloadApp when the
-  // host is not on overview). Last project is also warmed from dashboard after
-  // consolev3 loadCompleted so shell→list has a real head start.
-  useEffect(() => {
-    if (!workspace || !cluster || !namespace) return;
-    const host = window as unknown as Record<string, unknown>;
-    const remember = host['__KS_REMEMBER_CONSOLE_V3_PROJECT_BASE__'];
-    if (typeof remember === 'function') {
-      (remember as (path: string) => void)(pathname);
-    }
-    const scheduler = host['__KS_SCHEDULE_CONSOLE_V3_PROJECT_WARMUP__'];
-    if (typeof scheduler === 'function') {
-      (scheduler as (path: string) => void)(pathname);
-    }
-  }, [cluster, namespace, pathname, workspace]);
 
   if (
     projectResult.isLoading ||
