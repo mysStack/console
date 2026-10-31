@@ -16,11 +16,17 @@ const serverConfig = getServerConfig().server;
 
 module.exports = function (app) {
   // compress middleware
+  // koa-compress defaults br to {[BROTLI_PARAM_QUALITY]: 4} at the top level,
+  // but Node's createBrotliCompress only reads options.params — so `br: true`
+  // silently falls through to quality 11. Match proxyCompression.js: q=4.
+  const zlib = require('zlib');
   app.use(
     compress({
       threshold: 2048,
-      flush: require('zlib').Z_SYNC_FLUSH,
-      br: true,
+      flush: zlib.Z_SYNC_FLUSH,
+      br: {
+        params: { [zlib.constants.BROTLI_PARAM_QUALITY]: 4 },
+      },
     }),
   );
 
