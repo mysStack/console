@@ -94,6 +94,28 @@ test('notifies a kept-alive router whose location Wujie already moved', () => {
   assert.equal(events[0].type, 'popstate');
 });
 
+test('can skip popstate when the child already sits on the target route', () => {
+  const events: Event[] = [];
+  const appWindow = {
+    location: { pathname: '/consolev3/clusters/host/deployments', search: '', hash: '' },
+    history: { state: null, replaceState() {} },
+    dispatchEvent(event: Event) {
+      events.push(event);
+      return true;
+    },
+  };
+
+  assert.equal(
+    notifyConsoleV3ActivationRoute(
+      appWindow,
+      '//example.test/consolev3/clusters/host/deployments',
+      { notifyIfUnchanged: false },
+    ),
+    false,
+  );
+  assert.equal(events.length, 0);
+});
+
 test('moves and notifies when the child router still sits on the old route', () => {
   const events: Event[] = [];
   const replaced: string[] = [];

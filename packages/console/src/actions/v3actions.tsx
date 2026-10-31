@@ -32,6 +32,7 @@ export const useV3action = (action?: string, props?: any) => {
         name="consolev3"
         props={props}
         url={`//${window.location.host}/consolev3/`}
+        alive
         sync={false}
       />
     );

@@ -4,6 +4,11 @@ import test from 'node:test';
 
 const source = readFileSync(__filename.replace(/[^/]+$/, 'index.tsx'), 'utf8');
 
+test('resource host primes the list seed when the embed URL becomes ready', () => {
+  assert.match(source, /__KS_PRIME_CONSOLE_V3_LIST_SEED__/);
+  assert.match(source, /__KS_ENSURE_CONSOLE_V3_LIST_SEED__/);
+});
+
 test('resource host reuses the consolev3 app and exposes activation lifecycle marks', () => {
   assert.match(source, /name="consolev3"/);
   assert.match(source, /alive/);
@@ -98,10 +103,24 @@ test('resource host keeps the shared sandbox alive for non-alive embeds', () => 
   assert.match(source, /watchConsoleV3Sandbox\(lastConsoleV3AppWindow\?\.__WUJIE\)/);
 });
 
-test('activation settles the boot phase so empty husks can be rebuilt', () => {
+test('activation settles the boot phase only when the ShadowRoot has content', () => {
   const activation = source.match(/phase === 'activated'[\s\S]*?phase === 'deactivated'/);
   assert.ok(activation, 'activation branch not found');
   assert.match(activation[0], /mountedRevisions\.set\(scopeKey, revision\)/);
   assert.match(activation[0], /mountedResourceUrls\.set\(scopeKey, resourceUrl\)/);
+  // An empty activate must not end `booting`, or verify waits 3s then rebuilds
+  // into an ~8s SPA cold start. Rebuild immediately when the husk is empty.
+  assert.match(activation[0], /isConsoleV3InstanceMounted\(\)/);
   assert.match(activation[0], /markConsoleV3BootMounted\(\)/);
+  assert.match(activation[0], /destroyConsoleV3Instance|markConsoleV3BootStarted/);
+  // Immediate rebuild must not share retriedUrlRef with the verify path.
+  assert.match(activation[0], /activatedRebuildRef/);
+  assert.match(activation[0], /markConsoleV3BootFailed/);
+  assert.match(activation[0], /resolveConsoleV3Sandbox/);
+  assert.doesNotMatch(activation[0], /retriedUrlRef\.current = resourceUrl/);
+});
+
+test('empty husk destroy prefers lastConsoleV3AppWindow over DOM lookup', () => {
+  assert.match(source, /lastConsoleV3AppWindow\?\.__WUJIE \?\? getConsoleV3Sandbox\(\)/);
+  assert.match(source, /resolveConsoleV3Sandbox/);
 });

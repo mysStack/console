@@ -5,12 +5,15 @@ import test from 'node:test';
 import {
   getSpringCloudProbeCluster,
   getSpringCloudProbeUrl,
+  hydrateSpringCloudProbeSeedsFromSession,
+  persistSpringCloudProbeSeeds,
   primeSpringCloudProbeCache,
   primeSpringCloudProbeCacheForRoute,
   SPRINGCLOUD_CRD_NAME,
   SPRINGCLOUD_PROBE_CACHE_SOURCE,
   SPRINGCLOUD_PROBE_CACHE_TTL_MS,
   SPRINGCLOUD_PROBE_SEEDS_KEY,
+  SPRINGCLOUD_PROBE_SESSION_KEY,
   type SpringCloudProbeRecord,
 } from './springcloudProbeCache';
 
@@ -124,15 +127,19 @@ test('initWujie loads the probe cache into the shared V3 app before its scripts'
     /import \{[\s\S]{0,160}createConsoleV3SpringCloudProbeCachePlugin[\s\S]{0,160}\} from '\.\/springcloudProbeCache'/,
   );
   assert.match(source, /primeSpringCloudProbeCacheForRoute\(\);/);
+  assert.match(source, /primeConsoleV3ListSeedForRoute\(\);/);
+  assert.match(source, /resolveConsoleV3PreloadUrl\(window\.location\.pathname\)/);
   assert.match(
     source,
-    /const consoleV3Plugins = \[createConsoleV3SpringCloudProbeCachePlugin\(\)\]/,
+    /const consoleV3Plugins = \[\n  createConsoleV3SpringCloudProbeCachePlugin\(\),\n  createConsoleV3ListSeedPlugin\(\),\n\]/,
   );
   assert.equal(source.match(/plugins: consoleV3Plugins/g)?.length, 2);
 
   const preload = source.match(/preloadApp\(\{\n    name: 'consolev3',[\s\S]*?\n  \}\);/);
   assert.ok(preload, 'consolev3 preload not found');
   assert.match(preload[0], /plugins: consoleV3Plugins/);
+  assert.match(preload[0], /url: preloadUrl/);
+  assert.doesNotMatch(preload[0], /consolev3\/dashboard/);
 
   const setup = source.match(/setupApp\(\{\n    name: 'consolev3',[\s\S]*?\n  \}\);/);
   assert.ok(setup, 'consolev3 setup not found');
@@ -254,4 +261,100 @@ test('route priming skips login and routes without a cluster', async () => {
   });
   await new Promise(resolve => setTimeout(resolve, 0));
   assert.equal(store.host?.body, EMPTY_LIST);
+});
+
+function memoryStorage(memory: Record<string, string> = {}) {
+  return {
+    memory,
+    getItem: (key: string) => memory[key] ?? null,
+    setItem: (key: string, value: string) => {
+      memory[key] = value;
+    },
+  };
+}
+
+test('session storage hydrates a fresh seed across hard refresh', () => {
+  const storage = memoryStorage();
+  const persisted: Record<string, SpringCloudProbeRecord> = {
+    host: seedRecord({ at: 5_000, body: EMPTY_LIST }),
+  };
+  persistSpringCloudProbeSeeds(persisted, storage);
+
+  const store: Record<string, SpringCloudProbeRecord> = {};
+  const loaded = hydrateSpringCloudProbeSeedsFromSession(store, storage, 6_000);
+  assert.equal(loaded, 1);
+  assert.equal(store.host.body, EMPTY_LIST);
+  assert.equal(storage.memory[SPRINGCLOUD_PROBE_SESSION_KEY] !== undefined, true);
+});
+
+test('session hydration ignores expired probe seeds', () => {
+  const storage = memoryStorage({
+    [SPRINGCLOUD_PROBE_SESSION_KEY]: JSON.stringify({
+      host: seedRecord({ at: 0 }),
+    }),
+  });
+  const store: Record<string, SpringCloudProbeRecord> = {};
+  const loaded = hydrateSpringCloudProbeSeedsFromSession(
+    store,
+    storage,
+    SPRINGCLOUD_PROBE_CACHE_TTL_MS + 1,
+  );
+  assert.equal(loaded, 0);
+  assert.deepEqual(store, {});
+});
+
+test('default persist writes localStorage so a new tab can skip the CRD probe', () => {
+  const local = memoryStorage();
+  const session = memoryStorage();
+  const persisted: Record<string, SpringCloudProbeRecord> = {
+    host: seedRecord({ at: 5_000, body: EMPTY_LIST }),
+  };
+
+  persistSpringCloudProbeSeeds(persisted, undefined, {
+    localStorage: local,
+    sessionStorage: session,
+  });
+
+  assert.equal(local.memory[SPRINGCLOUD_PROBE_SESSION_KEY] !== undefined, true);
+  assert.equal(session.memory[SPRINGCLOUD_PROBE_SESSION_KEY] !== undefined, true);
+
+  // New tab: sessionStorage empty, localStorage still has the seed.
+  const store: Record<string, SpringCloudProbeRecord> = {};
+  const loaded = hydrateSpringCloudProbeSeedsFromSession(store, undefined, 6_000, {
+    localStorage: local,
+    sessionStorage: memoryStorage(),
+  });
+  assert.equal(loaded, 1);
+  assert.equal(store.host.body, EMPTY_LIST);
+});
+
+test('hydrating prefers a fresher localStorage seed over a stale session seed', () => {
+  const local = memoryStorage({
+    [SPRINGCLOUD_PROBE_SESSION_KEY]: JSON.stringify({
+      host: seedRecord({ at: 8_000, body: '{"items":[],"totalItems":0,"via":"local"}' }),
+    }),
+  });
+  const session = memoryStorage({
+    [SPRINGCLOUD_PROBE_SESSION_KEY]: JSON.stringify({
+      host: seedRecord({ at: 1_000, body: '{"items":[],"totalItems":0,"via":"session"}' }),
+    }),
+  });
+  const store: Record<string, SpringCloudProbeRecord> = {};
+  hydrateSpringCloudProbeSeedsFromSession(store, undefined, 9_000, {
+    localStorage: local,
+    sessionStorage: session,
+  });
+  assert.match(store.host.body, /via":"local"/);
+});
+
+test('initWujie defers actions dashboard preload until consolev3 is ready', () => {
+  const source = readFileSync(__filename.replace(/[^/]+$/, 'wujie.ts'), 'utf8');
+  assert.match(source, /isConsoleV3ProjectListPath/);
+  assert.match(source, /consoleV3Actions/);
+  // List landings wait for consolev3 `loadCompleted`, not a magic timer.
+  assert.doesNotMatch(source, /setTimeout\(preloadActions/);
+  assert.doesNotMatch(source, /requestIdleCallback/);
+  assert.match(source, /loadCompleted/);
+  assert.match(source, /preloadActionsOnce/);
+  assert.match(source, /deferActionsUntilListReady/);
 });

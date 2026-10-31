@@ -4,10 +4,10 @@
  */
 
 import React from 'react';
-import WujieReact from 'wujie-react';
 import { Banner } from '@kubed/components';
 import { useLocation, useParams } from 'react-router-dom';
 import { Icon, secretStore } from '@ks-console/shared';
+import ConsoleV3AliveEmbed from '../../../../../components/ConsoleV3AliveEmbed';
 
 export default function Embed() {
   const location = useLocation();
@@ -36,7 +36,7 @@ export default function Embed() {
         description={docUrl ? desc : t('CONFIGMAP_DESC')}
         className="mb12"
       />
-      <WujieReact width="100%" height="100%" name="consolev3" url={url} sync={false} />
+      <ConsoleV3AliveEmbed url={url} />
     </>
   );
 }

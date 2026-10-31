@@ -4,8 +4,8 @@
  */
 
 import React from 'react';
-import WujieReact from 'wujie-react';
 import { useLocation, useParams } from 'react-router-dom';
+import ConsoleV3AliveEmbed from '../../../../../components/ConsoleV3AliveEmbed';
 
 export default function Embed() {
   const location = useLocation();
@@ -14,5 +14,5 @@ export default function Embed() {
   const { cluster } = params;
 
   const url = `//${window.location.host}/consolev3/clusters/${cluster}/deployments${location.search}`;
-  return <WujieReact width="100%" height="100%" name="consolev3" url={url} sync={false} />;
+  return <ConsoleV3AliveEmbed url={url} />;
 }

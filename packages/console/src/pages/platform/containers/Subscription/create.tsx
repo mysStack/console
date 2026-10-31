@@ -4,12 +4,11 @@
  */
 
 import React from 'react';
-import WujieReact from 'wujie-react';
-
+import ConsoleV3AliveEmbed from '../../../../components/ConsoleV3AliveEmbed';
 function DeploymentDetail(): JSX.Element {
   const url = `//${window.location.host}/consolev3/settings/notification-subscription/subscription-mail/create`;
 
-  return <WujieReact width="100%" height="100%" name="consolev3" url={url} sync={false} />;
+  return <ConsoleV3AliveEmbed url={url} />;
 }
 
 export default DeploymentDetail;
