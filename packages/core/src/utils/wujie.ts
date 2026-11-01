@@ -8,21 +8,64 @@ import WujieReact from 'wujie-react';
 import { useEventEmitter } from '@ks-console/shared';
 import { setGlobalConsoleV3LoadCompleted } from '../utils/globals.consoleV3LoadCompleted';
 import {
+  bindConsoleV3ListSeedEnsure,
+  createConsoleV3ListSeedPlugin,
+  ensureConsoleV3ListSeedInChild,
+  installConsoleV3ListSeedPrimer,
+  primeConsoleV3ListSeedForRoute,
+} from './consoleV3ListSeed';
+import { isConsoleV3ProjectListPath, resolveConsoleV3PreloadUrl } from './consoleV3PreloadUrl';
+import {
   createConsoleV3SpringCloudProbeCachePlugin,
+  ensureSpringCloudProbeCacheInChild,
   primeSpringCloudProbeCacheForRoute,
 } from './springcloudProbeCache';
 
+const ensureChildFetchGuards = (appWindow: Window | undefined | null): void => {
+  ensureConsoleV3ListSeedInChild(appWindow);
+  ensureSpringCloudProbeCacheInChild(appWindow);
+};
+
 const { setupApp, preloadApp, bus } = WujieReact;
 
-// The springcloud probe cache has to exist before the V3 bundle runs, both in
-// the preload sandbox and on a fresh mount, so it is attached to the app
-// options instead of a lifecycle callback.
-const consoleV3Plugins = [createConsoleV3SpringCloudProbeCachePlugin()];
+// The springcloud probe cache and list seed have to exist before the V3 bundle
+// runs, both in the preload sandbox and on a fresh mount.
+const consoleV3Plugins = [
+  createConsoleV3SpringCloudProbeCachePlugin(),
+  createConsoleV3ListSeedPlugin(),
+];
 
 export function initWujie() {
-  // Runs before the V3 bundle download starts; the answer to V3's first
-  // springcloud probe is usually ready by the time it mounts.
+  // Runs before the V3 bundle download starts; the answers to V3's first
+  // springcloud probe and first resource-list GET are usually ready by mount.
   primeSpringCloudProbeCacheForRoute();
+  installConsoleV3ListSeedPrimer();
+  bindConsoleV3ListSeedEnsure(ensureChildFetchGuards);
+  primeConsoleV3ListSeedForRoute();
+
+  const preloadUrl = resolveConsoleV3PreloadUrl(window.location.pathname);
+  const deferActionsUntilListReady = isConsoleV3ProjectListPath(window.location.pathname);
+
+  let actionsPreloaded = false;
+  const preloadActionsOnce = () => {
+    if (actionsPreloaded) return;
+    actionsPreloaded = true;
+    preloadApp({
+      name: 'consoleV3Actions',
+      props: { actions: true },
+      url: `//${window.location.host}/consolev3/dashboard`,
+    });
+  };
+
+  // Listen before any preload so list landings can start actions only after
+  // the shared consolev3 app has finished loading (not on a wall-clock delay).
+  bus.$on('loadCompleted', (name: string) => {
+    if (name !== 'consolev3') return;
+    setGlobalConsoleV3LoadCompleted({ value: true });
+    if (deferActionsUntilListReady) {
+      preloadActionsOnce();
+    }
+  });
 
   setupApp({
     name: 'consolev3',
@@ -30,6 +73,9 @@ export function initWujie() {
     exec: true,
     plugins: consoleV3Plugins,
     afterMount: appWindow => {
+      // List/SPA fibers sometimes skip jsBeforeLoaders; patch fetch before V3
+      // issues its first list/probe GET.
+      ensureChildFetchGuards(appWindow);
       const { $emit } = useEventEmitter();
       $emit('afterMountConsoleV3', appWindow);
     },
@@ -44,24 +90,18 @@ export function initWujie() {
     url: `//${window.location.host}/consolev3/`,
     exec: true,
     props: { actions: true },
-    afterMount: () => {
-      bus.$on('loadCompleted', (name: string) => {
-        if (name === 'consolev3') {
-          setGlobalConsoleV3LoadCompleted({ value: true });
-        }
-      });
-    },
   });
 
-  preloadApp({
-    name: 'consoleV3Actions',
-    props: { actions: true },
-    url: `//${window.location.host}/consolev3/dashboard`,
-  });
-
+  // Shared list app preloads the landing route when the host URL is already a
+  // project embed, so activation does not pay for a dashboard → list navigation.
   preloadApp({
     name: 'consolev3',
-    url: `//${window.location.host}/consolev3/dashboard`,
+    url: preloadUrl,
     plugins: consoleV3Plugins,
   });
+
+  // Non-list routes keep the previous behaviour: warm actions immediately.
+  if (!deferActionsUntilListReady) {
+    preloadActionsOnce();
+  }
 }

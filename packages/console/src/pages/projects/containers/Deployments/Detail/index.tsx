@@ -4,9 +4,9 @@
  */
 
 import React, { useCallback, useEffect, useRef } from 'react';
-import WujieReact from 'wujie-react';
 import { useLocation, useParams } from 'react-router-dom';
 import { useConfigReferenceBridge } from '../../../components/ConfigReference/entry';
+import ConsoleV3AliveEmbed from '../../../../../components/ConsoleV3AliveEmbed';
 import {
   getConsoleV3DetailPath,
   getConsoleV3DeploymentListPath,
@@ -162,13 +162,8 @@ function DeploymentDetail(): JSX.Element {
 
   return (
     <>
-      <WujieReact
-        width="100%"
-        height="100%"
-        name="consolev3"
+      <ConsoleV3AliveEmbed
         url={embeddedUrl}
-        alive
-        sync={false}
         afterMount={handleAfterMount}
         activated={handleActivated}
         afterUnmount={handleAfterUnmount}

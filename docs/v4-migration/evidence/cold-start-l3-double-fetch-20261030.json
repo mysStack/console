@@ -1,0 +1,15 @@
+{
+  "date": "2026-10-30",
+  "finding": "Hard refresh issued two identical deployments GETs (~2.4s and ~3.6s host time).",
+  "attribution": [
+    "Preload targeted /consolev3/dashboard while embed needed deployments — in-sandbox navigation contributed to list traffic (L1).",
+    "scheduleConsoleV3ListRouteSync already no-ops when child path matches; aligned preload avoids forced popstate from that path.",
+    "notifyConsoleV3ActivationRoute still force-notifies for non-alive keepAlive cases; added notifyIfUnchanged:false for callers that know the child already rendered the route.",
+    "Identical second GET is also absorbed by CONSOLE_V3_LIST_SEED_TTL_MS (15s) sandbox/host seed cache (L2)."
+  ],
+  "code": [
+    "packages/core/src/utils/consoleV3PreloadUrl.ts",
+    "packages/core/src/utils/consoleV3ListSeed.ts",
+    "packages/console/src/components/ConsoleV3ResourceList/route.ts"
+  ]
+}

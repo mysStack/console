@@ -5,6 +5,5 @@ import test from 'node:test';
 const source = readFileSync(__filename.replace(/[^/]+$/, 'index.tsx'), 'utf8');
 
 test('Service detail reuses the persistent consolev3 instance', () => {
-  assert.match(source, /name="consolev3"/);
-  assert.match(source, /alive/);
+  assert.match(source, /ConsoleV3AliveEmbed/);
 });

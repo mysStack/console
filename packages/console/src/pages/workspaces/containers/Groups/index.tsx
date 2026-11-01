@@ -7,8 +7,7 @@ import React from 'react';
 import { Banner } from '@kubed/components';
 import { Group } from '@kubed/icons';
 import { useParams } from 'react-router-dom';
-import WujieReact from 'wujie-react';
-
+import ConsoleV3AliveEmbed from '../../../../components/ConsoleV3AliveEmbed';
 export default function BaseInfo() {
   const params: Record<string, any> = useParams();
   const { workspace } = params;
@@ -23,7 +22,7 @@ export default function BaseInfo() {
         className="mb12"
       />
       <div>
-        <WujieReact width="100%" height="100%" name="consolev3" url={url} sync={false} />
+        <ConsoleV3AliveEmbed url={url} />
       </div>
     </>
   );

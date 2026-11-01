@@ -4,10 +4,11 @@
  */
 
 import React from 'react';
-import WujieReact from 'wujie-react';
 import { useCacheStore as useStore } from '@ks-console/shared';
 import { useParams } from 'react-router-dom';
 import { useConfigReferenceBridge } from '../../../components/ConfigReference/entry';
+
+import ConsoleV3AliveEmbed from '../../../../../components/ConsoleV3AliveEmbed';
 
 function DaemonSetDetail(): JSX.Element {
   const { name } = useParams<'name'>();
@@ -16,13 +17,8 @@ function DaemonSetDetail(): JSX.Element {
 
   return (
     <>
-      <WujieReact
-        width="100%"
-        height="100%"
-        name="consolev3"
+      <ConsoleV3AliveEmbed
         url={`${wujieUrlPrefix}/daemonsets/${name}`}
-        alive
-        sync={false}
         afterMount={afterMount}
         afterUnmount={afterUnmount}
       />

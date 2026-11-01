@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-30",
+  "env": "http://192.168.2.131:30881",
+  "image_note": "boot-phase image already deployed; baseline before cold-start branch",
+  "scenarios": {
+    "hard_refresh_deployments": {
+      "url": "/dev-workspace/clusters/host/projects/dev-wes/deployments",
+      "preload_url_observed": "/consolev3/dashboard",
+      "iframe_final_path": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments",
+      "first_deployments_api_host_ms": 2413,
+      "second_deployments_api_host_ms": 3560,
+      "deployments_request_count": 2,
+      "list_visible": true,
+      "note": "preload targets dashboard while embed needs deployments — URL mismatch"
+    },
+    "overview_to_deployments": {
+      "from": "/dev-workspace/clusters/host/projects/dev-wes/overview",
+      "to": "/dev-workspace/clusters/host/projects/dev-wes/deployments",
+      "first_deployments_api_ms_since_click": 10762,
+      "second_deployments_api_ms_since_click": 12627,
+      "deployments_request_count": 2,
+      "list_visible": true,
+      "note": "SPA enter from V4 overview; still two identical list GETs"
+    }
+  },
+  "conclusions": [
+    "L1: align preloadApp URL with host pathname when it is a project V3 embed path",
+    "L2: host-seed the first deployments list GET while v3dist loads",
+    "L3: identical double GET — attribute after L1; reduce host-triggered route sync when path already matches"
+  ]
+}

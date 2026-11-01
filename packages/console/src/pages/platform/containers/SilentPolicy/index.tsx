@@ -4,10 +4,9 @@
  */
 
 import React from 'react';
+import ConsoleV3AliveEmbed from '../../../../components/ConsoleV3AliveEmbed';
 // import { isEmpty } from 'lodash';
-import WujieReact from 'wujie-react';
-
 export default function SilentPolicy() {
   const url = `//${window.location.host}/consolev3/settings/silent-policy`;
-  return <WujieReact width="100%" height="100%" name="consolev3" url={url} sync={false} />;
+  return <ConsoleV3AliveEmbed url={url} />;
 }

@@ -4,10 +4,10 @@
  */
 
 import React from 'react';
-import WujieReact from 'wujie-react';
 import { useParams } from 'react-router-dom';
 import { Banner } from '@kubed/components';
 import { Project } from '@kubed/icons';
+import ConsoleV3AliveEmbed from '../../../../components/ConsoleV3AliveEmbed';
 
 function FedProjects(): JSX.Element {
   const { workspace } = useParams<'workspace'>();
@@ -22,7 +22,7 @@ function FedProjects(): JSX.Element {
         className="mb12"
       />
       <div>
-        <WujieReact width="100%" height="100%" name="consolev3" url={url} sync={false} />
+        <ConsoleV3AliveEmbed url={url} />
       </div>
     </>
   );

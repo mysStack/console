@@ -4,15 +4,15 @@
  */
 
 import React from 'react';
-import WujieReact from 'wujie-react';
 import { useParams } from 'react-router-dom';
+import ConsoleV3AliveEmbed from '../../../../components/ConsoleV3AliveEmbed';
 
 const SettingEmbed = ({ component }: { component: string }) => {
   const { workspace } = useParams();
 
   const url = `//${window.location.host}/workspaces/${workspace}/gateways/${component}`;
 
-  return <WujieReact width="100%" height="100%" name="consolev3" url={url} sync={false} />;
+  return <ConsoleV3AliveEmbed url={url} />;
 };
 
 export default SettingEmbed;

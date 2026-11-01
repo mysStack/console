@@ -4,14 +4,14 @@
  */
 
 import * as React from 'react';
-import WujieReact from 'wujie-react';
 import { useLocation } from 'react-router-dom';
+import ConsoleV3AliveEmbed from '../../components/ConsoleV3AliveEmbed';
 
 const WhizardTelemetry = () => {
   const location = useLocation();
   const url = `//${window.location.host}/consolev3${location.pathname}${location.search}`;
 
-  return <WujieReact width="100%" height="100%" name="consolev3" url={url} sync={false} />;
+  return <ConsoleV3AliveEmbed url={url} />;
 };
 
 export default WhizardTelemetry;

@@ -4,23 +4,15 @@
  */
 
 import React from 'react';
-import WujieReact from 'wujie-react';
 import { useCacheStore as useStore } from '@ks-console/shared';
 import { useParams } from 'react-router-dom';
+import ConsoleV3AliveEmbed from '../../../../../components/ConsoleV3AliveEmbed';
 
 function PodDetail(): JSX.Element {
   const { podName } = useParams<'podName'>();
   const [wujieUrlPrefix] = useStore<string>('wujieUrlPrefix');
 
-  return (
-    <WujieReact
-      width="100%"
-      height="100%"
-      name="consolev3"
-      url={`${wujieUrlPrefix}/pods/${podName}`}
-      sync={false}
-    />
-  );
+  return <ConsoleV3AliveEmbed url={`${wujieUrlPrefix}/pods/${podName}`} />;
 }
 
 export default PodDetail;

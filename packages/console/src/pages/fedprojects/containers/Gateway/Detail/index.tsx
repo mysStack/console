@@ -4,8 +4,8 @@
  */
 
 import React from 'react';
-import WujieReact from 'wujie-react';
 import { useParams } from 'react-router-dom';
+import ConsoleV3AliveEmbed from '../../../../../components/ConsoleV3AliveEmbed';
 
 function Gateway(): JSX.Element {
   const { workspace, namespace, gatewayName } = useParams<
@@ -13,7 +13,7 @@ function Gateway(): JSX.Element {
   >();
   const url = `//${window.location.host}/consolev3/${workspace}/federatedprojects/${namespace}/gateways/${gatewayName}`;
 
-  return <WujieReact width="100%" height="100%" name="consolev3" url={url} sync={false} />;
+  return <ConsoleV3AliveEmbed url={url} />;
 }
 
 export default Gateway;

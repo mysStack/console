@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-30",
+  "branch": "fix/release-4.1.5-v3-cold-start",
+  "code_tip": "246488b9b",
+  "image": "ghcr.io/mysstack/ks-console:release-4.1.5-cold-start-20261030-246488b",
+  "imageID": "ghcr.io/mysstack/ks-console@sha256:2dffa68cd653d1fd9d054a0e6b9e14b506ea3754ce52ed640befa807430b2296",
+  "deploy": "ks-console-v415-rea @ 192.168.2.131:30881",
+  "pod": "ks-console-v415-rea-55c8d69cb7-mnf8n",
+  "scenario": "SPA overview → 工作负载/deployments after ensureConsoleV3ListSeedInChild + ensureSpringCloudProbeCacheInChild deploy",
+  "compared_to": {
+    "prior_image_37bcace_spa_list_visible_ms": 9000,
+    "prior_spa_seedFlag": false,
+    "note": "37bcace lacked SPA ensure inject; iframe seed/probe were false"
+  },
+  "spa_overview_to_deployments": {
+    "list_visible_ms": 7653,
+    "host_list_prime_since_click_ms": { "start": 72, "end": 350, "duration": 277, "xfer": 3561 },
+    "iframe_deployments_network_count": 0,
+    "seedFlag": true,
+    "probeFlag": true,
+    "seedKeys": [
+      "/clusters/host/kapis/resources.kubesphere.io/v1alpha3/namespaces/dev-wes/deployments"
+    ],
+    "iframe_path": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments",
+    "rows_visible": true,
+    "row_sample": ["wes-v2-server", "ams-server", "hip-server"],
+    "total": 3
+  },
+  "conclusion": "SPA ensure inject works: seedFlag/probeFlag true and child skips deployments GET. Visible time ~7.7s vs prior ~9s; still dominated by V3 sandbox boot, not list API.",
+  "not_retested_this_pass": [
+    "hard refresh deployments list-visible",
+    "seed 15s TTL stale display",
+    "bandwidth contention with v3dist"
+  ]
+}

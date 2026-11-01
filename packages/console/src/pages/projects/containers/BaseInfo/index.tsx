@@ -4,21 +4,13 @@
  */
 
 import React from 'react';
-import WujieReact from 'wujie-react';
 import { useCacheStore as useStore } from '@ks-console/shared';
+import ConsoleV3AliveEmbed from '../../../../components/ConsoleV3AliveEmbed';
 
 function BaseInfo(): JSX.Element {
   const [wujieUrlPrefix] = useStore<string>('wujieUrlPrefix');
 
-  return (
-    <WujieReact
-      width="100%"
-      height="100%"
-      name="consolev3"
-      url={`${wujieUrlPrefix}/base-info`}
-      sync={false}
-    />
-  );
+  return <ConsoleV3AliveEmbed url={`${wujieUrlPrefix}/base-info`} />;
 }
 
 export default BaseInfo;
