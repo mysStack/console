@@ -1,0 +1,177 @@
+{
+  "date": "2026-11-02T03:54:09.544Z",
+  "branch": "release-4.1.5",
+  "code_tip": "3b7540912",
+  "image": "ghcr.io/mysstack/ks-console:release-4.1.5-merged-20261102-3b75409",
+  "imageID": "ghcr.io/mysstack/ks-console@sha256:84b8b721c2e3a30c051d5788b6aabc73163dad9d79dccb75e2dce90430532268",
+  "deploy": "ks-console-v415-rea @ 192.168.2.131:30881",
+  "method": "Playwright chromium-1243; SPA = same-document <a> click; visible = iframe path+body text; hard refresh = goto deployments",
+  "historical_reference": {
+    "husk_overview_to_deployments_ms": 7653,
+    "source": "cold-start-spa-alive-fix-20261030.json",
+    "p0_full_retest_cold_ms": 3080,
+    "p0_full_retest_warm_ms": 1965,
+    "source_p0": "cold-start-p0-full-retest-20261031.json"
+  },
+  "thresholds_ms": {
+    "hard_refresh_cold_ms": 5000,
+    "hard_refresh_warm_ms": 3500,
+    "spa_activate_ms": 3000
+  },
+  "cases": {
+    "hard_refresh_cold": {
+      "clearSession": true,
+      "visible_from_poll_start_ms": 5507,
+      "visibleAt_perf_now": 6245,
+      "renderMark_ms": 4315,
+      "host_crd": [
+        {
+          "n": "/kapis/clusters/host/resources.kubesphere.io/v1alpha3/customresourcedefinitions",
+          "s": 687,
+          "e": 1923,
+          "d": 1236
+        }
+      ],
+      "dashboard": [],
+      "dashBeforeRender": [],
+      "dashAfterRender_ms": null
+    },
+    "hard_refresh_warm": {
+      "clearSession": false,
+      "visible_from_poll_start_ms": 1019,
+      "visibleAt_perf_now": 1431,
+      "renderMark_ms": 897,
+      "host_crd": [],
+      "dashboard": [],
+      "dashBeforeRender": [],
+      "dashAfterRender_ms": null
+    },
+    "overview_to_deployments": {
+      "nav_wall_ms": 1284,
+      "visibleAt_perf_now": 1280,
+      "visible_from_poll_start_ms": 918,
+      "overview_before": {
+        "alive": false,
+        "shadowKids": null,
+        "iframePath": "/consolev3/dashboard"
+      },
+      "after": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments"
+      },
+      "pass": true
+    },
+    "jobs_detail_to_list": {
+      "skipped": false,
+      "detail_path": "/dev-workspace/clusters/host/projects/dev-wes/jobs/ams-29893194",
+      "nav_wall_ms": 1385,
+      "visibleAt_perf_now": 1344,
+      "visible_from_poll_start_ms": 885,
+      "detail_before": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/jobs/ams-29893194"
+      },
+      "after": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/jobs"
+      },
+      "pass": true
+    },
+    "cronjobs_detail_to_list": {
+      "skipped": false,
+      "detail_path": "/dev-workspace/clusters/host/projects/dev-wes/cronjobs/wes-v2",
+      "nav_wall_ms": 1701,
+      "visibleAt_perf_now": 1644,
+      "visible_from_poll_start_ms": 1187,
+      "detail_before": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/cronjobs/wes-v2"
+      },
+      "after": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/cronjobs"
+      },
+      "pass": true
+    },
+    "pods_detail_to_list": {
+      "skipped": false,
+      "detail_path": "/dev-workspace/clusters/host/projects/dev-wes/pods/ams-29893194-zd86s",
+      "nav_wall_ms": 1319,
+      "visibleAt_perf_now": 1310,
+      "visible_from_poll_start_ms": 916,
+      "detail_before": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/pods/ams-29893194-zd86s"
+      },
+      "after": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/pods"
+      },
+      "pass": true
+    },
+    "deployments_detail_to_list": {
+      "skipped": false,
+      "detail_path": "/dev-workspace/clusters/host/projects/dev-wes/deployments/wes-v2-server",
+      "nav_wall_ms": 2074,
+      "visibleAt_perf_now": 2064,
+      "visible_from_poll_start_ms": 1533,
+      "detail_before": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments/wes-v2-server"
+      },
+      "after": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments"
+      },
+      "pass": true
+    },
+    "cluster_overview_to_deployments": {
+      "nav_wall_ms": 2956,
+      "visibleAt_perf_now": 2950,
+      "visible_from_poll_start_ms": 2333,
+      "overview_before": {
+        "alive": false,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dashboard"
+      },
+      "after": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/clusters/host/deployments"
+      },
+      "pass": true
+    }
+  },
+  "gates": {
+    "p0": {
+      "cold_under_threshold": false,
+      "warm_under_threshold": true,
+      "cold_still_primes_crd_once": true,
+      "warm_skips_host_crd": true,
+      "dashboard_never_before_render_cold": true,
+      "dashboard_never_before_render_warm": true
+    },
+    "spa": {
+      "overview_to_deployments": true,
+      "jobs_detail_to_list": true,
+      "cronjobs_detail_to_list": true,
+      "pods_detail_to_list": true,
+      "deployments_detail_to_list": true,
+      "cluster_overview_to_deployments": true
+    },
+    "p0_pass": false,
+    "spa_pass": true
+  },
+  "pass": false,
+  "conclusion": "\u5b8c\u6574\u590d\u6d4b\u672a\u901a\u8fc7\uff1a\u89c1 gates / cases\u3002",
+  "pod": "ks-console-v415-rea-658ff66b98-59kz8"
+}
