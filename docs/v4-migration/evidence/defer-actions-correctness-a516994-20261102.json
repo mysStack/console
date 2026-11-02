@@ -1,0 +1,36 @@
+{
+  "date": "2026-11-02T02:51:13.578Z",
+  "branch": "fix/release-4.1.5-v3-cold-start",
+  "code_tip": "a81c0fca5",
+  "image": "ghcr.io/mysstack/ks-console:release-4.1.5-defer-actions-20261102-a516994",
+  "imageID": "ghcr.io/mysstack/ks-console@sha256:5c0021f120fced7b185b42c598ac77939a22542586cd0885e6450b305c0cbf08",
+  "pod": "ks-console-v415-rea-f6b55b8bc-xnzh6",
+  "deploy": "ks-console-v415-rea @ 192.168.2.131:30881",
+  "focus": "correctness after seed narrow / husk retry / alive cleanup",
+  "cases": {
+    "hard_refresh_list": {
+      "visible_from_poll_start_ms": 2950,
+      "child_list_gets": [],
+      "host_seed_keys": [],
+      "pass": true
+    },
+    "spa_overview_to_deployments": {
+      "wall_ms": 4371,
+      "visible_from_poll_start_ms": 3700,
+      "child_list_gets": [],
+      "pass": true
+    },
+    "seed_key_shape": {
+      "host_seed_keys": [
+        "/clusters/host/kapis/resources.kubesphere.io/v1alpha3/namespaces/dev-wes/deployments?sortBy=updateTime&limit=10"
+      ],
+      "list_keys": [
+        "/clusters/host/kapis/resources.kubesphere.io/v1alpha3/namespaces/dev-wes/deployments?sortBy=updateTime&limit=10"
+      ],
+      "detail_like": [],
+      "log_like": [],
+      "pass": true
+    }
+  },
+  "pass": true
+}

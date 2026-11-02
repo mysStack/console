@@ -1,0 +1,59 @@
+{
+  "date": "2026-11-02T02:30:54.657Z",
+  "image": "ghcr.io/mysstack/ks-console:release-4.1.5-defer-actions-20261102-d475030",
+  "imageID": "ghcr.io/mysstack/ks-console@sha256:29fba0e139b34042cddb3fcc31e28fe1851bb2053acb95ad2302174c0e900e59",
+  "pod": "ks-console-v415-rea-8777dc48c-2dhsd",
+  "commit": "d4750300f",
+  "baseline_merged_dashboard_start_ms": 2693,
+  "cold": {
+    "clearSession": true,
+    "visible_ms": 4097,
+    "renderMark_ms": null,
+    "first_dashboard_ms": 17,
+    "dashboard_count": 1,
+    "dashboard": [
+      {
+        "ms": 17,
+        "rel": "/consolev3/dashboard",
+        "type": "fetch"
+      }
+    ],
+    "list_html": [
+      {
+        "ms": 759,
+        "rel": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments",
+        "type": "fetch"
+      }
+    ],
+    "chunk_count": 15,
+    "last_chunk_ms": 4831,
+    "dash_minus_visible_ms": -4080,
+    "dash_minus_render_ms": null
+  },
+  "warm": {
+    "clearSession": false,
+    "visible_ms": 1546,
+    "renderMark_ms": null,
+    "first_dashboard_ms": null,
+    "dashboard_count": 0,
+    "dashboard": [],
+    "list_html": [
+      {
+        "ms": 534,
+        "rel": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments",
+        "type": "fetch"
+      }
+    ],
+    "chunk_count": 16,
+    "last_chunk_ms": 1438,
+    "dash_minus_visible_ms": null,
+    "dash_minus_render_ms": null
+  },
+  "gates": {
+    "dashboard_still_preloads_cold": true,
+    "dashboard_still_preloads_warm": false,
+    "cold_list_visible": true,
+    "warm_list_visible": true
+  },
+  "pass": false
+}

@@ -1,0 +1,411 @@
+{
+  "date": "2026-11-02T02:17:41.578Z",
+  "image": "ghcr.io/mysstack/ks-console:release-4.1.5-defer-actions-20261102-d475030",
+  "pod": "ks-console-v415-rea-894f864cc-pfkjr",
+  "visibleAt": 1522,
+  "samples": [
+    {
+      "wait_after_visible_ms": 0,
+      "now": 1525,
+      "phases": [
+        {
+          "n": "deactivated",
+          "t": 1015
+        },
+        {
+          "n": "activated",
+          "t": 1015
+        },
+        {
+          "n": "render",
+          "t": 1016
+        }
+      ],
+      "dashboard": [],
+      "listHtml": [
+        {
+          "n": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments",
+          "s": 494,
+          "e": 751
+        }
+      ],
+      "chunks": [
+        {
+          "n": "/dist/v3dist/main.fde4b8733d31a10689e2.js",
+          "s": 774,
+          "e": 780
+        },
+        {
+          "n": "/dist/v3dist/0.2a90dd309666ab714877.js",
+          "s": 854,
+          "e": 881
+        },
+        {
+          "n": "/dist/v3dist/1.efdd42d9eeef0111e8ca.js",
+          "s": 854,
+          "e": 887
+        },
+        {
+          "n": "/dist/v3dist/10.7ae23270f3e1396468d8.js",
+          "s": 855,
+          "e": 875
+        },
+        {
+          "n": "/dist/v3dist/3.6245f4a9134d1592e79f.js",
+          "s": 856,
+          "e": 880
+        }
+      ],
+      "wujieApps": [
+        {
+          "tag": "WUJIE-APP",
+          "id": "consolev3",
+          "name": "",
+          "src": ""
+        },
+        {
+          "tag": "IFRAME",
+          "id": "",
+          "name": "consolev3",
+          "src": "blob:http://192.168.2.131:30881/8cf85d21-de46-4373-89b7-0a57bbaa17c9"
+        }
+      ]
+    },
+    {
+      "wait_after_visible_ms": 2000,
+      "now": 3530,
+      "phases": [
+        {
+          "n": "deactivated",
+          "t": 1015
+        },
+        {
+          "n": "activated",
+          "t": 1015
+        },
+        {
+          "n": "render",
+          "t": 1016
+        }
+      ],
+      "dashboard": [],
+      "listHtml": [
+        {
+          "n": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments",
+          "s": 494,
+          "e": 751
+        }
+      ],
+      "chunks": [
+        {
+          "n": "/dist/v3dist/main.fde4b8733d31a10689e2.js",
+          "s": 774,
+          "e": 780
+        },
+        {
+          "n": "/dist/v3dist/0.2a90dd309666ab714877.js",
+          "s": 854,
+          "e": 881
+        },
+        {
+          "n": "/dist/v3dist/1.efdd42d9eeef0111e8ca.js",
+          "s": 854,
+          "e": 887
+        },
+        {
+          "n": "/dist/v3dist/10.7ae23270f3e1396468d8.js",
+          "s": 855,
+          "e": 875
+        },
+        {
+          "n": "/dist/v3dist/3.6245f4a9134d1592e79f.js",
+          "s": 856,
+          "e": 880
+        }
+      ],
+      "wujieApps": [
+        {
+          "tag": "WUJIE-APP",
+          "id": "consolev3",
+          "name": "",
+          "src": ""
+        },
+        {
+          "tag": "IFRAME",
+          "id": "",
+          "name": "consolev3",
+          "src": "blob:http://192.168.2.131:30881/8cf85d21-de46-4373-89b7-0a57bbaa17c9"
+        }
+      ]
+    },
+    {
+      "wait_after_visible_ms": 4000,
+      "now": 5533,
+      "phases": [
+        {
+          "n": "deactivated",
+          "t": 1015
+        },
+        {
+          "n": "activated",
+          "t": 1015
+        },
+        {
+          "n": "render",
+          "t": 1016
+        }
+      ],
+      "dashboard": [],
+      "listHtml": [
+        {
+          "n": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments",
+          "s": 494,
+          "e": 751
+        }
+      ],
+      "chunks": [
+        {
+          "n": "/dist/v3dist/main.fde4b8733d31a10689e2.js",
+          "s": 774,
+          "e": 780
+        },
+        {
+          "n": "/dist/v3dist/0.2a90dd309666ab714877.js",
+          "s": 854,
+          "e": 881
+        },
+        {
+          "n": "/dist/v3dist/1.efdd42d9eeef0111e8ca.js",
+          "s": 854,
+          "e": 887
+        },
+        {
+          "n": "/dist/v3dist/10.7ae23270f3e1396468d8.js",
+          "s": 855,
+          "e": 875
+        },
+        {
+          "n": "/dist/v3dist/3.6245f4a9134d1592e79f.js",
+          "s": 856,
+          "e": 880
+        }
+      ],
+      "wujieApps": [
+        {
+          "tag": "WUJIE-APP",
+          "id": "consolev3",
+          "name": "",
+          "src": ""
+        },
+        {
+          "tag": "IFRAME",
+          "id": "",
+          "name": "consolev3",
+          "src": "blob:http://192.168.2.131:30881/8cf85d21-de46-4373-89b7-0a57bbaa17c9"
+        }
+      ]
+    },
+    {
+      "wait_after_visible_ms": 6000,
+      "now": 7537,
+      "phases": [
+        {
+          "n": "deactivated",
+          "t": 1015
+        },
+        {
+          "n": "activated",
+          "t": 1015
+        },
+        {
+          "n": "render",
+          "t": 1016
+        }
+      ],
+      "dashboard": [],
+      "listHtml": [
+        {
+          "n": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments",
+          "s": 494,
+          "e": 751
+        }
+      ],
+      "chunks": [
+        {
+          "n": "/dist/v3dist/main.fde4b8733d31a10689e2.js",
+          "s": 774,
+          "e": 780
+        },
+        {
+          "n": "/dist/v3dist/0.2a90dd309666ab714877.js",
+          "s": 854,
+          "e": 881
+        },
+        {
+          "n": "/dist/v3dist/1.efdd42d9eeef0111e8ca.js",
+          "s": 854,
+          "e": 887
+        },
+        {
+          "n": "/dist/v3dist/10.7ae23270f3e1396468d8.js",
+          "s": 855,
+          "e": 875
+        },
+        {
+          "n": "/dist/v3dist/3.6245f4a9134d1592e79f.js",
+          "s": 856,
+          "e": 880
+        }
+      ],
+      "wujieApps": [
+        {
+          "tag": "WUJIE-APP",
+          "id": "consolev3",
+          "name": "",
+          "src": ""
+        },
+        {
+          "tag": "IFRAME",
+          "id": "",
+          "name": "consolev3",
+          "src": "blob:http://192.168.2.131:30881/8cf85d21-de46-4373-89b7-0a57bbaa17c9"
+        }
+      ]
+    },
+    {
+      "wait_after_visible_ms": 8000,
+      "now": 9539,
+      "phases": [
+        {
+          "n": "deactivated",
+          "t": 1015
+        },
+        {
+          "n": "activated",
+          "t": 1015
+        },
+        {
+          "n": "render",
+          "t": 1016
+        }
+      ],
+      "dashboard": [],
+      "listHtml": [
+        {
+          "n": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments",
+          "s": 494,
+          "e": 751
+        }
+      ],
+      "chunks": [
+        {
+          "n": "/dist/v3dist/main.fde4b8733d31a10689e2.js",
+          "s": 774,
+          "e": 780
+        },
+        {
+          "n": "/dist/v3dist/0.2a90dd309666ab714877.js",
+          "s": 854,
+          "e": 881
+        },
+        {
+          "n": "/dist/v3dist/1.efdd42d9eeef0111e8ca.js",
+          "s": 854,
+          "e": 887
+        },
+        {
+          "n": "/dist/v3dist/10.7ae23270f3e1396468d8.js",
+          "s": 855,
+          "e": 875
+        },
+        {
+          "n": "/dist/v3dist/3.6245f4a9134d1592e79f.js",
+          "s": 856,
+          "e": 880
+        }
+      ],
+      "wujieApps": [
+        {
+          "tag": "WUJIE-APP",
+          "id": "consolev3",
+          "name": "",
+          "src": ""
+        },
+        {
+          "tag": "IFRAME",
+          "id": "",
+          "name": "consolev3",
+          "src": "blob:http://192.168.2.131:30881/8cf85d21-de46-4373-89b7-0a57bbaa17c9"
+        }
+      ]
+    },
+    {
+      "wait_after_visible_ms": 10000,
+      "now": 11543,
+      "phases": [
+        {
+          "n": "deactivated",
+          "t": 1015
+        },
+        {
+          "n": "activated",
+          "t": 1015
+        },
+        {
+          "n": "render",
+          "t": 1016
+        }
+      ],
+      "dashboard": [],
+      "listHtml": [
+        {
+          "n": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments",
+          "s": 494,
+          "e": 751
+        }
+      ],
+      "chunks": [
+        {
+          "n": "/dist/v3dist/main.fde4b8733d31a10689e2.js",
+          "s": 774,
+          "e": 780
+        },
+        {
+          "n": "/dist/v3dist/0.2a90dd309666ab714877.js",
+          "s": 854,
+          "e": 881
+        },
+        {
+          "n": "/dist/v3dist/1.efdd42d9eeef0111e8ca.js",
+          "s": 854,
+          "e": 887
+        },
+        {
+          "n": "/dist/v3dist/10.7ae23270f3e1396468d8.js",
+          "s": 855,
+          "e": 875
+        },
+        {
+          "n": "/dist/v3dist/3.6245f4a9134d1592e79f.js",
+          "s": 856,
+          "e": 880
+        }
+      ],
+      "wujieApps": [
+        {
+          "tag": "WUJIE-APP",
+          "id": "consolev3",
+          "name": "",
+          "src": ""
+        },
+        {
+          "tag": "IFRAME",
+          "id": "",
+          "name": "consolev3",
+          "src": "blob:http://192.168.2.131:30881/8cf85d21-de46-4373-89b7-0a57bbaa17c9"
+        }
+      ]
+    }
+  ],
+  "first_dash": null
+}
