@@ -1,0 +1,111 @@
+{
+  "date": "2026-11-02T04:17:45.772Z",
+  "image": "ghcr.io/mysstack/ks-console:release-4.1.5-v3-asset-preload-20261102-421b571",
+  "imageID": "ghcr.io/mysstack/ks-console@sha256:4468093d501c5b7f3e42516d0c64a419ddd7594ae6c9c6d15b97d06b29ec413e",
+  "pod": "ks-console-v415-rea-7966f455fb-k4jzz",
+  "commit": "421b5718c",
+  "cold": {
+    "clearSession": true,
+    "visible_ms": 1262,
+    "first_manifest_ms": 396,
+    "first_html_ms": 525,
+    "first_main_js_ms": 404,
+    "first_main_css_ms": 403,
+    "first_main_ms": 403,
+    "first_dashboard_ms": 3483,
+    "main_before_or_with_html": true,
+    "events": [
+      {
+        "ms": 396,
+        "rel": "/dist/v3dist/manifest.json",
+        "type": "fetch"
+      },
+      {
+        "ms": 403,
+        "rel": "/dist/v3dist/main.39ed81f6e5a43d5bb447.css",
+        "type": "stylesheet"
+      },
+      {
+        "ms": 404,
+        "rel": "/dist/v3dist/main.558f452048e49db23323.js",
+        "type": "script"
+      },
+      {
+        "ms": 525,
+        "rel": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments",
+        "type": "fetch"
+      },
+      {
+        "ms": 898,
+        "rel": "/dist/v3dist/main.39ed81f6e5a43d5bb447.css",
+        "type": "fetch"
+      },
+      {
+        "ms": 915,
+        "rel": "/dist/v3dist/main.558f452048e49db23323.js",
+        "type": "fetch"
+      },
+      {
+        "ms": 3483,
+        "rel": "/consolev3/dashboard",
+        "type": "fetch"
+      }
+    ]
+  },
+  "warm": {
+    "clearSession": false,
+    "visible_ms": 1201,
+    "first_manifest_ms": 408,
+    "first_html_ms": 516,
+    "first_main_js_ms": 433,
+    "first_main_css_ms": 433,
+    "first_main_ms": 433,
+    "first_dashboard_ms": 3404,
+    "main_before_or_with_html": true,
+    "events": [
+      {
+        "ms": 408,
+        "rel": "/dist/v3dist/manifest.json",
+        "type": "fetch"
+      },
+      {
+        "ms": 433,
+        "rel": "/dist/v3dist/main.39ed81f6e5a43d5bb447.css",
+        "type": "stylesheet"
+      },
+      {
+        "ms": 433,
+        "rel": "/dist/v3dist/main.558f452048e49db23323.js",
+        "type": "script"
+      },
+      {
+        "ms": 516,
+        "rel": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments",
+        "type": "fetch"
+      },
+      {
+        "ms": 801,
+        "rel": "/dist/v3dist/main.39ed81f6e5a43d5bb447.css",
+        "type": "fetch"
+      },
+      {
+        "ms": 814,
+        "rel": "/dist/v3dist/main.558f452048e49db23323.js",
+        "type": "fetch"
+      },
+      {
+        "ms": 3404,
+        "rel": "/consolev3/dashboard",
+        "type": "fetch"
+      }
+    ]
+  },
+  "gates": {
+    "cold_main_overlaps_html": true,
+    "warm_main_overlaps_html": true,
+    "cold_list_visible": true,
+    "warm_list_visible": true,
+    "cold_no_early_dashboard": true
+  },
+  "pass": true
+}

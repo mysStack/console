@@ -14,6 +14,7 @@ import {
   installConsoleV3ListSeedPrimer,
   primeConsoleV3ListSeedForRoute,
 } from './consoleV3ListSeed';
+import { preloadConsoleV3MainAssetsForRoute } from './consoleV3AssetPreload';
 import { isConsoleV3ProjectListPath, resolveConsoleV3PreloadUrl } from './consoleV3PreloadUrl';
 import {
   createConsoleV3SpringCloudProbeCachePlugin,
@@ -42,6 +43,8 @@ export function initWujie() {
   installConsoleV3ListSeedPrimer();
   bindConsoleV3ListSeedEnsure(ensureChildFetchGuards);
   primeConsoleV3ListSeedForRoute();
+  // Overlap v3dist main css/js download with the consolev3 HTML BFF wait.
+  preloadConsoleV3MainAssetsForRoute();
 
   const preloadUrl = resolveConsoleV3PreloadUrl(window.location.pathname);
   const deferActionsUntilListReady = isConsoleV3ProjectListPath(window.location.pathname);
