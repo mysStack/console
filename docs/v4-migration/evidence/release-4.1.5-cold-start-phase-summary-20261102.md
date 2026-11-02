@@ -63,13 +63,30 @@
 - 在本仓库拆包/重编 sealed V3 业务 bundle
 - 为再抠亚秒可见而扩大共享底座改动面
 
+## 观测固化（已落地）
+
+固定 smoke：`scripts/cold-start-baseline-smoke.mjs`
+
+- 覆盖：list 硬刷新冷/暖可见、main 与 HTML 重叠、dashboard 不抢跑、SPA overview→deployments keep-alive
+- 阈值：冷 <5s / 暖 <3.5s / SPA <3s（与 P1 同族）
+- 首次固化证据：`cold-start-baseline-smoke-20261102.json`（pass；冷 1069ms / 暖 1115ms / SPA 1236ms；Pod `…qzv89` 同基线镜像）
+
+运行（建议在 `/tmp/pw-p0`）：
+
+```bash
+cp scripts/cold-start-baseline-smoke.mjs /tmp/pw-p0/
+KS_OUT=docs/v4-migration/evidence/cold-start-baseline-smoke-$(date -u +%Y%m%d).json \
+KS_IMAGE=… KS_IMAGE_ID=… KS_POD=… \
+node /tmp/pw-p0/cold-start-baseline-smoke.mjs
+```
+
 ## 若后续再开项
 
 优先顺序建议：
 
 1. **V3 产物侧**：减小/拆分 sealed `v3dist`（需 V3 构建流水线，不在本 console 补丁循环内）
-2. **观测固化**：把 deployments list 冷/暖可见与 main/html/dashboard 时间线做成固定 smoke，防止回归
-3. 仅当有新的实测竞态证据时，再开小补丁分支
+2. 仅当有新的实测竞态证据时，再开小补丁分支
+3. 回归时先跑 `cold-start-baseline-smoke.mjs`，失败再对照本总结剩余地板
 
 ## 结论
 
