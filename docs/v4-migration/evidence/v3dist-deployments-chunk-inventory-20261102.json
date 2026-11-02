@@ -1,0 +1,243 @@
+{
+  "date": "2026-11-02T07:27:09.939Z",
+  "purpose": "V3 artifact reduction REA input: chunks fetched on cold deployments list",
+  "image": "ghcr.io/mysstack/ks-console:release-4.1.5-merged-20261102-ad724a3",
+  "imageID": "ghcr.io/mysstack/ks-console@sha256:5994c1562f8ab6d59bffac3cf39adb22ffe02801b3cc3da74c86c34485605f6e",
+  "pod": "ks-console-v415-rea-678bbd9d66-qzv89",
+  "deploy": "ks-console-v415-rea @ 192.168.2.131:30881",
+  "visible_ms": 1117,
+  "chunk_count": 16,
+  "bytes_before_visible": 11572553,
+  "bytes_after_visible": 79462,
+  "bytes_total_fetched": 11652015,
+  "before_visible": [
+    {
+      "ms": 431,
+      "rel": "/dist/v3dist/manifest.json",
+      "name": "manifest.json",
+      "type": "fetch",
+      "local_bytes": 27038
+    },
+    {
+      "ms": 434,
+      "rel": "/dist/v3dist/main.39ed81f6e5a43d5bb447.css",
+      "name": "main.39ed81f6e5a43d5bb447.css",
+      "type": "stylesheet",
+      "local_bytes": 129268
+    },
+    {
+      "ms": 434,
+      "rel": "/dist/v3dist/main.558f452048e49db23323.js",
+      "name": "main.558f452048e49db23323.js",
+      "type": "script",
+      "local_bytes": 2024351
+    },
+    {
+      "ms": 816,
+      "rel": "/dist/v3dist/assets/73f0a88bbca1bec19fb1303c689d04c6.woff2",
+      "name": "73f0a88bbca1bec19fb1303c689d04c6.woff2",
+      "type": "font",
+      "local_bytes": null
+    },
+    {
+      "ms": 816,
+      "rel": "/dist/v3dist/assets/4357beb823a5f8d65c260f045d9e019a.woff2",
+      "name": "4357beb823a5f8d65c260f045d9e019a.woff2",
+      "type": "font",
+      "local_bytes": null
+    },
+    {
+      "ms": 817,
+      "rel": "/dist/v3dist/assets/b52fac2bb93c5858f3f2675e4b52e1de.woff2",
+      "name": "b52fac2bb93c5858f3f2675e4b52e1de.woff2",
+      "type": "font",
+      "local_bytes": null
+    },
+    {
+      "ms": 901,
+      "rel": "/dist/v3dist/locale-zh.4dcfc8f8663252717a8c.json",
+      "name": "locale-zh.4dcfc8f8663252717a8c.json",
+      "type": "fetch",
+      "local_bytes": 328973
+    },
+    {
+      "ms": 1000,
+      "rel": "/dist/v3dist/0.79b1d388db9009cab691.js",
+      "name": "0.79b1d388db9009cab691.js",
+      "type": "fetch",
+      "local_bytes": 2052295
+    },
+    {
+      "ms": 1000,
+      "rel": "/dist/v3dist/1.9dcfc2ca150f3eeabe9b.css",
+      "name": "1.9dcfc2ca150f3eeabe9b.css",
+      "type": "fetch",
+      "local_bytes": 514213
+    },
+    {
+      "ms": 1001,
+      "rel": "/dist/v3dist/1.9ca3a76d71946712055c.js",
+      "name": "1.9ca3a76d71946712055c.js",
+      "type": "fetch",
+      "local_bytes": 3194070
+    },
+    {
+      "ms": 1001,
+      "rel": "/dist/v3dist/12.5ab8d0604671d18a395b.css",
+      "name": "12.5ab8d0604671d18a395b.css",
+      "type": "fetch",
+      "local_bytes": 103631
+    },
+    {
+      "ms": 1001,
+      "rel": "/dist/v3dist/12.2a69b0c5dbf5a00a4a8d.js",
+      "name": "12.2a69b0c5dbf5a00a4a8d.js",
+      "type": "fetch",
+      "local_bytes": 985379
+    },
+    {
+      "ms": 1001,
+      "rel": "/dist/v3dist/3.460a788d2dd1417c95c2.css",
+      "name": "3.460a788d2dd1417c95c2.css",
+      "type": "fetch",
+      "local_bytes": 263264
+    },
+    {
+      "ms": 1001,
+      "rel": "/dist/v3dist/3.bb6cbee4309e765b70c1.js",
+      "name": "3.bb6cbee4309e765b70c1.js",
+      "type": "fetch",
+      "local_bytes": 1950071
+    }
+  ],
+  "after_visible": [
+    {
+      "ms": 4369,
+      "rel": "/dist/v3dist/5.cf8d79e7b36287e34d92.css",
+      "name": "5.cf8d79e7b36287e34d92.css",
+      "type": "fetch",
+      "local_bytes": 13761
+    },
+    {
+      "ms": 4370,
+      "rel": "/dist/v3dist/5.b3ebc4536a8f41200f09.js",
+      "name": "5.b3ebc4536a8f41200f09.js",
+      "type": "fetch",
+      "local_bytes": 65701
+    }
+  ],
+  "all": [
+    {
+      "ms": 431,
+      "rel": "/dist/v3dist/manifest.json",
+      "name": "manifest.json",
+      "type": "fetch",
+      "local_bytes": 27038
+    },
+    {
+      "ms": 434,
+      "rel": "/dist/v3dist/main.39ed81f6e5a43d5bb447.css",
+      "name": "main.39ed81f6e5a43d5bb447.css",
+      "type": "stylesheet",
+      "local_bytes": 129268
+    },
+    {
+      "ms": 434,
+      "rel": "/dist/v3dist/main.558f452048e49db23323.js",
+      "name": "main.558f452048e49db23323.js",
+      "type": "script",
+      "local_bytes": 2024351
+    },
+    {
+      "ms": 816,
+      "rel": "/dist/v3dist/assets/73f0a88bbca1bec19fb1303c689d04c6.woff2",
+      "name": "73f0a88bbca1bec19fb1303c689d04c6.woff2",
+      "type": "font",
+      "local_bytes": null
+    },
+    {
+      "ms": 816,
+      "rel": "/dist/v3dist/assets/4357beb823a5f8d65c260f045d9e019a.woff2",
+      "name": "4357beb823a5f8d65c260f045d9e019a.woff2",
+      "type": "font",
+      "local_bytes": null
+    },
+    {
+      "ms": 817,
+      "rel": "/dist/v3dist/assets/b52fac2bb93c5858f3f2675e4b52e1de.woff2",
+      "name": "b52fac2bb93c5858f3f2675e4b52e1de.woff2",
+      "type": "font",
+      "local_bytes": null
+    },
+    {
+      "ms": 901,
+      "rel": "/dist/v3dist/locale-zh.4dcfc8f8663252717a8c.json",
+      "name": "locale-zh.4dcfc8f8663252717a8c.json",
+      "type": "fetch",
+      "local_bytes": 328973
+    },
+    {
+      "ms": 1000,
+      "rel": "/dist/v3dist/0.79b1d388db9009cab691.js",
+      "name": "0.79b1d388db9009cab691.js",
+      "type": "fetch",
+      "local_bytes": 2052295
+    },
+    {
+      "ms": 1000,
+      "rel": "/dist/v3dist/1.9dcfc2ca150f3eeabe9b.css",
+      "name": "1.9dcfc2ca150f3eeabe9b.css",
+      "type": "fetch",
+      "local_bytes": 514213
+    },
+    {
+      "ms": 1001,
+      "rel": "/dist/v3dist/1.9ca3a76d71946712055c.js",
+      "name": "1.9ca3a76d71946712055c.js",
+      "type": "fetch",
+      "local_bytes": 3194070
+    },
+    {
+      "ms": 1001,
+      "rel": "/dist/v3dist/12.5ab8d0604671d18a395b.css",
+      "name": "12.5ab8d0604671d18a395b.css",
+      "type": "fetch",
+      "local_bytes": 103631
+    },
+    {
+      "ms": 1001,
+      "rel": "/dist/v3dist/12.2a69b0c5dbf5a00a4a8d.js",
+      "name": "12.2a69b0c5dbf5a00a4a8d.js",
+      "type": "fetch",
+      "local_bytes": 985379
+    },
+    {
+      "ms": 1001,
+      "rel": "/dist/v3dist/3.460a788d2dd1417c95c2.css",
+      "name": "3.460a788d2dd1417c95c2.css",
+      "type": "fetch",
+      "local_bytes": 263264
+    },
+    {
+      "ms": 1001,
+      "rel": "/dist/v3dist/3.bb6cbee4309e765b70c1.js",
+      "name": "3.bb6cbee4309e765b70c1.js",
+      "type": "fetch",
+      "local_bytes": 1950071
+    },
+    {
+      "ms": 4369,
+      "rel": "/dist/v3dist/5.cf8d79e7b36287e34d92.css",
+      "name": "5.cf8d79e7b36287e34d92.css",
+      "type": "fetch",
+      "local_bytes": 13761
+    },
+    {
+      "ms": 4370,
+      "rel": "/dist/v3dist/5.b3ebc4536a8f41200f09.js",
+      "name": "5.b3ebc4536a8f41200f09.js",
+      "type": "fetch",
+      "local_bytes": 65701
+    }
+  ]
+}
