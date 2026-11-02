@@ -58,12 +58,15 @@ export function initWujie() {
   };
 
   // Listen before any preload so list landings can start actions only after
-  // the shared consolev3 app has finished loading (not on a wall-clock delay).
+  // consolev3 reports ready. A further fixed delay avoids racing late list
+  // chunks / parse with a second V3 dashboard boot (idle callbacks used to
+  // fire mid-boot; loadCompleted alone still starts too early).
+  const LIST_ACTIONS_PRELOAD_DELAY_MS = 2000;
   bus.$on('loadCompleted', (name: string) => {
     if (name !== 'consolev3') return;
     setGlobalConsoleV3LoadCompleted({ value: true });
     if (deferActionsUntilListReady) {
-      preloadActionsOnce();
+      window.setTimeout(preloadActionsOnce, LIST_ACTIONS_PRELOAD_DELAY_MS);
     }
   });
 
