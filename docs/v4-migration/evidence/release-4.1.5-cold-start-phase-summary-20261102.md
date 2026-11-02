@@ -84,7 +84,8 @@ node /tmp/pw-p0/cold-start-baseline-smoke.mjs
 
 优先顺序建议：
 
-1. **V3 产物侧**：减小/拆分 sealed `v3dist`（需 V3 构建流水线，不在本 console 补丁循环内）
+1. **V3 产物侧**：减小/拆分 sealed `v3dist`（需 V3 构建流水线，不在本 console 补丁循环内）  
+   已开项取证：`v3dist-deployments-chunk-inventory-20261102.json`、`v3dist-reduction-next-track-20261102.md`（可见前 ≈11 MiB / 14 资源）
 2. 仅当有新的实测竞态证据时，再开小补丁分支
 3. 回归时先跑 `cold-start-baseline-smoke.mjs`，失败再对照本总结剩余地板
 
