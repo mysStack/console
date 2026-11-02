@@ -1,0 +1,32 @@
+{
+  "date": "2026-11-02T05:31:22.061Z",
+  "branch": "fix/release-4.1.5-v3-cold-start",
+  "code_tip": "a81c0fca5",
+  "image": "ghcr.io/mysstack/ks-console:release-4.1.5-merged-20261102-ad724a3",
+  "imageID": "ghcr.io/mysstack/ks-console@sha256:5994c1562f8ab6d59bffac3cf39adb22ffe02801b3cc3da74c86c34485605f6e",
+  "pod": "ks-console-v415-rea-678bbd9d66-qzv89",
+  "deploy": "ks-console-v415-rea @ 192.168.2.131:30881",
+  "focus": "correctness after seed narrow / husk retry / alive cleanup",
+  "cases": {
+    "hard_refresh_list": {
+      "visible_from_poll_start_ms": 2203,
+      "child_list_gets": [],
+      "host_seed_keys": [],
+      "pass": true
+    },
+    "spa_overview_to_deployments": {
+      "wall_ms": 2381,
+      "visible_from_poll_start_ms": 1511,
+      "child_list_gets": [],
+      "pass": true
+    },
+    "seed_key_shape": {
+      "host_seed_keys": [],
+      "list_keys": [],
+      "detail_like": [],
+      "log_like": [],
+      "pass": true
+    }
+  },
+  "pass": true
+}
