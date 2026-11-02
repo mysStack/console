@@ -1,0 +1,184 @@
+{
+  "date": "2026-11-02T05:31:46.511Z",
+  "branch": "release-4.1.5",
+  "code_tip": "ad724a38b",
+  "image": "ghcr.io/mysstack/ks-console:release-4.1.5-merged-20261102-ad724a3",
+  "imageID": "ghcr.io/mysstack/ks-console@sha256:5994c1562f8ab6d59bffac3cf39adb22ffe02801b3cc3da74c86c34485605f6e",
+  "deploy": "ks-console-v415-rea @ 192.168.2.131:30881",
+  "method": "Playwright chromium-1243; SPA = same-document <a> click; visible = iframe path+body text; hard refresh = goto deployments",
+  "historical_reference": {
+    "husk_overview_to_deployments_ms": 7653,
+    "source": "cold-start-spa-alive-fix-20261030.json",
+    "p0_full_retest_cold_ms": 3080,
+    "p0_full_retest_warm_ms": 1965,
+    "source_p0": "cold-start-p0-full-retest-20261031.json"
+  },
+  "thresholds_ms": {
+    "hard_refresh_cold_ms": 5000,
+    "hard_refresh_warm_ms": 3500,
+    "spa_activate_ms": 3000
+  },
+  "cases": {
+    "hard_refresh_cold": {
+      "clearSession": true,
+      "visible_from_poll_start_ms": 2292,
+      "visibleAt_perf_now": 2999,
+      "renderMark_ms": 2176,
+      "host_crd": [
+        {
+          "n": "/kapis/clusters/host/resources.kubesphere.io/v1alpha3/customresourcedefinitions",
+          "s": 648,
+          "e": 2086,
+          "d": 1438
+        }
+      ],
+      "dashboard": [
+        {
+          "n": "/consolev3/dashboard",
+          "s": 4860,
+          "e": 4992,
+          "d": 133
+        }
+      ],
+      "dashBeforeRender": [],
+      "dashAfterRender_ms": 2684
+    },
+    "hard_refresh_warm": {
+      "clearSession": false,
+      "visible_from_poll_start_ms": 1152,
+      "visibleAt_perf_now": 1663,
+      "renderMark_ms": 1038,
+      "host_crd": [],
+      "dashboard": [],
+      "dashBeforeRender": [],
+      "dashAfterRender_ms": null
+    },
+    "overview_to_deployments": {
+      "nav_wall_ms": 1872,
+      "visibleAt_perf_now": 1828,
+      "visible_from_poll_start_ms": 1112,
+      "overview_before": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/overview"
+      },
+      "after": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments"
+      },
+      "pass": true
+    },
+    "jobs_detail_to_list": {
+      "skipped": false,
+      "detail_path": "/dev-workspace/clusters/host/projects/dev-wes/jobs/ams-29893292",
+      "nav_wall_ms": 1536,
+      "visibleAt_perf_now": 1449,
+      "visible_from_poll_start_ms": 865,
+      "detail_before": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/jobs/ams-29893292"
+      },
+      "after": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/jobs"
+      },
+      "pass": true
+    },
+    "cronjobs_detail_to_list": {
+      "skipped": false,
+      "detail_path": "/dev-workspace/clusters/host/projects/dev-wes/cronjobs/wes-v2",
+      "nav_wall_ms": 1468,
+      "visibleAt_perf_now": 1460,
+      "visible_from_poll_start_ms": 1069,
+      "detail_before": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/cronjobs/wes-v2"
+      },
+      "after": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/cronjobs"
+      },
+      "pass": true
+    },
+    "pods_detail_to_list": {
+      "skipped": false,
+      "detail_path": "/dev-workspace/clusters/host/projects/dev-wes/pods/ams-29893292-tj9bn",
+      "nav_wall_ms": 1366,
+      "visibleAt_perf_now": 1350,
+      "visible_from_poll_start_ms": 953,
+      "detail_before": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/pods/ams-29893292-tj9bn"
+      },
+      "after": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/pods"
+      },
+      "pass": true
+    },
+    "deployments_detail_to_list": {
+      "skipped": false,
+      "detail_path": "/dev-workspace/clusters/host/projects/dev-wes/deployments/wes-v2-server",
+      "nav_wall_ms": 1714,
+      "visibleAt_perf_now": 1581,
+      "visible_from_poll_start_ms": 1140,
+      "detail_before": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments/wes-v2-server"
+      },
+      "after": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments"
+      },
+      "pass": true
+    },
+    "cluster_overview_to_deployments": {
+      "nav_wall_ms": 1678,
+      "visibleAt_perf_now": 1674,
+      "visible_from_poll_start_ms": 1341,
+      "overview_before": {
+        "alive": false,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dashboard"
+      },
+      "after": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/clusters/host/deployments"
+      },
+      "pass": true
+    }
+  },
+  "gates": {
+    "p0": {
+      "cold_under_threshold": true,
+      "warm_under_threshold": true,
+      "cold_still_primes_crd_once": true,
+      "warm_skips_host_crd": true,
+      "dashboard_never_before_render_cold": true,
+      "dashboard_never_before_render_warm": true
+    },
+    "spa": {
+      "overview_to_deployments": true,
+      "jobs_detail_to_list": true,
+      "cronjobs_detail_to_list": true,
+      "pods_detail_to_list": true,
+      "deployments_detail_to_list": true,
+      "cluster_overview_to_deployments": true
+    },
+    "p0_pass": true,
+    "spa_pass": true
+  },
+  "pass": true,
+  "conclusion": "\u5b8c\u6574\u590d\u6d4b\u901a\u8fc7\uff1aP0 \u51b7/\u6696\u786c\u5237\u65b0\u95e8\u7981\u4fdd\u6301\uff0cP1 SPA \u8be6\u60c5/\u6982\u89c8\u5f80\u8fd4\u5747\u5728 keep-alive \u6fc0\u6d3b\u9608\u503c\u5185\uff08\u65e0\u7a7a\u58f3\u51b7\u542f\u52a8\u91cf\u7ea7\uff09\u3002",
+  "pod": "ks-console-v415-rea-678bbd9d66-qzv89"
+}
