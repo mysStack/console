@@ -64,10 +64,11 @@ export function initWujie() {
   const LIST_ACTIONS_PRELOAD_DELAY_MS = 2000;
   bus.$on('loadCompleted', (name: string) => {
     if (name !== 'consolev3') return;
-    setGlobalConsoleV3LoadCompleted({ value: true });
+    // Schedule actions first so a missing `window.globals` cannot skip preload.
     if (deferActionsUntilListReady) {
       window.setTimeout(preloadActionsOnce, LIST_ACTIONS_PRELOAD_DELAY_MS);
     }
+    setGlobalConsoleV3LoadCompleted({ value: true });
   });
 
   setupApp({
