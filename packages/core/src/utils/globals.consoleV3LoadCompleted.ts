@@ -9,6 +9,9 @@ export function getGlobalConsoleV3LoadCompleted() {
 }
 
 export function setGlobalConsoleV3LoadCompleted({ value }: { value: boolean }) {
+  // Host boot can emit loadCompleted before `window.globals` is assigned.
+  // @ts-expect-error
+  if (!window.globals) window.globals = {};
   // @ts-expect-error
   window.globals.consoleV3LoadCompleted = value;
 }

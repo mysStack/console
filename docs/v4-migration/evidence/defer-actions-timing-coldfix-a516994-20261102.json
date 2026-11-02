@@ -1,0 +1,69 @@
+{
+  "date": "2026-11-02T02:55:13.010Z",
+  "image": "ghcr.io/mysstack/ks-console:release-4.1.5-defer-actions-20261102-a516994",
+  "imageID": "ghcr.io/mysstack/ks-console@sha256:5c0021f120fced7b185b42c598ac77939a22542586cd0885e6450b305c0cbf08",
+  "pod": "ks-console-v415-rea-f6b55b8bc-xnzh6",
+  "commit": "a5169945b",
+  "baseline_merged_dashboard_start_ms": 2693,
+  "cold": {
+    "clearSession": true,
+    "visible_ms": 954,
+    "renderMark_ms": null,
+    "loadCompleted_flag": true,
+    "first_dashboard_ms": 3191,
+    "dashboard_count": 1,
+    "dashboard": [
+      {
+        "ms": 3191,
+        "rel": "/consolev3/dashboard",
+        "type": "fetch"
+      }
+    ],
+    "list_html": [
+      {
+        "ms": 489,
+        "rel": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments",
+        "type": "fetch"
+      }
+    ],
+    "chunk_count": 22,
+    "last_chunk_ms": 3593,
+    "dash_minus_visible_ms": 2237,
+    "dash_minus_render_ms": null
+  },
+  "warm": {
+    "clearSession": false,
+    "visible_ms": 1136,
+    "renderMark_ms": null,
+    "loadCompleted_flag": true,
+    "first_dashboard_ms": 3273,
+    "dashboard_count": 1,
+    "dashboard": [
+      {
+        "ms": 3273,
+        "rel": "/consolev3/dashboard",
+        "type": "fetch"
+      }
+    ],
+    "list_html": [
+      {
+        "ms": 483,
+        "rel": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments",
+        "type": "fetch"
+      }
+    ],
+    "chunk_count": 23,
+    "last_chunk_ms": 3527,
+    "dash_minus_visible_ms": 2137,
+    "dash_minus_render_ms": null
+  },
+  "gates": {
+    "dashboard_still_preloads_cold": true,
+    "dashboard_still_preloads_warm": true,
+    "cold_dash_after_list_html": true,
+    "warm_dash_after_list_html": true,
+    "cold_list_visible": true,
+    "warm_list_visible": true
+  },
+  "pass": true
+}

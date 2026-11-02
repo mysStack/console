@@ -1,0 +1,74 @@
+{
+  "date": "2026-11-02T02:15:01.759Z",
+  "image": "ghcr.io/mysstack/ks-console:release-4.1.5-defer-actions-20261102-d475030",
+  "imageID": "ghcr.io/mysstack/ks-console@sha256:29fba0e139b34042cddb3fcc31e28fe1851bb2053acb95ad2302174c0e900e59",
+  "pod": "ks-console-v415-rea-894f864cc-pfkjr",
+  "deploy": "ks-console-v415-rea @ 192.168.2.131:30881",
+  "commit": "d4750300f",
+  "change": "loadCompleted + 2000ms before consoleV3Actions dashboard preload",
+  "cold": {
+    "clearSession": true,
+    "visible_from_poll_start_ms": 5073,
+    "visibleAt_perf_now": 5725,
+    "renderMark_ms": 6471,
+    "host_crd": [
+      {
+        "n": "/kapis/clusters/host/resources.kubesphere.io/v1alpha3/customresourcedefinitions",
+        "s": 642,
+        "e": 1843,
+        "d": 1200,
+        "transfer": 334
+      }
+    ],
+    "dashboard": [],
+    "list_html": [
+      {
+        "n": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments",
+        "s": 664,
+        "e": 1145,
+        "d": 482,
+        "transfer": 6413
+      }
+    ],
+    "chunks_count": 12,
+    "last_chunk_end_ms": 6797,
+    "dashBeforeRender": [],
+    "dashAfterRender_ms": null,
+    "dash_vs_last_chunk_ms": null,
+    "first_dash_start_ms": null
+  },
+  "warm": {
+    "clearSession": false,
+    "visible_from_poll_start_ms": 1258,
+    "visibleAt_perf_now": 1729,
+    "renderMark_ms": 1057,
+    "host_crd": [],
+    "dashboard": [],
+    "list_html": [
+      {
+        "n": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments",
+        "s": 443,
+        "e": 699,
+        "d": 256,
+        "transfer": 6413
+      }
+    ],
+    "chunks_count": 12,
+    "last_chunk_end_ms": 1058,
+    "dashBeforeRender": [],
+    "dashAfterRender_ms": null,
+    "dash_vs_last_chunk_ms": null,
+    "first_dash_start_ms": null
+  },
+  "gates": {
+    "cold_no_dash_before_render": true,
+    "warm_no_dash_before_render": true,
+    "cold_dash_after_render_ge_1500": true,
+    "warm_dash_after_render_ge_1500": true,
+    "cold_list_visible": true,
+    "warm_list_visible": true
+  },
+  "pass": true,
+  "baseline_merged_dashboard_start_ms": 2693,
+  "baseline_merged_last_chunk_end_ms": 3357
+}

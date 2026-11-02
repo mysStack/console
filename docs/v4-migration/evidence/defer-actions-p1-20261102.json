@@ -1,0 +1,176 @@
+{
+  "date": "2026-11-02T02:15:31.099Z",
+  "branch": "fix/release-4.1.5-v3-cold-start",
+  "code_tip": "3efbe6c27",
+  "image": "ghcr.io/mysstack/ks-console:release-4.1.5-cold-start-20261031-3efbe6c",
+  "imageID": "ghcr.io/mysstack/ks-console@sha256:e5245c73348789174b8fb4ed3c4203ab5c8fbf7146f1b7da0a38ca588a1d0616",
+  "deploy": "ks-console-v415-rea @ 192.168.2.131:30881",
+  "method": "Playwright chromium-1243; SPA = same-document <a> click; visible = iframe path+body text; hard refresh = goto deployments",
+  "historical_reference": {
+    "husk_overview_to_deployments_ms": 7653,
+    "source": "cold-start-spa-alive-fix-20261030.json",
+    "p0_full_retest_cold_ms": 3080,
+    "p0_full_retest_warm_ms": 1965,
+    "source_p0": "cold-start-p0-full-retest-20261031.json"
+  },
+  "thresholds_ms": {
+    "hard_refresh_cold_ms": 5000,
+    "hard_refresh_warm_ms": 3500,
+    "spa_activate_ms": 3000
+  },
+  "cases": {
+    "hard_refresh_cold": {
+      "clearSession": true,
+      "visible_from_poll_start_ms": 3311,
+      "visibleAt_perf_now": 4010,
+      "renderMark_ms": 3507,
+      "host_crd": [
+        {
+          "n": "/kapis/clusters/host/resources.kubesphere.io/v1alpha3/customresourcedefinitions",
+          "s": 647,
+          "e": 2902,
+          "d": 2255
+        }
+      ],
+      "dashboard": [],
+      "dashBeforeRender": [],
+      "dashAfterRender_ms": null
+    },
+    "hard_refresh_warm": {
+      "clearSession": false,
+      "visible_from_poll_start_ms": 1155,
+      "visibleAt_perf_now": 1582,
+      "renderMark_ms": 1228,
+      "host_crd": [],
+      "dashboard": [],
+      "dashBeforeRender": [],
+      "dashAfterRender_ms": null
+    },
+    "overview_to_deployments": {
+      "nav_wall_ms": 1411,
+      "visibleAt_perf_now": 1404,
+      "visible_from_poll_start_ms": 982,
+      "overview_before": {
+        "alive": false,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dashboard"
+      },
+      "after": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments"
+      },
+      "pass": true
+    },
+    "jobs_detail_to_list": {
+      "skipped": false,
+      "detail_path": "/dev-workspace/clusters/host/projects/dev-wes/jobs/ams-29893096",
+      "nav_wall_ms": 1770,
+      "visibleAt_perf_now": 1717,
+      "visible_from_poll_start_ms": 1326,
+      "detail_before": {
+        "alive": false,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dashboard"
+      },
+      "after": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/jobs"
+      },
+      "pass": true
+    },
+    "cronjobs_detail_to_list": {
+      "skipped": false,
+      "detail_path": "/dev-workspace/clusters/host/projects/dev-wes/cronjobs/wes-v2",
+      "nav_wall_ms": 1809,
+      "visibleAt_perf_now": 1796,
+      "visible_from_poll_start_ms": 1325,
+      "detail_before": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/cronjobs/wes-v2"
+      },
+      "after": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/cronjobs"
+      },
+      "pass": true
+    },
+    "pods_detail_to_list": {
+      "skipped": false,
+      "detail_path": "/dev-workspace/clusters/host/projects/dev-wes/pods/ams-29893096-qrz7f",
+      "nav_wall_ms": 1610,
+      "visibleAt_perf_now": 1607,
+      "visible_from_poll_start_ms": 1231,
+      "detail_before": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/pods/ams-29893096-qrz7f"
+      },
+      "after": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/pods"
+      },
+      "pass": true
+    },
+    "deployments_detail_to_list": {
+      "skipped": false,
+      "detail_path": "/dev-workspace/clusters/host/projects/dev-wes/deployments/wes-v2-server",
+      "nav_wall_ms": 1705,
+      "visibleAt_perf_now": 1701,
+      "visible_from_poll_start_ms": 1317,
+      "detail_before": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments/wes-v2-server"
+      },
+      "after": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments"
+      },
+      "pass": true
+    },
+    "cluster_overview_to_deployments": {
+      "nav_wall_ms": 2169,
+      "visibleAt_perf_now": 2158,
+      "visible_from_poll_start_ms": 1766,
+      "overview_before": {
+        "alive": false,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/dashboard"
+      },
+      "after": {
+        "alive": true,
+        "shadowKids": 1,
+        "iframePath": "/consolev3/clusters/host/deployments"
+      },
+      "pass": true
+    }
+  },
+  "gates": {
+    "p0": {
+      "cold_under_threshold": true,
+      "warm_under_threshold": true,
+      "cold_still_primes_crd_once": true,
+      "warm_skips_host_crd": true,
+      "dashboard_never_before_render_cold": true,
+      "dashboard_never_before_render_warm": true
+    },
+    "spa": {
+      "overview_to_deployments": true,
+      "jobs_detail_to_list": true,
+      "cronjobs_detail_to_list": true,
+      "pods_detail_to_list": true,
+      "deployments_detail_to_list": true,
+      "cluster_overview_to_deployments": true
+    },
+    "p0_pass": true,
+    "spa_pass": true
+  },
+  "pass": true,
+  "conclusion": "完整复测通过：P0 冷/暖硬刷新门禁保持，P1 SPA 详情/概览往返均在 keep-alive 激活阈值内（无空壳冷启动量级）。"
+}

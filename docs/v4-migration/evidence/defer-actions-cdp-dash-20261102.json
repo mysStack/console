@@ -1,0 +1,128 @@
+{
+  "date": "2026-11-02T02:28:51.751Z",
+  "visibleWall_ms": 3479,
+  "samples": [
+    {
+      "now": 4145,
+      "loadCompleted": null,
+      "pathname": "/dev-workspace/clusters/host/projects/dev-wes/deployments",
+      "res": [],
+      "wujie": [
+        {
+          "id": "consolev3"
+        }
+      ]
+    },
+    {
+      "now": 5648,
+      "loadCompleted": null,
+      "pathname": "/dev-workspace/clusters/host/projects/dev-wes/deployments",
+      "res": [],
+      "wujie": [
+        {
+          "id": "consolev3"
+        }
+      ]
+    },
+    {
+      "now": 7154,
+      "loadCompleted": null,
+      "pathname": "/dev-workspace/clusters/host/projects/dev-wes/deployments",
+      "res": [],
+      "wujie": [
+        {
+          "id": "consolev3"
+        }
+      ]
+    },
+    {
+      "now": 8659,
+      "loadCompleted": null,
+      "pathname": "/dev-workspace/clusters/host/projects/dev-wes/deployments",
+      "res": [],
+      "wujie": [
+        {
+          "id": "consolev3"
+        }
+      ]
+    },
+    {
+      "now": 10163,
+      "loadCompleted": null,
+      "pathname": "/dev-workspace/clusters/host/projects/dev-wes/deployments",
+      "res": [],
+      "wujie": [
+        {
+          "id": "consolev3"
+        }
+      ]
+    },
+    {
+      "now": 11668,
+      "loadCompleted": null,
+      "pathname": "/dev-workspace/clusters/host/projects/dev-wes/deployments",
+      "res": [],
+      "wujie": [
+        {
+          "id": "consolev3"
+        }
+      ]
+    },
+    {
+      "now": 13172,
+      "loadCompleted": null,
+      "pathname": "/dev-workspace/clusters/host/projects/dev-wes/deployments",
+      "res": [],
+      "wujie": [
+        {
+          "id": "consolev3"
+        }
+      ]
+    },
+    {
+      "now": 14675,
+      "loadCompleted": null,
+      "pathname": "/dev-workspace/clusters/host/projects/dev-wes/deployments",
+      "res": [],
+      "wujie": [
+        {
+          "id": "consolev3"
+        }
+      ]
+    }
+  ],
+  "net_consolev3": [
+    {
+      "t": 2567,
+      "wall": 1793586513969,
+      "url": "/consolev3/dashboard",
+      "type": "fetch"
+    },
+    {
+      "t": 4175,
+      "wall": 1793586515576,
+      "url": "/consolev3/dashboard",
+      "type": "fetch"
+    },
+    {
+      "t": 4849,
+      "wall": 1793586516251,
+      "url": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments",
+      "type": "fetch"
+    }
+  ],
+  "net_dashboard": [
+    {
+      "t": 2567,
+      "wall": 1793586513969,
+      "url": "/consolev3/dashboard",
+      "type": "fetch"
+    },
+    {
+      "t": 4175,
+      "wall": 1793586515576,
+      "url": "/consolev3/dashboard",
+      "type": "fetch"
+    }
+  ]
+}

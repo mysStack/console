@@ -351,10 +351,12 @@ test('initWujie defers actions dashboard preload until consolev3 is ready', () =
   const source = readFileSync(__filename.replace(/[^/]+$/, 'wujie.ts'), 'utf8');
   assert.match(source, /isConsoleV3ProjectListPath/);
   assert.match(source, /consoleV3Actions/);
-  // List landings wait for consolev3 `loadCompleted`, not a magic timer.
-  assert.doesNotMatch(source, /setTimeout\(preloadActions/);
-  assert.doesNotMatch(source, /requestIdleCallback/);
+  // List landings: loadCompleted, then a fixed post-ready delay (not an
+  // idle-callback schedule, which used to fire mid-boot).
   assert.match(source, /loadCompleted/);
+  assert.match(source, /setTimeout\(preloadActionsOnce,\s*LIST_ACTIONS_PRELOAD_DELAY_MS\)/);
+  assert.match(source, /LIST_ACTIONS_PRELOAD_DELAY_MS\s*=\s*2000/);
+  assert.doesNotMatch(source, /requestIdleCallback/);
   assert.match(source, /preloadActionsOnce/);
   assert.match(source, /deferActionsUntilListReady/);
 });
