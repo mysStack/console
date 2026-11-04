@@ -1,0 +1,166 @@
+{
+  "date": "2026-11-03T08:52:21.624Z",
+  "base": "http://192.168.2.131:30881",
+  "method": "fresh context each case; CDP Network.setCacheDisabled for true_cold; no pre-hydrate; visible=tbody names or textRe",
+  "true_cold": [
+    {
+      "id": "dev-web/deployments",
+      "path": "/dev-workspace/clusters/host/projects/dev-web/deployments",
+      "disableCache": true,
+      "domcontentloaded_ms": 2493,
+      "visible_ms": 5295,
+      "total_wall_ms": 7789,
+      "visible": {
+        "ms": 5295,
+        "mode": "rows",
+        "names": ["web-wes-v2", "web-wms", "web-matrix", "web-rms-map", "web-wms-h5"],
+        "rowCount": 7
+      },
+      "resStats": {
+        "v3_count": 14,
+        "transfer_sum": 3463623,
+        "encoded_sum": 3459423,
+        "cached_like": 0,
+        "last_end": 7777
+      }
+    },
+    {
+      "id": "dev-wes/deployments",
+      "path": "/dev-workspace/clusters/host/projects/dev-wes/deployments",
+      "disableCache": true,
+      "domcontentloaded_ms": 2042,
+      "visible_ms": 4843,
+      "total_wall_ms": 6885,
+      "visible": {
+        "ms": 4843,
+        "mode": "rows",
+        "names": ["wes-v2-server", "ams-server", "hip-server"],
+        "rowCount": 3
+      },
+      "resStats": {
+        "v3_count": 12,
+        "transfer_sum": 3333651,
+        "encoded_sum": 3330051,
+        "cached_like": 0,
+        "last_end": 6381
+      }
+    },
+    {
+      "id": "dev-wes/overview",
+      "path": "/dev-workspace/clusters/host/projects/dev-wes/overview",
+      "disableCache": true,
+      "domcontentloaded_ms": 1372,
+      "visible_ms": 5684,
+      "total_wall_ms": 7056,
+      "visible": {
+        "ms": 5684,
+        "mode": "text",
+        "sample": "概览 0 容器组 0 部署 0 有状态副本集 0 守护进程集 0 任务 0 定时任务 0 持久卷声明 0 服务 0 应用路由 项目配额 CPU 上限 资源类型 "
+      },
+      "resStats": {
+        "v3_count": 13,
+        "transfer_sum": 2840211,
+        "encoded_sum": 2836311,
+        "cached_like": 0,
+        "last_end": 5991
+      }
+    },
+    {
+      "id": "dev-wes/pods",
+      "path": "/dev-workspace/clusters/host/projects/dev-wes/pods",
+      "disableCache": true,
+      "domcontentloaded_ms": 1865,
+      "visible_ms": 3539,
+      "total_wall_ms": 5404,
+      "visible": {
+        "ms": 3539,
+        "mode": "rows",
+        "names": [
+          "ams-29894932-dc8vr",
+          "dev01（192.168.2.131）",
+          "wes-v2-29894910-f85kh",
+          "dev01（192.168.2.131）",
+          "wes-v2-server-6d77d5d949-nhvxh"
+        ],
+        "rowCount": 6
+      },
+      "resStats": {
+        "v3_count": 12,
+        "transfer_sum": 3333651,
+        "encoded_sum": 3330051,
+        "cached_like": 0,
+        "last_end": 4094
+      }
+    },
+    {
+      "id": "dev-wes/services",
+      "path": "/dev-workspace/clusters/host/projects/dev-wes/services",
+      "disableCache": true,
+      "domcontentloaded_ms": 2668,
+      "visible_ms": 4472,
+      "total_wall_ms": 7140,
+      "visible": {
+        "ms": 4472,
+        "mode": "rows",
+        "names": ["hip-service", "wes-v2-service", "ams-service"],
+        "rowCount": 3
+      },
+      "resStats": {
+        "v3_count": 14,
+        "transfer_sum": 3463623,
+        "encoded_sum": 3459423,
+        "cached_like": 0,
+        "last_end": 6379
+      }
+    },
+    {
+      "id": "cluster/nodes",
+      "path": "/clusters/host/nodes",
+      "error": "Error: timeout /nodes"
+    }
+  ],
+  "cache_allowed_fresh_context": [
+    {
+      "id": "dev-web/deployments",
+      "path": "/dev-workspace/clusters/host/projects/dev-web/deployments",
+      "disableCache": false,
+      "domcontentloaded_ms": 1128,
+      "visible_ms": 4751,
+      "total_wall_ms": 5879,
+      "visible": {
+        "ms": 4751,
+        "mode": "rows",
+        "names": ["web-wes-v2", "web-wms", "web-matrix", "web-rms-map", "web-wms-h5"],
+        "rowCount": 7
+      },
+      "resStats": {
+        "v3_count": 14,
+        "transfer_sum": 2827675,
+        "encoded_sum": 3459423,
+        "cached_like": 2,
+        "last_end": 5721
+      }
+    },
+    {
+      "id": "dev-wes/deployments",
+      "path": "/dev-workspace/clusters/host/projects/dev-wes/deployments",
+      "disableCache": false,
+      "domcontentloaded_ms": 892,
+      "visible_ms": 22163,
+      "total_wall_ms": 23055,
+      "visible": {
+        "ms": 22163,
+        "mode": "rows",
+        "names": ["wes-v2-server", "ams-server", "hip-server"],
+        "rowCount": 3
+      },
+      "resStats": {
+        "v3_count": 14,
+        "transfer_sum": 2806532,
+        "encoded_sum": 3459423,
+        "cached_like": 3,
+        "last_end": 23027
+      }
+    }
+  ]
+}
