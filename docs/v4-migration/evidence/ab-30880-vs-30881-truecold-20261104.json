@@ -1,0 +1,212 @@
+{
+  "date": "2026-11-04T07:07:10.553Z",
+  "note_port_30080": "192.168.2.131:30080 is watchalert-web (title React App), NOT KubeSphere Console. Old console NodePort is 30880 (ks-console).",
+  "method": "true cold: fresh BrowserContext + CDP Network.setCacheDisabled; login; FIRST navigation; no prehydrate",
+  "hosts": [
+    {
+      "id": "30880-old-ks-console",
+      "base": "http://192.168.2.131:30880"
+    },
+    {
+      "id": "30881-v415-rea",
+      "base": "http://192.168.2.131:30881"
+    }
+  ],
+  "cases": ["dev-wes/deployments", "dev-web/deployments", "dev-wes/pods"],
+  "results": [
+    {
+      "host": "30880-old-ks-console",
+      "base": "http://192.168.2.131:30880",
+      "case": "dev-wes/deployments",
+      "path": "/dev-workspace/clusters/host/projects/dev-wes/deployments",
+      "method": "true_cold_nocache_no_prehydrate",
+      "domcontentloaded_ms": 2299,
+      "visible_ms": 4344,
+      "total_wall_ms": 6683,
+      "visible": {
+        "ms": 4344,
+        "mode": "host-text",
+        "sample": "扩展市场 应用商店 工作台 admin platform-admin dev-wes wes服务 概览 应用负载 应用 服务 工作负载 任务 应用路由 容器组 "
+      },
+      "transfer": {
+        "v3_count": 0,
+        "v3_transfer_sum": 0,
+        "v3_cached_like": 0,
+        "js_transfer_sum": 2997308,
+        "js_count": 15
+      },
+      "rejects_as_false_cold": false,
+      "pass": true
+    },
+    {
+      "host": "30881-v415-rea",
+      "base": "http://192.168.2.131:30881",
+      "case": "dev-wes/deployments",
+      "path": "/dev-workspace/clusters/host/projects/dev-wes/deployments",
+      "method": "true_cold_nocache_no_prehydrate",
+      "domcontentloaded_ms": 1694,
+      "visible_ms": 5345,
+      "total_wall_ms": 7049,
+      "visible": {
+        "ms": 5345,
+        "mode": "nameRe",
+        "sample": "工作负载 工作负载（Workload）用于处理业务请求，可包含一个或多个容器组。日志、监控等系统功能也是由工作负载实现的。 部署 有状态副本集 守护进程集 名称"
+      },
+      "transfer": {
+        "v3_count": 14,
+        "v3_transfer_sum": 3463623,
+        "v3_cached_like": 0,
+        "js_transfer_sum": 8373937,
+        "js_count": 21
+      },
+      "rejects_as_false_cold": false,
+      "pass": true
+    },
+    {
+      "host": "30880-old-ks-console",
+      "base": "http://192.168.2.131:30880",
+      "case": "dev-web/deployments",
+      "path": "/dev-workspace/clusters/host/projects/dev-web/deployments",
+      "method": "true_cold_nocache_no_prehydrate",
+      "domcontentloaded_ms": 1426,
+      "visible_ms": 1867,
+      "total_wall_ms": 3317,
+      "visible": {
+        "ms": 1867,
+        "mode": "host-text",
+        "sample": "扩展市场 应用商店 工作台 admin platform-admin dev-web 前端服务 概览 应用负载 应用 服务 工作负载 任务 应用路由 容器组 存"
+      },
+      "transfer": {
+        "v3_count": 0,
+        "v3_transfer_sum": 0,
+        "v3_cached_like": 0,
+        "js_transfer_sum": 2997308,
+        "js_count": 15
+      },
+      "rejects_as_false_cold": false,
+      "pass": true
+    },
+    {
+      "host": "30881-v415-rea",
+      "base": "http://192.168.2.131:30881",
+      "case": "dev-web/deployments",
+      "path": "/dev-workspace/clusters/host/projects/dev-web/deployments",
+      "method": "true_cold_nocache_no_prehydrate",
+      "domcontentloaded_ms": 1960,
+      "visible_ms": 19814,
+      "total_wall_ms": 21847,
+      "visible": {
+        "ms": 19814,
+        "mode": "nameRe",
+        "sample": " 工作负载工作负载（Workload）用于处理业务请求，可包含一个或多个容器组。日志、监控等系统功能也是由工作负载实现的。部署有状态副本集守护进程集名称状态应用"
+      },
+      "transfer": {
+        "v3_count": 12,
+        "v3_transfer_sum": 3333651,
+        "v3_cached_like": 0,
+        "js_transfer_sum": 6729485,
+        "js_count": 19
+      },
+      "rejects_as_false_cold": false,
+      "pass": true
+    },
+    {
+      "host": "30880-old-ks-console",
+      "base": "http://192.168.2.131:30880",
+      "case": "dev-wes/pods",
+      "path": "/dev-workspace/clusters/host/projects/dev-wes/pods",
+      "method": "true_cold_nocache_no_prehydrate",
+      "domcontentloaded_ms": 1929,
+      "visible_ms": 4729,
+      "total_wall_ms": 6675,
+      "visible": {
+        "ms": 4729,
+        "mode": "rows",
+        "names": [
+          "ams-29896266-v8rck",
+          "dev01（192.168.2.131）",
+          "wes-v2-29896260-th529",
+          "dev01（192.168.2.131）",
+          "wes-v2-bench-baseline-989f66d9c-h58w5"
+        ]
+      },
+      "transfer": {
+        "v3_count": 11,
+        "v3_transfer_sum": 2815341,
+        "v3_cached_like": 0,
+        "js_transfer_sum": 5485532,
+        "js_count": 20
+      },
+      "rejects_as_false_cold": false,
+      "pass": true
+    },
+    {
+      "host": "30881-v415-rea",
+      "base": "http://192.168.2.131:30881",
+      "case": "dev-wes/pods",
+      "path": "/dev-workspace/clusters/host/projects/dev-wes/pods",
+      "method": "true_cold_nocache_no_prehydrate",
+      "domcontentloaded_ms": 2065,
+      "visible_ms": 3498,
+      "total_wall_ms": 5579,
+      "visible": {
+        "ms": 3498,
+        "mode": "rows",
+        "names": [
+          "ams-29896266-v8rck",
+          "dev01（192.168.2.131）",
+          "wes-v2-29896260-th529",
+          "dev01（192.168.2.131）",
+          "wes-v2-bench-baseline-989f66d9c-h58w5"
+        ]
+      },
+      "transfer": {
+        "v3_count": 14,
+        "v3_transfer_sum": 3463623,
+        "v3_cached_like": 0,
+        "js_transfer_sum": 8373937,
+        "js_count": 21
+      },
+      "rejects_as_false_cold": false,
+      "pass": true
+    }
+  ],
+  "comparisons": {
+    "dev-wes/deployments": {
+      "old_30880_visible_ms": 4344,
+      "new_30881_visible_ms": 5345,
+      "delta_ms": 1001,
+      "slower_on_30881": true,
+      "old_pass": true,
+      "new_pass": true,
+      "old_v3_xfer": 0,
+      "new_v3_xfer": 3463623,
+      "old_err": null,
+      "new_err": null
+    },
+    "dev-web/deployments": {
+      "old_30880_visible_ms": 1867,
+      "new_30881_visible_ms": 19814,
+      "delta_ms": 17947,
+      "slower_on_30881": true,
+      "old_pass": true,
+      "new_pass": true,
+      "old_v3_xfer": 0,
+      "new_v3_xfer": 3333651,
+      "old_err": null,
+      "new_err": null
+    },
+    "dev-wes/pods": {
+      "old_30880_visible_ms": 4729,
+      "new_30881_visible_ms": 3498,
+      "delta_ms": -1231,
+      "slower_on_30881": false,
+      "old_pass": true,
+      "new_pass": true,
+      "old_v3_xfer": 2815341,
+      "new_v3_xfer": 3463623,
+      "old_err": null,
+      "new_err": null
+    }
+  }
+}
