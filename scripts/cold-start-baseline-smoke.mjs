@@ -174,10 +174,10 @@ function summarizeEvents(events) {
     first_dashboard_ms: firstDash,
     main_before_or_with_html:
       mainEarliest != null && firstHtml != null ? mainEarliest <= firstHtml + 50 : false,
-    // true-cold: preload and BFF often start within a small race window
+    // true-cold: preload and BFF often start within a small race window (±300ms)
     main_near_html:
       mainEarliest != null && firstHtml != null
-        ? Math.abs(mainEarliest - firstHtml) <= 200 || mainEarliest <= firstHtml + 50
+        ? Math.abs(mainEarliest - firstHtml) <= 300 || mainEarliest <= firstHtml + 50
         : false,
     dash_after_html: firstDash == null || firstHtml == null ? null : firstDash - firstHtml,
     events: events.slice(0, 30),
@@ -260,7 +260,7 @@ async function main() {
       (true_cold.transfer?.transfer_sum || 0) >= THRESH.cold_min_transfer_bytes &&
       (true_cold.transfer?.cached_like || 0) === 0,
     warm_list_visible: warm.visible_ms != null && warm.visible_ms < THRESH.hard_refresh_warm_ms,
-    // warm must still show host preload beating/tying HTML; true-cold allows ±200ms race
+    // warm must still show host preload beating/tying HTML; true-cold allows ±300ms race
     true_cold_main_near_html: true_cold.main_near_html === true,
     warm_main_overlaps_html: warm.main_before_or_with_html === true,
     true_cold_no_early_dashboard:

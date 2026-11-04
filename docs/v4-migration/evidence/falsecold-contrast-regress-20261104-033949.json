@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-04T03:43:14.660Z",
+  "purpose": "contrast only: old false-cold method (NOT a pass criterion)",
+  "method": "prehydrate deployments -> sessionStorage.clear -> timed goto; HTTP cache left hot",
+  "visible_ms": 1293,
+  "total_wall_ms": 1696,
+  "transfer": {
+    "transfer_sum": 129972,
+    "cached_like": 12,
+    "v3_count": 14
+  },
+  "is_false_cold": true
+}
