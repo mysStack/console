@@ -1,0 +1,162 @@
+{
+  "date": "2026-11-04T03:44:46.690Z",
+  "purpose": "true-cold baseline smoke (methodology fix 2026-11-03)",
+  "methodology": {
+    "true_cold": "fresh context + Network.setCacheDisabled; first deployments nav after login",
+    "warm": "hydrate once then hard refresh with HTTP cache allowed",
+    "visible": "iframe /deployments body matches LIST_TEXT (wes-v2-server)",
+    "rejects_false_cold": "true_cold requires transfer_sum>=1MiB and cached_like===0"
+  },
+  "errata": "Do not compare visible_ms to pre-2026-11-03 ~1s numbers; those were HTTP-cache-hot false cold.",
+  "historical_reference": {
+    "p0_full_retest_cold_ms": 3080,
+    "p0_full_retest_warm_ms": 1965,
+    "source": "cold-start-p0-full-retest-20261031.json",
+    "note": "P0 cold used new context without list pre-hydrate; closer to true cold than #15 smoke"
+  },
+  "baseline_image_tip": "release-4.1.5-merged-20261102-ad724a3",
+  "image": "ghcr.io/mysstack/ks-console:release-4.1.5-merged-20261102-ad724a3",
+  "imageID": "ghcr.io/mysstack/ks-console@sha256:5994c1562f8ab6d59bffac3cf39adb22ffe02801b3cc3da74c86c34485605f6e",
+  "pod": "ks-console-v415-rea-678bbd9d66-qzv89",
+  "deploy": "ks-console-v415-rea @ 192.168.2.131:30881",
+  "script": "scripts/cold-start-baseline-smoke.mjs",
+  "thresholds_ms": {
+    "hard_refresh_cold_ms": 8000,
+    "hard_refresh_warm_ms": 5000,
+    "spa_activate_ms": 3000,
+    "cold_min_transfer_bytes": 1000000
+  },
+  "true_cold": {
+    "label": "true_cold_nocache",
+    "domcontentloaded_ms": 4849,
+    "visible_ms": 6302,
+    "total_wall_ms": 16154,
+    "transfer": {
+      "v3_count": 17,
+      "transfer_sum": 3559020,
+      "encoded_sum": 3553920,
+      "cached_like": 0
+    },
+    "first_manifest_ms": 4849,
+    "first_html_ms": 4856,
+    "first_main_js_ms": 5074,
+    "first_main_css_ms": 5074,
+    "first_main_ms": 5074,
+    "first_dashboard_ms": 12978,
+    "main_before_or_with_html": false,
+    "main_near_html": false,
+    "dash_after_html": 8122,
+    "events": [
+      {
+        "ms": 4849,
+        "rel": "/dist/v3dist/manifest.json",
+        "type": "fetch"
+      },
+      {
+        "ms": 4856,
+        "rel": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments",
+        "type": "fetch"
+      },
+      {
+        "ms": 5074,
+        "rel": "/dist/v3dist/main.39ed81f6e5a43d5bb447.css",
+        "type": "stylesheet"
+      },
+      {
+        "ms": 5074,
+        "rel": "/dist/v3dist/main.558f452048e49db23323.js",
+        "type": "script"
+      },
+      {
+        "ms": 5789,
+        "rel": "/dist/v3dist/main.39ed81f6e5a43d5bb447.css",
+        "type": "fetch"
+      },
+      {
+        "ms": 6329,
+        "rel": "/dist/v3dist/main.558f452048e49db23323.js",
+        "type": "fetch"
+      },
+      {
+        "ms": 12978,
+        "rel": "/consolev3/dashboard",
+        "type": "fetch"
+      }
+    ]
+  },
+  "warm": {
+    "label": "warm_hard_refresh",
+    "domcontentloaded_ms": 390,
+    "visible_ms": 1252,
+    "total_wall_ms": 6648,
+    "transfer": {
+      "v3_count": 17,
+      "transfer_sum": 24817,
+      "encoded_sum": 3553920,
+      "cached_like": 15
+    },
+    "first_manifest_ms": 389,
+    "first_html_ms": 570,
+    "first_main_js_ms": 415,
+    "first_main_css_ms": 415,
+    "first_main_ms": 415,
+    "first_dashboard_ms": 3350,
+    "main_before_or_with_html": true,
+    "main_near_html": true,
+    "dash_after_html": 2780,
+    "events": [
+      {
+        "ms": 389,
+        "rel": "/dist/v3dist/manifest.json",
+        "type": "fetch"
+      },
+      {
+        "ms": 415,
+        "rel": "/dist/v3dist/main.39ed81f6e5a43d5bb447.css",
+        "type": "stylesheet"
+      },
+      {
+        "ms": 415,
+        "rel": "/dist/v3dist/main.558f452048e49db23323.js",
+        "type": "script"
+      },
+      {
+        "ms": 570,
+        "rel": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments",
+        "type": "fetch"
+      },
+      {
+        "ms": 890,
+        "rel": "/dist/v3dist/main.39ed81f6e5a43d5bb447.css",
+        "type": "fetch"
+      },
+      {
+        "ms": 904,
+        "rel": "/dist/v3dist/main.558f452048e49db23323.js",
+        "type": "fetch"
+      },
+      {
+        "ms": 3350,
+        "rel": "/consolev3/dashboard",
+        "type": "fetch"
+      }
+    ]
+  },
+  "spa_overview_to_deployments": {
+    "nav_wall_ms": 1735,
+    "visible_ms": 1263,
+    "alive": true,
+    "shadowKids": 1,
+    "path": "/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments"
+  },
+  "gates": {
+    "true_cold_list_visible": true,
+    "true_cold_uncached_transfer": true,
+    "warm_list_visible": true,
+    "true_cold_main_near_html": false,
+    "warm_main_overlaps_html": true,
+    "true_cold_no_early_dashboard": true,
+    "spa_overview_to_deployments": true
+  },
+  "pass": false
+}

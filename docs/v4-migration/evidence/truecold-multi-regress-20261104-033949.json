@@ -1,0 +1,127 @@
+{
+  "date": "2026-11-04T03:43:03.398Z",
+  "purpose": "regression true-cold multi-page (no false cold)",
+  "method": "fresh context + Network.setCacheDisabled; login then FIRST nav; no pre-hydrate",
+  "image": "ghcr.io/mysstack/ks-console:release-4.1.5-merged-20261102-ad724a3",
+  "imageID": "ghcr.io/mysstack/ks-console@sha256:5994c1562f8ab6d59bffac3cf39adb22ffe02801b3cc3da74c86c34485605f6e",
+  "pod": "ks-console-v415-rea-678bbd9d66-qzv89",
+  "cases": [
+    {
+      "id": "dev-wes/deployments",
+      "path": "/dev-workspace/clusters/host/projects/dev-wes/deployments",
+      "disableCache": true,
+      "prehydrate": false,
+      "domcontentloaded_ms": 1976,
+      "visible_ms": 3721,
+      "total_wall_ms": 5711,
+      "visible": {
+        "ms": 3721,
+        "mode": "nameRe",
+        "sample": " 工作负载工作负载（Workload）用于处理业务请求，可包含一个或多个容器组。日志、监控等系统功能也是由工作负载实现的。部署有状态副本集守护进程集名称状态应用"
+      },
+      "transfer": {
+        "v3_count": 12,
+        "transfer_sum": 3333651,
+        "encoded_sum": 3330051,
+        "cached_like": 0
+      },
+      "rejects_as_false_cold": false,
+      "pass": true
+    },
+    {
+      "id": "dev-web/deployments",
+      "path": "/dev-workspace/clusters/host/projects/dev-web/deployments",
+      "disableCache": true,
+      "prehydrate": false,
+      "domcontentloaded_ms": 1926,
+      "visible_ms": 4514,
+      "total_wall_ms": 6453,
+      "visible": {
+        "ms": 4514,
+        "mode": "nameRe",
+        "sample": "工作负载 工作负载（Workload）用于处理业务请求，可包含一个或多个容器组。日志、监控等系统功能也是由工作负载实现的。 部署 有状态副本集 守护进程集 名称"
+      },
+      "transfer": {
+        "v3_count": 14,
+        "transfer_sum": 3463623,
+        "encoded_sum": 3459423,
+        "cached_like": 0
+      },
+      "rejects_as_false_cold": false,
+      "pass": true
+    },
+    {
+      "id": "dev-wes/pods",
+      "path": "/dev-workspace/clusters/host/projects/dev-wes/pods",
+      "disableCache": true,
+      "prehydrate": false,
+      "domcontentloaded_ms": 1857,
+      "visible_ms": 4384,
+      "total_wall_ms": 6258,
+      "visible": {
+        "ms": 4384,
+        "mode": "rows",
+        "names": [
+          "ams-29896062-m9rjq",
+          "dev01（192.168.2.131）",
+          "ams-29896060-t792n",
+          "dev01（192.168.2.131）",
+          "wes-v2-29896050-5tbcq"
+        ]
+      },
+      "transfer": {
+        "v3_count": 12,
+        "transfer_sum": 3333651,
+        "encoded_sum": 3330051,
+        "cached_like": 0
+      },
+      "rejects_as_false_cold": false,
+      "pass": true
+    },
+    {
+      "id": "dev-wes/services",
+      "path": "/dev-workspace/clusters/host/projects/dev-wes/services",
+      "disableCache": true,
+      "prehydrate": false,
+      "domcontentloaded_ms": 2043,
+      "visible_ms": 4914,
+      "total_wall_ms": 6969,
+      "visible": {
+        "ms": 4914,
+        "mode": "rows",
+        "names": ["hip-service", "wes-v2-service", "ams-service"]
+      },
+      "transfer": {
+        "v3_count": 14,
+        "transfer_sum": 3463623,
+        "encoded_sum": 3459423,
+        "cached_like": 0
+      },
+      "rejects_as_false_cold": false,
+      "pass": true
+    },
+    {
+      "id": "dev-wes/overview",
+      "path": "/dev-workspace/clusters/host/projects/dev-wes/overview",
+      "disableCache": true,
+      "prehydrate": false,
+      "domcontentloaded_ms": 2620,
+      "visible_ms": 5299,
+      "total_wall_ms": 7936,
+      "visible": {
+        "ms": 5299,
+        "mode": "text",
+        "sample": "概览 0 容器组 0 部署 0 有状态副本集 0 守护进程集 0 任务 0 定时任务 0 持久卷声明 0 服务 0 应用路由 项目配额 CPU 上限 资源类型 "
+      },
+      "transfer": {
+        "v3_count": 13,
+        "transfer_sum": 2840211,
+        "encoded_sum": 2836311,
+        "cached_like": 0
+      },
+      "rejects_as_false_cold": false,
+      "pass": true
+    }
+  ],
+  "pass": true
+}
