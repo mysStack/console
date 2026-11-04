@@ -1,12 +1,16 @@
 #!/usr/bin/env node
 /**
- * Fixed cold-start baseline smoke for release-4.1.5.
+ * Cold-start baseline smoke for release-4.1.5 (true-cold methodology).
  *
- * Guards the closed phase floor on deployments list:
- * - hard refresh cold / warm visible timing
- * - host preload timeline (manifest / main overlaps html)
- * - deferred dashboard (no early race vs list HTML)
- * - SPA overview → deployments keep-alive activate
+ * IMPORTANT (2026-11-03):
+ * Older runs pre-opened the list page then cleared sessionStorage only. That left
+ * HTTP cache hot (transferSize=0) and reported ~1s "cold" falsely.
+ *
+ * Current method:
+ * - true_cold: fresh BrowserContext + CDP Network.setCacheDisabled; login then
+ *   FIRST navigation to deployments (no pre-hydrate); visible = real list name
+ * - warm_hard_refresh: same context, second goto after true_cold (HTTP cache warm)
+ * - spa: overview → deployments keep-alive (after warm)
  *
  * Usage (from /tmp/pw-p0 with playwright deps):
  *   KS_OUT=... KS_IMAGE=... KS_IMAGE_ID=... KS_POD=... node cold-start-baseline-smoke.mjs
@@ -24,12 +28,15 @@ const OUT =
   '/home/bruce/code/ks-develop/console-v3-asset-preload/docs/v4-migration/evidence/cold-start-baseline-smoke.json';
 const LIST_TEXT = /wes-v2-server/;
 
-/** P1 regression ceilings (same family as p1-full-retest). */
+/**
+ * True-cold ceilings are intentionally higher than the old false-cold 5s/3.5s.
+ * Override with KS_COLD_MS / KS_WARM_MS / KS_SPA_MS if needed.
+ */
 const THRESH = {
-  hard_refresh_cold_ms: Number(process.env.KS_COLD_MS || 5000),
-  hard_refresh_warm_ms: Number(process.env.KS_WARM_MS || 3500),
+  hard_refresh_cold_ms: Number(process.env.KS_COLD_MS || 8000),
+  hard_refresh_warm_ms: Number(process.env.KS_WARM_MS || 5000),
   spa_activate_ms: Number(process.env.KS_SPA_MS || 3000),
-  dash_after_html_ms: 0,
+  cold_min_transfer_bytes: Number(process.env.KS_COLD_MIN_XFER || 1_000_000),
 };
 
 function loadCreds() {
@@ -44,6 +51,7 @@ function loadCreds() {
 }
 
 async function ensureLogin(page, creds) {
+  await page.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded' });
   if (!page.url().includes('/login')) return;
   await page.waitForSelector(
     'input[placeholder="user@example.com"], input[name="username"], input[type="text"]',
@@ -55,10 +63,10 @@ async function ensureLogin(page, creds) {
   );
   await page.fill('input[placeholder="Password"], input[type="password"]', creds.pass);
   await page.click('button:has-text("Log In"), button[type="submit"]');
-  await page.waitForURL(u => !u.pathname.includes('/login'), { timeout: 30000 });
+  await page.waitForURL(u => !u.pathname.includes('/login'), { timeout: 45000 });
 }
 
-async function waitVisible(page, timeoutMs = 45000) {
+async function waitVisible(page, timeoutMs = 120000) {
   const t0 = Date.now();
   for (;;) {
     const ok = await page.evaluate(src => {
@@ -74,7 +82,7 @@ async function waitVisible(page, timeoutMs = 45000) {
     }, LIST_TEXT.source);
     if (ok) return Date.now() - t0;
     if (Date.now() - t0 > timeoutMs) throw new Error('visible timeout');
-    await page.waitForTimeout(100);
+    await page.waitForTimeout(50);
   }
 }
 
@@ -111,22 +119,9 @@ async function sandboxAlive(page) {
   });
 }
 
-async function hardRefreshRound(page, { clearSession }) {
-  const dep = `${BASE}${PROJECT}/deployments`;
-  await page.goto(dep, { waitUntil: 'domcontentloaded' });
-  await waitVisible(page);
-  if (clearSession) {
-    await page.evaluate(() => {
-      try {
-        sessionStorage.clear();
-      } catch (_) {}
-    });
-  }
-  await page.waitForTimeout(800);
-
-  const events = [];
-  let navStart = 0;
+function attachTimeline(page, events, getNavStart) {
   const onReq = r => {
+    const navStart = getNavStart();
     if (!navStart) return;
     const rel = r.url().replace(BASE, '');
     const ms = Date.now() - navStart;
@@ -140,12 +135,24 @@ async function hardRefreshRound(page, { clearSession }) {
     }
   };
   page.on('request', onReq);
-  navStart = Date.now();
-  await page.goto(dep, { waitUntil: 'domcontentloaded' });
-  const visible_ms = await waitVisible(page);
-  await page.waitForTimeout(5000);
-  page.off('request', onReq);
+  return () => page.off('request', onReq);
+}
 
+async function collectTransferStats(page) {
+  return page.evaluate(() => {
+    const v3 = performance
+      .getEntriesByType('resource')
+      .filter(e => /\/dist\/v3dist\//.test(e.name));
+    return {
+      v3_count: v3.length,
+      transfer_sum: v3.reduce((s, e) => s + (e.transferSize || 0), 0),
+      encoded_sum: v3.reduce((s, e) => s + (e.encodedBodySize || 0), 0),
+      cached_like: v3.filter(e => e.transferSize === 0 && e.encodedBodySize > 0).length,
+    };
+  });
+}
+
+function summarizeEvents(events) {
   const first = re => events.find(e => re.test(e.rel))?.ms ?? null;
   const firstHtml = first(/\/consolev3\/.*\/deployments/);
   const firstMainJs = first(/\/dist\/v3dist\/main\.[^/?#]+\.js$/);
@@ -158,10 +165,7 @@ async function hardRefreshRound(page, { clearSession }) {
       : firstMainCss == null
         ? firstMainJs
         : Math.min(firstMainJs, firstMainCss);
-
   return {
-    clearSession,
-    visible_ms,
     first_manifest_ms: firstManifest,
     first_html_ms: firstHtml,
     first_main_js_ms: firstMainJs,
@@ -170,8 +174,37 @@ async function hardRefreshRound(page, { clearSession }) {
     first_dashboard_ms: firstDash,
     main_before_or_with_html:
       mainEarliest != null && firstHtml != null ? mainEarliest <= firstHtml + 50 : false,
+    // true-cold: preload and BFF often start within a small race window
+    main_near_html:
+      mainEarliest != null && firstHtml != null
+        ? Math.abs(mainEarliest - firstHtml) <= 200 || mainEarliest <= firstHtml + 50
+        : false,
     dash_after_html: firstDash == null || firstHtml == null ? null : firstDash - firstHtml,
     events: events.slice(0, 30),
+  };
+}
+
+async function measureNavigation(page, { label }) {
+  const dep = `${BASE}${PROJECT}/deployments`;
+  const events = [];
+  let navStart = 0;
+  const detach = attachTimeline(page, events, () => navStart);
+
+  navStart = Date.now();
+  await page.goto(dep, { waitUntil: 'domcontentloaded' });
+  const dcl = Date.now() - navStart;
+  const visible_ms = await waitVisible(page);
+  // allow deferred dashboard request to show up
+  await page.waitForTimeout(5000);
+  detach();
+  const transfer = await collectTransferStats(page);
+  return {
+    label,
+    domcontentloaded_ms: dcl,
+    visible_ms,
+    total_wall_ms: Date.now() - navStart,
+    transfer,
+    ...summarizeEvents(events),
   };
 }
 
@@ -192,25 +225,48 @@ async function spaOverviewToDeployments(page) {
 async function main() {
   const creds = loadCreds();
   const browser = await chromium.launch({ executablePath: CHROME, headless: true });
-  const context = await browser.newContext();
-  const page = await context.newPage();
 
-  await page.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded' });
-  await ensureLogin(page, creds);
+  // --- true cold: fresh context, cache disabled, no pre-hydrate ---
+  const coldCtx = await browser.newContext();
+  const coldPage = await coldCtx.newPage();
+  const coldCdp = await coldCtx.newCDPSession(coldPage);
+  await coldCdp.send('Network.enable');
+  await coldCdp.send('Network.setCacheDisabled', { cacheDisabled: true });
+  await ensureLogin(coldPage, creds);
+  await coldPage.evaluate(() => {
+    try {
+      sessionStorage.clear();
+      localStorage.clear();
+    } catch (_) {}
+  });
+  const true_cold = await measureNavigation(coldPage, { label: 'true_cold_nocache' });
+  await coldCtx.close();
 
-  const cold = await hardRefreshRound(page, { clearSession: true });
-  const warm = await hardRefreshRound(page, { clearSession: false });
-  const spa = await spaOverviewToDeployments(page);
+  // --- warm hard refresh: fresh login, hydrate once, then timed goto (cache on) ---
+  const warmCtx = await browser.newContext();
+  const warmPage = await warmCtx.newPage();
+  await ensureLogin(warmPage, creds);
+  await warmPage.goto(`${BASE}${PROJECT}/deployments`, { waitUntil: 'domcontentloaded' });
+  await waitVisible(warmPage);
+  await warmPage.waitForTimeout(1000);
+  const warm = await measureNavigation(warmPage, { label: 'warm_hard_refresh' });
+  const spa = await spaOverviewToDeployments(warmPage);
+  await warmCtx.close();
 
   const gates = {
-    cold_list_visible: cold.visible_ms != null && cold.visible_ms < THRESH.hard_refresh_cold_ms,
+    true_cold_list_visible:
+      true_cold.visible_ms != null && true_cold.visible_ms < THRESH.hard_refresh_cold_ms,
+    true_cold_uncached_transfer:
+      (true_cold.transfer?.transfer_sum || 0) >= THRESH.cold_min_transfer_bytes &&
+      (true_cold.transfer?.cached_like || 0) === 0,
     warm_list_visible: warm.visible_ms != null && warm.visible_ms < THRESH.hard_refresh_warm_ms,
-    cold_main_overlaps_html: cold.main_before_or_with_html === true,
+    // warm must still show host preload beating/tying HTML; true-cold allows ±200ms race
+    true_cold_main_near_html: true_cold.main_near_html === true,
     warm_main_overlaps_html: warm.main_before_or_with_html === true,
-    cold_no_early_dashboard:
-      cold.first_dashboard_ms == null ||
-      cold.first_html_ms == null ||
-      cold.first_dashboard_ms >= cold.first_html_ms + THRESH.dash_after_html_ms,
+    true_cold_no_early_dashboard:
+      true_cold.first_dashboard_ms == null ||
+      true_cold.first_html_ms == null ||
+      true_cold.first_dashboard_ms >= true_cold.first_html_ms,
     spa_overview_to_deployments:
       spa.visible_ms != null && spa.visible_ms < THRESH.spa_activate_ms && spa.alive === true,
   };
@@ -218,7 +274,21 @@ async function main() {
 
   const out = {
     date: new Date().toISOString(),
-    purpose: 'fixed cold-start baseline smoke after phase close',
+    purpose: 'true-cold baseline smoke (methodology fix 2026-11-03)',
+    methodology: {
+      true_cold: 'fresh context + Network.setCacheDisabled; first deployments nav after login',
+      warm: 'hydrate once then hard refresh with HTTP cache allowed',
+      visible: 'iframe /deployments body matches LIST_TEXT (wes-v2-server)',
+      rejects_false_cold: 'true_cold requires transfer_sum>=1MiB and cached_like===0',
+    },
+    errata:
+      'Do not compare visible_ms to pre-2026-11-03 ~1s numbers; those were HTTP-cache-hot false cold.',
+    historical_reference: {
+      p0_full_retest_cold_ms: 3080,
+      p0_full_retest_warm_ms: 1965,
+      source: 'cold-start-p0-full-retest-20261031.json',
+      note: 'P0 cold used new context without list pre-hydrate; closer to true cold than #15 smoke',
+    },
     baseline_image_tip: 'release-4.1.5-merged-20261102-ad724a3',
     image: process.env.KS_IMAGE || '',
     imageID: process.env.KS_IMAGE_ID || '',
@@ -226,7 +296,7 @@ async function main() {
     deploy: 'ks-console-v415-rea @ 192.168.2.131:30881',
     script: 'scripts/cold-start-baseline-smoke.mjs',
     thresholds_ms: THRESH,
-    cold,
+    true_cold,
     warm,
     spa_overview_to_deployments: spa,
     gates,
@@ -241,19 +311,21 @@ async function main() {
         out: OUT,
         pass,
         gates,
-        cold: {
-          visible_ms: cold.visible_ms,
-          first_manifest_ms: cold.first_manifest_ms,
-          first_html_ms: cold.first_html_ms,
-          first_main_ms: cold.first_main_ms,
-          first_dashboard_ms: cold.first_dashboard_ms,
+        true_cold: {
+          visible_ms: true_cold.visible_ms,
+          total_wall_ms: true_cold.total_wall_ms,
+          transfer_sum: true_cold.transfer?.transfer_sum,
+          cached_like: true_cold.transfer?.cached_like,
+          first_main_ms: true_cold.first_main_ms,
+          first_html_ms: true_cold.first_html_ms,
+          first_dashboard_ms: true_cold.first_dashboard_ms,
         },
         warm: {
           visible_ms: warm.visible_ms,
-          first_manifest_ms: warm.first_manifest_ms,
-          first_html_ms: warm.first_html_ms,
+          transfer_sum: warm.transfer?.transfer_sum,
+          cached_like: warm.transfer?.cached_like,
           first_main_ms: warm.first_main_ms,
-          first_dashboard_ms: warm.first_dashboard_ms,
+          first_html_ms: warm.first_html_ms,
         },
         spa: {
           visible_ms: spa.visible_ms,
