@@ -1,6 +1,9 @@
 import assert from 'node:assert';
 import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import test from 'node:test';
+
+const coreSrc = join(process.cwd(), 'packages/core/src');
 
 import {
   CONSOLE_V3_MANIFEST_URL,
@@ -9,6 +12,7 @@ import {
   preloadConsoleV3MainAssetsForRoute,
   resetConsoleV3MainAssetPreloadForTests,
   resolveConsoleV3AssetHref,
+  shouldPreloadConsoleV3MainAssets,
 } from './consoleV3AssetPreload';
 
 function installDom() {
@@ -65,7 +69,19 @@ test('injectConsoleV3MainAssetPreloads maps entrypoint files', () => {
   });
 });
 
-test('preloadConsoleV3MainAssetsForRoute skips non-list paths', async () => {
+test('shouldPreloadConsoleV3MainAssets skips login/oauth only', () => {
+  assert.equal(shouldPreloadConsoleV3MainAssets('/login'), false);
+  assert.equal(shouldPreloadConsoleV3MainAssets('/login?referer=/'), false);
+  assert.equal(shouldPreloadConsoleV3MainAssets('/oauth/authorize'), false);
+  assert.equal(shouldPreloadConsoleV3MainAssets('/'), true);
+  assert.equal(shouldPreloadConsoleV3MainAssets('/workspaces'), true);
+  assert.equal(
+    shouldPreloadConsoleV3MainAssets('/dev-workspace/clusters/host/projects/dev-wes/deployments'),
+    true,
+  );
+});
+
+test('preloadConsoleV3MainAssetsForRoute skips login paths', async () => {
   resetConsoleV3MainAssetPreloadForTests();
   installDom();
   let called = 0;
@@ -81,7 +97,7 @@ test('preloadConsoleV3MainAssetsForRoute skips non-list paths', async () => {
   assert.equal(called, 0);
 });
 
-test('preloadConsoleV3MainAssetsForRoute fetches manifest on list path once', async () => {
+test('preloadConsoleV3MainAssetsForRoute warms on V4 shell paths once', async () => {
   resetConsoleV3MainAssetPreloadForTests();
   const links = installDom();
   let called = 0;
@@ -98,9 +114,8 @@ test('preloadConsoleV3MainAssetsForRoute fetches manifest on list path once', as
     };
   }) as unknown as typeof fetch;
 
-  const listPath = '/dev-workspace/clusters/host/projects/dev-wes/deployments';
-  preloadConsoleV3MainAssetsForRoute(listPath, fakeFetch);
-  preloadConsoleV3MainAssetsForRoute(listPath, fakeFetch);
+  preloadConsoleV3MainAssetsForRoute('/workspaces', fakeFetch);
+  preloadConsoleV3MainAssetsForRoute('/workspaces', fakeFetch);
   await new Promise(r => setTimeout(r, 0));
   assert.equal(called, 1);
   assert.equal(links.length, 2);
@@ -109,11 +124,19 @@ test('preloadConsoleV3MainAssetsForRoute fetches manifest on list path once', as
 });
 
 test('initWujie primes V3 main assets before preloadApp', () => {
-  const source = readFileSync(__filename.replace(/[^/]+$/, 'wujie.ts'), 'utf8');
+  const source = readFileSync(join(coreSrc, 'utils/wujie.ts'), 'utf8');
   assert.match(source, /preloadConsoleV3MainAssetsForRoute/);
   assert.match(source, /consoleV3AssetPreload/);
   const primeAt = source.indexOf('preloadConsoleV3MainAssetsForRoute(');
   const preloadAppAt = source.indexOf("preloadApp({\n    name: 'consolev3'");
   assert.ok(primeAt >= 0 && preloadAppAt >= 0);
   assert.ok(primeAt < preloadAppAt, 'main asset preload should run before consolev3 preloadApp');
+});
+
+test('run starts initWujie before extension registration', () => {
+  const source = readFileSync(join(coreSrc, 'run.tsx'), 'utf8');
+  const initAt = source.indexOf('initWujie();');
+  const extAt = source.indexOf('await registerInternalExtensions();');
+  assert.ok(initAt >= 0 && extAt >= 0);
+  assert.ok(initAt < extAt, 'initWujie should run before registerInternalExtensions');
 });

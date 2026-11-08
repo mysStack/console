@@ -34,10 +34,12 @@ if (!isEmpty(globals?.ksConfig?.enabledExtensionModulesStatus)) {
 }
 
 export const run = async () => {
+  // Official 4.3 starts `initWujie({ isPreload: true })` before React render.
+  // Kick V3 preload before extension registration so deep-links overlap shell work.
+  initWujie();
+
   await registerInternalExtensions();
   await registerLocalExtensions();
-
-  initWujie();
 
   await i18n.init();
   emitter.init();

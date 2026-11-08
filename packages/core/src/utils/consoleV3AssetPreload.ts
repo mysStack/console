@@ -11,10 +11,20 @@
  * host overlaps that HTML wait so the first paint pays less sequential download.
  */
 
-import { isConsoleV3ProjectListPath } from './consoleV3PreloadUrl';
-
 export const CONSOLE_V3_MANIFEST_URL = '/dist/v3dist/manifest.json';
 export const CONSOLE_V3_ASSET_PREFIX = '/dist/v3dist';
+
+/**
+ * Official 4.3 calls `initWujie({ isPreload: true })` on every authenticated
+ * shell boot, not only list deep-links. Skip login/oauth so we do not race the
+ * unauthenticated gate or waste bandwidth on the login page.
+ */
+export function shouldPreloadConsoleV3MainAssets(pathname: string): boolean {
+  const path = String(pathname || '/').split('?')[0] || '/';
+  if (path === '/login' || path.startsWith('/login/')) return false;
+  if (path === '/oauth' || path.startsWith('/oauth/')) return false;
+  return true;
+}
 
 export interface ConsoleV3MainEntrypoint {
   css?: string[];
@@ -70,13 +80,16 @@ export function injectConsoleV3MainAssetPreloads(
 /**
  * Fire-and-forget: fetch the sealed v3dist manifest and preload main css/js.
  * Errors are swallowed so cold-start never depends on this helper.
+ *
+ * Aligns with official 4.3 shell-boot preload: warm V3 main assets while the
+ * user is still on V4-native pages so the first V3 navigation feels smoother.
  */
 export function preloadConsoleV3MainAssetsForRoute(
   pathname: string = typeof window === 'undefined' ? '/' : window.location.pathname,
   fetchImpl?: typeof fetch,
 ): void {
   if (preloadedOnce) return;
-  if (!isConsoleV3ProjectListPath(pathname)) return;
+  if (!shouldPreloadConsoleV3MainAssets(pathname)) return;
   if (typeof document === 'undefined') return;
   const doFetch =
     fetchImpl ||
