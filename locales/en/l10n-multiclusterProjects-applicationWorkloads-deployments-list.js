@@ -223,4 +223,8 @@ module.exports = {
     'Set different environment variables for containers in different clusters.',
   CONTAINER_IMAGE: 'Container Image',
   // Customize Columns
+  POD_GRACE_PERIOD: 'Pod Graceful Termination',
+  POD_GRACE_PERIOD_DESC:
+    'Set the time to wait before terminating containers. Containers are forcibly terminated after the timeout.',
+  TERMINATION_GRACEPERIOD_SECONDS: 'Termination Grace Period (s)',
 };

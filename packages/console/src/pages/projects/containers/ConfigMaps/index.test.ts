@@ -4,8 +4,9 @@ import test from 'node:test';
 
 const source = readFileSync(__filename.replace(/[^/]+$/, 'index.tsx'), 'utf8');
 
-test('ConfigMap list uses the shared persistent consolev3 resource host', () => {
-  assert.match(source, /ConsoleV3ResourceList/);
-  assert.match(source, /url=\{`\$\{wujieUrlPrefix\}\/configmaps`\}/);
+test('ConfigMap list uses host-native ListPage instead of consolev3 embed', () => {
+  assert.doesNotMatch(source, /ConsoleV3ResourceList/);
+  assert.match(source, /configMapStore/);
+  assert.match(source, /ListPage/);
   assert.doesNotMatch(source, /WujieReact/);
 });

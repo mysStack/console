@@ -8,6 +8,9 @@ module.exports = {
   // List
   STATEFULSETS_LOW: 'Statefulsets',
   STATEFULSETS_PL: 'Statefulsets',
+  CREATE_STATEFULSET: 'Create StatefulSet',
+  CREATE_STATEFULSET_FAILED: 'Failed to create the StatefulSet.',
+  SERVICE_PORT: 'Service Port',
   // List > Create > Basic Information
   // List > Create > Pod Settings > Update Settings > Rolling Update Settings
   PARTITION_ORDINAL_EMPTY: 'Please set a ordinal for dividing pod replicas.',

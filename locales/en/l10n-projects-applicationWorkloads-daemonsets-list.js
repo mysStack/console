@@ -4,6 +4,8 @@
  */
 
 module.exports = {
+  CREATE_DAEMONSET: 'Create DaemonSet',
+  CREATE_DAEMONSET_FAILED: 'Failed to create DaemonSet.',
   // Banner
   // List
   // List > Create > Basic Information
