@@ -138,6 +138,7 @@ const StatefulSetsDetail = () => {
   }, [detail]);
 
   useEffect(() => {
+    if (!detail) return;
     setDetailProps({ module, detail, isLoading, isError });
   }, [detail]);
 

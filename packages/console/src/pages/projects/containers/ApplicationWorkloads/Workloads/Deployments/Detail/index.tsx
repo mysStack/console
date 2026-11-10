@@ -236,6 +236,7 @@ const DeploymentDetail = () => {
   });
 
   useEffect(() => {
+    if (!detail) return;
     setDetailProps({ module, detail, isLoading, isError });
   }, [detail]);
 
