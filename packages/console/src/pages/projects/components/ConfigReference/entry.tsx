@@ -17,6 +17,7 @@ import {
   findConfigReferenceMountParent,
   findManualEnvScope,
   getConfigReferenceNativeEditRoots,
+  getConfigReferenceWujieAppWindow,
   injectConfigReferenceEntry,
   installConfigReferenceNativeEdit,
   resolveConfigReferenceEnvRoot,
@@ -547,22 +548,10 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
     let bound = false;
     const bindIframe = () => {
       if (bound) return;
-      const frames = Array.from(document.querySelectorAll('iframe')) as HTMLIFrameElement[];
-      const app = document.querySelector('wujie-app[data-wujie-id="consolev3"]');
-      if (app?.shadowRoot) {
-        frames.push(...Array.from(app.shadowRoot.querySelectorAll('iframe')));
-      }
-      for (const frame of frames) {
-        try {
-          if (frame.contentWindow?.document) {
-            bound = true;
-            bindRoot(frame.contentWindow, 'consolev3');
-            return;
-          }
-        } catch {
-          // Cross-origin frames are ignored.
-        }
-      }
+      const appWindow = getConfigReferenceWujieAppWindow(document);
+      if (!appWindow) return;
+      bound = true;
+      bindRoot(appWindow, 'consolev3');
     };
     bindIframe();
     const observer = new MutationObserver(bindIframe);

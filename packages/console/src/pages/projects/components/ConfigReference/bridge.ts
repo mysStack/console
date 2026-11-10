@@ -62,6 +62,31 @@ export function getConfigReferenceNativeEditRoots(
   return roots;
 }
 
+/**
+ * Workspace Wujie lives in `wujie-app[data-wujie-id="consolev3"]`. Native
+ * cluster pages also have unrelated iframes (toolbox, etc.); binding those
+ * as the V3 app observes the whole host document and the detail tab never
+ * leaves its loading spinner.
+ */
+export function getConfigReferenceWujieAppWindow(hostDocument: Document): Window | undefined {
+  const app = hostDocument.querySelector('wujie-app[data-wujie-id="consolev3"]');
+  if (!app) return undefined;
+  const frames = [
+    ...Array.from(app.querySelectorAll('iframe')),
+    ...Array.from(app.shadowRoot?.querySelectorAll('iframe') ?? []),
+  ];
+  for (const frame of frames) {
+    try {
+      if (frame.contentWindow?.document) {
+        return frame.contentWindow;
+      }
+    } catch {
+      // Cross-origin frames are ignored.
+    }
+  }
+  return undefined;
+}
+
 export function resolveConfigReferenceFormRoot(
   roots: ConfigReferenceDomRoot[],
 ): ConfigReferenceDomRoot | undefined {

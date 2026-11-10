@@ -11,6 +11,7 @@ import {
   findConfigReferenceContainerName,
   findConfigReferenceMountParent,
   getConfigReferenceNativeEditRoots,
+  getConfigReferenceWujieAppWindow,
   resolveConfigReferenceFormRoot,
   resolveConfigReferenceEnvRoot,
   injectConfigReferenceEntry,
@@ -52,6 +53,29 @@ test('Wujie 编辑设置拦截要覆盖宿主 document、iframe document 和 sha
   assert.deepEqual(getConfigReferenceNativeEditRoots(host, { document: host } as Window, null), [
     host,
   ]);
+});
+
+test('原生页面没有 consolev3 时不能把随便一个 iframe 当成配置引用桥', () => {
+  const stray = { contentWindow: { document: { id: 'toolbox' } } };
+  const host = {
+    querySelector: () => null,
+    querySelectorAll: (selector: string) => (selector === 'iframe' ? [stray] : []),
+  } as unknown as Document;
+  assert.equal(getConfigReferenceWujieAppWindow(host), undefined);
+});
+
+test('只从 consolev3 的 iframe 取配置引用桥窗口', () => {
+  const appWindow = { document: { id: 'v3' } };
+  const app = {
+    querySelectorAll: (selector: string) =>
+      selector === 'iframe' ? [{ contentWindow: appWindow }] : [],
+    shadowRoot: null,
+  };
+  const host = {
+    querySelector: (selector: string) =>
+      selector === 'wujie-app[data-wujie-id="consolev3"]' ? app : null,
+  } as unknown as Document;
+  assert.equal(getConfigReferenceWujieAppWindow(host), appWindow);
 });
 
 test('Wujie iframe 里的下拉菜单也要进拦截根', () => {

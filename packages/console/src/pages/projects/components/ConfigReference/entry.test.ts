@@ -24,6 +24,12 @@ test('工作台 Wujie 在宿主 document 拦截编辑设置，避免下拉菜单
   assert.match(src, /installConfigReferenceNativeEdit\(document/);
 });
 
+test('原生集群详情只绑 consolev3 iframe，避免工具箱 iframe 拖死环境变量页', () => {
+  const src = readFileSync(join(__dirname, 'entry.tsx'), 'utf8');
+  assert.match(src, /getConfigReferenceWujieAppWindow\(document\)/);
+  assert.doesNotMatch(src, /document\.querySelectorAll\('iframe'\)/);
+});
+
 test('环境变量页用已有卡片扫描扫全部 Wujie 根，不只扫编辑表单根', () => {
   const src = readFileSync(join(__dirname, 'entry.tsx'), 'utf8');
   assert.match(src, /resolveConfigReferenceEnvRoot\(collectRoots\(\)\)/);
