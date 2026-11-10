@@ -14,6 +14,7 @@ module.exports = {
   // Resource Status > Containers > Container Logs
   CONTAINER_LOGS_NOT_SUPPORTED: '容器在当前不支持实时日志，请稍后重试。',
   CONTAINER_LOGS: '容器日志',
+  CONTAINER_LOG_LATEST_LINES: '最近 1000 行',
   CONTAINER_LOG_MATCH: '匹配',
   SEARCH_BY_KEYWORD: '按关键词搜索',
   LOG_MATCH: '结果匹配',

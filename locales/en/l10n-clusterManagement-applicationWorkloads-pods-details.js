@@ -15,6 +15,7 @@ module.exports = {
   CONTAINER_LOGS_NOT_SUPPORTED:
     'The container does not support real-time logs currently. Please try again later.',
   CONTAINER_LOGS: 'Container Logs',
+  CONTAINER_LOG_LATEST_LINES: 'Latest 1000 lines',
   CONTAINER_LOG_MATCH: 'Match',
   SEARCH_BY_KEYWORD: 'Search by keyword',
   LOG_MATCH: 'match',

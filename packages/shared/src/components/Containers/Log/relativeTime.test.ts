@@ -3,13 +3,16 @@ import test from 'node:test';
 
 import {
   DEFAULT_RELATIVE_TIME,
+  LATEST_LINES_TIME,
   createRelativeTime,
+  isLatestLines,
   parseRelativeTime,
   toSeconds,
 } from './relativeTime';
 
-test('默认时间范围为最近 15 分钟', () => {
-  assert.equal(DEFAULT_RELATIVE_TIME.seconds, 900);
+test('默认时间范围为最近 1000 行，不带 sinceSeconds', () => {
+  assert.equal(DEFAULT_RELATIVE_TIME.seconds, 0);
+  assert.equal(isLatestLines(LATEST_LINES_TIME), true);
   assert.deepEqual(parseRelativeTime('15m'), createRelativeTime(15, 'm'));
 });
 
@@ -21,5 +24,5 @@ test('把预设和自定义时间换算成 sinceSeconds', () => {
 });
 
 test('无法解析时回退到 15 分钟', () => {
-  assert.deepEqual(parseRelativeTime('oops'), DEFAULT_RELATIVE_TIME);
+  assert.deepEqual(parseRelativeTime('oops'), createRelativeTime(15, 'm'));
 });

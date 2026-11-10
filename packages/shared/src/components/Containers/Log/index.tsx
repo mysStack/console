@@ -53,7 +53,7 @@ function ContainerLog({
   const [filterActive, setFilterActive] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const { data: hasContainer } = useQuery([], async () => {
+  const { data: hasContainer } = useQuery(['pod-exists', cluster, namespace, podName], async () => {
     const res = await checkName({
       cluster,
       namespace,
@@ -62,16 +62,18 @@ function ContainerLog({
     return res.exist;
   });
 
-  const logParams = useMemo(
-    () => ({
-      container: containerName,
+  const logParams = useMemo(() => {
+    const params: Record<string, string | number | boolean> = {
+      container: containerName ?? '',
       tailLines: 1000,
       timestamps: true,
-      sinceSeconds: timeRange.seconds,
       follow: selfRealtime,
-    }),
-    [containerName, timeRange.seconds, selfRealtime],
-  );
+    };
+    if (timeRange.seconds > 0) {
+      params.sinceSeconds = timeRange.seconds;
+    }
+    return params;
+  }, [containerName, timeRange.seconds, selfRealtime]);
 
   const namespaceName = gatewayName ? gatewayNamespace : namespace;
 
@@ -192,7 +194,8 @@ function ContainerLog({
           </LogBody>
         ) : (
           <EmptyWrapper
-            title={t('NO_DATA')}
+            title={t(timeRange.seconds > 0 ? 'NO_LOG_DATA_FOUND' : 'NO_DATA')}
+            description={timeRange.seconds > 0 ? t('NO_LOG_DATA_FOUND_TIP') : undefined}
             image={<img src="/assets/empty-card.svg" />}
             imageStyle={{ width: '100%', background: 'none' }}
           />

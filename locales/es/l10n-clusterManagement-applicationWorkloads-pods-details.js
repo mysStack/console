@@ -15,6 +15,7 @@ module.exports = {
   CONTAINER_LOGS_NOT_SUPPORTED:
     'El contenedor no admite logs en tiempo real en el estado actual, intente nuevamente más tarde.',
   CONTAINER_LOGS: 'Registros de contenedores',
+  CONTAINER_LOG_LATEST_LINES: 'Últimas 1000 líneas',
   CONTAINER_LOG_MATCH: 'Coincidir',
   SEARCH_BY_KEYWORD: 'Buscar por palabra clave',
   LOG_MATCH: 'coincidencia',

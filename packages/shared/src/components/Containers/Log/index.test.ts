@@ -7,6 +7,7 @@ test('容器日志按 4.3 交互提供关键词匹配、过滤和上下跳转', 
   const src = readFileSync(join(__dirname, 'index.tsx'), 'utf8');
   const searchBar = readFileSync(join(__dirname, 'SearchBar.tsx'), 'utf8');
   assert.match(src, /sinceSeconds/);
+  assert.match(src, /timeRange\.seconds > 0/);
   assert.match(src, /RelativeTimeSelector/);
   assert.match(src, /LogSearchBar/);
   assert.match(src, /LOG_EXPORT/);

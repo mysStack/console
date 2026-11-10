@@ -8,13 +8,13 @@ import { Card, Empty } from '@kubed/components';
 
 export const ContentCard = styled(Card)`
   height: 100%;
-  min-height: 0;
+  min-height: 480px;
   box-shadow: none;
 
   & > div,
   .kubed-card-body {
     height: 100%;
-    min-height: 0;
+    min-height: 440px;
     display: flex;
     flex-direction: column;
     padding: 20px;
@@ -211,7 +211,7 @@ export const OkButton = styled.button`
 export const LogPanel = styled.div`
   position: relative;
   flex: 1;
-  min-height: 0;
+  min-height: 360px;
   overflow: hidden;
   border-radius: 4px;
   background-color: #242e42;

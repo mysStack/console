@@ -2,10 +2,12 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { CaretDown, TimedTask } from '@kubed/icons';
 import {
   CUSTOM_TIME_UNITS,
+  LATEST_LINES_TIME,
   RELATIVE_TIME_OPTIONS,
   RelativeTimeValue,
   TimeUnit,
   createRelativeTime,
+  isLatestLines,
   parseRelativeTime,
 } from './relativeTime';
 import {
@@ -35,6 +37,9 @@ function unitLabel(unit: TimeUnit) {
 }
 
 function timeLabel(value: RelativeTimeValue) {
+  if (isLatestLines(value)) {
+    return t('CONTAINER_LOG_LATEST_LINES');
+  }
   return t('LAST_TIME', {
     value: t(`TIME_${value.unit.toUpperCase()}`, { count: value.value }),
   });
@@ -75,11 +80,18 @@ export function RelativeTimeSelector({ value, onChange, zIndex = 3 }: Props) {
         <TimeDropdown $zIndex={zIndex}>
           <TimeSectionTitle>{t('SELECT_TIME_RANGE')}</TimeSectionTitle>
           <TimeOptionList>
+            <TimeOption
+              type="button"
+              $selected={isLatestLines(value)}
+              onClick={() => select(LATEST_LINES_TIME)}
+            >
+              {timeLabel(LATEST_LINES_TIME)}
+            </TimeOption>
             {options.map(option => (
               <TimeOption
                 key={`${option.value}${option.unit}`}
                 type="button"
-                $selected={option.seconds === value.seconds}
+                $selected={!isLatestLines(value) && option.seconds === value.seconds}
                 onClick={() => select(option)}
               >
                 {timeLabel(option)}

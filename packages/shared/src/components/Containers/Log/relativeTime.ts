@@ -47,4 +47,14 @@ export function parseRelativeTime(raw: string): RelativeTimeValue {
   return createRelativeTime(Number(matched[1]) || 15, matched[2] as TimeUnit);
 }
 
-export const DEFAULT_RELATIVE_TIME = createRelativeTime(15, 'm');
+export const LATEST_LINES_TIME: RelativeTimeValue = {
+  value: 0,
+  unit: 'm',
+  seconds: 0,
+};
+
+export function isLatestLines(value: RelativeTimeValue) {
+  return !value.seconds;
+}
+
+export const DEFAULT_RELATIVE_TIME = LATEST_LINES_TIME;
