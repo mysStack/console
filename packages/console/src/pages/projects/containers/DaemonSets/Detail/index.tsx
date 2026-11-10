@@ -24,6 +24,7 @@ function DaemonSetDetail(): JSX.Element {
         alive
         sync={false}
         afterMount={afterMount}
+        activated={afterMount}
         afterUnmount={afterUnmount}
       />
       {inline}

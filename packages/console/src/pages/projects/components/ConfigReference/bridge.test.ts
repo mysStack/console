@@ -10,6 +10,9 @@ import {
   findConfigReferenceEnvSections,
   findConfigReferenceContainerName,
   findConfigReferenceMountParent,
+  getConfigReferenceNativeEditRoots,
+  resolveConfigReferenceFormRoot,
+  resolveConfigReferenceEnvRoot,
   injectConfigReferenceEntry,
   installConfigReferenceNativeEdit,
   shouldInjectConfigReferenceEntry,
@@ -34,6 +37,71 @@ test('keeps retrying configuration reference injection for a still-loading V3 fo
     true,
   );
   assert.equal(shouldRetryConfigReferenceInjection(CONFIG_REFERENCE_INJECTION_RETRY_LIMIT), false);
+});
+
+test('Wujie 编辑设置拦截要覆盖宿主 document、iframe document 和 shadow', () => {
+  const host = { id: 'host' } as unknown as Document;
+  const iframeDoc = { id: 'iframe' } as unknown as Document;
+  const shadow = { id: 'shadow' } as unknown as ShadowRoot;
+  const appWindow = { document: iframeDoc } as Window;
+  assert.deepEqual(getConfigReferenceNativeEditRoots(host, appWindow, shadow), [
+    host,
+    iframeDoc,
+    shadow,
+  ]);
+  assert.deepEqual(getConfigReferenceNativeEditRoots(host, { document: host } as Window, null), [
+    host,
+  ]);
+});
+
+test('Wujie iframe 里的下拉菜单也要进拦截根', () => {
+  const iframeDoc = { id: 'iframe-doc' } as unknown as Document;
+  const host = {
+    querySelectorAll: (selector: string) =>
+      selector === 'iframe' ? [{ contentDocument: iframeDoc }] : [],
+  } as unknown as Document;
+  const roots = getConfigReferenceNativeEditRoots(host);
+  assert.equal(roots.includes(host), true);
+  assert.equal(roots.includes(iframeDoc), true);
+});
+
+test('环境变量页展示要从有容器卡片的 iframe 根取，不能停在宿主空壳', () => {
+  const host = {
+    querySelector: () => null,
+    querySelectorAll: () => [],
+    defaultView: {
+      location: {
+        pathname: '/dev-workspace/clusters/host/projects/dev-wes/deployments/x/env',
+      },
+    },
+  } as unknown as Document;
+  const iframe = fakeEnvTabDocument([{ name: 'wes-v2-bench-appcds' }]);
+  assert.equal(resolveConfigReferenceEnvRoot([host, iframe]), iframe);
+  assert.equal(
+    resolveConfigReferenceFormRoot([host, iframe]),
+    host,
+    'without an editor dialog the form picker must not steal the env-tab root',
+  );
+});
+
+test('注入根优先选已经出现批量引用锚点的 document', () => {
+  const empty = {
+    querySelector: () => null,
+    querySelectorAll: () => [],
+  } as unknown as Document;
+  const button = {
+    tagName: 'BUTTON',
+    closest: () => null,
+    getAttribute: () => null,
+    parentElement: null,
+  };
+  const withAction = {
+    querySelector: (selector: string) =>
+      selector === '[data-test="add-env-configmap"]' ? button : null,
+    querySelectorAll: (selector: string) =>
+      selector === '[data-test="add-env-configmap"]' ? [button] : [],
+  } as unknown as Document;
+  assert.equal(resolveConfigReferenceFormRoot([empty, withAction]), withAction);
 });
 
 test('native settings activation opens the controlled action before the old editor and leaves other actions untouched', () => {
@@ -336,6 +404,7 @@ const fakeEnvTabDocument = (cards: FakeCard[], activeHref = '/env') => {
 
   return {
     querySelector: (selector: string) => (selector === 'div.detail-page-content' ? content : null),
+    querySelectorAll: () => [],
     defaultView: { location: { pathname: activeHref } },
   } as unknown as Document;
 };

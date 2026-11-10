@@ -143,9 +143,10 @@ function DeploymentDetail(): JSX.Element {
   );
   const handleActivated = useCallback(
     (appWindow: Window) => {
+      afterMount(appWindow);
       bindHistory(appWindow);
     },
-    [bindHistory],
+    [afterMount, bindHistory],
   );
   const handleAfterUnmount = useCallback(() => {
     removeHostHistoryRef.current?.();

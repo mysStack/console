@@ -24,6 +24,7 @@ function StatefulDetail(): JSX.Element {
         alive
         sync={false}
         afterMount={afterMount}
+        activated={afterMount}
         afterUnmount={afterUnmount}
       />
       {inline}

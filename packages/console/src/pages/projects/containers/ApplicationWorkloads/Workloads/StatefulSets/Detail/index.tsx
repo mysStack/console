@@ -18,7 +18,6 @@ import {
   getDisplayName,
   formatTime,
   useCommonActions,
-  useV3action,
   hasClusterModule,
   hpaStore,
   ClusterAliasName,
@@ -31,6 +30,8 @@ import {
 } from '../../../../../../clusters/hooks/useModal';
 import type { FormattedWorkload } from '@ks-console/shared';
 import { Firewall } from '@kubed/icons';
+import { useConfigReferenceBridge } from '../../../../../components/ConfigReference/entry';
+import { openNativeEditSettings } from '../../openNativeEditSettings';
 
 const module = 'statefulsets';
 const WORKLOAD_TYPE = 'STATEFULSET';
@@ -231,7 +232,7 @@ const StatefulSetsDetail = () => {
     ];
   }, [detail]);
 
-  const { open, render: renderV3Modal } = useV3action();
+  const { inline, summary, openEditor } = useConfigReferenceBridge('statefulsets');
 
   const isExtensionEnabledInCluster = hasClusterModule(cluster!, 'metrics-server');
   const actions = () => {
@@ -276,20 +277,7 @@ const StatefulSetsDetail = () => {
         icon: <Icon name="storage" />,
         text: t('EDIT_SETTINGS'),
         action: 'edit',
-        onClick: () => {
-          open({
-            module,
-            ...params,
-            detail,
-            v3Module: 'workload',
-            v3StoreParams: module,
-            hasRootStore: true,
-            success: () => {
-              notify.success(t('UPDATE_SUCCESSFUL'));
-              refetch();
-            },
-          });
-        },
+        onClick: () => openNativeEditSettings(openEditor),
       },
       {
         key: 'editYaml',
@@ -385,7 +373,8 @@ const StatefulSetsDetail = () => {
           onCancel={() => closeDeleteModal()}
         ></DeleteConfirmModal>
       )}
-      {renderV3Modal()}
+      {inline}
+      {summary}
       {renderAutoScalingModal()}
     </>
   );
