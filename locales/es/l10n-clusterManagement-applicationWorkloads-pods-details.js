@@ -15,6 +15,16 @@ module.exports = {
   CONTAINER_LOGS_NOT_SUPPORTED:
     'El contenedor no admite logs en tiempo real en el estado actual, intente nuevamente más tarde.',
   CONTAINER_LOGS: 'Registros de contenedores',
+  CONTAINER_LOG_MATCH: 'Coincidir',
+  SEARCH_BY_KEYWORD: 'Buscar por palabra clave',
+  LOG_MATCH: 'coincidencia',
+  LOG_MATCHES: 'coincidencias',
+  FILTER_LOG_LINES: 'Filtrar líneas coincidentes',
+  PREVIOUS_MATCH: 'Coincidencia anterior',
+  NEXT_MATCH: 'Siguiente coincidencia',
+  START_REAL_TIME: 'Tiempo real',
+  STOP_REAL_TIME: 'Tiempo real',
+  LOG_EXPORT: 'Exportar',
   // Resource Status > Details > Container Details > Attributes
   COMMAND: 'Comando',
   IMAGE_ID: 'ID de imagen',
