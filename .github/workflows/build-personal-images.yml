@@ -39,7 +39,7 @@ jobs:
         run: yarn test
 
       - name: Run server proxy regressions
-        run: node --test server/proxy.keepalive.test.js server/routes.pstatic.test.js
+        run: node --test server/proxy.keepalive.test.js server/routes.pstatic.test.js server/routes.springcloud.test.js
 
   build:
     name: Build and publish ks-console
