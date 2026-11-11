@@ -38,8 +38,8 @@ jobs:
       - name: Run unit tests
         run: yarn test
 
-      - name: Run server proxy regressions
-        run: node --test server/proxy.keepalive.test.js server/routes.pstatic.test.js server/routes.springcloud.test.js
+      - name: Run server regressions
+        run: node --test server/proxy.keepalive.test.js server/routes.pstatic.test.js server/routes.springcloud.test.js server/controllers/view.bootstrap.test.js server/controllers/session.test.js server/routes.compat.test.js
 
   build:
     name: Build and publish ks-console
