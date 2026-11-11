@@ -14,6 +14,9 @@ const NEED_OMIT_HEADERS = ['cookie', 'referer'];
 const k8sResourceProxy = {
   target,
   changeOrigin: true,
+  // Without an agent, http-proxy forces Connection: close upstream and
+  // forwards it to the browser, discarding the API connection after each GET.
+  agent,
   events: {
     proxyReq(proxyReq, req) {
       // Set authorization
