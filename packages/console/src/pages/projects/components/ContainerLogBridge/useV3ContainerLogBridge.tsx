@@ -1,25 +1,19 @@
 import React, { useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { NativeContainerLogModal } from './NativeContainerLogModal';
-import { parseV3ContainerLogClick } from './parse';
+import { bindV3ContainerLogClick, collectV3ContainerLogRoots } from './bind';
 
 export function useV3ContainerLogBridge() {
   const { cluster, namespace } = useParams<'cluster' | 'namespace'>();
   const [target, setTarget] = useState<{ podName: string; containerName: string } | null>(null);
 
   const bindContainerLog = useCallback((appWindow: Window) => {
-    const handleClick = (event: Event) => {
-      const parsed = parseV3ContainerLogClick(event.target);
-      if (!parsed) {
-        return;
-      }
-      event.preventDefault();
-      event.stopPropagation();
-      (event as Event & { stopImmediatePropagation?: () => void }).stopImmediatePropagation?.();
-      setTarget(parsed);
-    };
-    appWindow.document.addEventListener('click', handleClick, true);
-    return () => appWindow.document.removeEventListener('click', handleClick, true);
+    const hostDocument = window.document;
+    const app = hostDocument.querySelector('wujie-app[data-wujie-id="consolev3"]');
+    return bindV3ContainerLogClick(
+      collectV3ContainerLogRoots(hostDocument, appWindow, app?.shadowRoot),
+      setTarget,
+    );
   }, []);
 
   const modal =
