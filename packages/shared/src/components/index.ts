@@ -41,6 +41,7 @@ export { default as TextPreview } from './TextPreview';
 export * from './Inputs';
 export { default as TimeSelector } from './TimeSelector';
 export { default as PodsCard } from './PodsCard';
+export { default as ContainerLog } from './Containers/Log';
 export * from './Charts';
 
 export { default as RecreateModal } from './RecreateModal';
