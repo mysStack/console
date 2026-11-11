@@ -107,6 +107,8 @@ export function useContainerLogFollow({
   )}?${query}`;
 
   const xhr = useRef<XMLHttpRequest>();
+  const flushTimer = useRef<ReturnType<typeof setTimeout>>();
+  const pending = useRef('');
   const [data, setData] = useState<string>('');
 
   function fetch() {
@@ -114,7 +116,14 @@ export function useContainerLogFollow({
     if (enabled) {
       xhr.current.addEventListener('readystatechange', () => {
         if (xhr.current?.readyState === XMLHttpRequest.LOADING && xhr.current.status === 200) {
-          setData(xhr.current.responseText);
+          pending.current = xhr.current.responseText;
+          if (flushTimer.current) {
+            return;
+          }
+          flushTimer.current = setTimeout(() => {
+            flushTimer.current = undefined;
+            setData(pending.current);
+          }, 300);
         }
       });
 
@@ -127,7 +136,13 @@ export function useContainerLogFollow({
 
   useEffect(() => {
     fetch();
-    return () => xhr.current?.abort();
+    return () => {
+      if (flushTimer.current) {
+        clearTimeout(flushTimer.current);
+        flushTimer.current = undefined;
+      }
+      xhr.current?.abort();
+    };
   }, [enabled, url]);
 
   const refetch = () => {

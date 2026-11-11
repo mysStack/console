@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChevronDown, ChevronUp } from '@kubed/icons';
 import { IconButton, MatchCount, SearchBarWrap, SearchInput } from './styles';
 
@@ -31,8 +31,21 @@ export function LogSearchBar({
   onPrev,
   onNext,
 }: Props) {
+  const [draft, setDraft] = useState(keyword);
   const label = matchCount === 1 ? t('LOG_MATCH') : t('LOG_MATCHES');
   const navDisabled = disabled || matchCount === 0;
+
+  useEffect(() => {
+    setDraft(keyword);
+  }, [keyword]);
+
+  useEffect(() => {
+    if (draft === keyword) {
+      return undefined;
+    }
+    const timer = window.setTimeout(() => onKeywordChange(draft), 250);
+    return () => window.clearTimeout(timer);
+  }, [draft, keyword, onKeywordChange]);
 
   return (
     <SearchBarWrap className="container-log-searchbar">
@@ -42,14 +55,17 @@ export function LogSearchBar({
       <SearchInput
         data-test="container-log-match"
         placeholder={t('SEARCH_BY_KEYWORD')}
-        value={keyword}
+        value={draft}
         disabled={disabled}
-        onChange={event => onKeywordChange(event.target.value)}
+        onChange={event => setDraft(event.target.value)}
         onKeyDown={event => {
           if (event.key !== 'Enter') {
             return;
           }
           event.preventDefault();
+          if (draft !== keyword) {
+            onKeywordChange(draft);
+          }
           if (event.shiftKey) {
             onPrev();
           } else {

@@ -4,6 +4,9 @@ export interface LogMatch {
   end: number;
 }
 
+export const MAX_LOG_MATCHES = 500;
+export const MAX_HIGHLIGHTS_PER_LINE = 30;
+
 export function splitLogLines(log: string): string[] {
   const normalized = (log ?? '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
   if (!normalized) {
@@ -23,8 +26,8 @@ export function findLogMatches(lines: string[], keyword: string): LogMatch[] {
   }
   const lower = needle.toLowerCase();
   const matches: LogMatch[] = [];
-  lines.forEach((text, index) => {
-    const haystack = text.toLowerCase();
+  for (let index = 0; index < lines.length; index += 1) {
+    const haystack = lines[index].toLowerCase();
     let from = 0;
     while (from <= haystack.length - lower.length) {
       const start = haystack.indexOf(lower, from);
@@ -36,10 +39,31 @@ export function findLogMatches(lines: string[], keyword: string): LogMatch[] {
         start,
         end: start + needle.length,
       });
+      if (matches.length >= MAX_LOG_MATCHES) {
+        return matches;
+      }
       from = start + Math.max(lower.length, 1);
     }
-  });
+  }
   return matches;
+}
+
+export function groupMatchesByLine(
+  matches: LogMatch[],
+): Map<number, Array<LogMatch & { index: number }>> {
+  const grouped = new Map<number, Array<LogMatch & { index: number }>>();
+  matches.forEach((item, index) => {
+    const next = { ...item, index };
+    const row = grouped.get(item.lineNumber);
+    if (!row) {
+      grouped.set(item.lineNumber, [next]);
+      return;
+    }
+    if (row.length < MAX_HIGHLIGHTS_PER_LINE) {
+      row.push(next);
+    }
+  });
+  return grouped;
 }
 
 export function visibleLineNumbers(

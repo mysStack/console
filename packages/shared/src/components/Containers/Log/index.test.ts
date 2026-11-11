@@ -15,6 +15,7 @@ test('容器日志按 4.3 交互提供关键词匹配、过滤和上下跳转', 
   assert.match(src, /findLogMatches/);
   assert.match(src, /wrapMatchIndex/);
   assert.match(searchBar, /SEARCH_BY_KEYWORD/);
+  assert.match(searchBar, /setTimeout/);
   assert.match(searchBar, /data-test="container-log-match"/);
   assert.match(searchBar, /FILTER_LOG_LINES/);
   assert.match(searchBar, /PREVIOUS_MATCH/);
