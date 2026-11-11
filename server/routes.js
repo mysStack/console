@@ -9,6 +9,7 @@ const convert = require('koa-convert');
 const bodyParser = require('koa-bodyparser');
 
 const proxy = require('./middlewares/proxy');
+const compressStaticProxy = require('./middlewares/compressStaticProxy');
 const checkToken = require('./middlewares/checkToken');
 const checkIfExist = require('./middlewares/checkIfExist');
 
@@ -102,6 +103,7 @@ router
   // plugin static files proxy.
   .get(
     '/pstatic/(.*)',
+    compressStaticProxy,
     RouterProxy('(.*)', {
       target: serverConfig.apiServer.url,
       changeOrigin: true,
