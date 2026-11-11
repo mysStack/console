@@ -6,7 +6,6 @@ import {
   getConsoleV3Sandbox,
   getConsoleV3ScopeKey,
   isConsoleV3InstanceMounted,
-  isConsoleV3ListCacheExpired,
   markConsoleV3Phase,
   normalizeConsoleV3Url,
   shouldRebuildConsoleV3Instance,
@@ -47,7 +46,6 @@ test('ConsoleV3 scope guard distinguishes resource scopes', () => {
 test('ConsoleV3 reuses the live app when switching resource scopes', () => {
   assert.equal(
     shouldRebuildConsoleV3Instance({
-      cacheExpired: false,
       deactivated: false,
       mountedRevision: undefined,
       revision: '0:0',
@@ -56,19 +54,28 @@ test('ConsoleV3 reuses the live app when switching resource scopes', () => {
   );
 });
 
-test('ConsoleV3 rebuilds a stale cached scope after mutation or TTL expiry', () => {
+test('ConsoleV3 rebuilds a deactivated scope after mutation', () => {
   const input = {
-    cacheExpired: false,
     deactivated: true,
     mountedRevision: '0:0',
     revision: '1:1',
   };
 
   assert.equal(shouldRebuildConsoleV3Instance(input), true);
-  assert.equal(
-    shouldRebuildConsoleV3Instance({ ...input, cacheExpired: true, deactivated: false }),
-    true,
-  );
+  assert.equal(shouldRebuildConsoleV3Instance({ ...input, deactivated: false }), false);
+});
+
+test('ConsoleV3 retains an unchanged runtime after the old data cache TTL', () => {
+  // Regression: the former data-expiry hint must not force a runtime rebuild.
+  const agedScope = {
+    cacheExpired: true,
+    deactivated: true,
+    mountedRevision: '0:0',
+    revision: '0:0',
+  };
+
+  assert.equal(shouldRebuildConsoleV3Instance(agedScope), false);
+  assert.equal(shouldRebuildConsoleV3Instance({ ...agedScope, revision: '1:1' }), true);
 });
 
 test('ConsoleV3 treats a rendered ShadowRoot as a mounted app', () => {
@@ -146,10 +153,4 @@ test('ConsoleV3 keeps an already absolute app URL unchanged', () => {
 
 test('ConsoleV3 leaves an unresolved URL untouched instead of guessing', () => {
   assert.equal(normalizeConsoleV3Url('undefined/pods', 'ks.test:30881'), 'undefined/pods');
-});
-
-test('ConsoleV3 list cache expires after the configured TTL', () => {
-  assert.equal(isConsoleV3ListCacheExpired(undefined, 30_000, 30_000), false);
-  assert.equal(isConsoleV3ListCacheExpired(0, 30_000, 30_000), false);
-  assert.equal(isConsoleV3ListCacheExpired(0, 30_001, 30_000), true);
 });

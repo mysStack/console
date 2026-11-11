@@ -122,7 +122,6 @@ export const getConsoleV3InstanceState = (
 };
 
 export interface ConsoleV3RebuildInput {
-  cacheExpired: boolean;
   deactivated: boolean;
   mountedRevision: string | undefined;
   revision: string;
@@ -130,21 +129,15 @@ export interface ConsoleV3RebuildInput {
 
 /**
  * Reuse the live instance across resource scopes: the app is alive, and the
- * activated lifecycle syncs it to the new list route. Rebuild only when the
- * cache expired or a mutation changed the list the user is returning to.
+ * activated lifecycle syncs it to the new list route. Rebuild only when
+ * a mutation changed the list the user is returning to. Route activation
+ * refreshes list data; its age must not discard the loaded application.
  */
 export const shouldRebuildConsoleV3Instance = ({
-  cacheExpired,
   deactivated,
   mountedRevision,
   revision,
-}: ConsoleV3RebuildInput): boolean => cacheExpired || (deactivated && mountedRevision !== revision);
-
-export const isConsoleV3ListCacheExpired = (
-  lastUsedAt: number | undefined,
-  now: number,
-  ttlMs: number,
-): boolean => lastUsedAt !== undefined && now - lastUsedAt > ttlMs;
+}: ConsoleV3RebuildInput): boolean => deactivated && mountedRevision !== revision;
 
 export const getConsoleV3MarkName = (phase: ConsoleV3Phase, url: string): string =>
   `consolev3:${phase}:${getPathname(url)}`;
