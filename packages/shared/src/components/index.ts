@@ -55,6 +55,8 @@ export { default as MetaData } from './Widgets/MetaData';
 export { default as Events } from './Widgets/Events';
 export { default as NavTitle } from './Layouts/NavTitle';
 export * from './Layouts/NavMenu';
+export type { PageLayoutProps } from './Layouts/PageLayout';
+export { default as PageLayout } from './Layouts/PageLayout';
 export type { ListPageProps } from './Layouts/ListPage';
 export { default as ListPage } from './Layouts/ListPage';
 export { default as DetailPage, useDetailPage } from './Layouts/DetailPage';

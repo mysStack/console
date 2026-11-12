@@ -133,17 +133,10 @@ export default function ConsoleV3ResourceList({
       setInstanceReady(true);
       return;
     }
-    // An embed without `alive` (cluster and other V3-only routes) clears the
-    // shared ShadowRoot on unmount but leaves the sandbox and its scripts
-    // loaded. Render the app again in place instead of booting it from zero.
-    // Entering such a route first leaves no child window here, and the cleared
-    // sandbox renders nothing when activated: boot a clean app, as the plain
-    // mount always did, instead of waiting for the verify timer below.
-    if (!lastConsoleV3AppWindow && !isConsoleV3InstanceMounted()) {
-      WujieReact.destroyApp('consolev3');
-      setInstanceReady(true);
-      return;
-    }
+    // No local callback does not mean there is no sandbox: the global
+    // preloader may still be loading, or already own a mounted hidden app.
+    // Let Wujie's startApp reuse it and await its preload promise. Destroying
+    // it here races both bootstrap and the async child unmount hook.
     if (getConsoleV3InstanceState(lastConsoleV3AppWindow) !== 'stale') {
       setInstanceReady(true);
       return;
@@ -163,6 +156,9 @@ export default function ConsoleV3ResourceList({
   useEffect(() => {
     if (!instanceReady) return;
     const timer = window.setTimeout(() => {
+      // No lifecycle callback yet means the first boot may still be loading.
+      // The recovery timer is for a previously mounted app, not a boot timeout.
+      if (!lastConsoleV3AppWindow) return;
       if (isConsoleV3InstanceMounted()) return;
       if (retriedUrlRef.current === resourceUrl) return;
       if (
