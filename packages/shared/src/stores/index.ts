@@ -52,6 +52,7 @@ import limitRangesStore from './limitranges';
 import projectNewStore from './project.new';
 import quotaStore from './quotas';
 import BaseStore from './store';
+import * as storeHooks from './useStore';
 import deploymentStore from './workload/deployment';
 import { default as useEnvStore } from './workload/env';
 import hpaStore from './workload/hpa';
@@ -126,6 +127,7 @@ export {
   volumeSnapshotClassStore,
   storageClassStore,
   BaseStore,
+  storeHooks,
   limitRangesStore,
   quotaStore,
   volumeSnapshotStore,
