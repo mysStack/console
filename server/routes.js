@@ -9,8 +9,10 @@ const convert = require('koa-convert');
 const bodyParser = require('koa-bodyparser');
 
 const proxy = require('./middlewares/proxy');
+const compressStaticProxy = require('./middlewares/compressStaticProxy');
 const checkToken = require('./middlewares/checkToken');
 const checkIfExist = require('./middlewares/checkIfExist');
+const legacyCapabilityProbe = require('./middlewares/legacyCapabilityProbe');
 
 const { getServerConfig } = require('./libs/utils');
 
@@ -60,7 +62,7 @@ router
   .get('/blank_md', renderMarkdown)
 
   .all('/proxy-api/(.*)', checkToken, checkIfExist)
-  .all('(/clusters/[^/]*)?/(k?)api(s?)/(.*)', checkToken, checkIfExist)
+  .all('(/clusters/[^/]*)?/(k?)api(s?)/(.*)', checkToken, checkIfExist, legacyCapabilityProbe)
   .use(proxy('/apis/marketplace/(.*)', marketplaceApiProxy))
   .use(proxy('(/clusters/[^/]*)?/(k?)api(s?)/(.*)', k8sResourceProxy))
   .use(proxy('/proxy/(.*)', k8sResourceProxy))
@@ -102,6 +104,7 @@ router
   // plugin static files proxy.
   .get(
     '/pstatic/(.*)',
+    compressStaticProxy,
     RouterProxy('(.*)', {
       target: serverConfig.apiServer.url,
       changeOrigin: true,

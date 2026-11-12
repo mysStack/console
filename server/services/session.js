@@ -336,7 +336,7 @@ const getKSConfig = async ctx => {
   return resp;
 };
 
-const getCurrentUser = async (ctx, clusterRole, isMulticluster) => {
+const getCurrentUser = async (ctx, clusterRole) => {
   const token = ctx.cookies.get('token');
 
   if (!token) {
@@ -347,7 +347,7 @@ const getCurrentUser = async (ctx, clusterRole, isMulticluster) => {
   }
 
   const [userDetail, workspaces, clusters] = await Promise.all([
-    getUserDetail(token, clusterRole, isMulticluster),
+    getUserDetail(token, clusterRole),
     getWorkspaces(token, clusterRole),
     getClusters(token),
   ]);

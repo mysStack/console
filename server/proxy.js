@@ -14,6 +14,8 @@ const NEED_OMIT_HEADERS = ['cookie', 'referer'];
 const k8sResourceProxy = {
   target,
   changeOrigin: true,
+  // Keep the existing upstream agent as well as response compression.
+  agent,
   compressResponse: true,
   events: {
     proxyReq(proxyReq, req) {

@@ -18,13 +18,14 @@ import {
   getDisplayName,
   formatTime,
   useCommonActions,
-  useV3action,
   hasClusterModule,
   ClusterAliasName,
   ProjectAliasName,
 } from '@ks-console/shared';
 import { useRollbackModal, useAutoScalingModal } from '../../../../../../clusters/hooks/useModal';
 import type { FormattedWorkload } from '@ks-console/shared';
+import { useConfigReferenceBridge } from '../../../../../components/ConfigReference/entry';
+import { openNativeEditSettings } from '../../openNativeEditSettings';
 
 const module = 'deployments';
 const WORKLOAD_TYPE = 'DEPLOYMENT';
@@ -235,10 +236,11 @@ const DeploymentDetail = () => {
   });
 
   useEffect(() => {
+    if (!detail) return;
     setDetailProps({ module, detail, isLoading, isError });
   }, [detail]);
 
-  const { open, render: renderV3Modal } = useV3action();
+  const { inline, summary, openEditor } = useConfigReferenceBridge('deployments');
   const isExtensionEnabledInCluster = hasClusterModule(cluster!, 'metrics-server');
   const actions = () => {
     return [
@@ -278,20 +280,7 @@ const DeploymentDetail = () => {
         icon: <Storage />,
         text: t('EDIT_SETTINGS'),
         action: 'edit',
-        onClick: () => {
-          open({
-            module,
-            ...params,
-            detail,
-            v3Module: 'workload',
-            v3StoreParams: module,
-            hasRootStore: true,
-            success: () => {
-              notify.success(t('UPDATE_SUCCESSFUL'));
-              refetch();
-            },
-          });
-        },
+        onClick: () => openNativeEditSettings(openEditor),
       },
       {
         key: 'editYaml',
@@ -364,7 +353,8 @@ const DeploymentDetail = () => {
           }}
         />
       )}
-      {renderV3Modal()}
+      {inline}
+      {summary}
       {renderRollbackModal()}
       {renderAutoScalingModal()}
       {recreateModalIsOpen && (

@@ -14,6 +14,17 @@ module.exports = {
   // Resource Status > Containers > Container Logs
   CONTAINER_LOGS_NOT_SUPPORTED: '容器在当前不支持实时日志，请稍后重试。',
   CONTAINER_LOGS: '容器日志',
+  CONTAINER_LOG_LATEST_LINES: '最近 1000 行',
+  CONTAINER_LOG_MATCH: '匹配',
+  SEARCH_BY_KEYWORD: '按关键词搜索',
+  LOG_MATCH: '结果匹配',
+  LOG_MATCHES: '结果匹配',
+  FILTER_LOG_LINES: '过滤匹配行',
+  PREVIOUS_MATCH: '上一个匹配',
+  NEXT_MATCH: '下一个匹配',
+  START_REAL_TIME: '实时',
+  STOP_REAL_TIME: '实时',
+  LOG_EXPORT: '导出',
   // Resource Status > Details > Container Details > Attributes
   COMMAND: '命令',
   IMAGE_ID: '镜像 ID',

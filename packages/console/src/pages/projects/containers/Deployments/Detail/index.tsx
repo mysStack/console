@@ -4,9 +4,10 @@
  */
 
 import React, { useCallback, useEffect, useRef } from 'react';
+import ConsoleV3AliveEmbed from '../../../../../components/ConsoleV3AliveEmbed';
 import { useLocation, useParams } from 'react-router-dom';
 import { useConfigReferenceBridge } from '../../../components/ConfigReference/entry';
-import ConsoleV3AliveEmbed from '../../../../../components/ConsoleV3AliveEmbed';
+import { useV3ContainerLogBridge } from '../../../components/ContainerLogBridge/useV3ContainerLogBridge';
 import {
   getConsoleV3DetailPath,
   getConsoleV3DeploymentListPath,
@@ -24,9 +25,11 @@ function DeploymentDetail(): JSX.Element {
   >();
   const location = useLocation();
   const { afterMount, afterUnmount, inline, summary } = useConfigReferenceBridge('deployments');
+  const { bindContainerLog, modal: containerLogModal } = useV3ContainerLogBridge();
   const appWindowRef = useRef<Window>();
   const routeSyncFrameRef = useRef<number>();
   const removeHostHistoryRef = useRef<() => void>();
+  const unbindContainerLogRef = useRef<() => void>();
   const projectPrefix = getConsoleV3ProjectPrefix({
     workspace,
     cluster,
@@ -138,16 +141,23 @@ function DeploymentDetail(): JSX.Element {
     (appWindow: Window) => {
       afterMount(appWindow);
       bindHistory(appWindow);
+      unbindContainerLogRef.current?.();
+      unbindContainerLogRef.current = bindContainerLog(appWindow);
     },
-    [afterMount, bindHistory],
+    [afterMount, bindContainerLog, bindHistory],
   );
   const handleActivated = useCallback(
     (appWindow: Window) => {
+      afterMount(appWindow);
       bindHistory(appWindow);
+      unbindContainerLogRef.current?.();
+      unbindContainerLogRef.current = bindContainerLog(appWindow);
     },
-    [bindHistory],
+    [afterMount, bindContainerLog, bindHistory],
   );
   const handleAfterUnmount = useCallback(() => {
+    unbindContainerLogRef.current?.();
+    unbindContainerLogRef.current = undefined;
     removeHostHistoryRef.current?.();
     removeHostHistoryRef.current = undefined;
     if (appWindowRef.current && routeSyncFrameRef.current !== undefined) {
@@ -163,6 +173,8 @@ function DeploymentDetail(): JSX.Element {
   return (
     <>
       <ConsoleV3AliveEmbed
+        width="100%"
+        height="100%"
         url={embeddedUrl}
         afterMount={handleAfterMount}
         activated={handleActivated}
@@ -170,6 +182,7 @@ function DeploymentDetail(): JSX.Element {
       />
       {inline}
       {summary}
+      {containerLogModal}
     </>
   );
 }

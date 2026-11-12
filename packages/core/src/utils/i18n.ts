@@ -9,6 +9,9 @@ import { ENV, cookie, getBrowserLang, request } from '@ks-console/shared';
 import { buildLocaleResources, LOCALE_FALLBACK_LANG } from './localeResources';
 import type { LocaleBundle } from './localeResources';
 
+const localeRequests = new Map<string, Promise<LocaleBundle | undefined>>();
+let initialization: Promise<unknown> | undefined;
+
 const resolveLocalePath = (lang?: string) => {
   if (!lang) {
     return '';
@@ -29,16 +32,26 @@ const loadLocale = async (lang?: string): Promise<LocaleBundle | undefined> => {
   if (!path) {
     return undefined;
   }
-  try {
-    // The shared axios instance unwraps `response.data` in a response interceptor
-    // (packages/shared/src/utils/request.ts), so the second generic states what
-    // actually resolves. Same idiom as request.get<never, OriginalPodList>; the
-    // callable form declares no generics, hence `.get` rather than `request(path)`.
-    return await request.get<never, LocaleBundle>(path);
-  } catch (error) {
-    console.warn(`[i18n] could not load the ${lang} locale bundle from ${path}`, error);
-    return undefined;
-  }
+  const cached = ENV.isProduction && localeRequests.get(path);
+  if (cached) return cached;
+
+  const pending = (async () => {
+    try {
+      // The shared axios instance unwraps `response.data` in a response interceptor
+      // (packages/shared/src/utils/request.ts), so the second generic states what
+      // actually resolves. Same idiom as request.get<never, OriginalPodList>; the
+      // callable form declares no generics, hence `.get` rather than `request(path)`.
+      return await request.get<never, LocaleBundle>(path);
+    } catch (error) {
+      // A temporary failure must not poison the cache for later extensions.
+      localeRequests.delete(path);
+      console.warn(`[i18n] could not load the ${lang} locale bundle from ${path}`, error);
+      return undefined;
+    }
+  })();
+  // Development locale URLs have no content hash and must remain reloadable.
+  if (ENV.isProduction) localeRequests.set(path, pending);
+  return pending;
 };
 
 const init = async () => {
@@ -73,7 +86,20 @@ const init = async () => {
     pluginLocales,
   });
 
-  await i18next.init(
+  if (initialization) {
+    await initialization;
+    for (const [lang, { translation }] of Object.entries(totalLocales)) {
+      // Replace the complete namespace so a changed manifest can remove old keys.
+      i18next.removeResourceBundle(lang, 'translation');
+      i18next.addResourceBundle(lang, 'translation', translation);
+    }
+    if (userLang && i18next.language !== userLang) {
+      await i18next.changeLanguage(userLang);
+    }
+    return;
+  }
+
+  initialization = i18next.init(
     {
       lng: userLang,
       fallbackLng: LOCALE_FALLBACK_LANG,
@@ -90,6 +116,12 @@ const init = async () => {
       window.t = t;
     },
   );
+  try {
+    await initialization;
+  } catch (error) {
+    initialization = undefined;
+    throw error;
+  }
 };
 
 export default { init };

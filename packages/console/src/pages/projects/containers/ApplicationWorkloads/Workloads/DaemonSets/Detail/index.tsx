@@ -9,7 +9,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Loading, notify } from '@kubed/components';
 import { useCacheStore as useStore } from '@ks-console/shared';
 import { useDisclosure } from '@kubed/hooks';
-import { hasClusterModule, useV3action } from '@ks-console/shared';
+import { hasClusterModule } from '@ks-console/shared';
 
 import {
   Icon,
@@ -25,6 +25,8 @@ import {
 } from '@ks-console/shared';
 import { useRollbackModal, useBaseInfoModal } from '../../../../../../clusters/hooks/useModal';
 import type { FormattedWorkload } from '@ks-console/shared';
+import { useConfigReferenceBridge } from '../../../../../components/ConfigReference/entry';
+import { openNativeEditSettings } from '../../openNativeEditSettings';
 
 const module = 'daemonsets';
 const WORKLOAD_TYPE = 'DAEMONSET';
@@ -142,6 +144,7 @@ const DaemonSetDetail = () => {
   });
 
   useEffect(() => {
+    if (!detail) return;
     setDetailProps({ module, detail, isLoading, isError });
   }, [detail]);
 
@@ -202,7 +205,7 @@ const DaemonSetDetail = () => {
     ];
   }, [detail]);
 
-  const { open, render: renderV3Modal } = useV3action();
+  const { inline, summary, openEditor } = useConfigReferenceBridge('daemonsets');
 
   const actions = () => {
     return [
@@ -238,20 +241,7 @@ const DaemonSetDetail = () => {
         icon: <Icon name="storage" />,
         text: t('EDIT_SETTINGS'),
         action: 'edit',
-        onClick: () => {
-          open({
-            module,
-            ...params,
-            detail,
-            v3Module: 'workload',
-            v3StoreParams: module,
-            hasRootStore: true,
-            success: () => {
-              notify.success(t('UPDATE_SUCCESSFUL'));
-              refetch();
-            },
-          });
-        },
+        onClick: () => openNativeEditSettings(openEditor),
       },
       {
         key: 'editYaml',
@@ -349,7 +339,8 @@ const DaemonSetDetail = () => {
           onCancel={() => closeDeleteModal()}
         ></DeleteConfirmModal>
       )}
-      {renderV3Modal()}
+      {inline}
+      {summary}
     </>
   );
 };

@@ -3,18 +3,10 @@ import WujieReact from 'wujie-react';
 
 import { getResourceListCacheVersion } from '@ks-console/shared';
 
-import {
-  isConsoleV3BootInFlight,
-  markConsoleV3BootFailed,
-  markConsoleV3BootMounted,
-  markConsoleV3BootStarted,
-} from './bootPhase';
-import { destroyConsoleV3Instance } from './destroy';
 import { watchConsoleV3Sandbox } from './keepAlive';
 import type { ConsoleV3AppWindow } from './metrics';
 import {
   getConsoleV3InstanceState,
-  getConsoleV3Sandbox,
   getConsoleV3ScopeKey,
   isConsoleV3InstanceMounted,
   markConsoleV3Phase,
@@ -32,9 +24,6 @@ const deactivatedScopes = new Set<string>();
 let lastConsoleV3AppWindow: ConsoleV3AppWindow | undefined;
 const VERIFY_MOUNT_DELAY_MS = 3_000;
 
-/** Prefer the last known `__WUJIE`; DOM lookup fails when ShadowRoot is empty. */
-const resolveConsoleV3Sandbox = () => lastConsoleV3AppWindow?.__WUJIE ?? getConsoleV3Sandbox();
-
 export interface ConsoleV3ResourceListProps {
   resource: string;
   url: string;
@@ -51,12 +40,7 @@ export default function ConsoleV3ResourceList({
 }: ConsoleV3ResourceListProps): JSX.Element {
   const [instanceReady, setInstanceReady] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
-  // Verify-path rebuild gate. Must stay separate from activatedRebuildRef:
-  // an empty activate already consumes one immediate rebuild; verify is the
-  // last insurance and must not share that token (or a second empty husk
-  // blanks the URL for the rest of the page lifetime).
   const retriedUrlRef = useRef('');
-  const activatedRebuildRef = useRef('');
   const revivedUrlRef = useRef('');
   // The project layout writes the Wujie URL prefix in an effect. Avoid an
   // initial mount with `undefined/...`; that mount would create a non-reusable
@@ -95,13 +79,6 @@ export default function ConsoleV3ResourceList({
             phase === 'afterMount'
               ? (appWindow?: Window) => {
                   lastConsoleV3AppWindow = appWindow ?? lastConsoleV3AppWindow;
-                  const ensure = (window as unknown as Record<string, unknown>)[
-                    '__KS_ENSURE_CONSOLE_V3_LIST_SEED__'
-                  ];
-                  if (typeof ensure === 'function') {
-                    (ensure as (w?: Window) => void)(appWindow);
-                  }
-                  markConsoleV3BootMounted();
                   watchConsoleV3Sandbox(lastConsoleV3AppWindow?.__WUJIE);
                   mountedResourceUrls.set(scopeKey, resourceUrl);
                   mountedRevisions.set(scopeKey, revision);
@@ -114,12 +91,6 @@ export default function ConsoleV3ResourceList({
                 : phase === 'activated'
                   ? (appWindow?: Window) => {
                       lastConsoleV3AppWindow = appWindow ?? lastConsoleV3AppWindow;
-                      const ensure = (window as unknown as Record<string, unknown>)[
-                        '__KS_ENSURE_CONSOLE_V3_LIST_SEED__'
-                      ];
-                      if (typeof ensure === 'function') {
-                        (ensure as (w?: Window) => void)(appWindow);
-                      }
                       watchConsoleV3Sandbox(lastConsoleV3AppWindow?.__WUJIE);
                       deactivatedScopes.delete(scopeKey);
                       // The first mount of a scope can activate without
@@ -128,9 +99,6 @@ export default function ConsoleV3ResourceList({
                       mountedResourceUrls.set(scopeKey, resourceUrl);
                       mountedRevisions.set(scopeKey, revision);
                       if (appWindow) {
-                        // Only sync when the child is on another path. A cold
-                        // start that already preloaded `resourceUrl` is already
-                        // there; forcing popstate refetches the list.
                         scheduleConsoleV3ListRouteSync(appWindow, resourceUrl);
                       }
                       markConsoleV3Phase('activated', resourceUrl);
@@ -143,28 +111,6 @@ export default function ConsoleV3ResourceList({
                           markConsoleV3Phase('render', resourceUrl),
                         );
                       }
-                      // A non-alive peer (or cleared preload husk) can activate
-                      // with an empty ShadowRoot. Settling `mounted` then lets
-                      // the 3s verify timer wait before destroy — SPA visible
-                      // time jumps to ~8s. Rebuild immediately instead.
-                      if (!isConsoleV3InstanceMounted()) {
-                        if (activatedRebuildRef.current === resourceUrl) {
-                          // Immediate rebuild already failed once; stop spinning
-                          // and leave verify free to try its own path once.
-                          markConsoleV3BootFailed();
-                          return;
-                        }
-                        activatedRebuildRef.current = resourceUrl;
-                        markConsoleV3BootStarted();
-                        void destroyConsoleV3Instance(resolveConsoleV3Sandbox(), () =>
-                          WujieReact.destroyApp('consolev3'),
-                        ).then(() => {
-                          lastConsoleV3AppWindow = undefined;
-                          setRetryCount(count => count + 1);
-                        });
-                        return;
-                      }
-                      markConsoleV3BootMounted();
                     }
                   : phase === 'deactivated'
                     ? () => {
@@ -181,23 +127,8 @@ export default function ConsoleV3ResourceList({
 
   useEffect(() => {
     if (!isReady) return;
-    // SPA entries (overview → list) miss initWujie route priming; kick the
-    // host list seed as soon as the embed URL is known.
-    const primer = (window as unknown as Record<string, unknown>)[
-      '__KS_PRIME_CONSOLE_V3_LIST_SEED__'
-    ];
-    if (typeof primer === 'function') {
-      (primer as (pathname: string) => void)(window.location.pathname);
-    }
-  }, [isReady, resourceUrl]);
-
-  useEffect(() => {
-    if (!isReady) return;
     if (shouldRebuild) {
-      // The rebuild starts a fresh boot below. Enter `booting` here, or the
-      // verify timer would destroy the sandbox while it is still loading.
-      markConsoleV3BootStarted();
-      destroyConsoleV3Instance(resolveConsoleV3Sandbox(), () => WujieReact.destroyApp('consolev3'));
+      WujieReact.destroyApp('consolev3');
       lastConsoleV3AppWindow = undefined;
       setInstanceReady(true);
       return;
@@ -206,20 +137,10 @@ export default function ConsoleV3ResourceList({
     // shared ShadowRoot on unmount but leaves the sandbox and its scripts
     // loaded. Render the app again in place instead of booting it from zero.
     // Entering such a route first leaves no child window here, and the cleared
-    // sandbox renders nothing when activated. `destroyApp` cannot clear that
-    // husk on a cold page load either: it also destroys the instance `preloadApp`
-    // is still filling in. Wujie 1.0.25 `destroy()` does not await the sandbox
-    // unmount, so the rest of that preload runs against a nulled document and
-    // the page reports `null._cacheListeners`. Boot on the existing instance
-    // instead; wujie-react awaits the running preload, and the verify timer
-    // below rebuilds only if this route really left an empty husk.
+    // sandbox renders nothing when activated: boot a clean app, as the plain
+    // mount always did, instead of waiting for the verify timer below.
     if (!lastConsoleV3AppWindow && !isConsoleV3InstanceMounted()) {
-      // Prefix re-writes can remount this host while the first boot still loads
-      // the V3 bundle. Stay in `booting` instead of treating the empty
-      // ShadowRoot as a failed mount; wujie-react queues the newer startApp.
-      if (!isConsoleV3BootInFlight()) {
-        markConsoleV3BootStarted();
-      }
+      WujieReact.destroyApp('consolev3');
       setInstanceReady(true);
       return;
     }
@@ -241,17 +162,8 @@ export default function ConsoleV3ResourceList({
   // in the surviving sandbox first, and rebuild only if that leaves it empty.
   useEffect(() => {
     if (!instanceReady) return;
-    let cancelled = false;
-    let timer = 0;
-    const verify = () => {
-      if (cancelled) return;
+    const timer = window.setTimeout(() => {
       if (isConsoleV3InstanceMounted()) return;
-      // Lifecycle has not settled yet: keep waiting. Protection ends on
-      // afterMount/activated (or the hung-boot watchdog), not on a wall clock.
-      if (isConsoleV3BootInFlight()) {
-        timer = window.setTimeout(verify, VERIFY_MOUNT_DELAY_MS);
-        return;
-      }
       if (retriedUrlRef.current === resourceUrl) return;
       if (
         revivedUrlRef.current !== resourceUrl &&
@@ -262,20 +174,11 @@ export default function ConsoleV3ResourceList({
         return;
       }
       retriedUrlRef.current = resourceUrl;
-      markConsoleV3BootStarted();
-      destroyConsoleV3Instance(resolveConsoleV3Sandbox(), () =>
-        WujieReact.destroyApp('consolev3'),
-      ).then(() => {
-        if (cancelled) return;
-        lastConsoleV3AppWindow = undefined;
-        setRetryCount(count => count + 1);
-      });
-    };
-    timer = window.setTimeout(verify, VERIFY_MOUNT_DELAY_MS);
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
-    };
+      WujieReact.destroyApp('consolev3');
+      lastConsoleV3AppWindow = undefined;
+      setRetryCount(count => count + 1);
+    }, VERIFY_MOUNT_DELAY_MS);
+    return () => window.clearTimeout(timer);
   }, [instanceReady, resourceUrl, retryCount]);
 
   if (!isReady || !instanceReady) {

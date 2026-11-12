@@ -27,6 +27,83 @@ export function shouldWaitForConfigReferenceShadowRoot(
 
 export type ConfigReferenceDomRoot = Document | ShadowRoot;
 
+/**
+ * V3「更多操作」dropdown is portaled. It may live in the Wujie shadow,
+ * the iframe document, or the host document — intercept all three.
+ */
+export function getConfigReferenceNativeEditRoots(
+  hostDocument: Document,
+  appWindow?: Window,
+  shadow?: ShadowRoot | null,
+): ConfigReferenceDomRoot[] {
+  const roots: ConfigReferenceDomRoot[] = [];
+  const add = (root: ConfigReferenceDomRoot | null | undefined) => {
+    if (root && !roots.includes(root)) {
+      roots.push(root);
+    }
+  };
+  const addIframes = (node: ParentNode | Document | ShadowRoot | null | undefined) => {
+    if (!node || typeof (node as ParentNode).querySelectorAll !== 'function') {
+      return;
+    }
+    (node as ParentNode).querySelectorAll('iframe').forEach(frame => {
+      try {
+        add((frame as HTMLIFrameElement).contentDocument);
+      } catch {
+        // Cross-origin frames are not interceptable.
+      }
+    });
+  };
+  add(hostDocument);
+  add(appWindow?.document);
+  add(shadow ?? undefined);
+  addIframes(hostDocument);
+  addIframes(shadow ?? undefined);
+  return roots;
+}
+
+/**
+ * Workspace Wujie lives in `wujie-app[data-wujie-id="consolev3"]`. Native
+ * cluster pages also have unrelated iframes (toolbox, etc.); binding those
+ * as the V3 app observes the whole host document and the detail tab never
+ * leaves its loading spinner.
+ */
+export function getConfigReferenceWujieAppWindow(hostDocument: Document): Window | undefined {
+  const app = hostDocument.querySelector('wujie-app[data-wujie-id="consolev3"]');
+  if (!app) return undefined;
+  const frames = [
+    ...Array.from(app.querySelectorAll('iframe')),
+    ...Array.from(app.shadowRoot?.querySelectorAll('iframe') ?? []),
+  ];
+  for (const frame of frames) {
+    try {
+      if (frame.contentWindow?.document) {
+        return frame.contentWindow;
+      }
+    } catch {
+      // Cross-origin frames are ignored.
+    }
+  }
+  return undefined;
+}
+
+export function resolveConfigReferenceFormRoot(
+  roots: ConfigReferenceDomRoot[],
+): ConfigReferenceDomRoot | undefined {
+  return (
+    roots.find(root => Boolean(findConfigReferenceAction(root))) ||
+    roots.find(root => Boolean(root.querySelector?.('[role="dialog"]'))) ||
+    roots[0]
+  );
+}
+
+/** Read-only 环境变量 tab cards live in the Wujie iframe, not the host shell. */
+export function resolveConfigReferenceEnvRoot(
+  roots: ConfigReferenceDomRoot[],
+): ConfigReferenceDomRoot | undefined {
+  return roots.find(root => findConfigReferenceEnvSections(root).length > 0);
+}
+
 export function installConfigReferenceNativeEdit(root: ConfigReferenceDomRoot, onOpen: () => void) {
   const handleClick = (event: Event) => {
     const target = event.target as Element | null;
@@ -37,6 +114,7 @@ export function installConfigReferenceNativeEdit(root: ConfigReferenceDomRoot, o
     )
       return;
     event.preventDefault();
+    event.stopPropagation();
     event.stopImmediatePropagation();
     onOpen();
   };

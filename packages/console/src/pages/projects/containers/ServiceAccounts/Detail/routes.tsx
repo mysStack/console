@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { Navigate } from 'react-router-dom';
+import ServiceAccountsData from '../../../../clusters/containers/Configuration/ServiceAccounts/Detail/Data';
 
 export default [
   {
@@ -13,6 +14,6 @@ export default [
   },
   {
     path: 'detail',
-    element: <></>,
+    element: <ServiceAccountsData />,
   },
 ];
