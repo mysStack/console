@@ -15,6 +15,17 @@ module.exports = {
   CONTAINER_LOGS_NOT_SUPPORTED:
     'The container does not support real-time logs currently. Please try again later.',
   CONTAINER_LOGS: 'Container Logs',
+  CONTAINER_LOG_LATEST_LINES: 'Latest 1000 lines',
+  CONTAINER_LOG_MATCH: 'Match',
+  SEARCH_BY_KEYWORD: 'Search by keyword',
+  LOG_MATCH: 'match',
+  LOG_MATCHES: 'matches',
+  FILTER_LOG_LINES: 'Filter matching lines',
+  PREVIOUS_MATCH: 'Previous match',
+  NEXT_MATCH: 'Next match',
+  START_REAL_TIME: 'Real-time',
+  STOP_REAL_TIME: 'Real-time',
+  LOG_EXPORT: 'Export',
   // Resource Status > Details > Container Details > Attributes
   COMMAND: 'Command',
   IMAGE_ID: 'Image ID',

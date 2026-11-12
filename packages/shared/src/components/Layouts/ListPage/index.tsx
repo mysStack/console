@@ -55,8 +55,10 @@ const ListPage = ({
   store,
 }: ListPageProps) => {
   const params = useParams();
-  const { cluster = '' } = params;
+  const { cluster = '', namespace: routeNamespace } = params;
   const [selectedNamespace, setSelectedNamespace] = useStore(`${cluster}-selectedNamespace`);
+  // A project route fixes the resource scope; cluster filter state must not override it.
+  const namespace = routeNamespace || selectedNamespace;
   const activeTab = tabs.length < 1 ? null : tabs.find(tab => tab.id === currentTab);
 
   const bannerProps = merge(banner, activeTab?.banner);
@@ -75,20 +77,21 @@ const ListPage = ({
     onNamespaceChange(name);
   };
 
-  const toolbarLeft = hasNamespaceSelector ? (
-    <NamespaceSelector
-      cluster={cluster}
-      onChange={handleNamespaceChange}
-      style={{ marginRight: '12px', width: '240px' }}
-      value={selectedNamespace}
-    />
-  ) : null;
+  const toolbarLeft =
+    hasNamespaceSelector && !routeNamespace ? (
+      <NamespaceSelector
+        cluster={cluster}
+        onChange={handleNamespaceChange}
+        style={{ marginRight: '12px', width: '240px' }}
+        value={selectedNamespace}
+      />
+    ) : null;
 
   const defaultUrl = currentStore?.getResourceUrl({
     cluster,
-    namespace: selectedNamespace,
+    namespace,
   });
-  const tableUrl = (getTableUrl ? getTableUrl(selectedNamespace) : tableProps.url) || defaultUrl;
+  const tableUrl = (getTableUrl ? getTableUrl(namespace) : tableProps.url) || defaultUrl;
   const tableName = tableProps.tableName || `${currentStore?.module}:table:list` || 'table:list';
   const defaultFormatter = (data: any) => currentStore?.mapper(data);
   const format = tableProps.format || defaultFormatter;

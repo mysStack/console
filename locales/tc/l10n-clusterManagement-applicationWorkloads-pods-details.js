@@ -14,6 +14,17 @@ module.exports = {
   // Resource Status > Containers > Container Logs
   CONTAINER_LOGS_NOT_SUPPORTED: '容器在目前狀態下不支持即時紀錄，請稍後再試',
   CONTAINER_LOGS: '容器紀錄',
+  CONTAINER_LOG_LATEST_LINES: '最近 1000 行',
+  CONTAINER_LOG_MATCH: '匹配',
+  SEARCH_BY_KEYWORD: '按關鍵詞搜索',
+  LOG_MATCH: '結果匹配',
+  LOG_MATCHES: '結果匹配',
+  FILTER_LOG_LINES: '過濾匹配行',
+  PREVIOUS_MATCH: '上一個匹配',
+  NEXT_MATCH: '下一個匹配',
+  START_REAL_TIME: '即時',
+  STOP_REAL_TIME: '即時',
+  LOG_EXPORT: '導出',
   // Resource Status > Details > Container Details > Attributes
   COMMAND: '命令',
   IMAGE_ID: '鏡像 ID',

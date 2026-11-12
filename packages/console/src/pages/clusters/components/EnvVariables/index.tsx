@@ -9,13 +9,14 @@ import EnvVariables from '../Cards/Containers/EnvVariables';
 import { useCacheStore as useStore } from '@ks-console/shared';
 import { useEnvStore } from '@ks-console/shared';
 import { Loading } from '@kubed/components';
+import { isWorkloadEnvDetailReady } from './ready';
 
 interface IProps {
   detailPropsName: string;
 }
 const Env = ({ detailPropsName }: IProps) => {
   const [props] = useStore(detailPropsName);
-  const { detail, module } = props;
+  const { detail, module } = props || {};
   const { list, fetchList } = useEnvStore();
 
   const getContainers = () => {
@@ -55,6 +56,7 @@ const Env = ({ detailPropsName }: IProps) => {
   };
 
   const fetchData = () => {
+    if (!isWorkloadEnvDetailReady(detail)) return;
     fetchList({
       namespace: detail.namespace,
       cluster: detail.cluster,
@@ -65,12 +67,13 @@ const Env = ({ detailPropsName }: IProps) => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [detail]);
 
   const { data, isLoading } = list;
-  return isLoading ? (
-    <Loading className="page-loading" />
-  ) : (
+  if (!isWorkloadEnvDetailReady(detail) || isLoading) {
+    return <Loading className="page-loading" />;
+  }
+  return (
     <>
       {data.map((container, index) => (
         <EnvVariables detail={container} key={index} expand={index === 0} module={module} />

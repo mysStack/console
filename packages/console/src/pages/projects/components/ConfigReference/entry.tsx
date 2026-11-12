@@ -1,4 +1,4 @@
-import React, { lazy, useCallback, useMemo, useRef, useState } from 'react';
+import React, { lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useParams } from 'react-router-dom';
 import { request, useV3action, workloadStore } from '@ks-console/shared';
@@ -16,8 +16,12 @@ import {
   findConfigReferenceContainerName,
   findConfigReferenceMountParent,
   findManualEnvScope,
+  getConfigReferenceNativeEditRoots,
+  getConfigReferenceWujieAppWindow,
   injectConfigReferenceEntry,
   installConfigReferenceNativeEdit,
+  resolveConfigReferenceEnvRoot,
+  resolveConfigReferenceFormRoot,
   readManualEnvNames,
   shouldWaitForConfigReferenceShadowRoot,
   shouldRetryConfigReferenceInjection,
@@ -110,15 +114,11 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
         }, 50);
         return;
       }
-      const root = app?.shadowRoot || appWindow.document;
-      const rootDocument = (root as ShadowRoot).ownerDocument || (root as Document);
-      // Empty env bodies are absolutely positioned by V3. When our section heading
-      // contributes content, put that body back into normal flow and suppress its
-      // text placeholder. Keep V3's display rule untouched: it owns collapse.
-      if (!root.querySelector('[data-test="config-reference-env-layout"]')) {
-        const style = rootDocument.createElement('style');
-        style.dataset.test = 'config-reference-env-layout';
-        style.textContent = `
+      const collectRoots = () =>
+        getConfigReferenceNativeEditRoots(document, appWindow, app?.shadowRoot);
+      let root = resolveConfigReferenceFormRoot(collectRoots()) || appWindow.document;
+      let rootDocument = (root as ShadowRoot).ownerDocument || (root as Document);
+      const envLayoutCss = `
           [data-config-reference-empty="true"]:has([data-test="config-reference-env-heading-host"]) {
             position: static !important; transform: none !important;
             height: auto !important; min-height: 0 !important; width: auto !important;
@@ -128,8 +128,15 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
           [data-test="config-reference-env-heading-host"] { width: 100%; font-size: 12px; }
           div:has(> [data-test="config-reference-env-host"]) { flex-direction: column; }
         `;
-        (root instanceof ShadowRoot ? root : root.head).appendChild(style);
-      }
+      const ensureEnvLayout = (target: ConfigReferenceDomRoot) => {
+        if (target.querySelector('[data-test="config-reference-env-layout"]')) return;
+        const doc = (target as ShadowRoot).ownerDocument || (target as Document);
+        const style = doc.createElement('style');
+        style.dataset.test = 'config-reference-env-layout';
+        style.textContent = envLayoutCss;
+        (target instanceof ShadowRoot ? target : doc.head).appendChild(style);
+      };
+      ensureEnvLayout(root);
 
       let editingContainer: string | undefined;
       let containerIntent: 'confirm' | 'cancel' | undefined;
@@ -150,6 +157,8 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
         setDraftVersion(value => value + 1);
       };
       const applyEntry = () => {
+        root = resolveConfigReferenceFormRoot(collectRoots()) || appWindow.document;
+        rootDocument = (root as ShadowRoot).ownerDocument || (root as Document);
         trackContainer();
         const action = findConfigReferenceAction(root);
         const parent = findConfigReferenceMountParent(action);
@@ -174,8 +183,14 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
         // Otherwise attach one block per container card on the read-only 环境变量
         // tab. That page renders a collapsible card per container and lists `env`
         // only, so a single page-level block would describe just the first
-        // container of a multi-container pod.
-        const sections = parent ? [] : findConfigReferenceEnvSections(root);
+        // container of a multi-container pod. Cards live in the Wujie iframe,
+        // which is not the form root on this host `/env` shell.
+        const envRoot = parent ? undefined : resolveConfigReferenceEnvRoot(collectRoots());
+        if (envRoot) ensureEnvLayout(envRoot);
+        const sections = envRoot ? findConfigReferenceEnvSections(envRoot) : [];
+        const envDocument = envRoot
+          ? (envRoot as ShadowRoot).ownerDocument || (envRoot as Document)
+          : rootDocument;
         const present = new Set<string>();
         sections.forEach(section => {
           present.add(section.containerName);
@@ -195,7 +210,7 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
             host = undefined;
           }
           if (!host) {
-            host = rootDocument.createElement('div');
+            host = envDocument.createElement('div');
             host.dataset.test = 'config-reference-env-host';
             // Never insert a third sibling into the native card: V3 hides its
             // last child on collapse. Both env and envFrom must share that body.
@@ -206,7 +221,7 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
             }
             const previousHeading = envHeadingHostsRef.current.get(section.containerName);
             previousHeading?.remove();
-            const headingHost = rootDocument.createElement('div');
+            const headingHost = envDocument.createElement('div');
             headingHost.dataset.test = 'config-reference-env-heading-host';
             section.body.insertBefore(headingHost, section.body.firstChild);
             envHeadingHostsRef.current.set(section.containerName, headingHost);
@@ -264,10 +279,18 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
         });
       };
 
+      let refreshIntercepts = () => {};
       if (appName === 'consolev3') {
-        removeEditListenerRef.current = installConfigReferenceNativeEdit(root, () =>
-          openEditorRef.current?.(),
-        );
+        refreshIntercepts = () => {
+          removeEditListenerRef.current?.();
+          const removes = collectRoots().map(editRoot =>
+            installConfigReferenceNativeEdit(editRoot, () => openEditorRef.current?.()),
+          );
+          removeEditListenerRef.current = () => {
+            removes.forEach(remove => remove());
+          };
+        };
+        refreshIntercepts();
       } else {
         const handleConfirmation = (event: Event) => {
           const target = event.target as Element | null;
@@ -302,26 +325,38 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
       }
 
       applyEntry();
-      const target = root;
-      if (!target) {
-        return;
-      }
-
-      const Observer = rootDocument.defaultView?.MutationObserver || MutationObserver;
-      const observer = new Observer(applyEntry);
-      observer.observe(target, { childList: true, subtree: true });
-      observerRef.current = observer;
+      const observers: MutationObserver[] = [];
+      const refreshObservers = () => {
+        observers.splice(0).forEach(item => item.disconnect());
+        collectRoots().forEach(target => {
+          const doc = (target as ShadowRoot).ownerDocument || (target as Document);
+          const Observer = doc.defaultView?.MutationObserver || MutationObserver;
+          const observer = new Observer(applyEntry);
+          try {
+            observer.observe(target as Node, { childList: true, subtree: true });
+            observers.push(observer);
+          } catch {
+            // Some Wujie document proxies reject observe().
+          }
+        });
+        observerRef.current = {
+          disconnect: () => observers.forEach(item => item.disconnect()),
+        } as MutationObserver;
+      };
+      refreshObservers();
 
       // The action form is lazy and can replace its toolbar after the first
       // mutation. A short bounded retry closes that window without keeping a
       // timer alive for the lifetime of the page.
       let attempt = 0;
       const retryEntry = () => {
+        refreshIntercepts();
+        refreshObservers();
         applyEntry();
-        if (
-          !root.querySelector(CONFIG_REFERENCE_ENTRY_SELECTOR) &&
-          shouldRetryConfigReferenceInjection(attempt)
-        ) {
+        const injected = collectRoots().some(item =>
+          Boolean(item.querySelector?.(CONFIG_REFERENCE_ENTRY_SELECTOR)),
+        );
+        if (!injected && shouldRetryConfigReferenceInjection(attempt)) {
           attempt += 1;
           entryRetryTimerRef.current = setTimeout(retryEntry, 100);
         } else {
@@ -502,9 +537,35 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
 
   const summary = [dialogSummary, ...containerSummaries];
 
+  const openEditor = useCallback(() => {
+    void openEditorRef.current?.();
+  }, []);
+
+  useEffect(() => {
+    const uninstallHost = installConfigReferenceNativeEdit(document, () => {
+      openEditorRef.current?.();
+    });
+    let bound = false;
+    const bindIframe = () => {
+      if (bound) return;
+      const appWindow = getConfigReferenceWujieAppWindow(document);
+      if (!appWindow) return;
+      bound = true;
+      bindRoot(appWindow, 'consolev3');
+    };
+    bindIframe();
+    const observer = new MutationObserver(bindIframe);
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+    return () => {
+      uninstallHost();
+      observer.disconnect();
+    };
+  }, [bindRoot]);
+
   return {
     afterMount,
     afterUnmount,
+    openEditor,
     inline: (
       <>
         {inline}

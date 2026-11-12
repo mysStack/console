@@ -30,8 +30,8 @@ const {
 
 const { client: clientConfig } = getServerConfig();
 
-const renderIndex = async (ctx, params) => {
-  const themeData = await getTheme(ctx);
+const renderIndex = async (ctx, params, themePromise = getTheme(ctx)) => {
+  const themeData = await themePromise;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const _theme = getThemeConfig(themeData);
   const { title, favicon, theme, defaultTheme, logo, background } = _theme;
@@ -65,12 +65,12 @@ const renderIndex = async (ctx, params) => {
         useDefaultTheme,
         ...params,
       }),
-    )
+    ),
   });
 };
 
-const renderV3Index = async (ctx, params) => {
-  const themeData = await getTheme(ctx);
+const renderV3Index = async (ctx, params, themePromise = getTheme(ctx)) => {
+  const themeData = await themePromise;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const _theme = getThemeConfig(themeData);
   const { theme, defaultTheme, logo } = _theme;
@@ -95,12 +95,12 @@ const renderV3Index = async (ctx, params) => {
 
         ...params,
       }),
-    )
+    ),
   });
 };
 
-const renderViewErr = async (ctx, err) => {
-  const themeData = await getTheme(ctx);
+const renderViewErr = async (ctx, err, themePromise = getTheme(ctx)) => {
+  const themeData = await themePromise;
   const _theme = getThemeConfig(themeData);
   const { title, favicon, logo, defaultTheme } = _theme;
   const useDefaultTheme = !startsWith(logo, '/theme');
@@ -180,7 +180,7 @@ const renderTerminal = async ctx => {
           defaultTheme,
           useDefaultTheme,
         }),
-      )
+      ),
     });
   } catch (err) {
     await renderViewErr(ctx, err);
@@ -192,60 +192,78 @@ const renderMarkdown = async ctx => {
 };
 
 const renderView = async ctx => {
+  let themePromise;
   try {
     const clusterRole = await getClusterRole(ctx);
-    const ksConfig = await getKSConfig(ctx);
+    // Theme and user reads do not depend on the configuration response.
+    // Share only this request's theme with the success/error render paths.
+    themePromise = getTheme(ctx);
 
-    const [user, runtime, installedExtensions] = await Promise.all([
-      getCurrentUser(ctx, clusterRole, ksConfig.multicluster),
+    const [ksConfig, user, runtime, installedExtensions, themeData] = await Promise.all([
+      getKSConfig(ctx),
+      getCurrentUser(ctx, clusterRole),
       getK8sRuntime(ctx),
       getInstalledExtensions(ctx),
+      themePromise,
     ]);
 
-    await renderIndex(ctx, {
-      ksConfig: {
-        ...ksConfig,
-        metrics_server: false,
+    await renderIndex(
+      ctx,
+      {
+        ksConfig: {
+          ...ksConfig,
+          metrics_server: false,
+        },
+        user,
+        runtime,
+        clusterRole,
+        installedExtensions,
+        config: {
+          ...clientConfig,
+          supportGpuType: [...clientConfig.supportGpuType],
+        },
       },
-      user,
-      runtime,
-      clusterRole,
-      installedExtensions,
-      config: {
-        ...clientConfig,
-        supportGpuType: [...clientConfig.supportGpuType],
-      },
-    });
+      themeData,
+    );
   } catch (err) {
-    await renderViewErr(ctx, err);
+    await renderViewErr(ctx, err, themePromise);
   }
 };
 
 const renderV3View = async ctx => {
+  let themePromise;
   try {
     const clusterRole = await getClusterRole(ctx);
-    const ksConfig = await getKSConfig(ctx);
+    // Theme and user reads do not depend on the configuration response.
+    // Share only this request's theme with the success/error render paths.
+    themePromise = getTheme(ctx);
 
-    const [user, runtime] = await Promise.all([
-      getCurrentUser(ctx, clusterRole, ksConfig.multicluster),
+    const [ksConfig, user, runtime, themeData] = await Promise.all([
+      getKSConfig(ctx),
+      getCurrentUser(ctx, clusterRole),
       getK8sRuntime(ctx),
+      themePromise,
     ]);
 
-    await renderV3Index(ctx, {
-      ksConfig: {
-        ...ksConfig,
-        metrics_server: false,
+    await renderV3Index(
+      ctx,
+      {
+        ksConfig: {
+          ...ksConfig,
+          metrics_server: false,
+        },
+        user,
+        runtime,
+        clusterRole,
+        config: {
+          ...clientConfig,
+          supportGpuType: [...clientConfig.supportGpuType],
+        },
       },
-      user,
-      runtime,
-      clusterRole,
-      config: {
-        ...clientConfig,
-        supportGpuType: [...clientConfig.supportGpuType],
-      },
-    });
+      themeData,
+    );
   } catch (err) {
-    await renderViewErr(ctx, err);
+    await renderViewErr(ctx, err, themePromise);
   }
 };
 
