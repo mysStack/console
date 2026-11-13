@@ -157,11 +157,13 @@ test('an editor retains reference editing and submission', () => {
 test('all workload types check edit permission in the selected project and cluster', () => {
   for (const moduleName of ['deployments', 'statefulsets', 'daemonsets']) {
     const f = renderPanel(false, moduleName);
+    const editor = renderPanel(true, moduleName);
+    assert.equal(editor.button('CONFIG_REFERENCE_SAVE').props.disabled, false);
     assert.equal(f.permissions.length, 1);
     assert.deepEqual(JSON.parse(JSON.stringify(f.permissions[0])), {
       cluster: 'cluster-a',
       project: 'project-a',
-      module: 'workloads',
+      module: moduleName,
       action: 'edit',
     });
   }

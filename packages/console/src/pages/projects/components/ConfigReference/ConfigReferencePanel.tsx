@@ -54,7 +54,7 @@ export default function ConfigReferencePanel({
   const canEdit = hasPermission({
     cluster,
     project: namespace,
-    module: 'workloads',
+    module,
     action: 'edit',
   });
   const emptyOption = { label: t('CONFIG_REFERENCE_SELECT_RESOURCE'), value: '' };
