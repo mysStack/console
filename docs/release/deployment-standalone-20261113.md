@@ -2,7 +2,7 @@
 
 范围为现有发布线的Deployment独立运行试用入口，基于30881当前代码aeeeda14fc1b0222feb11387fc5162590d2e7cd6。使用独立experiment分支和Worktree。本轮验证既有V3编译产物的独立入口与现有增强页之间的导航，属于有限试验。
 
-项目Deployment列表新增“独立视图”按钮，以完整document导航进入既有/consolev3/:workspace/clusters/:cluster/projects/:namespace/deployments。独立列表、详情及辅助Pod详情沿用V3的当前文档，其他资源的普通点击转向同作用域的当前控制台。Deployment详情增加“增强详情”和“配置引用”链接，分别进入既有增强详情及原生配置引用页。
+项目Deployment列表新增“独立视图”按钮，以完整document导航进入既有/consolev3/:workspace/clusters/:cluster/projects/:namespace/deployments。独立页面提供当前namespace与“返回控制台”入口。独立列表、详情及辅助Pod详情沿用V3的当前文档，其他资源的普通点击转向同作用域的当前控制台。Deployment详情增加“增强详情”和“配置引用”链接，分别进入既有增强详情及原生配置引用页。
 
 独立导航代码位于server/public/deploymentStandalone.js，仅在项目Deployment直接访问时激活，检测Wujie环境后退出。V3模板在主脚本前内联该小型桥接脚本。认证、角色和项目权限继续由既有renderV3View及V3资源请求验证。原始v3dist保持其制品输入。
 

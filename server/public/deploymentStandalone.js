@@ -42,8 +42,30 @@
     const doc = win.document;
     const language = String(win.globals?.user?.lang || win.navigator.language || 'en');
     const labels = language.startsWith('zh')
-      ? { detail: '增强详情', config: '配置引用' }
-      : { detail: 'Enhanced details', config: 'Configuration references' };
+      ? { detail: '增强详情', config: '配置引用', back: '返回控制台' }
+      : { detail: 'Enhanced details', config: 'Configuration references', back: 'Back to console' };
+    const bar = doc.createElement('nav');
+    bar.setAttribute('aria-label', 'Deployment');
+    bar.setAttribute('data-deployment-standalone-nav', '');
+    Object.assign(bar.style, {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: '8px 20px',
+      background: '#fff',
+      borderBottom: '1px solid #e3e9ef',
+      fontSize: '12px',
+      color: '#242e42',
+    });
+    const context = doc.createElement('span');
+    context.textContent = 'Deployment · ' + scope.split('/').pop();
+    const back = doc.createElement('a');
+    back.setAttribute('data-standalone-return', '');
+    back.href = win.location.origin + scope.slice('/consolev3'.length) + '/deployments';
+    back.textContent = labels.back;
+    Object.assign(back.style, { color: '#242e42', fontWeight: '600', padding: '4px 12px' });
+    bar.append(context, back);
+    doc.body.insertBefore(bar, doc.getElementById('root'));
     let scheduled = false;
 
     function syncLinks() {
