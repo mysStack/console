@@ -1,0 +1,21 @@
+# Deployment 独立视图验证
+
+范围为现有发布线的Deployment独立运行试用入口，基于30881当前代码aeeeda14fc1b0222feb11387fc5162590d2e7cd6。使用独立experiment分支和Worktree。本轮验证既有V3编译产物的独立入口与现有增强页之间的导航，属于有限试验。
+
+项目Deployment列表新增“独立视图”按钮，以完整document导航进入既有/consolev3/:workspace/clusters/:cluster/projects/:namespace/deployments。独立页面提供当前namespace与“返回控制台”入口。独立列表、详情及辅助Pod详情沿用V3的当前文档，其他资源的普通点击转向同作用域的当前控制台。Deployment详情增加“增强详情”和“配置引用”链接，分别进入既有增强详情及原生配置引用页。
+
+独立导航代码位于server/public/deploymentStandalone.js，仅在项目Deployment直接访问时激活，检测Wujie环境后退出。V3模板在主脚本前内联该小型桥接脚本。认证、角色和项目权限继续由既有renderV3View及V3资源请求验证。原始v3dist保持其制品输入。
+
+新增6项导航行为回归和1项实际Deployment入口组件回归，RED0/7→GREEN7/7。完整本地验证为75文件311项前端测试、57项服务端测试。Action服务端回归包含新测试。
+
+早期HTML响应替换实验触发Chrome局域网访问策略，CSS/JS被浏览器阻止。该实验结果用于修正测试方式，改用真实V3页面注入测试导航；正式交付必须以实际镜像部署和不替换document的浏览器结果验证。
+
+浏览器重点为列表—详情—环境变量—返回、刷新、直接访问、匿名登录回跳、增强配置引用与原生日志搜索入口、其他资源菜单、namespace范围和Wujie页面隔离。性能测量单独运行，使用相同登录前提、缓存控制和交错顺序，核对独立页仅加载V3运行时。当前记录不提前声称镜像构建、部署或浏览器验收完成，后续绑定候选SHA、Actions、digest和测试报告。
+
+部署验收补充发现未登录直达的回跳地址被旧 consolev3 过滤逻辑拦截。现仅允许项目 Deployment 列表和详情的本地路由登录回跳，其他 consolev3 页面保持原规则。新增回归覆盖列表、详情、编码路径、其他资源和外部地址。
+
+2026-11-13 完整登录链路补充定位：core 在匿名登录页也启动两个受保护 V3 预加载，请求重定向到 V4 登录文档并在子应用执行，引发 common is not defined。现保留应用注册，在缺少已认证 user 与 ksConfig bootstrap 时跳过预加载。影响为所有匿名登录及确认页，已认证页面继续预加载列表和操作应用。新增四项真实初始化函数测试，覆盖匿名、部分用户、认证后预加载和生命周期回调。部署验收从导航前开始记录 pageerror，并检查登录页没有 V3 请求。
+
+2026-11-13 功能闭环补充：使用独立测试项目、零副本 Deployment 验证真实编辑保存与取消，现有 envFrom、显式环境变量、文件挂载、多容器及初始化容器均保留。临时只读与项目操作员账号验证了后端 200/403 与跨项目拒绝访问，发现配置引用面板未限制只读控件。面板现复用 workloads 的项目编辑权限，禁用修改控件并保护提交入口。共享影响覆盖 Deployment、StatefulSet、DaemonSet 配置引用面板，组件回归覆盖三种类型，实际部署后补跑对应角色界面与数据保存回归。
+
+2026-11-13 受限账号部署验收纠正：集群 namespace 角色模板按 deployments、statefulsets、daemonsets 分别提供 manage/view 权限。面板改用当前 module 检查 edit，避免项目操作员被 workloads 空规则误禁用。组件回归核对三种资源的实际权限参数，部署后仍需逐类验证 viewer/editor。

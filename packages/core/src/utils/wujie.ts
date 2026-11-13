@@ -39,6 +39,10 @@ export function initWujie() {
     },
   });
 
+  // Login and confirmation pages have no authenticated console bootstrap.
+  // Their protected V3 preload redirects back to the V4 login document.
+  if (!globals.user?.username || !globals.ksConfig) return;
+
   preloadApp({
     name: 'consoleV3Actions',
     props: { actions: true },
