@@ -1,0 +1,13 @@
+# Deployment 独立视图验证
+
+范围为现有发布线的Deployment独立运行试用入口，基于30881当前代码aeeeda14fc1b0222feb11387fc5162590d2e7cd6。使用独立experiment分支和Worktree。本轮验证既有V3编译产物的独立入口与现有增强页之间的导航，属于有限试验。
+
+项目Deployment列表新增“独立视图”按钮，以完整document导航进入既有/consolev3/:workspace/clusters/:cluster/projects/:namespace/deployments。独立列表、详情及辅助Pod详情沿用V3的当前文档，其他资源的普通点击转向同作用域的当前控制台。Deployment详情增加“增强详情”和“配置引用”链接，分别进入既有增强详情及原生配置引用页。
+
+独立导航代码位于server/public/deploymentStandalone.js，仅在项目Deployment直接访问时激活，检测Wujie环境后退出。V3模板在主脚本前内联该小型桥接脚本。认证、角色和项目权限继续由既有renderV3View及V3资源请求验证。原始v3dist保持其制品输入。
+
+新增6项导航行为回归和1项实际Deployment入口组件回归，RED0/7→GREEN7/7。完整本地验证为75文件311项前端测试、57项服务端测试。Action服务端回归包含新测试。
+
+早期HTML响应替换实验触发Chrome局域网访问策略，CSS/JS被浏览器阻止。该实验结果用于修正测试方式，改用真实V3页面注入测试导航；正式交付必须以实际镜像部署和不替换document的浏览器结果验证。
+
+浏览器重点为列表—详情—环境变量—返回、刷新、直接访问、匿名登录回跳、增强配置引用与原生日志搜索入口、其他资源菜单、namespace范围和Wujie页面隔离。性能测量单独运行，使用相同登录前提、缓存控制和交错顺序，核对独立页仅加载V3运行时。当前记录不提前声称镜像构建、部署或浏览器验收完成，后续绑定候选SHA、Actions、digest和测试报告。
