@@ -128,10 +128,18 @@ const isValidReferer = path => {
 
   const isJsScript = referer.indexOf('javascript:') < 0;
 
-  const isConsoleV3 = referer.indexOf('consolev3') > -1; // todo tmp add for embed consolev3
+  const isConsoleV3 = referer.indexOf('consolev3') > -1;
+  const isStandaloneDeployment =
+    /^\/consolev3\/[a-z0-9-]+\/clusters\/[a-z0-9-]+\/projects\/[a-z0-9-]+\/deployments(?:\/[a-z0-9-]+(?:\/[a-z0-9-]+)*)?\/?$/.test(
+      referer,
+    );
 
   return (
-    referer !== '/' && referer.indexOf('/login') === -1 && !isUrl && isJsScript && !isConsoleV3
+    referer !== '/' &&
+    referer.indexOf('/login') === -1 &&
+    !isUrl &&
+    isJsScript &&
+    (!isConsoleV3 || isStandaloneDeployment)
   );
 };
 

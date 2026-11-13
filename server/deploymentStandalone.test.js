@@ -70,3 +70,20 @@ test('embedded Wujie pages do not install standalone navigation handlers', () =>
   const win = { __POWERED_BY_WUJIE__: true, location: { pathname: scope + '/deployments' } };
   assert.equal(bridge.mount(win), false);
 });
+
+test('login can return to a standalone project Deployment list or detail', () => {
+  global.SERVER_ROOT = __dirname;
+  const { isValidReferer } = require('./libs/utils');
+  for (const path of [scope + '/deployments', scope + '/deployments/app/env']) {
+    assert.equal(isValidReferer(path), true, path);
+    assert.equal(isValidReferer(encodeURIComponent(path)), true, path);
+  }
+  for (const path of [
+    scope + '/secrets',
+    '/consolev3/dashboard',
+    'https://external.test' + scope + '/deployments',
+    '//external.test' + scope + '/deployments',
+  ]) {
+    assert.equal(isValidReferer(path), false, path);
+  }
+});
