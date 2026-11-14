@@ -37,6 +37,18 @@ module.exports = function (app) {
   // encoded by server/middlewares/proxyCompression.js, which leaves
   // `follow`/`watch` streams and binary bodies on the plain pipe.
 
+  // Entry URLs contain their content hash. Cache successful asset responses
+  // independently from the manifest and authenticated HTML.
+  app.use(async (ctx, next) => {
+    await next();
+    if (
+      /^\/dist\/entry\/(auth|navigator|config-reference)\.[a-f0-9]{12}\.(js|css)$/.test(ctx.path) &&
+      [200, 304].includes(ctx.status)
+    ) {
+      ctx.set('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+  });
+
   // serve static files
   const httpStatic = serverConfig.http.static[process.env.NODE_ENV];
   for (const [k, v] of Object.entries(httpStatic)) {
