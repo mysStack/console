@@ -87,3 +87,8 @@ test('login can return to a standalone project Deployment list or detail', () =>
     assert.equal(isValidReferer(path), false, path);
   }
 });
+
+test('enabled configuration references use a native deep link in the current detail tab', () => {
+  const links = bridge.detailLinks(scope + '/deployments/app/env', origin, true);
+  assert.equal(links.config, origin + scope + '/deployments/app/env?enhancement=config-reference');
+});

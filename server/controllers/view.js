@@ -19,6 +19,7 @@ const {
   getConsoleReturnPath,
   getConsoleEntryFlags,
   getConsoleEntryManifest,
+  getConsoleSessionIdentity,
 } = require('../libs/consoleEntry');
 const { randomBytes } = require('crypto');
 
@@ -101,6 +102,7 @@ const renderEntry = async (ctx, name, params, themePromise = getTheme(ctx)) => {
     title: useDefaultTheme ? data.defaultTheme?.tabTitle : data.title,
     favicon: data.favicon,
     entry,
+    entryName: name,
     nonce,
     sharedCss: name === 'auth' ? getManifest('main')['main.css'] : null,
     globals: encodeURIComponent(
@@ -131,8 +133,13 @@ const renderV3Index = async (ctx, params, themePromise = getTheme(ctx)) => {
   const manifest = getV3Manifest('main');
   const localeManifest = getV3LocaleManifest();
 
+  const consoleEntry = getConsoleEntryFlags();
+  consoleEntry.enhancement =
+    consoleEntry.enhancement && !!getConsoleEntryManifest('config-reference');
+
   await ctx.render('consolev3', {
     manifest,
+    enhancement: consoleEntry.enhancement,
     isDev: global.MODE_DEV,
     title: clientConfig.title,
     hostname: ctx.hostname,
@@ -140,6 +147,7 @@ const renderV3Index = async (ctx, params, themePromise = getTheme(ctx)) => {
       JSON.stringify({
         config: clientConfig,
         localeManifest,
+        consoleEntry,
 
         theme,
         defaultTheme,
@@ -398,7 +406,40 @@ const renderConsoleHome = async ctx => {
   await renderView(ctx);
 };
 
+const renderEnhancementSession = async ctx => {
+  ctx.set('Cache-Control', 'no-store');
+  if (!getConsoleEntryFlags().enhancement) {
+    ctx.status = 404;
+    return;
+  }
+  const identity = getConsoleSessionIdentity(ctx);
+  if (!identity) {
+    ctx.status = 401;
+    ctx.body = { reason: 'Unauthorized' };
+    return;
+  }
+  ctx.body = identity;
+};
+
+const renderEnhancementFrame = async ctx => {
+  if (!getConsoleEntryFlags().enhancement || !getConsoleEntryManifest('config-reference')) {
+    ctx.status = 404;
+    return;
+  }
+  const identity = getConsoleSessionIdentity(ctx);
+  if (!identity) {
+    ctx.redirect('/login');
+    return;
+  }
+  await renderEntry(ctx, 'config-reference', {
+    user: identity,
+    enhancementUser: identity.username,
+  });
+};
+
 module.exports = {
+  renderEnhancementFrame,
+  renderEnhancementSession,
   renderConsoleHome,
   renderProjectNavigator,
   renderPasswordConfirm,

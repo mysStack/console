@@ -5,10 +5,13 @@
 
 import { get } from 'lodash';
 
-import { Constants } from '../../constants';
+import * as Constants from '../../constants/common';
 import type { PathParams } from '../../types';
 import { isMultiCluster } from '../../utils/checker';
-import { cookie, getApiVersion, getBrowserLang, getWebsiteUrl } from '../../utils';
+import cookie from '../../utils/cookie';
+import { getApiVersion } from '../../utils/getApiVersion';
+import { getBrowserLang } from '../../utils/common';
+import { getWebsiteUrl } from '../../utils/getter';
 
 export const getPath = ({
   cluster,

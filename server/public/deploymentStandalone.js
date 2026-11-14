@@ -24,7 +24,7 @@
     return url.href;
   }
 
-  function detailLinks(pathname, origin) {
+  function detailLinks(pathname, origin, enhancement = false) {
     const match = pathname.match(
       /^(\/consolev3\/[^/]+\/clusters\/[^/]+\/projects\/[^/]+\/deployments\/[^/]+)(?:\/|$)/,
     );
@@ -32,7 +32,9 @@
     const path = match[1].slice('/consolev3'.length);
     return {
       detail: origin + path + '/resource-status',
-      config: origin + path + '/config-reference',
+      config: enhancement
+        ? origin + pathname + '?enhancement=config-reference'
+        : origin + path + '/config-reference',
     };
   }
 
@@ -64,13 +66,28 @@
     back.href = win.location.origin + scope.slice('/consolev3'.length) + '/deployments';
     back.textContent = labels.back;
     Object.assign(back.style, { color: '#242e42', fontWeight: '600', padding: '4px 12px' });
-    bar.append(context, back);
+    if (win.globals?.consoleEntry?.navigator) {
+      const full = back.cloneNode(true);
+      full.removeAttribute('data-standalone-return');
+      full.setAttribute('data-standalone-full', '');
+      full.textContent = language.startsWith('zh') ? '完整控制台' : 'Full console';
+      back.href =
+        win.location.origin + '/project-console' + scope.slice('/consolev3'.length) + '/overview';
+      back.textContent = language.startsWith('zh') ? '项目导航' : 'Project navigator';
+      bar.append(context, back, full);
+    } else {
+      bar.append(context, back);
+    }
     doc.body.insertBefore(bar, doc.getElementById('root'));
     let scheduled = false;
 
     function syncLinks() {
       scheduled = false;
-      const links = detailLinks(win.location.pathname, win.location.origin);
+      const links = detailLinks(
+        win.location.pathname,
+        win.location.origin,
+        win.globals?.consoleEntry?.enhancement,
+      );
       const nav = doc.querySelector('.detail-page-nav');
       if (!links || !nav) return;
       const reference = Array.from(nav.querySelectorAll('a[href]')).find(

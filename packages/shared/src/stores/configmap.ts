@@ -6,10 +6,11 @@
 import { get } from 'lodash';
 
 import baseStore from './store';
-import { getOriginData, getBaseInfo } from '../utils';
+import { getOriginData } from '../utils/getter';
+import { getBaseInfo } from '../utils/getter';
 import type { FormattedConfigMap, OriginalConfigMap } from '../types';
 import { CONFIGMAP_METADATA_ACCEPT, toMetadataNameList } from './secretNameList';
-import { request } from '../utils';
+import request from '../utils/request';
 
 const module = 'configmaps';
 

@@ -5,7 +5,9 @@
 
 import baseStore from '../store';
 import { useMutation } from 'react-query';
-import { request, getHpaFormattedData, getApiVersion } from '../../utils';
+import request from '../../utils/request';
+import { getHpaFormattedData } from '../../utils/workloads';
+import { getApiVersion } from '../../utils/getApiVersion';
 
 import { HpaMapper } from './mapper';
 import type { PathParams, SuccessProps } from './types';

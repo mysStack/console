@@ -6,9 +6,11 @@
 import { useMutation, useQuery } from 'react-query';
 import { get, isEmpty, merge, set } from 'lodash';
 
-import { useUrl } from '../hooks';
+import { useUrl } from '../hooks/useUrl';
 import type { PathParams } from '../types';
-import { FetchListParams, formatFetchListParams, request } from '../utils';
+import type { FetchListParams } from '../utils/formatter';
+import { formatFetchListParams } from '../utils/formatter';
+import request from '../utils/request';
 import { getPaginationInfo } from '../utils/request.helper';
 
 type MutationFnParams = {

@@ -359,3 +359,34 @@ test('login query parsing does not decode a doubly encoded return path', async (
   await view.renderLogin(ctx);
   assert.deepEqual(writes[0], ['referer', null]);
 });
+
+test('the enabled native view exposes the enhancement controller only with its entry artifact', async () => {
+  await withEntryFlags({ KS_CONSOLE_DEPLOYMENT_ENHANCEMENT: 'true' }, async () => {
+    const { view } = loadView();
+    const ctx = context();
+    await view.renderV3View(ctx);
+    const data = ctx.rendered[0].data;
+    assert.equal(data.enhancement, true);
+    assert.equal(JSON.parse(decodeURIComponent(data.globals)).consoleEntry.enhancement, true);
+  });
+});
+
+test('the enhancement frame loads its own entry and scopes its bootstrap to the cookie identity', async () => {
+  await withEntryFlags({ KS_CONSOLE_DEPLOYMENT_ENHANCEMENT: 'true' }, async () => {
+    const { view } = loadView();
+    const ctx = context();
+    const token = [
+      'fixture',
+      Buffer.from(
+        JSON.stringify({ username: 'fixture-user', exp: Math.floor(Date.now() / 1000) + 300 }),
+      ).toString('base64url'),
+      'fixture',
+    ].join('.');
+    ctx.cookies.get = name => (name === 'token' ? token : undefined);
+    await view.renderEnhancementFrame(ctx);
+    const data = ctx.rendered[0].data;
+    assert.equal(data.entryName, 'config-reference');
+    assert.equal(JSON.parse(decodeURIComponent(data.globals)).enhancementUser, 'fixture-user');
+    assert.deepEqual(data.entry.js, ['entry/config-reference.fixture.js']);
+  });
+});

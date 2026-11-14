@@ -35,6 +35,7 @@ function moduleNames(modules) {
     for (const [name, maximum] of [
       ['auth', 220 * 1024],
       ['navigator', 40 * 1024],
+      ['config-reference', 220 * 1024],
     ]) {
       const stats = await compile(createEntryConfig(name, iconEntry));
       if (stats.warnings.length) throw Error(stats.warnings.map(value => value.message).join('\n'));

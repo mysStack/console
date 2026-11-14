@@ -12,7 +12,13 @@ import {
 import { findDuplicateReferences, parseEnvFrom } from './envFrom';
 import { readReloaderPolicy } from './reloader';
 import { buildConfigReferencePatch, getContainerEnvFrom, getContainerNames } from './workload';
-import type { ConfigReferenceKind, EnvFromReference } from './types';
+import type {
+  ConfigReferenceKind,
+  EnvFromReference,
+  ConfigReferenceSubmission,
+  ConfigReferenceSaveResult,
+  ConfigReferenceResource,
+} from './types';
 import { colors, columns } from './styles';
 import ConfigReferencePreview from './ConfigReferencePreview';
 import { useReferencePreviews } from './useReferencePreviews';
@@ -26,6 +32,8 @@ interface Props {
   module: WorkloadModule;
   workloadKind: string;
   onBack: () => void;
+  onWriteStart?: (submission: ConfigReferenceSubmission) => boolean | void;
+  onWriteResult?: (result: ConfigReferenceSaveResult) => void;
 }
 
 type NameOption = { label: string; value: string };
@@ -49,6 +57,8 @@ export default function ConfigReferencePanel({
   module,
   workloadKind,
   onBack,
+  onWriteStart,
+  onWriteResult,
 }: Props) {
   const store = storeByModule[module];
   const canEdit = hasPermission({
@@ -112,15 +122,23 @@ export default function ConfigReferencePanel({
   };
 
   const saveMutation = useMutation(
-    (data: Record<string, any>) =>
-      request.patch(store.getDetailUrl({ cluster, namespace, name }), data, {
-        headers: { 'content-type': 'application/json-patch+json' },
-      }),
+    (data: ConfigReferenceSubmission['patch']) =>
+      request.patch<never, ConfigReferenceResource>(
+        store.getDetailUrl({ cluster, namespace, name }),
+        data,
+        {
+          headers: { 'content-type': 'application/json-patch+json' },
+        },
+      ),
     {
-      onSuccess: () => {
+      onSuccess: async resource => {
         setSaveError(null);
         notify.success(t('CONFIG_REFERENCE_SAVE_SUCCESS'));
-        detailQuery.refetch();
+        try {
+          await detailQuery.refetch();
+        } finally {
+          onWriteResult?.({ outcome: 'saved', status: 200, resource });
+        }
       },
       onError: (error: any) => {
         // Same handling as the inline editor: the API answers with e.g.
@@ -134,6 +152,11 @@ export default function ConfigReferencePanel({
           message: String(message).slice(0, 300) || t('CONFIG_REFERENCE_SAVE_FAILED'),
         });
         notify.error(t('CONFIG_REFERENCE_SAVE_FAILED'));
+        onWriteResult?.(
+          error?.response?.status
+            ? { outcome: 'rejected', status: error.response.status }
+            : { outcome: 'unknown' },
+        );
       },
     },
   );
@@ -149,8 +172,13 @@ export default function ConfigReferencePanel({
     return <div role="alert">{t('CONFIG_REFERENCE_NO_CONTAINERS', { kind: workloadKind })}</div>;
   }
 
-  const original = (detailQuery.data as any)._originData || detailQuery.data;
-  const resourceVersion = original?.metadata?.resourceVersion;
+  const loaded = detailQuery.data as any;
+  const raw = loaded._originData || loaded;
+  // The workload mapper moves these fields out of _originData. Both values
+  // must come from this query snapshot so the array patch keeps its guard.
+  const resourceVersion = raw.metadata?.resourceVersion ?? loaded.resourceVersion;
+  const uid = raw.metadata?.uid ?? loaded.uid;
+  const original = { ...raw, metadata: { ...raw.metadata, resourceVersion, uid } };
   const hasResourceVersion = typeof resourceVersion === 'string' && resourceVersion.length > 0;
   const duplicateIndexes = findDuplicateReferences(references);
   const availableNames = {
@@ -180,10 +208,12 @@ export default function ConfigReferencePanel({
       notify.error(t('CONFIG_REFERENCE_UNAVAILABLE'));
       return;
     }
-    saveMutation.mutate([
+    const patch = [
       { op: 'test', path: '/metadata/resourceVersion', value: resourceVersion },
       ...buildConfigReferencePatch(detailQuery.data as any, names, references, reloaderEnabled),
-    ]);
+    ];
+    if (onWriteStart?.({ resource: original, patch }) === false) return;
+    saveMutation.mutate(patch);
   };
 
   return (
@@ -358,6 +388,14 @@ export default function ConfigReferencePanel({
         </div>
       </div>
 
+      {saveError?.index === -1 && (
+        <div role="alert" style={{ marginTop: 16 }}>
+          <p>{saveError.message}</p>
+          <Button type="button" onClick={() => detailQuery.refetch()}>
+            {t('CONFIG_REFERENCE_RELOAD_WORKLOAD')}
+          </Button>
+        </div>
+      )}
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 28 }}>
         <Button type="button" onClick={onBack}>
           {t('CONFIG_REFERENCE_CANCEL')}

@@ -1,4 +1,5 @@
 const fs = require('fs');
+const jwtDecode = require('jwt-decode');
 const path = require('path');
 const { URL, URLSearchParams } = require('url');
 
@@ -131,9 +132,29 @@ function getConsoleEntryManifest(name) {
   }
 }
 
+// This identifies an existing cookie for parent/frame consistency. API requests
+// continue to authorize every resource read and write on the backend.
+function getConsoleSessionIdentity(ctx) {
+  try {
+    const token = ctx.cookies.get('token');
+    if (!token) return null;
+    const value = jwtDecode(token);
+    if (
+      typeof value.username !== 'string' ||
+      typeof value.exp !== 'number' ||
+      value.exp * 1000 <= Date.now()
+    )
+      return null;
+    return { username: value.username };
+  } catch {
+    return null;
+  }
+}
+
 module.exports = {
   getConsoleReturnPath,
   getLoginReferer,
   getConsoleEntryFlags,
   getConsoleEntryManifest,
+  getConsoleSessionIdentity,
 };

@@ -11,9 +11,12 @@ function renderPanel(
   canEdit: boolean,
   moduleName = 'deployments',
   resourceVersion: string | undefined = '42',
+  formatted = false,
 ) {
   const permissions: unknown[] = [];
   const writes: unknown[] = [];
+  const events: unknown[] = [];
+  let mutationOptions: any;
   // Seed the loaded panel, including one existing reference, to exercise its controls.
   const states = [
     [{ label: 'fixture-config', value: 'fixture-config' }],
@@ -41,7 +44,7 @@ function renderPanel(
     useGetDetail: () => ({
       data: {
         _originData: {
-          metadata: { name: 'fixture', resourceVersion },
+          metadata: { name: 'fixture', ...(formatted ? {} : { resourceVersion }) },
           spec: {
             template: {
               spec: {
@@ -56,6 +59,7 @@ function renderPanel(
           },
         },
         name: 'fixture',
+        ...(formatted ? { resourceVersion, uid: 'fixture-uid' } : {}),
       },
       isLoading: false,
       isError: false,
@@ -83,7 +87,12 @@ function renderPanel(
     require: (id: string) => {
       if (id === 'react') return react;
       if (id === 'react-query')
-        return { useMutation: (fn: any) => ({ mutate: fn, isLoading: false }) };
+        return {
+          useMutation: (fn: any, options: any) => {
+            mutationOptions = options;
+            return { mutate: fn, isLoading: false };
+          },
+        };
       if (id === '@kubed/components')
         return {
           Button: 'Button',
@@ -122,6 +131,12 @@ function renderPanel(
     module: moduleName,
     workloadKind: 'Deployment',
     onBack: () => {},
+    onWriteStart: (value: unknown) => {
+      events.push({ type: 'start', value });
+    },
+    onWriteResult: (value: unknown) => {
+      events.push({ type: 'result', value });
+    },
   });
   const nodes: any[] = [];
   const visit = (node: any) => {
@@ -132,7 +147,7 @@ function renderPanel(
   visit(tree);
   const button = (label: string) =>
     nodes.find(node => node.type === 'Button' && node.children.includes(label));
-  return { nodes, button, permissions, writes };
+  return { nodes, button, permissions, writes, events, mutationOptions };
 }
 
 test('a project viewer can inspect references and select containers with editing disabled', () => {
@@ -190,4 +205,46 @@ test('saving tests the original resourceVersion before changing the container ar
     value: '42',
   });
   assert.equal(patch[1].path, '/spec/template/spec/containers/0/envFrom');
+});
+
+test('the panel reports the guarded submission and its saved resource to its host', async () => {
+  const f = renderPanel(true);
+  f.button('CONFIG_REFERENCE_SAVE').props.onClick();
+  assert.equal(f.events.length, 1);
+  const start = f.events[0] as any;
+  assert.equal(start.type, 'start');
+  assert.equal(start.value.patch[0].path, '/metadata/resourceVersion');
+  assert.equal(start.value.resource.metadata.resourceVersion, '42');
+  const saved = { metadata: { uid: 'fixture-uid', resourceVersion: '43' } };
+  await f.mutationOptions.onSuccess(saved);
+  assert.deepEqual(JSON.parse(JSON.stringify(f.events[1])), {
+    type: 'result',
+    value: { outcome: 'saved', status: 200, resource: saved },
+  });
+});
+
+test('network errors report an uncertain result while rejected saves retain the draft', () => {
+  const f = renderPanel(true);
+  f.mutationOptions.onError({ code: 'ECONNRESET' });
+  assert.deepEqual(JSON.parse(JSON.stringify(f.events[0])), {
+    type: 'result',
+    value: { outcome: 'unknown' },
+  });
+  f.mutationOptions.onError({
+    response: { status: 422, data: { message: 'resourceVersion test failed' } },
+  });
+  assert.deepEqual(JSON.parse(JSON.stringify(f.events[1])), {
+    type: 'result',
+    value: { outcome: 'rejected', status: 422 },
+  });
+});
+
+test('mapped workload metadata from the same query protects saves after raw metadata was omitted', () => {
+  const f = renderPanel(true, 'deployments', '42', true);
+  assert.equal(f.button('CONFIG_REFERENCE_SAVE').props.disabled, false);
+  f.button('CONFIG_REFERENCE_SAVE').props.onClick();
+  assert.equal((f.writes[0] as any[])[1][0].value, '42');
+  const submission = (f.events[0] as any).value;
+  assert.equal(submission.resource.metadata.uid, 'fixture-uid');
+  assert.equal(submission.resource.metadata.resourceVersion, '42');
 });

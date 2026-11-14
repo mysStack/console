@@ -42,6 +42,8 @@ const {
   renderConsoleHome,
   renderProjectNavigator,
   renderPasswordConfirm,
+  renderEnhancementFrame,
+  renderEnhancementSession,
   renderV3View,
   renderTerminal,
   renderLogin,
@@ -120,6 +122,8 @@ router
 
   .get('/', renderConsoleHome)
   .get('/project-console/(.*)', renderProjectNavigator)
+  .get('/console-entry/config-reference', renderEnhancementFrame)
+  .get('/console-entry/session', renderEnhancementSession)
 
   // page entry
   .all('(.*)', renderView);

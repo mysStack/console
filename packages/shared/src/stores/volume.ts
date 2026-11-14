@@ -4,7 +4,8 @@
  */
 
 import { get } from 'lodash';
-import { getBaseInfo, getOriginData } from '../utils';
+import { getBaseInfo } from '../utils/getter';
+import { getOriginData } from '../utils/getter';
 
 //TODO: type
 const getVolumePhase = (item: any) => {

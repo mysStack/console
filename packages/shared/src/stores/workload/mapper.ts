@@ -4,7 +4,10 @@
  */
 
 import { get, keyBy } from 'lodash';
-import { getBaseInfo, getOriginData, getWorkloadUpdateTime, getJobUpdateTime } from '../../utils';
+import { getBaseInfo } from '../../utils/getter';
+import { getOriginData } from '../../utils/getter';
+import { getWorkloadUpdateTime } from '../../utils/workloads';
+import { getJobUpdateTime } from '../../utils/workloads';
 import { OriginalWorkload, FormattedWorkload, OriginalCronJob, FormateCronJob } from '../../types';
 import { OriginalJob, FormateJob } from '../../types';
 

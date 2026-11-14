@@ -48,7 +48,9 @@ module.exports = function createEntryConfig(name, iconEntry) {
       [name]: path.join(
         root,
         'packages/console/src/entrypoints',
-        name === 'auth' ? 'auth.tsx' : 'navigator.ts',
+        { auth: 'auth.tsx', navigator: 'navigator.ts', 'config-reference': 'configReference.tsx' }[
+          name
+        ],
       ),
     },
     output: {
@@ -61,7 +63,11 @@ module.exports = function createEntryConfig(name, iconEntry) {
     resolve: {
       extensions: ['.tsx', '.ts', '.js', '.jsx', '.json'],
       alias: {
-        '@ks-console/shared$': path.join(root, 'packages/shared/src/entries/auth.ts'),
+        '@ks-console/shared$': path.join(
+          root,
+          'packages/shared/src/entries',
+          name === 'config-reference' ? 'configReference.ts' : 'auth.ts',
+        ),
         '@kubed/icons$': iconEntry,
         'styled-components': path.join(root, 'node_modules/styled-components'),
         'react/jsx-runtime': require.resolve('react/jsx-runtime.js'),

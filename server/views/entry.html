@@ -15,6 +15,11 @@
     <div id="root"></div>
     <script nonce="<%= nonce %>">
       window.globals = JSON.parse(decodeURIComponent(`<%- globals %>`));
+      <% if (entryName === 'config-reference') { %>
+      const host = window.parent.__deploymentEnhancement;
+      const shared = host && host.bootstrap(window, window.globals.enhancementUser);
+      if (shared) window.globals = shared;
+      <% } %>
     </script>
     <% entry.js.forEach(function(asset) { %>
     <script src="/dist/<%= asset %>"></script>

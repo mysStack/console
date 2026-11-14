@@ -4,7 +4,8 @@
  */
 
 import { get } from 'lodash';
-import { getBaseInfo, getOriginData } from '../utils';
+import { getBaseInfo } from './getter';
+import { getOriginData } from './getter';
 import { WorkLoadMapper, JobMapper, CronJobMapper } from '../stores/workload/mapper';
 
 const RevisionMapper = (item: Record<string, any>) => {

@@ -11,9 +11,13 @@ import { createUnauthorizedRedirect, shouldRedirectAfterUnauthorized } from './a
 import { GlobalMessage } from '../types';
 import { useEventEmitter } from '../hooks/useEventEmitter';
 
-const redirectAfterUnauthorized = createUnauthorizedRedirect(url => {
-  window.location.assign(url);
-});
+let unauthorizedNavigation = (url: string) => window.location.assign(url);
+
+export function configureUnauthorizedNavigation(navigate: (url: string) => void) {
+  unauthorizedNavigation = navigate;
+}
+
+const redirectAfterUnauthorized = createUnauthorizedRedirect(url => unauthorizedNavigation(url));
 
 export function getRequestUrl(url: string = '') {
   const formatUrl = url.startsWith('http') ? url : `/${url.trimLeft()}`;
@@ -81,17 +85,17 @@ axios.interceptors.response.use(
     return response.data;
   },
   error => {
+    if (!error.response) return Promise.reject(error);
     if (shouldRedirectAfterUnauthorized(error.response?.status, error.response?.config?.url)) {
       redirectAfterUnauthorized();
       return Promise.reject(error);
     }
 
-    if (!error.response.config.headers['x-ignore-error-notify']) {
+    if (!error.response.config?.headers?.['x-ignore-error-notify']) {
       const msg = formatError(error.response);
       const { $emit } = useEventEmitter();
       $emit('globalMsg', msg);
     }
-    console.warn(error);
     return Promise.reject(error);
   },
 );

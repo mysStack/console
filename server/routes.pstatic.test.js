@@ -31,6 +31,8 @@ function loadRoutes(target) {
         'renderConsoleHome',
         'renderProjectNavigator',
         'renderPasswordConfirm',
+        'renderEnhancementFrame',
+        'renderEnhancementSession',
         'renderV3View',
         'renderTerminal',
         'renderLogin',

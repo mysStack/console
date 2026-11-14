@@ -49,8 +49,15 @@ main {
   align-items: center;
   flex-wrap: wrap;
 }
+input,
 select,
 button {
   padding: 8px;
   font: inherit;
+}
+
+form[role='search'] {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
 }

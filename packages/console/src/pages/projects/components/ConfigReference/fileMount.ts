@@ -1,3 +1,4 @@
+import type { ConfigReferenceSubmission } from './types';
 import { get } from 'lodash';
 
 import type { ConfigReferenceKind } from './types';
@@ -212,7 +213,7 @@ export function buildFileMountPatch(
   containerIndex: number,
   containerName: string,
   references: FileMountReference[],
-): Array<Record<string, any>> {
+): ConfigReferenceSubmission['patch'] {
   const original = source?._originData || source;
   const containers = get(original, 'spec.template.spec.containers');
   const list = Array.isArray(containers) ? containers : [];
@@ -229,7 +230,7 @@ export function buildFileMountPatch(
     references,
   });
 
-  const patch: Array<Record<string, any>> = [];
+  const patch: ConfigReferenceSubmission['patch'] = [];
   const volumesPath = '/spec/template/spec/volumes';
   const mountsPath = `/spec/template/spec/containers/${containerIndex}/volumeMounts`;
 

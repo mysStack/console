@@ -4,6 +4,7 @@
  */
 
 module.exports = {
+  CONFIG_REFERENCE_RELOAD_WORKLOAD: '重新读取资源（将重新加载草稿）',
   CONFIG_REFERENCE: '配置引用',
   CONFIG_REFERENCE_BACK: '返回',
   CONFIG_REFERENCE_CONTAINER: '容器',

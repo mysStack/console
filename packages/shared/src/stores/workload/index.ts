@@ -6,7 +6,7 @@
 import { isEmpty, get } from 'lodash';
 import { useQuery, useMutation } from 'react-query';
 import baseStore from '../store';
-import { request } from '../../utils';
+import request from '../../utils/request';
 import ObjectMapper from '../../utils/object.mapper';
 import { getVolumeType, VolumeMapper } from '../volume';
 import hpaStore from './hpa';

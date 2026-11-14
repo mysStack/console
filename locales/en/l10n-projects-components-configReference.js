@@ -4,6 +4,7 @@
  */
 
 module.exports = {
+  CONFIG_REFERENCE_RELOAD_WORKLOAD: 'Reload resource and reset draft',
   CONFIG_REFERENCE: 'Configuration References',
   CONFIG_REFERENCE_SELECT_RESOURCE: 'Select a ConfigMap or Secret',
   CONFIG_REFERENCE_BACK: 'Back',

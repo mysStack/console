@@ -27,6 +27,7 @@ const text = zh
       forbidden: '没有权限查看这些资源',
       unavailable: '资源暂时不可用',
       overview: '完整概览',
+      search: '搜索',
     }
   : {
       home: 'Project navigator',
@@ -50,6 +51,7 @@ const text = zh
       forbidden: 'Access denied',
       unavailable: 'Resources are unavailable',
       overview: 'Full overview',
+      search: 'Search',
     };
 let generation = 0;
 let controller = new AbortController();
@@ -159,10 +161,31 @@ async function listing(section: HTMLElement, epoch: number, workspace?: string) 
   const parameters = new URL(location.href).searchParams;
   const page = Math.max(1, Number(parameters.get('page')) || 1);
   const limit = 20;
+  const searchName = parameters.get('name') || '';
   section.append(element('h1', workspace ? text.projects + ' · ' + workspace : text.spaces));
   const status = element('p', text.loading);
   status.setAttribute('role', 'status');
-  section.append(status);
+  const searchForm = element('form');
+  searchForm.setAttribute('role', 'search');
+  const searchInput = element('input');
+  searchInput.type = 'search';
+  searchInput.setAttribute('aria-label', text.search);
+  searchInput.pattern = '[a-zA-Z0-9_.-]{0,100}';
+  searchInput.maxLength = 100;
+  searchInput.value = searchName;
+  const searchButton = element('button', text.search);
+  searchButton.type = 'submit';
+  searchForm.append(searchInput, searchButton);
+  searchForm.onsubmit = event => {
+    event.preventDefault();
+    const url = new URL(location.href);
+    const value = searchInput.value.trim();
+    if (value) url.searchParams.set('name', value);
+    else url.searchParams.delete('name');
+    url.searchParams.delete('page');
+    navigate(url.pathname + url.search);
+  };
+  section.append(searchForm, status);
   let cluster = '';
   if (workspace) {
     const clusters = itemsOf(
@@ -173,6 +196,10 @@ async function listing(section: HTMLElement, epoch: number, workspace?: string) 
       ),
     );
     if (epoch !== generation) return;
+    if (!clusters.length && !parameters.has('cluster')) {
+      status.textContent = text.empty;
+      return;
+    }
     cluster = parameters.get('cluster') || nameOf(clusters[0] || {});
     if (!cluster || !clusters.some((item: any) => nameOf(item) === cluster)) throw Error('403');
     const label = element('label', text.cluster + ' ');
@@ -211,6 +238,7 @@ async function listing(section: HTMLElement, epoch: number, workspace?: string) 
     ascending: 'true',
   });
   if (workspace) query.set('labelSelector', 'kubesphere.io/managed=true');
+  if (searchName) query.set('name', searchName);
   const body = await read(url + '?' + query);
   if (epoch !== generation) return;
   const items = itemsOf(body);

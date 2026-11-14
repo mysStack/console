@@ -7,7 +7,11 @@ import { get } from 'lodash';
 
 import baseStore from './store';
 import type { FormattedSecret, OriginalSecret } from '../types';
-import { request, getOriginData, getBaseInfo, safeAtob, parser } from '../utils';
+import request from '../utils/request';
+import { getOriginData } from '../utils/getter';
+import { getBaseInfo } from '../utils/getter';
+import { safeAtob } from '../utils/base64';
+import * as parser from '../utils/parser';
 import { SECRET_METADATA_ACCEPT, toSecretNameList } from './secretNameList';
 
 const module = 'secrets';
