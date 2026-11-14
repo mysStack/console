@@ -11,6 +11,7 @@ import { createGlobalStyle } from 'styled-components';
 import type { GlobalMessage } from '@ks-console/shared';
 import {
   PageConstants,
+  isConsoleV3PageMounted,
   StylesConstants,
   useGlobalStyles,
   useEventEmitter,
@@ -94,6 +95,7 @@ export default function BaseLayout() {
   useEffect(() => {
     document.addEventListener('click', eventer);
     bus.$on('subRouteChange', (name: any, path: any) => {
+      if (globals.consoleEntry?.singleV3 && !isConsoleV3PageMounted(document)) return;
       const { location } = window;
       const pathname = normalizeNativeResourceDetailPath(path.pathname);
 

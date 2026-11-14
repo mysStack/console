@@ -65,6 +65,7 @@ const renderIndex = async (ctx, params, themePromise = getTheme(ctx)) => {
     globals: encodeURIComponent(
       JSON.stringify({
         config: clientConfig,
+        consoleEntry: getConsoleEntryFlags(),
         manifest,
         localeManifest,
         theme,

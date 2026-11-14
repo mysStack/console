@@ -390,3 +390,18 @@ test('the enhancement frame loads its own entry and scopes its bootstrap to the 
     assert.deepEqual(data.entry.js, ['entry/config-reference.fixture.js']);
   });
 });
+
+test('the full console receives the explicit single V3 runtime flag', async () => {
+  const previous = process.env.KS_CONSOLE_SINGLE_V3;
+  process.env.KS_CONSOLE_SINGLE_V3 = 'true';
+  try {
+    const { view } = loadView();
+    const ctx = context();
+    await view.renderView(ctx);
+    const bootstrap = JSON.parse(decodeURIComponent(ctx.rendered[0].data.globals));
+    assert.equal(bootstrap.consoleEntry.singleV3, true);
+  } finally {
+    if (previous === undefined) delete process.env.KS_CONSOLE_SINGLE_V3;
+    else process.env.KS_CONSOLE_SINGLE_V3 = previous;
+  }
+});

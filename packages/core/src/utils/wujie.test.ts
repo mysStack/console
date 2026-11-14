@@ -37,7 +37,11 @@ function fixture(globals: Record<string, any>) {
     require: (id: string) => {
       if (id === 'wujie-react') return wujie;
       if (id === '@ks-console/shared')
-        return { useEventEmitter: () => ({ $emit: (...args: any[]) => emitted.push(args) }) };
+        return {
+          useEventEmitter: () => ({ $emit: (...args: any[]) => emitted.push(args) }),
+          consoleV3Runtime: { reset() {}, markReady() {} },
+          findConsoleV3Window: () => undefined,
+        };
       if (id === '../utils/globals.consoleV3LoadCompleted')
         return {
           setGlobalConsoleV3LoadCompleted: ({ value }: { value: boolean }) => {
@@ -86,4 +90,32 @@ test('registered application lifecycle and action readiness callbacks stay avail
   f.setups[1].afterMount();
   f.listeners.get('loadCompleted')?.('consolev3');
   assert.equal(f.completed(), true);
+});
+
+test('single runtime mode preloads one alive page application with action support', () => {
+  const f = fixture({
+    user: { username: 'fixture-user' },
+    ksConfig: {},
+    consoleEntry: { singleV3: true },
+  });
+  assert.deepEqual(
+    f.setups.map(options => options.name),
+    ['consolev3'],
+  );
+  assert.deepEqual(
+    f.preloads.map(options => options.name),
+    ['consolev3'],
+  );
+  assert.equal(f.setups[0].alive, true);
+  assert.equal(f.setups[0].props.actions, true);
+  assert.equal(f.setups[0].props.name, 'consolev3');
+  assert.equal(f.preloads[0].alive, true);
+  assert.equal(f.preloads[0].props.actions, true);
+  assert.ok(f.listeners.has('loadCompleted'));
+});
+
+test('single runtime mode still leaves anonymous authentication pages without protected preloads', () => {
+  const f = fixture({ config: {}, consoleEntry: { singleV3: true } });
+  assert.equal(f.setups.length, 1);
+  assert.equal(f.preloads.length, 0);
 });

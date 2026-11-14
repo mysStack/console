@@ -44,3 +44,5 @@ export * as uiState from './uiState';
 export * from './table';
 export * from './resourceListInvalidation';
 export * from './consoleV3';
+
+export * from './consoleV3Runtime';

@@ -48,6 +48,7 @@ interface GlobalsConfig {
 }
 
 interface Globals {
+  consoleEntry?: { auth: boolean; navigator: boolean; enhancement: boolean; singleV3?: boolean };
   currentCluster?: string;
   config: GlobalsConfig;
   manifest: Record<string, string>;
