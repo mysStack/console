@@ -10,6 +10,7 @@ export { getConfigReferencePath } from './path';
 export type { ConfigReferencePathParams, ConfigReferenceWorkloadModule } from './path';
 import {
   CONFIG_REFERENCE_ENTRY_SELECTOR,
+  resolveConfigReferenceEventTarget,
   ConfigReferenceDomRoot,
   findConfigReferenceAction,
   findConfigReferenceEnvSections,
@@ -106,7 +107,11 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
       if (!appWindow?.document) {
         return;
       }
-      const app = document.querySelector<HTMLElement>(`wujie-app[data-wujie-id="${appName}"]`);
+      const physicalAppName =
+        (appWindow as Window & { __WUJIE?: { id?: string } }).__WUJIE?.id || appName;
+      const app = document.querySelector<HTMLElement>(
+        `wujie-app[data-wujie-id="${physicalAppName}"]`,
+      );
       if (shouldWaitForConfigReferenceShadowRoot(app, appName)) {
         rootRetryTimerRef.current = setTimeout(() => {
           rootRetryTimerRef.current = undefined;
@@ -292,8 +297,11 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
         };
         refreshIntercepts();
       } else {
+        const handledConfirmations = new WeakSet<Event>();
         const handleConfirmation = (event: Event) => {
-          const target = event.target as Element | null;
+          if (handledConfirmations.has(event)) return;
+          handledConfirmations.add(event);
+          const target = resolveConfigReferenceEventTarget(event);
           const confirmation = target?.closest(
             '[data-test="confirm-ok"], [data-test="confirm-cancel"]',
           );
@@ -319,9 +327,17 @@ export function useConfigReferenceBridge(module: ConfigReferenceWorkloadModule) 
             setDraftVersion(value => value + 1);
           }
         };
-        root.addEventListener('click', handleConfirmation, true);
-        removeConfirmationListenerRef.current = () =>
-          root.removeEventListener('click', handleConfirmation, true);
+        // Modals can arrive after this callback. Capture every current physical
+        // root and retain those exact targets for cleanup as the form moves.
+        const confirmationRoots = collectRoots();
+        confirmationRoots.forEach(target =>
+          target.addEventListener('click', handleConfirmation, true),
+        );
+        removeConfirmationListenerRef.current = () => {
+          confirmationRoots.forEach(target =>
+            target.removeEventListener('click', handleConfirmation, true),
+          );
+        };
       }
 
       applyEntry();
