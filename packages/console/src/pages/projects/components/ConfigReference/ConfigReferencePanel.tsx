@@ -149,6 +149,9 @@ export default function ConfigReferencePanel({
     return <div role="alert">{t('CONFIG_REFERENCE_NO_CONTAINERS', { kind: workloadKind })}</div>;
   }
 
+  const original = (detailQuery.data as any)._originData || detailQuery.data;
+  const resourceVersion = original?.metadata?.resourceVersion;
+  const hasResourceVersion = typeof resourceVersion === 'string' && resourceVersion.length > 0;
   const duplicateIndexes = findDuplicateReferences(references);
   const availableNames = {
     configMap: new Set(configMaps.map(option => option.value)),
@@ -163,7 +166,7 @@ export default function ConfigReferencePanel({
     setReferences(current => [...current, { kind: 'configMap', name: '', prefix: '' }]);
 
   const save = () => {
-    if (!canEdit) return;
+    if (!canEdit || !hasResourceVersion || saveMutation.isLoading) return;
     setSaveError(null);
     if (duplicateIndexes.length) {
       notify.error(t('CONFIG_REFERENCE_DUPLICATE'));
@@ -177,9 +180,10 @@ export default function ConfigReferencePanel({
       notify.error(t('CONFIG_REFERENCE_UNAVAILABLE'));
       return;
     }
-    saveMutation.mutate(
-      buildConfigReferencePatch(detailQuery.data as any, names, references, reloaderEnabled),
-    );
+    saveMutation.mutate([
+      { op: 'test', path: '/metadata/resourceVersion', value: resourceVersion },
+      ...buildConfigReferencePatch(detailQuery.data as any, names, references, reloaderEnabled),
+    ]);
   };
 
   return (
@@ -363,7 +367,7 @@ export default function ConfigReferencePanel({
           color="primary"
           loading={saveMutation.isLoading}
           onClick={save}
-          disabled={!canEdit}
+          disabled={!canEdit || !hasResourceVersion}
         >
           {t('CONFIG_REFERENCE_SAVE')}
         </Button>

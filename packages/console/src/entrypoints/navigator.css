@@ -1,0 +1,56 @@
+body {
+  margin: 0;
+  background: #f5f7fa;
+  color: #242e42;
+  font:
+    16px system-ui,
+    sans-serif;
+}
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding: 20px;
+  background: #fff;
+}
+a {
+  color: #237d54;
+}
+main {
+  max-width: 1080px;
+  margin: 32px auto;
+  padding: 24px;
+}
+.navigator-cards,
+.navigator-menu {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.navigator-cards a,
+.navigator-menu a {
+  background: #fff;
+  border: 1px solid #d8dee5;
+  border-radius: 6px;
+  padding: 24px;
+}
+.navigator-list {
+  list-style: none;
+  padding: 0;
+}
+.navigator-list li {
+  padding: 16px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+}
+.navigator-pagination {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+select,
+button {
+  padding: 8px;
+  font: inherit;
+}

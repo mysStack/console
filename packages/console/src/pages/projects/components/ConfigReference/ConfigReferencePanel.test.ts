@@ -7,7 +7,11 @@ import vm from 'node:vm';
 
 const requireFromSource = createRequire(join(__dirname, 'ConfigReferencePanel.tsx'));
 
-function renderPanel(canEdit: boolean, moduleName = 'deployments') {
+function renderPanel(
+  canEdit: boolean,
+  moduleName = 'deployments',
+  resourceVersion: string | undefined = '42',
+) {
   const permissions: unknown[] = [];
   const writes: unknown[] = [];
   // Seed the loaded panel, including one existing reference, to exercise its controls.
@@ -37,7 +41,7 @@ function renderPanel(canEdit: boolean, moduleName = 'deployments') {
     useGetDetail: () => ({
       data: {
         _originData: {
-          metadata: { name: 'fixture' },
+          metadata: { name: 'fixture', resourceVersion },
           spec: {
             template: {
               spec: {
@@ -167,4 +171,23 @@ test('all workload types check edit permission in the selected project and clust
       action: 'edit',
     });
   }
+});
+
+test('a missing loaded resourceVersion disables save and prevents an unguarded patch', () => {
+  const f = renderPanel(true, 'deployments', '');
+  assert.equal(f.button('CONFIG_REFERENCE_SAVE').props.disabled, true);
+  f.button('CONFIG_REFERENCE_SAVE').props.onClick();
+  assert.equal(f.writes.length, 0);
+});
+
+test('saving tests the original resourceVersion before changing the container array', () => {
+  const f = renderPanel(true, 'deployments', '42');
+  f.button('CONFIG_REFERENCE_SAVE').props.onClick();
+  const patch = (f.writes[0] as any[])[1];
+  assert.deepEqual(JSON.parse(JSON.stringify(patch[0])), {
+    op: 'test',
+    path: '/metadata/resourceVersion',
+    value: '42',
+  });
+  assert.equal(patch[1].path, '/spec/template/spec/containers/0/envFrom');
 });

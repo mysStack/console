@@ -28,6 +28,9 @@ function loadRoutes(target) {
     './controllers/view': Object.fromEntries(
       [
         'renderView',
+        'renderConsoleHome',
+        'renderProjectNavigator',
+        'renderPasswordConfirm',
         'renderV3View',
         'renderTerminal',
         'renderLogin',

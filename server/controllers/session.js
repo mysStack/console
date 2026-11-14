@@ -9,17 +9,12 @@ const jwtDecode = require('jwt-decode');
 const omit = require('lodash/omit');
 const base64UrlDecode = require('jwt-decode/lib/base64_url_decode');
 const { getServerConfig } = require('../libs/utils');
+const { getConsoleReturnPath } = require('../libs/consoleEntry');
 
 const { client: clientConfig } = getServerConfig();
 
 const { login, loginThird, oAuthLogin, getNewToken, createUser } = require('../services/session');
-const {
-  isValidReferer,
-  isAppsRoute,
-  decryptPassword,
-  safeParseJSON,
-  safeBase64,
-} = require('../libs/utils');
+const { isAppsRoute, decryptPassword, safeParseJSON, safeBase64 } = require('../libs/utils');
 
 const { sendGatewayRequest } = require('../libs/request');
 
@@ -90,8 +85,7 @@ const handleLogin = async ctx => {
   const params = ctx.request.body;
 
   const authAuthorizeUrl = ctx.cookies.get('authAuthorizeUrl');
-  let referer = ctx.cookies.get('referer');
-  referer = referer ? decodeURIComponent(referer) : '';
+  const referer = getConsoleReturnPath(ctx.cookies.get('referer'));
 
   let error = {};
   let user = null;
@@ -158,7 +152,7 @@ const handleLogin = async ctx => {
   ctx.cookies.set('token', user.token);
   ctx.cookies.set('expire', user.expire);
   ctx.cookies.set('refreshToken', user.refreshToken);
-  ctx.cookies.set('referer', null);
+  ctx.cookies.set('referer', referer);
 
   if (user.username === 'system:pre-registration') {
     const extraname = safeBase64.safeBtoa(user.extraname);
@@ -178,6 +172,8 @@ const handleLogin = async ctx => {
     };
     return;
   }
+
+  ctx.cookies.set('referer', null);
 
   if (lastToken) {
     const { username } = jwtDecode(lastToken);
@@ -201,15 +197,14 @@ const handleLogin = async ctx => {
 
   ctx.body = {
     success: true,
-    redirect: isValidReferer(referer) ? referer : '/',
+    redirect: referer || '/',
   };
 };
 
 const handleThirdLogin = async ctx => {
   const params = ctx.request.body;
 
-  let referer = ctx.cookies.get('referer');
-  referer = referer ? decodeURIComponent(referer) : '';
+  const referer = getConsoleReturnPath(ctx.cookies.get('referer'));
 
   const error = {};
   let user = null;
@@ -292,7 +287,7 @@ const handleThirdLogin = async ctx => {
   ctx.cookies.set('token', user.token);
   ctx.cookies.set('expire', user.expire);
   ctx.cookies.set('refreshToken', user.refreshToken);
-  ctx.cookies.set('referer', null);
+  ctx.cookies.set('referer', referer);
 
   if (user.username === 'system:pre-registration') {
     const extraname = safeBase64.safeBtoa(user.extraname);
@@ -318,6 +313,8 @@ const handleThirdLogin = async ctx => {
     return;
   }
 
+  ctx.cookies.set('referer', null);
+
   if (lastToken) {
     const { username } = jwtDecode(lastToken);
     if (username && username !== user.username) {
@@ -331,11 +328,11 @@ const handleThirdLogin = async ctx => {
     }
   }
 
-  // ctx.redirect(isValidReferer(referer) ? referer : '/');
+  // ctx.redirect(referer || '/');
 
   ctx.body = {
     success: true,
-    redirect: isValidReferer(referer) ? referer : '/',
+    redirect: referer || '/',
   };
 };
 
@@ -385,8 +382,7 @@ const handleOAuthLogin = async ctx => {
   let user = null;
   const error = {};
   const oauthParams = omit(ctx.query, ['redirect_url', 'state']);
-  let referer = ctx.cookies.get('referer');
-  referer = referer ? decodeURIComponent(referer) : '';
+  const referer = getConsoleReturnPath(ctx.cookies.get('referer'));
 
   try {
     user = await oAuthLogin({ ...oauthParams, oauthName: ctx.params.name });
@@ -410,7 +406,7 @@ const handleOAuthLogin = async ctx => {
   ctx.cookies.set('token', user.token);
   ctx.cookies.set('expire', user.expire);
   ctx.cookies.set('refreshToken', user.refreshToken);
-  ctx.cookies.set('referer', null);
+  ctx.cookies.set('referer', referer);
 
   if (user.username === 'system:pre-registration') {
     const extraname = safeBase64.safeBtoa(user.extraname);
@@ -420,33 +416,37 @@ const handleOAuthLogin = async ctx => {
     return;
   }
 
-  const state = ctx.query.state;
-  const redirectUrl = ctx.query.redirect_url;
+  if (!user.initialized) {
+    ctx.redirect('/password/confirm');
+    return;
+  }
 
-  if (state) {
+  ctx.cookies.set('referer', null);
+  let stateTarget;
+  try {
+    if (ctx.query.state) stateTarget = JSON.parse(base64UrlDecode(ctx.query.state)).redirect_url;
+  } catch {
+    // A malformed provider state cannot choose a destination.
+  }
+  const sameOriginPath = value => {
+    if (typeof value !== 'string') return null;
+    if (value.startsWith('/')) return getConsoleReturnPath(value);
     try {
-      const stateObject = JSON.parse(base64UrlDecode(state));
-      const stateUrl = stateObject.redirect_url;
-      if (stateUrl) {
-        ctx.redirect(stateUrl);
-      }
-    } catch (err) {
-      /* eslint-disable no-console */
-      console.log(err);
+      const origin = ctx.origin || `${ctx.protocol || 'http'}://${ctx.headers.host}`;
+      const url = new URL(value);
+      if (url.origin !== origin) return null;
+      return getConsoleReturnPath(url.pathname + url.search + url.hash);
+    } catch {
+      return null;
     }
-  }
-
-  if (redirectUrl) {
-    const redirectHost = new URL(redirectUrl).host;
-    if (redirectHost === ctx.headers.host) {
-      ctx.redirect(redirectUrl);
-    }
-  } else {
-    ctx.redirect(isValidReferer(referer) ? referer : '/');
-  }
+  };
+  ctx.redirect(
+    sameOriginPath(ctx.query.redirect_url) || sameOriginPath(stateTarget) || referer || '/',
+  );
 };
 
 const handleLoginConfirm = async ctx => {
+  const referer = getConsoleReturnPath(ctx.cookies.get('referer'));
   const token = ctx.cookies.get('token');
   const params = ctx.request.body;
 
@@ -460,9 +460,10 @@ const handleLoginConfirm = async ctx => {
 
     ctx.cookies.set('defaultUser', null);
     ctx.cookies.set('defaultEmail', null);
+    ctx.cookies.set('referer', null);
     ctx.body = {
       success: true,
-      redirect: '/',
+      redirect: referer || '/',
     };
   }
 };

@@ -40,7 +40,12 @@ function loadView(overrides = {}) {
       return fn(...args);
     };
   }
+  const entry = require('../libs/consoleEntry');
   const stubs = {
+    '../libs/consoleEntry': {
+      ...entry,
+      getConsoleEntryManifest: name => ({ js: [`entry/${name}.fixture.js`], css: [] }),
+    },
     '../services/session': session,
     '../services/extension': {
       getInstalledExtensions: async () => {
@@ -95,6 +100,7 @@ function context() {
     cookies: { get: () => undefined, set: () => {} },
     t: text => text,
     app: { emit: (...args) => errors.push(args) },
+    set: () => {},
     render: async (template, data) => rendered.push({ template, data }),
     redirect: url => redirects.push(url),
     rendered,
@@ -168,7 +174,7 @@ for (const [handler, template] of [
     });
     const ctx = context();
     await view[handler](ctx);
-    assert.deepEqual(ctx.redirects, ['/login?referer=/projects/fixture/deployments']);
+    assert.deepEqual(ctx.redirects, ['/login?referer=%2Fprojects%2Ffixture%2Fdeployments']);
     assert.deepEqual(ctx.rendered, []);
     assert.equal(calls.filter(x => x === 'getTheme').length, 1);
   });
@@ -218,4 +224,138 @@ test('login still fetches its theme when no page bootstrap promise is supplied',
   assert.equal(ctx.rendered[0].template, 'index');
   assert.equal(ctx.rendered[0].data.title, 'Fixture brand');
   assert.equal(calls.filter(x => x === 'getTheme').length, 1);
+});
+
+test('login stores only the parsed referer and clears a stale referer on an invalid login URL', async () => {
+  const { view } = loadView();
+  const writes = [];
+  const ctx = context();
+  ctx.querystring = 'referer=%2Fprojects%2Ffixture%2Fdeployments&lang=zh';
+  ctx.cookies.set = (...args) => writes.push(args);
+  await view.renderLogin(ctx);
+  assert.deepEqual(writes[0], ['referer', '/projects/fixture/deployments']);
+  writes.length = 0;
+  ctx.querystring = 'referer=https%3A%2F%2Fexternal.invalid';
+  await view.renderLogin(ctx);
+  assert.deepEqual(writes[0], ['referer', null]);
+});
+
+test('an expired standalone enhancement URL preserves its query through the login redirect', async () => {
+  const { view } = loadView({
+    getCurrentUser: async () => {
+      throw { code: 401 };
+    },
+  });
+  const ctx = context();
+  ctx.path = '/consolev3/ws/clusters/host/projects/ns/deployments/app/resource-status';
+  ctx.originalUrl = ctx.path + '?enhancement=config-reference';
+  await view.renderV3View(ctx);
+  assert.equal(
+    new URL(ctx.redirects[0], 'http://console.test').searchParams.get('referer'),
+    ctx.originalUrl,
+  );
+});
+
+async function withEntryFlags(flags, action) {
+  const saved = {};
+  for (const [name, value] of Object.entries(flags)) {
+    saved[name] = process.env[name];
+    process.env[name] = value;
+  }
+  try {
+    await action();
+  } finally {
+    for (const [name, value] of Object.entries(saved)) {
+      if (value === undefined) delete process.env[name];
+      else process.env[name] = value;
+    }
+  }
+}
+
+test('the enabled lightweight login renders its own scripts and preserves theme and OAuth providers', async () => {
+  await withEntryFlags({ KS_CONSOLE_LIGHT_AUTH: 'true' }, async () => {
+    const { view } = loadView({ getOAuthInfo: async () => [{ name: 'fixture-provider' }] });
+    const ctx = context();
+    await view.renderLogin(ctx);
+    assert.equal(ctx.rendered[0].template, 'entry');
+    assert.deepEqual(ctx.rendered[0].data.entry.js, ['entry/auth.fixture.js']);
+    const globals = JSON.parse(decodeURIComponent(ctx.rendered[0].data.globals));
+    assert.deepEqual(globals.oauthServers, [{ name: 'fixture-provider' }]);
+    assert.deepEqual(globals.theme, theme);
+    assert.equal(ctx.rendered[0].data.dllManifest, undefined);
+  });
+});
+
+test('the project navigator waits for authenticated rules without fetching extensions or runtimes', async () => {
+  await withEntryFlags({ KS_CONSOLE_PROJECT_NAVIGATOR: 'true' }, async () => {
+    const gate = deferred();
+    const { view, calls, userArgs } = loadView({ getCurrentUser: () => gate.promise });
+    const ctx = context();
+    ctx.path = '/project-console/dashboard';
+    const pending = view.renderProjectNavigator(ctx);
+    await tick();
+    assert.equal(ctx.rendered.length, 0);
+    gate.resolve(user);
+    await pending;
+    assert.equal(ctx.rendered[0].template, 'entry');
+    assert.deepEqual(ctx.rendered[0].data.entry.js, ['entry/navigator.fixture.js']);
+    assert.deepEqual(JSON.parse(decodeURIComponent(ctx.rendered[0].data.globals)).user, user);
+    assert.equal(userArgs[0][1], 'member');
+    assert.equal(calls.includes('getInstalledExtensions'), false);
+    assert.equal(calls.includes('getK8sRuntime'), false);
+    assert.equal(calls.includes('getKSConfig'), false);
+  });
+});
+
+test('a forbidden navigator request returns an exit page without a login redirect loop', async () => {
+  await withEntryFlags({ KS_CONSOLE_PROJECT_NAVIGATOR: 'true' }, async () => {
+    const { view } = loadView({
+      getCurrentUser: async () => {
+        throw { code: 403 };
+      },
+    });
+    const ctx = context();
+    ctx.path = '/project-console/access/workspaces';
+    await view.renderProjectNavigator(ctx);
+    assert.equal(ctx.status, 403);
+    assert.equal(ctx.rendered[0].template, 'error');
+    assert.deepEqual(ctx.redirects, []);
+  });
+});
+
+test('home consumes a validated post-confirmation return before selecting the default navigator', async () => {
+  await withEntryFlags({ KS_CONSOLE_PROJECT_NAVIGATOR: 'true' }, async () => {
+    const { view } = loadView();
+    const ctx = context();
+    ctx.cookies.get = () => '/project-console/workspaces/fixture/projects';
+    const writes = [];
+    ctx.cookies.set = (...args) => writes.push(args);
+    await view.renderConsoleHome(ctx);
+    assert.deepEqual(ctx.redirects, ['/project-console/workspaces/fixture/projects']);
+    assert.deepEqual(writes, [['referer', null]]);
+  });
+});
+
+test('an uninitialized navigator account reaches password confirmation with its return preserved', async () => {
+  await withEntryFlags({ KS_CONSOLE_PROJECT_NAVIGATOR: 'true' }, async () => {
+    const { view } = loadView({ getCurrentUser: async () => ({ ...user, uninitialized: 'true' }) });
+    const ctx = context();
+    ctx.path = '/project-console/access/workspaces';
+    const writes = [];
+    ctx.cookies.set = (...args) => writes.push(args);
+    await view.renderProjectNavigator(ctx);
+    assert.deepEqual(ctx.redirects, ['/password/confirm']);
+    assert.deepEqual(writes, [['referer', '/project-console/access/workspaces']]);
+    assert.deepEqual(ctx.rendered, []);
+  });
+});
+
+test('login query parsing does not decode a doubly encoded return path', async () => {
+  const { view } = loadView();
+  const ctx = context();
+  const writes = [];
+  ctx.querystring = 'referer=%252Fprojects%252Ffixture%252Fdeployments';
+  ctx.cookies.set = (...args) => writes.push(args);
+  await view.renderLogin(ctx);
+  assert.deepEqual(writes[0], ['referer', null]);
 });

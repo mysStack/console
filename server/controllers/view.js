@@ -14,13 +14,19 @@ const {
 } = require('../services/session');
 
 const { getInstalledExtensions } = require('../services/extension');
+const {
+  getLoginReferer,
+  getConsoleReturnPath,
+  getConsoleEntryFlags,
+  getConsoleEntryManifest,
+} = require('../libs/consoleEntry');
+const { randomBytes } = require('crypto');
 
 const {
   getServerConfig,
   getManifest,
   getLocaleManifest,
   getImportMap,
-  isValidReferer,
   safeBase64,
   getV3Manifest,
   getV3LocaleManifest,
@@ -69,6 +75,52 @@ const renderIndex = async (ctx, params, themePromise = getTheme(ctx)) => {
   });
 };
 
+const renderEntry = async (ctx, name, params, themePromise = getTheme(ctx)) => {
+  const entry = getConsoleEntryManifest(name);
+  if (!entry) return renderIndex(ctx, params, themePromise);
+  const data = getThemeConfig(await themePromise);
+  const useDefaultTheme = !startsWith(data.logo, '/theme');
+  const nonce = randomBytes(18).toString('base64');
+  ctx.set('Cache-Control', 'no-store');
+  ctx.set(
+    'Content-Security-Policy',
+    [
+      "default-src 'self'",
+      `script-src 'self' 'nonce-${nonce}'`,
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: blob: http: https:",
+      "font-src 'self' data:",
+      "connect-src 'self' ws: wss:",
+      "frame-src 'self'",
+      "frame-ancestors 'self'",
+      "object-src 'none'",
+      "base-uri 'self'",
+    ].join('; '),
+  );
+  await ctx.render('entry', {
+    title: useDefaultTheme ? data.defaultTheme?.tabTitle : data.title,
+    favicon: data.favicon,
+    entry,
+    nonce,
+    sharedCss: name === 'auth' ? getManifest('main')['main.css'] : null,
+    globals: encodeURIComponent(
+      JSON.stringify({
+        config: clientConfig,
+        manifest: getManifest('main'),
+        localeManifest: getLocaleManifest(),
+        theme: data.theme,
+        defaultTheme: data.defaultTheme,
+        useDefaultTheme,
+        consoleEntry: getConsoleEntryFlags(),
+        ...params,
+      }),
+    ),
+  });
+};
+
+const renderAuthentication = (ctx, params) =>
+  getConsoleEntryFlags().auth ? renderEntry(ctx, 'auth', params) : renderIndex(ctx, params);
+
 const renderV3Index = async (ctx, params, themePromise = getTheme(ctx)) => {
   const themeData = await themePromise;
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -99,7 +151,7 @@ const renderV3Index = async (ctx, params, themePromise = getTheme(ctx)) => {
   });
 };
 
-const renderViewErr = async (ctx, err, themePromise = getTheme(ctx)) => {
+const renderViewErr = async (ctx, err, themePromise = getTheme(ctx), forbiddenAsPage = false) => {
   const themeData = await themePromise;
   const _theme = getThemeConfig(themeData);
   const { title, favicon, logo, defaultTheme } = _theme;
@@ -107,9 +159,20 @@ const renderViewErr = async (ctx, err, themePromise = getTheme(ctx)) => {
 
   ctx.app.emit('error', err);
   if (err) {
+    if (forbiddenAsPage && (err.code === 403 || err.status === 403)) {
+      ctx.status = 403;
+      await ctx.render('error', {
+        title: useDefaultTheme ? defaultTheme?.tabTitle : title,
+        favicon,
+        message: ctx.t('NO_PERMISSION'),
+        t: ctx.t.bind(ctx),
+      });
+      return;
+    }
     if (err.code === 401 || err.code === 403 || err.status === 401) {
-      if (isValidReferer(ctx.path)) {
-        ctx.redirect(`/login?referer=${ctx.path}`);
+      const referer = getConsoleReturnPath(ctx.originalUrl || ctx.url || ctx.path);
+      if (referer) {
+        ctx.redirect(`/login?referer=${encodeURIComponent(referer)}`);
       } else {
         ctx.redirect('/login');
       }
@@ -268,26 +331,18 @@ const renderV3View = async ctx => {
 };
 
 const renderLogin = async ctx => {
-  const referer = ctx.querystring.split('referer=')[1];
-
-  if (isValidReferer(referer)) {
-    if (referer === '/dist/') {
-      ctx.cookies.set('referer', '/dashboard');
-    } else {
-      ctx.cookies.set('referer', referer);
-    }
-  }
+  ctx.cookies.set('referer', getLoginReferer(ctx));
 
   const oauthServers = await getOAuthInfo(ctx);
 
-  await renderIndex(ctx, {
+  await renderAuthentication(ctx, {
     oauthServers: oauthServers || [],
   });
 };
 
 const renderLoginConfirm = async ctx => {
   const usrName = ctx.cookies.get('defaultUser') || '';
-  await renderIndex(ctx, {
+  await renderAuthentication(ctx, {
     user: {
       username: safeBase64.safeAtob(usrName),
       email: ctx.cookies.get('defaultEmail'),
@@ -295,7 +350,58 @@ const renderLoginConfirm = async ctx => {
   });
 };
 
+const renderProjectNavigator = async ctx => {
+  if (!getConsoleEntryFlags().navigator || !getConsoleEntryManifest('navigator')) {
+    ctx.redirect('/dashboard');
+    return;
+  }
+  let themePromise;
+  try {
+    const clusterRole = await getClusterRole(ctx);
+    themePromise = getTheme(ctx);
+    const user = await getCurrentUser(ctx, clusterRole);
+    if (user?.uninitialized === 'true') {
+      ctx.cookies.set('referer', getConsoleReturnPath(ctx.originalUrl || ctx.url || ctx.path));
+      ctx.redirect('/password/confirm');
+      return;
+    }
+    await renderEntry(ctx, 'navigator', { user, clusterRole, ksConfig: {} }, themePromise);
+  } catch (err) {
+    await renderViewErr(ctx, err, themePromise, true);
+  }
+};
+
+const renderPasswordConfirm = async ctx => {
+  if (!getConsoleEntryFlags().auth) return renderView(ctx);
+  let themePromise;
+  try {
+    const clusterRole = await getClusterRole(ctx);
+    themePromise = getTheme(ctx);
+    const user = await getCurrentUser(ctx, clusterRole);
+    await renderEntry(ctx, 'auth', { user, clusterRole }, themePromise);
+  } catch (err) {
+    await renderViewErr(ctx, err, themePromise);
+  }
+};
+
+const renderConsoleHome = async ctx => {
+  const referer = getConsoleReturnPath(ctx.cookies.get('referer'));
+  if (referer) {
+    ctx.cookies.set('referer', null);
+    ctx.redirect(referer);
+    return;
+  }
+  if (getConsoleEntryFlags().navigator && getConsoleEntryManifest('navigator')) {
+    ctx.redirect('/project-console/dashboard');
+    return;
+  }
+  await renderView(ctx);
+};
+
 module.exports = {
+  renderConsoleHome,
+  renderProjectNavigator,
+  renderPasswordConfirm,
   renderView,
   renderV3View,
   renderTerminal,

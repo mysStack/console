@@ -39,6 +39,9 @@ const {
 
 const {
   renderView,
+  renderConsoleHome,
+  renderProjectNavigator,
+  renderPasswordConfirm,
   renderV3View,
   renderTerminal,
   renderLogin,
@@ -76,6 +79,7 @@ router
   .get('/login', renderLogin)
   .post('/login/confirm', parseBody, handleLoginConfirm)
   .get('/login/confirm', renderLoginConfirm)
+  .get('/password/confirm', renderPasswordConfirm)
   .get('/logout', handleLogout)
   // oauth callback
   .get('/oauth/redirect/:name', handleOAuthLogin)
@@ -113,6 +117,9 @@ router
       },
     }),
   )
+
+  .get('/', renderConsoleHome)
+  .get('/project-console/(.*)', renderProjectNavigator)
 
   // page entry
   .all('(.*)', renderView);

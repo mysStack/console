@@ -14,8 +14,9 @@
     "locales"
   ],
   "scripts": {
-    "build": "yarn build:dll && yarn build:locales && yarn build:prod && yarn build:server",
+    "build": "yarn build:dll && yarn build:locales && yarn build:prod && yarn build:entries && yarn build:server",
     "build:dll": "ksc build:dll -s true",
+    "build:entries": "node scripts/build-console-entries.js",
     "build:ext": "ksc build:ext",
     "build:locales": "esno scripts/build-locales.js",
     "build:packages": "esno scripts/build-packages.js",

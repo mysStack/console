@@ -115,33 +115,9 @@ const getServerConfig = key => {
 };
 const getCache = () => cache;
 
-const URL_PATTEN =
-  /^(https|http|ftp|rtsp|mms){0,1}:?(\/)+(([A-Za-z0-9-~]+)\.)+([A-Za-z0-9-~\\/])+$/;
+const { getConsoleReturnPath } = require('./consoleEntry');
 
-// eslint-disable-next-line @typescript-eslint/no-shadow
-const isValidReferer = path => {
-  if (isEmpty(path)) {
-    return false;
-  }
-  const referer = decodeURIComponent(path);
-  const isUrl = URL_PATTEN.test(referer);
-
-  const isJsScript = referer.indexOf('javascript:') < 0;
-
-  const isConsoleV3 = referer.indexOf('consolev3') > -1;
-  const isStandaloneDeployment =
-    /^\/consolev3\/[a-z0-9-]+\/clusters\/[a-z0-9-]+\/projects\/[a-z0-9-]+\/deployments(?:\/[a-z0-9-]+(?:\/[a-z0-9-]+)*)?\/?$/.test(
-      referer,
-    );
-
-  return (
-    referer !== '/' &&
-    referer.indexOf('/login') === -1 &&
-    !isUrl &&
-    isJsScript &&
-    (!isConsoleV3 || isStandaloneDeployment)
-  );
-};
+const isValidReferer = value => getConsoleReturnPath(value) !== null;
 
 /**
  *
