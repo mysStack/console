@@ -46,12 +46,13 @@ test('hashed console entries have immutable public caching only after successful
       middleware.push(fn);
     },
   });
-  for (const [pathname, status, expected] of [
+  for (const [pathname, status, expected, type = 'application/javascript'] of [
     ['/dist/entry/auth.123456abcdef.js', 200, true],
     ['/dist/entry/navigator.123456abcdef.css', 304, true],
     ['/dist/entry/config-reference.123456abcdef.js', 200, true],
     ['/dist/entry/auth.123456abcdef.js', 404, false],
     ['/dist/entry/manifest.json', 200, false],
+    ['/dist/entry/auth.123456abcdef.js', 200, false, 'text/html'],
     ['/dist/entry/auth.js', 200, false],
     ['/dashboard', 200, false],
   ]) {
@@ -59,6 +60,7 @@ test('hashed console entries have immutable public caching only after successful
     const ctx = {
       path: pathname,
       status,
+      type,
       set(name, value) {
         headers[name] = value;
       },

@@ -43,7 +43,8 @@ module.exports = function (app) {
     await next();
     if (
       /^\/dist\/entry\/(auth|navigator|config-reference)\.[a-f0-9]{12}\.(js|css)$/.test(ctx.path) &&
-      [200, 304].includes(ctx.status)
+      [200, 304].includes(ctx.status) &&
+      ['application/javascript', 'text/javascript', 'text/css'].includes(ctx.type)
     ) {
       ctx.set('Cache-Control', 'public, max-age=31536000, immutable');
     }
