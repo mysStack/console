@@ -61,3 +61,64 @@ test('a real child reload resets readiness and its document listeners', () => {
   f.callbacks.pagehide();
   assert.equal(f.calls.filter(x => x[0] === 'reset').length, 1);
 });
+
+test('unsubscribing releases child handlers and keeps chained subscriptions tracked', () => {
+  const f = fixture();
+  const first = () => {};
+  const second = () => {};
+  const bus = f.window.$wujie.bus;
+  assert.equal(bus.$on('first', first), bus);
+  bus.$on('first', first);
+  assert.equal(f.bridge.listeners.length, 1);
+  bus.$on('second', second).$off('first', first);
+  assert.deepEqual(
+    f.bridge.listeners.map(item => item[0]),
+    ['second'],
+  );
+  assert.equal(f.calls.filter(item => item[0] === 'off').length, 1);
+});
+
+test('clearing child subscriptions preserves host subscriptions', () => {
+  const f = fixture();
+  const first = () => {};
+  const second = () => {};
+  f.bridge.bus.$clear = () => {
+    throw Error('The shared host bus must keep its listeners');
+  };
+  f.window.$wujie.bus.$on('first', first);
+  f.window.$wujie.bus.$on('second', second);
+  assert.equal(f.window.$wujie.bus.$clear(), f.window.$wujie.bus);
+  assert.equal(f.bridge.listeners.length, 0);
+  assert.deepEqual(
+    f.calls.filter(item => item[0] === 'off').map(item => item[1]),
+    ['first', 'second'],
+  );
+});
+
+test('once and all-event helpers use the tracked child subscription methods', () => {
+  const f = fixture();
+  f.bridge.bus.$once = function (event, handler) {
+    const once = (...args) => {
+      this.$off(event, once);
+      handler(...args);
+    };
+    this.$on(event, once);
+  };
+  f.bridge.bus.$onAll = function (handler) {
+    return this.$on('*', handler);
+  };
+  f.bridge.bus.$offAll = function (handler) {
+    return this.$off('*', handler);
+  };
+  const handler = () => {};
+  const bus = f.window.$wujie.bus;
+  bus.$once('once', handler);
+  assert.equal(f.bridge.listeners.length, 1);
+  const once = f.bridge.listeners[0][1];
+  once();
+  assert.equal(f.bridge.listeners.length, 0);
+  assert.equal(bus.$onAll(handler), bus);
+  assert.equal(f.bridge.listeners.length, 1);
+  bus.$offAll(handler);
+  assert.equal(f.bridge.listeners.length, 0);
+});
