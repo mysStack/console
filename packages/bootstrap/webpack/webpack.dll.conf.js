@@ -57,6 +57,10 @@ const config = {
   module: {
     rules: [
       {
+        resource: require.resolve('@kubed/icons'),
+        loader: path.resolve(__dirname, 'lazy-icon-index-loader.js'),
+      },
+      {
         test: /\.jsx?$/,
         loader: 'babel-loader',
         include: [resolveShared('shared'), resolveShared('packages')],

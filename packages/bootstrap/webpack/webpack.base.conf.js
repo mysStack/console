@@ -46,6 +46,10 @@ const webpackBaseConfig = merge(configs, {
   module: {
     rules: [
       {
+        resource: require.resolve('@kubed/icons'),
+        loader: absResolve('webpack/lazy-icon-index-loader.js'),
+      },
+      {
         resource: config.webIndex,
         use: [
           {
