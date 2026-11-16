@@ -3,6 +3,6 @@
  * https://github.com/kubesphere/console/blob/master/LICENSE
  */
 
-import { run } from '@ks-console/core';
+import { run } from '../../core/src/run';
 
 run();

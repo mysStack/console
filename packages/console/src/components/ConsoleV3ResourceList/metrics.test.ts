@@ -80,7 +80,8 @@ test('ConsoleV3 retains an unchanged runtime after the old data cache TTL', () =
 
 test('ConsoleV3 treats a rendered ShadowRoot as a mounted app', () => {
   const doc = {
-    querySelector: () => ({ shadowRoot: { childElementCount: 1 } }),
+    querySelector: (selector: string) =>
+      selector.startsWith('iframe[') ? null : { shadowRoot: { childElementCount: 1 } },
   } as unknown as Document;
 
   assert.equal(isConsoleV3InstanceMounted(doc), true);
@@ -88,7 +89,8 @@ test('ConsoleV3 treats a rendered ShadowRoot as a mounted app', () => {
 
 test('ConsoleV3 treats an emptied ShadowRoot as unmounted', () => {
   const emptied = {
-    querySelector: () => ({ shadowRoot: { childElementCount: 0 } }),
+    querySelector: (selector: string) =>
+      selector.startsWith('iframe[') ? null : { shadowRoot: { childElementCount: 0 } },
   } as unknown as Document;
   const missing = { querySelector: () => null } as unknown as Document;
 
@@ -153,4 +155,16 @@ test('ConsoleV3 keeps an already absolute app URL unchanged', () => {
 
 test('ConsoleV3 leaves an unresolved URL untouched instead of guessing', () => {
   assert.equal(normalizeConsoleV3Url('undefined/pods', 'ks.test:30881'), 'undefined/pods');
+});
+
+test('a native resource document becomes ready only after its action registry', () => {
+  let ready = false;
+  const appWindow = {
+    frameElement: {
+      getAttribute: (key: string) => (key === 'data-native-v3' ? 'true' : String(ready)),
+    },
+  } as any;
+  assert.equal(getConsoleV3InstanceState(appWindow), 'missing');
+  ready = true;
+  assert.equal(getConsoleV3InstanceState(appWindow), 'ready');
 });

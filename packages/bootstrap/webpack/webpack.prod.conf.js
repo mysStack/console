@@ -85,7 +85,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     splitChunks: {
       cacheGroups: {
         commons: {
-          chunks: 'all',
+          chunks: 'initial',
           minChunks: 1,
           priority: 1,
           test: /[\\/]node_modules[\\/]/,

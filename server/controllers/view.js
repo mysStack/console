@@ -141,6 +141,7 @@ const renderV3Index = async (ctx, params, themePromise = getTheme(ctx)) => {
   await ctx.render('consolev3', {
     manifest,
     enhancement: consoleEntry.enhancement,
+    nativeV3: consoleEntry.nativeV3,
     isDev: global.MODE_DEV,
     title: clientConfig.title,
     hostname: ctx.hostname,

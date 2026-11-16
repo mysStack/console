@@ -20,6 +20,11 @@
     <script type="text/javascript">
       window.globals = JSON.parse(decodeURIComponent(`<%- globals %>`));
     </script>
+    <% if (typeof nativeV3 !== 'undefined' && nativeV3) { %>
+    <script type="text/javascript">
+      <%- include('../public/nativeConsoleV3Bridge.js') %>
+    </script>
+    <% } %>
     <script type="text/javascript">
       <%- include('../public/deploymentStandalone.js') %>
     </script>

@@ -21,16 +21,16 @@ const NAV_KEY = 'FED_PROJECT_NAV';
 function ListLayout(): JSX.Element {
   const { workspace, namespace } = useParams<'workspace' | 'namespace'>();
   const location = useLocation();
-  const { getNav, setNav } = useGlobalStore();
+  const { getNav, setNav, navRevision } = useGlobalStore();
   const { getfederatedProjectNavs } = permissionStore();
   let navs = getNav(NAV_KEY);
 
   useEffect(() => {
-    if (!navs) {
+    if (!navs || navRevision > 0) {
       navs = getfederatedProjectNavs();
       setNav(NAV_KEY, navs);
     }
-  }, []);
+  }, [navRevision]);
 
   return (
     <>

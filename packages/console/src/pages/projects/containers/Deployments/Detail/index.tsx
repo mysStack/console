@@ -1,3 +1,4 @@
+import { isNativeConsoleV3Enabled } from '../../../../../../../shared/src/components/ConsoleV3Embed/index';
 /*
  * Please refer to the LICENSE file in the root directory of the project.
  * https://github.com/kubesphere/console/blob/master/LICENSE
@@ -52,6 +53,11 @@ function DeploymentDetail(): JSX.Element {
   const listPath = getConsoleV3DeploymentListPath(projectPrefix);
   const syncDetailRoute = useCallback(
     (appWindow: Window) => {
+      if (isNativeConsoleV3Enabled()) {
+        if (appWindow.location.pathname !== embeddedPath)
+          replaceConsoleV3Route(appWindow, embeddedPath);
+        return;
+      }
       if (routeSyncFrameRef.current !== undefined) {
         appWindow.cancelAnimationFrame(routeSyncFrameRef.current);
       }
@@ -175,7 +181,8 @@ function DeploymentDetail(): JSX.Element {
       <ConsoleV3AliveEmbed
         width="100%"
         height="100%"
-        url={embeddedUrl}
+        url={isNativeConsoleV3Enabled() ? embeddedPath : embeddedUrl}
+        synchronizeRoute={false}
         afterMount={handleAfterMount}
         activated={handleActivated}
         afterUnmount={handleAfterUnmount}

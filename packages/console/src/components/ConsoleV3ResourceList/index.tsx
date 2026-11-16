@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import WujieReact from 'wujie-react';
+import WujieReact from '../../../../shared/src/components/ConsoleV3Embed/index';
 
 import { getResourceListCacheVersion } from '@ks-console/shared';
 

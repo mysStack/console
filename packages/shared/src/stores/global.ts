@@ -23,6 +23,7 @@ const initialGlobalStore: GlobalStore = {
 };
 
 export const useGlobalStore = () => {
+  const [navRevision] = useStore<number>('ExtensionNavigationRevision', 0);
   const [globalStore, setGlobalStore] = useStore<GlobalStore>('GlobalStore', initialGlobalStore);
 
   const getNav = (name: string): NavMenuItem[] => {
@@ -30,11 +31,10 @@ export const useGlobalStore = () => {
   };
 
   const setNav = (key: string, data: NavMenuItem[]) => {
-    globalStore.navs[key] = data;
-    setGlobalStore(globalStore);
-    // mutate('GlobalStore', (state: GlobalStore) => {
-    //   state.navs[key] = data;
-    // });
+    setGlobalStore(previous => {
+      const current = previous || initialGlobalStore;
+      return { ...current, navs: { ...current.navs, [key]: data } };
+    });
   };
 
   const setNavOpen = (isOpen: boolean) => {
@@ -46,6 +46,7 @@ export const useGlobalStore = () => {
 
   return {
     globalStore,
+    navRevision,
     setGlobalStore,
     getNav,
     setNav,

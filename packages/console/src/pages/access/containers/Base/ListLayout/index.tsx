@@ -15,15 +15,15 @@ const navKey = 'ACCESS_NAVS';
 
 function ListLayout() {
   const location = useLocation();
-  const { getNav, setNav } = useGlobalStore();
+  const { getNav, setNav, navRevision } = useGlobalStore();
   let navs = getNav(navKey);
 
   useEffect(() => {
-    if (!navs) {
+    if (!navs || navRevision > 0) {
       navs = getAccessNavs();
       setNav(navKey, navs);
     }
-  }, []);
+  }, [navRevision]);
 
   return (
     <>

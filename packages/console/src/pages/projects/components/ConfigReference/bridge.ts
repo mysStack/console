@@ -77,6 +77,8 @@ export function getConfigReferenceNativeEditRoots(
  * leaves its loading spinner.
  */
 export function getConfigReferenceWujieAppWindow(hostDocument: Document): Window | undefined {
+  const native = hostDocument.querySelector<HTMLIFrameElement>('iframe[data-native-v3]');
+  if (native?.contentWindow) return native.contentWindow;
   const app = hostDocument.querySelector('wujie-app[data-wujie-id="consolev3"]');
   if (!app) return undefined;
   const frames = [

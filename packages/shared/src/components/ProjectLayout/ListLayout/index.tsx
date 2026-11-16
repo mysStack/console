@@ -44,7 +44,7 @@ function ListLayout(): JSX.Element {
   const location = useLocation();
   const modal = useModal();
   const navigate = useNavigate();
-  const { getNav, setNav } = useGlobalStore();
+  const { getNav, setNav, navRevision } = useGlobalStore();
   const { cluster, workspace, namespace } = useParams();
   const [defaultProjectDetail] = useStore<FormattedNamespace>('project');
   const [wujieUrlPrefix, setWujieUrlPrefix] = useStore<string>('wujieUrlPrefix');
@@ -110,7 +110,7 @@ function ListLayout(): JSX.Element {
     if (navs.length !== 0) {
       setNav(navKey, navs);
     }
-  }, []);
+  }, [cluster, workspace, namespace, navRevision]);
 
   useEffect(() => {
     assignConsoleV3UrlPrefixIfChanged(

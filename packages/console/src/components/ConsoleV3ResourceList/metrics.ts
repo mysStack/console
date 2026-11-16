@@ -48,6 +48,12 @@ export const shouldKeepConsoleV3Alive = (
 export const isConsoleV3InstanceMounted = (
   doc: Document | undefined = typeof document === 'undefined' ? undefined : document,
 ): boolean => {
+  const native = doc?.querySelector<HTMLIFrameElement>('iframe[data-native-v3]');
+  if (native)
+    return (
+      native.dataset.nativeReady === 'true' &&
+      Boolean(native.contentDocument?.getElementById('root')?.hasChildNodes())
+    );
   const host = doc?.querySelector('wujie-app[data-wujie-id="consolev3"]');
   const shadowRoot = (host as HTMLElement | null)?.shadowRoot;
 
@@ -115,6 +121,10 @@ export const getConsoleV3Sandbox = (
 export const getConsoleV3InstanceState = (
   appWindow?: ConsoleV3AppWindow,
 ): ConsoleV3InstanceState => {
+  if (appWindow?.frameElement?.getAttribute('data-native-v3'))
+    return appWindow.frameElement.getAttribute('data-native-ready') === 'true'
+      ? 'ready'
+      : 'missing';
   const sandbox = appWindow?.__WUJIE;
   const shadowRoot = sandbox?.shadowRoot;
 

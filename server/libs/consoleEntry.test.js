@@ -46,3 +46,28 @@ test('existing full-console bookmarks and scoped navigator pagination remain val
   ])
     assert.equal(isValidReferer(value), true, value);
 });
+
+test('native resource documents require the explicit single-V3 and native switches', () => {
+  const { getConsoleEntryFlags } = require('./consoleEntry');
+  const previous = {
+    single: process.env.KS_CONSOLE_SINGLE_V3,
+    native: process.env.KS_CONSOLE_NATIVE_V3,
+  };
+  try {
+    process.env.KS_CONSOLE_NATIVE_V3 = 'true';
+    delete process.env.KS_CONSOLE_SINGLE_V3;
+    assert.equal(getConsoleEntryFlags().nativeV3, false);
+    process.env.KS_CONSOLE_SINGLE_V3 = 'true';
+    assert.equal(getConsoleEntryFlags().nativeV3, true);
+    process.env.KS_CONSOLE_NATIVE_V3 = 'false';
+    assert.equal(getConsoleEntryFlags().nativeV3, false);
+  } finally {
+    for (const [key, value] of [
+      ['KS_CONSOLE_SINGLE_V3', previous.single],
+      ['KS_CONSOLE_NATIVE_V3', previous.native],
+    ]) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+  }
+});

@@ -77,11 +77,11 @@ export default function Header() {
     };
   }, []);
 
-  const { getNav, setNav } = useGlobalStore();
+  const { getNav, setNav, navRevision } = useGlobalStore();
   let navs = getNav(platformNavKey);
 
   useEffect(() => {
-    if (!navs) {
+    if (!navs || navRevision > 0) {
       navs = getGlobalNavs();
       setNav(platformNavKey, navs);
     }
@@ -89,7 +89,7 @@ export default function Header() {
     const scrollHandler = () => setIsScroll(document.documentElement.scrollTop > 10);
     document.addEventListener('scroll', scrollHandler);
     return () => document.removeEventListener('scroll', scrollHandler);
-  }, []);
+  }, [navRevision]);
 
   const topbarNavs = globals.config.topbarNavs.children;
 

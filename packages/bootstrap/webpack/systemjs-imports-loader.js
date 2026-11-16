@@ -19,13 +19,40 @@ module.exports = function (source) {
   const options = getOptions(this);
   validate(schema, options, 'SystemImport Loader');
 
-  const importsStr = Object.entries(options.importsMap).map(([key, value]) => {
-    if (key === 'react') {
-      return `System.set("${value}", { default: require("${key}"), ...require("${key}"), })`;
+  const requests = Object.entries(options.importsMap);
+  const imports = requests.map(([request]) => `import(${JSON.stringify(request)})`);
+  const registrations = requests.map(([request, name], index) => {
+    const value = `modules[${index}]`;
+    if (request === 'react') {
+      return `System.set(${JSON.stringify(name)}, {default:${value}.default, ...${value}.default});`;
     }
-    return `System.set("${value}", require("${key}"))`;
+    if (request === 'wujie-react')
+      return `System.set(${JSON.stringify(name)}, {default:ConsoleV3Embed});`;
+    if (request === 'react-dom') return `System.set(${JSON.stringify(name)}, ${value}.default);`;
+    return `System.set(${JSON.stringify(name)}, ${value}.default?.[Symbol.toStringTag] === 'Module' ? ${value}.default : ${value});`;
   });
-
-  const callback = this.async();
-  callback(null, source + '\n\n' + importsStr + '\n\n');
+  const initialization = `
+    configureExtensionSDK(async () => {
+      const modules = await Promise.all([${imports.join(',')}]);
+      ${registrations.join('\n')}
+      registerIconNamespace(System.get(${JSON.stringify(options.importsMap['@kubed/icons'])}));
+    });
+    installExtensionSDK().catch(error => console.error('Extension SDK initialization failed', error));
+  `;
+  const dependency = JSON.stringify(
+    require('path').resolve(__dirname, '../../core/src/utils/extensionSDK'),
+  );
+  const iconRegistry = JSON.stringify(
+    require('path').resolve(__dirname, '../../shared/src/components/Icon/registry'),
+  );
+  const adapter = JSON.stringify(
+    require('path').resolve(__dirname, '../../shared/src/components/ConsoleV3Embed'),
+  );
+  return (
+    `import ConsoleV3Embed from ${adapter};\n` +
+    `import {registerIconNamespace} from ${iconRegistry};\n` +
+    `import {configureExtensionSDK, installExtensionSDK} from ${dependency};\n` +
+    source +
+    initialization
+  );
 };

@@ -19,7 +19,7 @@ import { LoginWrapper, NotLogin, Avatar, NotifiContext } from './styles';
 import About from '../About';
 import UserSetting from '../UserSetting';
 import { clearResourceListRevisions, hasKSModule, useV3action } from '@ks-console/shared';
-import WujieReact from 'wujie-react';
+import WujieReact from '../../../../../../shared/src/components/ConsoleV3Embed/index';
 
 import {
   getGlobalConsoleV3LoadCompleted,

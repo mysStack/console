@@ -13,7 +13,7 @@ function documentFixture(child: any, connected = true, hidden = false) {
       { contentWindow: { __WUJIE: { id: 'consolev3_tool' } } },
       { contentWindow: child },
     ],
-    querySelector: () => app,
+    querySelector: (selector: string) => (selector.startsWith('iframe[') ? null : app),
   } as unknown as Document;
 }
 
@@ -47,4 +47,25 @@ test('only a visible page host can navigate the parent console', () => {
   assert.equal(isConsoleV3PageMounted(documentFixture(child)), true);
   assert.equal(isConsoleV3PageMounted(documentFixture(child, false)), false);
   assert.equal(isConsoleV3PageMounted(documentFixture(child, true, true)), false);
+});
+
+test('native document readiness resets without replacing its WindowProxy', () => {
+  const runtime = createConsoleV3Runtime();
+  const child = {} as Window;
+  const frame = {
+    contentWindow: child,
+    dataset: { nativeReady: 'false', nativePageMounted: 'false' },
+  };
+  const doc = {
+    querySelector: (selector: string) => (selector.startsWith('iframe[') ? frame : null),
+  } as unknown as Document;
+  assert.equal(findConsoleV3Window(doc), undefined);
+  frame.dataset.nativeReady = 'true';
+  runtime.markReady(child);
+  assert.equal(runtime.getReadyWindow(doc), child);
+  assert.equal(isConsoleV3PageMounted(doc), false);
+  frame.dataset.nativePageMounted = 'true';
+  assert.equal(isConsoleV3PageMounted(doc), true);
+  frame.dataset.nativeReady = 'false';
+  assert.equal(runtime.getReadyWindow(doc), undefined);
 });

@@ -4,7 +4,7 @@
  */
 
 import React, { useCallback, useEffect, useRef } from 'react';
-import WujieReact from 'wujie-react';
+import WujieReact from '../../../../shared/src/components/ConsoleV3Embed/index';
 
 import { watchConsoleV3Sandbox } from '../ConsoleV3ResourceList/keepAlive';
 import type { ConsoleV3AppWindow } from '../ConsoleV3ResourceList/metrics';
@@ -12,6 +12,7 @@ import { scheduleConsoleV3ListRouteSync } from '../ConsoleV3ResourceList/route';
 
 export interface ConsoleV3AliveEmbedProps {
   url: string;
+  synchronizeRoute?: boolean;
   width?: string;
   height?: string;
   afterMount?: (appWindow: Window) => void;
@@ -34,6 +35,7 @@ export default function ConsoleV3AliveEmbed({
   url,
   width = '100%',
   height = '100%',
+  synchronizeRoute = true,
   afterMount,
   afterUnmount,
   activated,
@@ -52,11 +54,11 @@ export default function ConsoleV3AliveEmbed({
     (appWindow?: Window) => {
       const child = appWindow as ConsoleV3AppWindow | undefined;
       watchConsoleV3Sandbox(child?.__WUJIE);
-      if (child) {
+      if (child && synchronizeRoute) {
         scheduleConsoleV3ListRouteSync(child, url);
       }
     },
-    [url],
+    [url, synchronizeRoute],
   );
 
   return (

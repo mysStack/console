@@ -4,7 +4,7 @@
  */
 
 import * as React from 'react';
-import WujieReact from 'wujie-react';
+import WujieReact from '../../components/ConsoleV3Embed/index';
 import { Loading, notify } from '@kubed/components';
 import { consoleV3Runtime } from '../../utils/consoleV3Runtime';
 
@@ -52,7 +52,11 @@ export const useV3action = () => {
       return;
     }
     const child = consoleV3Runtime.getReadyWindow();
-    if (!child || !document.querySelector('wujie-app[data-wujie-id="consolev3"]')) return;
+    if (
+      !child ||
+      !document.querySelector('wujie-app[data-wujie-id="consolev3"], iframe[data-native-v3]')
+    )
+      return;
     pending.current = undefined;
     window.clearTimeout(queued.timer);
     setLoading(false);
@@ -99,7 +103,7 @@ export const useV3action = () => {
       timer: window.setTimeout(() => cancelPending(true), INITIALIZATION_TIMEOUT_MS),
     };
     setLoading(true);
-    if (!document.querySelector('wujie-app[data-wujie-id="consolev3"]')) {
+    if (!document.querySelector('wujie-app[data-wujie-id="consolev3"], iframe[data-native-v3]')) {
       // A V4 page can reactivate the already booted app in a zero-size host.
       // A fresh key also handles a previous host whose ShadowRoot moved to a list.
       setVisible(true);

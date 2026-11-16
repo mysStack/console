@@ -1,5 +1,5 @@
 import React from 'react';
-import WujieReact from 'wujie-react';
+import WujieReact from '../ConsoleV3Embed/index';
 
 import type { ExtensionConsoleV3EmbedProps } from './types';
 import { DEFAULT_PROPS } from './constants';

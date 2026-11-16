@@ -36,17 +36,17 @@ const ListLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [cluster] = useStore<ClusterDetail>('cluster');
-  const { getNav, setNav } = useGlobalStore();
+  const { getNav, setNav, navRevision } = useGlobalStore();
   const { getClusterNavs } = permissionStore();
   let navs = getNav(`${navKey}-${clusterName}`);
   const modal = useModal();
 
   useEffect(() => {
-    if (!navs) {
+    if (!navs || navRevision > 0) {
       navs = getClusterNavs(clusterName);
       setNav(`${navKey}-${clusterName}`, navs);
     }
-  }, []);
+  }, [clusterName, navRevision]);
 
   const handleSelect = (modalId: string, selectedCluster: ClusterDetail) => {
     navigate(`/clusters/${selectedCluster.name}/overview`);

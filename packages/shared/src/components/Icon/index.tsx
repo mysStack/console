@@ -4,7 +4,7 @@
  */
 
 import React, { CSSProperties, forwardRef, AllHTMLAttributes } from 'react';
-import * as Icons from '@kubed/icons';
+import { getIcon } from './registry';
 import * as LocalIcons from '../Icons';
 
 export const toHumpName = (name: string): string => {
@@ -27,7 +27,7 @@ interface IconProps extends AllHTMLAttributes<SVGAElement> {
 
 const Icon = ({ name, ...rest }: IconProps, ref?: any) => {
   // @ts-ignore
-  const IconElement = Icons[toComponentName(name)] || LocalIcons[toComponentName(name)];
+  const IconElement = getIcon(toComponentName(name)) || LocalIcons[toComponentName(name)];
   if (!IconElement) {
     throw new Error(`Icon with name: ${name} was not found!`);
   }

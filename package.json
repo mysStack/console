@@ -14,7 +14,8 @@
     "locales"
   ],
   "scripts": {
-    "build": "yarn build:dll && yarn build:locales && yarn build:prod && yarn build:entries && yarn build:server",
+    "build": "yarn build:dll && yarn build:locales && yarn build:prod && yarn build:entries && yarn build:server && yarn build:compress",
+    "build:compress": "node scripts/precompress-static.js",
     "build:dll": "ksc build:dll -s true",
     "build:entries": "node scripts/build-console-entries.js",
     "build:ext": "ksc build:ext",

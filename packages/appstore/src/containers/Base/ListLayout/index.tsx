@@ -14,14 +14,14 @@ const NAV_KEY = 'WORKSPACE_NAV';
 
 function ListLayout(): JSX.Element {
   const location = useLocation();
-  const { getNav, setNav } = useGlobalStore();
+  const { getNav, setNav, navRevision } = useGlobalStore();
   let navs = getNav(NAV_KEY);
 
   useEffect(() => {
-    if (!navs) {
+    if (!navs || navRevision > 0) {
       setNav(NAV_KEY, globals.config.manageAppNavs);
     }
-  }, []);
+  }, [navRevision]);
 
   return (
     <>

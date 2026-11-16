@@ -4,6 +4,7 @@
  */
 
 import { Loading } from '@kubed/components';
+import { useCacheStore } from '@ks-console/shared';
 import { default as React, useEffect } from 'react';
 import type { RouteObject } from 'react-router-dom';
 import { Navigate, useRoutes } from 'react-router-dom';
@@ -37,8 +38,9 @@ const useRouterStore = create<{
 
 function Pages() {
   const setRoutes = useRouterStore(state => state.setRoutes);
+  const [, setNavigationRevision] = useCacheStore<number>('ExtensionNavigationRevision', 0);
   useEffect(() => {
-    registerRemoteExtensions()?.finally(() => {
+    const publishRoutes = (extensionsReady: boolean) => {
       const pages = {
         path: '/',
         element: <BaseLayout />,
@@ -54,13 +56,18 @@ function Pages() {
           },
           {
             path: '*',
-            element: <NotFound />,
+            element: extensionsReady ? <NotFound /> : <Loading className="page-loading" />,
           },
         ],
       };
 
       const routes = [pages, ...baseRoutes];
       setRoutes(routes);
+    };
+    publishRoutes(false);
+    Promise.resolve(registerRemoteExtensions()).then(() => {
+      setNavigationRevision(value => (value ?? 0) + 1);
+      publishRoutes(true);
     });
   }, [setRoutes]);
 

@@ -35,7 +35,7 @@ function fixture(globals: Record<string, any>) {
     globals,
     window: { globals, location: { host: 'console.test:30881' } },
     require: (id: string) => {
-      if (id === 'wujie-react') return wujie;
+      if (id === 'wujie-react' || id.includes('/ConsoleV3Embed')) return wujie;
       if (id === '@ks-console/shared')
         return {
           useEventEmitter: () => ({ $emit: (...args: any[]) => emitted.push(args) }),

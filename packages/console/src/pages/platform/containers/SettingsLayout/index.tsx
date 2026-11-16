@@ -15,15 +15,15 @@ const { getPlatformSettingsNavs } = permissionStore();
 
 function PlatformSettingsLayout(): JSX.Element {
   const location = useLocation();
-  const { getNav, setNav } = useGlobalStore();
+  const { getNav, setNav, navRevision } = useGlobalStore();
   let navs = getNav(NAV_KEY);
 
   useEffect(() => {
-    if (!navs) {
+    if (!navs || navRevision > 0) {
       navs = getPlatformSettingsNavs();
       setNav(NAV_KEY, navs);
     }
-  }, []);
+  }, [navRevision]);
 
   return (
     <>

@@ -3,7 +3,7 @@
  * https://github.com/kubesphere/console/blob/master/LICENSE
  */
 
-import WujieReact from 'wujie-react';
+import WujieReact from '../../../shared/src/components/ConsoleV3Embed/index';
 
 import { consoleV3Runtime, findConsoleV3Window, useEventEmitter } from '@ks-console/shared';
 import { setGlobalConsoleV3LoadCompleted } from '../utils/globals.consoleV3LoadCompleted';
@@ -32,11 +32,11 @@ export function initWujie() {
       : {}),
     url: `//${window.location.host}/consolev3/`,
     exec: true,
-    afterMount: appWindow => {
+    afterMount: (appWindow: Window) => {
       const { $emit } = useEventEmitter();
       $emit('afterMountConsoleV3', appWindow);
     },
-    afterUnmount: appWindow => {
+    afterUnmount: (appWindow: Window) => {
       const { $emit } = useEventEmitter();
       $emit('afterUnmountConsoleV3', appWindow);
     },

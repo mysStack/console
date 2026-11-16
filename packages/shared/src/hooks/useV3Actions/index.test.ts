@@ -84,7 +84,8 @@ function fixture(ready = true, mounted = true) {
     clearTimeout: (id: number) => timers.delete(id),
     require(id: string) {
       if (id === 'react') return react;
-      if (id === 'wujie-react') return { default: component, __esModule: true };
+      if (id === 'wujie-react' || id.includes('/ConsoleV3Embed'))
+        return { default: component, __esModule: true };
       if (id === '@kubed/components')
         return {
           Loading: 'Loading',

@@ -9,6 +9,7 @@ import { ENV } from '@ks-console/shared';
 import type { ExtensionConfig } from '../types/extension-config';
 import { resolveExtensionConfig } from './extensions.config';
 import i18n from './i18n';
+import { installExtensionSDK } from './extensionSDK';
 
 interface Extension {
   name: string;
@@ -29,7 +30,7 @@ function importRemoteExtensions(extensions: Extension[]) {
     extensions.forEach(extension => {
       const { extensionName, link, resourceVersion, entries } = extension;
       const moduleId = `/pstatic${link}?resourceVersion=${resourceVersion}`;
-      const module = System.import(moduleId);
+      const module = installExtensionSDK().then(() => System.import(moduleId));
 
       const promise = module
         .then(({ default: input }) => (input ? resolveExtensionConfig(input) : null))
@@ -60,7 +61,7 @@ function importRemoteExtensions(extensions: Extension[]) {
   return Promise.allSettled(promises);
 }
 
-export function registerRemoteExtensions() {
+function loadRemoteExtensions() {
   const remoteExtensions = globals?.installedExtensions ?? [];
 
   if (ENV.isProduction) {
@@ -90,4 +91,11 @@ export function registerRemoteExtensions() {
     });
     return importRemoteExtensions(extensions);
   }
+}
+
+let registration: ReturnType<typeof loadRemoteExtensions>;
+
+export function registerRemoteExtensions() {
+  if (!registration) registration = loadRemoteExtensions();
+  return registration;
 }

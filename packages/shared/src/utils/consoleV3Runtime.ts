@@ -1,6 +1,11 @@
 export type ConsoleV3Window = Window & { __WUJIE?: { id?: string } };
 
 export function findConsoleV3Window(hostDocument: Document): ConsoleV3Window | undefined {
+  const native = hostDocument.querySelector<HTMLIFrameElement>('iframe[data-native-v3]');
+  if (native)
+    return native.dataset.nativeReady === 'true'
+      ? (native.contentWindow as ConsoleV3Window)
+      : undefined;
   for (const frame of Array.from(hostDocument.querySelectorAll('iframe'))) {
     try {
       const child = frame.contentWindow as ConsoleV3Window | null;
@@ -13,6 +18,8 @@ export function findConsoleV3Window(hostDocument: Document): ConsoleV3Window | u
 }
 
 export function isConsoleV3PageMounted(hostDocument: Document): boolean {
+  const native = hostDocument.querySelector<HTMLIFrameElement>('iframe[data-native-v3]');
+  if (native) return native.dataset.nativePageMounted === 'true';
   const app = hostDocument.querySelector('wujie-app[data-wujie-id="consolev3"]');
   return Boolean(app && !app.closest('[data-console-v3-actions-host]'));
 }

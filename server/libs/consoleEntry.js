@@ -96,6 +96,8 @@ function getConsoleEntryFlags() {
     navigator: process.env.KS_CONSOLE_PROJECT_NAVIGATOR === 'true',
     enhancement: process.env.KS_CONSOLE_DEPLOYMENT_ENHANCEMENT === 'true',
     singleV3: process.env.KS_CONSOLE_SINGLE_V3 === 'true',
+    nativeV3:
+      process.env.KS_CONSOLE_SINGLE_V3 === 'true' && process.env.KS_CONSOLE_NATIVE_V3 === 'true',
   };
 }
 

@@ -56,7 +56,7 @@ function ListLayout(): JSX.Element {
   const navigate = useNavigate();
   const params = useParams<'workspace' | 'cluster'>();
   const { workspace: workspaceName = '', cluster } = params;
-  const { getNav, setNav } = useGlobalStore();
+  const { getNav, setNav, navRevision } = useGlobalStore();
   const { getWorkspaceNavs } = permissionStore();
   let navs = getNav(`${navKey}-${workspaceName}`);
   const modal = useModal();
@@ -88,12 +88,12 @@ function ListLayout(): JSX.Element {
   };
 
   useEffect(() => {
-    if (!navs && workspaceDetail?.clusters) {
+    if ((!navs || navRevision > 0) && workspaceDetail?.clusters) {
       const clusters = workspaceDetail.clusters.map(item => item.name);
       navs = getWorkspaceNavs(workspaceName, clusters);
       setNav(`${navKey}-${workspaceName}`, navs);
     }
-  }, [workspaceDetail?.clusters]);
+  }, [workspaceName, workspaceDetail?.clusters, navRevision]);
 
   const title = workspaceDetail?.aliasName
     ? `${workspaceDetail?.aliasName}（${workspaceName}）`
