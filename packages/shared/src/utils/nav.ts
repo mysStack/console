@@ -15,13 +15,7 @@ import {
 } from './checker';
 import { getLicenseErrorInfoFromLicenses } from '../utils/licenses';
 
-export const hasClusterModule = (cluster: string, module: string) => {
-  return get(
-    globals,
-    `ksConfig.enabledExtensionModulesStatus.${module}.clusterSchedulingStatuses.${cluster}`,
-    false,
-  );
-};
+export const hasClusterModule = hasClusterExtensionModule;
 export const checkNavItem = (item: any, callback: (params: any) => any) => {
   if (item.skipAuth) {
     return true;
