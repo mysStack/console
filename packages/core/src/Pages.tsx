@@ -45,18 +45,7 @@ function Pages() {
         path: '/',
         element: <BaseLayout />,
         children: [
-          ...globals.context.routes.map(route => {
-            // An installed extension may replace an internal legacy fallback.
-            // Do not mount that fallback before its routes have registered.
-            const pending =
-              !extensionsReady &&
-              globals.installedExtensions?.some(
-                extension => route.path === `/${extension.extensionName}`,
-              );
-            return pending
-              ? { ...route, element: <Loading className="page-loading" />, children: [] }
-              : route;
-          }),
+          ...globals.context.routes,
           ...extensionsRoutes,
           ...marketplaceRoutes,
           ...supportRoutes,

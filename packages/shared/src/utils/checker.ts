@@ -16,20 +16,19 @@ export const hasKSModule = (module: string) => {
 };
 
 export const hasClusterExtensionModule = (cluster: string, module: string) => {
-  // Basic telemetry is also served by the enabled platform services on the host.
-  // A failed optional agent task must not hide access to those existing services.
+  // Enabled platform installations also provide basic telemetry on the host.
+  const basicTelemetry = ['whizard-monitoring', 'whizard-alerting'].includes(module);
   const platformTelemetry =
+    basicTelemetry &&
     !!cluster &&
-    cluster === get(globals, 'ksConfig.multicluster.hostClusterName') &&
-    ['whizard-monitoring', 'whizard-alerting'].includes(module) &&
-    hasKSModule(module);
-  return (
+    cluster === get(globals, 'ksConfig.multicluster.hostClusterName');
+  const available =
     get(
       globals,
       `ksConfig.enabledExtensionModulesStatus.${module}.clusterSchedulingStatuses.${cluster}`,
       false,
-    ) || platformTelemetry
-  );
+    ) || platformTelemetry;
+  return available && (!basicTelemetry || hasKSModule(module));
 };
 
 export const hasExtensionModuleAnnotation = (module: string, annotation: string) => {

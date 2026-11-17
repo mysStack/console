@@ -3,7 +3,6 @@
  * https://github.com/kubesphere/console/blob/master/LICENSE
  */
 
-import * as ConfigConstants from './config';
 import * as ENV from './env';
 import * as Constants from './common';
 import * as Pattern from './patterns';
@@ -11,12 +10,4 @@ import * as StylesConstants from './styles';
 import * as LicensesConstants from './licenses';
 import * as PageConstants from './pages';
 
-export {
-  ConfigConstants,
-  ENV,
-  Constants,
-  Pattern,
-  StylesConstants,
-  LicensesConstants,
-  PageConstants,
-};
+export { ENV, Constants, Pattern, StylesConstants, LicensesConstants, PageConstants };

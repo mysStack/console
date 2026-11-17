@@ -108,7 +108,11 @@ const getEnabledExtensionModules = async ({ token }, ctx) => {
       extensions.items.forEach(item => {
         const name = get(item, 'metadata.name');
         const enabled = get(item, 'status.enabled');
-        if (enabled) {
+        const basicTelemetry = ['whizard-monitoring', 'whizard-alerting'].includes(name);
+        const installed =
+          Boolean(get(item, 'status.installedVersion')) ||
+          get(item, 'status.state') === 'Installed';
+        if (enabled && (!basicTelemetry || installed)) {
           enabledExtensionModules[name] = true;
           if (name === 'whizard-monitoring') {
             const annotations = get(item, 'metadata.annotations', {});

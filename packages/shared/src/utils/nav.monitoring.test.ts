@@ -83,3 +83,22 @@ test('project custom monitoring is available through navigation with its own per
   globals.ksConfig['whizard-monitoring'] = false;
   assert.deepEqual(visible(['custom-monitoring']), []);
 });
+
+test('disabled telemetry remains hidden even if a stale cluster installation record remains', () => {
+  const globals = fixture();
+  globals.ksConfig.enabledExtensionModulesStatus[
+    'whizard-monitoring'
+  ].clusterSchedulingStatuses.host = true;
+  globals.ksConfig['whizard-monitoring'] = false;
+  assert.equal(hasClusterModule('host', 'whizard-monitoring'), false);
+});
+
+test('uninstalled telemetry is hidden in both the host and member clusters', () => {
+  const globals = fixture();
+  delete (globals.ksConfig as Record<string, any>)['whizard-monitoring'];
+  delete (globals.ksConfig as Record<string, any>)['whizard-alerting'];
+  for (const cluster of ['host', 'member']) {
+    assert.equal(hasClusterModule(cluster, 'whizard-monitoring'), false);
+    assert.equal(hasClusterModule(cluster, 'whizard-alerting'), false);
+  }
+});

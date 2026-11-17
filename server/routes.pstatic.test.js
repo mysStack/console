@@ -12,7 +12,6 @@ function loadRoutes(target) {
   const stubs = {
     './libs/utils': { getServerConfig: () => ({ server: { apiServer: { url: target } } }) },
     './middlewares/proxy': () => next,
-    './middlewares/extensionStaticProxy': next,
     './middlewares/checkToken': next,
     './middlewares/checkIfExist': next,
     './proxy': {},
