@@ -20,11 +20,17 @@
 
 用户环境的 `whizard-monitoring` 为 Installed/enabled，版本 1.2.2，`whizard-alerting` 为 Installed/enabled，版本 1.0.3。项目仪表板 API 返回 200。前一个较大候选通过本地菜单点击读取现有 qa 面板，Deployment 流程也通过。这些结果需要在本次精简版本重新验证。
 
-精简版本已执行 `sh scripts/test.sh`，87 文件、367 项通过。工作流服务端回归 98 项通过，production 隔离构建成功。真实浏览器从项目菜单进入自定义监控并读取现有面板，仪表板 API 返回 200。组件禁用后的菜单隐藏已通过真实页面中的权限函数验证。Actions 镜像部署后的验证仍待完成。
+精简版本已执行 `sh scripts/test.sh`，87 文件、367 项通过。工作流服务端回归 98 项通过，production 隔离构建成功。候选正式镜像及 30881 均已 rollout 成功，真实浏览器从项目菜单进入自定义监控并读取现有 qa 面板，仪表板 API 返回 200。Deployment 列表、详情、编辑弹窗取消、五轮进出详情、详情直达及刷新通过。
+
+组件禁用后的菜单隐藏通过真实页面中的权限函数进行浏览器状态模拟验证，安装失败、禁用、卸载与残留状态由单测覆盖。实机使用管理员验收，受限权限通过测试用例覆盖。
 
 ## 部署与现有问题
 
-30881 尚为原镜像 `ghcr.io:443/mysstack/ks-console@sha256:deb31b06738eca1f827745ed6458db7b1097b60ee74818e5372859fa492b20e9`。临时候选为 `ks-console-monitoring-20261117`，端口 31267，先前镜像拉取失败重试。
+镜像源码为 `ec147abd7836856802225ea54fba469b70ca7ee3`，Actions 为 https://github.com/mysStack/console/actions/runs/44045064566 。
+
+30881 部署镜像为 `ghcr.nju.edu.cn/mysstack/ks-console@sha256:53590476da8c1a2dfcb455c49b9971f7f53223eed5aea213aba580dbef51cd01`。实际 Pod 为 `ks-console-v415-rea-5454f6dcb5-qcwgr`，Ready，实际 imageID 为 `ghcr.io:443/mysstack/ks-console@sha256:53590476da8c1a2dfcb455c49b9971f7f53223eed5aea213aba580dbef51cd01`。
+
+节点 Docker Hub 代理域名解析失败，GHCR 直连拉取超时。通过节点上的现有控制台容器验证南京大学 GHCR 代理返回的 manifest 内容哈希与 Actions 制品一致后，使用该代理完成部署。临时候选 Deployment/Service `ks-console-monitoring-20261117`（31267）已核验 UID 后清理。
 
 原有独立插件的 SDK 不匹配错误保留为后续兼容问题。本次通过内置基础页面恢复原有入口。告警服务还有 handler.go:301/462 下游资源不存在的 404，需要单独排查。
 
