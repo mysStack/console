@@ -25,7 +25,19 @@ const PermissionStore = () => {
     const globalNavs = cloneDeep(globals.config.globalNavs);
 
     globalNavs?.children?.forEach((nav: any) => {
-      if (checkNavItem(nav, params => hasPermission(params))) {
+      // New telemetry entries are launchers; authorize them from their actual
+      // registered child pages rather than a synthetic "observability" RBAC key.
+      const childNavs =
+        nav.name === 'observability' && nav.skipWorkspaceAuth && !nav.authKey
+          ? globals.config.whizardTelemetryNavs?.children
+          : undefined;
+      const canView = (params: any) =>
+        childNavs
+          ? childNavs.some((section: any) =>
+              checkNavItem(cloneDeep(section), (child: any) => hasPermission(child)),
+            )
+          : hasPermission(params);
+      if (checkNavItem(nav, canView)) {
         navs.push(nav);
       }
     });

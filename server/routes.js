@@ -10,6 +10,7 @@ const bodyParser = require('koa-bodyparser');
 
 const proxy = require('./middlewares/proxy');
 const compressStaticProxy = require('./middlewares/compressStaticProxy');
+const extensionStaticProxy = require('./middlewares/extensionStaticProxy');
 const checkToken = require('./middlewares/checkToken');
 const checkIfExist = require('./middlewares/checkIfExist');
 const legacyCapabilityProbe = require('./middlewares/legacyCapabilityProbe');
@@ -108,6 +109,8 @@ router
   .use(proxy('/theme/(.*)', staticFileProxy))
 
   // plugin static files proxy.
+  .use(extensionStaticProxy)
+
   .get(
     '/pstatic/(.*)',
     compressStaticProxy,
