@@ -21,10 +21,8 @@ import Toolbox from '../../../containers/Toolbox';
 import Header from '../Header';
 import { Main } from './styles';
 import v3Notify from './v3Notify';
-import {
-  normalizeNativeResourceDetailPath,
-  shouldReplaceNativeResourceRoute,
-} from './nativeResourceRoute';
+import { toHostResourceLocation } from './consoleV3HostRoute';
+import { shouldReplaceNativeResourceRoute } from './nativeResourceRoute';
 
 const GlobalStyle = createGlobalStyle<{ $navbarHeight?: number; $licenseTipHeight?: number }>`
   :root {
@@ -92,12 +90,11 @@ export default function BaseLayout() {
   globals.currentCluster = cluster;
 
   useEffect(() => {
-    document.addEventListener('click', eventer);
-    bus.$on('subRouteChange', (name: any, path: any) => {
+    const applyHostRoute = (pathOrRoute: string | { pathname?: string; search?: string }) => {
+      const loc = toHostResourceLocation(pathOrRoute);
+      if (!loc) return;
       const { location } = window;
-      const pathname = normalizeNativeResourceDetailPath(path.pathname);
-
-      if (pathname !== location.pathname) {
+      if (loc.pathname !== location.pathname) {
         // Replace Wujie's temporary `/resource/name` entry with the native V4
         // detail route. Otherwise browser Back visits the temporary entry
         // first and appears to require two clicks before reaching the list.
@@ -105,17 +102,37 @@ export default function BaseLayout() {
         // in browser history. The replace case only applies when the host is
         // already on the temporary V3 detail entry (or an equivalent native
         // path) and V3 is subsequently reporting its canonical sub-route.
-        const replaceTemporaryEntry = shouldReplaceNativeResourceRoute(location.pathname, pathname);
-        navigate(`${pathname}${path.search}`, { replace: replaceTemporaryEntry });
-      } else if (pathname === location.pathname && path.search !== location.search) {
-        // @ts-ignore
-        const url = new URL(`${location.origin}${pathname}${path.search}`);
+        const replaceTemporaryEntry = shouldReplaceNativeResourceRoute(
+          location.pathname,
+          loc.pathname,
+        );
+        navigate(`${loc.pathname}${loc.search}`, { replace: replaceTemporaryEntry });
+      } else if (loc.search !== location.search) {
+        const url = new URL(`${location.origin}${loc.pathname}${loc.search}`);
         window.history.pushState('', '', url);
       }
-    });
+    };
+    const onSubRouteChange = (_name: unknown, path: { pathname?: string; search?: string }) =>
+      applyHostRoute(path);
+    const onConsoleRouteChange = (route: string) => applyHostRoute(route);
+    const onEmbedMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.data?.type !== 'consoleRouteChange' || typeof event.data.route !== 'string') {
+        return;
+      }
+      applyHostRoute(event.data.route);
+    };
+
+    document.addEventListener('click', eventer);
+    window.addEventListener('message', onEmbedMessage);
+    bus.$on('subRouteChange', onSubRouteChange);
+    bus.$on('consoleRouteChange', onConsoleRouteChange);
     bus.$on('notify', v3Notify);
     return () => {
+      bus.$off('subRouteChange', onSubRouteChange);
+      bus.$off('consoleRouteChange', onConsoleRouteChange);
       bus.$off('notify', v3Notify);
+      window.removeEventListener('message', onEmbedMessage);
       document.removeEventListener('click', eventer);
     };
   }, []);
