@@ -16,22 +16,39 @@ interface OpenParams {
   [key: string]: any;
 }
 
+type PendingAction = { action: string; restParams: Record<string, any> };
+
 /**
  * Use Modals in consoleV3. Note that you need to specify action , v3Module , v3StoreParams etc.
  * v3Module needs to be registered in V3 code => src/stores/getStore.js.
  */
 export const useV3action = () => {
   const [visible, setVisible] = React.useState(false);
+  const pendingRef = React.useRef<PendingAction | null>(null);
+  const timerRef = React.useRef<number>();
+
+  const flush = () => {
+    const pending = pendingRef.current;
+    if (!pending) {
+      return;
+    }
+    pendingRef.current = null;
+    if (timerRef.current) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = undefined;
+    }
+    bus.$emit('triggerAction', pending.action, pending.restParams);
+  };
 
   const open = (params: OpenParams) => {
-    let time = visible ? 0 : 1000;
     const { action = 'workload.template.edit', ...restParams } = params;
-    if (!visible) {
-      setVisible(true);
+    pendingRef.current = { action, restParams };
+    if (visible) {
+      flush();
+      return;
     }
-    setTimeout(() => {
-      bus.$emit('triggerAction', action, restParams);
-    }, time);
+    setVisible(true);
+    timerRef.current = window.setTimeout(flush, 1000);
   };
 
   const render = (lifecycles?: { afterMount?: (appWindow: Window) => void }) => {
@@ -43,9 +60,13 @@ export const useV3action = () => {
         width="0"
         height="0"
         name="consoleV3Actions"
+        props={{ actions: true, name: 'consoleV3Actions' }}
         url={`//${window.location.host}/consolev3/dashboard`}
         sync={false}
-        {...lifecycles}
+        afterMount={appWindow => {
+          lifecycles?.afterMount?.(appWindow);
+          flush();
+        }}
       />
     );
   };
