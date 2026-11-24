@@ -29,11 +29,9 @@ spec:
         mysstack.io/v3dist-ref: feature/v3dist-embed
         mysstack.io/console-branch: feature/v3dist-embed
     spec:
-      imagePullSecrets:
-        - name: ks-console-v415-rea-registry
       containers:
         - name: ks-console
-          image: crpi-p97knjjid10efrly.cn-shanghai.personal.cr.aliyuncs.com/ecochain/ks-console:v3dist-embed-20261124-162731-e2602ee1c588
+          image: ghcr.io/mysstack/ks-console:feature-v3dist-embed-20261124-163702-936c8941050a
           imagePullPolicy: Always
           env:
             - name: V3DIST_UPSTREAM
