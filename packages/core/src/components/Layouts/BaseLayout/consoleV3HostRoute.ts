@@ -11,10 +11,17 @@ export interface ConsoleV3HostLocation {
 }
 
 const EMBEDDED_PREFIX = '/consolev3';
+const IGNORED_HOST_PATHS = new Set(['/', '/dashboard', '/login', '/workspaces', '/extensions']);
+
+function isIgnoredHostPath(pathname: string): boolean {
+  const trimmed = pathname.replace(/\/+$/, '') || '/';
+  return IGNORED_HOST_PATHS.has(trimmed);
+}
 
 /**
  * Map a V3 embed route (or Wujie location) onto the host React Router path.
  * Embed reports `/consolev3/...`; the host address bar must not keep that prefix.
+ * The actions overlay boots at `/consolev3/dashboard` and must not yank the host home.
  */
 export function toHostResourceLocation(
   pathOrRoute: string | { pathname?: string; search?: string } | null | undefined,
@@ -36,7 +43,7 @@ export function toHostResourceLocation(
   if (pathname.startsWith(`${EMBEDDED_PREFIX}/`)) {
     pathname = pathname.slice(EMBEDDED_PREFIX.length);
   }
-  if (!pathname) return null;
+  if (!pathname || isIgnoredHostPath(pathname)) return null;
 
   return {
     pathname: normalizeNativeResourceDetailPath(pathname),

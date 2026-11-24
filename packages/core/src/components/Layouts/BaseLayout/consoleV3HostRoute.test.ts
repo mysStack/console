@@ -52,3 +52,12 @@ test('keeps list routes as lists and accepts Wujie location objects', () => {
   assert.equal(toHostResourceLocation('/consolev3'), null);
   assert.equal(toHostResourceLocation(''), null);
 });
+
+test('does not follow the actions app landing page back to the host home', () => {
+  assert.equal(toHostResourceLocation('/consolev3/dashboard'), null);
+  assert.equal(toHostResourceLocation('/consolev3/'), null);
+  assert.equal(toHostResourceLocation('/dashboard'), null);
+  assert.equal(toHostResourceLocation('/'), null);
+  assert.equal(toHostResourceLocation({ pathname: '/dashboard', search: '' }), null);
+  assert.equal(toHostResourceLocation('/login'), null);
+});

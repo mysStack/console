@@ -112,8 +112,10 @@ export default function BaseLayout() {
         window.history.pushState('', '', url);
       }
     };
-    const onSubRouteChange = (_name: unknown, path: { pathname?: string; search?: string }) =>
+    const onSubRouteChange = (name: unknown, path: { pathname?: string; search?: string }) => {
+      if (name === 'consoleV3Actions') return;
       applyHostRoute(path);
+    };
     const onConsoleRouteChange = (route: string) => applyHostRoute(route);
     const onEmbedMessage = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return;
