@@ -57,18 +57,6 @@ async function devServer(setAlias, checkUpgrade) {
     };
   }
 
-  // copy consolev3 files
-  const v3distDir = path.resolve(process.cwd(), 'dist/v3dist');
-  if (!fs.pathExistsSync(v3distDir)) {
-    try {
-      fs.ensureDirSync(v3distDir);
-      const srcDir = path.resolve(__dirname, '../assets/v3dist');
-      fs.copySync(srcDir, v3distDir);
-    } catch (e) {
-      console.warn(e);
-    }
-  }
-
   process.env.NODE_ENV = 'development';
   const compiler = Webpack(webpackDevConfig);
   const devServerOptions = { ...webpackDevConfig.devServer };

@@ -99,10 +99,6 @@ const webpackBaseConfig = merge(configs, {
           to: `${config.distAssetsPath}`,
           globOptions: { ignore: ['**/v3dist/**'] },
         },
-        {
-          from: `${config.assetsPath}/v3dist`,
-          to: `${config.distPath}/v3dist`,
-        },
       ],
     }),
     new WebpackBar({
