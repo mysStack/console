@@ -12,6 +12,7 @@ const merge = require('lodash/merge');
 const isEmpty = require('lodash/isEmpty');
 const pick = require('lodash/pick');
 const systemImports = require('../configs/systemImports');
+const { getV3DistUpstream, loadV3DistJson } = require('./v3distEmbed');
 const http = require('http');
 const https = require('https');
 const { URL } = require('url');
@@ -261,35 +262,39 @@ const getLocaleManifest = () => {
   return manifestCache;
 };
 
-const getV3Manifest = entry => {
-  let manifestCache = cache.get(`${MANIFEST_CACHE_KEY_PREFIX}${entry}`);
-  if (!manifestCache) {
-    let data = {};
-    try {
-      const dataStream = fs.readFileSync(cwdResolve('dist/v3dist/manifest.json'));
-      data = safeParseJSON(dataStream.toString(), {});
-    } catch (error) {}
-    manifestCache = get(data, `entrypoints.${entry}`);
-    cache.set(`${MANIFEST_CACHE_KEY_PREFIX}${entry}`, manifestCache);
+const getV3Manifest = async entry => {
+  const cacheKey = `${MANIFEST_CACHE_KEY_PREFIX}${entry}`;
+  let manifestCache = cache.get(cacheKey);
+  if (manifestCache) {
+    return manifestCache;
   }
-
+  let data = {};
+  try {
+    data = await loadV3DistJson('manifest.json');
+  } catch (error) {}
+  manifestCache = get(data, `entrypoints.${entry}`);
+  if (manifestCache) {
+    cache.set(cacheKey, manifestCache, getV3DistUpstream() ? 60 : 0);
+  }
   return manifestCache;
 };
 
-const getV3LocaleManifest = () => {
-  let manifestCache = cache.get(`${LOCALE_MANIFEST_CACHE_KEY}v3`);
+const getV3LocaleManifest = async () => {
+  const cacheKey = `${LOCALE_MANIFEST_CACHE_KEY}v3`;
+  let manifestCache = cache.get(cacheKey);
 
   if (!manifestCache) {
     let data = {};
     try {
-      const dataStream = fs.readFileSync(cwdResolve('dist/v3dist/manifest.locale.json'));
-      data = safeParseJSON(dataStream.toString(), {});
+      data = await loadV3DistJson('manifest.locale.json');
     } catch (error) {}
     manifestCache = pick(
       data,
       Object.keys(data).filter(key => key.startsWith('locale-')),
     );
-    cache.set(`${LOCALE_MANIFEST_CACHE_KEY}v3`, manifestCache);
+    if (manifestCache && Object.keys(manifestCache).length) {
+      cache.set(cacheKey, manifestCache, getV3DistUpstream() ? 60 : 0);
+    }
   }
 
   return manifestCache;

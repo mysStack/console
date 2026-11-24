@@ -11,6 +11,7 @@ const fs = require('fs-extra');
 const path = require('path');
 
 const { getServerConfig, root, cwdResolve } = require('../libs/utils');
+const { applyV3DistProxy } = require('../libs/v3distEmbed');
 
 const serverConfig = getServerConfig().server;
 
@@ -36,6 +37,9 @@ module.exports = function (app) {
   // koa-compress skipped the already encoded body. Proxied responses are now
   // encoded by server/middlewares/proxyCompression.js, which leaves
   // `follow`/`watch` streams and binary bodies on the plain pipe.
+
+  // Same-host v3dist: proxy /dist/v3dist to ks-console-embed before local dist/.
+  applyV3DistProxy(app);
 
   // serve static files
   const httpStatic = serverConfig.http.static[process.env.NODE_ENV];

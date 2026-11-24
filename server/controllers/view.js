@@ -76,8 +76,8 @@ const renderV3Index = async (ctx, params, themePromise = getTheme(ctx)) => {
   const { theme, defaultTheme, logo } = _theme;
   const useDefaultTheme = !startsWith(logo, '/theme');
 
-  const manifest = getV3Manifest('main');
-  const localeManifest = getV3LocaleManifest();
+  const manifest = await getV3Manifest('main');
+  const localeManifest = await getV3LocaleManifest();
 
   await ctx.render('consolev3', {
     manifest,

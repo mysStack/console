@@ -20,7 +20,7 @@ const deferred = () => {
   return { promise, resolve, reject };
 };
 
-function loadView(overrides = {}) {
+function loadView(overrides = {}, utilOverrides = {}) {
   const calls = [];
   const userArgs = [];
   const session = {
@@ -63,6 +63,7 @@ function loadView(overrides = {}) {
         theme: data,
         defaultTheme: { tabTitle: 'Default brand' },
       }),
+      ...utilOverrides,
     },
   };
   const saved = new Map();
@@ -210,6 +211,25 @@ for (const [handler, template] of [
     assert.equal(calls.filter(x => x === 'getTheme').length, 2);
   });
 }
+
+test('renderV3View waits for the embed v3 manifest before rendering consolev3', async () => {
+  const gate = deferred();
+  const { view } = loadView({}, { getV3Manifest: () => gate.promise });
+  const ctx = context();
+  const pending = view.renderV3View(ctx);
+  try {
+    await tick();
+    assert.equal(ctx.rendered.length, 0, 'HTML must not use a pending manifest promise');
+  } finally {
+    gate.resolve({ js: ['embed.main.js'], css: ['embed.main.css'] });
+    await pending;
+  }
+  assert.equal(ctx.rendered[0].template, 'consolev3');
+  assert.deepEqual(ctx.rendered[0].data.manifest, {
+    js: ['embed.main.js'],
+    css: ['embed.main.css'],
+  });
+});
 
 test('login still fetches its theme when no page bootstrap promise is supplied', async () => {
   const { view, calls } = loadView();
