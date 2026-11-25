@@ -5,6 +5,7 @@ import {
   notifyConsoleV3ActivationRoute,
   scheduleConsoleV3ListRouteSync,
   scheduleConsoleV3RouteNotification,
+  shouldSyncAliveEmbedToUrl,
   syncConsoleV3ListRoute,
 } from './route';
 
@@ -38,6 +39,55 @@ test('syncs an alive V3 app back to the requested list route', () => {
     syncConsoleV3ListRoute(appWindow, '//example.test/consolev3/project/configmaps'),
     false,
   );
+});
+
+test('does not yank a detail host back onto the cached workload list', () => {
+  const listUrl =
+    '//example.test/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments';
+  const detail =
+    '/dev-workspace/clusters/host/projects/dev-wes/deployments/wes-v2-server/resource-status';
+  assert.equal(shouldSyncAliveEmbedToUrl(detail, listUrl), false);
+  assert.equal(
+    shouldSyncAliveEmbedToUrl('/dev-workspace/clusters/host/projects/dev-wes/deployments', listUrl),
+    true,
+  );
+  assert.equal(
+    shouldSyncAliveEmbedToUrl(
+      '/dev-workspace/clusters/host/projects/dev-wes/pods/wes-v2-server-0/resource-status',
+      '//example.test/consolev3/dev-workspace/clusters/host/projects/dev-wes/pods/wes-v2-server-0',
+    ),
+    true,
+    'pod detail embeds must still sync onto the named pod',
+  );
+
+  const callbacks: FrameRequestCallback[] = [];
+  const events: Event[] = [];
+  const appWindow = {
+    location: {
+      pathname: '/consolev3/dev-workspace/clusters/host/projects/dev-wes/deployments',
+      search: '',
+      hash: '',
+    },
+    history: {
+      state: null,
+      replaceState() {
+        throw new Error('detail host must not replace the child onto the list');
+      },
+    },
+    dispatchEvent(event: Event) {
+      events.push(event);
+      return true;
+    },
+    requestAnimationFrame(callback: FrameRequestCallback) {
+      callbacks.push(callback);
+      return callbacks.length;
+    },
+  };
+
+  scheduleConsoleV3ListRouteSync(appWindow, listUrl, detail);
+  callbacks.shift()?.(0);
+  callbacks.shift()?.(0);
+  assert.equal(events.length, 0);
 });
 
 test('schedules route synchronization after the alive app has activated', () => {

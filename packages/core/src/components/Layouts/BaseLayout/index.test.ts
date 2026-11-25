@@ -11,5 +11,6 @@ test('BaseLayout listens for embed consoleRouteChange', () => {
   const source = readFileSync(__filename.replace(/[^/]+$/, 'index.tsx'), 'utf8');
   assert.match(source, /bus\.\$on\('consoleRouteChange'/);
   assert.match(source, /toHostResourceLocation/);
+  assert.match(source, /shouldFollowConsoleV3Route/);
   assert.match(source, /name === 'consoleV3Actions'/);
 });

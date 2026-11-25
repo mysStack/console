@@ -18,6 +18,35 @@ function isIgnoredHostPath(pathname: string): boolean {
   return IGNORED_HOST_PATHS.has(trimmed);
 }
 
+function stripTrailingSlash(pathname: string): string {
+  return pathname.replace(/\/+$/, '') || '/';
+}
+
+export function isHostOnDeeperResource(currentPath: string, nextPath: string): boolean {
+  const current = stripTrailingSlash(currentPath);
+  const next = stripTrailingSlash(nextPath);
+  return Boolean(current && next && current !== next && current.startsWith(`${next}/`));
+}
+
+/**
+ * Follow list→detail and user breadcrumbs (PUSH). Ignore the cached list URL
+ * that a detail embed boots on, and ignore popstate/replace of that list while
+ * the host is already on the resource.
+ */
+export function shouldFollowConsoleV3Route(
+  currentPath: string,
+  nextPath: string,
+  action?: string | null,
+): boolean {
+  if (!currentPath || !nextPath || currentPath === nextPath) {
+    return true;
+  }
+  if (isHostOnDeeperResource(currentPath, nextPath) && action !== 'PUSH') {
+    return false;
+  }
+  return true;
+}
+
 /**
  * Map a V3 embed route (or Wujie location) onto the host React Router path.
  * Embed reports `/consolev3/...`; the host address bar must not keep that prefix.

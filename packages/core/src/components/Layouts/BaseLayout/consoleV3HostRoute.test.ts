@@ -6,7 +6,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { toHostResourceLocation } from './consoleV3HostRoute';
+import { shouldFollowConsoleV3Route, toHostResourceLocation } from './consoleV3HostRoute';
 
 test('strips /consolev3 and maps a deployment click onto the native detail route', () => {
   assert.deepEqual(
@@ -51,6 +51,21 @@ test('keeps list routes as lists and accepts Wujie location objects', () => {
   );
   assert.equal(toHostResourceLocation('/consolev3'), null);
   assert.equal(toHostResourceLocation(''), null);
+});
+
+test('keeps a direct detail URL when the child reports its boot list', () => {
+  const detail =
+    '/dev-workspace/clusters/host/projects/dev-wms/deployments/wms-pod-collating/resource-status';
+  const list = '/dev-workspace/clusters/host/projects/dev-wms/deployments';
+  assert.equal(shouldFollowConsoleV3Route(detail, list), false);
+  assert.equal(shouldFollowConsoleV3Route(detail, list, 'POP'), false);
+  assert.equal(shouldFollowConsoleV3Route(detail, list, 'REPLACE'), false);
+  assert.equal(shouldFollowConsoleV3Route(detail, list, 'PUSH'), true);
+  assert.equal(
+    shouldFollowConsoleV3Route(list, `${list}/wms-pod-collating/resource-status`, 'PUSH'),
+    true,
+  );
+  assert.equal(shouldFollowConsoleV3Route(list, list), true);
 });
 
 test('does not follow the actions app landing page back to the host home', () => {

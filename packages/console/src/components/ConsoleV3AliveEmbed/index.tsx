@@ -53,7 +53,7 @@ export default function ConsoleV3AliveEmbed({
       const child = appWindow as ConsoleV3AppWindow | undefined;
       watchConsoleV3Sandbox(child?.__WUJIE);
       if (child) {
-        scheduleConsoleV3ListRouteSync(child, url);
+        scheduleConsoleV3ListRouteSync(child, url, window.location.pathname);
       }
     },
     [url],

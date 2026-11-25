@@ -21,7 +21,7 @@ import Toolbox from '../../../containers/Toolbox';
 import Header from '../Header';
 import { Main } from './styles';
 import v3Notify from './v3Notify';
-import { toHostResourceLocation } from './consoleV3HostRoute';
+import { shouldFollowConsoleV3Route, toHostResourceLocation } from './consoleV3HostRoute';
 import { shouldReplaceNativeResourceRoute } from './nativeResourceRoute';
 
 const GlobalStyle = createGlobalStyle<{ $navbarHeight?: number; $licenseTipHeight?: number }>`
@@ -90,10 +90,16 @@ export default function BaseLayout() {
   globals.currentCluster = cluster;
 
   useEffect(() => {
-    const applyHostRoute = (pathOrRoute: string | { pathname?: string; search?: string }) => {
+    const applyHostRoute = (
+      pathOrRoute: string | { pathname?: string; search?: string },
+      action?: string,
+    ) => {
       const loc = toHostResourceLocation(pathOrRoute);
       if (!loc) return;
       const { location } = window;
+      if (!shouldFollowConsoleV3Route(location.pathname, loc.pathname, action)) {
+        return;
+      }
       if (loc.pathname !== location.pathname) {
         // Replace Wujie's temporary `/resource/name` entry with the native V4
         // detail route. Otherwise browser Back visits the temporary entry
@@ -116,13 +122,16 @@ export default function BaseLayout() {
       if (name === 'consoleV3Actions') return;
       applyHostRoute(path);
     };
-    const onConsoleRouteChange = (route: string) => applyHostRoute(route);
+    const onConsoleRouteChange = (route: string, action?: string) => applyHostRoute(route, action);
     const onEmbedMessage = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return;
       if (event.data?.type !== 'consoleRouteChange' || typeof event.data.route !== 'string') {
         return;
       }
-      applyHostRoute(event.data.route);
+      applyHostRoute(
+        event.data.route,
+        typeof event.data.action === 'string' ? event.data.action : undefined,
+      );
     };
 
     document.addEventListener('click', eventer);

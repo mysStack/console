@@ -12,6 +12,29 @@ function loadEmbed() {
   return require('./v3distEmbed');
 }
 
+test('boot.js uses the upstream-aware legacy asset redirect', () => {
+  const source = fs.readFileSync(require.resolve('../components/boot.js'), 'utf8');
+  assert.match(source, /shouldRedirectLegacyV3Asset/);
+  assert.match(source, /getV3DistUpstream/);
+  assert.doesNotMatch(source, /fs\.pathExistsSync\(path\.join\('dist', 'v3dist', ctx\.url\)\) &&/);
+});
+
+test('redirects legacy /assets images to Embed when upstream is set', () => {
+  const { shouldRedirectLegacyV3Asset } = loadEmbed();
+  assert.equal(shouldRedirectLegacyV3Asset('/assets/500.svg', { hasUpstream: true }), true);
+  assert.equal(shouldRedirectLegacyV3Asset('/assets/500.svg?cache=1', { hasUpstream: true }), true);
+  assert.equal(
+    shouldRedirectLegacyV3Asset('/assets/500.svg', {
+      distExists: true,
+      hasUpstream: true,
+    }),
+    false,
+  );
+  assert.equal(shouldRedirectLegacyV3Asset('/assets/500.svg', { localV3Exists: true }), true);
+  assert.equal(shouldRedirectLegacyV3Asset('/assets/500.svg', {}), false);
+  assert.equal(shouldRedirectLegacyV3Asset('/login', { hasUpstream: true }), false);
+});
+
 test('getV3DistUpstream reads V3DIST_UPSTREAM and strips a trailing slash', () => {
   const prev = process.env.V3DIST_UPSTREAM;
   process.env.V3DIST_UPSTREAM = 'http://ks-console-embed.kubesphere-system.svc/';

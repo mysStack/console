@@ -8,7 +8,7 @@ test('ConsoleV3AliveEmbed keeps the shared consolev3 sandbox alive', () => {
   assert.match(source, /name="consolev3"/);
   assert.match(source, /\balive\b/);
   assert.match(source, /watchConsoleV3Sandbox/);
-  assert.match(source, /scheduleConsoleV3ListRouteSync/);
+  assert.match(source, /scheduleConsoleV3ListRouteSync\(child, url, window\.location\.pathname\)/);
 });
 
 test('ConsoleV3AliveEmbed runs afterUnmount on deactivated and React unmount', () => {

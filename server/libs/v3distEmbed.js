@@ -8,9 +8,30 @@ const http = require('http');
 const https = require('https');
 const path = require('path');
 
+const LEGACY_V3_ASSET = /^\/assets(\/[a-zA-Z-0-9_]+)+\.(svg|png|jpg|ico)$/;
+
 const getV3DistUpstream = () => {
   const raw = process.env.V3DIST_UPSTREAM || process.env.KS_CONSOLE_EMBED_URL || '';
   return String(raw).trim().replace(/\/+$/, '');
+};
+
+/**
+ * Old V4 pages request `/assets/*.svg`. After the split, Console has no local
+ * v3dist tree, so the redirect must follow V3DIST_UPSTREAM instead of a disk
+ * probe under dist/v3dist.
+ */
+const shouldRedirectLegacyV3Asset = (
+  url,
+  { distExists = false, localV3Exists = false, hasUpstream = false } = {},
+) => {
+  const pathname = String(url || '').split(/[?#]/)[0];
+  if (!LEGACY_V3_ASSET.test(pathname)) {
+    return false;
+  }
+  if (distExists) {
+    return false;
+  }
+  return Boolean(localV3Exists || hasUpstream);
 };
 
 const readLocalV3Json = name => {
@@ -71,4 +92,5 @@ module.exports = {
   getV3DistUpstream,
   loadV3DistJson,
   applyV3DistProxy,
+  shouldRedirectLegacyV3Asset,
 };

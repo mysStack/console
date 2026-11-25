@@ -11,7 +11,11 @@ const fs = require('fs-extra');
 const path = require('path');
 
 const { getServerConfig, root, cwdResolve } = require('../libs/utils');
-const { applyV3DistProxy } = require('../libs/v3distEmbed');
+const {
+  applyV3DistProxy,
+  getV3DistUpstream,
+  shouldRedirectLegacyV3Asset,
+} = require('../libs/v3distEmbed');
 
 const serverConfig = getServerConfig().server;
 
@@ -50,12 +54,15 @@ module.exports = function (app) {
   if (!global.MODE_DEV) {
     app.use(async (ctx, next) => {
       // If the resource for version 4.0 does not exist, redirect to version 3.x
+      const assetPath = (ctx.path || ctx.url || '').split(/[?#]/)[0];
       if (
-        /^\/assets(\/[a-zA-Z-0-9_]+)+\.(svg|png|jpg|ico)$/.test(ctx.url) &&
-        !fs.pathExistsSync(path.join('dist', ctx.url)) &&
-        fs.pathExistsSync(path.join('dist', 'v3dist', ctx.url))
+        shouldRedirectLegacyV3Asset(assetPath, {
+          distExists: fs.pathExistsSync(path.join('dist', assetPath)),
+          localV3Exists: fs.pathExistsSync(path.join('dist', 'v3dist', assetPath)),
+          hasUpstream: Boolean(getV3DistUpstream()),
+        })
       ) {
-        ctx.redirect(`/dist/v3dist${ctx.url}`);
+        ctx.redirect(`/dist/v3dist${assetPath}`);
       } else {
         await next();
       }

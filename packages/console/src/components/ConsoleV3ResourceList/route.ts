@@ -12,6 +12,29 @@ const getRoutePath = (url: string): string => {
   return `${target.pathname}${target.search}${target.hash}`;
 };
 
+const stripEmbeddedPrefix = (pathname: string): string =>
+  pathname.replace(/^\/consolev3(?=\/|$)/, '') || '/';
+
+/**
+ * `/projects/:ns/deployments` is the cached workload list. A detail embed boots
+ * there so Wujie keeps a live document; the host must not be yanked onto it.
+ */
+export function isConsoleV3CollectionPath(resourceUrl: string): boolean {
+  const path = stripEmbeddedPrefix(getRoutePath(resourceUrl).split(/[?#]/)[0] || '');
+  return /\/projects\/[^/]+\/[a-z0-9-]+\/?$/i.test(path);
+}
+
+export function shouldSyncAliveEmbedToUrl(hostPathname: string, resourceUrl: string): boolean {
+  if (!hostPathname || !isConsoleV3CollectionPath(resourceUrl)) {
+    return true;
+  }
+  const list =
+    stripEmbeddedPrefix(getRoutePath(resourceUrl).split(/[?#]/)[0] || '').replace(/\/+$/, '') ||
+    '/';
+  const host = hostPathname.replace(/\/+$/, '') || '/';
+  return !(host !== list && host.startsWith(`${list}/`));
+}
+
 const getCurrentPath = (appWindow: ConsoleV3RouteWindow): string =>
   `${appWindow.location.pathname}${appWindow.location.search}${appWindow.location.hash}`;
 
@@ -92,10 +115,16 @@ const afterActivation = (appWindow: ConsoleV3FrameWindow, sync: () => void): voi
 export function scheduleConsoleV3ListRouteSync(
   appWindow: ConsoleV3FrameWindow,
   resourceUrl: string,
+  hostPathname = '',
 ): void {
   // syncConsoleV3ListRoute no-ops (no popstate) when already on resourceUrl,
   // which avoids a redundant list refetch after an aligned preload.
-  afterActivation(appWindow, () => syncConsoleV3ListRoute(appWindow, resourceUrl));
+  afterActivation(appWindow, () => {
+    if (hostPathname && !shouldSyncAliveEmbedToUrl(hostPathname, resourceUrl)) {
+      return;
+    }
+    syncConsoleV3ListRoute(appWindow, resourceUrl);
+  });
 }
 
 export function scheduleConsoleV3RouteNotification(
