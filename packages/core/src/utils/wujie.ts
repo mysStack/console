@@ -8,7 +8,7 @@ import WujieReact from 'wujie-react';
 import { useEventEmitter } from '@ks-console/shared';
 import { setGlobalConsoleV3LoadCompleted } from '../utils/globals.consoleV3LoadCompleted';
 import { preloadConsoleV3MainAssetsForRoute } from './consoleV3AssetPreload';
-import { resolveConsoleV3PreloadUrl, shouldPreloadConsoleV3 } from './consoleV3PreloadUrl';
+import { shouldPreloadConsoleV3 } from './consoleV3PreloadUrl';
 
 const { setupApp, preloadApp, bus } = WujieReact;
 
@@ -61,9 +61,8 @@ export function initWujie() {
     return;
   }
 
+  // Start only the versioned static assets on direct list landings. Executing
+  // the app in a detached host before visible activation can leave Wujie's
+  // activeFlag false when that host is removed, swallowing user navigation.
   preloadConsoleV3MainAssetsForRoute(pathname);
-  preloadApp({
-    name: 'consolev3',
-    url: resolveConsoleV3PreloadUrl(pathname),
-  });
 }
