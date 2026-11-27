@@ -174,6 +174,12 @@ export function alignConsoleV3Url(
 export function scheduleConsoleV3RouteNotification(
   appWindow: ConsoleV3FrameWindow,
   resourceUrl: string,
+  hostPathname = typeof window === 'undefined' ? '' : window.location.pathname,
 ): void {
-  afterActivation(appWindow, () => notifyConsoleV3ActivationRoute(appWindow, resourceUrl));
+  afterActivation(appWindow, () => {
+    if (hostPathname && typeof window !== 'undefined' && window.location.pathname !== hostPathname)
+      return;
+    if (hostPathname && !shouldSyncAliveEmbedToUrl(hostPathname, resourceUrl)) return;
+    notifyConsoleV3ActivationRoute(appWindow, resourceUrl);
+  });
 }

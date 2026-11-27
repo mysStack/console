@@ -53,7 +53,7 @@ function DeploymentDetail(): JSX.Element {
   const syncDetailRoute = useCallback(
     (appWindow: Window) => {
       if (routeSyncFrameRef.current !== undefined) {
-        appWindow.cancelAnimationFrame(routeSyncFrameRef.current);
+        window.cancelAnimationFrame(routeSyncFrameRef.current);
       }
 
       if (
@@ -72,7 +72,6 @@ function DeploymentDetail(): JSX.Element {
 
       let framesRemaining = 300;
       let stableFrames = 0;
-      let previousRootSignature = '';
       const syncRoute = () => {
         if (
           window.location.pathname !== location.pathname ||
@@ -89,12 +88,11 @@ function DeploymentDetail(): JSX.Element {
           // Wujie can briefly expose a document proxy without its backing
           // document during activation. The shadow root is already mounted on
           // the host, so use it while the proxy is being restored.
-          root =
-            window.document
-              .querySelector('wujie-app[data-wujie-id="consolev3"]')
-              ?.shadowRoot?.querySelector('#root') ?? null;
         }
-        const rootSignature = `${root?.childElementCount ?? 0}:${root?.textContent?.trim() ?? ''}`;
+        root ??=
+          window.document
+            .querySelector('wujie-app[data-wujie-id="consolev3"]')
+            ?.shadowRoot?.querySelector('#root') ?? null;
         const detailRouteReady =
           appWindow.location.pathname + appWindow.location.search + appWindow.location.hash ===
             embeddedLocation && Boolean(root?.hasChildNodes());
@@ -102,16 +100,15 @@ function DeploymentDetail(): JSX.Element {
           shouldSyncConsoleV3DetailRoute(appWindow.location.pathname, embeddedPath, listPath) &&
           Boolean(root?.hasChildNodes());
         const routeReady = detailRouteReady || listRouteReady;
-        if (routeReady && rootSignature === previousRootSignature) {
+        if (routeReady) {
           stableFrames += 1;
         } else {
           stableFrames = 0;
         }
-        previousRootSignature = rootSignature;
 
         if ((!routeReady || stableFrames < 3) && framesRemaining > 0) {
           framesRemaining -= 1;
-          routeSyncFrameRef.current = appWindow.requestAnimationFrame(syncRoute);
+          routeSyncFrameRef.current = window.requestAnimationFrame(syncRoute);
           return;
         }
         if (detailRouteReady && stableFrames >= 3) {
@@ -177,7 +174,7 @@ function DeploymentDetail(): JSX.Element {
     removeHostHistoryRef.current?.();
     removeHostHistoryRef.current = undefined;
     if (appWindowRef.current && routeSyncFrameRef.current !== undefined) {
-      appWindowRef.current.cancelAnimationFrame(routeSyncFrameRef.current);
+      window.cancelAnimationFrame(routeSyncFrameRef.current);
     }
     appWindowRef.current = undefined;
     routeSyncFrameRef.current = undefined;
@@ -185,6 +182,11 @@ function DeploymentDetail(): JSX.Element {
   }, [afterUnmount]);
 
   useEffect(() => () => removeHostHistoryRef.current?.(), []);
+
+  useEffect(() => {
+    const appWindow = appWindowRef.current;
+    if (appWindow) syncDetailRoute(appWindow);
+  }, [syncDetailRoute]);
 
   return (
     <>

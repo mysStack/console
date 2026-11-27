@@ -256,3 +256,26 @@ test('schedules the activation notification after two frames', () => {
   callbacks.shift()?.(0);
   assert.equal(events.length, 1);
 });
+
+test('template activation does not send a detail host back to the cached list', () => {
+  const list = '/consolev3/dev-workspace/clusters/host/projects/dev-wms/deployments';
+  const detail =
+    '/dev-workspace/clusters/host/projects/dev-wms/deployments/example/resource-status';
+  const appWindow = {
+    location: { pathname: '/consolev3' + detail, search: '', hash: '' },
+    history: {
+      state: null,
+      replaceState() {
+        throw Error('stale list route');
+      },
+    },
+    dispatchEvent() {
+      throw Error('unexpected route notification');
+    },
+    requestAnimationFrame(callback: FrameRequestCallback) {
+      callback(0);
+      return 1;
+    },
+  };
+  scheduleConsoleV3RouteNotification(appWindow, list, detail);
+});
