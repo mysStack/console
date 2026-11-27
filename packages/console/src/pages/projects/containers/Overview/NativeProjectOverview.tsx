@@ -53,7 +53,7 @@ function ProjectRank({ scope }: { scope: ProjectScope }) {
           sort_metric: metric,
           metrics_filter: [...rankMetrics, 'replica'].join('|'),
         },
-        headers: { 'x-ignore-error-notify': true },
+        headers: { 'x-ignore-error-notify': 'true' },
       }),
     { retry: false },
   );
@@ -111,7 +111,7 @@ function ProjectApps({ scope }: { scope: ProjectScope }) {
     () =>
       request.get<never, any>(openpitrixStore.getApplicationUrl(scope), {
         params: { limit: 3 },
-        headers: { 'x-ignore-error-notify': true },
+        headers: { 'x-ignore-error-notify': 'true' },
       }),
     { retry: false },
   );
@@ -183,7 +183,7 @@ function QuotaReminders({ scope, detail }: { scope: ProjectScope; detail: Format
           <p>{t('DEFAULT_CONTAINER_QUOTAS_DESC')}</p>
           <Button
             onClick={() =>
-              openLimits(({ limitranges, data: project }) => [
+              openLimits(({ limitranges, data: project } = {}) => [
                 { detail: limitranges?.[0], params: scope, workspace, store: limitRangesStore },
                 {
                   params: scope,
