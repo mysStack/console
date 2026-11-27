@@ -91,3 +91,37 @@ test('normal routes retain the legacy sandbox and the alternative renders within
   assert.match(source, /<NativeProjectOverview/);
   assert.match(source, /<ConsoleV3AliveEmbed/);
 });
+
+test('actual monitoring response workload_type label preserves the resource kind for links', () => {
+  const data = {
+    results: [
+      {
+        metric_name: 'workload_cpu_usage',
+        data: {
+          result: [
+            {
+              metric: { namespace: 'dev-wms', workload: 'wms-a', workload_type: 'deployment' },
+              value: [1, '4'],
+            },
+            {
+              metric: { namespace: 'dev-wms', workload: 'wms-b', workload_type: 'StatefulSet' },
+              value: [1, '2'],
+            },
+            {
+              metric: { namespace: 'dev-wms', workload: 'wms-c', workload_type: 'daemonsets' },
+              value: [1, '1'],
+            },
+          ],
+        },
+      },
+    ],
+  };
+  assert.deepEqual(
+    getScopedWorkloadRank(data, 'workload_cpu_usage', { namespace: 'dev-wms', cluster: 'host' }),
+    [
+      { name: 'wms-a', kind: 'Deployment', value: 4 },
+      { name: 'wms-b', kind: 'StatefulSet', value: 2 },
+      { name: 'wms-c', kind: 'DaemonSet', value: 1 },
+    ],
+  );
+});

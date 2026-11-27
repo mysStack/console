@@ -44,7 +44,17 @@ export function getScopedWorkloadRank(
       const name = String(metric.workload || '').replace(/^\w+:/, '');
       const value = Number(item?.value?.[1]);
       if (!name || !Number.isFinite(value) || value < 0) return [];
-      return [{ name, kind: String(metric.owner_kind || ''), value }];
+      const rawKind = String(metric.owner_kind || metric.workload_type || '');
+      const normalized = rawKind.toLowerCase().replace(/s$/, '');
+      const kinds: Record<string, string> = {
+        deployment: 'Deployment',
+        statefulset: 'StatefulSet',
+        daemonset: 'DaemonSet',
+        pod: 'Pod',
+        job: 'Job',
+        cronjob: 'CronJob',
+      };
+      return [{ name, kind: kinds[normalized] || rawKind, value }];
     })
     .sort((a, b) => b.value - a.value)
     .slice(0, 5);
