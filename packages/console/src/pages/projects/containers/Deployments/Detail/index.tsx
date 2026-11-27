@@ -8,16 +8,7 @@ import ConsoleV3AliveEmbed from '../../../../../components/ConsoleV3AliveEmbed';
 import { useLocation, useParams } from 'react-router-dom';
 import { useConfigReferenceBridge } from '../../../components/ConfigReference/entry';
 import { useV3ContainerLogBridge } from '../../../components/ContainerLogBridge/useV3ContainerLogBridge';
-import {
-  getConsoleV3DetailPath,
-  getConsoleV3DeploymentListPath,
-  getConsoleV3DetailUrl,
-  getConsoleV3ProjectPrefix,
-  bindConsoleV3DetailHistory,
-  replaceConsoleV3Route,
-  replaceConsoleV3RouteSilently,
-  shouldSyncConsoleV3DetailRoute,
-} from '../../Base/BaseLayout/route';
+import { bindConsoleV3DetailHistory, getConsoleV3DetailUrl } from '../../Base/BaseLayout/route';
 
 function DeploymentDetail(): JSX.Element {
   const { workspace, cluster, namespace, name } = useParams<
@@ -26,140 +17,24 @@ function DeploymentDetail(): JSX.Element {
   const location = useLocation();
   const { afterMount, afterUnmount, inline, summary } = useConfigReferenceBridge('deployments');
   const { bindContainerLog, modal: containerLogModal } = useV3ContainerLogBridge();
-  const appWindowRef = useRef<Window>();
-  const routeSyncFrameRef = useRef<number>();
   const removeHostHistoryRef = useRef<() => void>();
   const unbindContainerLogRef = useRef<() => void>();
-  const projectPrefix = getConsoleV3ProjectPrefix({
-    workspace,
-    cluster,
-    namespace,
-  });
-  const hostProjectPath = `/${workspace}/clusters/${cluster}/projects/${namespace}`;
-  const hostDetailPath = `${hostProjectPath}/deployments/${name}`;
+  const hostDetailPath = `/${workspace}/clusters/${cluster}/projects/${namespace}/deployments/${name}`;
   const embeddedUrl = getConsoleV3DetailUrl({
     host: window.location.host,
-    projectPrefix,
-    name,
+    pathname: location.pathname,
+    search: location.search,
+    hash: location.hash,
   });
-  const embeddedPath = getConsoleV3DetailPath({
-    projectPrefix,
-    name,
-    hostPath: location.pathname,
-    hostDetailPath,
-  });
-  const embeddedLocation = `${embeddedPath}${location.search}${location.hash}`;
-  const listPath = getConsoleV3DeploymentListPath(projectPrefix);
-  const syncDetailRoute = useCallback(
-    (appWindow: Window) => {
-      if (routeSyncFrameRef.current !== undefined) {
-        window.cancelAnimationFrame(routeSyncFrameRef.current);
-      }
 
-      if (
-        appWindow.location.pathname + appWindow.location.search + appWindow.location.hash ===
-        embeddedLocation
-      ) {
-        return;
-      }
-
-      // A reused/preloaded instance may still be on dashboard or another
-      // namespace. Bring it to this workload list first so the detail route
-      // event is handled by the mounted V3 router instead of a stale page.
-      if (appWindow.location.pathname !== listPath) {
-        replaceConsoleV3RouteSilently(appWindow, listPath);
-      }
-
-      let framesRemaining = 300;
-      let stableFrames = 0;
-      const syncRoute = () => {
-        if (
-          window.location.pathname !== location.pathname ||
-          window.location.search !== location.search ||
-          window.location.hash !== location.hash
-        ) {
-          routeSyncFrameRef.current = undefined;
-          return;
-        }
-        let root: Element | null = null;
-        try {
-          root = appWindow.document?.getElementById?.('root') ?? null;
-        } catch {
-          // Wujie can briefly expose a document proxy without its backing
-          // document during activation. The shadow root is already mounted on
-          // the host, so use it while the proxy is being restored.
-        }
-        root ??=
-          window.document
-            .querySelector('wujie-app[data-wujie-id="consolev3"]')
-            ?.shadowRoot?.querySelector('#root') ?? null;
-        const detailRouteReady =
-          appWindow.location.pathname + appWindow.location.search + appWindow.location.hash ===
-            embeddedLocation && Boolean(root?.hasChildNodes());
-        const listRouteReady =
-          shouldSyncConsoleV3DetailRoute(appWindow.location.pathname, embeddedPath, listPath) &&
-          Boolean(root?.hasChildNodes());
-        const routeReady = detailRouteReady || listRouteReady;
-        if (routeReady) {
-          stableFrames += 1;
-        } else {
-          stableFrames = 0;
-        }
-
-        if ((!routeReady || stableFrames < 3) && framesRemaining > 0) {
-          framesRemaining -= 1;
-          routeSyncFrameRef.current = window.requestAnimationFrame(syncRoute);
-          return;
-        }
-        if (detailRouteReady && stableFrames >= 3) {
-          routeSyncFrameRef.current = undefined;
-          return;
-        }
-        if (!routeReady || stableFrames < 3) {
-          // Keep this diagnostic until the route synchronization race is
-          // eliminated; a blank detail page must never fail silently.
-          // eslint-disable-next-line no-console
-          console.error('[Wujie Deployment] Detail route sync timeout', {
-            currentPath: appWindow.location.pathname,
-            expectedPath: embeddedPath,
-            listPath,
-            framesRemaining,
-            stableFrames,
-            rootExists: Boolean(appWindow.document.getElementById('root')),
-          });
-          routeSyncFrameRef.current = undefined;
-          return;
-        }
-        replaceConsoleV3Route(appWindow, embeddedLocation);
-        routeSyncFrameRef.current = undefined;
-      };
-      syncRoute();
-    },
-    [embeddedPath, embeddedLocation, listPath, location.pathname, location.search, location.hash],
-  );
   const bindHistory = useCallback(
     (appWindow: Window) => {
-      appWindowRef.current = appWindow;
       removeHostHistoryRef.current?.();
-      removeHostHistoryRef.current = bindConsoleV3DetailHistory(window, appWindow, {
-        projectPrefix,
-        name,
-        hostDetailPath,
-      });
-      syncDetailRoute(appWindow);
+      removeHostHistoryRef.current = bindConsoleV3DetailHistory(window, appWindow, hostDetailPath);
     },
-    [hostDetailPath, name, projectPrefix, syncDetailRoute],
+    [hostDetailPath],
   );
   const handleAfterMount = useCallback(
-    (appWindow: Window) => {
-      afterMount(appWindow);
-      bindHistory(appWindow);
-      unbindContainerLogRef.current?.();
-      unbindContainerLogRef.current = bindContainerLog(appWindow);
-    },
-    [afterMount, bindContainerLog, bindHistory],
-  );
-  const handleActivated = useCallback(
     (appWindow: Window) => {
       afterMount(appWindow);
       bindHistory(appWindow);
@@ -173,20 +48,10 @@ function DeploymentDetail(): JSX.Element {
     unbindContainerLogRef.current = undefined;
     removeHostHistoryRef.current?.();
     removeHostHistoryRef.current = undefined;
-    if (appWindowRef.current && routeSyncFrameRef.current !== undefined) {
-      window.cancelAnimationFrame(routeSyncFrameRef.current);
-    }
-    appWindowRef.current = undefined;
-    routeSyncFrameRef.current = undefined;
     afterUnmount();
   }, [afterUnmount]);
 
   useEffect(() => () => removeHostHistoryRef.current?.(), []);
-
-  useEffect(() => {
-    const appWindow = appWindowRef.current;
-    if (appWindow) syncDetailRoute(appWindow);
-  }, [syncDetailRoute]);
 
   return (
     <>
@@ -195,7 +60,7 @@ function DeploymentDetail(): JSX.Element {
         height="100%"
         url={embeddedUrl}
         afterMount={handleAfterMount}
-        activated={handleActivated}
+        activated={handleAfterMount}
         afterUnmount={handleAfterUnmount}
       />
       {inline}
