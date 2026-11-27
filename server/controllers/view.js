@@ -4,6 +4,7 @@
  */
 
 const { startsWith, get } = require('lodash');
+const { randomBytes } = require('crypto');
 const {
   getCurrentUser,
   getKSConfig,
@@ -18,6 +19,7 @@ const { getInstalledExtensions } = require('../services/extension');
 const {
   getServerConfig,
   getManifest,
+  getAuthEntryManifest,
   getLocaleManifest,
   getImportMap,
   isValidReferer,
@@ -62,6 +64,48 @@ const renderIndex = async (ctx, params, themePromise = getTheme(ctx)) => {
         localeManifest,
         theme,
         defaultTheme,
+        useDefaultTheme,
+        ...params,
+      }),
+    ),
+  });
+};
+
+const renderAuthentication = async (ctx, params, themePromise = getTheme(ctx)) => {
+  const entry = !global.MODE_DEV && getAuthEntryManifest();
+  if (!entry) return renderIndex(ctx, params, themePromise);
+  const data = getThemeConfig(await themePromise);
+  const useDefaultTheme = !startsWith(data.logo, '/theme');
+  const nonce = randomBytes(18).toString('base64');
+  ctx.set('Cache-Control', 'no-store');
+  ctx.set(
+    'Content-Security-Policy',
+    [
+      "default-src 'self'",
+      `script-src 'self' 'nonce-${nonce}'`,
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: blob: http: https:",
+      "font-src 'self' data:",
+      "connect-src 'self' ws: wss:",
+      "frame-src 'self'",
+      "frame-ancestors 'self'",
+      "object-src 'none'",
+      "base-uri 'self'",
+    ].join('; '),
+  );
+  await ctx.render('auth', {
+    title: useDefaultTheme ? data.defaultTheme?.tabTitle : data.title,
+    favicon: data.favicon,
+    entry,
+    nonce,
+    sharedCss: getManifest('main')['main.css'],
+    globals: encodeURIComponent(
+      JSON.stringify({
+        config: clientConfig,
+        manifest: getManifest('main'),
+        localeManifest: getLocaleManifest(),
+        theme: data.theme,
+        defaultTheme: data.defaultTheme,
         useDefaultTheme,
         ...params,
       }),
@@ -280,14 +324,14 @@ const renderLogin = async ctx => {
 
   const oauthServers = await getOAuthInfo(ctx);
 
-  await renderIndex(ctx, {
+  await renderAuthentication(ctx, {
     oauthServers: oauthServers || [],
   });
 };
 
 const renderLoginConfirm = async ctx => {
   const usrName = ctx.cookies.get('defaultUser') || '';
-  await renderIndex(ctx, {
+  await renderAuthentication(ctx, {
     user: {
       username: safeBase64.safeAtob(usrName),
       email: ctx.cookies.get('defaultEmail'),

@@ -51,6 +51,7 @@ function loadView(overrides = {}, utilOverrides = {}) {
     '../libs/utils': {
       getServerConfig: () => ({ client }),
       getManifest: () => ({ js: ['main.fixture.js'], css: ['main.fixture.css'] }),
+      getAuthEntryManifest: () => null,
       getDllManifest: () => ({ fixture: 'dll.fixture.js' }),
       getLocaleManifest: () => ({ zh: 'locale.fixture.json' }),
       getV3Manifest: () => ({ js: ['v3.fixture.js'], css: ['v3.fixture.css'] }),
@@ -98,6 +99,10 @@ function context() {
     app: { emit: (...args) => errors.push(args) },
     render: async (template, data) => rendered.push({ template, data }),
     redirect: url => redirects.push(url),
+    headers: {},
+    set(name, value) {
+      this.headers[name] = value;
+    },
     rendered,
     redirects,
     errors,
@@ -238,4 +243,45 @@ test('login still fetches its theme when no page bootstrap promise is supplied',
   assert.equal(ctx.rendered[0].template, 'index');
   assert.equal(ctx.rendered[0].data.title, 'Fixture brand');
   assert.equal(calls.filter(x => x === 'getTheme').length, 1);
+});
+
+test('login uses the dedicated auth entry when its manifest is present', async () => {
+  const entry = { js: ['entry/auth.fixture.js'], css: [] };
+  const { view, calls } = loadView(
+    { getOAuthInfo: async () => [{ title: 'Fixture OAuth' }] },
+    {
+      getAuthEntryManifest: () => entry,
+      getManifest: () => ({ 'main.css': 'main.fixture.css', 'locales-zh': 'locale.fixture.json' }),
+    },
+  );
+  const ctx = context();
+  await view.renderLogin(ctx);
+  const { template, data } = ctx.rendered[0];
+  assert.equal(template, 'auth');
+  assert.deepEqual(data.entry, entry);
+  assert.equal(data.sharedCss, 'main.fixture.css');
+  assert.equal(data.title, 'Fixture brand');
+  assert.deepEqual(JSON.parse(decodeURIComponent(data.globals)).oauthServers, [
+    { title: 'Fixture OAuth' },
+  ]);
+  assert.equal(ctx.headers['Cache-Control'], 'no-store');
+  assert.ok(ctx.headers['Content-Security-Policy'].includes(data.nonce));
+  assert.equal(calls.filter(x => x === 'getTheme').length, 1);
+});
+
+test('login confirmation uses the same entry and preserves the existing user bootstrap', async () => {
+  const { view } = loadView(
+    {},
+    { getAuthEntryManifest: () => ({ js: ['entry/auth.fixture.js'], css: [] }) },
+  );
+  const ctx = context();
+  ctx.cookies.get = name =>
+    name === 'defaultUser' ? Buffer.from('fixture').toString('base64') : 'fixture@example.test';
+  await view.renderLoginConfirm(ctx);
+  const { template, data } = ctx.rendered[0];
+  assert.equal(template, 'auth');
+  assert.deepEqual(JSON.parse(decodeURIComponent(data.globals)).user, {
+    username: 'fixture',
+    email: 'fixture@example.test',
+  });
 });

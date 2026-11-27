@@ -18,6 +18,7 @@ const https = require('https');
 const { URL } = require('url');
 
 const MANIFEST_CACHE_KEY = 'MANIFEST_CACHE_KEY';
+const AUTH_ENTRY_MANIFEST_CACHE_KEY = 'AUTH_ENTRY_MANIFEST_CACHE_KEY';
 const MANIFEST_CACHE_KEY_PREFIX = 'MANIFEST_CACHE_KEY_V3_';
 const LOCALE_MANIFEST_CACHE_KEY = 'LOCALE_MANIFEST_CACHE_KEY';
 const DLL_MANIFEST_CACHE_KEY = 'DLL_MANIFEST_CACHE_KEY';
@@ -300,6 +301,33 @@ const getV3LocaleManifest = async () => {
   return manifestCache;
 };
 
+const getAuthEntryManifest = () => {
+  const cached = cache.get(AUTH_ENTRY_MANIFEST_CACHE_KEY);
+  if (cached) return cached;
+  try {
+    const input = JSON.parse(fs.readFileSync(cwdResolve('dist/entry/manifest.json'), 'utf8'));
+    const entry = input.auth;
+    if (!entry || !Array.isArray(entry.js) || !entry.js.length || !Array.isArray(entry.css)) {
+      return null;
+    }
+    const assets = [...entry.js, ...entry.css];
+    if (
+      !assets.every(
+        asset =>
+          typeof asset === 'string' &&
+          /^entry\/[\w.-]+$/.test(asset) &&
+          !asset.includes('..') &&
+          fs.statSync(cwdResolve('dist/' + asset)).isFile(),
+      )
+    )
+      return null;
+    cache.set(AUTH_ENTRY_MANIFEST_CACHE_KEY, entry);
+    return entry;
+  } catch {
+    return null;
+  }
+};
+
 const getDllManifest = () => {
   let manifestCache = cache.get(DLL_MANIFEST_CACHE_KEY);
 
@@ -378,4 +406,5 @@ module.exports = {
   getV3LocaleManifest,
   mapResource,
   getDllManifest,
+  getAuthEntryManifest,
 };
