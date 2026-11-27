@@ -24,7 +24,8 @@ import {
   hasExtensionModuleAnnotation,
   hasClusterModule,
 } from '@ks-console/shared';
-import { notify } from '@kubed/components';
+import { Banner, Loading, notify } from '@kubed/components';
+import { getScopedProjectPath, resolveProjectCluster } from './projectScope';
 import { Pen, Project, Trash } from '@kubed/icons';
 import { get, isEqual } from 'lodash';
 import * as React from 'react';
@@ -71,20 +72,16 @@ const Projects = (props: ProjectsProps) => {
   const tableRef = React.useRef<TableRef>(null);
   const params1 = useParams();
   const { workspace } = params1;
-  const [cluster, setCluster] = React.useState<string>('');
+  const [selectedCluster, setCluster] = React.useState<string>('');
 
   const { data: clusters, isLoading: clusterLoading } = clusterStore.fetchList(params1, true);
+  const cluster = resolveProjectCluster(selectedCluster, clusters, clusterLoading);
 
   const params = {
     workspace,
     cluster,
   };
 
-  React.useEffect(() => {
-    if (Array.isArray(clusters) && clusters.length && !cluster) {
-      setCluster(clusters.filter(i => i.isReady)[0]?.name);
-    }
-  }, [clusters]);
   const callback = () => {
     tableRef?.current?.refetch();
   };
@@ -102,7 +99,13 @@ const Projects = (props: ProjectsProps) => {
       'monitoring.kubesphere.io/enable-gpu-monitoring',
     ) && hasClusterModule(cluster, 'whizard-monitoring');
 
-  const [list, setlist] = React.useState<FormattedNamespace[]>([]);
+  const [scopedList, setScopedList] = React.useState<{
+    workspace?: string;
+    cluster: string;
+    items: FormattedNamespace[];
+  }>({ cluster: '', items: [] });
+  const list =
+    scopedList.workspace === workspace && scopedList.cluster === cluster ? scopedList.items : [];
   const {
     data: metricsData,
     isFetching,
@@ -115,7 +118,7 @@ const Projects = (props: ProjectsProps) => {
       last: true,
     },
     {
-      enabled: !!hasMonitoring,
+      enabled: !!cluster && !!hasMonitoring && list.length > 0,
     },
   );
 
@@ -309,7 +312,7 @@ const Projects = (props: ProjectsProps) => {
           const detailUrl =
             record.status === 'Terminating'
               ? ''
-              : `/${record.workspace}/clusters/${cluster}/projects/${record.name}`;
+              : getScopedProjectPath(record.workspace, cluster, record.name);
 
           return (
             <AvatarWrapper
@@ -388,7 +391,7 @@ const Projects = (props: ProjectsProps) => {
               item={{
                 id: record.uid,
                 name: record.name,
-                url: `/${record.workspace}/clusters/${cluster}/projects/${record.name}`,
+                url: getScopedProjectPath(record.workspace, cluster, record.name),
                 type: 'Project',
                 isHost: false,
               }}
@@ -405,19 +408,25 @@ const Projects = (props: ProjectsProps) => {
     ] as Column<FormattedNamespace>[]
   ).filter(i => !omitKeys.has(i.id!));
 
-  const listRef = React.useRef<FormattedNamespace[]>(list);
-  const onChangeData = React.useCallback((e: FormattedNamespace[]) => {
-    if (
-      e &&
-      !isEqual(
-        e.map(item => item.name),
-        listRef.current.map(item => item.name),
-      )
-    ) {
-      setlist(e);
-      listRef.current = e;
-    }
-  }, []);
+  const onChangeData = React.useCallback(
+    (items: FormattedNamespace[]) => {
+      if (!items) return;
+      setScopedList(current => {
+        if (
+          current.workspace === workspace &&
+          current.cluster === cluster &&
+          isEqual(
+            current.items.map(item => item.name),
+            items.map(item => item.name),
+          )
+        ) {
+          return current;
+        }
+        return { workspace, cluster, items };
+      });
+    },
+    [workspace, cluster],
+  );
 
   const renderClusterSelect = () => {
     return (
@@ -436,7 +445,7 @@ const Projects = (props: ProjectsProps) => {
   const table = React.useMemo(() => {
     return {
       ref: tableRef,
-      tableName: `${cluster}.workspace.namespace:table:${type}:list`,
+      tableName: `${workspace}.${cluster}.workspace.namespace:table:${type}:list`,
       columns: columns as Column[],
       transformRequestParams: transformProjectTableParams,
       batchActions: renderBatchActions({}),
@@ -444,13 +453,22 @@ const Projects = (props: ProjectsProps) => {
       toolbarLeft: renderClusterSelect(),
       isLoading: isFetching && clusterLoading,
       onChangeData: onChangeData,
-      onRefresh: refetch,
+      onRefresh: hasMonitoring && list.length > 0 ? refetch : undefined,
       url: projectNewStore.getListUrl({
         ...params,
         cluster,
       }),
     };
-  }, [type, isFetching, cluster, clusterLoading]);
+  }, [type, isFetching, workspace, cluster, clusterLoading, list.length, hasMonitoring]);
+  if (!cluster) {
+    return (
+      <>
+        <Banner {...banner} className="mb12" />
+        {renderClusterSelect()}
+        {clusterLoading ? <Loading className="page-loading" /> : <p>{t('NO_CLUSTER_AVAILABLE')}</p>}
+      </>
+    );
+  }
   return (
     <ListPage banner={banner} table={table as any} currentTab={type} store={projectNewStore} />
   );
