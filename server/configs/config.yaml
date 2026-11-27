@@ -204,7 +204,31 @@ client:
       - name: monitoring-alerting
         title: MONITORING_AND_ALERTING
         icon: monitor
-        children: []
+        children:
+          - name: monitor-cluster
+            title: CLUSTER_STATUS
+            icon: linechart
+            authKey: monitoring
+            clusterModule: whizard-monitoring
+          - name: monitor-resource
+            title: APPLICATION_RESOURCE_PL
+            icon: linechart
+            authKey: monitoring
+            clusterModule: whizard-monitoring
+          - name: alerts
+            title: ALERTING_MESSAGE_PL
+            icon: loudspeaker
+            clusterModule: whizard-alerting
+          - name: alert-rules
+            title: ALERTING_POLICY_PL
+            icon: hammer
+            authKey: rulegroups
+            clusterModule: whizard-alerting
+          - name: custom-monitoring
+            title: CUSTOM_MONITORING
+            authKey: custom-monitoring
+            clusterModule: whizard-monitoring
+            requiredClusterVersion: v3.1.0
         # children:
         #   - {
         #     name: monitor-cluster,
@@ -386,7 +410,21 @@ client:
       - name: monitoring
         title: MONITORING_AND_ALERTING
         icon: monitor
-        children: []
+        children:
+          - name: alerts
+            title: ALERTING_MESSAGE_PL
+            icon: loudspeaker
+            clusterModule: whizard-alerting
+          - name: alert-rules
+            title: ALERTING_POLICY_PL
+            icon: hammer
+            authKey: rulegroups
+            clusterModule: whizard-alerting
+          - name: custom-monitoring
+            title: CUSTOM_MONITORING
+            authKey: custom-monitoring
+            clusterModule: whizard-monitoring
+            requiredClusterVersion: v3.1.0
         # children:
         # - {
         #   name: alerts,
