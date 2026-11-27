@@ -1,12 +1,24 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useMutation } from 'react-query';
 import { Button, Card, Input, Loading, Select, Switch, notify } from '@kubed/components';
-import { configMapStore, request, secretStore, workloadStore } from '@ks-console/shared';
+import {
+  configMapStore,
+  hasPermission,
+  request,
+  secretStore,
+  workloadStore,
+} from '@ks-console/shared';
 
 import { findDuplicateReferences, parseEnvFrom } from './envFrom';
 import { readReloaderPolicy } from './reloader';
 import { buildConfigReferencePatch, getContainerEnvFrom, getContainerNames } from './workload';
-import type { ConfigReferenceKind, EnvFromReference } from './types';
+import type {
+  ConfigReferenceKind,
+  EnvFromReference,
+  ConfigReferenceSubmission,
+  ConfigReferenceSaveResult,
+  ConfigReferenceResource,
+} from './types';
 import { colors, columns } from './styles';
 import ConfigReferencePreview from './ConfigReferencePreview';
 import { useReferencePreviews } from './useReferencePreviews';
@@ -20,6 +32,8 @@ interface Props {
   module: WorkloadModule;
   workloadKind: string;
   onBack: () => void;
+  onWriteStart?: (submission: ConfigReferenceSubmission) => boolean | void;
+  onWriteResult?: (result: ConfigReferenceSaveResult) => void;
 }
 
 type NameOption = { label: string; value: string };
@@ -43,8 +57,16 @@ export default function ConfigReferencePanel({
   module,
   workloadKind,
   onBack,
+  onWriteStart,
+  onWriteResult,
 }: Props) {
   const store = storeByModule[module];
+  const canEdit = hasPermission({
+    cluster,
+    project: namespace,
+    module,
+    action: 'edit',
+  });
   const emptyOption = { label: t('CONFIG_REFERENCE_SELECT_RESOURCE'), value: '' };
   const detailQuery = store.useGetDetail({ cluster, namespace, name });
   const [configMaps, setConfigMaps] = useState<NameOption[]>([]);
@@ -100,15 +122,23 @@ export default function ConfigReferencePanel({
   };
 
   const saveMutation = useMutation(
-    (data: Record<string, any>) =>
-      request.patch(store.getDetailUrl({ cluster, namespace, name }), data, {
-        headers: { 'content-type': 'application/json-patch+json' },
-      }),
+    (data: ConfigReferenceSubmission['patch']) =>
+      request.patch<never, ConfigReferenceResource>(
+        store.getDetailUrl({ cluster, namespace, name }),
+        data,
+        {
+          headers: { 'content-type': 'application/json-patch+json' },
+        },
+      ),
     {
-      onSuccess: () => {
+      onSuccess: async resource => {
         setSaveError(null);
         notify.success(t('CONFIG_REFERENCE_SAVE_SUCCESS'));
-        detailQuery.refetch();
+        try {
+          await detailQuery.refetch();
+        } finally {
+          onWriteResult?.({ outcome: 'saved', status: 200, resource });
+        }
       },
       onError: (error: any) => {
         // Same handling as the inline editor: the API answers with e.g.
@@ -122,6 +152,11 @@ export default function ConfigReferencePanel({
           message: String(message).slice(0, 300) || t('CONFIG_REFERENCE_SAVE_FAILED'),
         });
         notify.error(t('CONFIG_REFERENCE_SAVE_FAILED'));
+        onWriteResult?.(
+          error?.response?.status
+            ? { outcome: 'rejected', status: error.response.status }
+            : { outcome: 'unknown' },
+        );
       },
     },
   );
@@ -137,6 +172,14 @@ export default function ConfigReferencePanel({
     return <div role="alert">{t('CONFIG_REFERENCE_NO_CONTAINERS', { kind: workloadKind })}</div>;
   }
 
+  const loaded = detailQuery.data as any;
+  const raw = loaded._originData || loaded;
+  // The workload mapper moves these fields out of _originData. Both values
+  // must come from this query snapshot so the array patch keeps its guard.
+  const resourceVersion = raw.metadata?.resourceVersion ?? loaded.resourceVersion;
+  const uid = raw.metadata?.uid ?? loaded.uid;
+  const original = { ...raw, metadata: { ...raw.metadata, resourceVersion, uid } };
+  const hasResourceVersion = typeof resourceVersion === 'string' && resourceVersion.length > 0;
   const duplicateIndexes = findDuplicateReferences(references);
   const availableNames = {
     configMap: new Set(configMaps.map(option => option.value)),
@@ -151,6 +194,7 @@ export default function ConfigReferencePanel({
     setReferences(current => [...current, { kind: 'configMap', name: '', prefix: '' }]);
 
   const save = () => {
+    if (!canEdit || !hasResourceVersion || saveMutation.isLoading) return;
     setSaveError(null);
     if (duplicateIndexes.length) {
       notify.error(t('CONFIG_REFERENCE_DUPLICATE'));
@@ -164,9 +208,12 @@ export default function ConfigReferencePanel({
       notify.error(t('CONFIG_REFERENCE_UNAVAILABLE'));
       return;
     }
-    saveMutation.mutate(
-      buildConfigReferencePatch(detailQuery.data as any, names, references, reloaderEnabled),
-    );
+    const patch = [
+      { op: 'test', path: '/metadata/resourceVersion', value: resourceVersion },
+      ...buildConfigReferencePatch(detailQuery.data as any, names, references, reloaderEnabled),
+    ];
+    if (onWriteStart?.({ resource: original, patch }) === false) return;
+    saveMutation.mutate(patch);
   };
 
   return (
@@ -201,7 +248,7 @@ export default function ConfigReferencePanel({
             {t('CONFIG_REFERENCE_SECRET_NOTICE')}
           </p>
         </div>
-        <Button type="button" onClick={addReference} disabled={resourceLoading}>
+        <Button type="button" onClick={addReference} disabled={!canEdit || resourceLoading}>
           {t('CONFIG_REFERENCE_ADD')}
         </Button>
       </div>
@@ -252,6 +299,7 @@ export default function ConfigReferencePanel({
                 <Select
                   aria-label={t('CONFIG_REFERENCE_ARIA_KIND', { index: index + 1 })}
                   value={reference.kind}
+                  disabled={!canEdit}
                   options={[
                     { label: 'ConfigMap', value: 'configMap' },
                     { label: 'Secret', value: 'secret' },
@@ -269,6 +317,7 @@ export default function ConfigReferencePanel({
                 <Select
                   aria-label={t('CONFIG_REFERENCE_ARIA_RESOURCE', { index: index + 1 })}
                   value={reference.name}
+                  disabled={!canEdit}
                   options={resourceOptions}
                   loading={resourceLoading}
                   onChange={value =>
@@ -282,6 +331,7 @@ export default function ConfigReferencePanel({
                 <Input
                   aria-label={t('CONFIG_REFERENCE_ARIA_PREFIX', { index: index + 1 })}
                   value={reference.prefix || ''}
+                  readOnly={!canEdit}
                   placeholder={t('CONFIG_REFERENCE_PREFIX_PLACEHOLDER')}
                   onChange={event =>
                     setReferences(current =>
@@ -294,6 +344,7 @@ export default function ConfigReferencePanel({
                 <Button
                   type="button"
                   onClick={() => setReferences(current => current.filter((_, i) => i !== index))}
+                  disabled={!canEdit}
                 >
                   删除
                 </Button>
@@ -331,16 +382,31 @@ export default function ConfigReferencePanel({
             variant="button"
             label={t(reloaderEnabled ? 'CONFIG_REFERENCE_ENABLED' : 'CONFIG_REFERENCE_DISABLED')}
             checked={reloaderEnabled}
+            disabled={!canEdit}
             onChange={checked => setReloaderEnabled(checked)}
           />
         </div>
       </div>
 
+      {saveError?.index === -1 && (
+        <div role="alert" style={{ marginTop: 16 }}>
+          <p>{saveError.message}</p>
+          <Button type="button" onClick={() => detailQuery.refetch()}>
+            {t('CONFIG_REFERENCE_RELOAD_WORKLOAD')}
+          </Button>
+        </div>
+      )}
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 28 }}>
         <Button type="button" onClick={onBack}>
           {t('CONFIG_REFERENCE_CANCEL')}
         </Button>
-        <Button type="button" color="primary" loading={saveMutation.isLoading} onClick={save}>
+        <Button
+          type="button"
+          color="primary"
+          loading={saveMutation.isLoading}
+          onClick={save}
+          disabled={!canEdit || !hasResourceVersion}
+        >
           {t('CONFIG_REFERENCE_SAVE')}
         </Button>
       </div>

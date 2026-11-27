@@ -26,3 +26,18 @@ export interface ConfigReferenceWorkload {
     };
   };
 }
+
+export interface ConfigReferenceResource {
+  metadata?: { uid?: string; resourceVersion?: string; annotations?: Record<string, string> };
+  spec?: Record<string, any>;
+}
+
+export interface ConfigReferenceSubmission {
+  resource: ConfigReferenceResource;
+  patch: Array<{ op: string; path: string; value?: unknown }>;
+}
+
+export type ConfigReferenceSaveResult =
+  | { outcome: 'saved'; status: number; resource: ConfigReferenceResource }
+  | { outcome: 'rejected'; status: number }
+  | { outcome: 'unknown' };

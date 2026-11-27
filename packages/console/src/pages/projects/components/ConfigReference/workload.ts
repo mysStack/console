@@ -3,7 +3,7 @@ import { get } from 'lodash';
 import { serializeEnvFrom } from './envFrom';
 import { buildFileMountPatch } from './fileMount';
 import type { FileMountReference } from './fileMount';
-import type { ConfigReferenceWorkload, EnvFromReference } from './types';
+import type { ConfigReferenceSubmission, ConfigReferenceWorkload, EnvFromReference } from './types';
 
 type WorkloadLike = ConfigReferenceWorkload & {
   _originData?: ConfigReferenceWorkload;
@@ -68,7 +68,7 @@ export function buildConfigReferencePatch(
 
   const currentEnvFrom = containers[containerIndex]?.envFrom;
   const nextEnvFrom = serializeEnvFrom(references);
-  const patch: Array<Record<string, any>> = [];
+  const patch: ConfigReferenceSubmission['patch'] = [];
   const envFromPath = `/spec/template/spec/containers/${containerIndex}/envFrom`;
 
   if (nextEnvFrom.length > 0) {

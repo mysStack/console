@@ -1,3 +1,11 @@
+/** Read the native control before DOM event retargeting crosses a ShadowRoot. */
+export function resolveConfigReferenceEventTarget(event: Event): Element | null {
+  const original = event
+    .composedPath?.()
+    .find(node => typeof (node as Element)?.closest === 'function');
+  return (original || event.target) as Element | null;
+}
+
 export const CONFIG_REFERENCE_ENTRY_SELECTOR = '[data-test="config-reference-entry"]';
 export const CONFIG_REFERENCE_ENVIRONMENT_ACTION_SELECTOR = '[data-test="add-env-configmap"]';
 
@@ -69,6 +77,8 @@ export function getConfigReferenceNativeEditRoots(
  * leaves its loading spinner.
  */
 export function getConfigReferenceWujieAppWindow(hostDocument: Document): Window | undefined {
+  const native = hostDocument.querySelector<HTMLIFrameElement>('iframe[data-native-v3]');
+  if (native?.contentWindow) return native.contentWindow;
   const app = hostDocument.querySelector('wujie-app[data-wujie-id="consolev3"]');
   if (!app) return undefined;
   const frames = [

@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
   CONFIG_REFERENCE_ENTRY_SELECTOR,
+  resolveConfigReferenceEventTarget,
   CONFIG_REFERENCE_ENVIRONMENT_ACTION_SELECTOR,
   CONFIG_REFERENCE_INJECTION_RETRY_LIMIT,
   configReferenceContainerFromHeading,
@@ -554,4 +555,12 @@ test('finds no section while another tab is active', () => {
     findConfigReferenceEnvSections(fakeEnvTabDocument([{ name: 'main' }], '/resource-status')),
     [],
   );
+});
+
+test('confirmation tracking uses the original button across an open shadow boundary', () => {
+  const host = { closest: () => null };
+  const button = { closest: () => button };
+  const event = { target: host, composedPath: () => [button, host] } as unknown as Event;
+  assert.equal(resolveConfigReferenceEventTarget(event), button);
+  assert.equal(resolveConfigReferenceEventTarget({ target: host } as unknown as Event), host);
 });
