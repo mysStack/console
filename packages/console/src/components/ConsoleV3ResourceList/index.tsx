@@ -7,22 +7,17 @@ import { getResourceListCacheVersion } from '@ks-console/shared';
 import { watchConsoleV3Sandbox } from './keepAlive';
 import type { ConsoleV3AppWindow } from './metrics';
 import {
-  getConsoleV3InstanceState,
   getConsoleV3ScopeKey,
   isConsoleV3InstanceMounted,
   markConsoleV3Phase,
   normalizeConsoleV3Url,
   shouldRebuildConsoleV3Instance,
 } from './metrics';
-import { reviveConsoleV3Instance } from './revive';
 import { alignConsoleV3Url, scheduleConsoleV3ListRouteSync } from './route';
 
 const mountedResourceUrls = new Map<string, string>();
 const mountedRevisions = new Map<string, string>();
 const deactivatedScopes = new Set<string>();
-// The child window is the only handle on the shared sandbox once its host
-// element is detached, and it is what tells a reusable app from a cleared one.
-let lastConsoleV3AppWindow: ConsoleV3AppWindow | undefined;
 const VERIFY_MOUNT_DELAY_MS = 3_000;
 
 export interface ConsoleV3ResourceListProps {
@@ -42,7 +37,6 @@ export default function ConsoleV3ResourceList({
   const [instanceReady, setInstanceReady] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   const retriedUrlRef = useRef('');
-  const revivedUrlRef = useRef('');
   // The project layout writes the Wujie URL prefix in an effect. Avoid an
   // initial mount with `undefined/...`; that mount would create a non-reusable
   // Wujie instance before the real resource URL is available.
@@ -58,7 +52,7 @@ export default function ConsoleV3ResourceList({
   const location = useLocation();
   const resourceUrl = alignConsoleV3Url(resolvedUrl, location);
   // Reuse the live app across resource scopes: activation syncs the new list
-  // route. The mount effect below rebuilds only if the reused app stays empty.
+  // route. Rebuild a previously deactivated scope only after a data mutation.
   const shouldRebuild = shouldRebuildConsoleV3Instance({
     deactivated: deactivatedScopes.has(scopeKey),
     mountedRevision: mountedRevisions.get(scopeKey),
@@ -68,6 +62,7 @@ export default function ConsoleV3ResourceList({
     () =>
       (
         [
+          'beforeLoad',
           'beforeMount',
           'afterMount',
           'activated',
@@ -78,59 +73,63 @@ export default function ConsoleV3ResourceList({
       ).reduce(
         (callbacks, phase) => {
           callbacks[phase] =
-            phase === 'afterMount'
-              ? (appWindow?: Window) => {
-                  lastConsoleV3AppWindow = appWindow ?? lastConsoleV3AppWindow;
-                  watchConsoleV3Sandbox(lastConsoleV3AppWindow?.__WUJIE);
-                  if (appWindow) {
-                    scheduleConsoleV3ListRouteSync(
-                      appWindow,
-                      resourceUrl,
-                      window.location.pathname,
-                    );
-                  }
-                  mountedResourceUrls.set(scopeKey, resourceUrl);
+            phase === 'beforeLoad'
+              ? () => {
+                  deactivatedScopes.delete(scopeKey);
                   mountedRevisions.set(scopeKey, revision);
-                  markConsoleV3Phase('afterMount', resourceUrl);
+                  mountedResourceUrls.set(scopeKey, resourceUrl);
                 }
-              : phase === 'afterUnmount'
-                ? () => {
-                    markConsoleV3Phase('afterUnmount', resourceUrl);
-                  }
-                : phase === 'activated'
-                  ? (appWindow?: Window) => {
-                      lastConsoleV3AppWindow = appWindow ?? lastConsoleV3AppWindow;
-                      watchConsoleV3Sandbox(lastConsoleV3AppWindow?.__WUJIE);
-                      deactivatedScopes.delete(scopeKey);
-                      // The first mount of a scope can activate without
-                      // `afterMount`; record the rendered revision here too, or
-                      // the first return to that scope rebuilds the app.
-                      mountedResourceUrls.set(scopeKey, resourceUrl);
-                      mountedRevisions.set(scopeKey, revision);
-                      if (appWindow) {
-                        scheduleConsoleV3ListRouteSync(
-                          appWindow,
-                          resourceUrl,
-                          window.location.pathname,
-                        );
-                      }
-                      markConsoleV3Phase('activated', resourceUrl);
-                      if (appWindow?.requestAnimationFrame) {
-                        appWindow.requestAnimationFrame(() =>
-                          markConsoleV3Phase('render', resourceUrl),
-                        );
-                      } else {
-                        window.requestAnimationFrame(() =>
-                          markConsoleV3Phase('render', resourceUrl),
-                        );
-                      }
+              : phase === 'afterMount'
+                ? (appWindow?: ConsoleV3AppWindow) => {
+                    watchConsoleV3Sandbox(appWindow?.__WUJIE);
+                    if (appWindow) {
+                      scheduleConsoleV3ListRouteSync(
+                        appWindow,
+                        resourceUrl,
+                        window.location.pathname,
+                      );
                     }
-                  : phase === 'deactivated'
-                    ? () => {
-                        deactivatedScopes.add(scopeKey);
-                        markConsoleV3Phase('deactivated', resourceUrl);
+                    mountedResourceUrls.set(scopeKey, resourceUrl);
+                    mountedRevisions.set(scopeKey, revision);
+                    markConsoleV3Phase('afterMount', resourceUrl);
+                  }
+                : phase === 'afterUnmount'
+                  ? () => {
+                      markConsoleV3Phase('afterUnmount', resourceUrl);
+                    }
+                  : phase === 'activated'
+                    ? (appWindow?: ConsoleV3AppWindow) => {
+                        watchConsoleV3Sandbox(appWindow?.__WUJIE);
+                        deactivatedScopes.delete(scopeKey);
+                        // The first mount of a scope can activate without
+                        // `afterMount`; record the rendered revision here too, or
+                        // the first return to that scope rebuilds the app.
+                        mountedResourceUrls.set(scopeKey, resourceUrl);
+                        mountedRevisions.set(scopeKey, revision);
+                        if (appWindow) {
+                          scheduleConsoleV3ListRouteSync(
+                            appWindow,
+                            resourceUrl,
+                            window.location.pathname,
+                          );
+                        }
+                        markConsoleV3Phase('activated', resourceUrl);
+                        if (appWindow?.requestAnimationFrame) {
+                          appWindow.requestAnimationFrame(() =>
+                            markConsoleV3Phase('render', resourceUrl),
+                          );
+                        } else {
+                          window.requestAnimationFrame(() =>
+                            markConsoleV3Phase('render', resourceUrl),
+                          );
+                        }
                       }
-                    : () => markConsoleV3Phase(phase, resourceUrl);
+                    : phase === 'deactivated'
+                      ? () => {
+                          deactivatedScopes.add(scopeKey);
+                          markConsoleV3Phase('deactivated', resourceUrl);
+                        }
+                      : () => markConsoleV3Phase(phase, resourceUrl);
           return callbacks;
         },
         {} as Record<string, (appWindow?: Window) => string | void>,
@@ -142,53 +141,22 @@ export default function ConsoleV3ResourceList({
     if (!isReady) return;
     if (shouldRebuild) {
       WujieReact.destroyApp('consolev3');
-      lastConsoleV3AppWindow = undefined;
-      setInstanceReady(true);
-      return;
     }
-    // An embed without `alive` (cluster and other V3-only routes) clears the
-    // shared ShadowRoot on unmount but leaves the sandbox and its scripts
-    // loaded. Render the app again in place instead of booting it from zero.
-    // Entering such a route first leaves no child window here, and the cleared
-    // sandbox renders nothing when activated: boot a clean app, as the plain
-    // mount always did, instead of waiting for the verify timer below.
-    if (!lastConsoleV3AppWindow && !isConsoleV3InstanceMounted()) {
-      WujieReact.destroyApp('consolev3');
-      setInstanceReady(true);
-      return;
-    }
-    if (getConsoleV3InstanceState(lastConsoleV3AppWindow) !== 'stale') {
-      setInstanceReady(true);
-      return;
-    }
-    let cancelled = false;
-    reviveConsoleV3Instance(resourceUrl).then(() => {
-      if (!cancelled) setInstanceReady(true);
-    });
-    return () => {
-      cancelled = true;
-    };
+    // Wujie owns the shared sandbox, including instances booted by overview
+    // and detail pages. A detached host is normal during an alive activation.
+    setInstanceReady(true);
   }, [isReady, resourceUrl, shouldRebuild]);
 
-  // A reused instance can be an empty ShadowRoot when another caller destroyed
-  // it without `alive`. Verify the real DOM once per URL; render the app again
-  // in the surviving sandbox first, and rebuild only if that leaves it empty.
+  // Recover a genuinely empty mount once, after Wujie has had a chance to
+  // activate its existing sandbox. The independent V3 bundle renders itself
+  // and does not expose a Wujie mount hook for a detached revival.
   useEffect(() => {
     if (!instanceReady) return;
     const timer = window.setTimeout(() => {
       if (isConsoleV3InstanceMounted()) return;
       if (retriedUrlRef.current === resourceUrl) return;
-      if (
-        revivedUrlRef.current !== resourceUrl &&
-        getConsoleV3InstanceState(lastConsoleV3AppWindow) === 'stale'
-      ) {
-        revivedUrlRef.current = resourceUrl;
-        reviveConsoleV3Instance(resourceUrl).then(() => setRetryCount(count => count + 1));
-        return;
-      }
       retriedUrlRef.current = resourceUrl;
       WujieReact.destroyApp('consolev3');
-      lastConsoleV3AppWindow = undefined;
       setRetryCount(count => count + 1);
     }, VERIFY_MOUNT_DELAY_MS);
     return () => window.clearTimeout(timer);

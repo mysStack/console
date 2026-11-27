@@ -18,38 +18,24 @@ test('resource host reuses the consolev3 app and exposes activation lifecycle ma
   assert.match(source, /normalizeConsoleV3Url/);
 });
 
-test('resource host renders a cleared instance again instead of booting it', () => {
-  assert.match(source, /getConsoleV3InstanceState/);
-  assert.match(source, /reviveConsoleV3Instance\(resourceUrl\)/);
+test('resource host lets Wujie reuse an existing alive sandbox on first list entry', () => {
   const mountEffect = source.match(
     /if \(!isReady\) return;[\s\S]*?\[isReady, resourceUrl, shouldRebuild\]/,
   );
   assert.ok(mountEffect, 'mount effect not found');
-  assert.match(mountEffect[0], /getConsoleV3InstanceState\(lastConsoleV3AppWindow\) !== 'stale'/);
+  assert.equal(mountEffect[0].match(/destroyApp\('consolev3'\)/g)?.length, 1);
+  assert.match(mountEffect[0], /if \(shouldRebuild\)/);
+  assert.doesNotMatch(source, /lastConsoleV3AppWindow|reviveConsoleV3Instance/);
 });
 
-test('resource host boots a clean app when it never saw the shared sandbox', () => {
-  // Entering a V3-only page directly (cluster list/detail) creates the app
-  // without `alive`; its unmount clears the ShadowRoot and no child window is
-  // kept here. Activating that husk renders nothing, so start from zero.
-  const mountEffect = source.match(
-    /if \(!isReady\) return;[\s\S]*?\[isReady, resourceUrl, shouldRebuild\]/,
-  );
-  assert.ok(mountEffect, 'mount effect not found');
-  assert.match(mountEffect[0], /!lastConsoleV3AppWindow && !isConsoleV3InstanceMounted\(\)/);
-  const coldStart = mountEffect[0].match(/!lastConsoleV3AppWindow[\s\S]*?return;/);
-  assert.ok(coldStart, 'cold start branch not found');
-  assert.match(coldStart[0], /WujieReact\.destroyApp\('consolev3'\)/);
+test('resource host recovers an empty mount only once for the current URL', () => {
+  assert.match(source, /isConsoleV3InstanceMounted\(\)/);
+  assert.match(source, /if \(retriedUrlRef.current === resourceUrl\) return/);
+  assert.match(source, /retriedUrlRef.current = resourceUrl/);
 });
 
-test('resource host keeps the child window of the shared sandbox', () => {
-  assert.match(source, /let lastConsoleV3AppWindow: ConsoleV3AppWindow \| undefined;/);
-  assert.match(source, /lastConsoleV3AppWindow = appWindow \?\? lastConsoleV3AppWindow/);
-});
-
-test('resource host keeps the shared sandbox alive for non-alive embeds', () => {
-  assert.match(source, /import \{ watchConsoleV3Sandbox \} from '\.\/keepAlive'/);
-  assert.match(source, /watchConsoleV3Sandbox\(lastConsoleV3AppWindow\?\.__WUJIE\)/);
+test('resource host observes the shared sandbox on activation', () => {
+  assert.match(source, /watchConsoleV3Sandbox\(appWindow/);
 });
 
 test('activation records the rendered revision so the first return reuses the app', () => {
@@ -57,4 +43,10 @@ test('activation records the rendered revision so the first return reuses the ap
   assert.ok(activation, 'activation branch not found');
   assert.match(activation[0], /mountedRevisions\.set\(scopeKey, revision\)/);
   assert.match(activation[0], /mountedResourceUrls\.set\(scopeKey, resourceUrl\)/);
+});
+
+test('first legacy V3 boot records the revision without requiring a mount hook', () => {
+  const beforeLoad = source.match(/phase === 'beforeLoad'[\s\S]*?phase === 'afterMount'/);
+  assert.ok(beforeLoad);
+  assert.match(beforeLoad[0], /mountedRevisions\.set\(scopeKey, revision\)/);
 });
