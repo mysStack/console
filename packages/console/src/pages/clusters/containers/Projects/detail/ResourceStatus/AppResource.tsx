@@ -133,13 +133,16 @@ export interface IAppResource {
   time: number;
   isObservability?: boolean;
   hasMonitoring?: boolean;
+  resourceLink?: (module: string, status?: string) => string;
 }
 
 const AppResource = (props: IAppResource) => {
-  const { params, time, hasMonitoring = true } = props;
+  const { params, time, hasMonitoring = true, resourceLink } = props;
   const { cluster, namespace, workspace } = params;
   const navigate = useNavigate();
-  const [{ data: appQuota }, { data: appStatus }] = useQueryProjectQuotaAndStatus(params);
+  const [quotaQuery, statusQuery] = useQueryProjectQuotaAndStatus(params);
+  const { data: appQuota } = quotaQuery;
+  const { data: appStatus } = statusQuery;
 
   const { data: appData, isFetching } = useQueryProjectMonitor(
     {
@@ -169,6 +172,11 @@ const AppResource = (props: IAppResource) => {
     const status = routeName === 'volumes' ? 'pending' : 'updating';
 
     if (routeName) {
+      if (resourceLink) {
+        const target = resourceLink(routeName, status);
+        if (target) navigate(target);
+        return;
+      }
       navigate(
         isObservability
           ? `/whizard-telemetry/${cluster}/projects/${namespace}/${routeName}?status=${status}`
@@ -198,7 +206,10 @@ const AppResource = (props: IAppResource) => {
   };
 
   return (
-    <AppWrapper>
+    <AppWrapper
+      data-test={resourceLink ? 'native-overview-counts' : undefined}
+      data-ready={quotaQuery.isSuccess && statusQuery.isSuccess ? 'true' : 'false'}
+    >
       <LoadingOverlay visible={isFetching} />
       {appResource
         // .filter(item => !item.disabled)
@@ -218,8 +229,15 @@ const AppResource = (props: IAppResource) => {
                 <Icon name={icon} size={40} />
                 {renderWarn(item)}
               </ItemIcon>
-              <ItemContent to={`/clusters/${cluster}/${module}?namespace=${namespace}`}>
-                <ItemTitle>{num}</ItemTitle>
+              <ItemContent
+                to={
+                  resourceLink
+                    ? resourceLink(item.routeName)
+                    : `/clusters/${cluster}/${module}?namespace=${namespace}`
+                }
+                data-test={resourceLink ? `native-overview-resource-${module}` : undefined}
+              >
+                <ItemTitle>{num ?? '-'}</ItemTitle>
                 <ItemDesc>{t(`${name}_PL`)}</ItemDesc>
               </ItemContent>
               {hasMonitoring && (

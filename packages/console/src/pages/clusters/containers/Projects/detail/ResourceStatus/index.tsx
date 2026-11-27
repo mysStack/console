@@ -11,7 +11,12 @@ import { Header, SelectWrapper, Title } from './styles';
 import { hasClusterModule } from '@ks-console/shared';
 import PhysicalResource from './PhysicalResource';
 
-const ResourceStatus = () => {
+interface ResourceStatusProps {
+  resourceLink?: (module: string, status?: string) => string;
+  enablePhysical?: boolean;
+}
+
+const ResourceStatus = ({ resourceLink, enablePhysical = false }: ResourceStatusProps = {}) => {
   const params = useParams();
   const hasMonitoring = hasClusterModule(params.cluster!, 'whizard-monitoring');
 
@@ -26,11 +31,11 @@ const ResourceStatus = () => {
           ? {
               value: 'physical',
               label: t('PHYSICAL_RESOURCE_PL'),
-              disabled: true,
+              disabled: !enablePhysical,
             }
           : undefined,
       ].filter(Boolean),
-    [],
+    [hasMonitoring, enablePhysical],
   );
 
   const [type, setType] = React.useState('app');
@@ -60,7 +65,12 @@ const ResourceStatus = () => {
           </Header>
         )}
         {type === 'app' && (
-          <AppResource params={params} time={time} hasMonitoring={!!hasMonitoring} />
+          <AppResource
+            params={params}
+            time={time}
+            hasMonitoring={!!hasMonitoring}
+            resourceLink={resourceLink}
+          />
         )}
         {type === 'physical' && <PhysicalResource time={time} params={params} />}
       </Card>
