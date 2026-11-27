@@ -5,6 +5,7 @@ export interface ConsoleV3RouteWindow {
     replaceState: (state: unknown, title: string, url?: string | URL | null) => void;
   };
   dispatchEvent: (event: Event) => boolean;
+  __KS_CONSOLE_HOST_ROUTE_SYNC__?: boolean;
 }
 
 const getRoutePath = (url: string): string => {
@@ -38,10 +39,25 @@ export function shouldSyncAliveEmbedToUrl(hostPathname: string, resourceUrl: str
 const getCurrentPath = (appWindow: ConsoleV3RouteWindow): string =>
   `${appWindow.location.pathname}${appWindow.location.search}${appWindow.location.hash}`;
 
-const createPopStateEvent = (appWindow: ConsoleV3RouteWindow): Event =>
-  typeof PopStateEvent === 'function'
-    ? new PopStateEvent('popstate', { state: appWindow.history.state })
-    : new Event('popstate');
+/** The child history listener must distinguish host synchronization from a user POP. */
+export function notifyConsoleV3HostSync(
+  appWindow: Pick<
+    ConsoleV3RouteWindow,
+    'history' | 'dispatchEvent' | '__KS_CONSOLE_HOST_ROUTE_SYNC__'
+  >,
+): void {
+  const previous = appWindow.__KS_CONSOLE_HOST_ROUTE_SYNC__;
+  appWindow.__KS_CONSOLE_HOST_ROUTE_SYNC__ = true;
+  try {
+    appWindow.dispatchEvent(
+      typeof PopStateEvent === 'function'
+        ? new PopStateEvent('popstate', { state: appWindow.history.state })
+        : new Event('popstate'),
+    );
+  } finally {
+    appWindow.__KS_CONSOLE_HOST_ROUTE_SYNC__ = previous;
+  }
+}
 
 /**
  * Wujie does not sync the host route into an alive app when it is activated.
@@ -56,7 +72,7 @@ export function syncConsoleV3ListRoute(
   if (getCurrentPath(appWindow) === path) return false;
 
   appWindow.history.replaceState(appWindow.history.state, '', path);
-  appWindow.dispatchEvent(createPopStateEvent(appWindow));
+  notifyConsoleV3HostSync(appWindow);
   return true;
 }
 
@@ -92,7 +108,7 @@ export function notifyConsoleV3ActivationRoute(
     appWindow.history.replaceState(appWindow.history.state, '', path);
   }
   if (moved || notifyIfUnchanged) {
-    appWindow.dispatchEvent(createPopStateEvent(appWindow));
+    notifyConsoleV3HostSync(appWindow);
   }
   return moved;
 }
@@ -120,11 +136,39 @@ export function scheduleConsoleV3ListRouteSync(
   // syncConsoleV3ListRoute no-ops (no popstate) when already on resourceUrl,
   // which avoids a redundant list refetch after an aligned preload.
   afterActivation(appWindow, () => {
+    if (
+      hostPathname &&
+      typeof window !== 'undefined' &&
+      window.location.pathname !== hostPathname
+    ) {
+      return;
+    }
     if (hostPathname && !shouldSyncAliveEmbedToUrl(hostPathname, resourceUrl)) {
       return;
     }
     syncConsoleV3ListRoute(appWindow, resourceUrl);
   });
+}
+
+/** Keep the explicitly requested child route and carry the host's tab/query/fragment. */
+export function alignConsoleV3Url(
+  resourceUrl: string,
+  location: { pathname: string; search: string; hash: string },
+): string {
+  if (!resourceUrl.includes('/consolev3/')) return resourceUrl;
+  const target = new URL(resourceUrl, 'http://localhost');
+  const path = stripEmbeddedPrefix(target.pathname);
+  const samePath = location.pathname === path;
+  const detailTab =
+    !isConsoleV3CollectionPath(resourceUrl) && location.pathname.startsWith(`${path}/`);
+  if (!samePath && !detailTab) return resourceUrl;
+  const pathname = detailTab ? `/consolev3${location.pathname}` : target.pathname;
+  return (
+    resourceUrl.slice(0, resourceUrl.indexOf('/consolev3/')) +
+    pathname +
+    location.search +
+    location.hash
+  );
 }
 
 export function scheduleConsoleV3RouteNotification(

@@ -91,16 +91,21 @@ export default function BaseLayout() {
 
   useEffect(() => {
     const applyHostRoute = (
-      pathOrRoute: string | { pathname?: string; search?: string },
+      pathOrRoute: string | { pathname?: string; search?: string; hash?: string },
       action?: string,
+      previousRoute?: string,
     ) => {
       const loc = toHostResourceLocation(pathOrRoute);
       if (!loc) return;
       const { location } = window;
-      if (!shouldFollowConsoleV3Route(location.pathname, loc.pathname, action)) {
+      if (!shouldFollowConsoleV3Route(location.pathname, loc.pathname, action, previousRoute)) {
         return;
       }
-      if (loc.pathname !== location.pathname) {
+      if (
+        loc.pathname !== location.pathname ||
+        loc.search !== location.search ||
+        loc.hash !== location.hash
+      ) {
         // Replace Wujie's temporary `/resource/name` entry with the native V4
         // detail route. Otherwise browser Back visits the temporary entry
         // first and appears to require two clicks before reaching the list.
@@ -108,29 +113,42 @@ export default function BaseLayout() {
         // in browser history. The replace case only applies when the host is
         // already on the temporary V3 detail entry (or an equivalent native
         // path) and V3 is subsequently reporting its canonical sub-route.
-        const replaceTemporaryEntry = shouldReplaceNativeResourceRoute(
-          location.pathname,
-          loc.pathname,
-        );
-        navigate(`${loc.pathname}${loc.search}`, { replace: replaceTemporaryEntry });
-      } else if (loc.search !== location.search) {
-        const url = new URL(`${location.origin}${loc.pathname}${loc.search}`);
-        window.history.pushState('', '', url);
+        const replaceTemporaryEntry =
+          loc.pathname !== location.pathname &&
+          shouldReplaceNativeResourceRoute(location.pathname, loc.pathname);
+        navigate(`${loc.pathname}${loc.search}${loc.hash}`, {
+          replace: replaceTemporaryEntry || action === 'REPLACE' || action === 'POP',
+        });
       }
     };
-    const onSubRouteChange = (name: unknown, path: { pathname?: string; search?: string }) => {
+    const onSubRouteChange = (
+      name: unknown,
+      path: { pathname?: string; search?: string; hash?: string },
+    ) => {
       if (name === 'consoleV3Actions') return;
       applyHostRoute(path);
     };
-    const onConsoleRouteChange = (route: string, action?: string) => applyHostRoute(route, action);
+    const onConsoleRouteChange = (route: string, action?: string, previousRoute?: string) => {
+      // A parked sandbox or an actions overlay must not navigate the host.
+      if (
+        !document.querySelector(
+          'wujie-app[data-wujie-id="consolev3"],iframe[data-wujie-id="consolev3"]',
+        )
+      )
+        return;
+      applyHostRoute(route, action, previousRoute);
+    };
     const onEmbedMessage = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return;
       if (event.data?.type !== 'consoleRouteChange' || typeof event.data.route !== 'string') {
         return;
       }
-      applyHostRoute(
+      const child = document.querySelector<HTMLIFrameElement>('iframe[name="consolev3"]');
+      if (event.source !== child?.contentWindow) return;
+      onConsoleRouteChange(
         event.data.route,
         typeof event.data.action === 'string' ? event.data.action : undefined,
+        typeof event.data.previousRoute === 'string' ? event.data.previousRoute : undefined,
       );
     };
 

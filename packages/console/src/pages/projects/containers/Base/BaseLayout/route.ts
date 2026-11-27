@@ -1,3 +1,5 @@
+import { notifyConsoleV3HostSync } from '../../../../../components/ConsoleV3ResourceList/route';
+
 interface ProjectRouteParts {
   workspace?: string;
   cluster?: string;
@@ -53,7 +55,7 @@ export function replaceConsoleV3Route(
 ): void {
   const state = appWindow.history.state;
   appWindow.history.replaceState(state, '', path);
-  appWindow.dispatchEvent(new PopStateEvent('popstate', { state }));
+  notifyConsoleV3HostSync(appWindow);
 }
 
 /** Update a reused child route without emitting Wujie's host route event. */
@@ -90,8 +92,17 @@ export function bindConsoleV3DetailHistory(
     if (hostPath !== route.hostDetailPath && !hostPath.startsWith(`${route.hostDetailPath}/`)) {
       return;
     }
-    const path = getConsoleV3DetailPath({ ...route, hostPath });
-    if (appWindow.location.pathname === path) return;
+    const path =
+      getConsoleV3DetailPath({ ...route, hostPath }) +
+      (hostWindow.location.search || '') +
+      (hostWindow.location.hash || '');
+    if (
+      appWindow.location.pathname +
+        (appWindow.location.search || '') +
+        (appWindow.location.hash || '') ===
+      path
+    )
+      return;
     // Native browser Back emits on the host only (Wujie sync=false). Keep
     // both history entries intact; notify V3's router in its own document.
     replaceConsoleV3Route(appWindow, path);

@@ -37,7 +37,6 @@ function DeploymentDetail(): JSX.Element {
   });
   const hostProjectPath = `/${workspace}/clusters/${cluster}/projects/${namespace}`;
   const hostDetailPath = `${hostProjectPath}/deployments/${name}`;
-  const initialHostPath = useRef(location.pathname);
   const embeddedUrl = getConsoleV3DetailUrl({
     host: window.location.host,
     projectPrefix,
@@ -46,14 +45,22 @@ function DeploymentDetail(): JSX.Element {
   const embeddedPath = getConsoleV3DetailPath({
     projectPrefix,
     name,
-    hostPath: initialHostPath.current,
+    hostPath: location.pathname,
     hostDetailPath,
   });
+  const embeddedLocation = `${embeddedPath}${location.search}${location.hash}`;
   const listPath = getConsoleV3DeploymentListPath(projectPrefix);
   const syncDetailRoute = useCallback(
     (appWindow: Window) => {
       if (routeSyncFrameRef.current !== undefined) {
         appWindow.cancelAnimationFrame(routeSyncFrameRef.current);
+      }
+
+      if (
+        appWindow.location.pathname + appWindow.location.search + appWindow.location.hash ===
+        embeddedLocation
+      ) {
+        return;
       }
 
       // A reused/preloaded instance may still be on dashboard or another
@@ -67,6 +74,14 @@ function DeploymentDetail(): JSX.Element {
       let stableFrames = 0;
       let previousRootSignature = '';
       const syncRoute = () => {
+        if (
+          window.location.pathname !== location.pathname ||
+          window.location.search !== location.search ||
+          window.location.hash !== location.hash
+        ) {
+          routeSyncFrameRef.current = undefined;
+          return;
+        }
         let root: Element | null = null;
         try {
           root = appWindow.document?.getElementById?.('root') ?? null;
@@ -81,7 +96,8 @@ function DeploymentDetail(): JSX.Element {
         }
         const rootSignature = `${root?.childElementCount ?? 0}:${root?.textContent?.trim() ?? ''}`;
         const detailRouteReady =
-          appWindow.location.pathname === embeddedPath && Boolean(root?.hasChildNodes());
+          appWindow.location.pathname + appWindow.location.search + appWindow.location.hash ===
+            embeddedLocation && Boolean(root?.hasChildNodes());
         const listRouteReady =
           shouldSyncConsoleV3DetailRoute(appWindow.location.pathname, embeddedPath, listPath) &&
           Boolean(root?.hasChildNodes());
@@ -117,12 +133,12 @@ function DeploymentDetail(): JSX.Element {
           routeSyncFrameRef.current = undefined;
           return;
         }
-        replaceConsoleV3Route(appWindow, embeddedPath);
+        replaceConsoleV3Route(appWindow, embeddedLocation);
         routeSyncFrameRef.current = undefined;
       };
       syncRoute();
     },
-    [embeddedPath, listPath],
+    [embeddedPath, embeddedLocation, listPath, location.pathname, location.search, location.hash],
   );
   const bindHistory = useCallback(
     (appWindow: Window) => {

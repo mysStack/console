@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import WujieReact from 'wujie-react';
+import { useLocation } from 'react-router-dom';
 
 import { getResourceListCacheVersion } from '@ks-console/shared';
 
@@ -14,7 +15,7 @@ import {
   shouldRebuildConsoleV3Instance,
 } from './metrics';
 import { reviveConsoleV3Instance } from './revive';
-import { scheduleConsoleV3ListRouteSync } from './route';
+import { alignConsoleV3Url, scheduleConsoleV3ListRouteSync } from './route';
 
 const mountedResourceUrls = new Map<string, string>();
 const mountedRevisions = new Map<string, string>();
@@ -54,7 +55,8 @@ export default function ConsoleV3ResourceList({
   const scopeKey = isReady ? getConsoleV3ScopeKey(resource, resolvedUrl, user) : '';
   // Keep the iframe URL stable. The revision is used only to decide whether a
   // deactivated instance must be rebuilt after a resource mutation.
-  const resourceUrl = resolvedUrl;
+  const location = useLocation();
+  const resourceUrl = alignConsoleV3Url(resolvedUrl, location);
   // Reuse the live app across resource scopes: activation syncs the new list
   // route. The mount effect below rebuilds only if the reused app stays empty.
   const shouldRebuild = shouldRebuildConsoleV3Instance({
@@ -80,6 +82,13 @@ export default function ConsoleV3ResourceList({
               ? (appWindow?: Window) => {
                   lastConsoleV3AppWindow = appWindow ?? lastConsoleV3AppWindow;
                   watchConsoleV3Sandbox(lastConsoleV3AppWindow?.__WUJIE);
+                  if (appWindow) {
+                    scheduleConsoleV3ListRouteSync(
+                      appWindow,
+                      resourceUrl,
+                      window.location.pathname,
+                    );
+                  }
                   mountedResourceUrls.set(scopeKey, resourceUrl);
                   mountedRevisions.set(scopeKey, revision);
                   markConsoleV3Phase('afterMount', resourceUrl);
@@ -99,7 +108,11 @@ export default function ConsoleV3ResourceList({
                       mountedResourceUrls.set(scopeKey, resourceUrl);
                       mountedRevisions.set(scopeKey, revision);
                       if (appWindow) {
-                        scheduleConsoleV3ListRouteSync(appWindow, resourceUrl);
+                        scheduleConsoleV3ListRouteSync(
+                          appWindow,
+                          resourceUrl,
+                          window.location.pathname,
+                        );
                       }
                       markConsoleV3Phase('activated', resourceUrl);
                       if (appWindow?.requestAnimationFrame) {

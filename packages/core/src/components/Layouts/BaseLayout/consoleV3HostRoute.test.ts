@@ -17,6 +17,7 @@ test('strips /consolev3 and maps a deployment click onto the native detail route
       pathname:
         '/dev-workspace/clusters/host/projects/dev-wms/deployments/wms-pod-collating/resource-status',
       search: '',
+      hash: '',
     },
   );
   assert.deepEqual(
@@ -27,6 +28,7 @@ test('strips /consolev3 and maps a deployment click onto the native detail route
       pathname:
         '/dev-workspace/clusters/host/projects/dev-wms/deployments/wms-pod-collating/resource-status',
       search: '',
+      hash: '',
     },
   );
 });
@@ -37,20 +39,52 @@ test('keeps list routes as lists and accepts Wujie location objects', () => {
     {
       pathname: '/dev-workspace/clusters/host/projects/dev-wms/deployments',
       search: '',
+      hash: '',
     },
   );
   assert.deepEqual(
     toHostResourceLocation({
       pathname: '/dev-workspace/clusters/host/projects/dev-wms/services/example',
       search: '?tab=events',
+      hash: '',
     }),
     {
       pathname: '/dev-workspace/clusters/host/projects/dev-wms/services/example/resource-status',
       search: '?tab=events',
+      hash: '',
     },
   );
   assert.equal(toHostResourceLocation('/consolev3'), null);
   assert.equal(toHostResourceLocation(''), null);
+});
+
+test('preserves the entire child location including a cleared query or hash', () => {
+  assert.deepEqual(toHostResourceLocation('/consolev3/clusters/host/nodes?sort=name#details'), {
+    pathname: '/clusters/host/nodes',
+    search: '?sort=name',
+    hash: '#details',
+  });
+  assert.deepEqual(
+    toHostResourceLocation({ pathname: '/clusters/host/nodes', search: '', hash: '#detail' }),
+    {
+      pathname: '/clusters/host/nodes',
+      search: '',
+      hash: '#detail',
+    },
+  );
+});
+
+test('follows actual child POP and REPLACE but rejects a stale boot or inactive page', () => {
+  const list = '/dev-workspace/clusters/host/projects/dev-wms/deployments';
+  const detail = `${list}/wms-pod-collating/resource-status`;
+  for (const action of ['POP', 'REPLACE']) {
+    assert.equal(shouldFollowConsoleV3Route(detail, list, action, detail), true);
+    assert.equal(shouldFollowConsoleV3Route(detail, list, action, list), false);
+    assert.equal(
+      shouldFollowConsoleV3Route('/clusters/host/overview', list, action, detail),
+      false,
+    );
+  }
 });
 
 test('keeps a direct detail URL when the child reports its boot list', () => {

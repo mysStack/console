@@ -2,12 +2,53 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  alignConsoleV3Url,
+  notifyConsoleV3HostSync,
   notifyConsoleV3ActivationRoute,
   scheduleConsoleV3ListRouteSync,
   scheduleConsoleV3RouteNotification,
   shouldSyncAliveEmbedToUrl,
   syncConsoleV3ListRoute,
 } from './route';
+
+test('preserves host search and hash for a list and a detail tab without moving a deployment boot URL', () => {
+  const list = '/dev-workspace/clusters/host/projects/dev-wms/deployments';
+  const detail = `${list}/example`;
+  assert.equal(
+    alignConsoleV3Url(`/consolev3${list}`, { pathname: list, search: '?page=2', hash: '#row' }),
+    `/consolev3${list}?page=2#row`,
+  );
+  assert.equal(
+    alignConsoleV3Url(`/consolev3${list}`, {
+      pathname: `${detail}/events`,
+      search: '',
+      hash: '#event',
+    }),
+    `/consolev3${list}`,
+  );
+  assert.equal(
+    alignConsoleV3Url(`/consolev3${detail}`, {
+      pathname: `${detail}/events`,
+      search: '?name=x',
+      hash: '#event',
+    }),
+    `/consolev3${detail}/events?name=x#event`,
+  );
+});
+
+test('marks the synthetic POP as host synchronization only for the duration of delivery', () => {
+  const child = {
+    history: { state: null, replaceState() {} },
+    __KS_CONSOLE_HOST_ROUTE_SYNC__: false,
+    dispatchEvent(event: Event) {
+      assert.equal(event.type, 'popstate');
+      assert.equal(child.__KS_CONSOLE_HOST_ROUTE_SYNC__, true);
+      return true;
+    },
+  };
+  notifyConsoleV3HostSync(child);
+  assert.equal(child.__KS_CONSOLE_HOST_ROUTE_SYNC__, false);
+});
 
 test('syncs an alive V3 app back to the requested list route', () => {
   const events: Event[] = [];

@@ -8,6 +8,7 @@ import { normalizeNativeResourceDetailPath } from './nativeResourceRoute';
 export interface ConsoleV3HostLocation {
   pathname: string;
   search: string;
+  hash: string;
 }
 
 const EMBEDDED_PREFIX = '/consolev3';
@@ -37,7 +38,15 @@ export function shouldFollowConsoleV3Route(
   currentPath: string,
   nextPath: string,
   action?: string | null,
+  previousRoute?: string,
 ): boolean {
+  if (action === 'INITIAL') return false;
+  if (previousRoute !== undefined) {
+    const previous = toHostResourceLocation(previousRoute);
+    return Boolean(
+      previous && previous.pathname === normalizeNativeResourceDetailPath(currentPath),
+    );
+  }
   if (!currentPath || !nextPath || currentPath === nextPath) {
     return true;
   }
@@ -53,19 +62,22 @@ export function shouldFollowConsoleV3Route(
  * The actions overlay boots at `/consolev3/dashboard` and must not yank the host home.
  */
 export function toHostResourceLocation(
-  pathOrRoute: string | { pathname?: string; search?: string } | null | undefined,
+  pathOrRoute: string | { pathname?: string; search?: string; hash?: string } | null | undefined,
 ): ConsoleV3HostLocation | null {
   if (!pathOrRoute) return null;
 
   let pathname = '';
   let search = '';
+  let hash = '';
   if (typeof pathOrRoute === 'string') {
     const url = new URL(pathOrRoute, 'http://localhost');
     pathname = url.pathname;
     search = url.search;
+    hash = url.hash;
   } else {
     pathname = pathOrRoute.pathname || '';
     search = pathOrRoute.search || '';
+    hash = pathOrRoute.hash || '';
   }
 
   if (!pathname || pathname === EMBEDDED_PREFIX) return null;
@@ -77,5 +89,6 @@ export function toHostResourceLocation(
   return {
     pathname: normalizeNativeResourceDetailPath(pathname),
     search,
+    hash,
   };
 }

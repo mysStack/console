@@ -5,10 +5,11 @@
 
 import React, { useCallback, useEffect, useRef } from 'react';
 import WujieReact from 'wujie-react';
+import { useLocation } from 'react-router-dom';
 
 import { watchConsoleV3Sandbox } from '../ConsoleV3ResourceList/keepAlive';
 import type { ConsoleV3AppWindow } from '../ConsoleV3ResourceList/metrics';
-import { scheduleConsoleV3ListRouteSync } from '../ConsoleV3ResourceList/route';
+import { alignConsoleV3Url, scheduleConsoleV3ListRouteSync } from '../ConsoleV3ResourceList/route';
 
 export interface ConsoleV3AliveEmbedProps {
   url: string;
@@ -31,13 +32,15 @@ export interface ConsoleV3AliveEmbedProps {
  * must run on deactivated and on React unmount.
  */
 export default function ConsoleV3AliveEmbed({
-  url,
+  url: requestedUrl,
   width = '100%',
   height = '100%',
   afterMount,
   afterUnmount,
   activated,
 }: ConsoleV3AliveEmbedProps): JSX.Element {
+  const location = useLocation();
+  const url = alignConsoleV3Url(requestedUrl, location);
   const afterUnmountRef = useRef(afterUnmount);
   afterUnmountRef.current = afterUnmount;
 
