@@ -23,39 +23,52 @@ interface ExtensionConfigWithName extends ExtensionConfig {
 }
 
 function importRemoteExtensions(extensions: Extension[]) {
-  const promises: Promise<ExtensionConfigWithName | null>[] = [];
-
-  if (Array.isArray(extensions)) {
-    extensions.forEach(extension => {
-      const { extensionName, link, resourceVersion, entries } = extension;
-      const moduleId = `/pstatic${link}?resourceVersion=${resourceVersion}`;
-      const module = System.import(moduleId);
-
-      const promise = module
-        .then(({ default: input }) => (input ? resolveExtensionConfig(input) : null))
-        .then(async extensionConfig => {
-          globals.context.registerLocales(extensionConfig?.locales);
-          await i18n.init();
-          return extensionConfig;
-        })
-        .then(extensionConfig => {
-          const newExtensionConfig = { ...extensionConfig };
-          if (Array.isArray(entries) && entries.length > 0) {
-            newExtensionConfig.menus = entries;
-          }
-          if (!isEmpty(newExtensionConfig)) {
-            globals.context.registerExtension(newExtensionConfig, { extensionName });
-          }
-          return { ...extensionConfig, extensionName };
-        })
-        .catch(reason => {
-          console.error(`[${extensionName}]`, reason);
-          throw reason;
-        });
-
-      promises.push(promise);
-    });
+  if (!Array.isArray(extensions) || extensions.length === 0) {
+    return Promise.resolve([]);
   }
+
+  // Fetch and resolve all extension configs concurrently. The host routes already
+  // wait for this batch, so rebuilding the complete locale resources once for each
+  // module wastes main-thread work without making a page available earlier.
+  const pending = extensions.map(async extension => {
+    const { extensionName, link, resourceVersion, entries } = extension;
+    const moduleId = `/pstatic${link}?resourceVersion=${resourceVersion}`;
+    const { default: input } = await System.import(moduleId);
+    const extensionConfig = input ? await resolveExtensionConfig(input) : null;
+    globals.context.registerLocales(extensionConfig?.locales);
+    return { extensionName, entries, extensionConfig };
+  });
+
+  const refreshLocales = Promise.allSettled(pending).then(async results => {
+    if (results.some(result => result.status === 'fulfilled')) {
+      try {
+        await i18n.init();
+      } catch {
+        // Retain a retry opportunity if refreshing the shared locales fails.
+        await i18n.init();
+      }
+    }
+  });
+
+  const promises = pending.map((config, index) =>
+    config
+      .then(async ({ extensionName, entries, extensionConfig }) => {
+        // Register routes/menus only once their translations are available.
+        await refreshLocales;
+        const newExtensionConfig = { ...extensionConfig };
+        if (Array.isArray(entries) && entries.length > 0) {
+          newExtensionConfig.menus = entries;
+        }
+        if (!isEmpty(newExtensionConfig)) {
+          globals.context.registerExtension(newExtensionConfig, { extensionName });
+        }
+        return { ...extensionConfig, extensionName } as ExtensionConfigWithName;
+      })
+      .catch(reason => {
+        console.error(`[${extensions[index].extensionName}]`, reason);
+        throw reason;
+      }),
+  );
 
   return Promise.allSettled(promises);
 }
